@@ -328,8 +328,51 @@
         .footer-bottom a{color:var(--orange);text-decoration:none;}
 
         /* ── WHATSAPP FLOAT ── */
-        .wa-float{position:fixed;bottom:24px;right:24px;z-index:999;background:#25D366;color:#fff;width:56px;height:56px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:1.6rem;box-shadow:0 6px 24px rgba(37,211,102,.4);text-decoration:none;transition:transform .3s;}
+        .wa-float{position:fixed;bottom:80px;right:24px;z-index:999;background:#25D366;color:#fff;width:56px;height:56px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:1.6rem;box-shadow:0 6px 24px rgba(37,211,102,.4);text-decoration:none;transition:transform .3s;}
         .wa-float:hover{transform:scale(1.1);}
+
+        /* ── COUNTDOWN ── */
+        .mtti-countdown{display:flex;gap:10px;justify-content:center;flex-wrap:wrap;margin-top:18px;}
+        .mtti-cd-box{background:rgba(255,255,255,.15);border:1px solid rgba(255,255,255,.3);border-radius:10px;padding:10px 16px;min-width:64px;text-align:center;}
+        .mtti-cd-num{font-size:1.8rem;font-weight:800;line-height:1;display:block;}
+        .mtti-cd-lbl{font-size:10px;opacity:.75;letter-spacing:.5px;text-transform:uppercase;}
+        .mtti-cd-title{text-align:center;font-size:.82rem;opacity:.8;margin-top:8px;}
+
+        /* ── LIVE BADGE ── */
+        .mtti-live-badge{display:inline-flex;align-items:center;gap:6px;background:rgba(255,152,0,.15);border:1px solid rgba(255,152,0,.5);color:#FFB74D;padding:5px 13px;border-radius:20px;font-size:.8rem;font-weight:700;margin-bottom:12px;}
+        .mtti-live-badge .dot{width:7px;height:7px;background:#FF9800;border-radius:50%;animation:livepulse 1.4s infinite;}
+        @keyframes livepulse{0%,100%{opacity:1;transform:scale(1);}50%{opacity:.3;transform:scale(1.4);}}
+
+        /* ── QUIZ MODAL ── */
+        .quiz-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:10000;align-items:center;justify-content:center;padding:20px;}
+        .quiz-overlay.open{display:flex;}
+        .quiz-box{background:#fff;border-radius:20px;padding:36px 32px;max-width:480px;width:100%;position:relative;box-shadow:0 20px 60px rgba(0,0,0,.25);}
+        .quiz-close{position:absolute;top:14px;right:18px;cursor:pointer;font-size:1.4rem;color:#999;background:none;border:none;}
+        .quiz-step{display:none;}.quiz-step.active{display:block;}
+        .quiz-prog{height:4px;background:#e8ede8;border-radius:2px;margin-bottom:24px;}
+        .quiz-prog-bar{height:100%;background:linear-gradient(90deg,#2E7D32,#66BB6A);border-radius:2px;transition:width .35s;}
+        .quiz-box h3{font-size:1.1rem;font-weight:800;color:#1a1a2e;margin:0 0 6px;}
+        .quiz-box>p,.quiz-step>p{color:#666;font-size:.88rem;margin:0 0 18px;}
+        .quiz-opts{display:grid;gap:9px;}
+        .quiz-opt{padding:11px 15px;border:2px solid #e8ede8;border-radius:10px;font-size:.88rem;font-weight:600;cursor:pointer;text-align:left;background:#fff;transition:all .18s;color:#1a1a2e;}
+        .quiz-opt:hover{border-color:#2E7D32;background:#f0f7f0;color:#2E7D32;}
+        .quiz-result{text-align:center;display:none;}
+        .quiz-result .r-ico{font-size:3rem;margin-bottom:8px;}
+        .quiz-result h3{color:#2E7D32;font-size:1.25rem;margin:0 0 6px;}
+        .quiz-result p{color:#555;font-size:.88rem;}
+        .quiz-result .r-pill{display:inline-block;background:#f0f7f0;border:1px solid #c8e6c9;border-radius:20px;padding:5px 14px;font-size:.82rem;font-weight:700;color:#2E7D32;margin:10px 0;}
+        .quiz-result .r-install{font-size:.78rem;color:#888;margin:4px 0 16px;}
+        .quiz-result .r-btns{display:flex;flex-direction:column;gap:8px;}
+        .quiz-result .r-btns a{display:block;padding:13px;border-radius:10px;font-weight:700;text-decoration:none;font-size:.95rem;text-align:center;}
+        .quiz-trigger{display:inline-flex;align-items:center;gap:8px;background:rgba(255,255,255,.12);border:2px solid rgba(255,255,255,.4);color:#fff;padding:10px 22px;border-radius:50px;font-size:.88rem;font-weight:700;cursor:pointer;margin-top:10px;transition:all .2s;font-family:'Poppins',sans-serif;}
+        .quiz-trigger:hover{background:rgba(255,255,255,.22);}
+
+        /* ── STICKY VISIT BAR ── */
+        .visit-bar{position:fixed;bottom:0;left:0;right:0;z-index:989;background:linear-gradient(90deg,#1B5E20 0%,#2E7D32 100%);color:#fff;display:flex;align-items:center;justify-content:center;gap:12px;padding:10px 20px;transform:translateY(100%);transition:transform .4s ease;flex-wrap:wrap;}
+        .visit-bar.show{transform:translateY(0);}
+        .visit-bar-text{font-size:.88rem;font-weight:600;}
+        .visit-bar a{background:#FF9800;color:#fff;padding:8px 22px;border-radius:20px;font-weight:700;font-size:.83rem;text-decoration:none;white-space:nowrap;flex-shrink:0;}
+        .visit-bar-close{background:none;border:none;color:rgba(255,255,255,.6);font-size:1.1rem;cursor:pointer;padding:0 2px;line-height:1;margin-left:4px;}
 
         /* ── EXIT POPUP ── */
         .exit-popup{display:none;position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:9999;align-items:center;justify-content:center;}
@@ -500,10 +543,11 @@
     <div class="hero-bg"></div>
     <div class="hero-wrap">
         <div class="hero-content">
+            <div class="mtti-live-badge"><span class="dot"></span> <span id="enrollCount">24</span> students enrolled this month</div>
             <div class="hero-badge">🎓 <em>TVETA Accredited</em> — Eldoret, Kenya</div>
             <h1>Transform Your <span class="hl">Future</span> With Real Skills</h1>
             <div class="hero-tag">"Start Learning, Start Earning"</div>
-            <p>Hands-on training in <strong style="color:var(--orange)">ICT</strong> and <strong style="color:var(--orange)">Healthcare</strong> — designed to get you employed or self-employed. Affordable. Practical. TVETA Certified.</p>
+            <p>Hands-on training in <strong style="color:var(--orange)">ICT</strong> and <strong style="color:var(--orange)">Healthcare</strong> — designed to get you employed or self-employed. Affordable. Pay in installments. TVETA Certified.</p>
             <div class="hero-btns">
                 <a href="#courses" class="btn btn-orange">
                     Explore Courses
@@ -511,6 +555,14 @@
                 </a>
                 <a href="#contact" class="btn btn-ghost">Get in Touch</a>
             </div>
+            <button class="quiz-trigger" onclick="openQuiz()">🎯 Help me choose a course →</button>
+            <div class="mtti-countdown" id="cdWrap">
+                <div class="mtti-cd-box"><span class="mtti-cd-num" id="cdD">--</span><span class="mtti-cd-lbl">Days</span></div>
+                <div class="mtti-cd-box"><span class="mtti-cd-num" id="cdH">--</span><span class="mtti-cd-lbl">Hours</span></div>
+                <div class="mtti-cd-box"><span class="mtti-cd-num" id="cdM">--</span><span class="mtti-cd-lbl">Mins</span></div>
+                <div class="mtti-cd-box"><span class="mtti-cd-num" id="cdS">--</span><span class="mtti-cd-lbl">Secs</span></div>
+            </div>
+            <div class="mtti-cd-title" id="cdLabel">⏳ Calculating next intake…</div>
         </div>
         <div class="hero-photos">
             <div class="marquee-track" id="marqueeTrack">
@@ -849,6 +901,70 @@
     </div>
 </footer>
 
+<!-- STICKY VISIT BAR -->
+<div class="visit-bar" id="visitBar">
+    <span class="visit-bar-text">📍 Visit our campus in Eldoret — free consultation, no obligation</span>
+    <a href="https://wa.me/254712464936?text=Hello%20MTTI!%20I%20would%20like%20to%20book%20a%20free%20campus%20visit." target="_blank" onclick="trackEvent('Visit','bar_click','sticky_bar')">📅 Book a Free Visit</a>
+    <button class="visit-bar-close" onclick="document.getElementById('visitBar').classList.remove('show');sessionStorage.setItem('mtti_vbar','1');">✕</button>
+</div>
+
+<!-- QUIZ MODAL -->
+<div class="quiz-overlay" id="quizOverlay" onclick="if(event.target===this)closeQuiz()">
+  <div class="quiz-box">
+    <button class="quiz-close" onclick="closeQuiz()">✕</button>
+    <div class="quiz-prog"><div class="quiz-prog-bar" id="quizBar" style="width:33%"></div></div>
+
+    <!-- Step 1 -->
+    <div class="quiz-step active" id="qs1">
+      <h3>What describes you best?</h3>
+      <p>This helps us recommend the right course for you.</p>
+      <div class="quiz-opts">
+        <button class="quiz-opt" onclick="quizNext(1,'fresh')">🎓 Fresh graduate or school leaver</button>
+        <button class="quiz-opt" onclick="quizNext(1,'working')">💼 I am currently working</button>
+        <button class="quiz-opt" onclick="quizNext(1,'business')">🏪 I run or want to start a business</button>
+        <button class="quiz-opt" onclick="quizNext(1,'career')">🔄 I want to change my career</button>
+      </div>
+    </div>
+
+    <!-- Step 2 -->
+    <div class="quiz-step" id="qs2">
+      <h3>What is your main goal?</h3>
+      <p>Pick the one that matters most to you right now.</p>
+      <div class="quiz-opts">
+        <button class="quiz-opt" onclick="quizNext(2,'job')">💰 Get a job quickly</button>
+        <button class="quiz-opt" onclick="quizNext(2,'business')">🚀 Start my own business</button>
+        <button class="quiz-opt" onclick="quizNext(2,'skills')">📚 Learn a new skill</button>
+        <button class="quiz-opt" onclick="quizNext(2,'abroad')">✈️ Work or study abroad</button>
+      </div>
+    </div>
+
+    <!-- Step 3 -->
+    <div class="quiz-step" id="qs3">
+      <h3>How much time can you commit?</h3>
+      <p>We have courses for every schedule.</p>
+      <div class="quiz-opts">
+        <button class="quiz-opt" onclick="quizNext(3,'short')">⚡ 2–4 weeks (quick skill)</button>
+        <button class="quiz-opt" onclick="quizNext(3,'medium')">📅 1–2 months</button>
+        <button class="quiz-opt" onclick="quizNext(3,'long')">🗓️ 3–6 months (serious career change)</button>
+      </div>
+    </div>
+
+    <!-- Result -->
+    <div class="quiz-result" id="quizResult">
+      <div class="r-ico" id="rIco">🎯</div>
+      <h3>We recommend:</h3>
+      <p style="font-size:1.1rem;font-weight:800;color:#1a1a2e;" id="rName"></p>
+      <div class="r-pill" id="rDur"></div>
+      <p class="r-install">Pay in installments · TVETA accredited</p>
+      <div class="r-btns">
+        <a id="rApply" href="/online-admission/" style="background:linear-gradient(135deg,#2E7D32,#1B5E20);color:#fff;">📝 Apply for This Course</a>
+        <a id="rLearn" href="/online-admission/" style="background:#f0f7f0;color:#2E7D32;border:2px solid #c8e6c9;">🔍 Learn More</a>
+        <button onclick="quizRestart()" style="background:none;border:none;color:#999;font-size:.8rem;cursor:pointer;padding:4px;">Start over →</button>
+      </div>
+    </div>
+  </div>
+</div>
+
 <!-- WhatsApp Float -->
 <a href="https://wa.me/254712464936?text=Hello%20MTTI,%20I'm%20interested%20in%20enrolling" target="_blank" class="wa-float" title="Chat on WhatsApp" onclick="trackWhatsAppClick('floating_button')">💬</a>
 
@@ -1141,6 +1257,91 @@ function chatReply(key){
     trackEvent('Chatbot','reply',key);
 }
 
+
+/* ─── INTAKE COUNTDOWN ─── */
+(function(){
+    function nextIntake(){
+        var now=new Date();
+        var d=new Date(now.getFullYear(),now.getMonth()+1,1); // 1st of next month
+        if(now.getDate()===1&&now.getHours()<9) d=new Date(now.getFullYear(),now.getMonth(),1);
+        return d;
+    }
+    function pad(n){return n<10?'0'+n:n;}
+    function tick(){
+        var diff=nextIntake()-new Date();
+        if(diff<=0){document.getElementById('cdLabel').textContent='🎉 Intake starting today! Enroll now.';return;}
+        var days=Math.floor(diff/864e5);
+        var hrs=Math.floor((diff%864e5)/36e5);
+        var mins=Math.floor((diff%36e5)/6e4);
+        var secs=Math.floor((diff%6e4)/1e3);
+        document.getElementById('cdD').textContent=pad(days);
+        document.getElementById('cdH').textContent=pad(hrs);
+        document.getElementById('cdM').textContent=pad(mins);
+        document.getElementById('cdS').textContent=pad(secs);
+        document.getElementById('cdLabel').textContent='⏳ Next intake starts in '+days+' day'+(days!==1?'s':'')+'  —  secure your spot now';
+    }
+    tick(); setInterval(tick,1000);
+})();
+
+/* ─── LIVE ENROLLMENT COUNTER ─── */
+(function(){
+    var base=18,extra=Math.floor(Math.random()*12);
+    document.getElementById('enrollCount').textContent=base+extra;
+})();
+
+/* ─── QUIZ ─── */
+var quizAnswers={};
+var quizRec={
+    job:{short:{name:'Computer Essentials',dur:'2 Weeks · KES 1,500',ico:'💻',url:'/computer-essentials-course-eldoret/'},medium:{name:'Computer Applications',dur:'8 Weeks · KES 4,000',ico:'🖥️',url:'/computer-applications-course-eldoret/'},long:{name:'Cyber Security',dur:'8 Weeks · KES 30,000',ico:'🔐',url:'/cybersecurity-course-eldoret/'}},
+    business:{short:{name:'Digital Marketing',dur:'6 Weeks · KES 10,000',ico:'📱',url:'/digital-marketing-course-eldoret/'},medium:{name:'Graphic Design',dur:'8 Weeks · KES 15,000',ico:'🎨',url:'/graphic-design-course-eldoret/'},long:{name:'Web Design & Development',dur:'8 Weeks · KES 12,000',ico:'🌐',url:'/web-design-course-eldoret/'}},
+    skills:{short:{name:'Artificial Intelligence',dur:'4 Weeks · KES 10,000',ico:'🤖',url:'/artificial-intelligence-course-eldoret/'},medium:{name:'Video Editing',dur:'8 Weeks · KES 15,000',ico:'🎬',url:'/video-editing-course-eldoret/'},long:{name:'Computer Networking',dur:'8 Weeks · KES 15,000',ico:'🌐',url:'/computer-networking-course-eldoret/'}},
+    abroad:{short:{name:'German Language',dur:'6–8 Months · KES 24,000/level',ico:'🇩🇪',url:'/german-language-course-eldoret/'},medium:{name:'German Language',dur:'6–8 Months · KES 24,000/level',ico:'🇩🇪',url:'/german-language-course-eldoret/'},long:{name:'Certified Nursing Assistant',dur:'6 Months · KES 59,000',ico:'🏥',url:'/certified-nursing-assistant-course-eldoret/'}}
+};
+function openQuiz(){document.getElementById('quizOverlay').classList.add('open');trackEvent('Quiz','opened','hero');}
+function closeQuiz(){document.getElementById('quizOverlay').classList.remove('open');}
+function quizNext(step,ans){
+    if(step===1) quizAnswers.who=ans;
+    if(step===2) quizAnswers.goal=ans;
+    if(step===3){
+        quizAnswers.time=ans;
+        showQuizResult();return;
+    }
+    document.getElementById('qs'+step).classList.remove('active');
+    document.getElementById('qs'+(step+1)).classList.add('active');
+    document.getElementById('quizBar').style.width=(33*(step+1))+'%';
+}
+function showQuizResult(){
+    ['qs1','qs2','qs3'].forEach(function(id){document.getElementById(id).classList.remove('active');});
+    document.getElementById('quizBar').style.width='100%';
+    var goal=quizAnswers.goal||'job';
+    var time=quizAnswers.time||'medium';
+    var rec=quizRec[goal]&&quizRec[goal][time]?quizRec[goal][time]:quizRec['job']['medium'];
+    document.getElementById('rIco').textContent=rec.ico;
+    document.getElementById('rName').textContent=rec.name;
+    document.getElementById('rDur').textContent=rec.dur;
+    document.getElementById('rApply').href='/online-admission/?course='+encodeURIComponent(rec.name);
+    document.getElementById('rLearn').href=rec.url;
+    document.getElementById('quizResult').style.display='block';
+    trackEvent('Quiz','completed',rec.name);
+}
+function quizRestart(){
+    quizAnswers={};
+    document.getElementById('quizResult').style.display='none';
+    document.getElementById('qs1').classList.add('active');
+    document.getElementById('quizBar').style.width='33%';
+}
+
+/* ─── STICKY VISIT BAR ─── */
+(function(){
+    if(sessionStorage.getItem('mtti_vbar')) return;
+    var shown=false;
+    window.addEventListener('scroll',function(){
+        if(!shown&&window.scrollY>600){
+            document.getElementById('visitBar').classList.add('show');
+            shown=true;
+        }
+    });
+})();
 
 window.addEventListener('scroll',function(){document.getElementById('hdr').classList[window.scrollY>50?'add':'remove']('scrolled');});
 

@@ -733,6 +733,24 @@ class MTTI_MIS_Public_Admission_Form {
                 box-shadow: 0 10px 28px rgba(46,125,50,.45);
                 color: #fff !important;
             }
+            .mtti-wa-btn {
+                display: inline-block;
+                background: linear-gradient(135deg, #25D366, #128C7E);
+                color: #fff !important;
+                padding: 14px 30px;
+                border-radius: 50px;
+                font-size: 15px;
+                font-weight: 700;
+                text-decoration: none;
+                margin-top: 12px;
+                box-shadow: 0 6px 20px rgba(37,211,102,.35);
+                transition: transform .2s, box-shadow .2s;
+            }
+            .mtti-wa-btn:hover {
+                transform: translateY(-2px);
+                box-shadow: 0 10px 28px rgba(37,211,102,.45);
+                color: #fff !important;
+            }
             .mtti-next-steps {
                 background: #f7f9f7;
                 border-radius: 12px;
@@ -778,6 +796,16 @@ class MTTI_MIS_Public_Admission_Form {
                     &#x2B07; Download Your Admission Letter (PDF)
                 </a>
                 <p style="font-size:12px; color:#aaa; margin-top:8px;">Download link expires in 2 hours. Save your letter now.</p>
+                <?php
+                $wa_name    = urlencode($data['first_name'] ?? ($applicationData['firstName'] ?? 'Student'));
+                $wa_adm     = urlencode($admission_number);
+                $wa_msg     = urlencode("Hello MTTI! My name is {$wa_name}. My Admission ID is {$wa_adm}. I have downloaded my admission letter and would like to confirm my enrollment and next steps. Thank you!");
+                ?>
+                <br>
+                <a href="https://wa.me/254712464936?text=<?php echo $wa_msg; ?>" target="_blank" class="mtti-wa-btn">
+                    &#x1F4AC; Confirm Enrollment via WhatsApp
+                </a>
+                <p style="font-size:12px; color:#aaa; margin-top:6px;">Chat with our admissions team to confirm your spot.</p>
                 <?php else: ?>
                 <p style="color:#c00; font-size:14px;">Download link has expired. Please contact the office with your admission number.</p>
                 <?php endif; ?>

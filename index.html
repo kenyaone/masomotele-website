@@ -520,7 +520,7 @@
         .chat-opt:hover{background:var(--green);color:#fff;}
         .chat-opt.primary{background:var(--orange);border-color:var(--orange);color:#fff;}
         .chat-opt.primary:hover{background:var(--orange-dark);}
-        @media(max-width:480px){#mtti-chat{bottom:16px;left:12px;}#chat-box{width:calc(100vw - 24px);left:0;}}
+        @media(max-width:480px){#mtti-chat{bottom:90px;right:12px;left:auto;}#chat-box{width:calc(100vw - 24px);right:0;left:auto;}}
     </style>
 </head>
 <body>
@@ -1369,26 +1369,47 @@ function quizRestart(){
     document.getElementById('quizBar').style.width='33%';
 }
 
-/* ─── STICKY VISIT BAR ─── */
+/* ─── STICKY VISIT BAR + CHATBOT SCROLL REVEAL ─── */
 (function(){
-    if(sessionStorage.getItem('mtti_vbar')) return;
-    var shown=false;
+    var chat=document.getElementById('mtti-chat');
+    var waFloat=document.querySelector('.wa-float');
+    // Hide chatbot until user scrolls past hero so it never blocks the quiz button
+    chat.style.opacity='0';
+    chat.style.pointerEvents='none';
+
+    var vbarShown=false;
+    var chatVisible=false;
+
+    function showChat(){
+        if(chatVisible) return;
+        chatVisible=true;
+        chat.style.transition='opacity .4s';
+        chat.style.opacity='1';
+        chat.style.pointerEvents='';
+    }
+
     function showBar(){
+        if(sessionStorage.getItem('mtti_vbar')) return;
         var bar=document.getElementById('visitBar');
         bar.classList.add('show');
-        shown=true;
-        // Push right-side floats up by visit bar height
+        vbarShown=true;
         var h=bar.offsetHeight||52;
-        document.querySelector('.wa-float').style.bottom=(88+h)+'px';
-        document.getElementById('mtti-chat').style.bottom=(150+h)+'px';
+        waFloat.style.bottom=(88+h)+'px';
+        chat.style.bottom=(150+h)+'px';
     }
+
     window.addEventListener('scroll',function(){
-        if(!shown&&window.scrollY>600) showBar();
+        var y=window.scrollY;
+        // Show chatbot after scrolling 400px (past hero)
+        if(y>400) showChat();
+        // Show visit bar after 600px
+        if(!vbarShown&&y>600) showBar();
     });
-    // Re-apply on close button
+
     document.querySelector('.visit-bar-close').addEventListener('click',function(){
-        document.querySelector('.wa-float').style.bottom='88px';
-        document.getElementById('mtti-chat').style.bottom='150px';
+        sessionStorage.setItem('mtti_vbar','1');
+        waFloat.style.bottom='88px';
+        chat.style.bottom='150px';
     });
 })();
 

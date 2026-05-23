@@ -374,6 +374,26 @@
         .visit-bar a{background:#FF9800;color:#fff;padding:8px 22px;border-radius:20px;font-weight:700;font-size:.83rem;text-decoration:none;white-space:nowrap;flex-shrink:0;}
         .visit-bar-close{background:none;border:none;color:rgba(255,255,255,.6);font-size:1.1rem;cursor:pointer;padding:0 2px;line-height:1;margin-left:4px;}
 
+        /* ── QUIZ BANNER SECTION ── */
+        .quiz-banner{background:linear-gradient(135deg,#FF6F00 0%,#FF9800 50%,#FFB300 100%);padding:56px 24px;text-align:center;position:relative;overflow:hidden;}
+        .quiz-banner::before{content:'';position:absolute;inset:0;background:url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.05'%3E%3Ccircle cx='30' cy='30' r='20'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");pointer-events:none;}
+        .quiz-banner-inner{max-width:680px;margin:0 auto;position:relative;}
+        .qb-emoji{font-size:3.5rem;display:block;margin-bottom:12px;animation:qbBounce 2s ease-in-out infinite;}
+        @keyframes qbBounce{0%,100%{transform:translateY(0);}50%{transform:translateY(-8px);}}
+        .quiz-banner h2{color:#fff;font-size:clamp(1.5rem,4vw,2.2rem);font-weight:800;margin:0 0 12px;text-shadow:0 2px 8px rgba(0,0,0,.15);}
+        .quiz-banner p{color:rgba(255,255,255,.92);font-size:1rem;margin:0 0 28px;max-width:520px;margin-left:auto;margin-right:auto;}
+        .qb-btn{display:inline-flex;align-items:center;gap:10px;background:#fff;color:#E65100;padding:18px 40px;border-radius:50px;font-size:1.1rem;font-weight:800;border:none;cursor:pointer;font-family:'Poppins',sans-serif;box-shadow:0 8px 30px rgba(0,0,0,.2);transition:transform .2s,box-shadow .2s;position:relative;}
+        .qb-btn:hover{transform:translateY(-3px);box-shadow:0 14px 40px rgba(0,0,0,.25);}
+        .qb-btn::after{content:'';position:absolute;inset:-4px;border-radius:54px;border:3px solid rgba(255,255,255,.5);animation:qbRing 2s ease-in-out infinite;}
+        @keyframes qbRing{0%,100%{opacity:.8;transform:scale(1);}50%{opacity:0;transform:scale(1.07);}}
+        .qb-tags{display:flex;flex-wrap:wrap;gap:8px;justify-content:center;margin-top:24px;}
+        .qb-tag{background:rgba(255,255,255,.2);color:#fff;padding:5px 14px;border-radius:20px;font-size:.78rem;font-weight:600;border:1px solid rgba(255,255,255,.35);}
+        .qb-note{color:rgba(255,255,255,.75);font-size:.78rem;margin-top:14px !important;}
+
+        /* ── HERO QUIZ BUTTON (updated) ── */
+        .quiz-trigger{display:inline-flex;align-items:center;gap:8px;background:rgba(255,255,255,.12);border:2px solid rgba(255,255,255,.4);color:#fff;padding:10px 22px;border-radius:50px;font-size:.88rem;font-weight:700;cursor:pointer;margin-top:10px;transition:all .2s;font-family:'Poppins',sans-serif;}
+        .quiz-trigger:hover{background:rgba(255,255,255,.22);}
+
         /* ── EXIT POPUP ── */
         .exit-popup{display:none;position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:9999;align-items:center;justify-content:center;}
         .exit-popup.show{display:flex;}
@@ -587,6 +607,28 @@
         <div class="stat fade-up"><div class="stat-ico">📚</div><div class="stat-n" data-target="15">0</div><div class="stat-l">Expert Courses</div></div>
         <div class="stat fade-up"><div class="stat-ico">⚡</div><div class="stat-n">2W–8M</div><div class="stat-l">Flexible Duration</div></div>
         <div class="stat fade-up"><div class="stat-ico">🏆</div><div class="stat-n">TVETA</div><div class="stat-l">Accredited</div></div>
+    </div>
+</section>
+
+<!-- QUIZ BANNER -->
+<section class="quiz-banner">
+    <div class="quiz-banner-inner">
+        <span class="qb-emoji">🎯</span>
+        <h2>Not Sure Which Course Is Right for You?</h2>
+        <p>Answer 3 quick questions and we'll recommend the perfect course for your goals, schedule, and budget — for free.</p>
+        <button class="qb-btn" onclick="openQuiz()">
+            <span>Find My Perfect Course</span>
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+        </button>
+        <div class="qb-tags">
+            <span class="qb-tag">💻 Computer Skills</span>
+            <span class="qb-tag">🎨 Creative & Design</span>
+            <span class="qb-tag">🔐 Tech & Security</span>
+            <span class="qb-tag">🏥 Healthcare</span>
+            <span class="qb-tag">🇩🇪 German Language</span>
+            <span class="qb-tag">📱 Digital Marketing</span>
+        </div>
+        <p class="qb-note">⏱ Takes less than 60 seconds · No sign-up required</p>
     </div>
 </section>
 

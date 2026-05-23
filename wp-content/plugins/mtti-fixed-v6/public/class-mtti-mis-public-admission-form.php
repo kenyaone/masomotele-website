@@ -84,6 +84,21 @@ class MTTI_MIS_Public_Admission_Form {
 
     private function render_form(array $errors = [], array $old = []) {
         $courses = $this->db->get_courses(array('status' => 'Active'));
+
+        // Pre-select course from URL param: ?course_id=5 or ?course=Graphic+Design
+        if (empty($old['course_id'])) {
+            if (!empty($_GET['course_id'])) {
+                $old['course_id'] = intval($_GET['course_id']);
+            } elseif (!empty($_GET['course'])) {
+                $q = strtolower(sanitize_text_field($_GET['course']));
+                foreach ($courses as $c) {
+                    if (stripos(strtolower($c->course_name), $q) !== false || stripos($q, strtolower($c->course_name)) !== false) {
+                        $old['course_id'] = $c->course_id;
+                        break;
+                    }
+                }
+            }
+        }
         $counties = $this->get_kenya_counties();
         ?>
         <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -453,7 +468,10 @@ class MTTI_MIS_Public_Admission_Form {
         }
         document.addEventListener('DOMContentLoaded', function() {
             var sel = document.getElementById('mtti_adm_course');
-            if (sel && sel.value) mttiShowFee(sel);
+            if (sel && sel.value) {
+                mttiShowFee(sel);
+                sel.scrollIntoView({behavior:'smooth', block:'center'});
+            }
         });
         </script>
         <?php

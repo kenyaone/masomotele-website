@@ -939,7 +939,7 @@ function renderCourses(){
         html+='<div class="course-body"><div class="course-price">'+c.fee+'</div><ul class="course-features">'+c.features.map(function(f){return'<li>'+f+'</li>';}).join('')+'</ul>';
         html+='<div style="display:flex;gap:8px;flex-wrap:wrap;">';
         if(c.url) html+='<a href="'+c.url+'" class="btn" style="background:#1B5E20;color:#fff;flex:1;text-align:center;padding:10px 12px;font-size:13px;">🔍 Learn More</a>';
-        html+='<a href="/online-admission/" class="btn btn-orange" style="flex:1;text-align:center;padding:10px 12px;font-size:13px;">📝 Apply</a>';
+        html+='<a href="/online-admission/?course='+encodeURIComponent(c.name)+'" class="btn btn-orange" style="flex:1;text-align:center;padding:10px 12px;font-size:13px;">📝 Apply</a>';
         html+='</div></div></div>';
     });
     g.innerHTML=html;

@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Quiz — Basics-of-Google-Drive-Program-Handout</title>
+<style>
+:root{--pri:#0a5e2a;--acc:#f5a623;--ok:#2e7d32;--no:#c62828;--bg:#f0f4f0;--card:#fff;--radius:12px;}
+*{box-sizing:border-box;margin:0;padding:0;font-family:'Segoe UI',sans-serif;}
+body{background:var(--bg);min-height:100vh;display:flex;flex-direction:column;}
+#top-bar{background:var(--pri);color:#fff;padding:10px 20px;display:flex;justify-content:space-between;align-items:center;position:sticky;top:0;z-index:10;}
+#top-bar h1{font-size:15px;font-weight:700;}
+#top-bar .meta{font-size:11px;opacity:.8;}
+#progress-bar{height:4px;background:rgba(255,255,255,.3);}
+#progress-fill{height:4px;background:var(--acc);transition:width .4s;}
+#stage{flex:1;display:flex;align-items:center;justify-content:center;padding:20px;}
+.q-card{background:var(--card);border-radius:var(--radius);padding:28px 26px;max-width:640px;width:100%;box-shadow:0 4px 20px rgba(0,0,0,.1);}
+.q-counter{font-size:11px;font-weight:700;color:var(--pri);text-transform:uppercase;letter-spacing:.06em;margin-bottom:10px;}
+.q-text{font-size:17px;font-weight:600;color:#1a1a1a;margin-bottom:22px;line-height:1.5;}
+.opt-btn{display:block;width:100%;text-align:left;padding:12px 16px;border:2px solid #e0e0e0;border-radius:8px;background:#fff;font-size:14px;cursor:pointer;margin-bottom:10px;transition:all .2s;}
+.opt-btn:hover{border-color:var(--pri);background:#f0f8f0;}
+.opt-btn.selected{border-color:var(--pri);background:#e8f5e9;}
+.opt-btn.correct{border-color:var(--ok);background:#e8f5e9;color:var(--ok);font-weight:700;}
+.opt-btn.wrong{border-color:var(--no);background:#ffebee;color:var(--no);}
+.fib-input{width:100%;padding:12px;border:2px solid #e0e0e0;border-radius:8px;font-size:15px;margin-bottom:14px;}
+.fib-input:focus{outline:none;border-color:var(--pri);}
+.short-input{width:100%;padding:12px;border:2px solid #e0e0e0;border-radius:8px;font-size:14px;min-height:80px;resize:vertical;margin-bottom:14px;}
+.feedback{padding:12px 16px;border-radius:8px;font-size:13px;font-weight:600;margin-bottom:16px;display:none;}
+.feedback.correct{background:#e8f5e9;color:var(--ok);}
+.feedback.wrong{background:#ffebee;color:var(--no);}
+.feedback.info{background:#e3f2fd;color:#1565C0;}
+.btn-next{background:var(--pri);color:#fff;border:none;border-radius:8px;padding:12px 28px;font-size:14px;font-weight:700;cursor:pointer;width:100%;margin-top:6px;}
+.btn-next:hover{background:#0d7a36;}
+#results{display:none;text-align:center;padding:32px 24px;background:var(--card);border-radius:var(--radius);max-width:480px;width:100%;box-shadow:0 4px 20px rgba(0,0,0,.1);}
+#results .score-ring{font-size:56px;font-weight:900;color:var(--pri);}
+#results h2{margin:12px 0 6px;font-size:20px;}
+#results .sub{font-size:13px;color:#666;margin-bottom:20px;}
+.btn-retry{background:var(--acc);color:#fff;border:none;border-radius:8px;padding:11px 26px;font-size:14px;font-weight:700;cursor:pointer;}
+</style>
+</head>
+<body>
+<div id="top-bar">
+  <h1>📝 Basics-of-Google-Drive-Program-Handout</h1>
+  <span class="meta">Medium · 10 questions · 30 Mar 2026</span>
+</div>
+<div id="progress-bar"><div id="progress-fill" style="width:0%"></div></div>
+
+<div id="stage">
+  <div id="q-card-wrap"></div>
+  <div id="results">
+    <div class="score-ring" id="score-pct">0%</div>
+    <h2 id="result-title"></h2>
+    <p class="sub" id="result-sub"></p>
+    <button class="btn-retry" onclick="initQuiz()">🔄 Try Again</button>
+  </div>
+</div>
+
+<script>
+const QUESTIONS = [{"question":"What is the primary purpose of Google Drive?","options":[],"answer":"Google Drive is a cloud storage service that allows users to store, sync, and share files online. It provides access to documents from any device with internet connection and enables collaboration with others.","type":"short"},{"question":"List three file types that can be stored in Google Drive.","options":[],"answer":"Google Drive can store documents (Word, PDF), images (JPEG, PNG), videos (MP4, AVI), spreadsheets, presentations, and many other file formats. Users can upload virtually any file type to their Drive storage.","type":"short"},{"question":"How do you create a new folder in Google Drive?","options":[],"answer":"Click the \"New\" button in Google Drive, then select \"Folder\" from the dropdown menu. Give the folder a name and click \"Create\" to organize your files into the new folder.","type":"short"},{"question":"What is the difference between \"My Drive\" and \"Shared with me\" sections?","options":[],"answer":"\"My Drive\" contains files and folders that you own and created, while \"Shared with me\" shows files that other users have shared with you. You have full control over items in My Drive but limited permissions on shared items.","type":"short"},{"question":"Explain how to share a file with specific people in Google Drive.","options":[],"answer":"Right-click on the file and select \"Share,\" then enter the email addresses of people you want to share with. Choose their permission level (view, comment, or edit) and click \"Send\" to grant access.","type":"short"},{"question":"What are the three main permission levels when sharing Google Drive files?","options":[],"answer":"The three permission levels are Viewer (can only view the file), Commenter (can view and add comments), and Editor (can view, comment, and make changes). These levels control what actions shared users can perform.","type":"short"},{"question":"How can you access Google Drive files when offline?","options":[],"answer":"Enable offline access in Google Drive settings, which downloads files to your device for offline use. You can view and edit certain file types without internet, and changes sync when you reconnect online.","type":"short"},{"question":"What happens when you delete a file from Google Drive?","options":[],"answer":"Deleted files move to the Trash folder where they remain for 30 days before permanent deletion. You can restore files from Trash during this period, but after 30 days they are permanently removed.","type":"short"},{"question":"Describe two ways to upload files to Google Drive.","options":[],"answer":"You can drag and drop files directly from your computer into the Google Drive interface, or click the \"New\" button and select \"File upload\" to browse and select files from your device.","type":"short"},{"question":"What is the storage limit for a free Google Drive account?","options":[],"answer":"Free Google Drive accounts receive 15 GB of storage space shared across Google services including Drive, Gmail, and Google Photos. Users can purchase additional storage if they need more space.","type":"short"}];
+let cur=0, score=0, answered=false;
+
+function initQuiz(){
+  cur=0; score=0; answered=false;
+  document.getElementById('results').style.display='none';
+  document.getElementById('q-card-wrap').style.display='block';
+  showQ();
+}
+
+function showQ(){
+  const q=QUESTIONS[cur];
+  const pct=Math.round(cur/QUESTIONS.length*100);
+  document.getElementById('progress-fill').style.width=pct+'%';
+  const wrap=document.getElementById('q-card-wrap');
+
+  let html=`<div class="q-card">
+    <div class="q-counter">Question ${cur+1} of ${QUESTIONS.length}</div>
+    <div class="q-text">${escHtml(q.question)}</div>`;
+
+  if(q.type==='mcq'){
+    for(const [k,v] of Object.entries(q.options||{})){
+      html+=`<button class="opt-btn" id="opt-${k}" onclick="pickMCQ('${k}')">${k}) ${escHtml(v)}</button>`;
+    }
+  } else if(q.type==='fib'){
+    html+=`<input class="fib-input" id="fib-in" type="text" placeholder="Type your answer…">`;
+  } else {
+    html+=`<textarea class="short-input" id="short-in" placeholder="Write your answer…"></textarea>`;
+  }
+
+  html+=`<div class="feedback" id="fb"></div>
+    <button class="btn-next" id="btn-next" onclick="nextQ()">Check Answer ✓</button>
+  </div>`;
+
+  wrap.innerHTML=html;
+  answered=false;
+}
+
+function pickMCQ(key){
+  if(answered) return;
+  document.querySelectorAll('.opt-btn').forEach(b=>b.classList.remove('selected'));
+  document.getElementById('opt-'+key).classList.add('selected');
+}
+
+function nextQ(){
+  if(!answered){
+    const q=QUESTIONS[cur];
+    const fb=document.getElementById('fb');
+    fb.style.display='block';
+
+    if(q.type==='mcq'){
+      const sel=document.querySelector('.opt-btn.selected');
+      if(!sel){fb.className='feedback info';fb.innerText='Please select an option.';return;}
+      const chosen=sel.id.replace('opt-','');
+      const correct=q.answer.trim().toUpperCase()[0];
+      if(chosen===correct){score++;sel.classList.add('correct');fb.className='feedback correct';fb.innerText='✅ Correct!';}
+      else{sel.classList.add('wrong');fb.className='feedback wrong';fb.innerText='❌ Incorrect. Answer: '+correct+') '+((q.options||{})[correct]||q.answer);}
+      document.querySelectorAll('.opt-btn').forEach(b=>b.style.pointerEvents='none');
+    } else if(q.type==='fib'){
+      const inp=document.getElementById('fib-in');
+      if(!inp.value.trim()){fb.className='feedback info';fb.innerText='Please type an answer.';return;}
+      const given=inp.value.trim().toLowerCase();
+      const ans=q.answer.trim().toLowerCase();
+      if(given===ans||ans.includes(given)){score++;fb.className='feedback correct';fb.innerText='✅ Correct! Answer: '+q.answer;}
+      else{fb.className='feedback wrong';fb.innerText='❌ Model answer: '+q.answer;}
+      inp.disabled=true;
+    } else {
+      const inp=document.getElementById('short-in');
+      if(!inp.value.trim()){fb.className='feedback info';fb.innerText='Please write your answer.';return;}
+      fb.className='feedback info';fb.innerText='📝 Model answer: '+q.answer;
+      inp.disabled=true;
+      score+=0.5; // partial credit for short answer attempts
+    }
+
+    document.getElementById('btn-next').innerText='Next →';
+    answered=true;
+    return;
+  }
+
+  cur++;
+  if(cur>=QUESTIONS.length){ showResults(); return; }
+  showQ();
+}
+
+function showResults(){
+  document.getElementById('q-card-wrap').style.display='none';
+  document.getElementById('progress-fill').style.width='100%';
+  const res=document.getElementById('results');
+  res.style.display='block';
+  const maxScore=QUESTIONS.length;
+  const pct=Math.round((score/maxScore)*100);
+  document.getElementById('score-pct').innerText=pct+'%';
+  let title,sub;
+  if(pct>=80){title='Excellent! 🎉';sub='Outstanding performance. Well done!';}
+  else if(pct>=60){title='Good effort! 👍';sub='You passed. Review the questions you missed.';}
+  else if(pct>=40){title='Keep practising 📖';sub='Review the lesson and try again.';}
+  else{title='Needs improvement 💪';sub='Go back to the lesson materials and try again.';}
+  document.getElementById('result-title').innerText=title;
+  document.getElementById('result-sub').innerText=sub+' ('+score.toFixed(1)+'/'+maxScore+')';
+
+  // Report to MTTI LMS if available
+  // Practice quiz — scores are not recorded in transcripts or unit results
+}
+
+function escHtml(t){
+  return String(t).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+
+initQuiz();
+</script>
+</body>
+</html>

@@ -1,0 +1,560 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Typography Practical Exam | M.T.T.I</title>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=Roboto:wght@300;400;700&family=Open+Sans:wght@300;400;600&family=Montserrat:wght@300;400;600;700&family=Lora:wght@400;700&family=Poppins:wght@300;400;600;700&family=Merriweather:wght@300;400;700&family=Raleway:wght@300;400;600&family=Oswald:wght@300;400;600&family=Dancing+Script:wght@400;700&family=Bebas+Neue&family=Pacifico&display=swap" rel="stylesheet">
+    <style>
+        :root{--c:#ec4899;--c2:#db2777;--bg:#1a0a14;--card:#2d1520;--success:#22c55e;--error:#ef4444}
+        *{margin:0;padding:0;box-sizing:border-box}
+        body{font-family:'Segoe UI',system-ui,sans-serif;background:var(--bg);color:#fce7f3;min-height:100vh}
+        
+        .header{background:var(--card);border-bottom:2px solid var(--c);padding:12px 20px;display:flex;justify-content:space-between;align-items:center;position:fixed;top:0;left:0;right:0;z-index:100}
+        .header h1{color:var(--c);font-size:1.1rem}
+        .timer{background:var(--c);color:#fff;padding:6px 16px;border-radius:20px;font-weight:600}
+        .timer.warn{background:var(--error);animation:pulse 1s infinite}
+        @keyframes pulse{50%{opacity:0.7}}
+        
+        .main-container{display:grid;grid-template-columns:320px 1fr;height:100vh;padding-top:52px}
+        @media(max-width:900px){.main-container{grid-template-columns:1fr}}
+        
+        .task-panel{background:var(--card);border-right:1px solid #4a1530;padding:20px;overflow-y:auto}
+        .task-badge{background:var(--c);color:#fff;padding:4px 12px;border-radius:15px;font-size:0.75rem;font-weight:600}
+        .task-title{font-size:1.2rem;color:#fff;margin:12px 0 8px}
+        .task-desc{color:#f9a8d4;font-size:0.9rem;line-height:1.5;margin-bottom:15px}
+        
+        .controls{background:rgba(0,0,0,0.3);border-radius:10px;padding:15px;margin-bottom:15px}
+        .controls h4{color:var(--c);margin-bottom:12px;font-size:0.85rem}
+        .control-group{margin-bottom:12px}
+        .control-group label{display:block;color:#fbcfe8;font-size:0.8rem;margin-bottom:5px}
+        .control-group select,.control-group input{width:100%;padding:8px;background:rgba(0,0,0,0.4);border:1px solid #4a1530;border-radius:6px;color:#fff;font-size:0.9rem}
+        .control-group select:focus,.control-group input:focus{outline:none;border-color:var(--c)}
+        .control-row{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+        
+        .range-control{display:flex;align-items:center;gap:10px}
+        .range-control input[type=range]{flex:1;-webkit-appearance:none;height:6px;background:#4a1530;border-radius:3px}
+        .range-control input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:16px;height:16px;background:var(--c);border-radius:50%;cursor:pointer}
+        .range-value{color:var(--c);font-weight:600;min-width:45px;text-align:right}
+        
+        .checklist{background:rgba(236,72,153,0.1);border-left:3px solid var(--c);padding:12px;border-radius:0 8px 8px 0;margin-bottom:15px}
+        .checklist h4{color:var(--c);font-size:0.85rem;margin-bottom:8px}
+        .check-item{display:flex;align-items:center;gap:8px;padding:4px 0;font-size:0.8rem}
+        .check-item.pass{color:var(--success)}
+        .check-item.fail{color:#f9a8d4}
+        .check-item::before{content:"○";color:#666}
+        .check-item.pass::before{content:"✓";color:var(--success)}
+        
+        .score-box{background:var(--c);color:#fff;padding:12px;border-radius:8px;text-align:center;margin:15px 0}
+        .score-box .score{font-size:2rem;font-weight:700}
+        
+        .nav-btns{display:flex;gap:10px}
+        .nav-btns button{flex:1;padding:10px;border:none;border-radius:8px;font-weight:600;cursor:pointer}
+        .btn-prev{background:rgba(236,72,153,0.2);color:var(--c)}
+        .btn-next{background:var(--c);color:#fff}
+        
+        .canvas-panel{background:#f5f5f5;display:flex;flex-direction:column}
+        .canvas-header{background:var(--card);padding:10px 15px;display:flex;justify-content:space-between;align-items:center}
+        .canvas-header span{color:var(--c);font-size:0.9rem}
+        .canvas-area{flex:1;display:flex;align-items:center;justify-content:center;padding:30px;overflow:auto}
+        .design-canvas{background:#fff;box-shadow:0 10px 40px rgba(0,0,0,0.2);border-radius:8px;min-height:400px;width:100%;max-width:600px;padding:40px;position:relative}
+        
+        .start-screen{position:fixed;inset:0;background:var(--bg);display:flex;align-items:center;justify-content:center;z-index:200;padding:20px}
+        .start-card{background:var(--card);border:2px solid var(--c);border-radius:20px;padding:40px;max-width:550px;text-align:center}
+        .start-card .icon{font-size:4rem;margin-bottom:15px}
+        .start-card h1{color:var(--c);font-size:1.8rem;margin-bottom:8px}
+        .start-card h2{color:#f9a8d4;font-weight:400;margin-bottom:25px}
+        .brief{background:rgba(0,0,0,0.3);padding:20px;border-radius:12px;text-align:left;margin-bottom:20px}
+        .brief h3{color:var(--c);margin-bottom:10px}
+        .brief p{color:#fce7f3;font-size:0.9rem;line-height:1.6}
+        .exam-info{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:20px}
+        .info-box{background:rgba(236,72,153,0.1);padding:15px;border-radius:10px}
+        .info-box span{display:block;color:#f9a8d4;font-size:0.7rem;text-transform:uppercase}
+        .info-box b{color:var(--c);font-size:1.3rem}
+        .name-input{width:100%;padding:14px;background:rgba(0,0,0,0.3);border:2px solid #4a1530;border-radius:10px;color:#fff;text-align:center;margin-bottom:15px}
+        .name-input:focus{outline:none;border-color:var(--c)}
+        .start-btn{width:100%;padding:14px;background:var(--c);color:#fff;border:none;border-radius:10px;font-weight:600;cursor:pointer}
+        .start-btn:disabled{opacity:0.5}
+        
+        .results-screen{position:fixed;inset:0;background:var(--bg);display:none;align-items:center;justify-content:center;z-index:200}
+        .results-card{background:var(--card);border:2px solid var(--c);border-radius:20px;padding:40px;max-width:450px;text-align:center}
+        .results-icon{font-size:4rem;margin-bottom:10px}
+        .results-status{font-size:1.8rem;font-weight:800}
+        .results-status.pass{color:var(--success)}
+        .results-status.fail{color:var(--error)}
+        .results-score{font-size:3rem;font-weight:800;color:var(--c);margin:10px 0}
+        .result-item{display:flex;justify-content:space-between;padding:8px 12px;background:rgba(0,0,0,0.2);border-radius:6px;margin:5px 0;font-size:0.85rem}
+        .result-item.pass{border-left:3px solid var(--success)}
+        .result-item.fail{border-left:3px solid var(--error)}
+        .retry-btn{padding:12px 30px;background:var(--c);color:#fff;border:none;border-radius:8px;font-weight:600;cursor:pointer;margin-top:15px}
+        
+        .font-preview{padding:15px;background:rgba(0,0,0,0.2);border-radius:8px;margin-top:10px}
+        .font-sample{margin:5px 0;transition:all 0.3s}
+    </style>
+<meta name="description" content="Professional training courses at MTTI Eldoret. TVETA-accredited programs in IT, healthcare, and creative fields. Enroll today.">
+<script type="text/javascript">(function(c,l,a,r,i,t,y){c[a]=c[a]||function(){(c[a].q=c[a].q||[]).push(arguments)};t=l.createElement(r);t.async=1;t.src="https://www.clarity.ms/tag/"+i;y=l.getElementsByTagName(r)[0];y.parentNode.insertBefore(t,y);})(window,document,"clarity","script","wg31zlwbt9");</script>\n</head>
+<body>
+    <div class="start-screen" id="startScreen">
+        <div class="start-card">
+            <div class="icon">🔤</div>
+            <h1>Typography Practical Exam</h1>
+            <h2>Design with Fonts & Text</h2>
+            <div class="brief">
+                <h3>📋 Your Challenge:</h3>
+                <p>Create real typography designs by selecting fonts, adjusting sizes, spacing, and creating professional text layouts. See your changes instantly on the design canvas!</p>
+            </div>
+            <div class="exam-info">
+                <div class="info-box"><span>Tasks</span><b>5</b></div>
+                <div class="info-box"><span>Time</span><b>40 min</b></div>
+                <div class="info-box"><span>Pass</span><b>60%</b></div>
+            </div>
+            <input type="text" class="name-input" id="studentName" placeholder="Enter Your Full Name">
+            <button class="start-btn" id="startBtn" disabled>🎨 Start Designing</button>
+        </div>
+    </div>
+
+    <div class="results-screen" id="resultsScreen">
+        <div class="results-card">
+            <div class="results-icon" id="resultsIcon">🏆</div>
+            <div class="results-status" id="resultsStatus">PASSED</div>
+            <div class="results-score" id="resultsScore">85%</div>
+            <div id="resultsBreakdown"></div>
+            <button class="retry-btn" onclick="location.reload()">🔄 Try Again</button>
+        </div>
+    </div>
+
+    <div class="header" id="header" style="display:none">
+        <h1>🔤 Typography Practical</h1>
+        <div style="display:flex;align-items:center;gap:15px">
+            <span id="taskProgress">Task 1/5</span>
+            <div class="timer" id="timer">40:00</div>
+        </div>
+    </div>
+
+    <div class="main-container" id="mainContainer" style="display:none">
+        <div class="task-panel" id="taskPanel"></div>
+        <div class="canvas-panel">
+            <div class="canvas-header">
+                <span>🖼️ Design Canvas</span>
+                <span id="canvasLabel">Poster Design</span>
+            </div>
+            <div class="canvas-area">
+                <div class="design-canvas" id="designCanvas"></div>
+            </div>
+        </div>
+    </div>
+
+<script>
+const fonts = {
+    serif: ['Playfair Display', 'Lora', 'Merriweather'],
+    sansSerif: ['Roboto', 'Open Sans', 'Montserrat', 'Poppins', 'Raleway'],
+    display: ['Oswald', 'Bebas Neue'],
+    script: ['Dancing Script', 'Pacifico']
+};
+
+const allFonts = [...fonts.serif, ...fonts.sansSerif, ...fonts.display, ...fonts.script];
+
+const tasks = [
+    {
+        title: "Font Pairing for a Blog",
+        desc: "Select a heading font and body font that work well together for a lifestyle blog.",
+        canvasType: "blog",
+        points: 20,
+        defaults: { headingFont: 'Roboto', bodyFont: 'Roboto', headingSize: 32, bodySize: 16, lineHeight: 1.5 },
+        checks: [
+            { test: (s) => fonts.serif.includes(s.headingFont) || fonts.display.includes(s.headingFont), text: 'Heading: Serif or Display font' },
+            { test: (s) => fonts.sansSerif.includes(s.bodyFont), text: 'Body: Sans-serif font' },
+            { test: (s) => s.headingFont !== s.bodyFont, text: 'Different fonts for contrast' },
+            { test: (s) => s.headingSize >= 28 && s.headingSize <= 40, text: 'Heading size: 28-40px' },
+            { test: (s) => s.bodySize >= 14 && s.bodySize <= 18, text: 'Body size: 14-18px' }
+        ]
+    },
+    {
+        title: "Event Poster Typography",
+        desc: "Design typography for a music concert poster with strong visual hierarchy.",
+        canvasType: "poster",
+        points: 20,
+        defaults: { headingFont: 'Roboto', subFont: 'Roboto', bodyFont: 'Roboto', headingSize: 48, subSize: 24, bodySize: 14, letterSpacing: 0 },
+        checks: [
+            { test: (s) => fonts.display.includes(s.headingFont) || s.headingFont === 'Montserrat', text: 'Heading: Bold display font' },
+            { test: (s) => s.headingSize >= 42 && s.headingSize <= 60, text: 'Heading: Large size (42-60px)' },
+            { test: (s) => s.subSize < s.headingSize && s.subSize > s.bodySize, text: 'Clear size hierarchy' },
+            { test: (s) => s.letterSpacing >= 2, text: 'Letter spacing for impact' },
+            { test: (s) => s.headingFont !== s.bodyFont, text: 'Font variety used' }
+        ]
+    },
+    {
+        title: "Professional Business Card",
+        desc: "Create elegant typography for a business card with proper spacing and alignment.",
+        canvasType: "businessCard",
+        points: 20,
+        defaults: { nameFont: 'Roboto', titleFont: 'Roboto', detailFont: 'Roboto', nameSize: 20, titleSize: 12, detailSize: 10, letterSpacing: 1 },
+        checks: [
+            { test: (s) => s.nameSize >= 18 && s.nameSize <= 24, text: 'Name: Prominent but not oversized' },
+            { test: (s) => s.titleSize < s.nameSize, text: 'Title smaller than name' },
+            { test: (s) => s.detailSize >= 9 && s.detailSize <= 12, text: 'Details: Readable (9-12px)' },
+            { test: (s) => fonts.sansSerif.includes(s.detailFont), text: 'Details: Clean sans-serif' },
+            { test: (s) => s.letterSpacing >= 0.5, text: 'Professional letter spacing' }
+        ]
+    },
+    {
+        title: "Magazine Article Layout",
+        desc: "Design readable typography for a magazine article with drop cap and pull quote.",
+        canvasType: "magazine",
+        points: 20,
+        defaults: { headlineFont: 'Playfair Display', bodyFont: 'Open Sans', quoteFont: 'Lora', headlineSize: 36, bodySize: 15, lineHeight: 1.6, quoteSize: 22 },
+        checks: [
+            { test: (s) => fonts.serif.includes(s.headlineFont), text: 'Headline: Elegant serif' },
+            { test: (s) => s.lineHeight >= 1.5 && s.lineHeight <= 1.8, text: 'Line height: 1.5-1.8 for readability' },
+            { test: (s) => s.bodySize >= 14 && s.bodySize <= 17, text: 'Body: Comfortable reading size' },
+            { test: (s) => fonts.serif.includes(s.quoteFont) || fonts.script.includes(s.quoteFont), text: 'Quote: Distinctive font' },
+            { test: (s) => s.quoteSize > s.bodySize, text: 'Quote: Larger than body' }
+        ]
+    },
+    {
+        title: "Wedding Invitation",
+        desc: "Create romantic, elegant typography for a wedding invitation.",
+        canvasType: "wedding",
+        points: 20,
+        defaults: { namesFont: 'Dancing Script', detailsFont: 'Lora', accentFont: 'Montserrat', namesSize: 42, detailsSize: 14, dateSize: 18, letterSpacing: 2 },
+        checks: [
+            { test: (s) => fonts.script.includes(s.namesFont) || fonts.serif.includes(s.namesFont), text: 'Names: Script or elegant serif' },
+            { test: (s) => s.namesSize >= 36, text: 'Names: Large and prominent' },
+            { test: (s) => fonts.serif.includes(s.detailsFont) || fonts.sansSerif.includes(s.detailsFont), text: 'Details: Readable font' },
+            { test: (s) => s.letterSpacing >= 1.5, text: 'Elegant letter spacing' },
+            { test: (s) => s.detailsSize <= 16, text: 'Details: Refined size' }
+        ]
+    }
+];
+
+let current = 0, timeLeft = 40 * 60, timer;
+let settings = tasks.map(t => ({...t.defaults}));
+let scores = Array(tasks.length).fill(0);
+
+const $ = id => document.getElementById(id);
+
+$('studentName').oninput = e => $('startBtn').disabled = !e.target.value.trim();
+$('startBtn').onclick = startExam;
+
+function startExam() {
+    $('startScreen').style.display = 'none';
+    $('header').style.display = 'flex';
+    $('mainContainer').style.display = 'grid';
+    renderTask();
+    timer = setInterval(tick, 1000);
+}
+
+function tick() {
+    timeLeft--;
+    $('timer').textContent = `${Math.floor(timeLeft/60)}:${(timeLeft%60).toString().padStart(2,'0')}`;
+    if (timeLeft <= 300) $('timer').classList.add('warn');
+    if (timeLeft <= 0) submitExam();
+}
+
+function renderTask() {
+    const t = tasks[current];
+    const s = settings[current];
+    $('taskProgress').textContent = `Task ${current + 1}/${tasks.length}`;
+    $('canvasLabel').textContent = t.title;
+    
+    let controlsHtml = '';
+    
+    if (t.canvasType === 'blog') {
+        controlsHtml = `
+            <div class="control-group">
+                <label>Heading Font</label>
+                <select id="headingFont" onchange="updateSetting('headingFont', this.value)">
+                    ${allFonts.map(f => `<option value="${f}" ${s.headingFont===f?'selected':''}>${f}</option>`).join('')}
+                </select>
+            </div>
+            <div class="control-group">
+                <label>Body Font</label>
+                <select id="bodyFont" onchange="updateSetting('bodyFont', this.value)">
+                    ${allFonts.map(f => `<option value="${f}" ${s.bodyFont===f?'selected':''}>${f}</option>`).join('')}
+                </select>
+            </div>
+            <div class="control-group">
+                <label>Heading Size: <span class="range-value">${s.headingSize}px</span></label>
+                <input type="range" min="20" max="50" value="${s.headingSize}" onchange="updateSetting('headingSize', +this.value)">
+            </div>
+            <div class="control-group">
+                <label>Body Size: <span class="range-value">${s.bodySize}px</span></label>
+                <input type="range" min="12" max="22" value="${s.bodySize}" onchange="updateSetting('bodySize', +this.value)">
+            </div>
+            <div class="control-group">
+                <label>Line Height: <span class="range-value">${s.lineHeight}</span></label>
+                <input type="range" min="1" max="2.5" step="0.1" value="${s.lineHeight}" onchange="updateSetting('lineHeight', +this.value)">
+            </div>
+        `;
+    } else if (t.canvasType === 'poster') {
+        controlsHtml = `
+            <div class="control-group">
+                <label>Main Title Font</label>
+                <select id="headingFont" onchange="updateSetting('headingFont', this.value)">
+                    ${allFonts.map(f => `<option value="${f}" ${s.headingFont===f?'selected':''}>${f}</option>`).join('')}
+                </select>
+            </div>
+            <div class="control-group">
+                <label>Subtitle Font</label>
+                <select id="subFont" onchange="updateSetting('subFont', this.value)">
+                    ${allFonts.map(f => `<option value="${f}" ${s.subFont===f?'selected':''}>${f}</option>`).join('')}
+                </select>
+            </div>
+            <div class="control-group">
+                <label>Details Font</label>
+                <select id="bodyFont" onchange="updateSetting('bodyFont', this.value)">
+                    ${allFonts.map(f => `<option value="${f}" ${s.bodyFont===f?'selected':''}>${f}</option>`).join('')}
+                </select>
+            </div>
+            <div class="control-group">
+                <label>Title Size: ${s.headingSize}px</label>
+                <input type="range" min="30" max="72" value="${s.headingSize}" onchange="updateSetting('headingSize', +this.value)">
+            </div>
+            <div class="control-group">
+                <label>Subtitle Size: ${s.subSize}px</label>
+                <input type="range" min="16" max="36" value="${s.subSize}" onchange="updateSetting('subSize', +this.value)">
+            </div>
+            <div class="control-group">
+                <label>Letter Spacing: ${s.letterSpacing}px</label>
+                <input type="range" min="0" max="10" value="${s.letterSpacing}" onchange="updateSetting('letterSpacing', +this.value)">
+            </div>
+        `;
+    } else if (t.canvasType === 'businessCard') {
+        controlsHtml = `
+            <div class="control-group">
+                <label>Name Font</label>
+                <select onchange="updateSetting('nameFont', this.value)">
+                    ${allFonts.map(f => `<option value="${f}" ${s.nameFont===f?'selected':''}>${f}</option>`).join('')}
+                </select>
+            </div>
+            <div class="control-group">
+                <label>Title Font</label>
+                <select onchange="updateSetting('titleFont', this.value)">
+                    ${allFonts.map(f => `<option value="${f}" ${s.titleFont===f?'selected':''}>${f}</option>`).join('')}
+                </select>
+            </div>
+            <div class="control-group">
+                <label>Details Font</label>
+                <select onchange="updateSetting('detailFont', this.value)">
+                    ${allFonts.map(f => `<option value="${f}" ${s.detailFont===f?'selected':''}>${f}</option>`).join('')}
+                </select>
+            </div>
+            <div class="control-group">
+                <label>Name Size: ${s.nameSize}px</label>
+                <input type="range" min="14" max="28" value="${s.nameSize}" onchange="updateSetting('nameSize', +this.value)">
+            </div>
+            <div class="control-group">
+                <label>Title Size: ${s.titleSize}px</label>
+                <input type="range" min="8" max="18" value="${s.titleSize}" onchange="updateSetting('titleSize', +this.value)">
+            </div>
+            <div class="control-group">
+                <label>Letter Spacing: ${s.letterSpacing}px</label>
+                <input type="range" min="0" max="5" step="0.5" value="${s.letterSpacing}" onchange="updateSetting('letterSpacing', +this.value)">
+            </div>
+        `;
+    } else if (t.canvasType === 'magazine') {
+        controlsHtml = `
+            <div class="control-group">
+                <label>Headline Font</label>
+                <select onchange="updateSetting('headlineFont', this.value)">
+                    ${allFonts.map(f => `<option value="${f}" ${s.headlineFont===f?'selected':''}>${f}</option>`).join('')}
+                </select>
+            </div>
+            <div class="control-group">
+                <label>Body Font</label>
+                <select onchange="updateSetting('bodyFont', this.value)">
+                    ${allFonts.map(f => `<option value="${f}" ${s.bodyFont===f?'selected':''}>${f}</option>`).join('')}
+                </select>
+            </div>
+            <div class="control-group">
+                <label>Pull Quote Font</label>
+                <select onchange="updateSetting('quoteFont', this.value)">
+                    ${allFonts.map(f => `<option value="${f}" ${s.quoteFont===f?'selected':''}>${f}</option>`).join('')}
+                </select>
+            </div>
+            <div class="control-group">
+                <label>Headline Size: ${s.headlineSize}px</label>
+                <input type="range" min="24" max="48" value="${s.headlineSize}" onchange="updateSetting('headlineSize', +this.value)">
+            </div>
+            <div class="control-group">
+                <label>Body Size: ${s.bodySize}px</label>
+                <input type="range" min="12" max="20" value="${s.bodySize}" onchange="updateSetting('bodySize', +this.value)">
+            </div>
+            <div class="control-group">
+                <label>Line Height: ${s.lineHeight}</label>
+                <input type="range" min="1.2" max="2" step="0.1" value="${s.lineHeight}" onchange="updateSetting('lineHeight', +this.value)">
+            </div>
+        `;
+    } else if (t.canvasType === 'wedding') {
+        controlsHtml = `
+            <div class="control-group">
+                <label>Names Font</label>
+                <select onchange="updateSetting('namesFont', this.value)">
+                    ${allFonts.map(f => `<option value="${f}" ${s.namesFont===f?'selected':''}>${f}</option>`).join('')}
+                </select>
+            </div>
+            <div class="control-group">
+                <label>Details Font</label>
+                <select onchange="updateSetting('detailsFont', this.value)">
+                    ${allFonts.map(f => `<option value="${f}" ${s.detailsFont===f?'selected':''}>${f}</option>`).join('')}
+                </select>
+            </div>
+            <div class="control-group">
+                <label>Names Size: ${s.namesSize}px</label>
+                <input type="range" min="28" max="56" value="${s.namesSize}" onchange="updateSetting('namesSize', +this.value)">
+            </div>
+            <div class="control-group">
+                <label>Details Size: ${s.detailsSize}px</label>
+                <input type="range" min="10" max="20" value="${s.detailsSize}" onchange="updateSetting('detailsSize', +this.value)">
+            </div>
+            <div class="control-group">
+                <label>Letter Spacing: ${s.letterSpacing}px</label>
+                <input type="range" min="0" max="6" step="0.5" value="${s.letterSpacing}" onchange="updateSetting('letterSpacing', +this.value)">
+            </div>
+        `;
+    }
+    
+    $('taskPanel').innerHTML = `
+        <span class="task-badge">Task ${current + 1}</span>
+        <h2 class="task-title">${t.title}</h2>
+        <p class="task-desc">${t.desc}</p>
+        <div class="controls">
+            <h4>🎛️ Typography Controls</h4>
+            ${controlsHtml}
+        </div>
+        <div class="checklist" id="checklist">
+            <h4>✅ Requirements</h4>
+        </div>
+        <div class="score-box">
+            <div style="font-size:0.8rem">Score</div>
+            <div class="score" id="currentScore">${scores.reduce((a,b)=>a+b,0)}</div>
+            <div style="font-size:0.8rem">/100</div>
+        </div>
+        <div class="nav-btns">
+            <button class="btn-prev" onclick="prevTask()" ${current===0?'style="visibility:hidden"':''}>← Prev</button>
+            <button class="btn-next" onclick="nextTask()">${current===tasks.length-1?'🏁 Finish':'Next →'}</button>
+        </div>
+    `;
+    
+    updateCanvas();
+    checkRequirements();
+}
+
+function updateSetting(key, value) {
+    settings[current][key] = value;
+    renderTask();
+}
+
+function updateCanvas() {
+    const t = tasks[current];
+    const s = settings[current];
+    let html = '';
+    
+    if (t.canvasType === 'blog') {
+        html = `
+            <div style="font-family:'${s.headingFont}';font-size:${s.headingSize}px;font-weight:700;margin-bottom:15px;color:#222">
+                The Art of Simple Living
+            </div>
+            <div style="font-family:'${s.bodyFont}';font-size:${s.bodySize}px;line-height:${s.lineHeight};color:#444">
+                In today's fast-paced world, finding moments of peace can seem impossible. Yet, the secret to a fulfilling life often lies in simplicity. This article explores how minimalism can transform not just your space, but your entire mindset.
+            </div>
+        `;
+    } else if (t.canvasType === 'poster') {
+        html = `
+            <div style="text-align:center;background:linear-gradient(135deg,#1a1a2e,#16213e);padding:40px;border-radius:8px;color:#fff">
+                <div style="font-family:'${s.headingFont}';font-size:${s.headingSize}px;font-weight:700;letter-spacing:${s.letterSpacing}px;text-transform:uppercase;margin-bottom:15px">
+                    SUMMER FEST
+                </div>
+                <div style="font-family:'${s.subFont}';font-size:${s.subSize}px;margin-bottom:20px;color:#eee">
+                    Live Music Experience
+                </div>
+                <div style="font-family:'${s.bodyFont}';font-size:${s.bodySize}px;color:#aaa">
+                    July 15, 2024 • Central Park • 6PM
+                </div>
+            </div>
+        `;
+    } else if (t.canvasType === 'businessCard') {
+        html = `
+            <div style="background:#fff;padding:30px;border:1px solid #ddd;max-width:350px;margin:auto">
+                <div style="font-family:'${s.nameFont}';font-size:${s.nameSize}px;font-weight:600;letter-spacing:${s.letterSpacing}px;margin-bottom:5px;color:#222">
+                    JANE SMITH
+                </div>
+                <div style="font-family:'${s.titleFont}';font-size:${s.titleSize}px;color:#666;margin-bottom:20px;text-transform:uppercase;letter-spacing:1px">
+                    Creative Director
+                </div>
+                <div style="font-family:'${s.detailFont}';font-size:${s.detailSize}px;color:#888;line-height:1.8">
+                    <div>jane@studio.com</div>
+                    <div>+254 712 345 678</div>
+                    <div>www.janesmithstudio.com</div>
+                </div>
+            </div>
+        `;
+    } else if (t.canvasType === 'magazine') {
+        html = `
+            <div style="font-family:'${s.headlineFont}';font-size:${s.headlineSize}px;font-weight:700;color:#222;margin-bottom:20px">
+                The Future of Design
+            </div>
+            <div style="font-family:'${s.bodyFont}';font-size:${s.bodySize}px;line-height:${s.lineHeight};color:#444;margin-bottom:20px">
+                <span style="font-size:${s.bodySize * 2.5}px;float:left;margin-right:8px;line-height:1;font-family:'${s.headlineFont}'">T</span>he world of design is evolving rapidly. New technologies and changing user expectations are reshaping how we think about visual communication. From AI-powered tools to sustainable practices, designers must adapt to stay relevant.
+            </div>
+            <div style="font-family:'${s.quoteFont}';font-size:${s.quoteSize || 20}px;font-style:italic;color:#666;border-left:3px solid #ec4899;padding-left:20px;margin:20px 0">
+                "Design is not just what it looks like, design is how it works."
+            </div>
+        `;
+    } else if (t.canvasType === 'wedding') {
+        html = `
+            <div style="text-align:center;padding:20px;background:linear-gradient(to bottom,#fdf2f8,#fff);border:2px solid #f9a8d4;border-radius:8px">
+                <div style="font-family:'${s.accentFont || 'Montserrat'}';font-size:12px;letter-spacing:3px;color:#888;margin-bottom:15px">TOGETHER WITH THEIR FAMILIES</div>
+                <div style="font-family:'${s.namesFont}';font-size:${s.namesSize}px;color:#333;margin-bottom:5px">
+                    Sarah & James
+                </div>
+                <div style="font-family:'${s.detailsFont}';font-size:${s.dateSize || 16}px;color:#666;margin:15px 0;letter-spacing:${s.letterSpacing}px">
+                    REQUEST THE PLEASURE OF YOUR COMPANY
+                </div>
+                <div style="font-family:'${s.detailsFont}';font-size:${s.detailsSize}px;color:#888;line-height:2;letter-spacing:1px">
+                    <div>SATURDAY, THE FIFTEENTH OF JUNE</div>
+                    <div>TWO THOUSAND TWENTY FOUR</div>
+                    <div>AT FOUR O'CLOCK IN THE AFTERNOON</div>
+                </div>
+            </div>
+        `;
+    }
+    
+    $('designCanvas').innerHTML = html;
+}
+
+function checkRequirements() {
+    const t = tasks[current];
+    const s = settings[current];
+    const results = t.checks.map(c => ({ pass: c.test(s), text: c.text }));
+    const passed = results.filter(r => r.pass).length;
+    scores[current] = Math.round((passed / results.length) * t.points);
+    
+    $('checklist').innerHTML = '<h4>✅ Requirements</h4>' + results.map(r =>
+        `<div class="check-item ${r.pass?'pass':'fail'}">${r.text}</div>`
+    ).join('');
+    $('currentScore').textContent = scores.reduce((a,b)=>a+b,0);
+}
+
+function prevTask() { if (current > 0) { current--; renderTask(); } }
+function nextTask() { if (current < tasks.length - 1) { current++; renderTask(); } else submitExam(); }
+
+function submitExam() {
+    clearInterval(timer);
+    const total = scores.reduce((a,b)=>a+b,0);
+    const pass = total >= 60;
+    
+    $('header').style.display = 'none';
+    $('mainContainer').style.display = 'none';
+    $('resultsScreen').style.display = 'flex';
+    $('resultsIcon').textContent = pass ? '🏆' : '📚';
+    $('resultsStatus').textContent = pass ? 'PASSED!' : 'KEEP PRACTICING';
+    $('resultsStatus').className = `results-status ${pass?'pass':'fail'}`;
+    $('resultsScore').textContent = `${total}%`;
+    $('resultsBreakdown').innerHTML = tasks.map((t,i) =>
+        `<div class="result-item ${scores[i]>=t.points*0.5?'pass':'fail'}"><span>${t.title}</span><span>${scores[i]}/${t.points}</span></div>`
+    ).join('');
+}
+</script>
+</body>
+</html>

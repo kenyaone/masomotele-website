@@ -1,0 +1,353 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Online Admission - Masomotele Technical Training Institute</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { 
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; 
+            line-height: 1.6; 
+            color: #333; 
+            background: linear-gradient(to bottom right, #eff6ff, #eef2ff);
+            padding: 20px;
+        }
+        .container { max-width: 900px; margin: 0 auto; }
+        .header { background: white; border-radius: 12px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); padding: 40px; text-align: center; margin-bottom: 30px; }
+        .header h1 { color: #312e81; font-size: 2rem; margin-bottom: 10px; }
+        .header p { color: #6b7280; margin-bottom: 20px; }
+        .promo { background: #fbbf24; color: #1f2937; padding: 15px 25px; border-radius: 8px; display: inline-block; font-weight: 600; }
+        .form-container { background: white; border-radius: 12px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); padding: 40px; }
+        .alert { padding: 15px; border-radius: 8px; margin-bottom: 20px; display: none; align-items: center; gap: 10px; }
+        .alert.success { background: #d1fae5; border: 1px solid #10b981; color: #065f46; }
+        .alert.error { background: #fee2e2; border: 1px solid #ef4444; color: #991b1b; }
+        .alert.show { display: flex; }
+        .section-title { font-size: 1.5rem; font-weight: bold; color: #1f2937; margin-bottom: 20px; padding-bottom: 10px; border-bottom: 2px solid #e5e7eb; }
+        .form-section { margin-bottom: 40px; }
+        .form-row { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 20px; margin-bottom: 20px; }
+        .form-group { display: flex; flex-direction: column; }
+        .form-group label { font-weight: 600; color: #374151; margin-bottom: 8px; font-size: 0.875rem; }
+        .form-group input, .form-group select, .form-group textarea { 
+            padding: 12px; 
+            border: 1px solid #d1d5db; 
+            border-radius: 8px; 
+            font-size: 1rem;
+            transition: border-color 0.3s, box-shadow 0.3s;
+        }
+        .form-group input:focus, .form-group select:focus, .form-group textarea:focus {
+            outline: none;
+            border-color: #4f46e5;
+            box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.1);
+        }
+        .form-group textarea { resize: vertical; min-height: 100px; }
+        .required { color: #ef4444; }
+        .submit-btn { 
+            background: #4f46e5; 
+            color: white; 
+            padding: 15px 40px; 
+            border: none; 
+            border-radius: 8px; 
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background 0.3s;
+            width: 100%;
+            max-width: 300px;
+            margin: 0 auto;
+            display: block;
+        }
+        .submit-btn:hover { background: #4338ca; }
+        .submit-btn:disabled { background: #9ca3af; cursor: not-allowed; }
+        .contact-info { 
+            text-align: center; 
+            margin-top: 30px; 
+            padding-top: 30px; 
+            border-top: 1px solid #e5e7eb;
+            color: #6b7280;
+            font-size: 0.875rem;
+        }
+        .contact-info strong { color: #4f46e5; }
+        .footer { background: white; border-radius: 12px; padding: 20px; text-align: center; margin-top: 30px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); color: #6b7280; }
+        @media (max-width: 768px) {
+            .header h1 { font-size: 1.5rem; }
+            .form-container { padding: 20px; }
+            .form-row { grid-template-columns: 1fr; }
+        }
+    </style>
+<meta name="description" content="Professional training courses at MTTI Eldoret. TVETA-accredited programs in IT, healthcare, and creative fields. Enroll today.">
+<script type="text/javascript">(function(c,l,a,r,i,t,y){c[a]=c[a]||function(){(c[a].q=c[a].q||[]).push(arguments)};t=l.createElement(r);t.async=1;t.src="https://www.clarity.ms/tag/"+i;y=l.getElementsByTagName(r)[0];y.parentNode.insertBefore(t,y);})(window,document,"clarity","script","wg31zlwbt9");</script>\n</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>Masomotele Technical Training Institute</h1>
+            <p>Online Admission Application</p>
+            <div class="promo">🎯 First 50 Students Get 30% Discount!</div>
+        </div>
+
+        <div id="statusAlert" class="alert"></div>
+
+        <div class="form-container">
+            <h2 class="section-title">Application Form</h2>
+
+            <div class="form-section">
+                <h3 style="color: #4b5563; margin-bottom: 15px;">Personal Information</h3>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Full Name <span class="required">*</span></label>
+                        <input type="text" id="fullName" placeholder="Enter your full name" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Email Address <span class="required">*</span></label>
+                        <input type="email" id="email" placeholder="your.email@example.com" required>
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Phone Number <span class="required">*</span></label>
+                        <input type="tel" id="phone" placeholder="0712 464 936" required>
+                    </div>
+                    <div class="form-group">
+                        <label>ID Number <span class="required">*</span></label>
+                        <input type="text" id="idNumber" placeholder="Enter your ID number" required>
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Date of Birth <span class="required">*</span></label>
+                        <input type="date" id="dateOfBirth" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Gender <span class="required">*</span></label>
+                        <select id="gender" required>
+                            <option value="">Select gender</option>
+                            <option value="Male">Male</option>
+                            <option value="Female">Female</option>
+                            <option value="Other">Other</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+
+            <div class="form-section">
+                <h3 style="color: #4b5563; margin-bottom: 15px;">Location</h3>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>County <span class="required">*</span></label>
+                        <input type="text" id="county" placeholder="e.g., Uasin Gishu" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Town <span class="required">*</span></label>
+                        <input type="text" id="town" placeholder="e.g., Eldoret" required>
+                    </div>
+                </div>
+            </div>
+
+            <div class="form-section">
+                <h3 style="color: #4b5563; margin-bottom: 15px;">Course Information</h3>
+                <div class="form-row">
+                    <div class="form-group" style="grid-column: 1 / -1;">
+                        <label>Select Course <span class="required">*</span></label>
+                        <select id="course" required>
+                            <option value="">Choose a course</option>
+                            <option value="Certificate in Computer Applications">Certificate in Computer Applications</option>
+                            <option value="Certificate in Web Design and Development">Certificate in Web Design and Development</option>
+                            <option value="Certificate in Graphic Design">Certificate in Graphic Design</option>
+                            <option value="Certificate in Digital Marketing (Social Media Marketing)">Certificate in Digital Marketing (Social Media Marketing)</option>
+                            <option value="Certificate in Cyber Security and Ethical Hacking">Certificate in Cyber Security and Ethical Hacking</option>
+                            <option value="Certificate in Computer and Mobile Phone Repair">Certificate in Computer and Mobile Phone Repair</option>
+                            <option value="Certificate in Cloud Computing">Certificate in Cloud Computing</option>
+                            <option value="Certificate in Artificial Intelligence">Certificate in Artificial Intelligence</option>
+                            <option value="Computer Essentials">Computer Essentials</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Highest Education Level <span class="required">*</span></label>
+                        <select id="educationLevel" required>
+                            <option value="">Select level</option>
+                            <option value="Primary">Primary</option>
+                            <option value="Secondary">Secondary (O-Level)</option>
+                            <option value="College">College/Diploma</option>
+                            <option value="University">University</option>
+                            <option value="Other">Other</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Preferred Payment Plan <span class="required">*</span></label>
+                        <select id="paymentPlan" required>
+                            <option value="">Select payment plan</option>
+                            <option value="Full Payment">Full Payment (with discount)</option>
+                            <option value="Installments">Installments</option>
+                            <option value="Need Info">Need more information</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+
+            <div class="form-section">
+                <h3 style="color: #4b5563; margin-bottom: 15px;">Additional Information</h3>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>How did you hear about us? <span class="required">*</span></label>
+                        <select id="howHeard" required>
+                            <option value="">Select an option</option>
+                            <option value="Facebook">Facebook</option>
+                            <option value="Instagram">Instagram</option>
+                            <option value="WhatsApp">WhatsApp</option>
+                            <option value="Friend">Friend/Family Referral</option>
+                            <option value="Website">Website</option>
+                            <option value="Walk-in">Walk-in</option>
+                            <option value="Other">Other</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label>Additional Message (Optional)</label>
+                    <textarea id="message" placeholder="Any questions or special requests?"></textarea>
+                </div>
+            </div>
+
+            <button type="button" class="submit-btn" id="submitBtn" onclick="submitApplication()">
+                📤 Submit Application
+            </button>
+
+            <div class="contact-info">
+                <p>Need help? Call/WhatsApp: <strong>0712 464 936</strong></p>
+                <p style="margin-top: 5px;">Email: <strong>info@masomoteletraining.co.ke</strong></p>
+            </div>
+        </div>
+
+        <div class="footer">
+            <p>📍 Sagaas Center, 4th Floor - Opposite AIC Fellowship Church, Eldoret</p>
+            <p style="margin-top: 10px;">⏰ Mon-Fri: 8AM-8PM | Sat: 8:30AM-8PM</p>
+        </div>
+    </div>
+
+    <script>
+        // REPLACE THIS WITH YOUR GOOGLE APPS SCRIPT WEB APP URL
+        // Instructions: See the separate SETUP_INSTRUCTIONS.txt file
+        const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbytnqEVnVx7xV7xbS2DY-Z2uGm6mYnlhandZGGEXDXUBW1q23nQgvHJHz6XZGG6eA6KpQ/exec';
+
+        function showAlert(message, type) {
+            const alert = document.getElementById('statusAlert');
+            alert.innerHTML = (type === 'success' ? '✅ ' : '❌ ') + message;
+            alert.className = 'alert ' + type + ' show';
+            alert.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+            
+            if (type === 'success') {
+                setTimeout(() => {
+                    alert.classList.remove('show');
+                }, 10000);
+            }
+        }
+
+        function submitApplication() {
+            const requiredFields = {
+                fullName: document.getElementById('fullName'),
+                email: document.getElementById('email'),
+                phone: document.getElementById('phone'),
+                idNumber: document.getElementById('idNumber'),
+                dateOfBirth: document.getElementById('dateOfBirth'),
+                gender: document.getElementById('gender'),
+                county: document.getElementById('county'),
+                town: document.getElementById('town'),
+                course: document.getElementById('course'),
+                educationLevel: document.getElementById('educationLevel'),
+                paymentPlan: document.getElementById('paymentPlan'),
+                howHeard: document.getElementById('howHeard')
+            };
+
+            // Validate required fields
+            for (let field in requiredFields) {
+                if (!requiredFields[field].value) {
+                    showAlert('Please fill in all required fields marked with *', 'error');
+                    requiredFields[field].focus();
+                    return;
+                }
+            }
+
+            // Get form data
+            const formData = {
+                fullName: requiredFields.fullName.value,
+                email: requiredFields.email.value,
+                phone: requiredFields.phone.value,
+                idNumber: requiredFields.idNumber.value,
+                dateOfBirth: requiredFields.dateOfBirth.value,
+                gender: requiredFields.gender.value,
+                county: requiredFields.county.value,
+                town: requiredFields.town.value,
+                course: requiredFields.course.value,
+                educationLevel: requiredFields.educationLevel.value,
+                paymentPlan: requiredFields.paymentPlan.value,
+                howHeard: requiredFields.howHeard.value,
+                message: document.getElementById('message').value,
+                timestamp: new Date().toLocaleString()
+            };
+
+            // Disable submit button
+            const submitBtn = document.getElementById('submitBtn');
+            submitBtn.disabled = true;
+            submitBtn.textContent = 'Sending...';
+
+            // Send to Google Apps Script (if configured)
+            if (SCRIPT_URL !== 'PASTE_YOUR_SCRIPT_URL_HERE') {
+                fetch(SCRIPT_URL, {
+                    method: 'POST',
+                    mode: 'no-cors',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(formData)
+                }).then(() => {
+                    console.log('Email sent successfully');
+                }).catch(err => {
+                    console.log('Email error (continuing):', err);
+                });
+            }
+
+            // Send WhatsApp notification
+            const whatsappMessage = `🎓 NEW APPLICATION - Masomotele Institute
+
+📋 STUDENT DETAILS:
+Name: ${formData.fullName}
+Email: ${formData.email}
+Phone: ${formData.phone}
+ID: ${formData.idNumber}
+DOB: ${formData.dateOfBirth}
+Gender: ${formData.gender}
+
+📍 LOCATION:
+County: ${formData.county}
+Town: ${formData.town}
+
+🎯 COURSE:
+${formData.course}
+Education: ${formData.educationLevel}
+Payment: ${formData.paymentPlan}
+
+📢 Source: ${formData.howHeard}
+${formData.message ? '💬 ' + formData.message : ''}
+
+⏰ ${formData.timestamp}`;
+            
+            const whatsappLink = `https://wa.me/254712464936?text=${encodeURIComponent(whatsappMessage)}`;
+            window.open(whatsappLink, '_blank');
+
+            // Show success message
+            showAlert('Application submitted successfully! We will contact you shortly.', 'success');
+
+            // Reset form
+            for (let field in requiredFields) {
+                requiredFields[field].value = '';
+            }
+            document.getElementById('message').value = '';
+
+            // Re-enable button
+            submitBtn.disabled = false;
+            submitBtn.textContent = '📤 Submit Application';
+        }
+    </script>
+</body>
+</html>

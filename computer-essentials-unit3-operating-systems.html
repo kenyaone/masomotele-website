@@ -1,0 +1,502 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Operating Systems - Practical Exam | M.T.T.I</title>
+    <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'IBM Plex Sans', sans-serif; background: linear-gradient(145deg, #0f0f23 0%, #1a1a3e 50%, #0f0f23 100%); color: #eee; min-height: 100vh; }
+        
+        .header { background: rgba(26, 26, 62, 0.95); border-bottom: 2px solid #00d9ff; padding: 15px 30px; display: flex; justify-content: space-between; align-items: center; position: sticky; top: 0; z-index: 100; }
+        .logo { font-size: 1.2rem; font-weight: 700; color: #00d9ff; }
+        .exam-info { text-align: center; }
+        .exam-title { font-size: 0.85rem; color: #fff; }
+        .exam-unit { font-size: 0.7rem; color: #aaa; }
+        .header-right { display: flex; align-items: center; gap: 20px; }
+        .timer { font-family: 'IBM Plex Mono', monospace; background: rgba(0, 217, 255, 0.1); padding: 8px 16px; border-radius: 20px; border: 1px solid #00d9ff; color: #00d9ff; }
+        .timer.warning { border-color: #ff6b6b; color: #ff6b6b; animation: pulse 1s infinite; }
+        @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.5; } }
+        
+        .start-screen { min-height: 100vh; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 20px; }
+        .start-card { background: rgba(26, 26, 62, 0.9); border: 1px solid rgba(0, 217, 255, 0.3); border-radius: 16px; padding: 40px; max-width: 500px; width: 100%; text-align: center; }
+        .start-icon { font-size: 4rem; margin-bottom: 20px; }
+        .start-card h1 { font-size: 1.5rem; color: #fff; margin-bottom: 5px; }
+        .start-card h2 { font-size: 1rem; color: #00d9ff; margin-bottom: 20px; font-weight: 500; }
+        .exam-meta { display: grid; grid-template-columns: repeat(3, 1fr); gap: 15px; margin-bottom: 25px; }
+        .meta-item { background: rgba(0, 217, 255, 0.1); padding: 15px; border-radius: 10px; }
+        .meta-item .value { font-size: 1.3rem; font-weight: 700; color: #00d9ff; }
+        .meta-item .label { font-size: 0.75rem; color: #aaa; }
+        .name-input { margin-bottom: 20px; }
+        .name-input label { display: block; margin-bottom: 8px; color: #aaa; font-size: 0.9rem; text-align: left; }
+        .name-input input { width: 100%; padding: 12px 16px; background: rgba(10, 10, 30, 0.8); border: 2px solid rgba(0, 217, 255, 0.3); border-radius: 8px; color: #fff; font-size: 1rem; }
+        .name-input input:focus { outline: none; border-color: #00d9ff; }
+        .start-btn { width: 100%; padding: 14px; font-size: 1.1rem; font-weight: 600; background: linear-gradient(135deg, #00d9ff, #0099cc); color: #000; border: none; border-radius: 8px; cursor: pointer; }
+        .start-btn:hover:not(:disabled) { transform: translateY(-2px); box-shadow: 0 10px 30px rgba(0, 217, 255, 0.3); }
+        .start-btn:disabled { opacity: 0.5; cursor: not-allowed; }
+        
+        .exam-container { display: none; }
+        .main-content { display: flex; min-height: calc(100vh - 70px); }
+        
+        .sidebar { width: 200px; background: rgba(26, 26, 62, 0.5); border-right: 1px solid rgba(0, 217, 255, 0.1); padding: 20px; }
+        .student-name { font-weight: 600; color: #fff; font-size: 0.9rem; margin-bottom: 20px; padding-bottom: 15px; border-bottom: 1px solid rgba(0, 217, 255, 0.1); }
+        .question-nav { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
+        .nav-btn { width: 100%; aspect-ratio: 1; background: rgba(10, 10, 30, 0.8); border: 1px solid rgba(0, 217, 255, 0.2); border-radius: 8px; color: #888; font-family: 'IBM Plex Mono', monospace; font-size: 0.8rem; cursor: pointer; }
+        .nav-btn:hover { border-color: #00d9ff; color: #00d9ff; }
+        .nav-btn.active { background: rgba(0, 217, 255, 0.2); border-color: #00d9ff; color: #00d9ff; }
+        .nav-btn.correct { background: rgba(0, 200, 100, 0.2); border-color: #00c864; color: #00c864; }
+        .nav-btn.incorrect { background: rgba(255, 100, 100, 0.2); border-color: #ff6464; color: #ff6464; }
+        
+        .task-area { flex: 1; padding: 30px; overflow-y: auto; }
+        .task-card { background: rgba(26, 26, 62, 0.6); border: 1px solid rgba(0, 217, 255, 0.15); border-radius: 16px; padding: 30px; max-width: 800px; margin: 0 auto; }
+        .task-header { display: flex; justify-content: space-between; margin-bottom: 20px; }
+        .task-number { font-family: 'IBM Plex Mono', monospace; color: #00d9ff; font-size: 0.85rem; }
+        .task-points { background: rgba(0, 217, 255, 0.15); color: #00d9ff; padding: 4px 12px; border-radius: 12px; font-size: 0.8rem; }
+        .task-title { font-size: 1.3rem; color: #fff; margin-bottom: 15px; }
+        .task-instruction { background: rgba(10, 10, 30, 0.6); border-left: 3px solid #00d9ff; padding: 15px 20px; border-radius: 0 8px 8px 0; margin-bottom: 20px; }
+        .task-instruction p { color: #ccc; line-height: 1.6; }
+        
+        .hint-toggle { background: none; border: 1px solid rgba(255, 193, 7, 0.4); color: #ffc107; padding: 8px 16px; border-radius: 6px; cursor: pointer; font-size: 0.85rem; margin-bottom: 15px; }
+        .hint-content { background: rgba(255, 193, 7, 0.1); border: 1px solid rgba(255, 193, 7, 0.3); padding: 12px 16px; border-radius: 8px; margin-bottom: 15px; color: #ffc107; font-size: 0.9rem; display: none; }
+        .hint-content.show { display: block; }
+        
+        .input-area { margin-bottom: 20px; }
+        .input-area label { display: block; color: #888; font-size: 0.85rem; margin-bottom: 8px; text-transform: uppercase; }
+        .input-area input[type="text"] { width: 100%; padding: 14px; background: rgba(255, 255, 255, 0.95); border: 2px solid rgba(0, 217, 255, 0.3); border-radius: 8px; font-size: 1rem; font-family: 'IBM Plex Mono', monospace; color: #222; }
+        .input-area input:focus { outline: none; border-color: #00d9ff; }
+        
+        .matching-area { margin-bottom: 20px; }
+        .match-row { display: flex; align-items: center; gap: 15px; margin-bottom: 12px; padding: 12px; background: rgba(10, 10, 30, 0.4); border-radius: 8px; }
+        .match-left { flex: 1; color: #ddd; font-size: 0.95rem; }
+        .match-select { flex: 1; padding: 10px; background: #fff; border: 2px solid rgba(0, 217, 255, 0.3); border-radius: 6px; font-size: 0.9rem; color: #222; }
+        
+        .os-icons { display: flex; gap: 20px; justify-content: center; margin-bottom: 20px; }
+        .os-icon { font-size: 3rem; padding: 20px; background: rgba(0, 217, 255, 0.1); border-radius: 12px; cursor: pointer; border: 2px solid transparent; transition: all 0.2s; }
+        .os-icon:hover { border-color: rgba(0, 217, 255, 0.5); }
+        .os-icon.selected { border-color: #00d9ff; background: rgba(0, 217, 255, 0.2); }
+        
+        .feedback-box { padding: 15px 20px; border-radius: 10px; margin-bottom: 20px; display: none; }
+        .feedback-box.show { display: block; }
+        .feedback-box.correct { background: rgba(0, 200, 100, 0.15); border: 1px solid rgba(0, 200, 100, 0.4); }
+        .feedback-box.incorrect { background: rgba(255, 100, 100, 0.15); border: 1px solid rgba(255, 100, 100, 0.4); }
+        .feedback-title { font-weight: 600; }
+        .feedback-box.correct .feedback-title { color: #00c864; }
+        .feedback-box.incorrect .feedback-title { color: #ff6464; }
+        .correct-answer { margin-top: 10px; padding-top: 10px; border-top: 1px solid rgba(255,255,255,0.1); }
+        .correct-answer strong { color: #888; font-size: 0.85rem; }
+        .correct-answer p { color: #00d9ff; font-family: 'IBM Plex Mono', monospace; margin-top: 5px; }
+        
+        .action-buttons { display: flex; justify-content: space-between; padding-top: 20px; border-top: 1px solid rgba(0, 217, 255, 0.1); }
+        .check-btn { padding: 12px 30px; background: linear-gradient(135deg, #00d9ff, #0099cc); color: #000; font-weight: 600; border: none; border-radius: 8px; cursor: pointer; }
+        .nav-buttons { display: flex; gap: 10px; }
+        .nav-buttons button { padding: 12px 24px; background: rgba(0, 217, 255, 0.1); border: 1px solid rgba(0, 217, 255, 0.3); color: #00d9ff; border-radius: 8px; cursor: pointer; }
+        .nav-buttons button:disabled { opacity: 0.4; cursor: not-allowed; }
+        
+        .results-screen { display: none; min-height: 100vh; align-items: center; justify-content: center; padding: 20px; }
+        .results-card { background: rgba(26, 26, 62, 0.95); border: 1px solid rgba(0, 217, 255, 0.2); border-radius: 20px; padding: 40px; max-width: 500px; width: 100%; text-align: center; }
+        .result-icon { font-size: 4rem; margin-bottom: 15px; }
+        .result-status { font-size: 1.5rem; font-weight: 700; margin-bottom: 20px; }
+        .result-status.passed { color: #00c864; }
+        .result-status.failed { color: #ff6464; }
+        .score-display { font-size: 3rem; font-weight: 700; color: #00d9ff; margin-bottom: 20px; }
+        .result-details { display: grid; grid-template-columns: repeat(3, 1fr); gap: 15px; margin-bottom: 25px; }
+        .detail-box { background: rgba(10, 10, 30, 0.6); padding: 15px; border-radius: 10px; }
+        .detail-value { font-size: 1.3rem; font-weight: 700; color: #00d9ff; }
+        .detail-label { font-size: 0.75rem; color: #888; }
+        .result-actions { display: flex; gap: 15px; }
+        .result-actions button { flex: 1; padding: 14px; font-size: 1rem; font-weight: 600; border-radius: 8px; cursor: pointer; }
+        .review-btn { background: rgba(0, 217, 255, 0.2); color: #00d9ff; border: 1px solid rgba(0, 217, 255, 0.4); }
+        .retry-btn { background: linear-gradient(135deg, #00d9ff, #0099cc); color: #000; border: none; }
+
+        @media (max-width: 768px) {
+            .main-content { flex-direction: column; }
+            .sidebar { width: 100%; }
+            .question-nav { grid-template-columns: repeat(5, 1fr); }
+        }
+    </style>
+<meta name="description" content="Professional training courses at MTTI Eldoret. TVETA-accredited programs in IT, healthcare, and creative fields. Enroll today.">
+<script type="text/javascript">(function(c,l,a,r,i,t,y){c[a]=c[a]||function(){(c[a].q=c[a].q||[]).push(arguments)};t=l.createElement(r);t.async=1;t.src="https://www.clarity.ms/tag/"+i;y=l.getElementsByTagName(r)[0];y.parentNode.insertBefore(t,y);})(window,document,"clarity","script","wg31zlwbt9");</script>\n</head>
+<body>
+    <div id="startScreen" class="start-screen">
+        <div class="start-card">
+            <div class="start-icon">💻</div>
+            <h1>Computer Essentials</h1>
+            <h2>Unit 3: Operating Systems</h2>
+            <p style="color: #888; margin-bottom: 20px;">Masomotele Technical Training Institute</p>
+            
+            <div class="exam-meta">
+                <div class="meta-item"><div class="value">15</div><div class="label">Questions</div></div>
+                <div class="meta-item"><div class="value">2 Hrs</div><div class="label">Duration</div></div>
+                <div class="meta-item"><div class="value">50%</div><div class="label">Pass Mark</div></div>
+            </div>
+            
+            <div class="name-input">
+                <label>Enter Your Full Name:</label>
+                <input type="text" id="studentName" placeholder="e.g., John Kamau">
+            </div>
+            
+            <button class="start-btn" id="startBtn" disabled>Start Examination</button>
+        </div>
+    </div>
+    
+    <div id="examContainer" class="exam-container">
+        <header class="header">
+            <div class="logo">💻 M.T.T.I</div>
+            <div class="exam-info">
+                <div class="exam-title">Operating Systems</div>
+                <div class="exam-unit">Computer Essentials - Unit 3</div>
+            </div>
+            <div class="header-right">
+                <div class="timer" id="timer">02:00:00</div>
+                <div style="color:#888;font-family:monospace;"><span id="currentQ">1</span>/15</div>
+                <button onclick="showResults()" style="padding:8px 16px;background:rgba(0,217,255,0.2);border:1px solid #00d9ff;color:#00d9ff;border-radius:8px;cursor:pointer;">Finish</button>
+            </div>
+        </header>
+        
+        <div class="main-content">
+            <aside class="sidebar">
+                <div class="student-name" id="displayName">Student</div>
+                <div class="question-nav" id="questionNav"></div>
+            </aside>
+            <main class="task-area">
+                <div class="task-card" id="taskCard"></div>
+            </main>
+        </div>
+    </div>
+    
+    <div id="resultsScreen" class="results-screen">
+        <div class="results-card">
+            <div class="result-icon" id="resultIcon">🎉</div>
+            <div class="result-status" id="resultStatus">PASSED</div>
+            <div class="score-display" id="scorePercent">0%</div>
+            <div class="result-details">
+                <div class="detail-box"><div class="detail-value" id="correctCount">0</div><div class="detail-label">Correct</div></div>
+                <div class="detail-box"><div class="detail-value" id="wrongCount">0</div><div class="detail-label">Wrong</div></div>
+                <div class="detail-box"><div class="detail-value" id="timeUsed">00:00</div><div class="detail-label">Time</div></div>
+            </div>
+            <div class="result-actions">
+                <button class="review-btn" onclick="reviewAnswers()">📝 Review</button>
+                <button class="retry-btn" onclick="retryExam()">🔄 Retry</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const questions = [
+            {
+                id: 1, type: "typing", title: "Define Operating System",
+                instruction: "An Operating System is software that manages computer hardware and provides services for programs. Type the common abbreviation for Operating System:",
+                targetText: "OS", acceptableAnswers: ["OS", "os", "O.S", "o.s"],
+                hint: "Two letters that stand for Operating System", points: 10
+            },
+            {
+                id: 2, type: "matching", title: "Match OS to Company",
+                instruction: "Match each operating system to its developer:",
+                pairs: [
+                    { left: "Windows", right: "Microsoft", id: "win" },
+                    { left: "macOS", right: "Apple", id: "mac" },
+                    { left: "Android", right: "Google", id: "android" },
+                    { left: "Ubuntu", right: "Canonical", id: "ubuntu" }
+                ],
+                hint: "Think about which company makes each OS", points: 10
+            },
+            {
+                id: 3, type: "typing", title: "Windows Start Menu",
+                instruction: "In Windows, which key on the keyboard opens the Start menu?",
+                targetText: "Windows", acceptableAnswers: ["Windows", "windows", "Windows key", "windows key", "Win", "win"],
+                hint: "It has the Windows logo on it", points: 10
+            },
+            {
+                id: 4, type: "typing", title: "Task Manager Shortcut",
+                instruction: "Type the keyboard shortcut to open Task Manager in Windows (use + between keys):",
+                targetText: "Ctrl+Shift+Esc", acceptableAnswers: ["Ctrl+Shift+Esc", "ctrl+shift+esc", "CTRL+SHIFT+ESC", "Ctrl+Alt+Delete", "ctrl+alt+delete"],
+                hint: "Ctrl+Shift+Esc opens it directly, or Ctrl+Alt+Delete shows options", points: 10
+            },
+            {
+                id: 5, type: "matching", title: "OS Types",
+                instruction: "Match each device type to its typical operating system:",
+                pairs: [
+                    { left: "Desktop PC", right: "Windows/macOS/Linux", id: "desktop" },
+                    { left: "iPhone", right: "iOS", id: "iphone" },
+                    { left: "Android Phone", right: "Android", id: "phone" },
+                    { left: "Web Server", right: "Linux", id: "server" }
+                ],
+                hint: "Think about what OS each device typically runs", points: 10
+            },
+            {
+                id: 6, type: "typing", title: "Desktop Icon Area",
+                instruction: "The main screen area where you see icons and wallpaper after Windows starts is called the:",
+                targetText: "Desktop", acceptableAnswers: ["Desktop", "desktop", "DESKTOP"],
+                hint: "Like a physical desk where you place items", points: 10
+            },
+            {
+                id: 7, type: "typing", title: "Bottom Bar in Windows",
+                instruction: "The bar at the bottom of the Windows screen showing open programs and the Start button is called the:",
+                targetText: "Taskbar", acceptableAnswers: ["Taskbar", "taskbar", "Task bar", "task bar", "TASKBAR"],
+                hint: "It shows your tasks/programs", points: 10
+            },
+            {
+                id: 8, type: "typing", title: "System Tray Location",
+                instruction: "The area in the bottom-right corner of Windows showing time, volume, and network icons is called the:",
+                targetText: "System Tray", acceptableAnswers: ["System Tray", "system tray", "System tray", "notification area", "Notification Area", "systray"],
+                hint: "Also called the notification area - shows system icons", points: 10
+            },
+            {
+                id: 9, type: "matching", title: "Windows Features",
+                instruction: "Match each Windows feature to its function:",
+                pairs: [
+                    { left: "Control Panel", right: "System settings and configuration", id: "control" },
+                    { left: "File Explorer", right: "Browse files and folders", id: "explorer" },
+                    { left: "Task Manager", right: "Monitor running programs", id: "taskmgr" },
+                    { left: "Settings App", right: "Modern Windows preferences", id: "settings" }
+                ],
+                hint: "Think about what you use each feature for", points: 10
+            },
+            {
+                id: 10, type: "typing", title: "Lock Screen Shortcut",
+                instruction: "Type the keyboard shortcut to LOCK your Windows computer (use + between keys):",
+                targetText: "Windows+L", acceptableAnswers: ["Windows+L", "windows+l", "Win+L", "win+l", "Windows + L"],
+                hint: "Windows key plus L for Lock", points: 10
+            },
+            {
+                id: 11, type: "typing", title: "File Manager in macOS",
+                instruction: "The file manager application in macOS (equivalent to Windows File Explorer) is called:",
+                targetText: "Finder", acceptableAnswers: ["Finder", "finder", "FINDER"],
+                hint: "It helps you 'find' your files on Mac", points: 10
+            },
+            {
+                id: 12, type: "typing", title: "Screenshot Shortcut Windows",
+                instruction: "Type the key that takes a screenshot of the entire screen in Windows:",
+                targetText: "Print Screen", acceptableAnswers: ["Print Screen", "print screen", "PrtScn", "prtscn", "PrintScreen", "PrtSc", "Print Scrn"],
+                hint: "Usually labeled PrtScn on the keyboard", points: 10
+            },
+            {
+                id: 13, type: "matching", title: "System Maintenance",
+                instruction: "Match each maintenance task to its purpose:",
+                pairs: [
+                    { left: "Windows Update", right: "Install security patches", id: "update" },
+                    { left: "Disk Cleanup", right: "Remove temporary files", id: "cleanup" },
+                    { left: "Defragmentation", right: "Optimize HDD performance", id: "defrag" },
+                    { left: "Antivirus Scan", right: "Detect malware", id: "antivirus" }
+                ],
+                hint: "Think about what each maintenance task does", points: 10
+            },
+            {
+                id: 14, type: "typing", title: "Restart vs Shutdown",
+                instruction: "When you want to turn off and immediately turn on the computer to apply updates, you should:",
+                targetText: "Restart", acceptableAnswers: ["Restart", "restart", "Reboot", "reboot", "RESTART"],
+                hint: "It's not shutdown - the computer turns back on automatically", points: 10
+            },
+            {
+                id: 15, type: "typing", title: "Run Dialog Box",
+                instruction: "Type the keyboard shortcut to open the Run dialog box in Windows (use + between keys):",
+                targetText: "Windows+R", acceptableAnswers: ["Windows+R", "windows+r", "Win+R", "win+r", "Windows + R"],
+                hint: "Windows key plus R for Run", points: 10
+            }
+        ];
+
+        let state = { studentName: '', currentQuestion: 0, answers: {}, results: {}, timeRemaining: 2*60*60, timerInterval: null };
+
+        document.getElementById('studentName').addEventListener('input', function() {
+            state.studentName = this.value.trim();
+            document.getElementById('startBtn').disabled = !state.studentName;
+        });
+        document.getElementById('startBtn').addEventListener('click', startExam);
+
+        function startExam() {
+            document.getElementById('startScreen').style.display = 'none';
+            document.getElementById('examContainer').style.display = 'block';
+            document.getElementById('displayName').textContent = state.studentName;
+            buildNavigation(); loadQuestion(0); startTimer();
+        }
+
+        function buildNavigation() {
+            const nav = document.getElementById('questionNav');
+            nav.innerHTML = '';
+            questions.forEach((q, i) => {
+                const btn = document.createElement('button');
+                btn.className = 'nav-btn' + (i === 0 ? ' active' : '');
+                btn.textContent = i + 1;
+                btn.onclick = () => loadQuestion(i);
+                nav.appendChild(btn);
+            });
+        }
+
+        function updateNavigation() {
+            document.querySelectorAll('.nav-btn').forEach((btn, i) => {
+                btn.classList.remove('active', 'correct', 'incorrect');
+                if (i === state.currentQuestion) btn.classList.add('active');
+                else if (state.results[i]?.correct) btn.classList.add('correct');
+                else if (state.results[i]?.checked) btn.classList.add('incorrect');
+            });
+        }
+
+        function startTimer() {
+            state.timerInterval = setInterval(() => {
+                state.timeRemaining--;
+                const h = Math.floor(state.timeRemaining / 3600);
+                const m = Math.floor((state.timeRemaining % 3600) / 60);
+                const s = state.timeRemaining % 60;
+                document.getElementById('timer').textContent = `${h.toString().padStart(2,'0')}:${m.toString().padStart(2,'0')}:${s.toString().padStart(2,'0')}`;
+                if (state.timeRemaining <= 300) document.getElementById('timer').classList.add('warning');
+                if (state.timeRemaining <= 0) { clearInterval(state.timerInterval); showResults(); }
+            }, 1000);
+        }
+
+        function loadQuestion(index) {
+            state.currentQuestion = index;
+            const q = questions[index];
+            document.getElementById('currentQ').textContent = index + 1;
+            
+            let html = `
+                <div class="task-header">
+                    <span class="task-number">Question ${index + 1} of ${questions.length}</span>
+                    <span class="task-points">${q.points} pts</span>
+                </div>
+                <h2 class="task-title">${q.title}</h2>
+                <div class="task-instruction"><p>${q.instruction}</p></div>
+                <button class="hint-toggle" onclick="document.getElementById('hintContent').classList.toggle('show')">💡 Show Hint</button>
+                <div class="hint-content" id="hintContent">${q.hint}</div>
+            `;
+
+            if (q.type === 'typing') {
+                html += `<div class="input-area"><label>Your Answer:</label><input type="text" id="userAnswer" placeholder="Type your answer..." value="${state.answers[index] || ''}"></div>`;
+            } else if (q.type === 'matching') {
+                html += `<div class="matching-area">`;
+                const shuffled = [...q.pairs].map(p => p.right).sort(() => Math.random() - 0.5);
+                q.pairs.forEach(pair => {
+                    const saved = state.answers[index]?.[pair.id] || '';
+                    html += `<div class="match-row"><div class="match-left">${pair.left}</div><select class="match-select" data-id="${pair.id}"><option value="">-- Select --</option>${shuffled.map(r => `<option value="${r}" ${saved === r ? 'selected' : ''}>${r}</option>`).join('')}</select></div>`;
+                });
+                html += `</div>`;
+            }
+
+            html += `
+                <div class="feedback-box" id="feedbackBox">
+                    <div style="display:flex;justify-content:space-between;margin-bottom:8px;">
+                        <span class="feedback-title" id="feedbackTitle"></span>
+                        <span style="color:#888;font-size:0.85rem;" id="feedbackScore"></span>
+                    </div>
+                    <div class="correct-answer" id="correctAnswerBox"><strong>Correct Answer:</strong><p id="correctAnswerText"></p></div>
+                </div>
+                <div class="action-buttons">
+                    <button class="check-btn" onclick="checkAnswer()">✓ Check Answer</button>
+                    <div class="nav-buttons">
+                        <button onclick="prevQuestion()" ${index === 0 ? 'disabled' : ''}>← Previous</button>
+                        <button onclick="nextQuestion()">${index === questions.length - 1 ? 'Finish →' : 'Next →'}</button>
+                    </div>
+                </div>
+            `;
+
+            document.getElementById('taskCard').innerHTML = html;
+            if (state.results[index]?.checked) showFeedback(index);
+            updateNavigation();
+        }
+
+        function saveAnswer() {
+            const q = questions[state.currentQuestion];
+            if (q.type === 'typing') {
+                const input = document.getElementById('userAnswer');
+                if (input) state.answers[state.currentQuestion] = input.value;
+            } else if (q.type === 'matching') {
+                state.answers[state.currentQuestion] = {};
+                document.querySelectorAll('.match-select').forEach(sel => {
+                    state.answers[state.currentQuestion][sel.dataset.id] = sel.value;
+                });
+            }
+        }
+
+        function checkAnswer() {
+            saveAnswer();
+            const q = questions[state.currentQuestion];
+            let correct = false, score = 0;
+
+            if (q.type === 'typing') {
+                const ans = (state.answers[state.currentQuestion] || '').trim();
+                correct = q.acceptableAnswers.some(a => ans.toLowerCase() === a.toLowerCase());
+                score = correct ? q.points : 0;
+            } else if (q.type === 'matching') {
+                let cnt = 0;
+                const ans = state.answers[state.currentQuestion] || {};
+                q.pairs.forEach(p => { if (ans[p.id] === p.right) cnt++; });
+                correct = cnt === q.pairs.length;
+                score = Math.round((cnt / q.pairs.length) * q.points);
+            }
+
+            state.results[state.currentQuestion] = { correct, score, maxScore: q.points, checked: true };
+            showFeedback(state.currentQuestion);
+            updateNavigation();
+        }
+
+        function showFeedback(index) {
+            const result = state.results[index];
+            const q = questions[index];
+            const box = document.getElementById('feedbackBox');
+            box.classList.remove('correct', 'incorrect');
+            box.classList.add('show', result.correct ? 'correct' : 'incorrect');
+            document.getElementById('feedbackTitle').textContent = result.correct ? '✅ Correct!' : '❌ Incorrect';
+            document.getElementById('feedbackScore').textContent = `${result.score}/${result.maxScore} points`;
+            
+            if (!result.correct) {
+                document.getElementById('correctAnswerBox').style.display = 'block';
+                document.getElementById('correctAnswerText').innerHTML = q.type === 'typing' ? q.targetText : q.pairs.map(p => `${p.left} → ${p.right}`).join('<br>');
+            } else {
+                document.getElementById('correctAnswerBox').style.display = 'none';
+            }
+        }
+
+        function prevQuestion() { saveAnswer(); if (state.currentQuestion > 0) loadQuestion(state.currentQuestion - 1); }
+        function nextQuestion() { saveAnswer(); if (state.currentQuestion < questions.length - 1) loadQuestion(state.currentQuestion + 1); else showResults(); }
+
+        function showResults() {
+            clearInterval(state.timerInterval);
+            let total = 0, max = 0, correctCount = 0;
+            questions.forEach((q, i) => { max += q.points; if (state.results[i]) { total += state.results[i].score; if (state.results[i].correct) correctCount++; } });
+            
+            const pct = Math.round((total / max) * 100);
+            const passed = pct >= 50;
+            const used = 2*60*60 - state.timeRemaining;
+            
+            document.getElementById('examContainer').style.display = 'none';
+            document.getElementById('resultsScreen').style.display = 'flex';
+            document.getElementById('resultIcon').textContent = passed ? '🎉' : '📚';
+            document.getElementById('resultStatus').textContent = passed ? 'PASSED!' : 'Keep Practicing';
+            document.getElementById('resultStatus').className = 'result-status ' + (passed ? 'passed' : 'failed');
+            document.getElementById('scorePercent').textContent = pct + '%';
+            document.getElementById('correctCount').textContent = correctCount;
+            document.getElementById('wrongCount').textContent = questions.length - correctCount;
+            document.getElementById('timeUsed').textContent = `${Math.floor(used/60)}:${(used%60).toString().padStart(2,'0')}`;
+            
+            // Save results to MTTI system
+            if (typeof submitExamToMTTI === 'function') {
+                const questionResults = questions.map((q, i) => ({
+                    question: q.question || q.title,
+                    correct: state.results[i] ? state.results[i].correct : false
+                }));
+                
+                submitExamToMTTI(
+                    document.title.split('|')[0].trim(),
+                    total,
+                    max,
+                    questionResults,
+                    Math.floor(used / 60)
+                ).then(result => {
+                    if (result.success) console.log('✅ Results saved to MTTI:', result.data);
+                    else console.error('❌ Failed to save results:', result.message);
+                });
+            }
+        }
+
+        function reviewAnswers() { document.getElementById('resultsScreen').style.display = 'none'; document.getElementById('examContainer').style.display = 'block'; loadQuestion(0); }
+        function retryExam() {
+            state = { studentName: state.studentName, currentQuestion: 0, answers: {}, results: {}, timeRemaining: 2*60*60, timerInterval: null };
+            document.getElementById('resultsScreen').style.display = 'none';
+            document.getElementById('examContainer').style.display = 'block';
+            document.getElementById('timer').textContent = '02:00:00';
+            document.getElementById('timer').classList.remove('warning');
+            buildNavigation(); loadQuestion(0); startTimer();
+        }
+    </script>
+</body>
+</html>

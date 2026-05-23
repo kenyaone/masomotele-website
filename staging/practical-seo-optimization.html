@@ -1,0 +1,432 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SEO Practical Exam - Optimize a Webpage | M.T.T.I</title>
+    <style>
+        :root{--c:#8b5cf6;--c2:#7c3aed;--bg:#1a0f2e;--card:#2d1f4a;--success:#22c55e;--error:#ef4444}
+        *{margin:0;padding:0;box-sizing:border-box}
+        body{font-family:'Segoe UI',system-ui,sans-serif;background:var(--bg);color:#ddd6fe;min-height:100vh}
+        
+        .header{background:var(--card);border-bottom:2px solid var(--c);padding:12px 20px;display:flex;justify-content:space-between;align-items:center;position:fixed;top:0;left:0;right:0;z-index:100}
+        .header h1{color:var(--c);font-size:1.1rem}
+        .timer{background:var(--c);color:#fff;padding:6px 16px;border-radius:20px;font-weight:600}
+        .timer.warn{background:var(--error);animation:pulse 1s infinite}
+        @keyframes pulse{50%{opacity:0.7}}
+        
+        .main-container{display:grid;grid-template-columns:350px 1fr;height:100vh;padding-top:52px}
+        @media(max-width:900px){.main-container{grid-template-columns:1fr}}
+        
+        .task-panel{background:var(--card);border-right:1px solid #4c1d95;padding:20px;overflow-y:auto}
+        .task-badge{background:var(--c);color:#fff;padding:4px 12px;border-radius:15px;font-size:0.75rem;font-weight:600}
+        .task-title{font-size:1.2rem;color:#fff;margin:12px 0 8px}
+        .task-desc{color:#a78bfa;font-size:0.9rem;line-height:1.5;margin-bottom:15px}
+        
+        .seo-form{background:rgba(0,0,0,0.2);border-radius:10px;padding:15px;margin-bottom:15px}
+        .seo-form h4{color:var(--c);margin-bottom:12px;font-size:0.9rem}
+        .form-group{margin-bottom:12px}
+        .form-group label{display:block;color:#c4b5fd;font-size:0.8rem;margin-bottom:4px}
+        .form-group input,.form-group textarea,.form-group select{width:100%;padding:10px;background:rgba(0,0,0,0.3);border:1px solid #4c1d95;border-radius:6px;color:#fff;font-size:0.9rem}
+        .form-group input:focus,.form-group textarea:focus,.form-group select:focus{outline:none;border-color:var(--c)}
+        .char-count{font-size:0.75rem;color:#a78bfa;text-align:right;margin-top:3px}
+        .char-count.warn{color:#f59e0b}
+        .char-count.error{color:var(--error)}
+        
+        .checklist{background:rgba(139,92,246,0.1);border-left:3px solid var(--c);padding:12px;border-radius:0 8px 8px 0;margin-bottom:15px}
+        .checklist h4{color:var(--c);font-size:0.85rem;margin-bottom:8px}
+        .check-item{display:flex;align-items:center;gap:8px;padding:4px 0;font-size:0.8rem}
+        .check-item .dot{width:14px;height:14px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:0.6rem}
+        .check-item.pass .dot{background:var(--success);color:#fff}
+        .check-item.fail .dot{background:rgba(255,255,255,0.1)}
+        
+        .score-box{background:var(--c);color:#fff;padding:12px;border-radius:8px;text-align:center;margin:15px 0}
+        .score-box .score{font-size:2rem;font-weight:700}
+        
+        .nav-btns{display:flex;gap:10px}
+        .nav-btns button{flex:1;padding:10px;border:none;border-radius:8px;font-weight:600;cursor:pointer}
+        .btn-prev{background:rgba(139,92,246,0.2);color:var(--c)}
+        .btn-next{background:var(--c);color:#fff}
+        
+        .preview-panel{background:#fff;display:flex;flex-direction:column}
+        .preview-header{background:var(--card);padding:10px 15px;display:flex;justify-content:space-between;align-items:center}
+        .preview-header span{color:var(--c);font-size:0.9rem}
+        .preview-tabs{display:flex;gap:5px}
+        .preview-tab{background:rgba(139,92,246,0.2);color:var(--c);border:none;padding:6px 12px;border-radius:5px;cursor:pointer;font-size:0.8rem}
+        .preview-tab.active{background:var(--c);color:#fff}
+        .preview-content{flex:1;overflow:auto;padding:20px}
+        
+        .google-preview{background:#fff;max-width:600px;font-family:Arial,sans-serif}
+        .google-preview .title{color:#1a0dab;font-size:20px;margin-bottom:3px;cursor:pointer;text-decoration:none;display:block}
+        .google-preview .title:hover{text-decoration:underline}
+        .google-preview .url{color:#006621;font-size:14px;margin-bottom:3px}
+        .google-preview .desc{color:#545454;font-size:14px;line-height:1.4}
+        
+        .code-view{background:#1e1e1e;color:#d4d4d4;font-family:monospace;font-size:13px;padding:15px;border-radius:8px;white-space:pre-wrap;line-height:1.6}
+        .code-view .tag{color:#569cd6}
+        .code-view .attr{color:#9cdcfe}
+        .code-view .str{color:#ce9178}
+        
+        .analysis-view{background:#f8f9fa;padding:20px;border-radius:8px}
+        .analysis-item{display:flex;align-items:flex-start;gap:12px;padding:12px;background:#fff;border-radius:6px;margin-bottom:10px;border-left:4px solid #ddd}
+        .analysis-item.good{border-left-color:var(--success)}
+        .analysis-item.warn{border-left-color:#f59e0b}
+        .analysis-item.bad{border-left-color:var(--error)}
+        .analysis-icon{font-size:1.2rem}
+        .analysis-text h5{color:#333;margin-bottom:3px;font-size:0.9rem}
+        .analysis-text p{color:#666;font-size:0.8rem}
+        
+        .start-screen{position:fixed;inset:0;background:var(--bg);display:flex;align-items:center;justify-content:center;z-index:200;padding:20px}
+        .start-card{background:var(--card);border:2px solid var(--c);border-radius:20px;padding:40px;max-width:550px;text-align:center}
+        .start-card .icon{font-size:4rem;margin-bottom:15px}
+        .start-card h1{color:var(--c);font-size:1.8rem;margin-bottom:8px}
+        .start-card h2{color:#a78bfa;font-weight:400;margin-bottom:25px}
+        .brief{background:rgba(0,0,0,0.3);padding:20px;border-radius:12px;text-align:left;margin-bottom:20px}
+        .brief h3{color:var(--c);margin-bottom:10px}
+        .brief p{color:#ddd6fe;font-size:0.9rem;line-height:1.6}
+        .exam-info{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:20px}
+        .info-box{background:rgba(139,92,246,0.1);padding:15px;border-radius:10px}
+        .info-box span{display:block;color:#a78bfa;font-size:0.7rem;text-transform:uppercase}
+        .info-box b{color:var(--c);font-size:1.3rem}
+        .name-input{width:100%;padding:14px;background:rgba(0,0,0,0.3);border:2px solid #4c1d95;border-radius:10px;color:#fff;text-align:center;margin-bottom:15px}
+        .name-input:focus{outline:none;border-color:var(--c)}
+        .start-btn{width:100%;padding:14px;background:var(--c);color:#fff;border:none;border-radius:10px;font-weight:600;cursor:pointer}
+        .start-btn:disabled{opacity:0.5}
+        
+        .results-screen{position:fixed;inset:0;background:var(--bg);display:none;align-items:center;justify-content:center;z-index:200}
+        .results-card{background:var(--card);border:2px solid var(--c);border-radius:20px;padding:40px;max-width:450px;text-align:center}
+        .results-icon{font-size:4rem;margin-bottom:10px}
+        .results-status{font-size:1.8rem;font-weight:800}
+        .results-status.pass{color:var(--success)}
+        .results-status.fail{color:var(--error)}
+        .results-score{font-size:3rem;font-weight:800;color:var(--c);margin:10px 0}
+        .result-item{display:flex;justify-content:space-between;padding:8px 12px;background:rgba(0,0,0,0.2);border-radius:6px;margin:5px 0;font-size:0.85rem}
+        .result-item.pass{border-left:3px solid var(--success)}
+        .result-item.fail{border-left:3px solid var(--error)}
+        .retry-btn{padding:12px 30px;background:var(--c);color:#fff;border:none;border-radius:8px;font-weight:600;cursor:pointer;margin-top:15px}
+    </style>
+</head>
+<body>
+    <div class="start-screen" id="startScreen">
+        <div class="start-card">
+            <div class="icon">🔍</div>
+            <h1>SEO Practical Exam</h1>
+            <h2>Optimize a Webpage for Search Engines</h2>
+            <div class="brief">
+                <h3>📋 Your Challenge:</h3>
+                <p>You'll optimize real web pages for search engines. Write meta titles, descriptions, headings, and see how your changes appear in Google search results in real-time!</p>
+            </div>
+            <div class="exam-info">
+                <div class="info-box"><span>Pages</span><b>5</b></div>
+                <div class="info-box"><span>Time</span><b>35 min</b></div>
+                <div class="info-box"><span>Pass</span><b>60%</b></div>
+            </div>
+            <input type="text" class="name-input" id="studentName" placeholder="Enter Your Full Name">
+            <button class="start-btn" id="startBtn" disabled>🚀 Start Optimizing</button>
+        </div>
+    </div>
+
+    <div class="results-screen" id="resultsScreen">
+        <div class="results-card">
+            <div class="results-icon" id="resultsIcon">🏆</div>
+            <div class="results-status" id="resultsStatus">PASSED</div>
+            <div class="results-score" id="resultsScore">85%</div>
+            <div id="resultsBreakdown"></div>
+            <button class="retry-btn" onclick="location.reload()">🔄 Try Again</button>
+        </div>
+    </div>
+
+    <div class="header" id="header" style="display:none">
+        <h1>🔍 SEO Practical Exam</h1>
+        <div style="display:flex;align-items:center;gap:15px">
+            <span id="taskProgress">Page 1/5</span>
+            <div class="timer" id="timer">35:00</div>
+        </div>
+    </div>
+
+    <div class="main-container" id="mainContainer" style="display:none">
+        <div class="task-panel" id="taskPanel"></div>
+        <div class="preview-panel">
+            <div class="preview-header">
+                <span>Preview</span>
+                <div class="preview-tabs">
+                    <button class="preview-tab active" onclick="showPreview('google')">Google</button>
+                    <button class="preview-tab" onclick="showPreview('code')">HTML</button>
+                    <button class="preview-tab" onclick="showPreview('analysis')">Analysis</button>
+                </div>
+            </div>
+            <div class="preview-content" id="previewContent"></div>
+        </div>
+    </div>
+
+<script>
+const pages = [
+    {
+        title: "Homepage SEO",
+        desc: "Optimize the M.T.T.I homepage for search engines.",
+        keyword: "technical training Kenya",
+        url: "mtti.ac.ke",
+        points: 20,
+        checks: [
+            { id: 'title', test: v => v.length >= 30 && v.length <= 60, text: 'Title: 30-60 characters' },
+            { id: 'title', test: v => v.toLowerCase().includes('training') || v.toLowerCase().includes('mtti'), text: 'Title: Contains keyword' },
+            { id: 'desc', test: v => v.length >= 120 && v.length <= 160, text: 'Description: 120-160 characters' },
+            { id: 'desc', test: v => v.toLowerCase().includes('training') || v.toLowerCase().includes('courses'), text: 'Description: Contains keywords' },
+            { id: 'h1', test: v => v.length > 5, text: 'H1 heading provided' }
+        ]
+    },
+    {
+        title: "Courses Page SEO",
+        desc: "Optimize the courses listing page for 'web development course Eldoret'.",
+        keyword: "web development course Eldoret",
+        url: "mtti.ac.ke/courses",
+        points: 20,
+        checks: [
+            { id: 'title', test: v => v.toLowerCase().includes('web') && v.toLowerCase().includes('course'), text: 'Title: Contains "web" and "course"' },
+            { id: 'title', test: v => v.toLowerCase().includes('eldoret') || v.toLowerCase().includes('kenya'), text: 'Title: Contains location' },
+            { id: 'desc', test: v => v.length >= 120, text: 'Description: Minimum 120 chars' },
+            { id: 'desc', test: v => v.toLowerCase().includes('enroll') || v.toLowerCase().includes('learn') || v.toLowerCase().includes('start'), text: 'Description: Call-to-action' },
+            { id: 'h1', test: v => v.toLowerCase().includes('course'), text: 'H1: Contains "course"' }
+        ]
+    },
+    {
+        title: "About Page SEO",
+        desc: "Optimize the About Us page to build trust and authority.",
+        keyword: "technical training institute Kenya",
+        url: "mtti.ac.ke/about",
+        points: 20,
+        checks: [
+            { id: 'title', test: v => v.toLowerCase().includes('about'), text: 'Title: Contains "About"' },
+            { id: 'title', test: v => v.length <= 60, text: 'Title: Under 60 characters' },
+            { id: 'desc', test: v => v.toLowerCase().includes('tveta') || v.toLowerCase().includes('accredited') || v.toLowerCase().includes('certified'), text: 'Description: Mentions credentials' },
+            { id: 'desc', test: v => v.length >= 100, text: 'Description: Sufficient length' },
+            { id: 'h1', test: v => v.length > 3, text: 'H1 heading provided' }
+        ]
+    },
+    {
+        title: "Blog Post SEO",
+        desc: "Optimize a blog post about '5 Reasons to Learn Web Development in 2024'.",
+        keyword: "learn web development 2024",
+        url: "mtti.ac.ke/blog/learn-web-development-2024",
+        points: 20,
+        checks: [
+            { id: 'title', test: v => /\d/.test(v), text: 'Title: Contains a number' },
+            { id: 'title', test: v => v.toLowerCase().includes('web development'), text: 'Title: Contains "web development"' },
+            { id: 'desc', test: v => v.toLowerCase().includes('2024') || v.toLowerCase().includes('learn'), text: 'Description: Relevant keywords' },
+            { id: 'desc', test: v => v.length >= 120 && v.length <= 160, text: 'Description: Optimal length' },
+            { id: 'h1', test: v => v.toLowerCase().includes('web'), text: 'H1: Topic-relevant' }
+        ]
+    },
+    {
+        title: "Contact Page SEO",
+        desc: "Optimize the Contact page for local search visibility.",
+        keyword: "contact MTTI Eldoret",
+        url: "mtti.ac.ke/contact",
+        points: 20,
+        checks: [
+            { id: 'title', test: v => v.toLowerCase().includes('contact'), text: 'Title: Contains "Contact"' },
+            { id: 'title', test: v => v.toLowerCase().includes('mtti') || v.toLowerCase().includes('eldoret'), text: 'Title: Brand/location name' },
+            { id: 'desc', test: v => v.toLowerCase().includes('eldoret') || v.toLowerCase().includes('kenya'), text: 'Description: Location mentioned' },
+            { id: 'desc', test: v => /\d/.test(v) || v.toLowerCase().includes('call') || v.toLowerCase().includes('email'), text: 'Description: Contact info hint' },
+            { id: 'h1', test: v => v.toLowerCase().includes('contact') || v.toLowerCase().includes('reach'), text: 'H1: Contact-related' }
+        ]
+    }
+];
+
+let current = 0, timeLeft = 35 * 60, timer, previewMode = 'google';
+let answers = pages.map(() => ({ title: '', desc: '', h1: '' }));
+let scores = Array(pages.length).fill(0);
+
+const $ = id => document.getElementById(id);
+
+$('studentName').oninput = e => $('startBtn').disabled = !e.target.value.trim();
+$('startBtn').onclick = startExam;
+
+function startExam() {
+    $('startScreen').style.display = 'none';
+    $('header').style.display = 'flex';
+    $('mainContainer').style.display = 'grid';
+    renderTask();
+    timer = setInterval(tick, 1000);
+}
+
+function tick() {
+    timeLeft--;
+    $('timer').textContent = `${Math.floor(timeLeft/60)}:${(timeLeft%60).toString().padStart(2,'0')}`;
+    if (timeLeft <= 300) $('timer').classList.add('warn');
+    if (timeLeft <= 0) submitExam();
+}
+
+function renderTask() {
+    const p = pages[current];
+    const a = answers[current];
+    
+    $('taskProgress').textContent = `Page ${current + 1}/${pages.length}`;
+    
+    $('taskPanel').innerHTML = `
+        <span class="task-badge">Page ${current + 1}</span>
+        <h2 class="task-title">${p.title}</h2>
+        <p class="task-desc">${p.desc}</p>
+        <p style="font-size:0.8rem;color:#a78bfa;margin-bottom:15px">🎯 Target keyword: <strong>${p.keyword}</strong></p>
+        
+        <div class="seo-form">
+            <h4>Meta Tags</h4>
+            <div class="form-group">
+                <label>Meta Title (30-60 chars recommended)</label>
+                <input type="text" id="metaTitle" value="${a.title}" placeholder="Enter page title..." oninput="updateAnswer('title', this.value)">
+                <div class="char-count" id="titleCount">0/60</div>
+            </div>
+            <div class="form-group">
+                <label>Meta Description (120-160 chars recommended)</label>
+                <textarea id="metaDesc" rows="3" placeholder="Enter meta description..." oninput="updateAnswer('desc', this.value)">${a.desc}</textarea>
+                <div class="char-count" id="descCount">0/160</div>
+            </div>
+            <div class="form-group">
+                <label>H1 Heading</label>
+                <input type="text" id="h1Tag" value="${a.h1}" placeholder="Main page heading..." oninput="updateAnswer('h1', this.value)">
+            </div>
+        </div>
+        
+        <div class="checklist" id="checklist">
+            <h4>SEO Requirements:</h4>
+        </div>
+        
+        <div class="score-box">
+            <div style="font-size:0.8rem">Score</div>
+            <div class="score" id="currentScore">${scores.reduce((a,b)=>a+b,0)}</div>
+            <div style="font-size:0.8rem">/100</div>
+        </div>
+        
+        <div class="nav-btns">
+            <button class="btn-prev" onclick="prevTask()" ${current===0?'style="visibility:hidden"':''}>← Prev</button>
+            <button class="btn-next" onclick="nextTask()">${current===pages.length-1?'🏁 Finish':'Next →'}</button>
+        </div>
+    `;
+    
+    updateCharCounts();
+    checkRequirements();
+    updatePreview();
+}
+
+function updateAnswer(field, value) {
+    answers[current][field] = value;
+    updateCharCounts();
+    checkRequirements();
+    updatePreview();
+}
+
+function updateCharCounts() {
+    const title = $('metaTitle').value;
+    const desc = $('metaDesc').value;
+    
+    const titleCount = $('titleCount');
+    titleCount.textContent = `${title.length}/60`;
+    titleCount.className = 'char-count' + (title.length > 60 ? ' error' : title.length < 30 ? ' warn' : '');
+    
+    const descCount = $('descCount');
+    descCount.textContent = `${desc.length}/160`;
+    descCount.className = 'char-count' + (desc.length > 160 ? ' error' : desc.length < 120 ? ' warn' : '');
+}
+
+function checkRequirements() {
+    const p = pages[current];
+    const a = answers[current];
+    
+    const results = p.checks.map(c => ({
+        pass: c.test(a[c.id] || ''),
+        text: c.text
+    }));
+    
+    const passed = results.filter(r => r.pass).length;
+    scores[current] = Math.round((passed / results.length) * p.points);
+    
+    $('checklist').innerHTML = '<h4>SEO Requirements:</h4>' + results.map(r =>
+        `<div class="check-item ${r.pass?'pass':'fail'}"><div class="dot">${r.pass?'✓':''}</div>${r.text}</div>`
+    ).join('');
+    
+    $('currentScore').textContent = scores.reduce((a,b)=>a+b,0);
+}
+
+function showPreview(mode) {
+    previewMode = mode;
+    document.querySelectorAll('.preview-tab').forEach(t => t.classList.remove('active'));
+    event.target.classList.add('active');
+    updatePreview();
+}
+
+function updatePreview() {
+    const p = pages[current];
+    const a = answers[current];
+    const title = a.title || 'Page Title';
+    const desc = a.desc || 'Add a meta description to see how it appears in search results.';
+    const h1 = a.h1 || 'Page Heading';
+    
+    if (previewMode === 'google') {
+        $('previewContent').innerHTML = `
+            <div style="padding:20px;background:#fff">
+                <p style="color:#666;font-size:13px;margin-bottom:20px">How your page appears in Google search results:</p>
+                <div class="google-preview">
+                    <a class="title">${title.substring(0, 60)}${title.length > 60 ? '...' : ''}</a>
+                    <div class="url">https://${p.url}</div>
+                    <div class="desc">${desc.substring(0, 160)}${desc.length > 160 ? '...' : ''}</div>
+                </div>
+            </div>
+        `;
+    } else if (previewMode === 'code') {
+        $('previewContent').innerHTML = `
+            <div class="code-view">
+<span class="tag">&lt;head&gt;</span>
+  <span class="tag">&lt;title&gt;</span>${title}<span class="tag">&lt;/title&gt;</span>
+  <span class="tag">&lt;meta</span> <span class="attr">name</span>=<span class="str">"description"</span> <span class="attr">content</span>=<span class="str">"${desc}"</span><span class="tag">&gt;</span>
+<span class="tag">&lt;/head&gt;</span>
+<span class="tag">&lt;body&gt;</span>
+  <span class="tag">&lt;h1&gt;</span>${h1}<span class="tag">&lt;/h1&gt;</span>
+<span class="tag">&lt;/body&gt;</span>
+            </div>
+        `;
+    } else {
+        const checks = [
+            { good: title.length >= 30 && title.length <= 60, warn: title.length > 0, text: 'Title Length', detail: `${title.length} chars (optimal: 30-60)` },
+            { good: desc.length >= 120 && desc.length <= 160, warn: desc.length > 0, text: 'Description Length', detail: `${desc.length} chars (optimal: 120-160)` },
+            { good: title.toLowerCase().includes(p.keyword.split(' ')[0].toLowerCase()), warn: false, text: 'Keyword in Title', detail: `Target: "${p.keyword}"` },
+            { good: h1.length > 5, warn: false, text: 'H1 Heading', detail: h1.length > 0 ? 'Provided' : 'Missing' }
+        ];
+        
+        $('previewContent').innerHTML = `
+            <div class="analysis-view">
+                ${checks.map(c => `
+                    <div class="analysis-item ${c.good?'good':c.warn?'warn':'bad'}">
+                        <div class="analysis-icon">${c.good?'✅':c.warn?'⚠️':'❌'}</div>
+                        <div class="analysis-text">
+                            <h5>${c.text}</h5>
+                            <p>${c.detail}</p>
+                        </div>
+                    </div>
+                `).join('')}
+            </div>
+        `;
+    }
+}
+
+function prevTask() { if (current > 0) { current--; renderTask(); } }
+function nextTask() { if (current < pages.length - 1) { current++; renderTask(); } else submitExam(); }
+
+function submitExam() {
+    clearInterval(timer);
+    const total = scores.reduce((a,b)=>a+b,0);
+    const pass = total >= 60;
+    
+    $('header').style.display = 'none';
+    $('mainContainer').style.display = 'none';
+    $('resultsScreen').style.display = 'flex';
+    $('resultsIcon').textContent = pass ? '🏆' : '📚';
+    $('resultsStatus').textContent = pass ? 'PASSED!' : 'KEEP PRACTICING';
+    $('resultsStatus').className = `results-status ${pass?'pass':'fail'}`;
+    $('resultsScore').textContent = `${total}%`;
+    $('resultsBreakdown').innerHTML = pages.map((p,i) =>
+        `<div class="result-item ${scores[i]>=p.points*0.5?'pass':'fail'}"><span>${p.title}</span><span>${scores[i]}/${p.points}</span></div>`
+    ).join('');
+}
+</script>
+</body>
+</html>

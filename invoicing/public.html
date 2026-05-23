@@ -1,0 +1,1771 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Masomotele Invoicing System</title>
+    <style>
+        * { margin:0; padding:0; box-sizing:border-box; }
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #1a472a 0%, #3D6318 100%);
+            min-height: 100vh; padding: 20px;
+        }
+        .container {
+            max-width: 1200px; margin: 0 auto;
+            background: white; border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.25); overflow: hidden;
+        }
+        .header {
+            background: linear-gradient(135deg, #1a472a 0%, #3D6318 100%);
+            color: white; padding: 28px 30px; display: flex;
+            align-items: center; gap: 20px;
+        }
+        .logo-circle {
+            width: 80px; height: 80px; border-radius: 50%;
+            border: 3px solid rgba(255,255,255,0.4);
+            overflow: hidden; flex-shrink: 0; background: rgba(255,255,255,0.15);
+            display: flex; align-items: center; justify-content: center; font-size: 2em;
+            cursor: pointer;
+        }
+        .logo-circle img { width:100%; height:100%; object-fit:cover; border-radius:50%; }
+        .header-text { flex: 1; }
+        .header-text h1 { font-size: 2em; text-shadow: 1px 1px 4px rgba(0,0,0,0.3); }
+        .header-text p { opacity: 0.85; font-size: 0.9em; margin-top: 4px; }
+        .header-right { text-align: right; font-size: 0.85em; opacity: 0.8; }
+        .sync-status { display: inline-flex; align-items:center; gap:6px; font-size:0.8em;
+            background: rgba(255,255,255,0.15); padding: 4px 10px; border-radius: 20px; margin-top: 4px; }
+        .sync-dot { width:8px; height:8px; border-radius:50%; background:#4ade80; }
+        .sync-dot.offline { background:#f87171; }
+        .sync-dot.syncing { background:#fbbf24; animation: pulse 1s infinite; }
+        @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.4} }
+
+        .nav-tabs {
+            display: flex; background: #f8f9fa; border-bottom: 2px solid #e9ecef;
+            overflow-x: auto;
+        }
+        .nav-tab {
+            flex: 1; min-width: 100px; padding: 16px 10px; text-align: center;
+            cursor: pointer; border: none; background: transparent;
+            font-size: 14px; font-weight: 600; color: #6c757d;
+            transition: all 0.2s; white-space: nowrap; border-bottom: 3px solid transparent;
+        }
+        .nav-tab:hover { background: #e9ecef; color: #495057; }
+        .nav-tab.active { background: white; color: #3D6318; border-bottom-color: #3D6318; }
+
+        .content { padding: 28px; }
+        .tab-content { display: none; }
+        .tab-content.active { display: block; animation: fadeIn 0.25s ease; }
+        @keyframes fadeIn { from{opacity:0;transform:translateY(8px)} to{opacity:1;transform:translateY(0)} }
+
+        .form-section {
+            background: #f8fdf8; border: 1px solid #d4edda; padding: 22px;
+            border-radius: 12px; margin-bottom: 22px;
+        }
+        .form-section h3 { color: #1a472a; margin-bottom: 18px; font-size: 1.1em;
+            display: flex; align-items:center; gap:8px; }
+        .form-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px,1fr)); gap: 18px; }
+        .form-group { margin-bottom: 12px; }
+        .form-group label { display: block; margin-bottom: 7px; font-weight: 600; color: #495057; font-size: 0.9em; }
+        .form-group input, .form-group textarea, .form-group select {
+            width: 100%; padding: 10px 13px; border: 2px solid #e2e8f0;
+            border-radius: 8px; font-size: 14px; transition: border-color 0.2s;
+            font-family: inherit; background: white;
+        }
+        .form-group input:focus, .form-group textarea:focus, .form-group select:focus {
+            outline: none; border-color: #3D6318; box-shadow: 0 0 0 3px rgba(61,99,24,0.1);
+        }
+        .checkbox-group { display:flex; align-items:center; gap:10px; margin-top:8px; }
+        .checkbox-group input[type=checkbox] { width:auto; accent-color: #3D6318; }
+
+        /* Items Table */
+        .items-table { width:100%; border-collapse:collapse; background:white;
+            border-radius:10px; overflow:hidden; box-shadow:0 2px 12px rgba(0,0,0,0.08); margin-top:15px; }
+        .items-table th, .items-table td { padding:12px 14px; text-align:left; border-bottom:1px solid #e9ecef; }
+        .items-table th { background:#1a472a; color:white; font-weight:600; font-size:0.9em; }
+        .items-table tr:hover { background:#f8fdf8; }
+        .text-center { text-align:center; }
+        .text-right { text-align:right; }
+
+        /* Records Table */
+        .records-table-wrap { overflow-x:auto; border-radius:10px; box-shadow:0 2px 12px rgba(0,0,0,0.08); margin-top:15px; }
+        .records-table { width:100%; border-collapse:collapse; background:white; min-width:600px; }
+        .records-table th, .records-table td { padding:11px 13px; text-align:left; border-bottom:1px solid #e9ecef; font-size:0.9em; }
+        .records-table th { background:#1a472a; color:white; font-weight:600; }
+        .records-table tr:hover { background:#f8fdf8; }
+
+        /* Buttons */
+        .btn {
+            padding: 10px 20px; border:none; border-radius:8px;
+            cursor:pointer; font-size:13px; font-weight:600;
+            transition: all 0.2s; margin:4px; display:inline-flex;
+            align-items:center; gap:6px; font-family:inherit;
+        }
+        .btn:hover { transform:translateY(-1px); }
+        .btn-primary { background: linear-gradient(135deg,#3D6318,#2d4d12); color:white; }
+        .btn-primary:hover { box-shadow:0 4px 12px rgba(61,99,24,0.4); }
+        .btn-success { background: linear-gradient(135deg,#27ae60,#1e8449); color:white; }
+        .btn-success:hover { box-shadow:0 4px 12px rgba(39,174,96,0.4); }
+        .btn-danger { background: linear-gradient(135deg,#e74c3c,#c0392b); color:white; }
+        .btn-danger:hover { box-shadow:0 4px 12px rgba(231,76,60,0.4); }
+        .btn-warning { background: linear-gradient(135deg,#f39c12,#d68910); color:white; }
+        .btn-info { background: linear-gradient(135deg,#17a2b8,#138496); color:white; }
+        .btn-orange { background: linear-gradient(135deg,#FF9700,#e68000); color:white; }
+        .btn-small { padding:6px 12px; font-size:12px; }
+        .actions { margin-top:20px; display:flex; flex-wrap:wrap; gap:4px; }
+
+        /* Stats */
+        .stats-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(160px,1fr)); gap:16px; margin-bottom:22px; }
+        .stat-card {
+            background: linear-gradient(135deg,#1a472a,#3D6318);
+            color:white; padding:20px; border-radius:12px; text-align:center;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.15);
+        }
+        .stat-number { font-size:1.8em; font-weight:700; margin-bottom:4px; }
+        .stat-label { font-size:0.8em; opacity:0.85; }
+
+        /* Alert */
+        .alert { padding:12px 16px; border-radius:8px; margin-bottom:16px; font-size:0.9em; }
+        .alert-success { background:#d4edda; border:1px solid #c3e6cb; color:#155724; }
+        .alert-info { background:#d1ecf1; border:1px solid #bee5eb; color:#0c5460; }
+        .alert-warning { background:#fff3cd; border:1px solid #ffc107; color:#856404; }
+        .alert-error { background:#f8d7da; border:1px solid #f5c6cb; color:#721c24; }
+
+        /* Document Preview */
+        .document-preview {
+            margin-top:25px; padding:30px; border:1px solid #dee2e6;
+            border-radius:12px; background:white;
+        }
+        .document-preview.hidden { display:none; }
+        .document-header { display:flex; justify-content:space-between; align-items:flex-start;
+            margin-bottom:30px; flex-wrap:wrap; gap:15px; }
+        .doc-company-info { max-width:280px; }
+        .doc-company-info h2 { color:#1a472a; font-size:1.4em; margin-bottom:6px; }
+        .doc-company-info p { color:#555; margin-bottom:3px; font-size:0.9em; }
+        .doc-details { text-align:right; }
+        .doc-title { font-size:1.8em; font-weight:700; color:#1a472a; margin-bottom:8px; }
+        .doc-details p { margin-bottom:4px; font-size:0.9em; color:#555; }
+        .totals { max-width:320px; margin-left:auto; margin-top:20px; }
+        .total-line { display:flex; justify-content:space-between; padding:8px 0;
+            border-bottom:1px solid #e9ecef; font-size:0.95em; }
+        .total-line.final { background:#1a472a; color:white; padding:12px 14px;
+            border-radius:8px; font-weight:700; font-size:1.05em; border:none; margin-top:4px; }
+        .doc-logo { width:60px; height:60px; border-radius:8px; object-fit:cover; margin-bottom:8px; }
+
+        /* Conversion Box */
+        .conversion-section {
+            background:#e8f5e8; border:2px solid #4caf50; border-radius:12px;
+            padding:18px; margin:18px 0;
+        }
+        .conversion-section h4 { color:#2d6a2d; margin-bottom:12px; font-size:1em; }
+
+        /* Modal */
+        .modal-overlay {
+            display:none; position:fixed; top:0;left:0;width:100%;height:100%;
+            background:rgba(0,0,0,0.55); z-index:9999; align-items:center; justify-content:center;
+        }
+        .modal-overlay.open { display:flex; }
+        .modal-box {
+            background:white; border-radius:16px; padding:30px;
+            width:90%; max-width:680px; max-height:88vh; overflow-y:auto;
+            box-shadow:0 25px 60px rgba(0,0,0,0.3); animation:fadeIn 0.2s ease;
+        }
+        .modal-box h2 { color:#1a472a; margin-bottom:18px; font-size:1.3em;
+            border-bottom:2px solid #3D6318; padding-bottom:10px; }
+        .modal-actions { display:flex; gap:10px; justify-content:flex-end;
+            margin-top:18px; border-top:1px solid #e9ecef; padding-top:14px; }
+        .modal-items-table { width:100%; border-collapse:collapse; margin-top:10px; font-size:13px; }
+        .modal-items-table th, .modal-items-table td { border:1px solid #dee2e6; padding:7px 10px; }
+        .modal-items-table th { background:#1a472a; color:white; }
+        .modal-items-table input { width:100%; border:none; background:transparent; font-size:13px; padding:2px; }
+        .modal-items-table input:focus { outline:2px solid #3D6318; border-radius:3px; }
+        .edit-badge {
+            display:inline-block; background:#fff3cd; color:#856404;
+            border:1px solid #ffc107; border-radius:4px; padding:2px 8px;
+            font-size:11px; font-weight:bold; margin-left:8px;
+        }
+
+        /* Logo Upload */
+        .logo-upload { display:flex; align-items:center; gap:15px; }
+        .logo-preview { width:64px; height:64px; border:2px dashed #ccc; border-radius:8px;
+            display:flex; align-items:center; justify-content:center; overflow:hidden;
+            background:#f8f9fa; cursor:pointer; }
+        .logo-preview img { width:100%; height:100%; object-fit:cover; }
+        .logo-preview:hover { border-color:#3D6318; }
+
+        /* Backup section */
+        .backup-section { background:#f0f7ff; border:1px solid #b3d4f5; border-radius:12px;
+            padding:20px; margin-top:20px; }
+        .backup-section h3 { color:#1a472a; margin-bottom:10px; }
+        .backup-buttons { display:flex; flex-wrap:wrap; gap:8px; margin-top:12px; }
+
+        /* Badge */
+        .badge { display:inline-block; padding:3px 9px; border-radius:20px;
+            font-size:0.75em; font-weight:700; }
+        .badge-invoice { background:#dbeafe; color:#1e40af; }
+        .badge-quotation { background:#ede9fe; color:#5b21b6; }
+        .badge-receipt { background:#dcfce7; color:#166534; }
+        .badge-delivery { background:#ffedd5; color:#9a3412; }
+
+        /* Search bar */
+        .search-bar { display:flex; gap:10px; margin-bottom:15px; }
+        .search-bar input { flex:1; }
+
+        /* Loading spinner */
+        .spinner { display:inline-block; width:16px; height:16px; border:2px solid rgba(255,255,255,0.3);
+            border-top-color:white; border-radius:50%; animation:spin 0.7s linear infinite; }
+        @keyframes spin { to{transform:rotate(360deg)} }
+
+        /* Print styles */
+        @media print {
+            body { background:white; padding:0; }
+            .container { box-shadow:none; border-radius:0; }
+            .header, .nav-tabs, .form-section, .actions, .alert,
+            .conversion-section, .modal-overlay, button, .backup-section { display:none !important; }
+            .tab-content { display:none !important; }
+            .document-preview { display:block !important; border:none; padding:20px; }
+            #printArea { display:block !important; }
+        }
+
+        /* Responsive */
+        @media (max-width:600px) {
+            .content { padding:16px; }
+            .header { padding:18px; flex-direction:column; text-align:center; }
+            .header-right { display:none; }
+            .nav-tab { font-size:12px; padding:12px 6px; }
+            .document-header { flex-direction:column; }
+            .doc-details { text-align:left; }
+        }
+    </style>
+<script type="text/javascript">(function(c,l,a,r,i,t,y){c[a]=c[a]||function(){(c[a].q=c[a].q||[]).push(arguments)};t=l.createElement(r);t.async=1;t.src="https://www.clarity.ms/tag/"+i;y=l.getElementsByTagName(r)[0];y.parentNode.insertBefore(t,y);})(window,document,"clarity","script","wg31zlwbt9");</script>\n</head>
+<body>
+<div class="container">
+
+    <!-- HEADER -->
+    <div class="header">
+        <div class="logo-circle" id="headerLogo" onclick="document.getElementById('logoUploadHidden').click()" title="Click to upload logo">
+            <span id="logoText">🏢</span>
+        </div>
+        <div class="header-text">
+            <h1 id="headerCompanyName">Loading...</h1>
+            <p id="headerCompanyContact"></p>
+        </div>
+        <div class="header-right">
+            <div>Masomotele Invoicing</div>
+            <div class="sync-status" id="syncStatus">
+                <span class="sync-dot" id="syncDot"></span>
+                <span id="syncText">Connecting...</span>
+            </div>
+        </div>
+        <input type="file" id="logoUploadHidden" accept="image/*" style="display:none" onchange="uploadLogo(event)">
+    </div>
+
+    <!-- NAV TABS -->
+    <div class="nav-tabs">
+        <button class="nav-tab active" onclick="switchTab('invoice',this)">🧾 Invoice</button>
+        <button class="nav-tab" onclick="switchTab('quotation',this)">📋 Quotation</button>
+        <button class="nav-tab" onclick="switchTab('receipt',this)">✅ Receipt</button>
+        <button class="nav-tab" onclick="switchTab('delivery',this)">🚚 Delivery</button>
+        <button class="nav-tab" onclick="switchTab('records',this)">📊 Records</button>
+        <button class="nav-tab" onclick="switchTab('settings',this)">⚙️ Settings</button>
+    </div>
+
+    <div class="content">
+
+        <!-- ══════════════════════════════════════
+             INVOICE TAB
+        ══════════════════════════════════════ -->
+        <div id="invoice" class="tab-content active">
+            <div class="form-section">
+                <h3>🧾 Invoice Details</h3>
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label>Invoice Number</label>
+                        <input type="text" id="invoiceNumber" value="INV-001">
+                    </div>
+                    <div class="form-group">
+                        <label>Date</label>
+                        <input type="date" id="invoiceDate">
+                    </div>
+                    <div class="form-group">
+                        <label>Due Date</label>
+                        <input type="date" id="invoiceDueDate">
+                    </div>
+                </div>
+            </div>
+            <div class="form-section">
+                <h3>👤 Client Information</h3>
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label>Client Name</label>
+                        <input type="text" id="invoiceClientName" placeholder="Client / Company Name">
+                    </div>
+                    <div class="form-group">
+                        <label>Client Address</label>
+                        <textarea id="invoiceClientAddress" rows="3" placeholder="P.O. Box 12345, Nairobi"></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label>Contact Info</label>
+                        <input type="text" id="invoiceClientContact" placeholder="+254 700 123456">
+                    </div>
+                </div>
+            </div>
+            <div class="form-section">
+                <h3>📦 Items</h3>
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label>Description</label>
+                        <input type="text" id="invoiceItemDescription" placeholder="Item / Service description">
+                    </div>
+                    <div class="form-group">
+                        <label>Quantity</label>
+                        <input type="number" id="invoiceItemQuantity" value="1" min="0.01" step="0.01">
+                    </div>
+                    <div class="form-group">
+                        <label>Unit Price (KSh)</label>
+                        <input type="number" id="invoiceItemPrice" placeholder="0.00" min="0" step="0.01">
+                    </div>
+                </div>
+                <button class="btn btn-success" onclick="addItem('invoice')">+ Add Item</button>
+                <table class="items-table">
+                    <thead><tr>
+                        <th>Description</th><th class="text-center">Qty</th>
+                        <th class="text-right">Unit Price</th><th class="text-right">Total</th><th></th>
+                    </tr></thead>
+                    <tbody id="invoiceItemsBody"></tbody>
+                    <tfoot id="invoiceTotalsFooter"></tfoot>
+                </table>
+            </div>
+            <div class="actions">
+                <button class="btn btn-primary" onclick="generateDocument('invoice')">🔍 Preview Invoice</button>
+                <button class="btn btn-success" onclick="saveAndPrint('invoice')" id="invoicePrintBtn" disabled>🖨️ Save & Print</button>
+            </div>
+            <div id="invoicePreview" class="document-preview hidden"></div>
+        </div>
+
+        <!-- ══════════════════════════════════════
+             QUOTATION TAB
+        ══════════════════════════════════════ -->
+        <div id="quotation" class="tab-content">
+            <div class="form-section">
+                <h3>📋 Quotation Details</h3>
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label>Quotation Number</label>
+                        <input type="text" id="quotationNumber" value="QUO-001">
+                    </div>
+                    <div class="form-group">
+                        <label>Date</label>
+                        <input type="date" id="quotationDate">
+                    </div>
+                    <div class="form-group">
+                        <label>Valid Until</label>
+                        <input type="date" id="quotationValidUntil">
+                    </div>
+                </div>
+            </div>
+            <div class="form-section">
+                <h3>👤 Client Information</h3>
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label>Client Name</label>
+                        <input type="text" id="quotationClientName" placeholder="Client / Company Name">
+                    </div>
+                    <div class="form-group">
+                        <label>Client Address</label>
+                        <textarea id="quotationClientAddress" rows="3" placeholder="P.O. Box 12345, Nairobi"></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label>Contact Info</label>
+                        <input type="text" id="quotationClientContact" placeholder="+254 700 123456">
+                    </div>
+                </div>
+            </div>
+            <div class="form-section">
+                <h3>📦 Items</h3>
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label>Description</label>
+                        <input type="text" id="quotationItemDescription" placeholder="Item / Service description">
+                    </div>
+                    <div class="form-group">
+                        <label>Quantity</label>
+                        <input type="number" id="quotationItemQuantity" value="1" min="0.01" step="0.01">
+                    </div>
+                    <div class="form-group">
+                        <label>Unit Price (KSh)</label>
+                        <input type="number" id="quotationItemPrice" placeholder="0.00" min="0" step="0.01">
+                    </div>
+                </div>
+                <button class="btn btn-success" onclick="addItem('quotation')">+ Add Item</button>
+                <table class="items-table">
+                    <thead><tr>
+                        <th>Description</th><th class="text-center">Qty</th>
+                        <th class="text-right">Unit Price</th><th class="text-right">Total</th><th></th>
+                    </tr></thead>
+                    <tbody id="quotationItemsBody"></tbody>
+                    <tfoot id="quotationTotalsFooter"></tfoot>
+                </table>
+            </div>
+            <div class="conversion-section">
+                <h4>🔄 Convert Quotation To:</h4>
+                <button class="btn btn-primary btn-small" onclick="convertTo('invoice')">→ Invoice</button>
+                <button class="btn btn-success btn-small" onclick="convertTo('receipt')">→ Receipt</button>
+                <button class="btn btn-orange btn-small" onclick="convertTo('delivery')">→ Delivery Note</button>
+            </div>
+            <div class="actions">
+                <button class="btn btn-primary" onclick="generateDocument('quotation')">🔍 Preview Quotation</button>
+                <button class="btn btn-success" onclick="saveAndPrint('quotation')" id="quotationPrintBtn" disabled>🖨️ Save & Print</button>
+            </div>
+            <div id="quotationPreview" class="document-preview hidden"></div>
+        </div>
+
+        <!-- ══════════════════════════════════════
+             RECEIPT TAB
+        ══════════════════════════════════════ -->
+        <div id="receipt" class="tab-content">
+            <div class="form-section">
+                <h3>✅ Receipt Details</h3>
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label>Receipt Number</label>
+                        <input type="text" id="receiptNumber" value="REC-001">
+                    </div>
+                    <div class="form-group">
+                        <label>Date</label>
+                        <input type="date" id="receiptDate">
+                    </div>
+                    <div class="form-group">
+                        <label>Payment Method</label>
+                        <select id="paymentMethod">
+                            <option>M-Pesa</option><option>Cash</option>
+                            <option>Bank Transfer</option><option>Cheque</option><option>Card</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+            <div class="form-section">
+                <h3>👤 Customer</h3>
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label>Customer Name</label>
+                        <input type="text" id="receiptCustomerName" placeholder="Customer Name">
+                    </div>
+                    <div class="form-group">
+                        <label>Customer Address</label>
+                        <textarea id="receiptCustomerAddress" rows="3" placeholder="Address (optional)"></textarea>
+                    </div>
+                </div>
+            </div>
+            <div class="form-section">
+                <h3>📦 Items</h3>
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label>Description</label>
+                        <input type="text" id="receiptItemDescription" placeholder="Item / Service description">
+                    </div>
+                    <div class="form-group">
+                        <label>Quantity</label>
+                        <input type="number" id="receiptItemQuantity" value="1" min="0.01" step="0.01">
+                    </div>
+                    <div class="form-group">
+                        <label>Unit Price (KSh)</label>
+                        <input type="number" id="receiptItemPrice" placeholder="0.00" min="0" step="0.01">
+                    </div>
+                </div>
+                <button class="btn btn-success" onclick="addItem('receipt')">+ Add Item</button>
+                <table class="items-table">
+                    <thead><tr>
+                        <th>Description</th><th class="text-center">Qty</th>
+                        <th class="text-right">Unit Price</th><th class="text-right">Total</th><th></th>
+                    </tr></thead>
+                    <tbody id="receiptItemsBody"></tbody>
+                    <tfoot id="receiptTotalsFooter"></tfoot>
+                </table>
+            </div>
+            <div class="actions">
+                <button class="btn btn-primary" onclick="generateDocument('receipt')">🔍 Preview Receipt</button>
+                <button class="btn btn-success" onclick="saveAndPrint('receipt')" id="receiptPrintBtn" disabled>🖨️ Save & Print</button>
+            </div>
+            <div id="receiptPreview" class="document-preview hidden"></div>
+        </div>
+
+        <!-- ══════════════════════════════════════
+             DELIVERY NOTE TAB
+        ══════════════════════════════════════ -->
+        <div id="delivery" class="tab-content">
+            <div class="form-section">
+                <h3>🚚 Delivery Note Details</h3>
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label>Delivery Number</label>
+                        <input type="text" id="deliveryNumber" value="DN-001">
+                    </div>
+                    <div class="form-group">
+                        <label>Date</label>
+                        <input type="date" id="deliveryDate">
+                    </div>
+                    <div class="form-group">
+                        <label>Time</label>
+                        <input type="time" id="deliveryTime">
+                    </div>
+                </div>
+            </div>
+            <div class="form-section">
+                <h3>📍 Delivery To</h3>
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label>Recipient Name</label>
+                        <input type="text" id="deliveryTo" placeholder="Recipient / Company">
+                    </div>
+                    <div class="form-group">
+                        <label>Delivery Address</label>
+                        <textarea id="deliveryAddress" rows="3" placeholder="Full delivery address"></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label>Special Instructions</label>
+                        <textarea id="deliveryInstructions" rows="3" placeholder="Any special handling notes..."></textarea>
+                    </div>
+                </div>
+            </div>
+            <div class="form-section">
+                <h3>📦 Items</h3>
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label>Description</label>
+                        <input type="text" id="deliveryItemDescription" placeholder="Item description">
+                    </div>
+                    <div class="form-group">
+                        <label>Quantity</label>
+                        <input type="number" id="deliveryItemQuantity" value="1" min="1" step="1">
+                    </div>
+                </div>
+                <button class="btn btn-success" onclick="addDeliveryItem()">+ Add Item</button>
+                <table class="items-table">
+                    <thead><tr>
+                        <th>Description</th><th class="text-center">Qty</th><th></th>
+                    </tr></thead>
+                    <tbody id="deliveryItemsBody"></tbody>
+                </table>
+            </div>
+            <div class="actions">
+                <button class="btn btn-primary" onclick="generateDocument('delivery')">🔍 Preview Delivery Note</button>
+                <button class="btn btn-success" onclick="saveAndPrint('delivery')" id="deliveryPrintBtn" disabled>🖨️ Save & Print</button>
+            </div>
+            <div id="deliveryPreview" class="document-preview hidden"></div>
+        </div>
+
+        <!-- ══════════════════════════════════════
+             RECORDS TAB
+        ══════════════════════════════════════ -->
+        <div id="records" class="tab-content">
+            <div id="syncAlert" class="alert alert-info" style="display:none">
+                <strong>⚠️ Offline Mode:</strong> Records are saved locally. They will sync when connection is restored.
+            </div>
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-number" id="statInvoices">0</div>
+                    <div class="stat-label">Invoices</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number" id="statQuotations">0</div>
+                    <div class="stat-label">Quotations</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number" id="statReceipts">0</div>
+                    <div class="stat-label">Receipts</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number" id="statRevenue">KSh 0</div>
+                    <div class="stat-label">Total Revenue</div>
+                </div>
+            </div>
+            <div class="form-section">
+                <h3>📋 Document Records</h3>
+                <div class="search-bar">
+                    <select id="recordFilter" onchange="loadRecords()">
+                        <option value="all">All Documents</option>
+                        <option value="invoice">Invoices</option>
+                        <option value="quotation">Quotations</option>
+                        <option value="receipt">Receipts</option>
+                        <option value="delivery">Delivery Notes</option>
+                    </select>
+                    <input type="text" id="recordSearch" placeholder="Search by name or number..." oninput="loadRecords()">
+                    <button class="btn btn-primary btn-small" onclick="loadRecords()">🔍</button>
+                </div>
+                <div class="records-table-wrap">
+                    <table class="records-table">
+                        <thead><tr>
+                            <th>Date</th><th>Type</th><th>Number</th>
+                            <th>Client / Recipient</th><th class="text-right">Total</th><th>Actions</th>
+                        </tr></thead>
+                        <tbody id="recordsBody">
+                            <tr><td colspan="6" class="text-center" style="padding:20px;color:#888">Loading...</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            <div class="actions">
+                <button class="btn btn-primary" onclick="exportCSV()">📋 Export CSV</button>
+                <button class="btn btn-warning" onclick="exportJSON()">💾 Export JSON</button>
+                <button class="btn btn-danger" onclick="clearAllRecords()">🗑️ Clear All</button>
+            </div>
+        </div>
+
+        <!-- ══════════════════════════════════════
+             SETTINGS TAB
+        ══════════════════════════════════════ -->
+        <div id="settings" class="tab-content">
+            <div class="form-section">
+                <h3>🏢 Company Information</h3>
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label>Company Logo</label>
+                        <div class="logo-upload">
+                            <div class="logo-preview" id="settingsLogoPreview" onclick="document.getElementById('logoUploadHidden').click()">
+                                <span>📁</span>
+                            </div>
+                            <div style="font-size:0.85em;color:#666">
+                                Click logo to change.<br>Max 2MB (JPG/PNG/GIF/WEBP)
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label>Company Name *</label>
+                        <input type="text" id="settingsCompanyName" placeholder="Your Company Name">
+                    </div>
+                    <div class="form-group">
+                        <label>Address</label>
+                        <textarea id="settingsAddress" rows="3" placeholder="P.O. Box 12345, Nairobi, Kenya"></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label>Phone</label>
+                        <input type="text" id="settingsPhone" placeholder="+254 700 123456">
+                    </div>
+                    <div class="form-group">
+                        <label>Email</label>
+                        <input type="email" id="settingsEmail" placeholder="info@company.co.ke">
+                    </div>
+                    <div class="form-group">
+                        <label>VAT Number (optional)</label>
+                        <input type="text" id="settingsVAT" placeholder="VAT: 0123456789">
+                    </div>
+                </div>
+                <div class="form-section" style="background:white;margin-top:15px;">
+                    <h3>💰 Tax Settings</h3>
+                    <div class="checkbox-group">
+                        <input type="checkbox" id="enableVAT" checked onchange="toggleVATSettings()">
+                        <label for="enableVAT">Enable VAT Calculation</label>
+                    </div>
+                    <div class="form-group" id="vatRateGroup" style="max-width:200px;margin-top:12px;">
+                        <label>VAT Rate (%)</label>
+                        <input type="number" id="vatRate" value="16" step="0.01" min="0" max="100">
+                    </div>
+                </div>
+                <button class="btn btn-success" onclick="saveSettings()">💾 Save Settings</button>
+                <span id="settingsSaveMsg" style="margin-left:10px;font-size:0.9em;color:#27ae60;display:none">✅ Saved!</span>
+            </div>
+
+            <div class="backup-section">
+                <h3>📁 Backup & Restore</h3>
+                <p style="font-size:0.9em;color:#555;margin-bottom:12px;">
+                    All data is saved to the server database. Use these tools for additional backups.
+                </p>
+                <div class="backup-buttons">
+                    <button class="btn btn-primary" onclick="exportJSON()">💾 Export All Records (JSON)</button>
+                    <button class="btn btn-primary" onclick="exportCSV()">📋 Export Records (CSV)</button>
+                    <label class="btn btn-warning" for="restoreFile" style="cursor:pointer">📂 Restore from JSON</label>
+                    <input type="file" id="restoreFile" accept=".json" style="display:none" onchange="restoreFromFile(event)">
+                </div>
+            </div>
+        </div>
+
+    </div><!-- .content -->
+</div><!-- .container -->
+
+<!-- ══════════════════════════════════════
+     EDIT MODAL
+══════════════════════════════════════ -->
+<div class="modal-overlay" id="editModal">
+    <div class="modal-box">
+        <h2 id="editModalTitle">Edit Record <span class="edit-badge">EDITING</span></h2>
+        <div id="editModalFields"></div>
+        <div class="modal-actions">
+            <button class="btn btn-danger btn-small" onclick="closeModal()">Cancel</button>
+            <button class="btn btn-success" onclick="saveEdit(false)">💾 Save</button>
+            <button class="btn btn-primary" onclick="saveEdit(true)">💾 Save & Print</button>
+        </div>
+    </div>
+</div>
+
+<!-- Hidden print area -->
+<div id="printArea" style="display:none"></div>
+
+<script>
+// ══════════════════════════════════════════════════════════
+//  CONFIGURATION
+// ══════════════════════════════════════════════════════════
+const API_BASE = 'api/index.php';
+let isOnline = true;
+let pendingSync = [];
+
+// App State
+let invoiceItems = [], quotationItems = [], receiptItems = [], deliveryItems = [];
+let companyInfo = { name:'', address:'', phone:'', email:'', vat:'', logo:'' };
+let taxSettings = { enableVAT:true, vatRate:16 };
+let allRecords = [];
+let editingRecordId = null, editingItems = [];
+
+// ══════════════════════════════════════════════════════════
+//  API HELPERS
+// ══════════════════════════════════════════════════════════
+async function api(action, method='GET', body=null, params={}) {
+    let url = `${API_BASE}?action=${action}`;
+    Object.keys(params).forEach(k => url += `&${k}=${encodeURIComponent(params[k])}`);
+    const opts = { method, headers:{'Content-Type':'application/json'} };
+    if (body && method!=='GET') opts.body = JSON.stringify(body);
+    try {
+        const res = await fetch(url, opts);
+        const data = await res.json();
+        setOnline(true);
+        return data;
+    } catch(e) {
+        setOnline(false);
+        return { success:false, message:'Network error', data:null };
+    }
+}
+
+function setOnline(online) {
+    isOnline = online;
+    const dot = document.getElementById('syncDot');
+    const txt = document.getElementById('syncText');
+    const alert = document.getElementById('syncAlert');
+    if (online) {
+        dot.className='sync-dot'; txt.textContent='Connected';
+        if(alert) alert.style.display='none';
+    } else {
+        dot.className='sync-dot offline'; txt.textContent='Offline';
+        if(alert) alert.style.display='block';
+    }
+}
+
+// ══════════════════════════════════════════════════════════
+//  INIT
+// ══════════════════════════════════════════════════════════
+document.addEventListener('DOMContentLoaded', async () => {
+    // Set today's dates
+    const today = new Date().toISOString().split('T')[0];
+    ['invoiceDate','quotationDate','receiptDate','deliveryDate'].forEach(id => {
+        const el = document.getElementById(id);
+        if(el) el.value = today;
+    });
+    // Due/valid defaults
+    const due = new Date(); due.setDate(due.getDate()+30);
+    document.getElementById('invoiceDueDate').value = due.toISOString().split('T')[0];
+    const valid = new Date(); valid.setDate(valid.getDate()+14);
+    document.getElementById('quotationValidUntil').value = valid.toISOString().split('T')[0];
+    // Set time
+    document.getElementById('deliveryTime').value = new Date().toTimeString().slice(0,5);
+
+    await loadSettings();
+    await loadNextNumbers();
+    updateAllTotals();
+    // Pre-load records so edit buttons work even before visiting the Records tab
+    await loadRecords();
+    loadStats();
+});
+
+// ══════════════════════════════════════════════════════════
+//  SETTINGS
+// ══════════════════════════════════════════════════════════
+async function loadSettings() {
+    const r = await api('settings');
+    if (!r.success) return;
+    const s = r.data;
+    companyInfo = {
+        name: s.company_name || '',
+        address: s.company_address || '',
+        phone: s.company_phone || '',
+        email: s.company_email || '',
+        vat: s.company_vat || '',
+        logo: s.company_logo || ''
+    };
+    taxSettings = {
+        enableVAT: s.vat_enabled === '1' || s.vat_enabled === 1 || s.vat_enabled === true,
+        vatRate: parseFloat(s.vat_rate) || 16
+    };
+    applySettingsToUI();
+}
+
+function applySettingsToUI() {
+    setVal('settingsCompanyName', companyInfo.name);
+    setVal('settingsAddress', companyInfo.address);
+    setVal('settingsPhone', companyInfo.phone);
+    setVal('settingsEmail', companyInfo.email);
+    setVal('settingsVAT', companyInfo.vat);
+    const ev = document.getElementById('enableVAT');
+    if(ev) ev.checked = taxSettings.enableVAT;
+    setVal('vatRate', taxSettings.vatRate);
+    toggleVATSettings();
+    updateHeader();
+    updateLogoUI(companyInfo.logo);
+}
+
+function updateHeader() {
+    setHTML('headerCompanyName', companyInfo.name || 'Masomotele Invoicing');
+    setHTML('headerCompanyContact', [companyInfo.phone, companyInfo.email].filter(Boolean).join(' | '));
+}
+
+function updateLogoUI(src) {
+    if (!src) return;
+    const imgs = [
+        document.getElementById('headerLogo'),
+        document.getElementById('settingsLogoPreview')
+    ];
+    imgs.forEach(el => {
+        if(el) el.innerHTML = `<img src="${src}" alt="Logo">`;
+    });
+}
+
+async function saveSettings() {
+    const body = {
+        company_name: getVal('settingsCompanyName'),
+        company_address: getVal('settingsAddress'),
+        company_phone: getVal('settingsPhone'),
+        company_email: getVal('settingsEmail'),
+        company_vat: getVal('settingsVAT'),
+        vat_enabled: document.getElementById('enableVAT').checked ? '1' : '0',
+        vat_rate: getVal('vatRate')
+    };
+    companyInfo = { ...companyInfo, name:body.company_name, address:body.company_address,
+        phone:body.company_phone, email:body.company_email, vat:body.company_vat };
+    taxSettings = { enableVAT: body.vat_enabled==='1', vatRate: parseFloat(body.vat_rate)||16 };
+    updateHeader();
+    updateAllTotals();
+    const r = await api('settings','POST',body);
+    const msg = document.getElementById('settingsSaveMsg');
+    msg.style.display='inline';
+    msg.textContent = r.success ? '✅ Saved to server!' : '⚠️ Saved locally (offline)';
+    setTimeout(()=>msg.style.display='none', 3000);
+}
+
+function toggleVATSettings() {
+    const el = document.getElementById('vatRateGroup');
+    if(el) el.style.display = document.getElementById('enableVAT').checked ? 'block' : 'none';
+}
+
+// ══════════════════════════════════════════════════════════
+//  LOGO UPLOAD
+// ══════════════════════════════════════════════════════════
+async function uploadLogo(event) {
+    const file = event.target.files[0];
+    if (!file) return;
+    const formData = new FormData();
+    formData.append('logo', file);
+    try {
+        const res = await fetch(`${API_BASE}?action=upload_logo`, {method:'POST',body:formData});
+        const data = await res.json();
+        if (data.success) {
+            companyInfo.logo = data.data.url;
+            updateLogoUI(data.data.url);
+            showToast('Logo uploaded successfully!');
+        } else {
+            // Fallback: use base64 locally
+            const reader = new FileReader();
+            reader.onload = e => { updateLogoUI(e.target.result); };
+            reader.readAsDataURL(file);
+            showToast('Logo set locally (server upload failed)');
+        }
+    } catch(e) {
+        const reader = new FileReader();
+        reader.onload = e => { companyInfo.logo=e.target.result; updateLogoUI(e.target.result); };
+        reader.readAsDataURL(file);
+    }
+}
+
+// ══════════════════════════════════════════════════════════
+//  DOCUMENT NUMBERS
+// ══════════════════════════════════════════════════════════
+async function loadNextNumbers() {
+    const types = ['invoice','quotation','receipt','delivery'];
+    const map = {invoice:'invoiceNumber',quotation:'quotationNumber',receipt:'receiptNumber',delivery:'deliveryNumber'};
+    for (const t of types) {
+        const r = await api('next_number','GET',null,{type:t});
+        if (r.success) setVal(map[t], r.data.number);
+    }
+}
+
+// ══════════════════════════════════════════════════════════
+//  ITEM MANAGEMENT
+// ══════════════════════════════════════════════════════════
+function getItems(type) {
+    return type==='invoice'?invoiceItems:type==='quotation'?quotationItems:type==='receipt'?receiptItems:deliveryItems;
+}
+function setItems(type, arr) {
+    if(type==='invoice') invoiceItems=arr;
+    else if(type==='quotation') quotationItems=arr;
+    else if(type==='receipt') receiptItems=arr;
+    else deliveryItems=arr;
+}
+
+function addItem(type) {
+    const desc = getVal(`${type}ItemDescription`);
+    const qty = parseFloat(getVal(`${type}ItemQuantity`));
+    const price = parseFloat(getVal(`${type}ItemPrice`));
+    if (!desc || !qty || !price) { showToast('Please fill in all item fields','warning'); return; }
+    getItems(type).push({ description:desc, quantity:qty, price:price, total:qty*price });
+    renderItemsTable(type);
+    setVal(`${type}ItemDescription`,'');
+    setVal(`${type}ItemQuantity`,'1');
+    setVal(`${type}ItemPrice`,'');
+    document.getElementById(`${type}ItemDescription`).focus();
+}
+
+function addDeliveryItem() {
+    const desc = getVal('deliveryItemDescription');
+    const qty = parseInt(getVal('deliveryItemQuantity'));
+    if (!desc || !qty) { showToast('Please fill in item fields','warning'); return; }
+    deliveryItems.push({ description:desc, quantity:qty });
+    renderDeliveryItemsTable();
+    setVal('deliveryItemDescription',''); setVal('deliveryItemQuantity','1');
+}
+
+function removeItem(type, idx) {
+    getItems(type).splice(idx,1);
+    if(type==='delivery') renderDeliveryItemsTable(); else renderItemsTable(type);
+}
+
+function renderItemsTable(type) {
+    const items = getItems(type);
+    const tbody = document.getElementById(`${type}ItemsBody`);
+    const tfoot = document.getElementById(`${type}TotalsFooter`);
+    tbody.innerHTML = items.map((item,i) => `
+        <tr>
+            <td>${esc(item.description)}</td>
+            <td class="text-center">${item.quantity}</td>
+            <td class="text-right">KSh ${item.price.toFixed(2)}</td>
+            <td class="text-right">KSh ${item.total.toFixed(2)}</td>
+            <td class="text-center"><button class="btn btn-danger btn-small" onclick="removeItem('${type}',${i})">✕</button></td>
+        </tr>
+    `).join('');
+    const totals = calcTotals(items);
+    tfoot.innerHTML = `
+        <tr style="background:#f8f9fa;font-weight:600">
+            <td colspan="3" class="text-right">Subtotal:</td>
+            <td class="text-right">KSh ${totals.subtotal.toFixed(2)}</td><td></td>
+        </tr>
+        ${taxSettings.enableVAT ? `<tr style="background:#f8f9fa;font-weight:600">
+            <td colspan="3" class="text-right">VAT (${taxSettings.vatRate}%):</td>
+            <td class="text-right">KSh ${totals.vat.toFixed(2)}</td><td></td>
+        </tr>` : ''}
+        <tr style="background:#1a472a;color:white;font-weight:700;font-size:1.05em">
+            <td colspan="3" class="text-right">TOTAL:</td>
+            <td class="text-right">KSh ${totals.total.toFixed(2)}</td><td></td>
+        </tr>
+    `;
+}
+
+function renderDeliveryItemsTable() {
+    const tbody = document.getElementById('deliveryItemsBody');
+    tbody.innerHTML = deliveryItems.map((item,i) => `
+        <tr>
+            <td>${esc(item.description)}</td>
+            <td class="text-center">${item.quantity}</td>
+            <td class="text-center"><button class="btn btn-danger btn-small" onclick="removeItem('delivery',${i})">✕</button></td>
+        </tr>
+    `).join('');
+}
+
+function updateAllTotals() {
+    ['invoice','quotation','receipt'].forEach(t => renderItemsTable(t));
+    renderDeliveryItemsTable();
+}
+
+function calcTotals(items) {
+    const subtotal = items.reduce((s,i)=>s+(i.total||0),0);
+    const vat = taxSettings.enableVAT ? subtotal*(taxSettings.vatRate/100) : 0;
+    return { subtotal, vat, total: subtotal+vat };
+}
+
+// ══════════════════════════════════════════════════════════
+//  DOCUMENT GENERATION & PRINT
+// ══════════════════════════════════════════════════════════
+function generateDocument(type) {
+    const html = buildDocumentHTML(type);
+    const preview = document.getElementById(`${type}Preview`);
+    preview.innerHTML = `
+        <div class="alert alert-info" style="margin-bottom:16px">
+            <strong>📄 Preview Ready.</strong> Click "Save & Print" to save to the database and print.
+        </div>
+        ${html}
+    `;
+    preview.classList.remove('hidden');
+    document.getElementById(`${type}PrintBtn`).disabled = false;
+    preview.scrollIntoView({behavior:'smooth',block:'start'});
+}
+
+async function saveAndPrint(type) {
+    const record = buildRecord(type);
+    const r = await api('save_record','POST',record);
+    if (!r.success && isOnline) {
+        showToast('Could not save to server: ' + r.message, 'error');
+    }
+    if (r.success) {
+        showToast('Saved! Doc# ' + (r.data?.doc_number || ''));
+        // Refresh records stats
+        loadStats();
+    }
+    // Print
+    const html = buildDocumentHTML(type);
+    const printWindow = window.open('','_blank','width=800,height=600');
+    printWindow.document.write(`
+        <!DOCTYPE html><html><head>
+        <title>${type.toUpperCase()} - ${record.doc_number}</title>
+        <style>
+            body{font-family:'Segoe UI',sans-serif;margin:20px;color:#333}
+            .document-header{display:flex;justify-content:space-between;margin-bottom:30px;flex-wrap:wrap;gap:15px}
+            .doc-company-info h2{color:#1a472a;font-size:1.4em;margin-bottom:6px}
+            .doc-company-info p{color:#555;margin-bottom:3px;font-size:0.9em}
+            .doc-details{text-align:right}
+            .doc-title{font-size:1.8em;font-weight:700;color:#1a472a;margin-bottom:8px}
+            .doc-details p{margin-bottom:4px;font-size:0.9em;color:#555}
+            table{width:100%;border-collapse:collapse;margin:20px 0}
+            th{background:#1a472a;color:white;padding:10px 14px;text-align:left}
+            td{padding:10px 14px;border-bottom:1px solid #e9ecef}
+            .totals{max-width:320px;margin-left:auto;margin-top:15px}
+            .total-line{display:flex;justify-content:space-between;padding:7px 0;border-bottom:1px solid #e9ecef}
+            .total-line.final{background:#1a472a;color:white;padding:10px 14px;border-radius:6px;font-weight:700;border:none}
+            .text-right{text-align:right} .text-center{text-align:center}
+            .doc-logo{width:60px;height:60px;border-radius:6px;object-fit:cover;margin-bottom:8px}
+        </style>
+        <script type="text/javascript">(function(c,l,a,r,i,t,y){c[a]=c[a]||function(){(c[a].q=c[a].q||[]).push(arguments)};t=l.createElement(r);t.async=1;t.src="https://www.clarity.ms/tag/"+i;y=l.getElementsByTagName(r)[0];y.parentNode.insertBefore(t,y);})(window,document,"clarity","script","wg31zlwbt9");</script>\n</head><body>${html}</body></html>
+    `);
+    printWindow.document.close();
+    printWindow.focus();
+    setTimeout(()=>printWindow.print(), 400);
+}
+
+function buildRecord(type) {
+    const today = new Date().toISOString().split('T')[0];
+    const prefixes = {invoice:'INV',quotation:'QUO',receipt:'REC',delivery:'DN'};
+    const base = {
+        type,
+        doc_number: getVal(type==='receipt'?'receiptNumber':type==='delivery'?'deliveryNumber':`${type}Number`),
+        doc_date: today,
+        items: type==='delivery' ? deliveryItems : getItems(type),
+        vat_enabled: taxSettings.enableVAT ? 1 : 0,
+        vat_rate: taxSettings.vatRate
+    };
+    if (type !== 'delivery') {
+        const totals = calcTotals(getItems(type));
+        base.subtotal = totals.subtotal;
+        base.vat_amount = totals.vat;
+        base.total = totals.total;
+    }
+    if (type === 'invoice') {
+        base.client_name = getVal('invoiceClientName');
+        base.client_address = getVal('invoiceClientAddress');
+        base.client_contact = getVal('invoiceClientContact');
+        base.due_date = getVal('invoiceDueDate');
+    } else if (type === 'quotation') {
+        base.client_name = getVal('quotationClientName');
+        base.client_address = getVal('quotationClientAddress');
+        base.client_contact = getVal('quotationClientContact');
+        base.valid_until = getVal('quotationValidUntil');
+    } else if (type === 'receipt') {
+        base.client_name = getVal('receiptCustomerName');
+        base.client_address = getVal('receiptCustomerAddress');
+        base.payment_method = getVal('paymentMethod');
+    } else if (type === 'delivery') {
+        base.delivery_to = getVal('deliveryTo');
+        base.delivery_address = getVal('deliveryAddress');
+        base.client_name = getVal('deliveryTo');
+        base.notes = getVal('deliveryInstructions');
+    }
+    return base;
+}
+
+function buildDocumentHTML(type) {
+    const logoHtml = companyInfo.logo
+        ? `<img src="${companyInfo.logo}" class="doc-logo" alt="Logo">`
+        : '';
+    const companyBlock = `
+        <div class="doc-company-info">
+            ${logoHtml}
+            <h2>${esc(companyInfo.name)}</h2>
+            <p>${esc(companyInfo.address)}</p>
+            <p>${esc(companyInfo.phone)}</p>
+            <p>${esc(companyInfo.email)}</p>
+            ${companyInfo.vat ? `<p>${esc(companyInfo.vat)}</p>` : ''}
+        </div>
+    `;
+
+    if (type === 'invoice') {
+        const items = invoiceItems;
+        const totals = calcTotals(items);
+        return `
+            <div class="document-header">
+                ${companyBlock}
+                <div class="doc-details">
+                    <div class="doc-title">INVOICE</div>
+                    <p><strong>Invoice #:</strong> ${getVal('invoiceNumber')}</p>
+                    <p><strong>Date:</strong> ${fmt(getVal('invoiceDate'))}</p>
+                    <p><strong>Due:</strong> ${fmt(getVal('invoiceDueDate'))}</p>
+                </div>
+            </div>
+            <div style="margin-bottom:24px">
+                <h3 style="margin-bottom:6px;color:#1a472a">Bill To:</h3>
+                <strong>${esc(getVal('invoiceClientName'))}</strong>
+                <p>${esc(getVal('invoiceClientAddress'))}</p>
+                <p>${esc(getVal('invoiceClientContact'))}</p>
+            </div>
+            ${itemsTableHTML(items)}
+            ${totalsHTML(totals)}
+            <div style="margin-top:25px;padding:16px;background:#f0f7f0;border-left:4px solid #3D6318;border-radius:8px">
+                <strong>Payment Terms:</strong> Payment due by ${fmt(getVal('invoiceDueDate'))}.
+                ${taxSettings.enableVAT ? `VAT ${taxSettings.vatRate}% included.` : ''}
+            </div>
+        `;
+    }
+    if (type === 'quotation') {
+        const items = quotationItems;
+        const totals = calcTotals(items);
+        return `
+            <div class="document-header">
+                ${companyBlock}
+                <div class="doc-details">
+                    <div class="doc-title">QUOTATION</div>
+                    <p><strong>Quote #:</strong> ${getVal('quotationNumber')}</p>
+                    <p><strong>Date:</strong> ${fmt(getVal('quotationDate'))}</p>
+                    <p><strong>Valid Until:</strong> ${fmt(getVal('quotationValidUntil'))}</p>
+                </div>
+            </div>
+            <div style="margin-bottom:24px">
+                <h3 style="margin-bottom:6px;color:#1a472a">Quote For:</h3>
+                <strong>${esc(getVal('quotationClientName'))}</strong>
+                <p>${esc(getVal('quotationClientAddress'))}</p>
+                <p>${esc(getVal('quotationClientContact'))}</p>
+            </div>
+            ${itemsTableHTML(items)}
+            ${totalsHTML(totals)}
+            <div style="margin-top:25px;padding:16px;background:#fff8e1;border-left:4px solid #FF9700;border-radius:8px">
+                <strong>Terms:</strong> This quote is valid until ${fmt(getVal('quotationValidUntil'))}.
+                Prices subject to change after validity date. ${taxSettings.enableVAT ? `VAT ${taxSettings.vatRate}% included.` : ''}
+            </div>
+        `;
+    }
+    if (type === 'receipt') {
+        const items = receiptItems;
+        const totals = calcTotals(items);
+        return `
+            <div class="document-header">
+                ${companyBlock}
+                <div class="doc-details">
+                    <div class="doc-title">RECEIPT</div>
+                    <p><strong>Receipt #:</strong> ${getVal('receiptNumber')}</p>
+                    <p><strong>Date:</strong> ${fmt(getVal('receiptDate'))}</p>
+                    <p><strong>Payment:</strong> ${getVal('paymentMethod')}</p>
+                </div>
+            </div>
+            <div style="margin-bottom:24px">
+                <h3 style="margin-bottom:6px;color:#1a472a">Received From:</h3>
+                <strong>${esc(getVal('receiptCustomerName'))}</strong>
+                <p>${esc(getVal('receiptCustomerAddress'))}</p>
+            </div>
+            ${itemsTableHTML(items)}
+            ${totalsHTML(totals, 'PAID')}
+            <div style="text-align:center;margin-top:25px;padding:20px;background:#d4edda;border-radius:10px;color:#155724">
+                <h3>✅ PAYMENT RECEIVED</h3>
+                <p style="margin:8px 0"><strong>KSh ${totals.total.toFixed(2)} — ${getVal('paymentMethod')}</strong></p>
+                <p>Asante sana kwa biashara yako! 🙏</p>
+            </div>
+        `;
+    }
+    if (type === 'delivery') {
+        return `
+            <div class="document-header">
+                ${companyBlock}
+                <div class="doc-details">
+                    <div class="doc-title">DELIVERY NOTE</div>
+                    <p><strong>DN #:</strong> ${getVal('deliveryNumber')}</p>
+                    <p><strong>Date:</strong> ${fmt(getVal('deliveryDate'))}</p>
+                    <p><strong>Time:</strong> ${getVal('deliveryTime')}</p>
+                </div>
+            </div>
+            <div style="margin-bottom:24px">
+                <h3 style="margin-bottom:6px;color:#1a472a">Deliver To:</h3>
+                <strong>${esc(getVal('deliveryTo'))}</strong>
+                <p>${esc(getVal('deliveryAddress'))}</p>
+            </div>
+            ${getVal('deliveryInstructions') ? `<div style="margin-bottom:20px;padding:12px;background:#fff3cd;border-left:4px solid #ffc107;border-radius:6px">
+                <strong>📝 Special Instructions:</strong><br>${esc(getVal('deliveryInstructions'))}
+            </div>` : ''}
+            <table style="width:100%;border-collapse:collapse;background:white;border-radius:8px;overflow:hidden;box-shadow:0 2px 8px rgba(0,0,0,0.08)">
+                <thead><tr>
+                    <th style="background:#1a472a;color:white;padding:12px">Item Description</th>
+                    <th style="background:#1a472a;color:white;padding:12px;text-align:center">Quantity</th>
+                    <th style="background:#1a472a;color:white;padding:12px;text-align:center">Received ✓</th>
+                </tr></thead>
+                <tbody>
+                    ${deliveryItems.map(i=>`<tr>
+                        <td style="padding:11px;border-bottom:1px solid #e9ecef">${esc(i.description)}</td>
+                        <td style="padding:11px;border-bottom:1px solid #e9ecef;text-align:center">${i.quantity}</td>
+                        <td style="padding:11px;border-bottom:1px solid #e9ecef;text-align:center">☐</td>
+                    </tr>`).join('')}
+                </tbody>
+            </table>
+            <div style="margin-top:40px;display:flex;justify-content:space-between;gap:20px">
+                <div style="text-align:center;flex:1">
+                    <div style="border-bottom:2px solid #000;height:50px;margin-bottom:8px"></div>
+                    <strong>Delivered By</strong><br><small>Signature & Date</small>
+                </div>
+                <div style="text-align:center;flex:1">
+                    <div style="border-bottom:2px solid #000;height:50px;margin-bottom:8px"></div>
+                    <strong>Received By</strong><br><small>Signature & Date</small>
+                </div>
+            </div>
+            <div style="margin-top:25px;padding:14px;background:#f8f9fa;border-radius:8px;text-align:center;font-size:0.9em;color:#555">
+                Please verify all items upon delivery. Sign only when all items are received in good condition.
+            </div>
+        `;
+    }
+}
+
+function itemsTableHTML(items) {
+    return `
+        <table style="width:100%;border-collapse:collapse;background:white;border-radius:8px;overflow:hidden;box-shadow:0 2px 8px rgba(0,0,0,0.08);margin:15px 0">
+            <thead><tr>
+                <th style="background:#1a472a;color:white;padding:12px">Description</th>
+                <th style="background:#1a472a;color:white;padding:12px;text-align:center">Qty</th>
+                <th style="background:#1a472a;color:white;padding:12px;text-align:right">Unit Price</th>
+                <th style="background:#1a472a;color:white;padding:12px;text-align:right">Total</th>
+            </tr></thead>
+            <tbody>
+                ${items.map(i=>`<tr>
+                    <td style="padding:11px;border-bottom:1px solid #e9ecef">${esc(i.description)}</td>
+                    <td style="padding:11px;border-bottom:1px solid #e9ecef;text-align:center">${i.quantity}</td>
+                    <td style="padding:11px;border-bottom:1px solid #e9ecef;text-align:right">KSh ${(i.price||i.unit_price||0).toFixed(2)}</td>
+                    <td style="padding:11px;border-bottom:1px solid #e9ecef;text-align:right">KSh ${i.total.toFixed(2)}</td>
+                </tr>`).join('')}
+            </tbody>
+        </table>
+    `;
+}
+
+function totalsHTML(totals, finalLabel='TOTAL') {
+    return `
+        <div class="totals">
+            <div class="total-line"><span>Subtotal:</span><span>KSh ${totals.subtotal.toFixed(2)}</span></div>
+            ${taxSettings.enableVAT ? `<div class="total-line"><span>VAT (${taxSettings.vatRate}%):</span><span>KSh ${totals.vat.toFixed(2)}</span></div>` : ''}
+            <div class="total-line final"><span>${finalLabel}:</span><span>KSh ${totals.total.toFixed(2)}</span></div>
+        </div>
+    `;
+}
+
+// ══════════════════════════════════════════════════════════
+//  QUOTATION CONVERSION
+// ══════════════════════════════════════════════════════════
+function convertTo(targetType) {
+    if (quotationItems.length === 0) { showToast('Add items to the quotation first','warning'); return; }
+    const clientName = getVal('quotationClientName');
+    const clientAddress = getVal('quotationClientAddress');
+    const clientContact = getVal('quotationClientContact');
+    const today = new Date().toISOString().split('T')[0];
+
+    if (targetType !== 'delivery') {
+        setItems(targetType, JSON.parse(JSON.stringify(quotationItems)));
+        renderItemsTable(targetType);
+    }
+
+    if (targetType === 'invoice') {
+        setVal('invoiceClientName', clientName);
+        setVal('invoiceClientAddress', clientAddress);
+        setVal('invoiceClientContact', clientContact);
+        setVal('invoiceDate', today);
+        const due = new Date(); due.setDate(due.getDate()+30);
+        setVal('invoiceDueDate', due.toISOString().split('T')[0]);
+    } else if (targetType === 'receipt') {
+        setVal('receiptCustomerName', clientName);
+        setVal('receiptCustomerAddress', clientAddress);
+        setVal('receiptDate', today);
+    } else if (targetType === 'delivery') {
+        setVal('deliveryTo', clientName);
+        setVal('deliveryAddress', clientAddress);
+        setVal('deliveryDate', today);
+        // Convert to delivery items (no price)
+        deliveryItems = quotationItems.map(i=>({description:i.description,quantity:i.quantity}));
+        renderDeliveryItemsTable();
+    }
+
+    // Switch to target tab
+    const tabBtns = document.querySelectorAll('.nav-tab');
+    const tabOrder = ['invoice','quotation','receipt','delivery','records','settings'];
+    const idx = tabOrder.indexOf(targetType);
+    if (idx >= 0) switchTab(targetType, tabBtns[idx]);
+    showToast(`Quotation converted to ${targetType}!`);
+}
+
+// ══════════════════════════════════════════════════════════
+//  RECORDS
+// ══════════════════════════════════════════════════════════
+async function loadRecords() {
+    const type = getVal('recordFilter');
+    const search = getVal('recordSearch');
+    const r = await api('records','GET',null,{type,search});
+    const tbody = document.getElementById('recordsBody');
+    if (!r.success || !r.data || r.data.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="6" style="text-align:center;padding:20px;color:#888">No records found</td></tr>';
+        allRecords = [];
+        return;
+    }
+    allRecords = r.data;
+    tbody.innerHTML = allRecords.map(rec => {
+        const typeBadge = `<span class="badge badge-${rec.type}">${rec.type}</span>`;
+        const clientDisplay = esc(rec.client_name || rec.delivery_to || '—');
+        const totalDisplay = rec.total ? `KSh ${parseFloat(rec.total).toFixed(2)}` : '—';
+        return `<tr>
+            <td>${rec.doc_date || rec.created_at?.split('T')[0] || ''}</td>
+            <td>${typeBadge}</td>
+            <td><strong>${esc(rec.doc_number)}</strong></td>
+            <td>${clientDisplay}</td>
+            <td class="text-right">${totalDisplay}</td>
+            <td style="white-space:nowrap">
+                <button class="btn btn-info btn-small" onclick="openEditModal(${rec.id})">✏️ Edit</button>
+                <button class="btn btn-success btn-small" onclick="reprintRecord(${rec.id})">🖨️ Print</button>
+                <button class="btn btn-danger btn-small" onclick="deleteRecord(${rec.id})">🗑️</button>
+            </td>
+        </tr>`;
+    }).join('');
+    loadStats();
+}
+
+async function loadStats() {
+    const r = await api('stats');
+    if (!r.success) return;
+    const s = r.data;
+    setHTML('statInvoices', s.invoice?.cnt || 0);
+    setHTML('statQuotations', s.quotation?.cnt || 0);
+    setHTML('statReceipts', s.receipt?.cnt || 0);
+    setHTML('statRevenue', `KSh ${parseFloat(s.total_revenue||0).toLocaleString('en-KE',{minimumFractionDigits:2})}`);
+}
+
+async function deleteRecord(id) {
+    if (!confirm('Delete this record permanently?')) return;
+    const r = await api('delete_record','POST',{id});
+    if (r.success) { showToast('Record deleted'); loadRecords(); }
+    else showToast('Delete failed: ' + r.message, 'error');
+}
+
+async function clearAllRecords() {
+    if (!confirm('Delete ALL records? This cannot be undone!')) return;
+    if (!confirm('Are you absolutely sure? All data will be permanently deleted.')) return;
+    // Delete each
+    for (const rec of allRecords) {
+        await api('delete_record','POST',{id:rec.id});
+    }
+    showToast('All records cleared');
+    loadRecords();
+}
+
+// ══════════════════════════════════════════════════════════
+//  EDIT MODAL
+// ══════════════════════════════════════════════════════════
+function openEditModal(id) {
+    const record = allRecords.find(r => r.id === id);
+    if (!record) return;
+    editingRecordId = id;
+    editingItems = JSON.parse(JSON.stringify(record.items || []));
+
+    const type = record.type;
+    let html = `
+        <div class="form-group"><label>Date</label>
+            <input type="date" id="edit_date" value="${record.doc_date||''}"></div>
+        <div class="form-group"><label>Document Number</label>
+            <input type="text" id="edit_doc_number" value="${esc(record.doc_number||'')}"></div>
+    `;
+    if (type === 'invoice' || type === 'quotation') {
+        html += `
+            <div class="form-group"><label>Client Name</label><input type="text" id="edit_clientName" value="${esc(record.client_name||'')}"></div>
+            <div class="form-group"><label>Client Address</label><textarea id="edit_clientAddress" rows="2">${esc(record.client_address||'')}</textarea></div>
+            <div class="form-group"><label>Contact</label><input type="text" id="edit_clientContact" value="${esc(record.client_contact||'')}"></div>
+            ${type==='invoice' ? `<div class="form-group"><label>Due Date</label><input type="date" id="edit_dueDate" value="${record.due_date||''}"></div>` :
+              `<div class="form-group"><label>Valid Until</label><input type="date" id="edit_validUntil" value="${record.valid_until||''}"></div>`}
+        `;
+    } else if (type === 'receipt') {
+        html += `
+            <div class="form-group"><label>Customer Name</label><input type="text" id="edit_clientName" value="${esc(record.client_name||'')}"></div>
+            <div class="form-group"><label>Customer Address</label><textarea id="edit_clientAddress" rows="2">${esc(record.client_address||'')}</textarea></div>
+            <div class="form-group"><label>Payment Method</label>
+                <select id="edit_paymentMethod">
+                    ${['M-Pesa','Cash','Bank Transfer','Cheque','Card'].map(m=>`<option value="${m}"${record.payment_method===m?' selected':''}>${m}</option>`).join('')}
+                </select>
+            </div>
+        `;
+    } else if (type === 'delivery') {
+        html += `
+            <div class="form-group"><label>Deliver To</label><input type="text" id="edit_deliveryTo" value="${esc(record.delivery_to||'')}"></div>
+            <div class="form-group"><label>Address</label><textarea id="edit_deliveryAddress" rows="2">${esc(record.delivery_address||'')}</textarea></div>
+            <div class="form-group"><label>Instructions</label><textarea id="edit_notes" rows="2">${esc(record.notes||'')}</textarea></div>
+        `;
+    }
+
+    // Items — always show so user can add items even to records saved with 0 items
+    {
+        const isDelivery = type === 'delivery';
+        html += `
+            <h3 style="margin:15px 0 10px;color:#1a472a">Items</h3>
+            <table class="modal-items-table">
+                <thead><tr>
+                    <th>Description</th><th style="width:70px">Qty</th>
+                    ${!isDelivery ? '<th style="width:100px">Unit Price</th><th style="width:100px">Total</th>' : ''}
+                    <th style="width:40px"></th>
+                </tr></thead>
+                <tbody id="editItemsBody"></tbody>
+            </table>
+            <button class="btn btn-primary btn-small" style="margin-top:8px" onclick="addEditItem()">+ Add Item</button>
+        `;
+    }
+
+    document.getElementById('editModalTitle').innerHTML = `Edit ${type.charAt(0).toUpperCase()+type.slice(1)} <span class="edit-badge">EDITING</span>`;
+    document.getElementById('editModalFields').innerHTML = html;
+    document.getElementById('editModal').classList.add('open');
+    renderEditItems();
+}
+
+function renderEditItems() {
+    const tbody = document.getElementById('editItemsBody');
+    if (!tbody) return;
+    const record = allRecords.find(r=>r.id===editingRecordId);
+    const isDelivery = record?.type === 'delivery';
+    tbody.innerHTML = editingItems.map((item,i) => `<tr>
+        <td><input value="${esc(item.description)}" onchange="editingItems[${i}].description=this.value"></td>
+        <td><input type="number" value="${item.quantity}" onchange="editingItems[${i}].quantity=parseFloat(this.value)||0;editingItems[${i}].total=(editingItems[${i}].quantity||0)*(editingItems[${i}].price||0)" style="width:60px"></td>
+        ${!isDelivery ? `
+        <td><input type="number" value="${item.price||0}" onchange="editingItems[${i}].price=parseFloat(this.value)||0;editingItems[${i}].total=(editingItems[${i}].quantity||0)*(editingItems[${i}].price||0)" style="width:90px"></td>
+        <td><input type="number" value="${item.total||0}" readonly style="width:90px;background:#f0f0f0"></td>
+        ` : ''}
+        <td><button class="btn btn-danger btn-small" onclick="editingItems.splice(${i},1);renderEditItems()">✕</button></td>
+    </tr>`).join('');
+}
+
+function addEditItem() {
+    const record = allRecords.find(r=>r.id===editingRecordId);
+    const isDelivery = record?.type === 'delivery';
+    editingItems.push(isDelivery ? {description:'',quantity:1} : {description:'',quantity:1,price:0,total:0});
+    renderEditItems();
+}
+
+async function saveEdit(andPrint=false) {
+    const record = allRecords.find(r=>r.id===editingRecordId);
+    if (!record) return;
+    const type = record.type;
+
+    // Recalculate totals
+    const totals = type==='delivery' ? {subtotal:0,vat:0,total:0} : calcTotals(editingItems);
+
+    // Build updated record from modal fields
+    const updated = {
+        type: type,
+        doc_number: getVal('edit_doc_number'),
+        doc_date: getVal('edit_date'),
+        client_name: getVal('edit_clientName') || getVal('edit_deliveryTo') || record.client_name || '',
+        client_address: getVal('edit_clientAddress') || getVal('edit_deliveryAddress') || record.client_address || '',
+        client_contact: getVal('edit_clientContact') || record.client_contact || '',
+        due_date: getVal('edit_dueDate') || record.due_date || '',
+        valid_until: getVal('edit_validUntil') || record.valid_until || '',
+        payment_method: getVal('edit_paymentMethod') || record.payment_method || '',
+        delivery_to: getVal('edit_deliveryTo') || record.delivery_to || '',
+        delivery_address: getVal('edit_deliveryAddress') || record.delivery_address || '',
+        notes: getVal('edit_notes') || record.notes || '',
+        items: editingItems,
+        subtotal: totals.subtotal,
+        vat_amount: totals.vat,
+        total: totals.total,
+    };
+
+    const body = { id: editingRecordId, ...updated };
+    const r = await api('update_record','POST',body);
+    if (r.success) {
+        showToast(andPrint ? 'Saved! Opening print...' : 'Record updated!');
+        closeModal();
+        loadRecords();
+        if (andPrint) {
+            // Print using the updated data directly
+            printFromRecord({ ...record, ...updated });
+        }
+    } else {
+        showToast('Update failed: ' + r.message, 'error');
+    }
+}
+
+async function reprintRecord(id) {
+    // Fetch full record with items from server then print
+    const r = await api('records','GET',null,{type:'all',limit:10000});
+    if (!r.success) { showToast('Could not load record','error'); return; }
+    const record = (r.data||[]).find(rec => rec.id === id);
+    if (!record) { showToast('Record not found','error'); return; }
+    // Parse items if they are a string
+    if (typeof record.items === 'string') {
+        try { record.items = JSON.parse(record.items); } catch(e) { record.items = []; }
+    }
+    printFromRecord(record);
+}
+
+function printFromRecord(record) {
+    const type = record.type;
+    const items = record.items || [];
+
+    const logoHtml = companyInfo.logo ? `<img src="${companyInfo.logo}" class="doc-logo" alt="Logo">` : '';
+    const co = `<div class="doc-company-info">
+        ${logoHtml}
+        <h2>${esc(companyInfo.name)}</h2>
+        <p>${esc(companyInfo.address)}</p>
+        <p>${esc(companyInfo.phone)}</p>
+        <p>${esc(companyInfo.email)}</p>
+        ${companyInfo.vat ? `<p>${esc(companyInfo.vat)}</p>` : ''}
+    </div>`;
+
+    const vatEnabled = record.vat_enabled == 1;
+    const vatRate = parseFloat(record.vat_rate || taxSettings.vatRate || 16);
+    const subtotal = parseFloat(record.subtotal || 0);
+    const vatAmt = parseFloat(record.vat_amount || 0);
+    const total = parseFloat(record.total || 0);
+
+    const itemRows = items.map(i => `<tr>
+        <td style="padding:10px 12px;border-bottom:1px solid #e9ecef">${esc(i.description||'')}</td>
+        <td style="padding:10px 12px;border-bottom:1px solid #e9ecef;text-align:center">${i.quantity||1}</td>
+        ${type !== 'delivery' ? `
+        <td style="padding:10px 12px;border-bottom:1px solid #e9ecef;text-align:right">KSh ${parseFloat(i.unit_price||i.price||0).toFixed(2)}</td>
+        <td style="padding:10px 12px;border-bottom:1px solid #e9ecef;text-align:right">KSh ${parseFloat(i.total||0).toFixed(2)}</td>
+        ` : `<td style="padding:10px 12px;border-bottom:1px solid #e9ecef;text-align:center">☐</td>`}
+    </tr>`).join('');
+
+    const itemsTable = `<table style="width:100%;border-collapse:collapse;margin:15px 0">
+        <thead><tr>
+            <th style="background:#1a472a;color:white;padding:11px 12px;text-align:left">Description</th>
+            <th style="background:#1a472a;color:white;padding:11px 12px;text-align:center">Qty</th>
+            ${type !== 'delivery'
+                ? '<th style="background:#1a472a;color:white;padding:11px 12px;text-align:right">Unit Price</th><th style="background:#1a472a;color:white;padding:11px 12px;text-align:right">Total</th>'
+                : '<th style="background:#1a472a;color:white;padding:11px 12px;text-align:center">Received ✓</th>'}
+        </tr></thead>
+        <tbody>${itemRows}</tbody>
+    </table>`;
+
+    const totalsBlock = type !== 'delivery' ? `<div style="max-width:300px;margin-left:auto;margin-top:15px">
+        <div style="display:flex;justify-content:space-between;padding:7px 0;border-bottom:1px solid #eee"><span>Subtotal:</span><span>KSh ${subtotal.toFixed(2)}</span></div>
+        ${vatEnabled ? `<div style="display:flex;justify-content:space-between;padding:7px 0;border-bottom:1px solid #eee"><span>VAT (${vatRate}%):</span><span>KSh ${vatAmt.toFixed(2)}</span></div>` : ''}
+        <div style="display:flex;justify-content:space-between;padding:10px 13px;background:#1a472a;color:white;font-weight:700;border-radius:7px;margin-top:4px">
+            <span>${type==='receipt'?'PAID':'TOTAL'}:</span><span>KSh ${total.toFixed(2)}</span>
+        </div>
+    </div>` : '';
+
+    let docBody = '';
+
+    if (type === 'invoice') {
+        docBody = `<div class="document-header">${co}
+            <div class="doc-details"><div class="doc-title">INVOICE</div>
+                <p><strong>Invoice #:</strong> ${esc(record.doc_number)}</p>
+                <p><strong>Date:</strong> ${fmt(record.doc_date)}</p>
+                <p><strong>Due:</strong> ${fmt(record.due_date)}</p>
+            </div></div>
+            <div style="margin-bottom:20px"><strong>Bill To:</strong><br>
+                <strong>${esc(record.client_name)}</strong><br>
+                ${esc(record.client_address||'').replace(/\n/g,'<br>')}<br>
+                ${esc(record.client_contact||'')}
+            </div>${itemsTable}${totalsBlock}
+            <div style="margin-top:20px;padding:14px;background:#f0f7f0;border-left:4px solid #3D6318;border-radius:6px">
+                Payment due by ${fmt(record.due_date)}.${vatEnabled?' VAT included.':''}
+            </div>`;
+    } else if (type === 'quotation') {
+        docBody = `<div class="document-header">${co}
+            <div class="doc-details"><div class="doc-title">QUOTATION</div>
+                <p><strong>Quote #:</strong> ${esc(record.doc_number)}</p>
+                <p><strong>Date:</strong> ${fmt(record.doc_date)}</p>
+                <p><strong>Valid Until:</strong> ${fmt(record.valid_until)}</p>
+            </div></div>
+            <div style="margin-bottom:20px"><strong>Quote For:</strong><br>
+                <strong>${esc(record.client_name)}</strong><br>
+                ${esc(record.client_address||'').replace(/\n/g,'<br>')}<br>
+                ${esc(record.client_contact||'')}
+            </div>${itemsTable}${totalsBlock}
+            <div style="margin-top:20px;padding:14px;background:#fff8e1;border-left:4px solid #FF9700;border-radius:6px">
+                Valid until ${fmt(record.valid_until)}. Prices subject to change after validity date.
+            </div>`;
+    } else if (type === 'receipt') {
+        docBody = `<div class="document-header">${co}
+            <div class="doc-details"><div class="doc-title">RECEIPT</div>
+                <p><strong>Receipt #:</strong> ${esc(record.doc_number)}</p>
+                <p><strong>Date:</strong> ${fmt(record.doc_date)}</p>
+                <p><strong>Payment:</strong> ${esc(record.payment_method||'')}</p>
+            </div></div>
+            <div style="margin-bottom:20px"><strong>Received From:</strong><br>
+                <strong>${esc(record.client_name)}</strong><br>
+                ${esc(record.client_address||'').replace(/\n/g,'<br>')}
+            </div>${itemsTable}${totalsBlock}
+            <div style="text-align:center;margin-top:20px;padding:18px;background:#d4edda;border-radius:8px;color:#155724">
+                <h3>✅ PAYMENT RECEIVED</h3>
+                <p><strong>KSh ${total.toFixed(2)} — ${esc(record.payment_method||'')}</strong></p>
+                <p>Asante sana kwa biashara yako! 🙏</p>
+            </div>`;
+    } else if (type === 'delivery') {
+        docBody = `<div class="document-header">${co}
+            <div class="doc-details"><div class="doc-title">DELIVERY NOTE</div>
+                <p><strong>DN #:</strong> ${esc(record.doc_number)}</p>
+                <p><strong>Date:</strong> ${fmt(record.doc_date)}</p>
+            </div></div>
+            <div style="margin-bottom:20px"><strong>Deliver To:</strong><br>
+                <strong>${esc(record.delivery_to||record.client_name||'')}</strong><br>
+                ${esc(record.delivery_address||record.client_address||'').replace(/\n/g,'<br>')}
+            </div>${itemsTable}
+            <div style="margin-top:36px;display:flex;gap:20px">
+                <div style="flex:1;text-align:center">
+                    <div style="border-bottom:2px solid #000;height:44px;margin-bottom:8px"></div>
+                    <strong>Delivered By</strong><br><small>Signature & Date</small>
+                </div>
+                <div style="flex:1;text-align:center">
+                    <div style="border-bottom:2px solid #000;height:44px;margin-bottom:8px"></div>
+                    <strong>Received By</strong><br><small>Signature & Date</small>
+                </div>
+            </div>`;
+    }
+
+    const w = window.open('','_blank','width=850,height=650');
+    w.document.write(`<!DOCTYPE html><html><head>
+        <title>${type.toUpperCase()} - ${esc(record.doc_number)}</title>
+        <style>
+            body{font-family:'Segoe UI',sans-serif;margin:24px;color:#333;font-size:13px}
+            .document-header{display:flex;justify-content:space-between;flex-wrap:wrap;gap:15px;margin-bottom:24px}
+            .doc-company-info h2{color:#1a472a;font-size:1.3em;margin:0 0 5px}
+            .doc-company-info p{margin:2px 0;color:#555;font-size:.88em}
+            .doc-details{text-align:right}
+            .doc-title{font-size:1.7em;font-weight:700;color:#1a472a;margin-bottom:6px}
+            .doc-details p{font-size:.88em;color:#555;margin:3px 0}
+            .doc-logo{width:55px;height:55px;border-radius:6px;object-fit:cover;margin-bottom:6px}
+            @media print{body{margin:0}}
+        </style>
+        <script type="text/javascript">(function(c,l,a,r,i,t,y){c[a]=c[a]||function(){(c[a].q=c[a].q||[]).push(arguments)};t=l.createElement(r);t.async=1;t.src="https://www.clarity.ms/tag/"+i;y=l.getElementsByTagName(r)[0];y.parentNode.insertBefore(t,y);})(window,document,"clarity","script","wg31zlwbt9");</script>\n</head><body>${docBody}</body></html>`);
+    w.document.close();
+    w.focus();
+    setTimeout(()=>w.print(), 450);
+}
+
+function closeModal() {
+    document.getElementById('editModal').classList.remove('open');
+    editingRecordId = null; editingItems = [];
+}
+
+// ══════════════════════════════════════════════════════════
+//  EXPORT
+// ══════════════════════════════════════════════════════════
+async function exportCSV() {
+    // Fetch all records fresh from server
+    const r = await api('records','GET',null,{type:'all',limit:10000});
+    const data = (r.success && r.data) ? r.data : allRecords;
+    const headers = ['Date','Type','Number','Client','Total (KSh)'];
+    const rows = data.map(r => [
+        r.doc_date || '', r.type, r.doc_number,
+        (r.client_name || r.delivery_to || '').replace(/,/g,';'),
+        r.total || 0
+    ]);
+    const csv = [headers, ...rows].map(r=>r.join(',')).join('\n');
+    downloadFile(csv, `records_${today()}.csv`, 'text/csv');
+    showToast('CSV exported — ' + data.length + ' records');
+}
+
+async function exportJSON() {
+    const r = await api('records','GET',null,{type:'all',limit:10000});
+    const data = (r.success && r.data) ? r.data : allRecords;
+    downloadFile(JSON.stringify({records:data,exportDate:new Date().toISOString()},null,2),
+        `records_${today()}.json`, 'application/json');
+    showToast('JSON exported — ' + data.length + ' records');
+}
+
+function restoreFromFile(event) {
+    const file = event.target.files[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = async e => {
+        try {
+            const data = JSON.parse(e.target.result);
+            const records = data.records || data.documentRecords || [];
+            if (!records.length) { showToast('No records found in file','warning'); return; }
+            if (!confirm(`Import ${records.length} records? Existing records will not be deleted.`)) return;
+            let saved = 0;
+            for (const rec of records) {
+                const r = await api('save_record','POST',rec);
+                if (r.success) saved++;
+            }
+            showToast(`Imported ${saved} records!`);
+            loadRecords();
+        } catch(e) {
+            showToast('Invalid backup file','error');
+        }
+    };
+    reader.readAsText(file);
+    event.target.value = '';
+}
+
+function downloadFile(content, name, type) {
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(new Blob([content],{type}));
+    a.download = name; document.body.appendChild(a); a.click();
+    document.body.removeChild(a);
+}
+
+// ══════════════════════════════════════════════════════════
+//  TAB SWITCHING
+// ══════════════════════════════════════════════════════════
+function switchTab(name, btn) {
+    document.querySelectorAll('.tab-content').forEach(t=>t.classList.remove('active'));
+    document.querySelectorAll('.nav-tab').forEach(t=>t.classList.remove('active'));
+    document.getElementById(name).classList.add('active');
+    if (btn) btn.classList.add('active');
+    if (name==='records') { loadRecords(); loadStats(); }
+}
+
+// ══════════════════════════════════════════════════════════
+//  UTILITIES
+// ══════════════════════════════════════════════════════════
+function getVal(id) { const el=document.getElementById(id); return el?(el.value||''):''; }
+function setVal(id, v) { const el=document.getElementById(id); if(el) el.value=v; }
+function setHTML(id, v) { const el=document.getElementById(id); if(el) el.innerHTML=v; }
+function esc(s) { return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+function today() { return new Date().toISOString().split('T')[0]; }
+function fmt(dateStr) {
+    if (!dateStr) return '—';
+    const d = new Date(dateStr);
+    return isNaN(d) ? dateStr : d.toLocaleDateString('en-KE',{day:'2-digit',month:'short',year:'numeric'});
+}
+
+let toastTimeout;
+function showToast(msg, type='success') {
+    clearTimeout(toastTimeout);
+    let toast = document.getElementById('toast');
+    if (!toast) {
+        toast = document.createElement('div');
+        toast.id = 'toast';
+        toast.style.cssText = 'position:fixed;bottom:24px;right:24px;padding:12px 20px;border-radius:10px;font-weight:600;font-size:14px;z-index:99999;transition:opacity 0.3s;box-shadow:0 4px 20px rgba(0,0,0,0.2)';
+        document.body.appendChild(toast);
+    }
+    const colors = {success:'#1a472a',warning:'#856404',error:'#721c24',info:'#0c5460'};
+    const bg = {success:'#d4edda',warning:'#fff3cd',error:'#f8d7da',info:'#d1ecf1'};
+    toast.style.background = bg[type]||bg.info;
+    toast.style.color = colors[type]||colors.info;
+    toast.style.border = `1px solid ${colors[type]||colors.info}`;
+    toast.style.opacity = '1';
+    toast.textContent = msg;
+    toastTimeout = setTimeout(()=>toast.style.opacity='0', 3500);
+}
+
+// Close modal on overlay click
+document.getElementById('editModal').addEventListener('click', function(e) {
+    if (e.target === this) closeModal();
+});
+
+// Keyboard shortcut: Escape to close modal
+document.addEventListener('keydown', e => {
+    if (e.key === 'Escape') closeModal();
+});
+</script>
+</body>
+</html>

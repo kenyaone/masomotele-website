@@ -1,0 +1,737 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Electrical Technology Gr.10 | 1.2 D.C. Electric Circuits</title>
+<style>
+:root{
+  --pri:#0a5e2a;--pri-l:#0d7a38;--acc:#f5a623;
+  --ok:#2e7d32;--no:#c62828;--bg:#f4f7f5;
+  --card:#fff;--border:#d0e0d4;--txt:#1a2e1f;
+  --warn-bg:#fff3e0;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Segoe UI',system-ui,sans-serif;background:var(--bg);color:var(--txt);min-height:100vh;display:flex;flex-direction:column}
+.top-bar{position:sticky;top:0;z-index:100;background:linear-gradient(135deg,var(--pri),var(--pri-l));color:#fff;padding:10px 16px;display:flex;align-items:center;gap:12px;box-shadow:0 2px 8px rgba(0,0,0,.25)}
+.top-bar .logo{font-weight:800;font-size:1rem;white-space:nowrap}
+.top-bar .title{font-size:.85rem;opacity:.9;flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.slide-badge{background:var(--acc);color:#000;font-weight:700;font-size:.8rem;padding:3px 10px;border-radius:20px;white-space:nowrap}
+.slides-wrap{flex:1;overflow:hidden}
+.slide{display:none;padding:16px;max-width:860px;margin:0 auto;animation:fadeIn .3s ease}
+.slide.active{display:block}
+@keyframes fadeIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+.slide-header{background:linear-gradient(135deg,var(--pri),var(--pri-l));color:#fff;padding:14px 18px;border-radius:10px;margin-bottom:16px}
+.slide-header h2{font-size:1.1rem;font-weight:700}
+.slide-header .strand{font-size:.78rem;opacity:.85;margin-top:3px}
+.lo-box{background:#fff;border-left:5px solid var(--acc);border-radius:8px;padding:14px 16px;margin-bottom:14px;box-shadow:0 1px 4px rgba(0,0,0,.06)}
+.lo-box h3{color:var(--pri);font-size:.95rem;margin-bottom:8px}
+.lo-box ol{padding-left:18px}
+.lo-box ol li{margin-bottom:5px;font-size:.88rem;line-height:1.5}
+.inquiry{margin-top:12px;background:var(--pri);color:#fff;border-radius:6px;padding:10px 14px;font-size:.85rem}
+.inquiry strong{display:block;margin-bottom:3px;color:var(--acc)}
+.teach-block{margin-bottom:18px}
+.teach-block h3{color:var(--pri);font-size:1rem;font-weight:700;padding-bottom:5px;border-bottom:2.5px solid var(--acc);margin-bottom:10px}
+.key-term{border-left:4px solid var(--acc);background:#fffbf0;padding:10px 14px;border-radius:0 6px 6px 0;margin:8px 0;font-size:.87rem}
+.key-term strong{color:var(--pri)}
+.info-table{width:100%;border-collapse:collapse;margin:10px 0;font-size:.84rem}
+.info-table th{background:var(--pri);color:#fff;padding:8px 10px;text-align:left}
+.info-table td{padding:7px 10px;border-bottom:1px solid var(--border)}
+.info-table tr:nth-child(even) td{background:#eef5f0}
+.example-box{background:#f0faf2;border:1.5px solid var(--ok);border-radius:8px;padding:12px 14px;margin:10px 0;font-size:.86rem}
+.example-box h4{color:var(--ok);margin-bottom:7px;font-size:.9rem}
+.warn-box{background:var(--warn-bg);border:1.5px solid #e65100;border-radius:8px;padding:11px 14px;margin:10px 0;font-size:.85rem}
+.warn-box h4{color:#e65100;margin-bottom:5px}
+.diagram-wrap{text-align:center;margin:14px 0;overflow-x:auto}
+.calc-box{background:#fff;border:1.5px solid var(--pri-l);border-radius:8px;padding:14px;margin:10px 0}
+.calc-box h4{color:var(--pri);margin-bottom:10px;font-size:.9rem}
+.practice-q{background:#fff;border-radius:8px;border:1px solid var(--border);padding:14px;margin-bottom:12px;box-shadow:0 1px 3px rgba(0,0,0,.05)}
+.practice-q .qnum{font-weight:700;color:var(--pri);font-size:.85rem;margin-bottom:5px}
+.fill-blank{border:none;border-bottom:2px dashed var(--pri);background:transparent;outline:none;font-size:.9rem;padding:2px 6px;min-width:100px;color:var(--txt)}
+.fill-blank.correct{border-bottom-color:var(--ok);background:#f0faf2;border-radius:4px}
+.fill-blank.wrong{border-bottom-color:var(--no);background:#fff0f0;border-radius:4px}
+.fb-feedback{font-size:.8rem;display:inline-block;margin-left:4px;font-weight:600}
+.sa-box{width:100%;min-height:80px;padding:8px 10px;border:1.5px solid var(--border);border-radius:6px;font-size:.86rem;font-family:inherit;resize:vertical}
+.grade-btn{background:var(--pri);color:#fff;border:none;padding:7px 18px;border-radius:6px;cursor:pointer;font-size:.84rem;margin-top:7px}
+.grade-btn:hover{background:var(--pri-l)}
+.sa-feedback{margin-top:8px;padding:10px;border-radius:6px;background:#f9f9f9;border:1px solid #ddd;font-size:.82rem;display:none}
+.kw-found{color:var(--ok);font-weight:600}
+.kw-missed{color:var(--no);font-weight:600}
+.model-ans{margin-top:6px;font-style:italic;color:#555}
+.check-btn{background:var(--ok);color:#fff;border:none;padding:8px 18px;border-radius:6px;cursor:pointer;font-size:.84rem;margin-top:8px}
+.check-btn:hover{background:#256427}
+.score-btn{display:block;margin:18px auto 0;background:var(--acc);color:#000;font-weight:700;border:none;padding:11px 32px;border-radius:8px;cursor:pointer;font-size:.95rem}
+.score-btn:hover{background:#e0951a}
+.next-lesson-box{margin-top:18px;text-align:center;display:none}.next-lesson-btn{display:inline-block;background:linear-gradient(135deg,var(--pri),var(--pri-l));color:#fff;font-weight:700;border:none;padding:14px 32px;border-radius:10px;cursor:pointer;font-size:.95rem;text-decoration:none;transition:all .3s;box-shadow:0 4px 15px rgba(10,94,42,.25)}.next-lesson-btn:hover{transform:translateY(-2px);box-shadow:0 8px 25px rgba(10,94,42,.35)}.next-lesson-sub{font-size:.78rem;color:#666;margin-top:8px}
+.total-result{margin-top:14px;text-align:center;font-size:1rem;font-weight:700;padding:12px;border-radius:8px;background:#fff;border:2px solid var(--pri)}
+.tag{display:inline-block;background:var(--pri);color:#fff;font-size:.72rem;padding:2px 8px;border-radius:10px;margin:2px}
+
+/* Calculator */
+.calc-row{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin:6px 0;font-size:.87rem}
+.calc-row label{min-width:80px;font-weight:600;color:var(--pri)}
+.calc-row input{padding:6px 10px;border:1.5px solid var(--border);border-radius:6px;font-size:.87rem;width:100px}
+.calc-row select{padding:6px 10px;border:1.5px solid var(--border);border-radius:6px;font-size:.87rem}
+.calc-result{background:var(--pri);color:#fff;padding:10px 14px;border-radius:6px;margin-top:8px;font-size:.88rem;font-weight:600;display:none}
+.calc-err{background:#fff0f0;color:var(--no);padding:8px 12px;border-radius:6px;margin-top:8px;font-size:.85rem;display:none}
+
+.nav-bar{position:sticky;bottom:0;background:#fff;border-top:2px solid var(--border);padding:10px 16px;display:flex;align-items:center;justify-content:space-between;gap:10px;z-index:90}
+.nav-btn{background:var(--pri);color:#fff;border:none;padding:9px 22px;border-radius:8px;font-size:.88rem;cursor:pointer;font-weight:600}
+.nav-btn:disabled{background:#b0b0b0;cursor:not-allowed}
+.nav-btn:hover:not(:disabled){background:var(--pri-l)}
+.dots{display:flex;gap:6px;flex-wrap:wrap;justify-content:center;flex:1}
+.dot{width:9px;height:9px;border-radius:50%;background:#ccc;cursor:pointer;transition:background .2s}
+.dot.active{background:var(--pri)}
+@media(max-width:600px){
+  .top-bar .title{display:none}
+  .slide{padding:10px}
+  .info-table{font-size:.78rem}
+  .nav-btn{padding:8px 14px;font-size:.82rem}
+  .calc-row{flex-direction:column;align-items:flex-start}
+}
+</style>
+<script type="text/javascript">(function(c,l,a,r,i,t,y){c[a]=c[a]||function(){(c[a].q=c[a].q||[]).push(arguments)};t=l.createElement(r);t.async=1;t.src="https://www.clarity.ms/tag/"+i;y=l.getElementsByTagName(r)[0];y.parentNode.insertBefore(t,y);})(window,document,"clarity","script","wg31zlwbt9");</script>\n</head>
+<body>
+
+<div class="top-bar">
+  <div class="logo">M.T.T.I</div>
+  <div class="title">Electrical Technology Gr.10 · 1.2 D.C. Electric Circuits</div>
+  <div class="slide-badge" id="slideLabel">1 / 10</div>
+</div>
+
+<div class="slides-wrap">
+
+<!-- ===== SLIDE 1: LEARNING OUTCOMES ===== -->
+<div class="slide active" id="s1">
+  <div class="slide-header">
+    <h2>Learning Outcomes</h2>
+    <div class="strand">Strand 1.0 Fundamentals · Sub-strand 1.2 D.C. Electric Circuits · 18 Lessons</div>
+  </div>
+  <div class="lo-box">
+    <h3>By the end of this sub-strand, you should be able to:</h3>
+    <ol>
+      <li>Describe the <strong>properties of resistors</strong> in DC circuits.</li>
+      <li>Analyse DC circuits using <strong>Ohm's Law</strong> and <strong>Kirchhoff's Laws</strong>.</li>
+      <li>Construct <strong>series and parallel resistor networks</strong> in DC circuits.</li>
+      <li>Troubleshoot DC circuits — identifying <strong>open circuit, short circuit</strong> and faulty components.</li>
+      <li>Appreciate the <strong>practical applications</strong> of DC circuits in everyday life.</li>
+    </ol>
+    <div class="inquiry">
+      <strong>🔍 Key Inquiry Questions</strong>
+      How do DC electric circuits work? &nbsp;|&nbsp; What are the applications of DC circuits in day-to-day life?
+    </div>
+  </div>
+  <div class="teach-block">
+    <h3>Topics Covered</h3>
+    <div style="display:flex;flex-wrap:wrap;gap:8px;margin-top:6px">
+      <span class="tag">Ohm's Law</span>
+      <span class="tag">Resistors</span>
+      <span class="tag">Series Circuits</span>
+      <span class="tag">Parallel Circuits</span>
+      <span class="tag">Kirchhoff's Laws</span>
+      <span class="tag">Faults in DC Circuits</span>
+    </div>
+  </div>
+</div>
+
+<!-- ===== SLIDE 2: BASIC CONCEPTS ===== -->
+<div class="slide" id="s2">
+  <div class="slide-header">
+    <h2>Basic DC Circuit Concepts</h2>
+    <div class="strand">Voltage, Current, Resistance — the three pillars</div>
+  </div>
+  <div class="teach-block">
+    <h3>Key Definitions</h3>
+    <div class="key-term"><strong>Direct Current (DC):</strong> Electric current that flows in one direction only. Source examples: batteries, solar cells, DC power supplies.</div>
+    <div class="key-term"><strong>Voltage (V):</strong> The electrical pressure that drives current through a circuit. Measured in Volts (V). Symbol: V or E.</div>
+    <div class="key-term"><strong>Current (I):</strong> The rate of flow of electric charge through a conductor. Measured in Amperes (A). Symbol: I.</div>
+    <div class="key-term"><strong>Resistance (R):</strong> The opposition to the flow of electric current in a circuit. Measured in Ohms (Ω). Symbol: R.</div>
+    <div class="key-term"><strong>Electric Circuit:</strong> A closed path through which electric current flows from a source, through components, and back to the source.</div>
+  </div>
+  <div class="teach-block">
+    <h3>Circuit Symbols</h3>
+    <div class="diagram-wrap">
+      <svg viewBox="0 0 660 130" xmlns="http://www.w3.org/2000/svg" style="font-family:'Segoe UI',sans-serif;max-width:660px">
+        <rect width="660" height="130" rx="8" fill="#f4f7f5"/>
+        <!-- Battery -->
+        <line x1="50" y1="50" x2="50" y2="80" stroke="#0a5e2a" stroke-width="3"/>
+        <line x1="40" y1="55" x2="60" y2="55" stroke="#0a5e2a" stroke-width="4"/>
+        <line x1="44" y1="70" x2="56" y2="70" stroke="#0a5e2a" stroke-width="2"/>
+        <text x="50" y="100" text-anchor="middle" fill="#0a5e2a" font-size="11" font-weight="700">Battery/Cell</text>
+        <text x="50" y="112" text-anchor="middle" fill="#666" font-size="9">EMF source</text>
+        <!-- Resistor -->
+        <rect x="120" y="52" width="50" height="26" rx="3" fill="none" stroke="#0a5e2a" stroke-width="2.5"/>
+        <line x1="100" y1="65" x2="120" y2="65" stroke="#0a5e2a" stroke-width="2.5"/>
+        <line x1="170" y1="65" x2="190" y2="65" stroke="#0a5e2a" stroke-width="2.5"/>
+        <text x="145" y="100" text-anchor="middle" fill="#0a5e2a" font-size="11" font-weight="700">Resistor</text>
+        <text x="145" y="112" text-anchor="middle" fill="#666" font-size="9">Opposes current</text>
+        <!-- Wire/Conductor -->
+        <line x1="220" y1="65" x2="290" y2="65" stroke="#0a5e2a" stroke-width="2.5"/>
+        <text x="255" y="100" text-anchor="middle" fill="#0a5e2a" font-size="11" font-weight="700">Conductor</text>
+        <text x="255" y="112" text-anchor="middle" fill="#666" font-size="9">Wire/cable</text>
+        <!-- Switch -->
+        <line x1="320" y1="65" x2="340" y2="65" stroke="#0a5e2a" stroke-width="2.5"/>
+        <line x1="340" y1="65" x2="365" y2="50" stroke="#0a5e2a" stroke-width="2.5"/>
+        <line x1="370" y1="65" x2="395" y2="65" stroke="#0a5e2a" stroke-width="2.5"/>
+        <circle cx="340" cy="65" r="3" fill="#0a5e2a"/>
+        <circle cx="370" cy="65" r="3" fill="#0a5e2a"/>
+        <text x="357" y="100" text-anchor="middle" fill="#0a5e2a" font-size="11" font-weight="700">Switch</text>
+        <text x="357" y="112" text-anchor="middle" fill="#666" font-size="9">Opens/closes circuit</text>
+        <!-- Bulb -->
+        <circle cx="470" cy="65" r="15" fill="none" stroke="#0a5e2a" stroke-width="2.5"/>
+        <line x1="462" y1="57" x2="478" y2="73" stroke="#0a5e2a" stroke-width="2"/>
+        <line x1="478" y1="57" x2="462" y2="73" stroke="#0a5e2a" stroke-width="2"/>
+        <line x1="440" y1="65" x2="455" y2="65" stroke="#0a5e2a" stroke-width="2.5"/>
+        <line x1="485" y1="65" x2="500" y2="65" stroke="#0a5e2a" stroke-width="2.5"/>
+        <text x="470" y="100" text-anchor="middle" fill="#0a5e2a" font-size="11" font-weight="700">Lamp/Bulb</text>
+        <text x="470" y="112" text-anchor="middle" fill="#666" font-size="9">Converts electrical energy</text>
+        <!-- Ammeter -->
+        <circle cx="580" cy="65" r="15" fill="none" stroke="#0a5e2a" stroke-width="2.5"/>
+        <text x="580" y="69" text-anchor="middle" fill="#0a5e2a" font-size="12" font-weight="800">A</text>
+        <line x1="550" y1="65" x2="565" y2="65" stroke="#0a5e2a" stroke-width="2.5"/>
+        <line x1="595" y1="65" x2="610" y2="65" stroke="#0a5e2a" stroke-width="2.5"/>
+        <text x="580" y="100" text-anchor="middle" fill="#0a5e2a" font-size="11" font-weight="700">Ammeter</text>
+        <text x="580" y="112" text-anchor="middle" fill="#666" font-size="9">Measures current</text>
+      </svg>
+    </div>
+  </div>
+</div>
+
+<!-- ===== SLIDE 3: OHM'S LAW ===== -->
+<div class="slide" id="s3">
+  <div class="slide-header">
+    <h2>Ohm's Law</h2>
+    <div class="strand">The fundamental law of DC circuits</div>
+  </div>
+  <div class="teach-block">
+    <h3>Statement of Ohm's Law</h3>
+    <div class="key-term"><strong>Ohm's Law:</strong> The current flowing through a conductor is directly proportional to the voltage across it, provided temperature and other physical conditions remain constant.</div>
+    <div class="diagram-wrap">
+      <svg viewBox="0 0 400 120" xmlns="http://www.w3.org/2000/svg" style="font-family:'Segoe UI',sans-serif;max-width:400px">
+        <rect width="400" height="120" rx="10" fill="#0a5e2a"/>
+        <text x="200" y="38" text-anchor="middle" fill="#f5a623" font-size="22" font-weight="800">V = I × R</text>
+        <line x1="40" y1="55" x2="360" y2="55" stroke="#ffffff33" stroke-width="1"/>
+        <text x="80" y="80" text-anchor="middle" fill="#fff" font-size="14" font-weight="700">I = V / R</text>
+        <text x="200" y="80" text-anchor="middle" fill="#fff" font-size="14" font-weight="700">R = V / I</text>
+        <text x="320" y="80" text-anchor="middle" fill="#fff" font-size="14" font-weight="700">V = I × R</text>
+        <text x="80" y="100" text-anchor="middle" fill="#f5a623" font-size="10">Find Current</text>
+        <text x="200" y="100" text-anchor="middle" fill="#f5a623" font-size="10">Find Resistance</text>
+        <text x="320" y="100" text-anchor="middle" fill="#f5a623" font-size="10">Find Voltage</text>
+      </svg>
+    </div>
+    <table class="info-table">
+      <tr><th>Symbol</th><th>Quantity</th><th>Unit</th><th>Instrument to Measure</th></tr>
+      <tr><td><strong>V</strong></td><td>Voltage (EMF or potential difference)</td><td>Volts (V)</td><td>Voltmeter — connected in parallel</td></tr>
+      <tr><td><strong>I</strong></td><td>Current</td><td>Amperes (A)</td><td>Ammeter — connected in series</td></tr>
+      <tr><td><strong>R</strong></td><td>Resistance</td><td>Ohms (Ω)</td><td>Ohmmeter / Multimeter</td></tr>
+    </table>
+  </div>
+  <div class="example-box">
+    <h4>✏️ Worked Examples</h4>
+    <p><strong>Example 1:</strong> A resistor has a resistance of 10Ω. If a voltage of 20V is applied across it, what current flows?</p>
+    <p style="margin-top:4px">I = V ÷ R = 20 ÷ 10 = <strong>2 A</strong></p>
+    <p style="margin-top:8px"><strong>Example 2:</strong> A current of 3A flows through a 15Ω resistor. What is the voltage across it?</p>
+    <p style="margin-top:4px">V = I × R = 3 × 15 = <strong>45 V</strong></p>
+    <p style="margin-top:8px"><strong>Example 3:</strong> A 12V battery drives a current of 4A through a resistor. What is the resistance?</p>
+    <p style="margin-top:4px">R = V ÷ I = 12 ÷ 4 = <strong>3 Ω</strong></p>
+  </div>
+</div>
+
+<!-- ===== SLIDE 4: SERIES CIRCUITS ===== -->
+<div class="slide" id="s4">
+  <div class="slide-header">
+    <h2>Series Resistor Circuits</h2>
+    <div class="strand">One path for current to flow</div>
+  </div>
+  <div class="teach-block">
+    <h3>Properties of a Series Circuit</h3>
+    <div class="key-term"><strong>Series circuit:</strong> A circuit in which all components are connected end-to-end along a single path so the same current flows through all components.</div>
+    <div class="diagram-wrap">
+      <svg viewBox="0 0 560 120" xmlns="http://www.w3.org/2000/svg" style="font-family:'Segoe UI',sans-serif;max-width:560px">
+        <rect width="560" height="120" rx="8" fill="#f4f7f5"/>
+        <!-- Circuit loop -->
+        <rect x="30" y="45" width="500" height="40" rx="0" fill="none"/>
+        <!-- Top wire -->
+        <line x1="30" y1="45" x2="530" y2="45" stroke="#0a5e2a" stroke-width="2.5"/>
+        <!-- Bottom wire -->
+        <line x1="30" y1="85" x2="530" y2="85" stroke="#0a5e2a" stroke-width="2.5"/>
+        <!-- Left side (battery) -->
+        <line x1="30" y1="45" x2="30" y2="85" stroke="#0a5e2a" stroke-width="2.5"/>
+        <line x1="20" y1="55" x2="40" y2="55" stroke="#0a5e2a" stroke-width="4"/>
+        <line x1="24" y1="68" x2="36" y2="68" stroke="#0a5e2a" stroke-width="2"/>
+        <text x="30" y="102" text-anchor="middle" fill="#0a5e2a" font-size="10" font-weight="700">12V</text>
+        <!-- Right side -->
+        <line x1="530" y1="45" x2="530" y2="85" stroke="#0a5e2a" stroke-width="2.5"/>
+        <!-- R1 -->
+        <rect x="100" y="36" width="60" height="18" rx="3" fill="none" stroke="#0a5e2a" stroke-width="2.5"/>
+        <text x="130" y="28" text-anchor="middle" fill="#0a5e2a" font-size="10" font-weight="700">R1 = 4Ω</text>
+        <text x="130" y="66" text-anchor="middle" fill="#f5a623" font-size="9">V1</text>
+        <!-- R2 -->
+        <rect x="240" y="36" width="60" height="18" rx="3" fill="none" stroke="#0a5e2a" stroke-width="2.5"/>
+        <text x="270" y="28" text-anchor="middle" fill="#0a5e2a" font-size="10" font-weight="700">R2 = 6Ω</text>
+        <text x="270" y="66" text-anchor="middle" fill="#f5a623" font-size="9">V2</text>
+        <!-- R3 -->
+        <rect x="380" y="36" width="60" height="18" rx="3" fill="none" stroke="#0a5e2a" stroke-width="2.5"/>
+        <text x="410" y="28" text-anchor="middle" fill="#0a5e2a" font-size="10" font-weight="700">R3 = 2Ω</text>
+        <text x="410" y="66" text-anchor="middle" fill="#f5a623" font-size="9">V3</text>
+        <!-- Current arrow -->
+        <text x="280" y="105" text-anchor="middle" fill="#c62828" font-size="10" font-weight="700">→ Same current I flows through all resistors →</text>
+      </svg>
+    </div>
+    <table class="info-table">
+      <tr><th>Property</th><th>Formula</th><th>Explanation</th></tr>
+      <tr><td>Total Resistance</td><td><strong>R<sub>T</sub> = R1 + R2 + R3</strong></td><td>Resistances add up</td></tr>
+      <tr><td>Current</td><td><strong>I = V<sub>T</sub> ÷ R<sub>T</sub></strong></td><td>Same current everywhere</td></tr>
+      <tr><td>Voltage</td><td><strong>V<sub>T</sub> = V1 + V2 + V3</strong></td><td>Voltages add up to supply</td></tr>
+      <tr><td>Individual Voltage</td><td><strong>V = I × R</strong></td><td>Ohm's Law per resistor</td></tr>
+    </table>
+  </div>
+  <div class="example-box">
+    <h4>✏️ Worked Example — Series Circuit</h4>
+    <p>R1=4Ω, R2=6Ω, R3=2Ω connected in series to a 12V battery.</p>
+    <p>R<sub>T</sub> = 4+6+2 = <strong>12Ω</strong></p>
+    <p>I = 12÷12 = <strong>1A</strong> (same through all)</p>
+    <p>V1 = 1×4 = <strong>4V</strong> &nbsp;|&nbsp; V2 = 1×6 = <strong>6V</strong> &nbsp;|&nbsp; V3 = 1×2 = <strong>2V</strong></p>
+    <p>Check: 4+6+2 = <strong>12V ✓</strong></p>
+  </div>
+</div>
+
+<!-- ===== SLIDE 5: PARALLEL CIRCUITS ===== -->
+<div class="slide" id="s5">
+  <div class="slide-header">
+    <h2>Parallel Resistor Circuits</h2>
+    <div class="strand">Multiple paths for current to flow</div>
+  </div>
+  <div class="teach-block">
+    <h3>Properties of a Parallel Circuit</h3>
+    <div class="key-term"><strong>Parallel circuit:</strong> A circuit in which components are connected across the same two points (nodes), providing multiple paths for current to flow. The same voltage appears across all branches.</div>
+    <div class="diagram-wrap">
+      <svg viewBox="0 0 500 160" xmlns="http://www.w3.org/2000/svg" style="font-family:'Segoe UI',sans-serif;max-width:500px">
+        <rect width="500" height="160" rx="8" fill="#f4f7f5"/>
+        <!-- Main horizontal wires -->
+        <line x1="30" y1="30" x2="470" y2="30" stroke="#0a5e2a" stroke-width="2.5"/>
+        <line x1="30" y1="130" x2="470" y2="130" stroke="#0a5e2a" stroke-width="2.5"/>
+        <!-- Battery left -->
+        <line x1="30" y1="30" x2="30" y2="130" stroke="#0a5e2a" stroke-width="2.5"/>
+        <line x1="18" y1="55" x2="42" y2="55" stroke="#0a5e2a" stroke-width="4"/>
+        <line x1="22" y1="72" x2="38" y2="72" stroke="#0a5e2a" stroke-width="2"/>
+        <text x="15" y="90" fill="#0a5e2a" font-size="10" font-weight="700">12V</text>
+        <!-- R1 branch -->
+        <line x1="150" y1="30" x2="150" y2="55" stroke="#0a5e2a" stroke-width="2"/>
+        <rect x="130" y="55" width="40" height="50" rx="3" fill="none" stroke="#0a5e2a" stroke-width="2"/>
+        <text x="150" y="84" text-anchor="middle" fill="#0a5e2a" font-size="10" font-weight="700">R1</text>
+        <text x="150" y="95" text-anchor="middle" fill="#0a5e2a" font-size="9">6Ω</text>
+        <line x1="150" y1="105" x2="150" y2="130" stroke="#0a5e2a" stroke-width="2"/>
+        <!-- R2 branch -->
+        <line x1="280" y1="30" x2="280" y2="55" stroke="#0a5e2a" stroke-width="2"/>
+        <rect x="260" y="55" width="40" height="50" rx="3" fill="none" stroke="#0a5e2a" stroke-width="2"/>
+        <text x="280" y="84" text-anchor="middle" fill="#0a5e2a" font-size="10" font-weight="700">R2</text>
+        <text x="280" y="95" text-anchor="middle" fill="#0a5e2a" font-size="9">12Ω</text>
+        <line x1="280" y1="105" x2="280" y2="130" stroke="#0a5e2a" stroke-width="2"/>
+        <!-- R3 branch -->
+        <line x1="410" y1="30" x2="410" y2="55" stroke="#0a5e2a" stroke-width="2"/>
+        <rect x="390" y="55" width="40" height="50" rx="3" fill="none" stroke="#0a5e2a" stroke-width="2"/>
+        <text x="410" y="84" text-anchor="middle" fill="#0a5e2a" font-size="10" font-weight="700">R3</text>
+        <text x="410" y="95" text-anchor="middle" fill="#0a5e2a" font-size="9">4Ω</text>
+        <line x1="410" y1="105" x2="410" y2="130" stroke="#0a5e2a" stroke-width="2"/>
+        <!-- Right side -->
+        <line x1="470" y1="30" x2="470" y2="130" stroke="#0a5e2a" stroke-width="2.5"/>
+        <!-- Label -->
+        <text x="250" y="150" text-anchor="middle" fill="#c62828" font-size="9" font-weight="700">Same voltage (12V) across all branches</text>
+      </svg>
+    </div>
+    <table class="info-table">
+      <tr><th>Property</th><th>Formula</th><th>Explanation</th></tr>
+      <tr><td>Total Resistance</td><td><strong>1/R<sub>T</sub> = 1/R1 + 1/R2 + 1/R3</strong></td><td>R<sub>T</sub> is less than smallest R</td></tr>
+      <tr><td>Voltage</td><td><strong>V<sub>T</sub> = V1 = V2 = V3</strong></td><td>Same voltage across all</td></tr>
+      <tr><td>Branch Current</td><td><strong>I<sub>n</sub> = V ÷ R<sub>n</sub></strong></td><td>Each branch has own current</td></tr>
+      <tr><td>Total Current</td><td><strong>I<sub>T</sub> = I1 + I2 + I3</strong></td><td>Currents add at junction</td></tr>
+    </table>
+  </div>
+  <div class="example-box">
+    <h4>✏️ Worked Example — Parallel Circuit</h4>
+    <p>R1=6Ω, R2=12Ω, R3=4Ω in parallel with 12V supply.</p>
+    <p>I1=12/6=<strong>2A</strong> &nbsp;|&nbsp; I2=12/12=<strong>1A</strong> &nbsp;|&nbsp; I3=12/4=<strong>3A</strong></p>
+    <p>I<sub>T</sub>=2+1+3=<strong>6A</strong></p>
+    <p>R<sub>T</sub>=V/I<sub>T</sub>=12/6=<strong>2Ω</strong> (less than smallest R=4Ω ✓)</p>
+  </div>
+</div>
+
+<!-- ===== SLIDE 6: KIRCHHOFF'S LAWS ===== -->
+<div class="slide" id="s6">
+  <div class="slide-header">
+    <h2>Kirchhoff's Laws</h2>
+    <div class="strand">Analysing complex DC circuits</div>
+  </div>
+  <div class="teach-block">
+    <h3>Kirchhoff's Current Law (KCL)</h3>
+    <div class="key-term"><strong>KCL:</strong> The total current entering a junction equals the total current leaving the junction. <em>ΣI<sub>in</sub> = ΣI<sub>out</sub></em></div>
+    <div class="example-box">
+      <h4>✏️ KCL Example</h4>
+      <p>At a junction: I1 = 5A enters, I2 = 2A leaves. What is I3 (the other leaving current)?</p>
+      <p>5 = 2 + I3 &nbsp;→&nbsp; I3 = <strong>3A</strong></p>
+    </div>
+  </div>
+  <div class="teach-block">
+    <h3>Kirchhoff's Voltage Law (KVL)</h3>
+    <div class="key-term"><strong>KVL:</strong> The sum of all voltages around any closed loop in a circuit equals zero. In other words, the total EMF equals the total voltage drops. <em>ΣV = 0</em></div>
+    <div class="example-box">
+      <h4>✏️ KVL Example</h4>
+      <p>A loop has a 12V battery and three resistors. V1=3V, V2=5V. Find V3.</p>
+      <p>12 = V1 + V2 + V3 &nbsp;→&nbsp; 12 = 3 + 5 + V3 &nbsp;→&nbsp; V3 = <strong>4V</strong></p>
+    </div>
+  </div>
+  <div class="teach-block">
+    <h3>Comparison: Series vs Parallel</h3>
+    <table class="info-table">
+      <tr><th>Property</th><th>Series</th><th>Parallel</th></tr>
+      <tr><td>Current</td><td>Same throughout</td><td>Splits at junctions</td></tr>
+      <tr><td>Voltage</td><td>Splits across components</td><td>Same across all branches</td></tr>
+      <tr><td>Total Resistance</td><td>R<sub>T</sub> = R1+R2+... (increases)</td><td>1/R<sub>T</sub> = 1/R1+1/R2+... (decreases)</td></tr>
+      <tr><td>If one opens</td><td>Whole circuit stops</td><td>Other branches still work</td></tr>
+      <tr><td>Application</td><td>String lights, fuses</td><td>Home wiring, car circuits</td></tr>
+    </table>
+  </div>
+</div>
+
+<!-- ===== SLIDE 7: FAULTS IN DC CIRCUITS ===== -->
+<div class="slide" id="s7">
+  <div class="slide-header">
+    <h2>Faults in DC Circuits</h2>
+    <div class="strand">Identifying and troubleshooting problems</div>
+  </div>
+  <div class="teach-block">
+    <h3>Common DC Circuit Faults</h3>
+    <div class="key-term"><strong>Open circuit:</strong> A break in the circuit path that prevents current from flowing. The circuit is incomplete — no current flows anywhere.</div>
+    <div class="key-term"><strong>Short circuit:</strong> An unintended low-resistance path that bypasses part of the circuit, causing very high current to flow, which can damage components or start a fire.</div>
+    <div class="key-term"><strong>High resistance fault:</strong> A connection that has developed resistance (e.g., loose terminal, dry solder joint) causing reduced current and voltage drop at that point.</div>
+    <table class="info-table">
+      <tr><th>Fault Type</th><th>Symptom</th><th>Cause</th><th>How to Find It</th></tr>
+      <tr><td>Open Circuit</td><td>No current flows; circuit dead</td><td>Broken wire, blown fuse, open switch</td><td>Voltmeter — shows full supply voltage across open</td></tr>
+      <tr><td>Short Circuit</td><td>High current; fuse blows; heat</td><td>Bare wires touching, faulty insulation</td><td>Ammeter reads very high; ohmmeter shows 0Ω</td></tr>
+      <tr><td>Faulty Component</td><td>Incorrect readings</td><td>Burnt/degraded resistor</td><td>Replace component; test with ohmmeter</td></tr>
+      <tr><td>Dry/Loose Joint</td><td>Intermittent fault</td><td>Poor solder, loose terminal</td><td>Visual check; tap test; voltmeter</td></tr>
+    </table>
+  </div>
+  <div class="warn-box">
+    <h4>⚠️ Short Circuit Safety</h4>
+    <p>A short circuit can cause <strong>fire, explosion of batteries, and severe burns</strong>. Always use fuses or circuit breakers to protect circuits. Never bypass protective devices.</p>
+  </div>
+  <div class="example-box">
+    <h4>✏️ Fault-Finding Procedure</h4>
+    <p>1. <strong>Observe</strong> — What symptoms are present? (No light? Burning smell?)</p>
+    <p>2. <strong>Isolate</strong> — Switch off and disconnect the supply for safety.</p>
+    <p>3. <strong>Measure</strong> — Use voltmeter/ohmmeter to locate the fault.</p>
+    <p>4. <strong>Identify</strong> — Pinpoint the faulty component or connection.</p>
+    <p>5. <strong>Repair</strong> — Replace or fix the fault, then retest.</p>
+  </div>
+</div>
+
+<!-- ===== SLIDE 8: INTERACTIVE CALCULATOR ===== -->
+<div class="slide" id="s8">
+  <div class="slide-header">
+    <h2>Interactive DC Circuit Calculator</h2>
+    <div class="strand">Calculate circuit values using Ohm's Law & circuit rules</div>
+  </div>
+
+  <div class="calc-box">
+    <h4>🔧 Tool 1: Ohm's Law Calculator</h4>
+    <p style="font-size:.83rem;margin-bottom:10px">Enter any TWO values — the third will be calculated.</p>
+    <div class="calc-row"><label>Voltage (V)</label><input type="number" id="ohm_v" placeholder="Volts"></div>
+    <div class="calc-row"><label>Current (A)</label><input type="number" id="ohm_i" placeholder="Amps"></div>
+    <div class="calc-row"><label>Resistance (Ω)</label><input type="number" id="ohm_r" placeholder="Ohms"></div>
+    <button class="check-btn" onclick="calcOhm()">⚡ Calculate</button>
+    <button class="check-btn" style="background:#888;margin-left:8px" onclick="clearOhm()">↺ Clear</button>
+    <div class="calc-result" id="ohm-result"></div>
+    <div class="calc-err" id="ohm-err"></div>
+  </div>
+
+  <div class="calc-box" style="margin-top:14px">
+    <h4>🔧 Tool 2: Resistor Network Calculator</h4>
+    <div class="calc-row">
+      <label>Circuit Type</label>
+      <select id="net_type">
+        <option value="series">Series</option>
+        <option value="parallel">Parallel</option>
+      </select>
+    </div>
+    <div class="calc-row"><label>R1 (Ω)</label><input type="number" id="net_r1" placeholder="e.g. 4"></div>
+    <div class="calc-row"><label>R2 (Ω)</label><input type="number" id="net_r2" placeholder="e.g. 6"></div>
+    <div class="calc-row"><label>R3 (Ω) <small style="color:#888">(optional)</small></label><input type="number" id="net_r3" placeholder="e.g. 2"></div>
+    <div class="calc-row"><label>Supply (V)</label><input type="number" id="net_v" placeholder="e.g. 12"></div>
+    <button class="check-btn" onclick="calcNetwork()">⚡ Calculate Network</button>
+    <button class="check-btn" style="background:#888;margin-left:8px" onclick="clearNetwork()">↺ Clear</button>
+    <div class="calc-result" id="net-result" style="white-space:pre-line"></div>
+    <div class="calc-err" id="net-err"></div>
+  </div>
+</div>
+
+<!-- ===== SLIDE 9: PRACTICE ===== -->
+<div class="slide" id="s9">
+  <div class="slide-header">
+    <h2>Practice Problems</h2>
+    <div class="strand">Apply Ohm's Law and circuit analysis</div>
+  </div>
+
+  <div class="practice-q">
+    <div class="qnum">Problem 1: Ohm's Law</div>
+    <p style="font-size:.86rem">A 24V battery is connected across a 8Ω resistor. Calculate: (a) the current, (b) the power dissipated.</p>
+    <div class="example-box" style="margin-top:8px">
+      <h4>📌 Solution</h4>
+      <p>(a) I = V ÷ R = 24 ÷ 8 = <strong>3 A</strong></p>
+      <p>(b) P = V × I = 24 × 3 = <strong>72 W</strong> &nbsp;(or P = I²R = 9×8 = 72W)</p>
+    </div>
+  </div>
+
+  <div class="practice-q">
+    <div class="qnum">Problem 2: Series Circuit</div>
+    <p style="font-size:.86rem">Three resistors R1=5Ω, R2=10Ω, R3=15Ω are connected in series to a 30V supply. Find: (a) total resistance, (b) current, (c) voltage across each resistor.</p>
+    <div class="example-box" style="margin-top:8px">
+      <h4>📌 Solution</h4>
+      <p>(a) R<sub>T</sub> = 5+10+15 = <strong>30 Ω</strong></p>
+      <p>(b) I = 30÷30 = <strong>1 A</strong></p>
+      <p>(c) V1=1×5=<strong>5V</strong> | V2=1×10=<strong>10V</strong> | V3=1×15=<strong>15V</strong></p>
+      <p>Check: 5+10+15 = 30V ✓</p>
+    </div>
+  </div>
+
+  <div class="practice-q">
+    <div class="qnum">Problem 3: Parallel Circuit</div>
+    <p style="font-size:.86rem">Two resistors R1=8Ω and R2=24Ω are connected in parallel across an 8V supply. Find: (a) current in each branch, (b) total current, (c) total resistance.</p>
+    <div class="example-box" style="margin-top:8px">
+      <h4>📌 Solution</h4>
+      <p>(a) I1=8÷8=<strong>1A</strong> | I2=8÷24=<strong>0.33A</strong></p>
+      <p>(b) I<sub>T</sub>=1+0.33=<strong>1.33A</strong></p>
+      <p>(c) R<sub>T</sub>=8÷1.33=<strong>6Ω</strong> (or: 1/R<sub>T</sub>=1/8+1/24=3/24+1/24=4/24 → R<sub>T</sub>=6Ω ✓)</p>
+    </div>
+  </div>
+
+  <div class="practice-q">
+    <div class="qnum">Problem 4: Fault Identification</div>
+    <p style="font-size:.86rem">In a series circuit with three bulbs and a 12V battery, one bulb is removed and all bulbs go off. In a parallel circuit with three bulbs, one bulb is removed and the others stay on. Explain why.</p>
+    <div class="example-box" style="margin-top:8px">
+      <h4>📌 Answer</h4>
+      <p><strong>Series:</strong> There is only ONE path for current. Removing a bulb creates an <strong>open circuit</strong> — no current flows anywhere, so all bulbs go off.</p>
+      <p style="margin-top:4px"><strong>Parallel:</strong> Each bulb has its own separate path. Removing one bulb only opens that one branch — current still flows through the other branches, so the remaining bulbs stay on.</p>
+    </div>
+  </div>
+</div>
+
+<!-- ===== SLIDE 10: QUIZ ===== -->
+<div class="slide" id="s10">
+  <div class="slide-header">
+    <h2>End-of-Lesson Quiz</h2>
+    <div class="strand">Sub-strand 1.2 · D.C. Electric Circuits</div>
+  </div>
+  <p style="font-size:.83rem;color:#555;margin-bottom:14px">Part A: 5 fill-in-the-blank (5 marks) &nbsp;|&nbsp; Part B: 3 short answer (10 marks) &nbsp;|&nbsp; <strong>Total: 15 marks</strong></p>
+
+  <div class="practice-q">
+    <div class="qnum">Part A: Fill in the Blank (1 mark each)</div>
+    <div style="font-size:.87rem">
+      <p style="margin:10px 0">1. Ohm's Law states that V = <input class="fill-blank" id="f1" placeholder="...">. <span class="fb-feedback" id="ff1"></span></p>
+      <p style="margin:10px 0">2. In a series circuit, the total resistance is <input class="fill-blank" id="f2" placeholder="..."> than any individual resistor. <span class="fb-feedback" id="ff2"></span></p>
+      <p style="margin:10px 0">3. In a parallel circuit, the voltage across each branch is <input class="fill-blank" id="f3" placeholder="...">. <span class="fb-feedback" id="ff3"></span></p>
+      <p style="margin:10px 0">4. A fault where the circuit path is broken and no current flows is called an <input class="fill-blank" id="f4" placeholder="..."> circuit. <span class="fb-feedback" id="ff4"></span></p>
+      <p style="margin:10px 0">5. Kirchhoff's Current Law states that the total current <input class="fill-blank" id="f5" placeholder="..."> a junction equals the total current leaving it. <span class="fb-feedback" id="ff5"></span></p>
+    </div>
+    <button class="check-btn" onclick="checkFills()" style="margin-top:12px">✓ Check Part A</button>
+  </div>
+
+  <div class="practice-q" style="margin-top:12px">
+    <div class="qnum">Part B: Short Answer</div>
+
+    <div style="margin-bottom:14px">
+      <p style="font-size:.87rem"><strong>B1.</strong> Three resistors of 10Ω, 20Ω and 30Ω are connected in series to a 60V DC supply. Calculate the total resistance, the current flowing in the circuit, and the voltage across the 20Ω resistor. <em>(3 marks)</em></p>
+      <textarea class="sa-box" id="sa1" placeholder="Show your working..."></textarea>
+      <button class="grade-btn" onclick="gradeAnswer('sa1','fb1',{keywords:['60','ohm','2a','2 a','40v','40 v','series','total','current','voltage'],required:5,marks:3,model:'RT = 10+20+30 = 60Ω. I = V÷RT = 60÷60 = 1A. V(20Ω) = I×R = 1×20 = 20V.'})">✓ Grade My Answer</button>
+      <div class="sa-feedback" id="fb1"></div>
+    </div>
+
+    <div style="margin-bottom:14px">
+      <p style="font-size:.87rem"><strong>B2.</strong> Explain the difference between a series circuit and a parallel circuit. State ONE advantage of connecting household appliances in parallel rather than in series. <em>(4 marks)</em></p>
+      <textarea class="sa-box" id="sa2" placeholder="Type your answer here..."></textarea>
+      <button class="grade-btn" onclick="gradeAnswer('sa2','fb2',{keywords:['series','one path','same current','parallel','multiple','same voltage','independent','one fails','advantage','voltage','individual'],required:5,marks:4,model:'Series circuit: components connected end-to-end along one path; same current flows through all; voltage splits. Parallel circuit: components connected across same two points; multiple paths; same voltage across all branches. Advantage: if one appliance fails, others continue working because each has its own independent path.'})">✓ Grade My Answer</button>
+      <div class="sa-feedback" id="fb2"></div>
+    </div>
+
+    <div style="margin-bottom:14px">
+      <p style="font-size:.87rem"><strong>B3.</strong> Describe TWO types of faults that can occur in a DC circuit and state how each fault can be identified using measuring instruments. <em>(3 marks)</em></p>
+      <textarea class="sa-box" id="sa3" placeholder="Type your answer here..."></textarea>
+      <button class="grade-btn" onclick="gradeAnswer('sa3','fb3',{keywords:['open circuit','short circuit','voltmeter','ammeter','ohmmeter','no current','high current','break','zero','fuse','blown'],required:5,marks:3,model:'1. Open circuit: a break in the circuit path; no current flows. Identified using a voltmeter — it reads full supply voltage across the open point. 2. Short circuit: unintended low-resistance path; very high current flows; fuse blows. Identified using an ammeter (reads very high) or ohmmeter (reads near 0Ω across the short).'})">✓ Grade My Answer</button>
+      <div class="sa-feedback" id="fb3"></div>
+    </div>
+  </div>
+
+  <button class="score-btn" onclick="showTotalScore()">📊 View My Total Score</button>
+  <div class="total-result" id="totalResult" style="display:none"></div>
+  <div class="next-lesson-box" id="nextLessonBox">
+    <a href="elec-1.3-capacitors-capacitance-full.html" class="next-lesson-btn">➡️ Next Lesson: 1.3 Capacitors &amp; Capacitance</a>
+    <div class="next-lesson-sub">You've completed this lesson! Keep going 🎉</div>
+  </div>
+</div>
+
+</div><!-- end slides-wrap -->
+
+<div class="nav-bar">
+  <button class="nav-btn" id="prevBtn" onclick="goSlide(-1)" disabled>← Prev</button>
+  <div class="dots" id="dotsWrap"></div>
+  <button class="nav-btn" id="nextBtn" onclick="goSlide(1)">Next →</button>
+</div>
+
+<script>
+// ── NAVIGATION ────────────────────────────────────────────────
+const TOTAL=10; let cur=0;
+const dotsWrap=document.getElementById('dotsWrap');
+for(let i=0;i<TOTAL;i++){
+  const d=document.createElement('div');
+  d.className='dot'+(i===0?' active':'');
+  d.onclick=()=>showSlide(i);
+  dotsWrap.appendChild(d);
+}
+function showSlide(n){
+  document.querySelectorAll('.slide').forEach((s,i)=>s.classList.toggle('active',i===n));
+  document.querySelectorAll('.dot').forEach((d,i)=>d.classList.toggle('active',i===n));
+  document.getElementById('prevBtn').disabled=(n===0);
+  document.getElementById('nextBtn').disabled=(n===TOTAL-1);
+  document.getElementById('slideLabel').textContent=(n+1)+' / '+TOTAL;
+  cur=n; window.scrollTo(0,0);
+}
+function goSlide(d){showSlide(Math.max(0,Math.min(TOTAL-1,cur+d)))}
+
+// ── OHM'S LAW CALCULATOR ──────────────────────────────────────
+function calcOhm(){
+  const v=parseFloat(document.getElementById('ohm_v').value);
+  const i=parseFloat(document.getElementById('ohm_i').value);
+  const r=parseFloat(document.getElementById('ohm_r').value);
+  const res=document.getElementById('ohm-result');
+  const err=document.getElementById('ohm-err');
+  res.style.display='none'; err.style.display='none';
+  const known=[!isNaN(v),!isNaN(i),!isNaN(r)].filter(Boolean).length;
+  if(known<2){err.textContent='Please enter at least TWO values.';err.style.display='block';return;}
+  let out='';
+  if(!isNaN(v)&&!isNaN(i)&&isNaN(r)){
+    const R=(v/i).toFixed(3);
+    document.getElementById('ohm_r').value=R;
+    out=`R = V ÷ I = ${v} ÷ ${i} = ${R} Ω`;
+  } else if(!isNaN(v)&&isNaN(i)&&!isNaN(r)){
+    const I=(v/r).toFixed(3);
+    document.getElementById('ohm_i').value=I;
+    out=`I = V ÷ R = ${v} ÷ ${r} = ${I} A`;
+  } else if(isNaN(v)&&!isNaN(i)&&!isNaN(r)){
+    const V=(i*r).toFixed(3);
+    document.getElementById('ohm_v').value=V;
+    out=`V = I × R = ${i} × ${r} = ${V} V`;
+  } else {
+    // All three given — verify
+    const calc_v=(i*r).toFixed(3);
+    out=`Verification: V = I×R = ${i}×${r} = ${calc_v}V. Entered V = ${v}V. ${Math.abs(v-calc_v)<0.1?'✓ Consistent':'⚠ Check your values'}`;
+  }
+  res.textContent=out; res.style.display='block';
+}
+function clearOhm(){
+  ['ohm_v','ohm_i','ohm_r'].forEach(id=>document.getElementById(id).value='');
+  document.getElementById('ohm-result').style.display='none';
+  document.getElementById('ohm-err').style.display='none';
+}
+
+// ── NETWORK CALCULATOR ────────────────────────────────────────
+function calcNetwork(){
+  const type=document.getElementById('net_type').value;
+  const r1=parseFloat(document.getElementById('net_r1').value);
+  const r2=parseFloat(document.getElementById('net_r2').value);
+  const r3=parseFloat(document.getElementById('net_r3').value);
+  const vs=parseFloat(document.getElementById('net_v').value);
+  const res=document.getElementById('net-result');
+  const err=document.getElementById('net-err');
+  res.style.display='none'; err.style.display='none';
+  if(isNaN(r1)||isNaN(r2)){err.textContent='Please enter at least R1 and R2.';err.style.display='block';return;}
+  const rs=[r1,r2];
+  if(!isNaN(r3)) rs.push(r3);
+  let RT, lines='';
+  if(type==='series'){
+    RT=rs.reduce((a,b)=>a+b,0);
+    lines=`Circuit Type: SERIES\nResistors: ${rs.join('Ω + ')}Ω\nTotal Resistance RT = ${RT.toFixed(2)} Ω`;
+    if(!isNaN(vs)){
+      const I=(vs/RT);
+      lines+=`\nSupply Voltage = ${vs} V\nTotal Current I = ${vs}/${RT.toFixed(2)} = ${I.toFixed(3)} A`;
+      rs.forEach((r,idx)=>{ lines+=`\nV${idx+1} = ${I.toFixed(3)} × ${r} = ${(I*r).toFixed(3)} V`; });
+    }
+  } else {
+    const recip=rs.reduce((a,b)=>a+1/b,0);
+    RT=1/recip;
+    lines=`Circuit Type: PARALLEL\nResistors: ${rs.join('Ω ∥ ')}Ω\n1/RT = ${rs.map(r=>'1/'+r).join(' + ')} = ${recip.toFixed(4)}\nTotal Resistance RT = ${RT.toFixed(3)} Ω`;
+    if(!isNaN(vs)){
+      const IT=(vs/RT);
+      lines+=`\nSupply Voltage = ${vs} V (same across all branches)\nTotal Current IT = ${IT.toFixed(3)} A`;
+      rs.forEach((r,idx)=>{ lines+=`\nI${idx+1} = ${vs}/${r} = ${(vs/r).toFixed(3)} A`; });
+    }
+  }
+  res.textContent=lines; res.style.display='block';
+}
+function clearNetwork(){
+  ['net_r1','net_r2','net_r3','net_v'].forEach(id=>document.getElementById(id).value='');
+  document.getElementById('net-result').style.display='none';
+  document.getElementById('net-err').style.display='none';
+}
+
+// ── FILL BLANK ────────────────────────────────────────────────
+const fbAns={
+  f1:['i x r','i × r','ir','i*r','current times resistance','current x resistance'],
+  f2:['greater','more','larger','higher'],
+  f3:['the same','equal','same','identical'],
+  f4:['open','open circuit'],
+  f5:['entering','into','in']
+};
+let fillScore=0, saScores={};
+function checkFills(){
+  fillScore=0;
+  Object.entries(fbAns).forEach(([id,ans])=>{
+    const inp=document.getElementById(id);
+    const fb=document.getElementById('f'+id.slice(1));
+    const val=inp.value.trim().toLowerCase();
+    const ok=ans.some(a=>val===a||val.includes(a));
+    if(ok){fillScore++;inp.className='fill-blank correct';fb.textContent='✓ +1';fb.style.color='#2e7d32';}
+    else{inp.className='fill-blank wrong';fb.textContent='✗ ('+ans[0]+')';fb.style.color='#c62828';}
+    fb.style.display='inline';
+  });
+}
+function gradeAnswer(saId,fbId,cfg){
+  const ans=document.getElementById(saId).value.trim().toLowerCase();
+  const found=cfg.keywords.filter(k=>ans.includes(k.toLowerCase()));
+  const missed=cfg.keywords.filter(k=>!ans.includes(k.toLowerCase()));
+  const hitRate=Math.min(found.length/cfg.required,1.0);
+  const marks=Math.round(hitRate*cfg.marks);
+  saScores[saId]=marks;
+  const grade=marks>=cfg.marks?'🌟 Excellent!':marks>=cfg.marks*0.5?'👍 Good attempt':'📖 Needs improvement';
+  const fbEl=document.getElementById(fbId);
+  fbEl.style.display='block';
+  fbEl.innerHTML=`<strong>${grade} — ${marks}/${cfg.marks} marks</strong><br>
+  <span class="kw-found">✅ Keywords found: ${found.join(', ')||'none'}</span><br>
+  <span class="kw-missed">❌ Missed keywords: ${missed.join(', ')||'none'}</span>
+  <div class="model-ans"><strong>Model Answer:</strong> ${cfg.model}</div>`;
+}
+function showTotalScore(){
+  const saTotal=Object.values(saScores).reduce((a,b)=>a+b,0);
+  const total=fillScore+saTotal;
+  const pct=Math.round(total/15*100);
+  const grade=pct>=80?'Exceeds Expectation 🎉':pct>=60?'Meets Expectation 👍':pct>=40?'Approaches Expectation 📖':'Below Expectation 💪';
+  const el=document.getElementById('totalResult');
+  el.style.display='block';
+  el.innerHTML=`<strong>Total Score: ${total} / 15 (${pct}%)</strong><br>
+  Part A: ${fillScore}/5 &nbsp;|&nbsp; Part B: ${saTotal}/10<br>
+  <span style="color:var(--pri);font-size:1.05rem">${grade}</span><br>
+  <span style="font-size:.8rem;color:#666;margin-top:4px;display:block">CBE Rubric — ${pct>=80?'Exceeds':pct>=60?'Meets':pct>=40?'Approaches':'Below'} Expectation</span>`;
+  submitExamToMTTI(total,15,pct);
+  document.getElementById('nextLessonBox').style.display='block';
+}
+function submitExamToMTTI(score,total,percent){
+  try{
+    fetch('/wp-json/mtti/v1/exam-result',{
+      method:'POST',
+      headers:{'Content-Type':'application/json','X-WP-Nonce':window.mtti_nonce||''},
+      body:JSON.stringify({lesson_id:'elec-1.2-dc-circuits',score,total,percent,timestamp:new Date().toISOString()})
+    }).then(r=>r.json()).then(d=>{if(d&&d.success)console.log('[MTTI] Result saved:',d);}).catch(e=>console.log('[MTTI] Offline:',e));
+  }catch(e){console.log('[MTTI] Error:',e);}
+}
+</script>
+</body>
+</html>

@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Quiz — Cybersecurity Notes</title>
+<style>
+:root{--pri:#0a5e2a;--acc:#f5a623;--ok:#2e7d32;--no:#c62828;--bg:#f0f4f0;--card:#fff;--radius:12px;}
+*{box-sizing:border-box;margin:0;padding:0;font-family:'Segoe UI',sans-serif;}
+body{background:var(--bg);min-height:100vh;display:flex;flex-direction:column;}
+#top-bar{background:var(--pri);color:#fff;padding:10px 20px;display:flex;justify-content:space-between;align-items:center;position:sticky;top:0;z-index:10;}
+#top-bar h1{font-size:15px;font-weight:700;}
+#top-bar .meta{font-size:11px;opacity:.8;}
+#progress-bar{height:4px;background:rgba(255,255,255,.3);}
+#progress-fill{height:4px;background:var(--acc);transition:width .4s;}
+#stage{flex:1;display:flex;align-items:center;justify-content:center;padding:20px;}
+.q-card{background:var(--card);border-radius:var(--radius);padding:28px 26px;max-width:640px;width:100%;box-shadow:0 4px 20px rgba(0,0,0,.1);}
+.q-counter{font-size:11px;font-weight:700;color:var(--pri);text-transform:uppercase;letter-spacing:.06em;margin-bottom:10px;}
+.q-text{font-size:17px;font-weight:600;color:#1a1a1a;margin-bottom:22px;line-height:1.5;}
+.opt-btn{display:block;width:100%;text-align:left;padding:12px 16px;border:2px solid #e0e0e0;border-radius:8px;background:#fff;font-size:14px;cursor:pointer;margin-bottom:10px;transition:all .2s;}
+.opt-btn:hover{border-color:var(--pri);background:#f0f8f0;}
+.opt-btn.selected{border-color:var(--pri);background:#e8f5e9;}
+.opt-btn.correct{border-color:var(--ok);background:#e8f5e9;color:var(--ok);font-weight:700;}
+.opt-btn.wrong{border-color:var(--no);background:#ffebee;color:var(--no);}
+.fib-input{width:100%;padding:12px;border:2px solid #e0e0e0;border-radius:8px;font-size:15px;margin-bottom:14px;}
+.fib-input:focus{outline:none;border-color:var(--pri);}
+.short-input{width:100%;padding:12px;border:2px solid #e0e0e0;border-radius:8px;font-size:14px;min-height:80px;resize:vertical;margin-bottom:14px;}
+.feedback{padding:12px 16px;border-radius:8px;font-size:13px;font-weight:600;margin-bottom:16px;display:none;}
+.feedback.correct{background:#e8f5e9;color:var(--ok);}
+.feedback.wrong{background:#ffebee;color:var(--no);}
+.feedback.info{background:#e3f2fd;color:#1565C0;}
+.btn-next{background:var(--pri);color:#fff;border:none;border-radius:8px;padding:12px 28px;font-size:14px;font-weight:700;cursor:pointer;width:100%;margin-top:6px;}
+.btn-next:hover{background:#0d7a36;}
+#results{display:none;text-align:center;padding:32px 24px;background:var(--card);border-radius:var(--radius);max-width:480px;width:100%;box-shadow:0 4px 20px rgba(0,0,0,.1);}
+#results .score-ring{font-size:56px;font-weight:900;color:var(--pri);}
+#results h2{margin:12px 0 6px;font-size:20px;}
+#results .sub{font-size:13px;color:#666;margin-bottom:20px;}
+.btn-retry{background:var(--acc);color:#fff;border:none;border-radius:8px;padding:11px 26px;font-size:14px;font-weight:700;cursor:pointer;}
+</style>
+</head>
+<body>
+<div id="top-bar">
+  <h1>📝 Cybersecurity Notes</h1>
+  <span class="meta">Medium · 10 questions · 27 Mar 2026</span>
+</div>
+<div id="progress-bar"><div id="progress-fill" style="width:0%"></div></div>
+
+<div id="stage">
+  <div id="q-card-wrap"></div>
+  <div id="results">
+    <div class="score-ring" id="score-pct">0%</div>
+    <h2 id="result-title"></h2>
+    <p class="sub" id="result-sub"></p>
+    <button class="btn-retry" onclick="initQuiz()">🔄 Try Again</button>
+  </div>
+</div>
+
+<script>
+const QUESTIONS = [{"question":"Define cybersecurity and explain its primary purpose in protecting digital systems.","options":[],"answer":"Cybersecurity is the practice of protecting computers, networks, programs, and data from digital attacks, unauthorized access, or damage. Its primary purpose is to ensure confidentiality, integrity, and availability of information systems and protect against cyber threats.","type":"short"},{"question":"List three common types of malware and briefly describe how each one affects computer systems.","options":[],"answer":"Three common types of malware are viruses (replicate and spread by attaching to other programs), worms (spread independently across networks without user interaction), and trojans (disguise themselves as legitimate software to gain unauthorized access). Each type can corrupt data, steal information, or compromise system security.","type":"short"},{"question":"Explain what a firewall is and describe two ways it protects a network from cyber threats.","options":[],"answer":"A firewall is a network security device that monitors and controls incoming and outgoing network traffic based on predetermined security rules. It protects networks by blocking unauthorized access attempts and filtering malicious traffic before it enters the system.","type":"short"},{"question":"Describe the difference between symmetric and asymmetric encryption methods.","options":[],"answer":"Symmetric encryption uses the same key for both encryption and decryption, making it faster but requiring secure key distribution. Asymmetric encryption uses a pair of keys (public and private) where data encrypted with one key can only be decrypted with the other, providing better security for key exchange.","type":"short"},{"question":"What is social engineering in cybersecurity and provide two examples of social engineering attacks?","options":[],"answer":"Social engineering is the manipulation of people to divulge confidential information or perform actions that compromise security. Examples include phishing emails that trick users into revealing passwords and pretexting where attackers impersonate trusted individuals to gain access to sensitive information.","type":"short"},{"question":"Explain what multi-factor authentication is and why it is more secure than single-factor authentication.","options":[],"answer":"Multi-factor authentication requires two or more verification methods from different categories such as something you know, something you have, or something you are. It is more secure than single-factor authentication because even if one factor is compromised, attackers still need the additional factors to gain access.","type":"short"},{"question":"Define a denial-of-service attack and explain how it affects the availability of network services.","options":[],"answer":"A denial-of-service attack is a cyber attack that aims to make a network service unavailable by overwhelming it with traffic or requests. It affects availability by consuming system resources, causing legitimate users to be unable to access the service or causing the system to crash.","type":"short"},{"question":"What is the purpose of data backup in cybersecurity and explain two types of backup strategies?","options":[],"answer":"Data backup in cybersecurity ensures data can be recovered after loss due to cyber attacks, system failures, or other incidents. Two backup strategies are full backup (complete copy of all data) and incremental backup (only backing up data that has changed since the last backup).","type":"short"},{"question":"Describe what an intrusion detection system does and explain how it helps maintain network security.","options":[],"answer":"An intrusion detection system monitors network traffic and system activities for suspicious behavior or known attack patterns. It helps maintain network security by alerting administrators to potential threats in real-time and enabling quick response to security incidents.","type":"short"},{"question":"Explain the concept of access control in cybersecurity and describe two methods used to implement it.","options":[],"answer":"Access control in cybersecurity is the process of restricting access to resources based on user identity and permissions. Two implementation methods are role-based access control (assigning permissions based on user roles) and mandatory access control (system-enforced restrictions based on security classifications).","type":"short"}];
+let cur=0, score=0, answered=false;
+
+function initQuiz(){
+  cur=0; score=0; answered=false;
+  document.getElementById('results').style.display='none';
+  document.getElementById('q-card-wrap').style.display='block';
+  showQ();
+}
+
+function showQ(){
+  const q=QUESTIONS[cur];
+  const pct=Math.round(cur/QUESTIONS.length*100);
+  document.getElementById('progress-fill').style.width=pct+'%';
+  const wrap=document.getElementById('q-card-wrap');
+
+  let html=`<div class="q-card">
+    <div class="q-counter">Question ${cur+1} of ${QUESTIONS.length}</div>
+    <div class="q-text">${escHtml(q.question)}</div>`;
+
+  if(q.type==='mcq'){
+    for(const [k,v] of Object.entries(q.options||{})){
+      html+=`<button class="opt-btn" id="opt-${k}" onclick="pickMCQ('${k}')">${k}) ${escHtml(v)}</button>`;
+    }
+  } else if(q.type==='fib'){
+    html+=`<input class="fib-input" id="fib-in" type="text" placeholder="Type your answer…">`;
+  } else {
+    html+=`<textarea class="short-input" id="short-in" placeholder="Write your answer…"></textarea>`;
+  }
+
+  html+=`<div class="feedback" id="fb"></div>
+    <button class="btn-next" id="btn-next" onclick="nextQ()">Check Answer ✓</button>
+  </div>`;
+
+  wrap.innerHTML=html;
+  answered=false;
+}
+
+function pickMCQ(key){
+  if(answered) return;
+  document.querySelectorAll('.opt-btn').forEach(b=>b.classList.remove('selected'));
+  document.getElementById('opt-'+key).classList.add('selected');
+}
+
+function nextQ(){
+  if(!answered){
+    const q=QUESTIONS[cur];
+    const fb=document.getElementById('fb');
+    fb.style.display='block';
+
+    if(q.type==='mcq'){
+      const sel=document.querySelector('.opt-btn.selected');
+      if(!sel){fb.className='feedback info';fb.innerText='Please select an option.';return;}
+      const chosen=sel.id.replace('opt-','');
+      const correct=q.answer.trim().toUpperCase()[0];
+      if(chosen===correct){score++;sel.classList.add('correct');fb.className='feedback correct';fb.innerText='✅ Correct!';}
+      else{sel.classList.add('wrong');fb.className='feedback wrong';fb.innerText='❌ Incorrect. Answer: '+correct+') '+((q.options||{})[correct]||q.answer);}
+      document.querySelectorAll('.opt-btn').forEach(b=>b.style.pointerEvents='none');
+    } else if(q.type==='fib'){
+      const inp=document.getElementById('fib-in');
+      if(!inp.value.trim()){fb.className='feedback info';fb.innerText='Please type an answer.';return;}
+      const given=inp.value.trim().toLowerCase();
+      const ans=q.answer.trim().toLowerCase();
+      if(given===ans||ans.includes(given)){score++;fb.className='feedback correct';fb.innerText='✅ Correct! Answer: '+q.answer;}
+      else{fb.className='feedback wrong';fb.innerText='❌ Model answer: '+q.answer;}
+      inp.disabled=true;
+    } else {
+      const inp=document.getElementById('short-in');
+      if(!inp.value.trim()){fb.className='feedback info';fb.innerText='Please write your answer.';return;}
+      fb.className='feedback info';fb.innerText='📝 Model answer: '+q.answer;
+      inp.disabled=true;
+      score+=0.5; // partial credit for short answer attempts
+    }
+
+    document.getElementById('btn-next').innerText='Next →';
+    answered=true;
+    return;
+  }
+
+  cur++;
+  if(cur>=QUESTIONS.length){ showResults(); return; }
+  showQ();
+}
+
+function showResults(){
+  document.getElementById('q-card-wrap').style.display='none';
+  document.getElementById('progress-fill').style.width='100%';
+  const res=document.getElementById('results');
+  res.style.display='block';
+  const maxScore=QUESTIONS.length;
+  const pct=Math.round((score/maxScore)*100);
+  document.getElementById('score-pct').innerText=pct+'%';
+  let title,sub;
+  if(pct>=80){title='Excellent! 🎉';sub='Outstanding performance. Well done!';}
+  else if(pct>=60){title='Good effort! 👍';sub='You passed. Review the questions you missed.';}
+  else if(pct>=40){title='Keep practising 📖';sub='Review the lesson and try again.';}
+  else{title='Needs improvement 💪';sub='Go back to the lesson materials and try again.';}
+  document.getElementById('result-title').innerText=title;
+  document.getElementById('result-sub').innerText=sub+' ('+score.toFixed(1)+'/'+maxScore+')';
+
+  // Report to MTTI LMS if available
+  // Practice quiz — scores are not recorded in transcripts or unit results
+}
+
+function escHtml(t){
+  return String(t).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+
+initQuiz();
+</script>
+</body>
+</html>

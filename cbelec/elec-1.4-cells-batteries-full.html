@@ -1,0 +1,699 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Electrical Technology Gr.10 | 1.4 Cells & Batteries</title>
+<style>
+:root{
+  --pri:#0a5e2a;--pri-l:#0d7a38;--acc:#f5a623;
+  --ok:#2e7d32;--no:#c62828;--bg:#f4f7f5;
+  --border:#d0e0d4;--txt:#1a2e1f;--warn-bg:#fff3e0;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Segoe UI',system-ui,sans-serif;background:var(--bg);color:var(--txt);min-height:100vh;display:flex;flex-direction:column}
+.top-bar{position:sticky;top:0;z-index:100;background:linear-gradient(135deg,var(--pri),var(--pri-l));color:#fff;padding:10px 16px;display:flex;align-items:center;gap:12px;box-shadow:0 2px 8px rgba(0,0,0,.25)}
+.top-bar .logo{font-weight:800;font-size:1rem;white-space:nowrap}
+.top-bar .title{font-size:.85rem;opacity:.9;flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.slide-badge{background:var(--acc);color:#000;font-weight:700;font-size:.8rem;padding:3px 10px;border-radius:20px;white-space:nowrap}
+.slides-wrap{flex:1;overflow:hidden}
+.slide{display:none;padding:16px;max-width:860px;margin:0 auto;animation:fadeIn .3s ease}
+.slide.active{display:block}
+@keyframes fadeIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+.slide-header{background:linear-gradient(135deg,var(--pri),var(--pri-l));color:#fff;padding:14px 18px;border-radius:10px;margin-bottom:16px}
+.slide-header h2{font-size:1.1rem;font-weight:700}
+.slide-header .strand{font-size:.78rem;opacity:.85;margin-top:3px}
+.lo-box{background:#fff;border-left:5px solid var(--acc);border-radius:8px;padding:14px 16px;margin-bottom:14px;box-shadow:0 1px 4px rgba(0,0,0,.06)}
+.lo-box h3{color:var(--pri);font-size:.95rem;margin-bottom:8px}
+.lo-box ol{padding-left:18px}
+.lo-box ol li{margin-bottom:5px;font-size:.88rem;line-height:1.5}
+.inquiry{margin-top:12px;background:var(--pri);color:#fff;border-radius:6px;padding:10px 14px;font-size:.85rem}
+.inquiry strong{display:block;margin-bottom:3px;color:var(--acc)}
+.teach-block{margin-bottom:18px}
+.teach-block h3{color:var(--pri);font-size:1rem;font-weight:700;padding-bottom:5px;border-bottom:2.5px solid var(--acc);margin-bottom:10px}
+.key-term{border-left:4px solid var(--acc);background:#fffbf0;padding:10px 14px;border-radius:0 6px 6px 0;margin:8px 0;font-size:.87rem}
+.key-term strong{color:var(--pri)}
+.info-table{width:100%;border-collapse:collapse;margin:10px 0;font-size:.84rem}
+.info-table th{background:var(--pri);color:#fff;padding:8px 10px;text-align:left}
+.info-table td{padding:7px 10px;border-bottom:1px solid var(--border)}
+.info-table tr:nth-child(even) td{background:#eef5f0}
+.example-box{background:#f0faf2;border:1.5px solid var(--ok);border-radius:8px;padding:12px 14px;margin:10px 0;font-size:.86rem}
+.example-box h4{color:var(--ok);margin-bottom:7px;font-size:.9rem}
+.warn-box{background:var(--warn-bg);border:1.5px solid #e65100;border-radius:8px;padding:11px 14px;margin:10px 0;font-size:.85rem}
+.warn-box h4{color:#e65100;margin-bottom:5px}
+.diagram-wrap{text-align:center;margin:14px 0;overflow-x:auto}
+.calc-box{background:#fff;border:1.5px solid var(--pri-l);border-radius:8px;padding:14px;margin:10px 0}
+.calc-box h4{color:var(--pri);margin-bottom:10px;font-size:.9rem}
+.practice-q{background:#fff;border-radius:8px;border:1px solid var(--border);padding:14px;margin-bottom:12px;box-shadow:0 1px 3px rgba(0,0,0,.05)}
+.practice-q .qnum{font-weight:700;color:var(--pri);font-size:.85rem;margin-bottom:5px}
+.fill-blank{border:none;border-bottom:2px dashed var(--pri);background:transparent;outline:none;font-size:.9rem;padding:2px 6px;min-width:110px;color:var(--txt)}
+.fill-blank.correct{border-bottom-color:var(--ok);background:#f0faf2;border-radius:4px}
+.fill-blank.wrong{border-bottom-color:var(--no);background:#fff0f0;border-radius:4px}
+.fb-feedback{font-size:.8rem;display:inline-block;margin-left:4px;font-weight:600}
+.sa-box{width:100%;min-height:80px;padding:8px 10px;border:1.5px solid var(--border);border-radius:6px;font-size:.86rem;font-family:inherit;resize:vertical}
+.grade-btn{background:var(--pri);color:#fff;border:none;padding:7px 18px;border-radius:6px;cursor:pointer;font-size:.84rem;margin-top:7px}
+.grade-btn:hover{background:var(--pri-l)}
+.sa-feedback{margin-top:8px;padding:10px;border-radius:6px;background:#f9f9f9;border:1px solid #ddd;font-size:.82rem;display:none}
+.kw-found{color:var(--ok);font-weight:600}
+.kw-missed{color:var(--no);font-weight:600}
+.model-ans{margin-top:6px;font-style:italic;color:#555}
+.check-btn{background:var(--ok);color:#fff;border:none;padding:8px 18px;border-radius:6px;cursor:pointer;font-size:.84rem;margin-top:8px}
+.check-btn:hover{background:#256427}
+.score-btn{display:block;margin:18px auto 0;background:var(--acc);color:#000;font-weight:700;border:none;padding:11px 32px;border-radius:8px;cursor:pointer;font-size:.95rem}
+.score-btn:hover{background:#e0951a}
+.next-lesson-box{margin-top:18px;text-align:center;display:none}.next-lesson-btn{display:inline-block;background:linear-gradient(135deg,var(--pri),var(--pri-l));color:#fff;font-weight:700;border:none;padding:14px 32px;border-radius:10px;cursor:pointer;font-size:.95rem;text-decoration:none;transition:all .3s;box-shadow:0 4px 15px rgba(10,94,42,.25)}.next-lesson-btn:hover{transform:translateY(-2px);box-shadow:0 8px 25px rgba(10,94,42,.35)}.next-lesson-sub{font-size:.78rem;color:#666;margin-top:8px}
+.total-result{margin-top:14px;text-align:center;font-size:1rem;font-weight:700;padding:12px;border-radius:8px;background:#fff;border:2px solid var(--pri)}
+.tag{display:inline-block;background:var(--pri);color:#fff;font-size:.72rem;padding:2px 8px;border-radius:10px;margin:2px}
+.calc-row{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin:6px 0;font-size:.87rem}
+.calc-row label{min-width:130px;font-weight:600;color:var(--pri)}
+.calc-row input{padding:6px 10px;border:1.5px solid var(--border);border-radius:6px;font-size:.87rem;width:110px}
+.calc-row select{padding:6px 10px;border:1.5px solid var(--border);border-radius:6px;font-size:.87rem}
+.calc-result{background:var(--pri);color:#fff;padding:10px 14px;border-radius:6px;margin-top:8px;font-size:.88rem;font-weight:600;display:none;white-space:pre-line}
+.calc-err{background:#fff0f0;color:var(--no);padding:8px 12px;border-radius:6px;margin-top:8px;font-size:.85rem;display:none}
+.nav-bar{position:sticky;bottom:0;background:#fff;border-top:2px solid var(--border);padding:10px 16px;display:flex;align-items:center;justify-content:space-between;gap:10px;z-index:90}
+.nav-btn{background:var(--pri);color:#fff;border:none;padding:9px 22px;border-radius:8px;font-size:.88rem;cursor:pointer;font-weight:600}
+.nav-btn:disabled{background:#b0b0b0;cursor:not-allowed}
+.nav-btn:hover:not(:disabled){background:var(--pri-l)}
+.dots{display:flex;gap:6px;flex-wrap:wrap;justify-content:center;flex:1}
+.dot{width:9px;height:9px;border-radius:50%;background:#ccc;cursor:pointer;transition:background .2s}
+.dot.active{background:var(--pri)}
+@media(max-width:600px){
+  .top-bar .title{display:none}
+  .slide{padding:10px}
+  .info-table{font-size:.78rem}
+  .nav-btn{padding:8px 14px;font-size:.82rem}
+  .calc-row{flex-direction:column;align-items:flex-start}
+}
+</style>
+<script type="text/javascript">(function(c,l,a,r,i,t,y){c[a]=c[a]||function(){(c[a].q=c[a].q||[]).push(arguments)};t=l.createElement(r);t.async=1;t.src="https://www.clarity.ms/tag/"+i;y=l.getElementsByTagName(r)[0];y.parentNode.insertBefore(t,y);})(window,document,"clarity","script","wg31zlwbt9");</script>\n</head>
+<body>
+
+<div class="top-bar">
+  <div class="logo">M.T.T.I</div>
+  <div class="title">Electrical Technology Gr.10 · 1.4 Cells & Batteries</div>
+  <div class="slide-badge" id="slideLabel">1 / 10</div>
+</div>
+
+<div class="slides-wrap">
+
+<!-- ===== SLIDE 1: LEARNING OUTCOMES ===== -->
+<div class="slide active" id="s1">
+  <div class="slide-header">
+    <h2>Learning Outcomes</h2>
+    <div class="strand">Strand 1.0 Fundamentals · Sub-strand 1.4 Cells & Batteries · 10 Lessons</div>
+  </div>
+  <div class="lo-box">
+    <h3>By the end of this sub-strand, you should be able to:</h3>
+    <ol>
+      <li>Describe the <strong>principle of operation</strong> of a simple cell.</li>
+      <li>Connect <strong>series and parallel battery arrays</strong> in a circuit.</li>
+      <li>Conduct a <strong>battery charging procedure</strong> for a secondary battery.</li>
+      <li>Perform <strong>maintenance procedures</strong> for cells and batteries.</li>
+      <li>Appreciate the importance of <strong>safe disposal</strong> of cells and batteries.</li>
+    </ol>
+    <div class="inquiry">
+      <strong>🔍 Key Inquiry Questions</strong>
+      How do cells and batteries work? &nbsp;|&nbsp; How are different types of batteries applied in various fields?
+    </div>
+  </div>
+  <div class="teach-block">
+    <h3>Topics Covered</h3>
+    <div style="display:flex;flex-wrap:wrap;gap:8px;margin-top:6px">
+      <span class="tag">Simple Cell</span>
+      <span class="tag">Primary Cells</span>
+      <span class="tag">Secondary Cells</span>
+      <span class="tag">Series & Parallel Arrays</span>
+      <span class="tag">Battery Charging</span>
+      <span class="tag">Maintenance</span>
+      <span class="tag">Safe Disposal</span>
+    </div>
+  </div>
+</div>
+
+<!-- ===== SLIDE 2: THE SIMPLE CELL ===== -->
+<div class="slide" id="s2">
+  <div class="slide-header">
+    <h2>The Simple Cell</h2>
+    <div class="strand">How chemical energy becomes electrical energy</div>
+  </div>
+  <div class="teach-block">
+    <h3>Principle of Operation</h3>
+    <div class="key-term"><strong>Cell:</strong> A device that converts chemical energy into electrical energy through an electrochemical reaction. It has two electrodes (anode and cathode) immersed in an electrolyte.</div>
+    <div class="key-term"><strong>Battery:</strong> Two or more cells connected together to provide a higher voltage or current than a single cell.</div>
+    <div class="key-term"><strong>EMF (Electromotive Force):</strong> The total voltage produced by a cell when no current is flowing. Measured in Volts (V).</div>
+    <div class="key-term"><strong>Internal Resistance (r):</strong> The resistance within the cell itself. It causes a voltage drop when current flows: <strong>Terminal Voltage = EMF − (I × r)</strong></div>
+  </div>
+  <div class="teach-block">
+    <h3>Simple Cell Structure</h3>
+    <div class="diagram-wrap">
+      <svg viewBox="0 0 520 170" xmlns="http://www.w3.org/2000/svg" style="font-family:'Segoe UI',sans-serif;max-width:520px">
+        <rect width="520" height="170" rx="8" fill="#f4f7f5"/>
+        <!-- Electrolyte container -->
+        <rect x="100" y="40" width="220" height="110" rx="6" fill="#e8f4fd" stroke="#0a5e2a" stroke-width="2"/>
+        <!-- Zinc electrode -->
+        <rect x="120" y="50" width="20" height="90" rx="3" fill="#888"/>
+        <text x="130" y="46" text-anchor="middle" fill="#555" font-size="10" font-weight="700">Zinc (−)</text>
+        <text x="130" y="155" text-anchor="middle" fill="#555" font-size="9">Anode</text>
+        <!-- Copper electrode -->
+        <rect x="280" y="50" width="20" height="90" rx="3" fill="#b87333"/>
+        <text x="290" y="46" text-anchor="middle" fill="#555" font-size="10" font-weight="700">Copper (+)</text>
+        <text x="290" y="155" text-anchor="middle" fill="#555" font-size="9">Cathode</text>
+        <!-- Electrolyte label -->
+        <text x="210" y="100" text-anchor="middle" fill="#0a5e2a" font-size="10" font-weight="700">Electrolyte</text>
+        <text x="210" y="113" text-anchor="middle" fill="#0a5e2a" font-size="9">(Dilute H₂SO₄)</text>
+        <!-- Wire -->
+        <line x1="130" y1="50" x2="130" y2="20" stroke="#333" stroke-width="2"/>
+        <line x1="130" y1="20" x2="290" y2="20" stroke="#333" stroke-width="2"/>
+        <line x1="290" y1="20" x2="290" y2="50" stroke="#333" stroke-width="2"/>
+        <!-- Bulb -->
+        <circle cx="210" cy="20" r="10" fill="none" stroke="#f5a623" stroke-width="2"/>
+        <line x1="204" y1="14" x2="216" y2="26" stroke="#f5a623" stroke-width="1.5"/>
+        <line x1="216" y1="14" x2="204" y2="26" stroke="#f5a623" stroke-width="1.5"/>
+        <!-- Arrows -->
+        <text x="170" y="17" fill="#c62828" font-size="9">← e⁻ flow</text>
+        <!-- Labels right side -->
+        <text x="350" y="60" fill="#0a5e2a" font-size="10" font-weight="700">EMF ≈ 1.1V</text>
+        <text x="350" y="75" fill="#555" font-size="9">Electrons flow</text>
+        <text x="350" y="87" fill="#555" font-size="9">from Zinc (−)</text>
+        <text x="350" y="99" fill="#555" font-size="9">to Copper (+)</text>
+        <text x="350" y="115" fill="#555" font-size="9">through external</text>
+        <text x="350" y="127" fill="#555" font-size="9">circuit</text>
+      </svg>
+    </div>
+  </div>
+  <div class="example-box">
+    <h4>✏️ Terminal Voltage Calculation</h4>
+    <p>A cell has EMF = 1.5V and internal resistance r = 0.5Ω. Current drawn = 1A.</p>
+    <p>Terminal Voltage = EMF − (I × r) = 1.5 − (1 × 0.5) = <strong>1.0V</strong></p>
+    <p>The 0.5V is "lost" inside the cell due to internal resistance.</p>
+  </div>
+</div>
+
+<!-- ===== SLIDE 3: PRIMARY & SECONDARY CELLS ===== -->
+<div class="slide" id="s3">
+  <div class="slide-header">
+    <h2>Primary & Secondary Cells</h2>
+    <div class="strand">Types of electrochemical cells</div>
+  </div>
+  <div class="teach-block">
+    <h3>Primary Cells (Non-rechargeable)</h3>
+    <div class="key-term"><strong>Primary cell:</strong> A cell that converts chemical energy to electrical energy irreversibly. Once the chemicals are used up, the cell cannot be recharged and must be disposed of.</div>
+    <table class="info-table">
+      <tr><th>Type</th><th>EMF</th><th>Electrolyte</th><th>Application</th></tr>
+      <tr><td>Dry cell (Leclanché)</td><td>1.5V</td><td>Ammonium chloride paste</td><td>Torches, remotes, clocks</td></tr>
+      <tr><td>Alkaline cell</td><td>1.5V</td><td>Potassium hydroxide</td><td>High-drain devices, cameras</td></tr>
+      <tr><td>Lithium cell</td><td>3.0V</td><td>Lithium salt</td><td>Watches, calculators, medical</td></tr>
+      <tr><td>Mercury cell</td><td>1.35V</td><td>Mercuric oxide</td><td>Hearing aids (being phased out)</td></tr>
+    </table>
+  </div>
+  <div class="teach-block">
+    <h3>Secondary Cells (Rechargeable)</h3>
+    <div class="key-term"><strong>Secondary cell:</strong> A cell that can be recharged by passing current through it in the reverse direction, restoring the chemical energy. Can be used many times.</div>
+    <table class="info-table">
+      <tr><th>Type</th><th>EMF/cell</th><th>Electrolyte</th><th>Application</th></tr>
+      <tr><td>Lead-acid</td><td>2.0V</td><td>Dilute sulphuric acid</td><td>Car batteries, UPS systems</td></tr>
+      <tr><td>Nickel-Cadmium (NiCd)</td><td>1.2V</td><td>Potassium hydroxide</td><td>Power tools, older phones</td></tr>
+      <tr><td>Nickel-Metal Hydride (NiMH)</td><td>1.2V</td><td>Potassium hydroxide</td><td>Hybrid cars, AA/AAA rechargeable</td></tr>
+      <tr><td>Lithium-ion (Li-ion)</td><td>3.6V</td><td>Lithium salt in organic solvent</td><td>Phones, laptops, EVs</td></tr>
+      <tr><td>Lithium Polymer (LiPo)</td><td>3.7V</td><td>Polymer electrolyte</td><td>Drones, RC cars, wearables</td></tr>
+    </table>
+  </div>
+</div>
+
+<!-- ===== SLIDE 4: SERIES & PARALLEL BATTERY ARRAYS ===== -->
+<div class="slide" id="s4">
+  <div class="slide-header">
+    <h2>Series & Parallel Battery Arrays</h2>
+    <div class="strand">Increasing voltage or current capacity</div>
+  </div>
+  <div class="teach-block">
+    <h3>Cells Connected in Series</h3>
+    <div class="key-term"><strong>Series connection:</strong> Cells connected positive to negative in a chain. <strong>Voltage adds up</strong>, current capacity stays the same as one cell.</div>
+    <div class="diagram-wrap">
+      <svg viewBox="0 0 500 90" xmlns="http://www.w3.org/2000/svg" style="font-family:'Segoe UI',sans-serif;max-width:500px">
+        <rect width="500" height="90" rx="8" fill="#f4f7f5"/>
+        <line x1="20" y1="45" x2="60" y2="45" stroke="#0a5e2a" stroke-width="2.5"/>
+        <!-- Cell 1 -->
+        <line x1="60" y1="30" x2="60" y2="60" stroke="#0a5e2a" stroke-width="4"/>
+        <line x1="68" y1="35" x2="68" y2="55" stroke="#0a5e2a" stroke-width="2"/>
+        <text x="64" y="22" text-anchor="middle" fill="#c62828" font-size="9">+</text>
+        <text x="56" y="22" text-anchor="middle" fill="#0a5e2a" font-size="9">−</text>
+        <line x1="68" y1="45" x2="120" y2="45" stroke="#0a5e2a" stroke-width="2.5"/>
+        <!-- Cell 2 -->
+        <line x1="120" y1="30" x2="120" y2="60" stroke="#0a5e2a" stroke-width="4"/>
+        <line x1="128" y1="35" x2="128" y2="55" stroke="#0a5e2a" stroke-width="2"/>
+        <line x1="128" y1="45" x2="180" y2="45" stroke="#0a5e2a" stroke-width="2.5"/>
+        <!-- Cell 3 -->
+        <line x1="180" y1="30" x2="180" y2="60" stroke="#0a5e2a" stroke-width="4"/>
+        <line x1="188" y1="35" x2="188" y2="55" stroke="#0a5e2a" stroke-width="2"/>
+        <line x1="188" y1="45" x2="260" y2="45" stroke="#0a5e2a" stroke-width="2.5"/>
+        <!-- Load -->
+        <rect x="260" y="35" width="50" height="20" rx="3" fill="none" stroke="#0a5e2a" stroke-width="2"/>
+        <text x="285" y="49" text-anchor="middle" fill="#0a5e2a" font-size="9">Load</text>
+        <line x1="310" y1="45" x2="380" y2="45" stroke="#0a5e2a" stroke-width="2.5"/>
+        <line x1="380" y1="45" x2="380" y2="20" stroke="#0a5e2a" stroke-width="2.5"/>
+        <line x1="20" y1="45" x2="20" y2="20" stroke="#0a5e2a" stroke-width="2.5"/>
+        <line x1="20" y1="20" x2="380" y2="20" stroke="#0a5e2a" stroke-width="2.5"/>
+        <!-- Label -->
+        <text x="430" y="40" fill="#0a5e2a" font-size="10" font-weight="700">V_T = V1+V2+V3</text>
+        <text x="430" y="55" fill="#555" font-size="9">I same as 1 cell</text>
+      </svg>
+    </div>
+    <div class="example-box">
+      <h4>✏️ Series Example</h4>
+      <p>3 × 1.5V cells in series → V<sub>T</sub> = 1.5+1.5+1.5 = <strong>4.5V</strong> (same current capacity)</p>
+    </div>
+  </div>
+  <div class="teach-block">
+    <h3>Cells Connected in Parallel</h3>
+    <div class="key-term"><strong>Parallel connection:</strong> All positive terminals joined together, all negative terminals joined together. <strong>Current capacity adds up</strong>, voltage stays the same as one cell.</div>
+    <div class="example-box">
+      <h4>✏️ Parallel Example</h4>
+      <p>3 × 1.5V cells (each 2Ah) in parallel → V = <strong>1.5V</strong>, Capacity = 2+2+2 = <strong>6Ah</strong></p>
+      <p style="margin-top:6px">Use parallel when you need <strong>longer runtime</strong> but same voltage.</p>
+      <p>Use series when you need <strong>higher voltage</strong>.</p>
+    </div>
+  </div>
+  <div class="teach-block">
+    <h3>Series-Parallel Combination</h3>
+    <table class="info-table">
+      <tr><th>Connection</th><th>Voltage</th><th>Current Capacity</th><th>Use Case</th></tr>
+      <tr><td>Series</td><td>Multiplied</td><td>Same as 1 cell</td><td>Higher voltage needed</td></tr>
+      <tr><td>Parallel</td><td>Same as 1 cell</td><td>Multiplied</td><td>Longer runtime needed</td></tr>
+      <tr><td>Series-Parallel</td><td>Increased</td><td>Increased</td><td>Both higher V and runtime</td></tr>
+    </table>
+  </div>
+</div>
+
+<!-- ===== SLIDE 5: LEAD-ACID BATTERY ===== -->
+<div class="slide" id="s5">
+  <div class="slide-header">
+    <h2>The Lead-Acid Battery</h2>
+    <div class="strand">The most common secondary battery in Kenya</div>
+  </div>
+  <div class="teach-block">
+    <h3>Construction & Operation</h3>
+    <div class="key-term"><strong>Lead-acid battery:</strong> A secondary battery using lead (Pb) plates as electrodes and dilute sulphuric acid (H₂SO₄) as electrolyte. Each cell produces 2V. A 12V car battery has 6 cells in series.</div>
+    <table class="info-table">
+      <tr><th>Component</th><th>Material</th><th>Role</th></tr>
+      <tr><td>Positive plate</td><td>Lead dioxide (PbO₂)</td><td>Cathode — oxidising agent</td></tr>
+      <tr><td>Negative plate</td><td>Spongy lead (Pb)</td><td>Anode — reducing agent</td></tr>
+      <tr><td>Electrolyte</td><td>Dilute H₂SO₄ (30–40%)</td><td>Ion conductor between plates</td></tr>
+      <tr><td>Separator</td><td>Microporous plastic/glass</td><td>Prevents plates touching</td></tr>
+      <tr><td>Case</td><td>Polypropylene</td><td>Contains cells and electrolyte</td></tr>
+    </table>
+  </div>
+  <div class="teach-block">
+    <h3>State of Charge — Electrolyte Density</h3>
+    <table class="info-table">
+      <tr><th>State</th><th>Specific Gravity</th><th>Cell Voltage</th></tr>
+      <tr><td>Fully charged</td><td>1.26–1.28 g/cm³</td><td>2.1V per cell</td></tr>
+      <tr><td>Half charged</td><td>1.20–1.22 g/cm³</td><td>2.0V per cell</td></tr>
+      <tr><td>Fully discharged</td><td>1.10–1.15 g/cm³</td><td>1.75V per cell</td></tr>
+    </table>
+    <p style="font-size:.84rem;margin-top:6px;color:#555">Use a <strong>hydrometer</strong> to measure specific gravity of the electrolyte — this tells you how charged the battery is.</p>
+  </div>
+  <div class="warn-box">
+    <h4>⚠️ Lead-Acid Battery Hazards</h4>
+    <p>• Sulphuric acid is <strong>highly corrosive</strong> — wear gloves and goggles when handling.<br>
+    • Charging produces <strong>hydrogen gas</strong> — never charge in an enclosed space; keep away from sparks and flames.<br>
+    • Lead is a <strong>toxic heavy metal</strong> — never dispose of in regular rubbish; use designated recycling points.</p>
+  </div>
+</div>
+
+<!-- ===== SLIDE 6: BATTERY CHARGING ===== -->
+<div class="slide" id="s6">
+  <div class="slide-header">
+    <h2>Battery Charging Procedure</h2>
+    <div class="strand">Correct charging keeps batteries healthy and safe</div>
+  </div>
+  <div class="teach-block">
+    <h3>Charging Methods</h3>
+    <table class="info-table">
+      <tr><th>Method</th><th>Description</th><th>Suitable For</th></tr>
+      <tr><td>Constant Current (CC)</td><td>Fixed current throughout charge</td><td>Lead-acid, NiCd, NiMH</td></tr>
+      <tr><td>Constant Voltage (CV)</td><td>Fixed voltage, current reduces as battery charges</td><td>Li-ion, LiPo</td></tr>
+      <tr><td>CC-CV (Combined)</td><td>Constant current until ~80%, then constant voltage</td><td>Li-ion (safest method)</td></tr>
+      <tr><td>Trickle charge</td><td>Very low current for long periods — maintenance charge</td><td>Lead-acid, standby systems</td></tr>
+    </table>
+  </div>
+  <div class="teach-block">
+    <h3>Lead-Acid Battery Charging Procedure</h3>
+    <div class="example-box">
+      <h4>📋 Step-by-Step Charging Procedure</h4>
+      <p>1. <strong>Inspect</strong> — Check for cracks, leaks, or corrosion on terminals.</p>
+      <p>2. <strong>Clean terminals</strong> — Remove corrosion with bicarbonate of soda solution and wire brush.</p>
+      <p>3. <strong>Check electrolyte level</strong> — Top up with <em>distilled water only</em> if low (not tap water).</p>
+      <p>4. <strong>Connect charger</strong> — Red (+) to positive terminal, Black (−) to negative terminal.</p>
+      <p>5. <strong>Set charge rate</strong> — Typically C/10 (10% of Ah capacity). E.g. 60Ah battery → 6A charge rate.</p>
+      <p>6. <strong>Charge in ventilated area</strong> — Hydrogen gas is produced during charging.</p>
+      <p>7. <strong>Monitor</strong> — Check voltage and temperature regularly. Stop if battery gets hot.</p>
+      <p>8. <strong>Disconnect</strong> — Remove charger when fully charged. Disconnect negative first.</p>
+    </div>
+  </div>
+  <div class="warn-box">
+    <h4>⚠️ Overcharging & Undercharging</h4>
+    <p><strong>Overcharging</strong> — causes excessive gassing, plate damage, electrolyte loss, and heat. Can cause explosion.<br>
+    <strong>Undercharging</strong> — causes sulphation of plates (lead sulphate crystals), permanently reducing capacity.</p>
+  </div>
+</div>
+
+<!-- ===== SLIDE 7: BATTERY MAINTENANCE & DISPOSAL ===== -->
+<div class="slide" id="s7">
+  <div class="slide-header">
+    <h2>Battery Maintenance & Safe Disposal</h2>
+    <div class="strand">Extend battery life and protect the environment</div>
+  </div>
+  <div class="teach-block">
+    <h3>Battery Maintenance Procedures</h3>
+    <table class="info-table">
+      <tr><th>Maintenance Task</th><th>How To Do It</th><th>Frequency</th></tr>
+      <tr><td>Terminal cleaning</td><td>Apply bicarbonate paste, scrub with wire brush, rinse, dry, apply petroleum jelly</td><td>Every 3 months</td></tr>
+      <tr><td>Electrolyte level check</td><td>Check each cell — level should be 10–15mm above plates; top up with distilled water</td><td>Monthly</td></tr>
+      <tr><td>Specific gravity check</td><td>Use hydrometer to measure electrolyte density in each cell</td><td>Monthly / before charging</td></tr>
+      <tr><td>Terminal tightening</td><td>Check and tighten terminal clamps; loose terminals cause arcing and voltage drops</td><td>Every 3 months</td></tr>
+      <tr><td>Case cleaning</td><td>Wipe battery case with damp cloth; keep dry and clean</td><td>Monthly</td></tr>
+      <tr><td>Proper storage</td><td>Store fully charged in cool, dry place; disconnect from load; recharge every 3 months if stored</td><td>When not in use</td></tr>
+    </table>
+  </div>
+  <div class="teach-block">
+    <h3>Safe Disposal of Batteries</h3>
+    <div class="key-term"><strong>Why proper disposal matters:</strong> Batteries contain toxic and hazardous materials — lead, cadmium, lithium, mercury, and acids — that can contaminate soil and water if dumped in landfills.</div>
+    <table class="info-table">
+      <tr><th>Battery Type</th><th>Hazardous Material</th><th>Disposal Method</th></tr>
+      <tr><td>Lead-acid</td><td>Lead, sulphuric acid</td><td>Return to battery dealer / NEMA registered recycler</td></tr>
+      <tr><td>NiCd</td><td>Cadmium (toxic)</td><td>Specialist recycling only — never in general waste</td></tr>
+      <tr><td>Li-ion / LiPo</td><td>Lithium (fire risk)</td><td>Dedicated e-waste collection points</td></tr>
+      <tr><td>Alkaline/Dry cell</td><td>Zinc, manganese</td><td>Dedicated battery bins; not general waste</td></tr>
+    </table>
+    <div class="warn-box">
+      <h4>⚠️ Kenya Environmental Law</h4>
+      <p>Improper disposal of hazardous waste including batteries is an offence under the <strong>Environmental Management and Coordination Act (EMCA)</strong>. Always use NEMA-approved disposal channels.</p>
+    </div>
+  </div>
+</div>
+
+<!-- ===== SLIDE 8: INTERACTIVE CALCULATOR ===== -->
+<div class="slide" id="s8">
+  <div class="slide-header">
+    <h2>Interactive Battery Calculator</h2>
+    <div class="strand">Battery arrays, terminal voltage & charging time</div>
+  </div>
+
+  <div class="calc-box">
+    <h4>🔧 Tool 1: Battery Array Calculator</h4>
+    <p style="font-size:.83rem;margin-bottom:10px">Calculate total voltage and capacity of a battery array.</p>
+    <div class="calc-row"><label>Connection Type</label>
+      <select id="bat_type">
+        <option value="series">Series</option>
+        <option value="parallel">Parallel</option>
+        <option value="series-parallel">Series-Parallel</option>
+      </select>
+    </div>
+    <div class="calc-row"><label>Voltage per cell (V)</label><input type="number" id="bat_v" placeholder="e.g. 1.5"></div>
+    <div class="calc-row"><label>Capacity per cell (Ah)</label><input type="number" id="bat_ah" placeholder="e.g. 2"></div>
+    <div class="calc-row"><label>Number of cells</label><input type="number" id="bat_n" placeholder="e.g. 4"></div>
+    <div class="calc-row" id="sp_row" style="display:none"><label>Cells per series string</label><input type="number" id="bat_ns" placeholder="e.g. 2"></div>
+    <button class="check-btn" onclick="calcBatArray()">⚡ Calculate Array</button>
+    <button class="check-btn" style="background:#888;margin-left:8px" onclick="clearBatArray()">↺ Clear</button>
+    <div class="calc-result" id="bat-result"></div>
+    <div class="calc-err" id="bat-err"></div>
+  </div>
+
+  <div class="calc-box" style="margin-top:14px">
+    <h4>🔧 Tool 2: Terminal Voltage Calculator</h4>
+    <p style="font-size:.83rem;margin-bottom:10px">V<sub>terminal</sub> = EMF − (I × r)</p>
+    <div class="calc-row"><label>EMF (V)</label><input type="number" id="tv_emf" placeholder="e.g. 12"></div>
+    <div class="calc-row"><label>Internal resistance r (Ω)</label><input type="number" id="tv_r" placeholder="e.g. 0.5"></div>
+    <div class="calc-row"><label>Current I (A)</label><input type="number" id="tv_i" placeholder="e.g. 2"></div>
+    <button class="check-btn" onclick="calcTerminal()">⚡ Calculate</button>
+    <div class="calc-result" id="tv-result"></div>
+  </div>
+
+  <div class="calc-box" style="margin-top:14px">
+    <h4>🔧 Tool 3: Charging Time Estimator</h4>
+    <p style="font-size:.83rem;margin-bottom:10px">Approximate charging time = Battery Capacity (Ah) ÷ Charge Current (A) × 1.2 (efficiency factor)</p>
+    <div class="calc-row"><label>Battery Capacity (Ah)</label><input type="number" id="ct_ah" placeholder="e.g. 60"></div>
+    <div class="calc-row"><label>Charge Current (A)</label><input type="number" id="ct_i" placeholder="e.g. 6"></div>
+    <button class="check-btn" onclick="calcChargeTime()">⚡ Calculate Time</button>
+    <div class="calc-result" id="ct-result"></div>
+  </div>
+</div>
+
+<!-- ===== SLIDE 9: PRACTICE ===== -->
+<div class="slide" id="s9">
+  <div class="slide-header">
+    <h2>Practice Problems</h2>
+    <div class="strand">Apply knowledge of cells and batteries</div>
+  </div>
+
+  <div class="practice-q">
+    <div class="qnum">Problem 1: Series Battery Array</div>
+    <p style="font-size:.86rem">Four 1.5V cells each with internal resistance 0.2Ω are connected in series. A load of 5Ω is connected. Find: (a) total EMF, (b) total internal resistance, (c) current flowing, (d) terminal voltage.</p>
+    <div class="example-box" style="margin-top:8px">
+      <h4>📌 Solution</h4>
+      <p>(a) EMF<sub>T</sub> = 4 × 1.5 = <strong>6V</strong></p>
+      <p>(b) r<sub>T</sub> = 4 × 0.2 = <strong>0.8Ω</strong></p>
+      <p>(c) I = EMF ÷ (R+r) = 6 ÷ (5+0.8) = 6 ÷ 5.8 = <strong>1.03A</strong></p>
+      <p>(d) V<sub>T</sub> = EMF − I×r = 6 − (1.03×0.8) = 6 − 0.83 = <strong>5.17V</strong></p>
+    </div>
+  </div>
+
+  <div class="practice-q">
+    <div class="qnum">Problem 2: Charging Time</div>
+    <p style="font-size:.86rem">A 12V, 45Ah lead-acid battery is to be charged at C/10 rate. Calculate: (a) the charging current, (b) approximate charging time.</p>
+    <div class="example-box" style="margin-top:8px">
+      <h4>📌 Solution</h4>
+      <p>(a) I = 45 ÷ 10 = <strong>4.5A</strong></p>
+      <p>(b) Time = 45 ÷ 4.5 × 1.2 = <strong>12 hours</strong> (×1.2 for charging efficiency)</p>
+    </div>
+  </div>
+
+  <div class="practice-q">
+    <div class="qnum">Problem 3: Primary vs Secondary</div>
+    <p style="font-size:.86rem">State whether each application is best served by a primary or secondary cell, and give a reason:</p>
+    <ol style="font-size:.86rem;padding-left:18px;margin-top:6px">
+      <li style="margin-bottom:5px">A TV remote control → <span style="color:var(--ok);font-weight:600">Primary (alkaline) — low drain, not worth the cost of a charger</span></li>
+      <li style="margin-bottom:5px">A car starter motor → <span style="color:var(--ok);font-weight:600">Secondary (lead-acid) — high current needed, must be recharged by alternator</span></li>
+      <li>A laptop computer → <span style="color:var(--ok);font-weight:600">Secondary (Li-ion) — needs recharging many times daily, high energy density</span></li>
+    </ol>
+  </div>
+
+  <div class="practice-q">
+    <div class="qnum">Problem 4: Maintenance Scenario</div>
+    <p style="font-size:.86rem">A car owner notices the battery terminals are covered in white/blue powder and the car is slow to start. What maintenance should they carry out? List the steps.</p>
+    <div class="example-box" style="margin-top:8px">
+      <h4>📌 Answer</h4>
+      <p>1. <strong>Disconnect</strong> battery (negative first for safety).</p>
+      <p>2. <strong>Mix</strong> bicarbonate of soda in water to make a cleaning paste.</p>
+      <p>3. <strong>Apply</strong> paste to terminals and scrub with a wire brush to remove corrosion.</p>
+      <p>4. <strong>Rinse</strong> with clean water and dry thoroughly.</p>
+      <p>5. <strong>Apply</strong> petroleum jelly/Vaseline to terminals to prevent future corrosion.</p>
+      <p>6. <strong>Reconnect</strong> battery (positive first).</p>
+      <p>7. <strong>Check</strong> electrolyte level and charge state with hydrometer.</p>
+    </div>
+  </div>
+</div>
+
+<!-- ===== SLIDE 10: QUIZ ===== -->
+<div class="slide" id="s10">
+  <div class="slide-header">
+    <h2>End-of-Lesson Quiz</h2>
+    <div class="strand">Sub-strand 1.4 · Cells & Batteries</div>
+  </div>
+  <p style="font-size:.83rem;color:#555;margin-bottom:14px">Part A: 5 fill-in-the-blank (5 marks) &nbsp;|&nbsp; Part B: 3 short answer (10 marks) &nbsp;|&nbsp; <strong>Total: 15 marks</strong></p>
+
+  <div class="practice-q">
+    <div class="qnum">Part A: Fill in the Blank (1 mark each)</div>
+    <div style="font-size:.87rem">
+      <p style="margin:10px 0">1. A cell that cannot be recharged is called a <input class="fill-blank" id="f1" placeholder="..."> cell. <span class="fb-feedback" id="ff1"></span></p>
+      <p style="margin:10px 0">2. The electrolyte used in a lead-acid battery is dilute <input class="fill-blank" id="f2" placeholder="...">. <span class="fb-feedback" id="ff2"></span></p>
+      <p style="margin:10px 0">3. When cells are connected in series, the total <input class="fill-blank" id="f3" placeholder="..."> increases while current capacity stays the same. <span class="fb-feedback" id="ff3"></span></p>
+      <p style="margin:10px 0">4. The formula for terminal voltage is V<sub>T</sub> = EMF − <input class="fill-blank" id="f4" placeholder="...">. <span class="fb-feedback" id="ff4"></span></p>
+      <p style="margin:10px 0">5. A <input class="fill-blank" id="f5" placeholder="..."> is used to measure the specific gravity of battery electrolyte. <span class="fb-feedback" id="ff5"></span></p>
+    </div>
+    <button class="check-btn" onclick="checkFills()" style="margin-top:12px">✓ Check Part A</button>
+  </div>
+
+  <div class="practice-q" style="margin-top:12px">
+    <div class="qnum">Part B: Short Answer</div>
+
+    <div style="margin-bottom:14px">
+      <p style="font-size:.87rem"><strong>B1.</strong> A battery has an EMF of 9V and an internal resistance of 1Ω. When connected to a load, a current of 2A flows. Calculate the terminal voltage and the power dissipated internally. <em>(3 marks)</em></p>
+      <textarea class="sa-box" id="sa1" placeholder="Show your working..."></textarea>
+      <button class="grade-btn" onclick="gradeAnswer('sa1','fb1',{keywords:['7v','7 v','terminal','emf','internal','2a','4w','4 w','power','i x r','voltage drop'],required:4,marks:3,model:'Terminal V = EMF - I×r = 9 - (2×1) = 7V. Power lost internally = I²×r = 4×1 = 4W (or V_lost × I = 2×2 = 4W).'})">✓ Grade My Answer</button>
+      <div class="sa-feedback" id="fb1"></div>
+    </div>
+
+    <div style="margin-bottom:14px">
+      <p style="font-size:.87rem"><strong>B2.</strong> Explain the difference between overcharging and undercharging a lead-acid battery. State ONE consequence of each. <em>(4 marks)</em></p>
+      <textarea class="sa-box" id="sa2" placeholder="Type your answer here..."></textarea>
+      <button class="grade-btn" onclick="gradeAnswer('sa2','fb2',{keywords:['overcharging','undercharging','sulphation','gassing','hydrogen','heat','explosion','plate','damage','capacity','electrolyte','loss'],required:5,marks:4,model:'Overcharging: applying more charge than the battery can hold. Consequence: excessive hydrogen gas production, electrolyte loss, plate damage, overheating, risk of explosion. Undercharging: not charging the battery fully. Consequence: sulphation — lead sulphate crystals form on plates, permanently reducing battery capacity and lifespan.'})">✓ Grade My Answer</button>
+      <div class="sa-feedback" id="fb2"></div>
+    </div>
+
+    <div style="margin-bottom:14px">
+      <p style="font-size:.87rem"><strong>B3.</strong> Why must batteries be disposed of properly and not thrown in ordinary rubbish bins? Name TWO types of batteries and state the specific hazard associated with each. <em>(3 marks)</em></p>
+      <textarea class="sa-box" id="sa3" placeholder="Type your answer here..."></textarea>
+      <button class="grade-btn" onclick="gradeAnswer('sa3','fb3',{keywords:['toxic','lead','acid','cadmium','lithium','fire','contaminate','soil','water','environment','hazardous','nema','recycle'],required:4,marks:3,model:'Batteries contain toxic and hazardous materials that contaminate soil and water if landfilled. Examples: 1. Lead-acid battery — contains lead (toxic heavy metal) and sulphuric acid (corrosive). 2. NiCd battery — contains cadmium, a highly toxic heavy metal. 3. Li-ion battery — lithium is a fire and explosion risk if damaged or improperly disposed.'})">✓ Grade My Answer</button>
+      <div class="sa-feedback" id="fb3"></div>
+    </div>
+  </div>
+
+  <button class="score-btn" onclick="showTotalScore()">📊 View My Total Score</button>
+  <div class="total-result" id="totalResult" style="display:none"></div>
+  <div class="next-lesson-box" id="nextLessonBox">
+    <a href="elec-2.1-magnetism-full.html" class="next-lesson-btn">➡️ Next Lesson: 2.1 Magnetism</a>
+    <div class="next-lesson-sub">You've completed this lesson! Keep going 🎉</div>
+  </div>
+</div>
+
+</div><!-- end slides-wrap -->
+
+<div class="nav-bar">
+  <button class="nav-btn" id="prevBtn" onclick="goSlide(-1)" disabled>← Prev</button>
+  <div class="dots" id="dotsWrap"></div>
+  <button class="nav-btn" id="nextBtn" onclick="goSlide(1)">Next →</button>
+</div>
+
+<script>
+// ── NAVIGATION ────────────────────────────────────────────────
+const TOTAL=10; let cur=0;
+const dotsWrap=document.getElementById('dotsWrap');
+for(let i=0;i<TOTAL;i++){
+  const d=document.createElement('div');
+  d.className='dot'+(i===0?' active':'');
+  d.onclick=()=>showSlide(i);
+  dotsWrap.appendChild(d);
+}
+function showSlide(n){
+  document.querySelectorAll('.slide').forEach((s,i)=>s.classList.toggle('active',i===n));
+  document.querySelectorAll('.dot').forEach((d,i)=>d.classList.toggle('active',i===n));
+  document.getElementById('prevBtn').disabled=(n===0);
+  document.getElementById('nextBtn').disabled=(n===TOTAL-1);
+  document.getElementById('slideLabel').textContent=(n+1)+' / '+TOTAL;
+  cur=n; window.scrollTo(0,0);
+}
+function goSlide(d){showSlide(Math.max(0,Math.min(TOTAL-1,cur+d)))}
+
+// ── SERIES-PARALLEL TOGGLE ────────────────────────────────────
+document.getElementById('bat_type').addEventListener('change',function(){
+  document.getElementById('sp_row').style.display=this.value==='series-parallel'?'flex':'none';
+});
+
+// ── BATTERY ARRAY CALCULATOR ──────────────────────────────────
+function calcBatArray(){
+  const type=document.getElementById('bat_type').value;
+  const v=parseFloat(document.getElementById('bat_v').value);
+  const ah=parseFloat(document.getElementById('bat_ah').value);
+  const n=parseFloat(document.getElementById('bat_n').value);
+  const res=document.getElementById('bat-result');
+  const err=document.getElementById('bat-err');
+  res.style.display='none'; err.style.display='none';
+  if(isNaN(v)||isNaN(ah)||isNaN(n)){err.textContent='Please fill in all fields.';err.style.display='block';return;}
+  let lines='';
+  if(type==='series'){
+    lines=`Type: SERIES\nTotal Voltage = ${v} × ${n} = ${(v*n).toFixed(2)} V\nCapacity = ${ah} Ah (same as 1 cell)\nUse: Higher voltage needed`;
+  } else if(type==='parallel'){
+    lines=`Type: PARALLEL\nTotal Voltage = ${v} V (same as 1 cell)\nTotal Capacity = ${ah} × ${n} = ${(ah*n).toFixed(2)} Ah\nUse: Longer runtime needed`;
+  } else {
+    const ns=parseFloat(document.getElementById('bat_ns').value);
+    if(isNaN(ns)||ns<=0){err.textContent='Enter cells per series string.';err.style.display='block';return;}
+    const np=n/ns;
+    lines=`Type: SERIES-PARALLEL\nCells per string: ${ns} (series) × ${np} strings (parallel)\nTotal Voltage = ${v} × ${ns} = ${(v*ns).toFixed(2)} V\nTotal Capacity = ${ah} × ${np} = ${(ah*np).toFixed(2)} Ah`;
+  }
+  res.textContent=lines; res.style.display='block';
+}
+function clearBatArray(){
+  ['bat_v','bat_ah','bat_n','bat_ns'].forEach(id=>document.getElementById(id).value='');
+  document.getElementById('bat-result').style.display='none';
+  document.getElementById('bat-err').style.display='none';
+}
+
+// ── TERMINAL VOLTAGE ──────────────────────────────────────────
+function calcTerminal(){
+  const emf=parseFloat(document.getElementById('tv_emf').value);
+  const r=parseFloat(document.getElementById('tv_r').value);
+  const i=parseFloat(document.getElementById('tv_i').value);
+  const res=document.getElementById('tv-result');
+  if(isNaN(emf)||isNaN(r)||isNaN(i)){res.textContent='Enter all three values.';res.style.display='block';return;}
+  const vt=emf-(i*r);
+  const plost=i*i*r;
+  res.textContent=`Terminal Voltage = ${emf} − (${i} × ${r}) = ${vt.toFixed(3)} V\nVoltage drop = ${(i*r).toFixed(3)} V\nPower lost internally = I²r = ${plost.toFixed(3)} W`;
+  res.style.display='block';
+}
+
+// ── CHARGE TIME ───────────────────────────────────────────────
+function calcChargeTime(){
+  const ah=parseFloat(document.getElementById('ct_ah').value);
+  const i=parseFloat(document.getElementById('ct_i').value);
+  const res=document.getElementById('ct-result');
+  if(isNaN(ah)||isNaN(i)){res.textContent='Enter capacity and current.';res.style.display='block';return;}
+  const t=(ah/i)*1.2;
+  const rec=ah/10;
+  res.textContent=`Estimated charge time = (${ah} ÷ ${i}) × 1.2 = ${t.toFixed(2)} hours\nRecommended charge current (C/10) = ${rec.toFixed(1)} A\nNote: Actual time varies by battery condition and charger type.`;
+  res.style.display='block';
+}
+
+// ── FILL BLANK ────────────────────────────────────────────────
+const fbAns={
+  f1:['primary'],
+  f2:['sulphuric acid','sulfuric acid','h2so4','h₂so₄'],
+  f3:['voltage','emf','electromotive force'],
+  f4:['i x r','i × r','ir','i*r','current times internal resistance'],
+  f5:['hydrometer']
+};
+let fillScore=0, saScores={};
+function checkFills(){
+  fillScore=0;
+  Object.entries(fbAns).forEach(([id,ans])=>{
+    const inp=document.getElementById(id);
+    const fb=document.getElementById('f'+id.slice(1));
+    const val=inp.value.trim().toLowerCase();
+    const ok=ans.some(a=>val===a||val.includes(a));
+    if(ok){fillScore++;inp.className='fill-blank correct';fb.textContent='✓ +1';fb.style.color='#2e7d32';}
+    else{inp.className='fill-blank wrong';fb.textContent='✗ ('+ans[0]+')';fb.style.color='#c62828';}
+    fb.style.display='inline';
+  });
+}
+function gradeAnswer(saId,fbId,cfg){
+  const ans=document.getElementById(saId).value.trim().toLowerCase();
+  const found=cfg.keywords.filter(k=>ans.includes(k.toLowerCase()));
+  const missed=cfg.keywords.filter(k=>!ans.includes(k.toLowerCase()));
+  const hitRate=Math.min(found.length/cfg.required,1.0);
+  const marks=Math.round(hitRate*cfg.marks);
+  saScores[saId]=marks;
+  const grade=marks>=cfg.marks?'🌟 Excellent!':marks>=cfg.marks*0.5?'👍 Good attempt':'📖 Needs improvement';
+  const fbEl=document.getElementById(fbId);
+  fbEl.style.display='block';
+  fbEl.innerHTML=`<strong>${grade} — ${marks}/${cfg.marks} marks</strong><br>
+  <span class="kw-found">✅ Keywords found: ${found.join(', ')||'none'}</span><br>
+  <span class="kw-missed">❌ Missed: ${missed.join(', ')||'none'}</span>
+  <div class="model-ans"><strong>Model Answer:</strong> ${cfg.model}</div>`;
+}
+function showTotalScore(){
+  const saTotal=Object.values(saScores).reduce((a,b)=>a+b,0);
+  const total=fillScore+saTotal;
+  const pct=Math.round(total/15*100);
+  const grade=pct>=80?'Exceeds Expectation 🎉':pct>=60?'Meets Expectation 👍':pct>=40?'Approaches Expectation 📖':'Below Expectation 💪';
+  const el=document.getElementById('totalResult');
+  el.style.display='block';
+  el.innerHTML=`<strong>Total Score: ${total} / 15 (${pct}%)</strong><br>
+  Part A: ${fillScore}/5 &nbsp;|&nbsp; Part B: ${saTotal}/10<br>
+  <span style="color:var(--pri);font-size:1.05rem">${grade}</span><br>
+  <span style="font-size:.8rem;color:#666;margin-top:4px;display:block">CBE Rubric — ${pct>=80?'Exceeds':pct>=60?'Meets':pct>=40?'Approaches':'Below'} Expectation</span>`;
+  submitExamToMTTI(total,15,pct);
+  document.getElementById('nextLessonBox').style.display='block';
+}
+function submitExamToMTTI(score,total,percent){
+  try{
+    fetch('/wp-json/mtti/v1/exam-result',{
+      method:'POST',
+      headers:{'Content-Type':'application/json','X-WP-Nonce':window.mtti_nonce||''},
+      body:JSON.stringify({lesson_id:'elec-1.4-cells-batteries',score,total,percent,timestamp:new Date().toISOString()})
+    }).then(r=>r.json()).then(d=>{if(d&&d.success)console.log('[MTTI] Result saved:',d);}).catch(e=>console.log('[MTTI] Offline:',e));
+  }catch(e){console.log('[MTTI] Error:',e);}
+}
+</script>
+</body>
+</html>

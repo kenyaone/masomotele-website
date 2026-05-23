@@ -1,0 +1,318 @@
+/**
+ * School Management Pro - Setup Wizard CSS
+ *
+ * Custom styles for the setup wizard interface
+ * Works with Bootstrap 4 framework
+ */
+
+.wlsm-setup-wizard-header h1 {
+    margin-bottom: 0.5rem;
+    font-weight: 600;
+}
+
+/* Progress Bar Styling */
+.wlsm-setup-progress .progress {
+    background-color: #e9ecef;
+    border-radius: 10px;
+    overflow: hidden;
+    box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+.wlsm-setup-progress .progress-bar {
+    transition: width 0.6s ease;
+    border-radius: 10px;
+}
+
+/* Setup Sidebar */
+.wlsm-setup-sidebar {
+    border: 1px solid #e9ecef;
+    border-radius: 8px;
+    background: #ffffff;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+.wlsm-setup-sidebar .sidebar-header {
+    border-bottom: 1px solid #e9ecef;
+    margin-bottom: 1rem;
+    padding-bottom: 1rem;
+}
+
+/* Step Items */
+.step-item {
+    border: 1px solid transparent;
+    transition: all 0.3s ease;
+    cursor: pointer;
+    border-radius: 6px;
+}
+
+.step-item:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.step-item.bg-primary {
+    border-color: #007cba;
+    box-shadow: 0 2px 8px rgba(0, 123, 186, 0.25);
+}
+
+.step-item.bg-success {
+    border-color: #28a745;
+    box-shadow: 0 2px 8px rgba(40, 167, 69, 0.25);
+}
+
+.step-item.bg-light {
+    border-color: #dee2e6;
+    background-color: #f8f9fa !important;
+}
+
+.step-item.bg-white {
+    border-color: #dee2e6;
+}
+
+/* Step Icons and Numbers */
+.step-number .badge {
+    font-size: 0.9rem;
+    padding: 0.4rem 0.6rem;
+    border-radius: 50%;
+    min-width: 2rem;
+    height: 2rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.step-number .fas {
+    font-size: 1.1rem;
+}
+
+/* Step Content */
+.step-title {
+    font-size: 0.95rem;
+    line-height: 1.4;
+    margin-bottom: 0.25rem;
+}
+
+.step-description {
+    font-size: 0.85rem;
+    line-height: 1.3;
+}
+
+/* Completion Indicators */
+.step-item .fa-check-double {
+    color: #28a745;
+    animation: checkPulse 2s infinite;
+}
+
+.step-item .fa-external-link-alt {
+    opacity: 0.5;
+    transition: opacity 0.3s ease;
+}
+
+.step-item:hover .fa-external-link-alt {
+    opacity: 0.8;
+}
+
+@keyframes checkPulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.7; }
+}
+
+/* Main Content Area */
+.wlsm-setup-content .content-wrapper {
+    border: 1px solid #e9ecef;
+    border-radius: 8px;
+    overflow: hidden;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+.wlsm-setup-content .content-header {
+    background: #ffffff;
+    border-bottom: 1px solid #e9ecef;
+}
+
+.wlsm-setup-content .content-body {
+    min-height: 400px;
+    background: #ffffff;
+}
+
+.wlsm-setup-content .content-footer {
+    background: #f8f9fa;
+    border-top: 1px solid #e9ecef;
+}
+
+/* Step Icon in Header */
+.content-header .step-icon i {
+    color: #007cba;
+}
+
+/* Navigation Buttons */
+.btn {
+    border-radius: 6px;
+    font-weight: 500;
+    padding: 0.5rem 1.5rem;
+    transition: all 0.3s ease;
+}
+
+.btn:hover {
+    transform: translateY(-1px);
+}
+
+.btn-primary {
+    background: linear-gradient(135deg, #007cba 0%, #0073aa 100%);
+    border: none;
+    box-shadow: 0 2px 4px rgba(0, 123, 186, 0.25);
+}
+
+.btn-primary:hover {
+    background: linear-gradient(135deg, #0073aa 0%, #006799 100%);
+    box-shadow: 0 4px 8px rgba(0, 123, 186, 0.35);
+}
+
+.btn-success {
+    background: linear-gradient(135deg, #28a745 0%, #20a039 100%);
+    border: none;
+    box-shadow: 0 2px 4px rgba(40, 167, 69, 0.25);
+}
+
+.btn-success:hover {
+    background: linear-gradient(135deg, #20a039 0%, #1e7e34 100%);
+    box-shadow: 0 4px 8px rgba(40, 167, 69, 0.35);
+}
+
+.btn-outline-secondary {
+    border-color: #6c757d;
+    color: #6c757d;
+}
+
+.btn-outline-secondary:hover {
+    background-color: #6c757d;
+    border-color: #6c757d;
+    color: #ffffff;
+}
+
+/* Loading Modal */
+#wlsm-setup-loading-modal .modal-content {
+    border: none;
+    border-radius: 8px;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
+}
+
+#wlsm-setup-loading-modal .spinner-border {
+    width: 3rem;
+    height: 3rem;
+}
+
+/* Alert Styles */
+.alert {
+    border-radius: 6px;
+    border: none;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+.alert-warning {
+    background-color: #fff3cd;
+    border-left: 4px solid #ffc107;
+    color: #856404;
+}
+
+.alert-warning strong {
+    color: #856404;
+}
+
+/* Demo Mode Styling */
+.btn:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+    transform: none !important;
+}
+
+/* Badge Improvements */
+.badge-sm {
+    font-size: 0.7rem;
+    padding: 0.2rem 0.4rem;
+}
+
+/* Link Styling */
+.step-item-link {
+    text-decoration: none !important;
+}
+
+.step-item-link:hover {
+    text-decoration: none !important;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .wlsm-setup-wizard-header {
+        margin-bottom: 1.5rem;
+    }
+
+    .wlsm-setup-sidebar {
+        margin-bottom: 2rem;
+    }
+
+    .step-item {
+        padding: 0.75rem !important;
+    }
+
+    .step-title {
+        font-size: 0.9rem;
+    }
+
+    .content-header .step-icon i {
+        font-size: 1.5rem !important;
+    }
+
+    .content-footer .btn {
+        width: 100%;
+        margin-bottom: 0.5rem;
+    }
+
+    .content-footer .d-flex {
+        flex-direction: column;
+    }
+}
+
+/* Animation for step transitions */
+.wlsm-setup-content {
+    animation: fadeInUp 0.5s ease;
+}
+
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Improved text contrast */
+.text-white-50 {
+    color: rgba(255, 255, 255, 0.75) !important;
+}
+
+/* Step completion status styling */
+.step-item.bg-success .badge-light {
+    background-color: rgba(255, 255, 255, 0.9) !important;
+    color: #28a745 !important;
+    font-weight: 600;
+}
+
+/* Focus states for accessibility */
+.step-item:focus,
+.btn:focus {
+    outline: 2px solid #007cba;
+    outline-offset: 2px;
+}
+
+/* Additional utility classes */
+.text-decoration-none {
+    text-decoration: none !important;
+}
+
+.text-decoration-none:hover {
+    text-decoration: none !important;
+}

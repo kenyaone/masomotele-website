@@ -1,0 +1,704 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Electrical Technology Gr.10 | 2.3 Measuring Instruments</title>
+<style>
+:root{
+  --pri:#0a5e2a;--pri-l:#0d7a38;--acc:#f5a623;
+  --ok:#2e7d32;--no:#c62828;--bg:#f4f7f5;
+  --border:#d0e0d4;--txt:#1a2e1f;--warn-bg:#fff3e0;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Segoe UI',system-ui,sans-serif;background:var(--bg);color:var(--txt);min-height:100vh;display:flex;flex-direction:column}
+.top-bar{position:sticky;top:0;z-index:100;background:linear-gradient(135deg,var(--pri),var(--pri-l));color:#fff;padding:10px 16px;display:flex;align-items:center;gap:12px;box-shadow:0 2px 8px rgba(0,0,0,.25)}
+.top-bar .logo{font-weight:800;font-size:1rem;white-space:nowrap}
+.top-bar .title{font-size:.85rem;opacity:.9;flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.slide-badge{background:var(--acc);color:#000;font-weight:700;font-size:.8rem;padding:3px 10px;border-radius:20px;white-space:nowrap}
+.slides-wrap{flex:1;overflow:hidden}
+.slide{display:none;padding:16px;max-width:860px;margin:0 auto;animation:fadeIn .3s ease}
+.slide.active{display:block}
+@keyframes fadeIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+.slide-header{background:linear-gradient(135deg,var(--pri),var(--pri-l));color:#fff;padding:14px 18px;border-radius:10px;margin-bottom:16px}
+.slide-header h2{font-size:1.1rem;font-weight:700}
+.slide-header .strand{font-size:.78rem;opacity:.85;margin-top:3px}
+.lo-box{background:#fff;border-left:5px solid var(--acc);border-radius:8px;padding:14px 16px;margin-bottom:14px;box-shadow:0 1px 4px rgba(0,0,0,.06)}
+.lo-box h3{color:var(--pri);font-size:.95rem;margin-bottom:8px}
+.lo-box ol{padding-left:18px}
+.lo-box ol li{margin-bottom:5px;font-size:.88rem;line-height:1.5}
+.inquiry{margin-top:12px;background:var(--pri);color:#fff;border-radius:6px;padding:10px 14px;font-size:.85rem}
+.inquiry strong{display:block;margin-bottom:3px;color:var(--acc)}
+.teach-block{margin-bottom:18px}
+.teach-block h3{color:var(--pri);font-size:1rem;font-weight:700;padding-bottom:5px;border-bottom:2.5px solid var(--acc);margin-bottom:10px}
+.key-term{border-left:4px solid var(--acc);background:#fffbf0;padding:10px 14px;border-radius:0 6px 6px 0;margin:8px 0;font-size:.87rem}
+.key-term strong{color:var(--pri)}
+.info-table{width:100%;border-collapse:collapse;margin:10px 0;font-size:.84rem}
+.info-table th{background:var(--pri);color:#fff;padding:8px 10px;text-align:left}
+.info-table td{padding:7px 10px;border-bottom:1px solid var(--border)}
+.info-table tr:nth-child(even) td{background:#eef5f0}
+.example-box{background:#f0faf2;border:1.5px solid var(--ok);border-radius:8px;padding:12px 14px;margin:10px 0;font-size:.86rem}
+.example-box h4{color:var(--ok);margin-bottom:7px;font-size:.9rem}
+.warn-box{background:var(--warn-bg);border:1.5px solid #e65100;border-radius:8px;padding:11px 14px;margin:10px 0;font-size:.85rem}
+.warn-box h4{color:#e65100;margin-bottom:5px}
+.diagram-wrap{text-align:center;margin:14px 0;overflow-x:auto}
+.calc-box{background:#fff;border:1.5px solid var(--pri-l);border-radius:8px;padding:14px;margin:10px 0}
+.calc-box h4{color:var(--pri);margin-bottom:10px;font-size:.9rem}
+.practice-q{background:#fff;border-radius:8px;border:1px solid var(--border);padding:14px;margin-bottom:12px;box-shadow:0 1px 3px rgba(0,0,0,.05)}
+.practice-q .qnum{font-weight:700;color:var(--pri);font-size:.85rem;margin-bottom:5px}
+.fill-blank{border:none;border-bottom:2px dashed var(--pri);background:transparent;outline:none;font-size:.9rem;padding:2px 6px;min-width:110px;color:var(--txt)}
+.fill-blank.correct{border-bottom-color:var(--ok);background:#f0faf2;border-radius:4px}
+.fill-blank.wrong{border-bottom-color:var(--no);background:#fff0f0;border-radius:4px}
+.fb-feedback{font-size:.8rem;display:inline-block;margin-left:4px;font-weight:600}
+.sa-box{width:100%;min-height:80px;padding:8px 10px;border:1.5px solid var(--border);border-radius:6px;font-size:.86rem;font-family:inherit;resize:vertical}
+.grade-btn{background:var(--pri);color:#fff;border:none;padding:7px 18px;border-radius:6px;cursor:pointer;font-size:.84rem;margin-top:7px}
+.grade-btn:hover{background:var(--pri-l)}
+.sa-feedback{margin-top:8px;padding:10px;border-radius:6px;background:#f9f9f9;border:1px solid #ddd;font-size:.82rem;display:none}
+.kw-found{color:var(--ok);font-weight:600}
+.kw-missed{color:var(--no);font-weight:600}
+.model-ans{margin-top:6px;font-style:italic;color:#555}
+.check-btn{background:var(--ok);color:#fff;border:none;padding:8px 18px;border-radius:6px;cursor:pointer;font-size:.84rem;margin-top:8px}
+.check-btn:hover{background:#256427}
+.score-btn{display:block;margin:18px auto 0;background:var(--acc);color:#000;font-weight:700;border:none;padding:11px 32px;border-radius:8px;cursor:pointer;font-size:.95rem}
+.score-btn:hover{background:#e0951a}
+.next-lesson-box{margin-top:18px;text-align:center;display:none}.next-lesson-btn{display:inline-block;background:linear-gradient(135deg,var(--pri),var(--pri-l));color:#fff;font-weight:700;border:none;padding:14px 32px;border-radius:10px;cursor:pointer;font-size:.95rem;text-decoration:none;transition:all .3s;box-shadow:0 4px 15px rgba(10,94,42,.25)}.next-lesson-btn:hover{transform:translateY(-2px);box-shadow:0 8px 25px rgba(10,94,42,.35)}.next-lesson-sub{font-size:.78rem;color:#666;margin-top:8px}
+.total-result{margin-top:14px;text-align:center;font-size:1rem;font-weight:700;padding:12px;border-radius:8px;background:#fff;border:2px solid var(--pri)}
+.tag{display:inline-block;background:var(--pri);color:#fff;font-size:.72rem;padding:2px 8px;border-radius:10px;margin:2px}
+.calc-row{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin:6px 0;font-size:.87rem}
+.calc-row label{min-width:150px;font-weight:600;color:var(--pri)}
+.calc-row input{padding:6px 10px;border:1.5px solid var(--border);border-radius:6px;font-size:.87rem;width:110px}
+.calc-row select{padding:6px 10px;border:1.5px solid var(--border);border-radius:6px;font-size:.87rem}
+.calc-result{background:var(--pri);color:#fff;padding:10px 14px;border-radius:6px;margin-top:8px;font-size:.88rem;font-weight:600;display:none;white-space:pre-line}
+.calc-err{background:#fff0f0;color:var(--no);padding:8px 12px;border-radius:6px;margin-top:8px;font-size:.85rem;display:none}
+.nav-bar{position:sticky;bottom:0;background:#fff;border-top:2px solid var(--border);padding:10px 16px;display:flex;align-items:center;justify-content:space-between;gap:10px;z-index:90}
+.nav-btn{background:var(--pri);color:#fff;border:none;padding:9px 22px;border-radius:8px;font-size:.88rem;cursor:pointer;font-weight:600}
+.nav-btn:disabled{background:#b0b0b0;cursor:not-allowed}
+.nav-btn:hover:not(:disabled){background:var(--pri-l)}
+.dots{display:flex;gap:6px;flex-wrap:wrap;justify-content:center;flex:1}
+.dot{width:9px;height:9px;border-radius:50%;background:#ccc;cursor:pointer;transition:background .2s}
+.dot.active{background:var(--pri)}
+@media(max-width:600px){
+  .top-bar .title{display:none}
+  .slide{padding:10px}
+  .info-table{font-size:.78rem}
+  .nav-btn{padding:8px 14px;font-size:.82rem}
+  .calc-row{flex-direction:column;align-items:flex-start}
+}
+</style>
+<script type="text/javascript">(function(c,l,a,r,i,t,y){c[a]=c[a]||function(){(c[a].q=c[a].q||[]).push(arguments)};t=l.createElement(r);t.async=1;t.src="https://www.clarity.ms/tag/"+i;y=l.getElementsByTagName(r)[0];y.parentNode.insertBefore(t,y);})(window,document,"clarity","script","wg31zlwbt9");</script>\n</head>
+<body>
+
+<div class="top-bar">
+  <div class="logo">M.T.T.I</div>
+  <div class="title">Electrical Technology Gr.10 · 2.3 Measuring Instruments</div>
+  <div class="slide-badge" id="slideLabel">1 / 10</div>
+</div>
+
+<div class="slides-wrap">
+
+<!-- SLIDE 1: LEARNING OUTCOMES -->
+<div class="slide active" id="s1">
+  <div class="slide-header">
+    <h2>Learning Outcomes</h2>
+    <div class="strand">Strand 2.0 Electrical Machines · Sub-strand 2.3 Measuring Instruments · 14 Lessons</div>
+  </div>
+  <div class="lo-box">
+    <h3>By the end of this sub-strand, you should be able to:</h3>
+    <ol>
+      <li>Explain the <strong>principle of operation</strong> of coil-based measuring instruments.</li>
+      <li>Compute resistance values for <strong>shunts and multipliers</strong> to extend instrument range.</li>
+      <li><strong>Calibrate</strong> coil-based measuring instruments for accurate measurement.</li>
+      <li>Select a <strong>suitable scale</strong> for measuring a specified electrical quantity.</li>
+      <li>Recognise the importance of <strong>electrical measuring instruments</strong> in practice.</li>
+    </ol>
+    <div class="inquiry">
+      <strong>🔍 Key Inquiry Questions</strong>
+      How does a measuring instrument work? &nbsp;|&nbsp; How are measuring instruments calibrated?
+    </div>
+  </div>
+  <div class="teach-block">
+    <h3>Topics Covered</h3>
+    <div style="display:flex;flex-wrap:wrap;gap:8px;margin-top:6px">
+      <span class="tag">Moving Coil Instrument</span>
+      <span class="tag">Galvanometer</span>
+      <span class="tag">Ammeter (Shunt)</span>
+      <span class="tag">Voltmeter (Multiplier)</span>
+      <span class="tag">Ohmmeter</span>
+      <span class="tag">Multimeter</span>
+      <span class="tag">Calibration</span>
+    </div>
+  </div>
+</div>
+
+<!-- SLIDE 2: PRINCIPLE OF OPERATION -->
+<div class="slide" id="s2">
+  <div class="slide-header">
+    <h2>The Moving Coil Instrument</h2>
+    <div class="strand">How a galvanometer works</div>
+  </div>
+  <div class="teach-block">
+    <h3>Principle of Operation</h3>
+    <div class="key-term"><strong>Moving Coil Instrument (Galvanometer):</strong> A sensitive instrument that detects and measures small electric currents. It works on the principle that a current-carrying coil placed in a magnetic field experiences a turning force (torque).</div>
+    <div class="key-term"><strong>D'Arsonval Movement:</strong> The most common moving coil mechanism. A rectangular coil wound on an aluminium former is suspended between the poles of a permanent magnet. Current through the coil creates a force that rotates it against a restoring spring.</div>
+  </div>
+  <div class="teach-block">
+    <h3>Construction of the Moving Coil Instrument</h3>
+    <div class="diagram-wrap">
+      <svg viewBox="0 0 580 180" xmlns="http://www.w3.org/2000/svg" style="font-family:'Segoe UI',sans-serif;max-width:580px">
+        <rect width="580" height="180" rx="8" fill="#f4f7f5"/>
+        <!-- Permanent magnet poles -->
+        <rect x="60" y="40" width="30" height="100" rx="4" fill="#c62828"/>
+        <text x="75" y="95" text-anchor="middle" fill="#fff" font-size="12" font-weight="800">N</text>
+        <rect x="230" y="40" width="30" height="100" rx="4" fill="#0a5e2a"/>
+        <text x="245" y="95" text-anchor="middle" fill="#fff" font-size="12" font-weight="800">S</text>
+        <!-- Soft iron cylinder -->
+        <circle cx="160" cy="90" r="28" fill="#bbb" opacity=".5"/>
+        <text x="160" y="93" text-anchor="middle" fill="#555" font-size="8">Iron core</text>
+        <!-- Coil -->
+        <rect x="130" y="65" width="60" height="50" rx="3" fill="none" stroke="#f5a623" stroke-width="3"/>
+        <text x="160" y="82" text-anchor="middle" fill="#8b5e00" font-size="8" font-weight="700">COIL</text>
+        <!-- Pointer -->
+        <line x1="160" y1="90" x2="320" y2="50" stroke="#333" stroke-width="2"/>
+        <circle cx="160" cy="90" r="4" fill="#333"/>
+        <!-- Scale arc -->
+        <path d="M280,150 A100,100 0 0,1 380,100" fill="none" stroke="#0a5e2a" stroke-width="2"/>
+        <text x="290" y="168" fill="#555" font-size="9">0</text>
+        <text x="355" y="110" fill="#555" font-size="9">FSD</text>
+        <!-- Spring symbol -->
+        <path d="M160,118 Q155,125 160,132 Q165,139 160,146" fill="none" stroke="#888" stroke-width="2"/>
+        <text x="175" y="138" fill="#555" font-size="8">Spring</text>
+        <!-- Labels -->
+        <text x="400" y="55" fill="#0a5e2a" font-size="10" font-weight="700">Parts:</text>
+        <text x="400" y="70" fill="#555" font-size="9">① Permanent magnet (N-S)</text>
+        <text x="400" y="83" fill="#555" font-size="9">② Soft iron cylinder</text>
+        <text x="400" y="96" fill="#555" font-size="9">③ Moving coil (wound wire)</text>
+        <text x="400" y="109" fill="#555" font-size="9">④ Pointer</text>
+        <text x="400" y="122" fill="#555" font-size="9">⑤ Restoring spring</text>
+        <text x="400" y="135" fill="#555" font-size="9">⑥ Calibrated scale</text>
+      </svg>
+    </div>
+    <table class="info-table">
+      <tr><th>Component</th><th>Role</th></tr>
+      <tr><td>Permanent magnet</td><td>Provides the fixed magnetic field in which the coil rotates</td></tr>
+      <tr><td>Soft iron cylinder</td><td>Concentrates flux and ensures uniform (radial) field for linear scale</td></tr>
+      <tr><td>Moving coil</td><td>Carries the current being measured; experiences torque F = BIlN</td></tr>
+      <tr><td>Pointer</td><td>Indicates reading on the calibrated scale</td></tr>
+      <tr><td>Restoring spring (hairspring)</td><td>Returns pointer to zero; provides counter-torque proportional to deflection</td></tr>
+      <tr><td>Aluminium former</td><td>Provides eddy current damping — prevents pointer oscillation</td></tr>
+    </table>
+  </div>
+</div>
+
+<!-- SLIDE 3: GALVANOMETER TO AMMETER -->
+<div class="slide" id="s3">
+  <div class="slide-header">
+    <h2>Converting Galvanometer to Ammeter</h2>
+    <div class="strand">Using a shunt resistor to extend current range</div>
+  </div>
+  <div class="teach-block">
+    <h3>The Shunt Resistor</h3>
+    <div class="key-term"><strong>Shunt (Rsh):</strong> A low-value resistor connected in <strong>parallel</strong> with the galvanometer coil to bypass most of the current and allow the instrument to measure larger currents.</div>
+    <div class="key-term"><strong>Full Scale Deflection (FSD) current (Ig):</strong> The maximum current that can flow through the galvanometer coil without damage. Typically in the range of microamperes to milliamperes.</div>
+  </div>
+  <div class="teach-block">
+    <h3>Shunt Formula Derivation</h3>
+    <div class="diagram-wrap">
+      <svg viewBox="0 0 500 110" xmlns="http://www.w3.org/2000/svg" style="font-family:'Segoe UI',sans-serif;max-width:500px">
+        <rect width="500" height="110" rx="8" fill="#f4f7f5"/>
+        <!-- Main wire -->
+        <line x1="20" y1="50" x2="120" y2="50" stroke="#0a5e2a" stroke-width="2.5"/>
+        <line x1="320" y1="50" x2="420" y2="50" stroke="#0a5e2a" stroke-width="2.5"/>
+        <!-- Junction lines -->
+        <line x1="120" y1="50" x2="120" y2="30" stroke="#0a5e2a" stroke-width="2"/>
+        <line x1="120" y1="50" x2="120" y2="75" stroke="#0a5e2a" stroke-width="2"/>
+        <line x1="320" y1="50" x2="320" y2="30" stroke="#0a5e2a" stroke-width="2"/>
+        <line x1="320" y1="50" x2="320" y2="75" stroke="#0a5e2a" stroke-width="2"/>
+        <!-- Galvanometer branch (top) -->
+        <circle cx="220" cy="30" r="14" fill="#fff" stroke="#0a5e2a" stroke-width="2"/>
+        <text x="220" y="34" text-anchor="middle" fill="#0a5e2a" font-size="10" font-weight="700">G</text>
+        <line x1="120" y1="30" x2="206" y2="30" stroke="#0a5e2a" stroke-width="2"/>
+        <line x1="234" y1="30" x2="320" y2="30" stroke="#0a5e2a" stroke-width="2"/>
+        <text x="220" y="18" text-anchor="middle" fill="#0a5e2a" font-size="9">Ig (small)</text>
+        <!-- Shunt branch (bottom) -->
+        <rect x="170" y="68" width="100" height="14" rx="3" fill="none" stroke="#c62828" stroke-width="2"/>
+        <text x="220" y="78" text-anchor="middle" fill="#c62828" font-size="9" font-weight="700">Rsh (shunt)</text>
+        <line x1="120" y1="75" x2="170" y2="75" stroke="#c62828" stroke-width="2"/>
+        <line x1="270" y1="75" x2="320" y2="75" stroke="#c62828" stroke-width="2"/>
+        <text x="220" y="98" text-anchor="middle" fill="#c62828" font-size="9">I - Ig (large current bypassed)</text>
+        <!-- Total current labels -->
+        <text x="60" y="44" text-anchor="middle" fill="#333" font-size="9">I (total)</text>
+        <text x="375" y="44" text-anchor="middle" fill="#333" font-size="9">I (total)</text>
+      </svg>
+    </div>
+    <div class="example-box">
+      <h4>📐 Shunt Formula</h4>
+      <p>Since shunt and galvanometer are in parallel: <strong>Voltage across both must be equal</strong></p>
+      <p>Ig × Rg = (I − Ig) × Rsh</p>
+      <p>Therefore: <strong>Rsh = (Ig × Rg) / (I − Ig)</strong></p>
+      <p style="margin-top:6px">Where: Ig = FSD current of galvanometer, Rg = galvanometer coil resistance, I = desired full-scale current of ammeter</p>
+    </div>
+    <div class="example-box">
+      <h4>✏️ Worked Example</h4>
+      <p>A galvanometer has Ig = 5mA and Rg = 20Ω. Convert to an ammeter reading 0–2A.</p>
+      <p>Rsh = (Ig × Rg) / (I − Ig) = (0.005 × 20) / (2 − 0.005)</p>
+      <p>Rsh = 0.1 / 1.995 = <strong>0.0501Ω ≈ 50mΩ</strong></p>
+    </div>
+  </div>
+</div>
+
+<!-- SLIDE 4: GALVANOMETER TO VOLTMETER -->
+<div class="slide" id="s4">
+  <div class="slide-header">
+    <h2>Converting Galvanometer to Voltmeter</h2>
+    <div class="strand">Using a multiplier resistor to extend voltage range</div>
+  </div>
+  <div class="teach-block">
+    <h3>The Multiplier Resistor</h3>
+    <div class="key-term"><strong>Multiplier (Rm):</strong> A high-value resistor connected in <strong>series</strong> with the galvanometer coil to limit current and allow the instrument to measure higher voltages. The voltmeter must have very high resistance to avoid loading the circuit.</div>
+    <div class="diagram-wrap">
+      <svg viewBox="0 0 500 90" xmlns="http://www.w3.org/2000/svg" style="font-family:'Segoe UI',sans-serif;max-width:500px">
+        <rect width="500" height="90" rx="8" fill="#f4f7f5"/>
+        <line x1="20" y1="45" x2="80" y2="45" stroke="#0a5e2a" stroke-width="2.5"/>
+        <!-- Multiplier -->
+        <rect x="80" y="35" width="100" height="20" rx="3" fill="none" stroke="#c62828" stroke-width="2.5"/>
+        <text x="130" y="48" text-anchor="middle" fill="#c62828" font-size="10" font-weight="700">Rm (multiplier)</text>
+        <line x1="180" y1="45" x2="260" y2="45" stroke="#0a5e2a" stroke-width="2.5"/>
+        <!-- Galvanometer -->
+        <circle cx="300" cy="45" r="18" fill="#fff" stroke="#0a5e2a" stroke-width="2.5"/>
+        <text x="300" y="49" text-anchor="middle" fill="#0a5e2a" font-size="11" font-weight="700">G</text>
+        <line x1="318" y1="45" x2="420" y2="45" stroke="#0a5e2a" stroke-width="2.5"/>
+        <!-- Voltage labels -->
+        <text x="20" y="35" fill="#333" font-size="9">+</text>
+        <text x="415" y="35" fill="#333" font-size="9">−</text>
+        <text x="240" y="75" text-anchor="middle" fill="#555" font-size="9">← Voltage V applied across entire series combination →</text>
+        <text x="130" y="25" text-anchor="middle" fill="#c62828" font-size="8">High resistance — drops most of V</text>
+      </svg>
+    </div>
+    <div class="example-box">
+      <h4>📐 Multiplier Formula</h4>
+      <p>Total voltage: V = Ig × (Rg + Rm)</p>
+      <p>Therefore: <strong>Rm = (V / Ig) − Rg</strong></p>
+      <p style="margin-top:6px">Where: V = desired full-scale voltage, Ig = FSD current, Rg = galvanometer resistance</p>
+    </div>
+    <div class="example-box">
+      <h4>✏️ Worked Example</h4>
+      <p>A galvanometer has Ig = 1mA and Rg = 50Ω. Convert to a voltmeter reading 0–10V.</p>
+      <p>Rm = (V / Ig) − Rg = (10 / 0.001) − 50 = 10,000 − 50 = <strong>9,950Ω ≈ 10kΩ</strong></p>
+    </div>
+  </div>
+  <div class="teach-block">
+    <h3>Summary: Ammeter vs Voltmeter Connection</h3>
+    <table class="info-table">
+      <tr><th>Instrument</th><th>Extension Component</th><th>Connection</th><th>Resistance</th><th>Connected in Circuit</th></tr>
+      <tr><td>Ammeter</td><td>Shunt (Rsh)</td><td>Parallel with G</td><td>Very LOW</td><td>Series with load</td></tr>
+      <tr><td>Voltmeter</td><td>Multiplier (Rm)</td><td>Series with G</td><td>Very HIGH</td><td>Parallel with load</td></tr>
+    </table>
+  </div>
+</div>
+
+<!-- SLIDE 5: OHMMETER & MULTIMETER -->
+<div class="slide" id="s5">
+  <div class="slide-header">
+    <h2>Ohmmeter & Multimeter</h2>
+    <div class="strand">Measuring resistance and combining all functions</div>
+  </div>
+  <div class="teach-block">
+    <h3>The Ohmmeter</h3>
+    <div class="key-term"><strong>Ohmmeter:</strong> An instrument that measures electrical resistance. It contains its own internal battery and works by measuring the current that flows through the unknown resistance.</div>
+    <div class="example-box">
+      <h4>📋 How an Ohmmeter Works</h4>
+      <p>1. Internal battery provides a fixed EMF.</p>
+      <p>2. When probes are shorted together (R=0) → maximum current flows → pointer reads <strong>0Ω</strong> (full deflection, right side).</p>
+      <p>3. When probes are open (R=∞) → no current → pointer at rest = <strong>∞Ω</strong> (left side).</p>
+      <p>4. Unknown R connected → current flows inversely proportional to R → pointer deflects to show resistance.</p>
+      <p style="margin-top:6px;color:var(--no)"><strong>Note:</strong> Ohmmeter scale reads RIGHT to LEFT (opposite to voltage/current). Always zero-adjust before use.</p>
+    </div>
+    <div class="warn-box">
+      <h4>⚠️ Critical Ohmmeter Safety Rule</h4>
+      <p>NEVER use an ohmmeter on a live circuit. The internal battery provides its own voltage — external voltage will give <strong>false readings</strong> and can <strong>permanently damage</strong> the instrument. Always isolate the circuit and discharge capacitors first.</p>
+    </div>
+  </div>
+  <div class="teach-block">
+    <h3>The Multimeter</h3>
+    <div class="key-term"><strong>Multimeter:</strong> A single instrument that combines voltmeter, ammeter, and ohmmeter functions. Available as analogue (moving coil) or digital (DMM — Digital Multimeter).</div>
+    <table class="info-table">
+      <tr><th>Type</th><th>Advantages</th><th>Disadvantages</th></tr>
+      <tr><td>Analogue multimeter</td><td>Shows trends; works without battery for V/I; cheap</td><td>Parallax error; scale reading difficulty; fragile</td></tr>
+      <tr><td>Digital multimeter (DMM)</td><td>High accuracy; auto-ranging; easy to read; robust</td><td>Needs battery; slower for trend reading; more expensive</td></tr>
+    </table>
+  </div>
+</div>
+
+<!-- SLIDE 6: CALIBRATION -->
+<div class="slide" id="s6">
+  <div class="slide-header">
+    <h2>Calibration of Measuring Instruments</h2>
+    <div class="strand">Ensuring accuracy before measurement</div>
+  </div>
+  <div class="teach-block">
+    <h3>What is Calibration?</h3>
+    <div class="key-term"><strong>Calibration:</strong> The process of configuring or adjusting a measuring instrument so that its readings correspond to a known standard. An uncalibrated instrument gives inaccurate or unreliable readings.</div>
+    <table class="info-table">
+      <tr><th>Calibration Type</th><th>What It Does</th><th>How It's Done</th></tr>
+      <tr><td>Zero calibration</td><td>Sets pointer to exactly zero before measurement</td><td>Adjust zero screw on instrument face with no input connected</td></tr>
+      <tr><td>Ohmmeter zero-adjust</td><td>Corrects for battery aging in ohmmeter</td><td>Short probes together and turn ZERO ADJ knob until pointer reads 0Ω</td></tr>
+      <tr><td>Range calibration</td><td>Verifies accuracy at full scale and mid-scale</td><td>Apply known voltage/current from reference standard; adjust if needed</td></tr>
+      <tr><td>Fine-tuning / span adjust</td><td>Corrects gain error across the full scale</td><td>Apply known full-scale input; adjust span potentiometer</td></tr>
+    </table>
+  </div>
+  <div class="teach-block">
+    <h3>Sources of Error in Measurement</h3>
+    <table class="info-table">
+      <tr><th>Error Type</th><th>Cause</th><th>How to Avoid</th></tr>
+      <tr><td>Parallax error</td><td>Reading scale at an angle (not directly in front)</td><td>View pointer perpendicular to scale; use mirror scale</td></tr>
+      <tr><td>Loading error</td><td>Ammeter too high R; voltmeter too low R changes circuit</td><td>Use instrument with appropriate resistance for the circuit</td></tr>
+      <tr><td>Zero error</td><td>Pointer not at zero before measurement</td><td>Zero-adjust before every measurement session</td></tr>
+      <tr><td>Range error</td><td>Wrong range selected — pointer barely deflects or goes off-scale</td><td>Always start on highest range; reduce to appropriate range</td></tr>
+      <tr><td>Temperature error</td><td>Instrument resistance changes with temperature</td><td>Allow warm-up time; use at rated temperature</td></tr>
+    </table>
+  </div>
+  <div class="example-box">
+    <h4>📋 Measurement Best Practice</h4>
+    <p>1. <strong>Select correct instrument</strong> — right quantity, right range.</p>
+    <p>2. <strong>Zero-adjust</strong> before each use.</p>
+    <p>3. <strong>Start on highest range</strong>, reduce until pointer is in upper half of scale.</p>
+    <p>4. <strong>Read directly in front</strong> — avoid parallax.</p>
+    <p>5. <strong>Record reading</strong> with correct unit and range setting.</p>
+    <p>6. <strong>Store properly</strong> — cover, protect from magnetic fields and mechanical shock.</p>
+  </div>
+</div>
+
+<!-- SLIDE 7: INSTRUMENT SELECTION & CARE -->
+<div class="slide" id="s7">
+  <div class="slide-header">
+    <h2>Instrument Selection & Care</h2>
+    <div class="strand">Choosing the right tool and keeping it accurate</div>
+  </div>
+  <div class="teach-block">
+    <h3>Selecting the Right Scale/Range</h3>
+    <table class="info-table">
+      <tr><th>Scenario</th><th>Instrument</th><th>Range to Select</th><th>Connection</th></tr>
+      <tr><td>Measure 240V mains voltage</td><td>Voltmeter / DMM</td><td>AC 300V or higher range</td><td>Parallel across supply</td></tr>
+      <tr><td>Measure car battery voltage</td><td>Voltmeter / DMM</td><td>DC 20V range</td><td>Parallel across battery</td></tr>
+      <tr><td>Measure current in a torch circuit</td><td>Ammeter / DMM</td><td>DC 200mA range</td><td>Series in circuit</td></tr>
+      <tr><td>Measure resistance of a resistor</td><td>Ohmmeter / DMM</td><td>Scale covering expected value</td><td>Across component (power OFF)</td></tr>
+      <tr><td>Check if fuse is blown</td><td>Ohmmeter / DMM continuity</td><td>Continuity/resistance range</td><td>Across fuse (power OFF)</td></tr>
+    </table>
+  </div>
+  <div class="teach-block">
+    <h3>Care and Storage of Instruments</h3>
+    <table class="info-table">
+      <tr><th>Care Procedure</th><th>Reason</th></tr>
+      <tr><td>Store in carrying case or covered</td><td>Protects from dust, moisture, mechanical shock</td></tr>
+      <tr><td>Keep away from strong magnets</td><td>External fields deflect the pointer and corrupt readings</td></tr>
+      <tr><td>Replace battery when low (DMM)</td><td>Low battery causes inaccurate resistance readings</td></tr>
+      <tr><td>Never exceed rated input</td><td>Overrange burns out shunt/multiplier or coil</td></tr>
+      <tr><td>Set to highest range before storage (DMM)</td><td>Prevents accidental damage from unexpected high input</td></tr>
+      <tr><td>Clean terminals regularly</td><td>Corrosion increases contact resistance → false readings</td></tr>
+    </table>
+  </div>
+  <div class="warn-box">
+    <h4>⚠️ Never Connect Ammeter in Parallel</h4>
+    <p>An ammeter has very low resistance. Connecting it in parallel across a voltage source creates a near short-circuit — <strong>very high current destroys the shunt and coil immediately</strong>. Always connect ammeters in series with the load.</p>
+  </div>
+</div>
+
+<!-- SLIDE 8: INTERACTIVE CALCULATORS -->
+<div class="slide" id="s8">
+  <div class="slide-header">
+    <h2>Interactive Calculators</h2>
+    <div class="strand">Shunt, multiplier and scale reading practice</div>
+  </div>
+
+  <div class="calc-box">
+    <h4>🔧 Tool 1: Shunt Resistor Calculator (Ammeter)</h4>
+    <p style="font-size:.83rem;margin-bottom:8px">Rsh = (Ig × Rg) / (I − Ig)</p>
+    <div class="calc-row"><label>FSD Current Ig (mA)</label><input type="number" id="sh_ig" placeholder="e.g. 5"></div>
+    <div class="calc-row"><label>Coil Resistance Rg (Ω)</label><input type="number" id="sh_rg" placeholder="e.g. 20"></div>
+    <div class="calc-row"><label>Desired Range I (A)</label><input type="number" id="sh_i" placeholder="e.g. 2"></div>
+    <button class="check-btn" onclick="calcShunt()">⚡ Calculate Shunt</button>
+    <button class="check-btn" style="background:#888;margin-left:8px" onclick="clearShunt()">↺ Clear</button>
+    <div class="calc-result" id="sh-result"></div>
+    <div class="calc-err" id="sh-err"></div>
+  </div>
+
+  <div class="calc-box" style="margin-top:14px">
+    <h4>🔧 Tool 2: Multiplier Resistor Calculator (Voltmeter)</h4>
+    <p style="font-size:.83rem;margin-bottom:8px">Rm = (V / Ig) − Rg</p>
+    <div class="calc-row"><label>FSD Current Ig (mA)</label><input type="number" id="mu_ig" placeholder="e.g. 1"></div>
+    <div class="calc-row"><label>Coil Resistance Rg (Ω)</label><input type="number" id="mu_rg" placeholder="e.g. 50"></div>
+    <div class="calc-row"><label>Desired Voltage V (V)</label><input type="number" id="mu_v" placeholder="e.g. 10"></div>
+    <button class="check-btn" onclick="calcMult()">⚡ Calculate Multiplier</button>
+    <button class="check-btn" style="background:#888;margin-left:8px" onclick="clearMult()">↺ Clear</button>
+    <div class="calc-result" id="mu-result"></div>
+    <div class="calc-err" id="mu-err"></div>
+  </div>
+
+  <div class="calc-box" style="margin-top:14px">
+    <h4>🔧 Tool 3: Scale Reading Practice</h4>
+    <p style="font-size:.83rem;margin-bottom:8px">An analogue meter has a full scale of 100 units. The pointer deflects to 65 divisions. What is the actual reading on different range settings?</p>
+    <div class="calc-row"><label>Full Scale Value (FSV)</label><input type="number" id="sc_fsv" placeholder="e.g. 100"></div>
+    <div class="calc-row"><label>Total scale divisions</label><input type="number" id="sc_div" placeholder="e.g. 100"></div>
+    <div class="calc-row"><label>Pointer position (divs)</label><input type="number" id="sc_pos" placeholder="e.g. 65"></div>
+    <div class="calc-row"><label>Selected Range</label>
+      <select id="sc_range">
+        <option value="1">×1</option>
+        <option value="10">×10</option>
+        <option value="100">×100</option>
+        <option value="0.1">×0.1</option>
+      </select>
+    </div>
+    <button class="check-btn" onclick="calcScale()">⚡ Calculate Reading</button>
+    <div class="calc-result" id="sc-result"></div>
+  </div>
+</div>
+
+<!-- SLIDE 9: PRACTICE -->
+<div class="slide" id="s9">
+  <div class="slide-header">
+    <h2>Practice Problems</h2>
+    <div class="strand">Shunts, multipliers and instrument use</div>
+  </div>
+
+  <div class="practice-q">
+    <div class="qnum">Problem 1: Shunt Calculation</div>
+    <p style="font-size:.86rem">A galvanometer with FSD current of 10mA and coil resistance of 15Ω is to be converted to an ammeter with a range of 0–5A. Calculate the required shunt resistance.</p>
+    <div class="example-box" style="margin-top:8px">
+      <h4>📌 Solution</h4>
+      <p>Rsh = (Ig × Rg) / (I − Ig)</p>
+      <p>Rsh = (0.01 × 15) / (5 − 0.01) = 0.15 / 4.99 = <strong>0.03Ω ≈ 30mΩ</strong></p>
+    </div>
+  </div>
+
+  <div class="practice-q">
+    <div class="qnum">Problem 2: Multiplier Calculation</div>
+    <p style="font-size:.86rem">A galvanometer has FSD current of 2mA and coil resistance of 100Ω. Calculate the multiplier needed for: (a) 50V range, (b) 250V range.</p>
+    <div class="example-box" style="margin-top:8px">
+      <h4>📌 Solution</h4>
+      <p>(a) Rm = (50 / 0.002) − 100 = 25,000 − 100 = <strong>24,900Ω ≈ 24.9kΩ</strong></p>
+      <p>(b) Rm = (250 / 0.002) − 100 = 125,000 − 100 = <strong>124,900Ω ≈ 124.9kΩ</strong></p>
+    </div>
+  </div>
+
+  <div class="practice-q">
+    <div class="qnum">Problem 3: Reading a Scale</div>
+    <p style="font-size:.86rem">An analogue voltmeter has 50 scale divisions and is set to the 150V range. The pointer rests at division 35. What is the voltage reading?</p>
+    <div class="example-box" style="margin-top:8px">
+      <h4>📌 Solution</h4>
+      <p>Scale factor = Full Scale Value / Total divisions = 150 / 50 = 3 V per division</p>
+      <p>Reading = 35 × 3 = <strong>105V</strong></p>
+    </div>
+  </div>
+
+  <div class="practice-q">
+    <div class="qnum">Problem 4: Instrument Selection</div>
+    <p style="font-size:.86rem">A technician needs to measure the current through a 60W, 240V light bulb when it is working normally. Select the appropriate instrument, range, and connection method.</p>
+    <div class="example-box" style="margin-top:8px">
+      <h4>📌 Answer</h4>
+      <p>Expected current: I = P/V = 60/240 = <strong>0.25A</strong></p>
+      <p>Instrument: <strong>Ammeter or DMM set to AC current</strong></p>
+      <p>Range: <strong>1A AC range</strong> (next range above 0.25A)</p>
+      <p>Connection: <strong>In series</strong> with the bulb — break the circuit and insert the ammeter in series.</p>
+    </div>
+  </div>
+</div>
+
+<!-- SLIDE 10: QUIZ -->
+<div class="slide" id="s10">
+  <div class="slide-header">
+    <h2>End-of-Lesson Quiz</h2>
+    <div class="strand">Sub-strand 2.3 · Measuring Instruments</div>
+  </div>
+  <p style="font-size:.83rem;color:#555;margin-bottom:14px">Part A: 5 fill-in-the-blank (5 marks) &nbsp;|&nbsp; Part B: 3 short answer (10 marks) &nbsp;|&nbsp; <strong>Total: 15 marks</strong></p>
+
+  <div class="practice-q">
+    <div class="qnum">Part A: Fill in the Blank (1 mark each)</div>
+    <div style="font-size:.87rem">
+      <p style="margin:10px 0">1. A low-value resistor connected in parallel with a galvanometer to extend its current range is called a <input class="fill-blank" id="f1" placeholder="...">. <span class="fb-feedback" id="ff1"></span></p>
+      <p style="margin:10px 0">2. A voltmeter must always be connected in <input class="fill-blank" id="f2" placeholder="..."> with the component being measured. <span class="fb-feedback" id="ff2"></span></p>
+      <p style="margin:10px 0">3. The component that returns the pointer to zero when no current flows is the restoring <input class="fill-blank" id="f3" placeholder="...">. <span class="fb-feedback" id="ff3"></span></p>
+      <p style="margin:10px 0">4. Reading a scale at an angle (not directly in front) causes a <input class="fill-blank" id="f4" placeholder="..."> error. <span class="fb-feedback" id="ff4"></span></p>
+      <p style="margin:10px 0">5. An ohmmeter must NEVER be used on a <input class="fill-blank" id="f5" placeholder="..."> circuit. <span class="fb-feedback" id="ff5"></span></p>
+    </div>
+    <button class="check-btn" onclick="checkFills()" style="margin-top:12px">✓ Check Part A</button>
+  </div>
+
+  <div class="practice-q" style="margin-top:12px">
+    <div class="qnum">Part B: Short Answer</div>
+
+    <div style="margin-bottom:14px">
+      <p style="font-size:.87rem"><strong>B1.</strong> A galvanometer has a FSD current of 2mA and internal resistance of 25Ω. Calculate the shunt resistance needed to convert it to an ammeter with a 0–1A range. <em>(3 marks)</em></p>
+      <textarea class="sa-box" id="sa1" placeholder="Show your working..."></textarea>
+      <button class="grade-btn" onclick="gradeAnswer('sa1','fb1',{keywords:['0.05','50m','shunt','parallel','rsh','0.002','25','1','formula'],required:4,marks:3,model:'Rsh = (Ig × Rg) / (I − Ig) = (0.002 × 25) / (1 − 0.002) = 0.05 / 0.998 = 0.0501Ω ≈ 50mΩ. The shunt is connected in parallel with the galvanometer coil.'})">✓ Grade My Answer</button>
+      <div class="sa-feedback" id="fb1"></div>
+    </div>
+
+    <div style="margin-bottom:14px">
+      <p style="font-size:.87rem"><strong>B2.</strong> Explain the principle of operation of a moving coil instrument. Name FOUR main components and state the function of each. <em>(4 marks)</em></p>
+      <textarea class="sa-box" id="sa2" placeholder="Type your answer here..."></textarea>
+      <button class="grade-btn" onclick="gradeAnswer('sa2','fb2',{keywords:['current','magnetic','torque','force','permanent magnet','coil','pointer','spring','deflect','rotate','field','balanced'],required:6,marks:4,model:'Principle: current through the coil in a permanent magnetic field produces a torque (turning force) that deflects the pointer. The deflection is balanced by the restoring spring at an angle proportional to current. Components: 1. Permanent magnet — provides fixed magnetic field. 2. Moving coil — carries measured current; experiences torque. 3. Pointer — indicates reading on scale. 4. Restoring spring — provides counter-torque; returns pointer to zero.'})">✓ Grade My Answer</button>
+      <div class="sa-feedback" id="fb2"></div>
+    </div>
+
+    <div style="margin-bottom:14px">
+      <p style="font-size:.87fem"><strong>B3.</strong> A student connects an ammeter in parallel with a resistor instead of in series. What will happen and why? How should it be correctly connected? <em>(3 marks)</em></p>
+      <textarea class="sa-box" id="sa3" placeholder="Type your answer here..."></textarea>
+      <button class="grade-btn" onclick="gradeAnswer('sa3','fb3',{keywords:['short circuit','low resistance','high current','damage','burn','series','parallel','shunt','wrong','destroy'],required:4,marks:3,model:'The ammeter has very low resistance (near 0Ω). Connecting it in parallel creates a near short-circuit across the resistor — almost all current flows through the ammeter instead of the load. The extremely high current will immediately burn out the shunt resistor and coil, destroying the instrument. Correct connection: break the circuit and connect the ammeter in series so that all the circuit current flows through it.'})">✓ Grade My Answer</button>
+      <div class="sa-feedback" id="fb3"></div>
+    </div>
+  </div>
+
+  <button class="score-btn" onclick="showTotalScore()">📊 View My Total Score</button>
+  <div class="total-result" id="totalResult" style="display:none"></div>
+  <div class="next-lesson-box" id="nextLessonBox">
+    <a href="elec-3.1-generation-transmission-full.html" class="next-lesson-btn">➡️ Next Lesson: 3.1 Generation, Transmission &amp; Distribution</a>
+    <div class="next-lesson-sub">You've completed this lesson! Keep going 🎉</div>
+  </div>
+</div>
+
+</div><!-- end slides-wrap -->
+
+<div class="nav-bar">
+  <button class="nav-btn" id="prevBtn" onclick="goSlide(-1)" disabled>← Prev</button>
+  <div class="dots" id="dotsWrap"></div>
+  <button class="nav-btn" id="nextBtn" onclick="goSlide(1)">Next →</button>
+</div>
+
+<script>
+// ── NAVIGATION ────────────────────────────────────────────────
+const TOTAL=10; let cur=0;
+const dotsWrap=document.getElementById('dotsWrap');
+for(let i=0;i<TOTAL;i++){
+  const d=document.createElement('div');
+  d.className='dot'+(i===0?' active':'');
+  d.onclick=()=>showSlide(i);
+  dotsWrap.appendChild(d);
+}
+function showSlide(n){
+  document.querySelectorAll('.slide').forEach((s,i)=>s.classList.toggle('active',i===n));
+  document.querySelectorAll('.dot').forEach((d,i)=>d.classList.toggle('active',i===n));
+  document.getElementById('prevBtn').disabled=(n===0);
+  document.getElementById('nextBtn').disabled=(n===TOTAL-1);
+  document.getElementById('slideLabel').textContent=(n+1)+' / '+TOTAL;
+  cur=n; window.scrollTo(0,0);
+}
+function goSlide(d){showSlide(Math.max(0,Math.min(TOTAL-1,cur+d)))}
+
+// ── SHUNT CALCULATOR ──────────────────────────────────────────
+function calcShunt(){
+  const ig=parseFloat(document.getElementById('sh_ig').value)/1000;
+  const rg=parseFloat(document.getElementById('sh_rg').value);
+  const i=parseFloat(document.getElementById('sh_i').value);
+  const res=document.getElementById('sh-result');
+  const err=document.getElementById('sh-err');
+  res.style.display='none'; err.style.display='none';
+  if(isNaN(ig)||isNaN(rg)||isNaN(i)){err.textContent='Enter all three values.';err.style.display='block';return;}
+  if(i<=ig*1000/1000){err.textContent='Desired range must be greater than Ig.';err.style.display='block';return;}
+  const rsh=(ig*rg)/(i-ig);
+  const mult=i/ig;
+  res.textContent=`Rsh = (Ig × Rg) / (I − Ig)\n= (${ig*1000}mA × ${rg}Ω) / (${i}A − ${ig*1000}mA)\n= ${(ig*rg).toFixed(4)} / ${(i-ig).toFixed(4)}\n= ${rsh.toFixed(4)} Ω = ${(rsh*1000).toFixed(2)} mΩ\nMultiplication factor: ×${mult.toFixed(1)}`;
+  res.style.display='block';
+}
+function clearShunt(){
+  ['sh_ig','sh_rg','sh_i'].forEach(id=>document.getElementById(id).value='');
+  document.getElementById('sh-result').style.display='none';
+  document.getElementById('sh-err').style.display='none';
+}
+
+// ── MULTIPLIER CALCULATOR ─────────────────────────────────────
+function calcMult(){
+  const ig=parseFloat(document.getElementById('mu_ig').value)/1000;
+  const rg=parseFloat(document.getElementById('mu_rg').value);
+  const v=parseFloat(document.getElementById('mu_v').value);
+  const res=document.getElementById('mu-result');
+  const err=document.getElementById('mu-err');
+  res.style.display='none'; err.style.display='none';
+  if(isNaN(ig)||isNaN(rg)||isNaN(v)){err.textContent='Enter all three values.';err.style.display='block';return;}
+  const rm=(v/ig)-rg;
+  const total=rm+rg;
+  res.textContent=`Rm = (V / Ig) − Rg\n= (${v}V / ${ig*1000}mA) − ${rg}Ω\n= ${(v/ig).toFixed(0)} − ${rg}\n= ${rm.toFixed(0)} Ω = ${(rm/1000).toFixed(2)} kΩ\nTotal voltmeter resistance = ${total.toFixed(0)} Ω`;
+  res.style.display='block';
+}
+function clearMult(){
+  ['mu_ig','mu_rg','mu_v'].forEach(id=>document.getElementById(id).value='');
+  document.getElementById('mu-result').style.display='none';
+  document.getElementById('mu-err').style.display='none';
+}
+
+// ── SCALE READING ─────────────────────────────────────────────
+function calcScale(){
+  const fsv=parseFloat(document.getElementById('sc_fsv').value);
+  const div=parseFloat(document.getElementById('sc_div').value);
+  const pos=parseFloat(document.getElementById('sc_pos').value);
+  const range=parseFloat(document.getElementById('sc_range').value);
+  const res=document.getElementById('sc-result');
+  if(isNaN(fsv)||isNaN(div)||isNaN(pos)){res.textContent='Enter FSV, divisions and pointer position.';res.style.display='block';return;}
+  const perDiv=fsv/div;
+  const rawReading=pos*perDiv;
+  const actualReading=rawReading*range;
+  res.textContent=`Scale factor = ${fsv}/${div} = ${perDiv.toFixed(3)} units/division\nRaw reading = ${pos} × ${perDiv.toFixed(3)} = ${rawReading.toFixed(3)}\nWith ×${range} range multiplier: ${actualReading.toFixed(3)} units`;
+  res.style.display='block';
+}
+
+// ── FILL BLANK ────────────────────────────────────────────────
+const fbAns={
+  f1:['shunt','shunt resistor'],
+  f2:['parallel'],
+  f3:['spring','hairspring'],
+  f4:['parallax'],
+  f5:['live','energised','powered','active']
+};
+let fillScore=0, saScores={};
+function checkFills(){
+  fillScore=0;
+  Object.entries(fbAns).forEach(([id,ans])=>{
+    const inp=document.getElementById(id);
+    const fb=document.getElementById('f'+id.slice(1));
+    const val=inp.value.trim().toLowerCase();
+    const ok=ans.some(a=>val===a||val.includes(a));
+    if(ok){fillScore++;inp.className='fill-blank correct';fb.textContent='✓ +1';fb.style.color='#2e7d32';}
+    else{inp.className='fill-blank wrong';fb.textContent='✗ ('+ans[0]+')';fb.style.color='#c62828';}
+    fb.style.display='inline';
+  });
+}
+function gradeAnswer(saId,fbId,cfg){
+  const ans=document.getElementById(saId).value.trim().toLowerCase();
+  const found=cfg.keywords.filter(k=>ans.includes(k.toLowerCase()));
+  const missed=cfg.keywords.filter(k=>!ans.includes(k.toLowerCase()));
+  const hitRate=Math.min(found.length/cfg.required,1.0);
+  const marks=Math.round(hitRate*cfg.marks);
+  saScores[saId]=marks;
+  const grade=marks>=cfg.marks?'🌟 Excellent!':marks>=cfg.marks*0.5?'👍 Good attempt':'📖 Needs improvement';
+  const fbEl=document.getElementById(fbId);
+  fbEl.style.display='block';
+  fbEl.innerHTML=`<strong>${grade} — ${marks}/${cfg.marks} marks</strong><br>
+  <span class="kw-found">✅ Keywords found: ${found.join(', ')||'none'}</span><br>
+  <span class="kw-missed">❌ Missed: ${missed.join(', ')||'none'}</span>
+  <div class="model-ans"><strong>Model Answer:</strong> ${cfg.model}</div>`;
+}
+function showTotalScore(){
+  const saTotal=Object.values(saScores).reduce((a,b)=>a+b,0);
+  const total=fillScore+saTotal;
+  const pct=Math.round(total/15*100);
+  const grade=pct>=80?'Exceeds Expectation 🎉':pct>=60?'Meets Expectation 👍':pct>=40?'Approaches Expectation 📖':'Below Expectation 💪';
+  const el=document.getElementById('totalResult');
+  el.style.display='block';
+  el.innerHTML=`<strong>Total Score: ${total} / 15 (${pct}%)</strong><br>
+  Part A: ${fillScore}/5 &nbsp;|&nbsp; Part B: ${saTotal}/10<br>
+  <span style="color:var(--pri);font-size:1.05rem">${grade}</span><br>
+  <span style="font-size:.8rem;color:#666;margin-top:4px;display:block">CBE Rubric — ${pct>=80?'Exceeds':pct>=60?'Meets':pct>=40?'Approaches':'Below'} Expectation</span>`;
+  submitExamToMTTI(total,15,pct);
+  document.getElementById('nextLessonBox').style.display='block';
+}
+function submitExamToMTTI(score,total,percent){
+  try{
+    fetch('/wp-json/mtti/v1/exam-result',{
+      method:'POST',
+      headers:{'Content-Type':'application/json','X-WP-Nonce':window.mtti_nonce||''},
+      body:JSON.stringify({lesson_id:'elec-2.3-measuring-instruments',score,total,percent,timestamp:new Date().toISOString()})
+    }).then(r=>r.json()).then(d=>{if(d&&d.success)console.log('[MTTI] Result saved:',d);}).catch(e=>console.log('[MTTI] Offline:',e));
+  }catch(e){console.log('[MTTI] Error:',e);}
+}
+</script>
+</body>
+</html>

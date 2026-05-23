@@ -1,0 +1,1767 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MS Word Practical Exam - M.T.T.I</title>
+    <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'IBM Plex Sans', -apple-system, sans-serif;
+            background: linear-gradient(145deg, #1a1a2e 0%, #16213e 50%, #0f0f1a 100%);
+            color: #e8e8e8;
+            min-height: 100vh;
+        }
+
+        /* Start Screen */
+        .start-screen {
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 2rem;
+        }
+
+        .logo-area {
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+
+        .logo-icon {
+            font-size: 4rem;
+            margin-bottom: 0.5rem;
+            animation: bounce 2s infinite;
+        }
+
+        @keyframes bounce {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-8px); }
+        }
+
+        .logo-area h1 {
+            font-size: 1.6rem;
+            font-weight: 700;
+            background: linear-gradient(90deg, #00d4ff, #00ff88);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .tagline {
+            color: #888;
+            font-style: italic;
+            margin-top: 0.5rem;
+        }
+
+        .exam-card {
+            background: rgba(26, 26, 46, 0.9);
+            border: 1px solid rgba(0, 212, 255, 0.2);
+            border-radius: 20px;
+            padding: 2rem;
+            max-width: 550px;
+            width: 100%;
+            backdrop-filter: blur(10px);
+        }
+
+        .card-header {
+            text-align: center;
+            margin-bottom: 1.5rem;
+        }
+
+        .card-header h2 {
+            font-size: 1.4rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .badge {
+            display: inline-block;
+            padding: 0.3rem 0.8rem;
+            background: rgba(0, 255, 136, 0.15);
+            color: #00ff88;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: 600;
+        }
+
+        .exam-details {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .detail-item {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.8rem;
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 10px;
+        }
+
+        .detail-item .icon {
+            font-size: 1.5rem;
+        }
+
+        .detail-item strong {
+            display: block;
+            font-size: 0.85rem;
+        }
+
+        .detail-item small {
+            color: #888;
+            font-size: 0.7rem;
+        }
+
+        .skills-preview h3, .instructions h3 {
+            font-size: 0.9rem;
+            color: #aaa;
+            margin-bottom: 0.75rem;
+        }
+
+        .skills-grid {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .skill-tag {
+            padding: 0.4rem 0.8rem;
+            background: rgba(0, 212, 255, 0.1);
+            border: 1px solid rgba(0, 212, 255, 0.3);
+            border-radius: 20px;
+            font-size: 0.75rem;
+            color: #00d4ff;
+        }
+
+        .instructions {
+            background: rgba(0, 255, 136, 0.08);
+            border: 1px solid rgba(0, 255, 136, 0.2);
+            border-radius: 12px;
+            padding: 1rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .instructions h3 {
+            color: #00ff88;
+        }
+
+        .instructions ul {
+            list-style: none;
+            font-size: 0.85rem;
+        }
+
+        .instructions li {
+            padding: 0.4rem 0;
+            padding-left: 1.2rem;
+            position: relative;
+            color: #ccc;
+        }
+
+        .instructions li::before {
+            content: "→";
+            position: absolute;
+            left: 0;
+            color: #00ff88;
+        }
+
+        .name-field {
+            margin-bottom: 1.5rem;
+        }
+
+        .name-field label {
+            display: block;
+            margin-bottom: 0.5rem;
+            color: #aaa;
+            font-size: 0.9rem;
+        }
+
+        .name-field input {
+            width: 100%;
+            padding: 0.9rem 1rem;
+            background: rgba(0, 0, 0, 0.4);
+            border: 2px solid rgba(0, 212, 255, 0.3);
+            border-radius: 10px;
+            color: #fff;
+            font-size: 1rem;
+            font-family: inherit;
+            transition: all 0.3s;
+        }
+
+        .name-field input:focus {
+            outline: none;
+            border-color: #00d4ff;
+            box-shadow: 0 0 20px rgba(0, 212, 255, 0.2);
+        }
+
+        .start-btn {
+            width: 100%;
+            padding: 1rem;
+            font-size: 1.1rem;
+            font-weight: 600;
+            font-family: inherit;
+            background: linear-gradient(135deg, #00d4ff, #00ff88);
+            color: #1a1a2e;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .start-btn:hover:not(:disabled) {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 30px rgba(0, 212, 255, 0.4);
+        }
+
+        .start-btn:disabled {
+            opacity: 0.4;
+            cursor: not-allowed;
+        }
+
+        .location {
+            margin-top: 2rem;
+            color: #666;
+            font-size: 0.8rem;
+        }
+
+        /* Exam Screen */
+        .exam-screen {
+            display: none;
+            min-height: 100vh;
+        }
+
+        .exam-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0.8rem 1.5rem;
+            background: rgba(0, 0, 0, 0.4);
+            border-bottom: 1px solid rgba(0, 212, 255, 0.2);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .header-left {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .logo {
+            font-weight: 700;
+            color: #00d4ff;
+        }
+
+        .divider {
+            color: #444;
+        }
+
+        .exam-name {
+            color: #888;
+            font-size: 0.9rem;
+        }
+
+        .timer {
+            font-family: 'IBM Plex Mono', monospace;
+            background: rgba(0, 0, 0, 0.5);
+            padding: 0.5rem 1rem;
+            border-radius: 20px;
+            border: 1px solid rgba(0, 212, 255, 0.3);
+        }
+
+        .timer.warning {
+            border-color: #ff4444;
+            color: #ff4444;
+            animation: pulse 1s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.6; }
+        }
+
+        .header-right {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .progress {
+            font-family: 'IBM Plex Mono', monospace;
+            color: #888;
+        }
+
+        .finish-btn {
+            padding: 0.5rem 1rem;
+            background: rgba(0, 255, 136, 0.2);
+            border: 1px solid rgba(0, 255, 136, 0.4);
+            border-radius: 8px;
+            color: #00ff88;
+            font-family: inherit;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .finish-btn:hover {
+            background: rgba(0, 255, 136, 0.3);
+        }
+
+        .exam-main {
+            display: flex;
+            min-height: calc(100vh - 60px);
+        }
+
+        /* Sidebar */
+        .task-nav {
+            width: 220px;
+            background: rgba(0, 0, 0, 0.3);
+            border-right: 1px solid rgba(0, 212, 255, 0.1);
+            padding: 1rem;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .nav-header {
+            padding-bottom: 1rem;
+            border-bottom: 1px solid rgba(0, 212, 255, 0.1);
+            margin-bottom: 1rem;
+        }
+
+        .student-badge {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .avatar {
+            width: 36px;
+            height: 36px;
+            background: linear-gradient(135deg, #00d4ff, #00ff88);
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            color: #1a1a2e;
+        }
+
+        .nav-sections {
+            flex: 1;
+            overflow-y: auto;
+        }
+
+        .nav-day {
+            margin-bottom: 1rem;
+        }
+
+        .nav-day h4 {
+            font-size: 0.75rem;
+            color: #666;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 0.5rem;
+        }
+
+        .nav-tasks {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.4rem;
+        }
+
+        .nav-task-btn {
+            width: 32px;
+            height: 32px;
+            background: rgba(0, 0, 0, 0.4);
+            border: 1px solid rgba(100, 100, 100, 0.3);
+            border-radius: 6px;
+            color: #888;
+            font-family: 'IBM Plex Mono', monospace;
+            font-size: 0.75rem;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .nav-task-btn:hover {
+            border-color: #00d4ff;
+            color: #fff;
+        }
+
+        .nav-task-btn.active {
+            background: rgba(0, 212, 255, 0.3);
+            border-color: #00d4ff;
+            color: #fff;
+        }
+
+        .nav-task-btn.correct {
+            background: rgba(0, 255, 136, 0.2);
+            border-color: #00ff88;
+            color: #00ff88;
+        }
+
+        .nav-task-btn.attempted {
+            background: rgba(255, 170, 0, 0.2);
+            border-color: #ffaa00;
+            color: #ffaa00;
+        }
+
+        .nav-legend {
+            padding-top: 1rem;
+            border-top: 1px solid rgba(0, 212, 255, 0.1);
+            font-size: 0.7rem;
+            color: #666;
+        }
+
+        .nav-legend span {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            margin-bottom: 0.4rem;
+        }
+
+        .dot {
+            width: 10px;
+            height: 10px;
+            border-radius: 3px;
+            display: inline-block;
+        }
+
+        .dot.active { background: #00d4ff; }
+        .dot.correct { background: #00ff88; }
+        .dot.attempted { background: #ffaa00; }
+
+        /* Task Area */
+        .task-area {
+            flex: 1;
+            padding: 2rem;
+            overflow-y: auto;
+        }
+
+        .task-header {
+            margin-bottom: 1.5rem;
+        }
+
+        .task-info {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .task-category {
+            font-size: 0.75rem;
+            color: #00d4ff;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .task-points {
+            background: rgba(0, 255, 136, 0.15);
+            color: #00ff88;
+            padding: 0.2rem 0.6rem;
+            border-radius: 10px;
+            font-size: 0.75rem;
+            font-weight: 600;
+        }
+
+        .task-header h2 {
+            font-size: 1.4rem;
+            font-weight: 600;
+        }
+
+        .task-instruction {
+            background: rgba(0, 0, 0, 0.3);
+            border-left: 3px solid #00d4ff;
+            padding: 1rem 1.25rem;
+            margin-bottom: 1.5rem;
+            border-radius: 0 10px 10px 0;
+        }
+
+        .instruction-text {
+            font-size: 1rem;
+            line-height: 1.6;
+            color: #ddd;
+        }
+
+        .target-text {
+            background: rgba(0, 212, 255, 0.1);
+            padding: 0.75rem 1rem;
+            border-radius: 6px;
+            font-family: 'IBM Plex Mono', monospace;
+            color: #00ff88;
+            margin-top: 0.75rem;
+            white-space: pre-wrap;
+        }
+
+        .hint-box {
+            margin-top: 0.75rem;
+            font-size: 0.85rem;
+        }
+
+        .hint-box summary {
+            cursor: pointer;
+            color: #ffaa00;
+        }
+
+        .hint-box p {
+            margin-top: 0.5rem;
+            color: #aaa;
+            font-size: 0.85rem;
+        }
+
+        /* Formatting Toolbar */
+        .formatting-toolbar {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 1rem;
+            padding: 0.75rem;
+            background: rgba(0, 0, 0, 0.4);
+            border-radius: 10px;
+        }
+
+        .format-group, .align-group {
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        .fmt-btn {
+            width: 40px;
+            height: 40px;
+            background: rgba(50, 50, 70, 0.8);
+            border: 1px solid rgba(100, 100, 100, 0.4);
+            border-radius: 8px;
+            color: #ccc;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .fmt-btn:hover {
+            background: rgba(0, 212, 255, 0.2);
+            border-color: #00d4ff;
+        }
+
+        .fmt-btn.active {
+            background: rgba(0, 212, 255, 0.3);
+            border-color: #00d4ff;
+            color: #00d4ff;
+        }
+
+        /* Preview Area */
+        .preview-area {
+            background: #fff;
+            color: #333;
+            padding: 1.5rem;
+            border-radius: 10px;
+            margin-bottom: 1.5rem;
+            min-height: 80px;
+        }
+
+        .formatted-text {
+            font-size: 1.1rem;
+            line-height: 1.6;
+        }
+
+        .target-hint {
+            margin-top: 1rem;
+            font-size: 0.8rem;
+            color: #666;
+            border-top: 1px solid #eee;
+            padding-top: 0.75rem;
+        }
+
+        /* Input Area */
+        .input-area {
+            margin-bottom: 1.5rem;
+        }
+
+        .original-text, .table-preview {
+            margin-bottom: 1rem;
+        }
+
+        .original-text label, .text-editor label, .table-preview label {
+            display: block;
+            font-size: 0.8rem;
+            color: #888;
+            margin-bottom: 0.5rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .original-text pre {
+            background: rgba(0, 0, 0, 0.4);
+            padding: 1rem;
+            border-radius: 8px;
+            font-family: 'IBM Plex Mono', monospace;
+            font-size: 0.9rem;
+            white-space: pre-wrap;
+            color: #aaa;
+        }
+
+        .preview-table {
+            width: 100%;
+            background: rgba(0, 0, 0, 0.4);
+            border-collapse: collapse;
+            border-radius: 8px;
+            overflow: hidden;
+        }
+
+        .preview-table td {
+            padding: 0.6rem 1rem;
+            border: 1px solid rgba(100, 100, 100, 0.3);
+        }
+
+        .preview-table tr:first-child td {
+            background: rgba(0, 212, 255, 0.15);
+            font-weight: 600;
+            color: #00d4ff;
+        }
+
+        .text-editor textarea {
+            width: 100%;
+            padding: 1rem;
+            background: rgba(255, 255, 255, 0.95);
+            border: 2px solid rgba(0, 212, 255, 0.3);
+            border-radius: 10px;
+            color: #333;
+            font-size: 1rem;
+            font-family: 'IBM Plex Mono', monospace;
+            resize: vertical;
+            transition: all 0.3s;
+        }
+
+        .text-editor textarea:focus {
+            outline: none;
+            border-color: #00d4ff;
+            box-shadow: 0 0 20px rgba(0, 212, 255, 0.2);
+        }
+
+        /* Feedback Box */
+        .feedback-box {
+            padding: 1rem 1.25rem;
+            border-radius: 10px;
+            margin-bottom: 1.5rem;
+            display: none;
+        }
+
+        .feedback-box.show {
+            display: block;
+        }
+
+        .feedback-box.correct {
+            background: rgba(0, 255, 136, 0.15);
+            border: 1px solid rgba(0, 255, 136, 0.4);
+        }
+
+        .feedback-box.incorrect {
+            background: rgba(255, 170, 0, 0.15);
+            border: 1px solid rgba(255, 170, 0, 0.4);
+        }
+
+        .feedback-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 0.5rem;
+            font-weight: 600;
+        }
+
+        .score-badge {
+            background: rgba(0, 0, 0, 0.3);
+            padding: 0.2rem 0.6rem;
+            border-radius: 10px;
+            font-size: 0.8rem;
+        }
+
+        .correct-answer {
+            margin-top: 0.75rem;
+            padding-top: 0.75rem;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .correct-answer strong {
+            display: block;
+            font-size: 0.8rem;
+            color: #888;
+            margin-bottom: 0.5rem;
+        }
+
+        .correct-answer pre {
+            background: rgba(0, 0, 0, 0.3);
+            padding: 0.75rem;
+            border-radius: 6px;
+            font-family: 'IBM Plex Mono', monospace;
+            font-size: 0.85rem;
+            white-space: pre-wrap;
+            color: #ddd;
+        }
+
+        /* Task Actions */
+        .task-actions {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding-top: 1.5rem;
+            border-top: 1px solid rgba(0, 212, 255, 0.1);
+        }
+
+        .check-btn {
+            padding: 0.8rem 1.5rem;
+            background: linear-gradient(135deg, #00d4ff, #00aaff);
+            color: #1a1a2e;
+            font-weight: 600;
+            font-family: inherit;
+            font-size: 1rem;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .check-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 20px rgba(0, 212, 255, 0.4);
+        }
+
+        .nav-buttons {
+            display: flex;
+            gap: 0.75rem;
+        }
+
+        .prev-btn, .next-btn {
+            padding: 0.8rem 1.25rem;
+            background: rgba(50, 50, 70, 0.8);
+            border: 1px solid rgba(100, 100, 100, 0.4);
+            border-radius: 8px;
+            color: #ccc;
+            font-family: inherit;
+            font-size: 0.9rem;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .prev-btn:hover:not(:disabled), .next-btn:hover:not(:disabled) {
+            background: rgba(0, 212, 255, 0.2);
+            border-color: #00d4ff;
+            color: #fff;
+        }
+
+        .prev-btn:disabled, .next-btn:disabled {
+            opacity: 0.4;
+            cursor: not-allowed;
+        }
+
+        .next-btn {
+            background: rgba(0, 255, 136, 0.2);
+            border-color: rgba(0, 255, 136, 0.4);
+            color: #00ff88;
+        }
+
+        /* Results Screen */
+        .results-screen {
+            display: none;
+            min-height: 100vh;
+            align-items: center;
+            justify-content: center;
+            padding: 2rem;
+        }
+
+        .results-card {
+            background: rgba(26, 26, 46, 0.95);
+            border: 1px solid rgba(0, 212, 255, 0.2);
+            border-radius: 20px;
+            padding: 2.5rem;
+            max-width: 600px;
+            width: 100%;
+            text-align: center;
+        }
+
+        .result-status {
+            display: inline-block;
+            padding: 0.5rem 1.5rem;
+            border-radius: 25px;
+            font-weight: 700;
+            font-size: 1rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .result-status.passed {
+            background: rgba(0, 255, 136, 0.2);
+            color: #00ff88;
+            border: 1px solid rgba(0, 255, 136, 0.4);
+        }
+
+        .result-status.failed {
+            background: rgba(255, 170, 0, 0.2);
+            color: #ffaa00;
+            border: 1px solid rgba(255, 170, 0, 0.4);
+        }
+
+        .results-card h1 {
+            font-size: 1.5rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .student-name-result {
+            color: #888;
+            margin-bottom: 0.25rem;
+        }
+
+        .time-taken {
+            color: #666;
+            font-size: 0.85rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .score-display {
+            margin-bottom: 2rem;
+        }
+
+        .big-score {
+            font-size: 4rem;
+            font-weight: 700;
+            font-family: 'IBM Plex Mono', monospace;
+            background: linear-gradient(135deg, #00d4ff, #00ff88);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .score-detail {
+            color: #888;
+            font-size: 1rem;
+        }
+
+        .day-breakdown {
+            text-align: left;
+            margin-bottom: 1.5rem;
+        }
+
+        .day-breakdown h3 {
+            font-size: 0.9rem;
+            color: #888;
+            margin-bottom: 0.75rem;
+        }
+
+        .day-row {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            margin-bottom: 0.6rem;
+        }
+
+        .day-label {
+            width: 50px;
+            font-size: 0.85rem;
+            color: #aaa;
+        }
+
+        .day-bar {
+            flex: 1;
+            height: 8px;
+            background: rgba(100, 100, 100, 0.2);
+            border-radius: 4px;
+            overflow: hidden;
+        }
+
+        .day-fill {
+            height: 100%;
+            border-radius: 4px;
+            transition: width 0.5s ease-out;
+        }
+
+        .day-score {
+            width: 50px;
+            text-align: right;
+            font-family: 'IBM Plex Mono', monospace;
+            font-size: 0.8rem;
+            color: #888;
+        }
+
+        .result-actions {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .review-btn, .restart-btn {
+            flex: 1;
+            padding: 0.9rem;
+            font-size: 0.95rem;
+            font-weight: 600;
+            font-family: inherit;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .review-btn {
+            background: rgba(0, 212, 255, 0.2);
+            color: #00d4ff;
+            border: 1px solid rgba(0, 212, 255, 0.4);
+        }
+
+        .restart-btn {
+            background: linear-gradient(135deg, #00d4ff, #00ff88);
+            color: #1a1a2e;
+        }
+
+        .certificate-message {
+            padding: 1rem;
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 10px;
+            font-size: 0.9rem;
+            color: #aaa;
+        }
+
+        .hidden {
+            display: none !important;
+        }
+
+        @media (max-width: 768px) {
+            .task-nav {
+                display: none;
+            }
+            .exam-details {
+                grid-template-columns: 1fr;
+            }
+            .exam-header {
+                flex-wrap: wrap;
+                gap: 0.5rem;
+            }
+        }
+    </style>
+<meta name="description" content="Professional training courses at MTTI Eldoret. TVETA-accredited programs in IT, healthcare, and creative fields. Enroll today.">
+<script type="text/javascript">(function(c,l,a,r,i,t,y){c[a]=c[a]||function(){(c[a].q=c[a].q||[]).push(arguments)};t=l.createElement(r);t.async=1;t.src="https://www.clarity.ms/tag/"+i;y=l.getElementsByTagName(r)[0];y.parentNode.insertBefore(t,y);})(window,document,"clarity","script","wg31zlwbt9");</script>\n</head>
+<body>
+    <!-- Start Screen -->
+    <div id="startScreen" class="start-screen">
+        <div class="logo-area">
+            <div class="logo-icon">⌨️</div>
+            <h1>Masomotele Technical Training Institute</h1>
+            <p class="tagline">Start Learning, Start Earning</p>
+        </div>
+
+        <div class="exam-card">
+            <div class="card-header">
+                <h2>🖥️ Microsoft Word Practical Exam</h2>
+                <span class="badge">ICDL Documents Module</span>
+            </div>
+
+            <div class="exam-details">
+                <div class="detail-item">
+                    <span class="icon">📝</span>
+                    <div>
+                        <strong>24 Tasks</strong>
+                        <small>Hands-on exercises</small>
+                    </div>
+                </div>
+                <div class="detail-item">
+                    <span class="icon">⭐</span>
+                    <div>
+                        <strong>215 Points</strong>
+                        <small>50% to pass</small>
+                    </div>
+                </div>
+                <div class="detail-item">
+                    <span class="icon">⏱️</span>
+                    <div>
+                        <strong>2 Hours</strong>
+                        <small>Time limit</small>
+                    </div>
+                </div>
+            </div>
+
+            <div class="skills-preview">
+                <h3>Skills You'll Demonstrate:</h3>
+                <div class="skills-grid">
+                    <span class="skill-tag">✍️ Typing Accuracy</span>
+                    <span class="skill-tag">🅱️ Bold/Italic/Underline</span>
+                    <span class="skill-tag">📐 Text Alignment</span>
+                    <span class="skill-tag">📋 Lists & Tables</span>
+                    <span class="skill-tag">📧 Mail Merge</span>
+                    <span class="skill-tag">✏️ Editing & Proofing</span>
+                </div>
+            </div>
+
+            <div class="instructions">
+                <h3>📜 How This Exam Works:</h3>
+                <ul>
+                    <li><strong>2-hour time limit</strong> - Exam auto-submits when time runs out</li>
+                    <li><strong>Type real text</strong> - Practice actual document content</li>
+                    <li><strong>Apply formatting</strong> - Use Bold, Italic, Underline buttons</li>
+                    <li><strong>Check your work</strong> - Get instant feedback on each task</li>
+                    <li><strong>Progress freely</strong> - Move forward even if answer is wrong</li>
+                    <li><strong>50% to pass</strong> - Score at least 108 points to pass</li>
+                </ul>
+            </div>
+
+            <div class="name-field">
+                <label>Enter Your Full Name to Begin:</label>
+                <input type="text" id="studentNameInput" placeholder="e.g., John Kamau" autofocus>
+            </div>
+
+            <button class="start-btn" id="startBtn" disabled>🚀 Start Practical Exam</button>
+        </div>
+
+        <p class="location">📍 Sagaas Center, Fourth Floor, Eldoret, Kenya</p>
+    </div>
+
+    <!-- Exam Screen -->
+    <div id="examScreen" class="exam-screen">
+        <header class="exam-header">
+            <div class="header-left">
+                <span class="logo">⌨️ M.T.T.I</span>
+                <span class="divider">|</span>
+                <span class="exam-name">Word Practical Exam</span>
+            </div>
+            <div class="header-center">
+                <span class="timer" id="timer">⏱️ 02:00:00</span>
+            </div>
+            <div class="header-right">
+                <span class="progress" id="progressText">1 / 24</span>
+                <button class="finish-btn" id="finishBtn">Finish Exam</button>
+            </div>
+        </header>
+
+        <div class="exam-main">
+            <aside class="task-nav">
+                <div class="nav-header">
+                    <div class="student-badge">
+                        <span class="avatar" id="avatarInitial">J</span>
+                        <span id="studentNameDisplay">Student</span>
+                    </div>
+                </div>
+
+                <div class="nav-sections" id="navSections">
+                    <!-- Generated by JS -->
+                </div>
+
+                <div class="nav-legend">
+                    <span><i class="dot active"></i> Current</span>
+                    <span><i class="dot correct"></i> Correct</span>
+                    <span><i class="dot attempted"></i> Attempted</span>
+                </div>
+            </aside>
+
+            <main class="task-area">
+                <div class="task-header">
+                    <div class="task-info">
+                        <span class="task-category" id="taskCategory">Using the Application</span>
+                        <span class="task-points" id="taskPoints">5 pts</span>
+                    </div>
+                    <h2 id="taskTitle">Task 1: Create and Save a Document</h2>
+                </div>
+
+                <div class="task-instruction">
+                    <div class="instruction-text" id="instructionText"></div>
+                    <div class="target-text" id="targetTextDisplay"></div>
+                    <details class="hint-box" id="hintBox">
+                        <summary>💡 Show Hint</summary>
+                        <p id="hintText"></p>
+                    </details>
+                </div>
+
+                <!-- Formatting Toolbar (shown for formatting tasks) -->
+                <div class="formatting-toolbar hidden" id="formattingToolbar">
+                    <div class="format-group" id="formatGroup">
+                        <button class="fmt-btn" id="boldBtn" title="Bold (Ctrl+B)"><strong>B</strong></button>
+                        <button class="fmt-btn" id="italicBtn" title="Italic (Ctrl+I)"><em>I</em></button>
+                        <button class="fmt-btn" id="underlineBtn" title="Underline (Ctrl+U)"><u>U</u></button>
+                    </div>
+                    <div class="align-group hidden" id="alignGroup">
+                        <button class="fmt-btn" id="leftBtn" title="Align Left">≡←</button>
+                        <button class="fmt-btn" id="centerBtn" title="Center">≡</button>
+                        <button class="fmt-btn" id="rightBtn" title="Align Right">→≡</button>
+                    </div>
+                </div>
+
+                <!-- Preview Area (for formatting tasks) -->
+                <div class="preview-area hidden" id="previewArea">
+                    <div class="formatted-text" id="formattedText"></div>
+                    <p class="target-hint" id="targetWordHint"></p>
+                </div>
+
+                <!-- Input Area -->
+                <div class="input-area" id="inputArea">
+                    <div class="original-text hidden" id="originalTextBox">
+                        <label>Original Text:</label>
+                        <pre id="originalText"></pre>
+                    </div>
+                    <div class="table-preview hidden" id="tablePreviewBox">
+                        <label>Create this table:</label>
+                        <table class="preview-table" id="previewTable"></table>
+                    </div>
+                    <div class="text-editor">
+                        <label>Your Answer:</label>
+                        <textarea id="userInput" rows="3" placeholder="Type your answer here..."></textarea>
+                    </div>
+                </div>
+
+                <!-- Feedback Box -->
+                <div class="feedback-box" id="feedbackBox">
+                    <div class="feedback-header">
+                        <span id="feedbackTitle">✅ Correct!</span>
+                        <span class="score-badge" id="feedbackScore">5/5 pts</span>
+                    </div>
+                    <div class="correct-answer" id="correctAnswerBox">
+                        <strong>Expected Answer:</strong>
+                        <pre id="correctAnswerText"></pre>
+                    </div>
+                </div>
+
+                <!-- Task Actions -->
+                <div class="task-actions">
+                    <button class="check-btn" id="checkBtn">✓ Check Answer</button>
+                    <div class="nav-buttons">
+                        <button class="prev-btn" id="prevBtn">← Previous</button>
+                        <button class="next-btn" id="nextBtn">Next →</button>
+                    </div>
+                </div>
+            </main>
+        </div>
+    </div>
+
+    <!-- Results Screen -->
+    <div id="resultsScreen" class="results-screen">
+        <div class="results-card">
+            <div class="result-status" id="resultStatus">🎉 PASSED!</div>
+            <h1>Practical Exam Results</h1>
+            <p class="student-name-result" id="resultStudentName">Student Name</p>
+            <p class="time-taken" id="timeTaken">Time Used: 01:23:45 / 2:00:00</p>
+
+            <div class="score-display">
+                <div class="big-score" id="bigScore">75%</div>
+                <div class="score-detail" id="scoreDetail">162 / 215 points</div>
+            </div>
+
+            <div class="day-breakdown">
+                <h3>Performance by Day</h3>
+                <div id="dayBreakdown"></div>
+            </div>
+
+            <div class="result-actions">
+                <button class="review-btn" id="reviewBtn">📝 Review Tasks</button>
+                <button class="restart-btn" id="restartBtn">🔄 Retake Exam</button>
+            </div>
+
+            <div class="certificate-message" id="certificateMessage">
+                ✅ Congratulations! You have demonstrated proficiency in Microsoft Word.
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Task Data
+        const tasks = [
+            // Day 1
+            { id: 1, day: 1, title: "Create and Save a Document", category: "Using the Application", instruction: "Type this business letter greeting exactly as shown:", targetText: "Dear Mr. Johnson,", type: "typing", hint: "Pay attention to capitalization, spacing, and the comma at the end", points: 5 },
+            { id: 2, day: 1, title: "Working with Templates", category: "Using the Application", instruction: "Type this professional email subject line exactly as shown:", targetText: "Meeting Request: Q4 Budget Review", type: "typing", hint: "Use proper capitalization for a subject line", points: 5 },
+            { id: 3, day: 1, title: "Keyboard Shortcuts", category: "Using the Application", instruction: "What keyboard shortcut moves the cursor to the END of a document? Type your answer:", targetText: "Ctrl+End", type: "typing", acceptableAnswers: ["Ctrl+End", "ctrl+end", "CTRL+END", "Ctrl + End"], hint: "It's a combination of Ctrl and another key", points: 5 },
+            
+            // Day 2
+            { id: 4, day: 2, title: "Entering Text with Symbols", category: "Document Creation", instruction: "Type this paragraph exactly as shown (including the © symbol):", targetText: "Welcome to Masomotele Technical Training Institute © 2024", type: "typing", hint: "You can copy the © symbol or type (c) and it may auto-convert", points: 10 },
+            { id: 5, day: 2, title: "Special Characters", category: "Document Creation", instruction: "Type the chemical formula for water:", targetText: "H2O", type: "typing", acceptableAnswers: ["H2O", "h2o", "H₂O"], hint: "The formula has Hydrogen and Oxygen", points: 5 },
+            { id: 6, day: 2, title: "Find and Replace", category: "Document Creation", instruction: "The text below has errors. Replace all 'teh' with 'the' (watch capitalization):", initialText: "Teh quick brown fox jumps over teh lazy dog. Teh end.", targetText: "The quick brown fox jumps over the lazy dog. The end.", type: "editing", hint: "Change: Teh→The, teh→the", points: 10 },
+            
+            // Day 3 - Formatting
+            { id: 7, day: 3, title: "Apply Bold Formatting", category: "Text Formatting", instruction: "Click the Bold button to make the text bold:", initialText: "This is an IMPORTANT announcement for all staff members.", targetWord: "IMPORTANT", formatRequired: "bold", type: "formatting", hint: "Click the B button in the toolbar above", points: 10 },
+            { id: 8, day: 3, title: "Apply Italic Formatting", category: "Text Formatting", instruction: "Click the Italic button to italicize the text:", initialText: "Please read Chapter 5 of Introduction to Computing before class.", targetWord: "Introduction to Computing", formatRequired: "italic", type: "formatting", hint: "Click the I button - book titles should be italicized", points: 10 },
+            { id: 9, day: 3, title: "Apply Underline Formatting", category: "Text Formatting", instruction: "Click the Underline button to underline the text:", initialText: "All applications must be submitted by December 15, 2024 without exception.", targetWord: "December 15, 2024", formatRequired: "underline", type: "formatting", hint: "Click the U button to underline the deadline date", points: 10 },
+            { id: 10, day: 3, title: "Combined Formatting", category: "Text Formatting", instruction: "Apply ALL THREE formats (Bold + Italic + Underline) to the text:", initialText: "WARNING: Do not operate machinery without proper training.", targetWord: "WARNING", formatRequired: "all", type: "formatting", hint: "Click B, I, and U buttons - all three must be active", points: 15 },
+            { id: 11, day: 3, title: "Center Alignment", category: "Paragraph Formatting", instruction: "Click the Center alignment button:", initialText: "Annual Report 2024", formatRequired: "center", type: "alignment", hint: "Click the center alignment button (≡)", points: 10 },
+            { id: 12, day: 3, title: "Right Alignment", category: "Paragraph Formatting", instruction: "Click the Right alignment button (for a letter date):", initialText: "January 15, 2025", formatRequired: "right", type: "alignment", hint: "Dates in formal letters are often right-aligned", points: 10 },
+            { id: 13, day: 3, title: "Create Bulleted List", category: "Paragraph Formatting", instruction: "Convert these items into a bulleted list. Add • before each item:", initialText: "Keyboard\nMouse\nMonitor\nPrinter", targetText: "• Keyboard\n• Mouse\n• Monitor\n• Printer", type: "list", hint: "Each item should start with a bullet point (•)", points: 10 },
+            { id: 14, day: 3, title: "Create Numbered List", category: "Paragraph Formatting", instruction: "Convert these steps into a numbered list:", initialText: "Open Microsoft Word\nClick File menu\nSelect New\nChoose a template", targetText: "1. Open Microsoft Word\n2. Click File menu\n3. Select New\n4. Choose a template", type: "list", hint: "Number each step starting from 1", points: 10 },
+            { id: 15, day: 3, title: "Change Text Case", category: "Text Formatting", instruction: "Convert this text to UPPERCASE:", initialText: "confidential document", targetText: "CONFIDENTIAL DOCUMENT", type: "case", hint: "Type the same words in ALL CAPITAL LETTERS", points: 5 },
+            
+            // Day 4 - Tables
+            { id: 16, day: 4, title: "Create a Simple Table", category: "Tables", instruction: "Create a table with the data shown. Use | to separate columns:", tableData: [["Name", "Score"], ["John", "85"], ["Mary", "92"]], targetText: "Name | Score\nJohn | 85\nMary | 92", type: "table", hint: "Format: Name | Score (use pipe | between columns)", points: 15 },
+            { id: 17, day: 4, title: "Table Data Entry", category: "Tables", instruction: "Create this price list table (Product | Price):", tableData: [["Product", "Price"], ["Laptop", "KES 45,000"], ["Mouse", "KES 500"], ["Keyboard", "KES 1,200"]], targetText: "Product | Price\nLaptop | KES 45,000\nMouse | KES 500\nKeyboard | KES 1,200", type: "table", hint: "Include currency (KES) with proper formatting", points: 15 },
+            { id: 18, day: 4, title: "Text Wrapping Knowledge", category: "Graphical Objects", instruction: "Type the text wrapping option that places an image BEHIND the text:", targetText: "Behind Text", type: "typing", acceptableAnswers: ["Behind Text", "behind text", "Behind text", "BEHIND TEXT"], hint: "This option makes text appear on top of the image", points: 5 },
+            
+            // Day 5 - Mail Merge
+            { id: 19, day: 5, title: "Mail Merge Fields", category: "Mail Merge", instruction: "Type a mail merge greeting using FirstName field. Use << >> for fields:", targetText: "Dear <<FirstName>>,", type: "typing", acceptableAnswers: ["Dear <<FirstName>>,", "Dear <<firstname>>,", "Dear <<FIRSTNAME>>,"], hint: "Format: Dear <<FieldName>>,", points: 10 },
+            { id: 20, day: 5, title: "Mail Merge Full Name", category: "Mail Merge", instruction: "Create a greeting with both FirstName and LastName fields:", targetText: "Dear <<FirstName>> <<LastName>>,", type: "typing", hint: "Include both field names with << >> brackets", points: 10 },
+            { id: 21, day: 5, title: "Header Content", category: "Page Setup", instruction: "Type this document header exactly as shown:", targetText: "Masomotele Technical Training Institute", type: "typing", hint: "Type the institute name exactly as shown", points: 5 },
+            { id: 22, day: 5, title: "Footer with Page Number", category: "Page Setup", instruction: "Type a footer showing page numbering:", targetText: "Page 1 of 5", type: "typing", acceptableAnswers: ["Page 1 of 5", "Page X of Y", "page 1 of 5"], hint: "Common format for multi-page documents", points: 5 },
+            { id: 23, day: 5, title: "Business Memo", category: "Comprehensive", instruction: "Type this complete business memo exactly as shown:", targetText: "TO: All Staff\nFROM: Manager\nDATE: January 2025\nSUBJECT: Meeting Notice", type: "memo", hint: "Type each line exactly, pressing Enter after each", points: 20 },
+            { id: 24, day: 5, title: "Spell Check Correction", category: "Proofing", instruction: "Correct all spelling errors in this sentence:", initialText: "Teh studnets will recieve there certificates tommorow.", targetText: "The students will receive their certificates tomorrow.", type: "editing", hint: "Fix: teh→the, studnets→students, recieve→receive, there→their, tommorow→tomorrow", points: 15 }
+        ];
+
+        // State
+        let state = {
+            studentName: '',
+            currentTask: 0,
+            timeRemaining: 2 * 60 * 60,
+            timerInterval: null,
+            userInputs: {},
+            taskResults: {},
+            formatting: {},
+            alignment: {}
+        };
+
+        // DOM Elements
+        const elements = {
+            startScreen: document.getElementById('startScreen'),
+            examScreen: document.getElementById('examScreen'),
+            resultsScreen: document.getElementById('resultsScreen'),
+            studentNameInput: document.getElementById('studentNameInput'),
+            startBtn: document.getElementById('startBtn'),
+            timer: document.getElementById('timer'),
+            progressText: document.getElementById('progressText'),
+            finishBtn: document.getElementById('finishBtn'),
+            avatarInitial: document.getElementById('avatarInitial'),
+            studentNameDisplay: document.getElementById('studentNameDisplay'),
+            navSections: document.getElementById('navSections'),
+            taskCategory: document.getElementById('taskCategory'),
+            taskPoints: document.getElementById('taskPoints'),
+            taskTitle: document.getElementById('taskTitle'),
+            instructionText: document.getElementById('instructionText'),
+            targetTextDisplay: document.getElementById('targetTextDisplay'),
+            hintBox: document.getElementById('hintBox'),
+            hintText: document.getElementById('hintText'),
+            formattingToolbar: document.getElementById('formattingToolbar'),
+            formatGroup: document.getElementById('formatGroup'),
+            alignGroup: document.getElementById('alignGroup'),
+            boldBtn: document.getElementById('boldBtn'),
+            italicBtn: document.getElementById('italicBtn'),
+            underlineBtn: document.getElementById('underlineBtn'),
+            leftBtn: document.getElementById('leftBtn'),
+            centerBtn: document.getElementById('centerBtn'),
+            rightBtn: document.getElementById('rightBtn'),
+            previewArea: document.getElementById('previewArea'),
+            formattedText: document.getElementById('formattedText'),
+            targetWordHint: document.getElementById('targetWordHint'),
+            inputArea: document.getElementById('inputArea'),
+            originalTextBox: document.getElementById('originalTextBox'),
+            originalText: document.getElementById('originalText'),
+            tablePreviewBox: document.getElementById('tablePreviewBox'),
+            previewTable: document.getElementById('previewTable'),
+            userInput: document.getElementById('userInput'),
+            feedbackBox: document.getElementById('feedbackBox'),
+            feedbackTitle: document.getElementById('feedbackTitle'),
+            feedbackScore: document.getElementById('feedbackScore'),
+            correctAnswerBox: document.getElementById('correctAnswerBox'),
+            correctAnswerText: document.getElementById('correctAnswerText'),
+            checkBtn: document.getElementById('checkBtn'),
+            prevBtn: document.getElementById('prevBtn'),
+            nextBtn: document.getElementById('nextBtn')
+        };
+
+        // Format time
+        function formatTime(seconds) {
+            const hrs = Math.floor(seconds / 3600);
+            const mins = Math.floor((seconds % 3600) / 60);
+            const secs = seconds % 60;
+            return `${hrs.toString().padStart(2, '0')}:${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
+        }
+
+        // Start timer
+        function startTimer() {
+            state.timerInterval = setInterval(() => {
+                state.timeRemaining--;
+                elements.timer.textContent = '⏱️ ' + formatTime(state.timeRemaining);
+                
+                if (state.timeRemaining <= 600) {
+                    elements.timer.classList.add('warning');
+                }
+                
+                if (state.timeRemaining <= 0) {
+                    clearInterval(state.timerInterval);
+                    showResults();
+                }
+            }, 1000);
+        }
+
+        // Build navigation
+        function buildNavigation() {
+            const days = {};
+            tasks.forEach((task, index) => {
+                if (!days[task.day]) days[task.day] = [];
+                days[task.day].push({ ...task, index });
+            });
+
+            let html = '';
+            Object.entries(days).forEach(([day, dayTasks]) => {
+                html += `<div class="nav-day"><h4>Day ${day}</h4><div class="nav-tasks">`;
+                dayTasks.forEach(task => {
+                    html += `<button class="nav-task-btn" data-index="${task.index}">${task.index + 1}</button>`;
+                });
+                html += '</div></div>';
+            });
+            elements.navSections.innerHTML = html;
+
+            // Add click handlers
+            document.querySelectorAll('.nav-task-btn').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    goToTask(parseInt(btn.dataset.index));
+                });
+            });
+        }
+
+        // Update navigation
+        function updateNavigation() {
+            document.querySelectorAll('.nav-task-btn').forEach(btn => {
+                const index = parseInt(btn.dataset.index);
+                btn.classList.remove('active', 'correct', 'attempted');
+                
+                if (index === state.currentTask) {
+                    btn.classList.add('active');
+                } else if (state.taskResults[tasks[index].id]?.isCorrect) {
+                    btn.classList.add('correct');
+                } else if (state.taskResults[tasks[index].id]?.checked) {
+                    btn.classList.add('attempted');
+                }
+            });
+        }
+
+        // Load task
+        function loadTask() {
+            const task = tasks[state.currentTask];
+            
+            // Update header
+            elements.taskCategory.textContent = task.category;
+            elements.taskPoints.textContent = task.points + ' pts';
+            elements.taskTitle.textContent = `Task ${state.currentTask + 1}: ${task.title}`;
+            elements.progressText.textContent = `${state.currentTask + 1} / ${tasks.length}`;
+            
+            // Instruction
+            elements.instructionText.textContent = task.instruction;
+            
+            // Target text display
+            if (task.targetText && task.type !== 'formatting' && task.type !== 'alignment') {
+                elements.targetTextDisplay.textContent = task.targetText;
+                elements.targetTextDisplay.classList.remove('hidden');
+            } else {
+                elements.targetTextDisplay.classList.add('hidden');
+            }
+            
+            // Hint
+            if (task.hint) {
+                elements.hintText.textContent = task.hint;
+                elements.hintBox.classList.remove('hidden');
+                elements.hintBox.open = false;
+            } else {
+                elements.hintBox.classList.add('hidden');
+            }
+            
+            // Reset areas
+            elements.formattingToolbar.classList.add('hidden');
+            elements.formatGroup.classList.add('hidden');
+            elements.alignGroup.classList.add('hidden');
+            elements.previewArea.classList.add('hidden');
+            elements.inputArea.classList.remove('hidden');
+            elements.originalTextBox.classList.add('hidden');
+            elements.tablePreviewBox.classList.add('hidden');
+            elements.feedbackBox.classList.remove('show');
+            
+            // Type-specific setup
+            if (task.type === 'formatting') {
+                elements.formattingToolbar.classList.remove('hidden');
+                elements.formatGroup.classList.remove('hidden');
+                elements.previewArea.classList.remove('hidden');
+                elements.inputArea.classList.add('hidden');
+                elements.formattedText.textContent = task.initialText;
+                elements.targetWordHint.innerHTML = `Target text to format: <strong>"${task.targetWord}"</strong>`;
+                elements.targetTextDisplay.classList.add('hidden');
+                
+                // Reset formatting buttons
+                const fmt = state.formatting[task.id] || {};
+                elements.boldBtn.classList.toggle('active', fmt.bold);
+                elements.italicBtn.classList.toggle('active', fmt.italic);
+                elements.underlineBtn.classList.toggle('active', fmt.underline);
+                updateFormattedTextStyle();
+                
+            } else if (task.type === 'alignment') {
+                elements.formattingToolbar.classList.remove('hidden');
+                elements.alignGroup.classList.remove('hidden');
+                elements.previewArea.classList.remove('hidden');
+                elements.inputArea.classList.add('hidden');
+                elements.formattedText.textContent = task.initialText;
+                elements.targetWordHint.textContent = '';
+                elements.targetTextDisplay.classList.add('hidden');
+                
+                const align = state.alignment[task.id] || 'left';
+                elements.leftBtn.classList.toggle('active', align === 'left');
+                elements.centerBtn.classList.toggle('active', align === 'center');
+                elements.rightBtn.classList.toggle('active', align === 'right');
+                elements.formattedText.style.textAlign = align;
+                
+            } else if (task.type === 'editing' || task.type === 'list') {
+                elements.originalTextBox.classList.remove('hidden');
+                elements.originalText.textContent = task.initialText;
+                elements.userInput.value = state.userInputs[task.id] || task.initialText;
+                elements.userInput.rows = 5;
+                
+            } else if (task.type === 'table') {
+                elements.tablePreviewBox.classList.remove('hidden');
+                let tableHtml = '';
+                task.tableData.forEach(row => {
+                    tableHtml += '<tr>';
+                    row.forEach(cell => {
+                        tableHtml += `<td>${cell}</td>`;
+                    });
+                    tableHtml += '</tr>';
+                });
+                elements.previewTable.innerHTML = tableHtml;
+                elements.userInput.value = state.userInputs[task.id] || '';
+                elements.userInput.rows = 5;
+                elements.userInput.placeholder = 'Enter table data using | to separate columns...';
+                
+            } else if (task.type === 'memo') {
+                elements.userInput.value = state.userInputs[task.id] || '';
+                elements.userInput.rows = 6;
+                elements.userInput.placeholder = 'Type the memo format...';
+                
+            } else {
+                elements.userInput.value = state.userInputs[task.id] || '';
+                elements.userInput.rows = 3;
+                elements.userInput.placeholder = 'Type your answer here...';
+            }
+            
+            // Show feedback if already checked
+            if (state.taskResults[task.id]?.checked) {
+                showFeedback(task.id);
+            }
+            
+            // Update nav buttons
+            elements.prevBtn.disabled = state.currentTask === 0;
+            elements.nextBtn.textContent = state.currentTask === tasks.length - 1 ? 'Finish →' : 'Next →';
+            
+            updateNavigation();
+        }
+
+        // Update formatted text style
+        function updateFormattedTextStyle() {
+            const task = tasks[state.currentTask];
+            const fmt = state.formatting[task.id] || {};
+            
+            elements.formattedText.style.fontWeight = fmt.bold ? 'bold' : 'normal';
+            elements.formattedText.style.fontStyle = fmt.italic ? 'italic' : 'normal';
+            elements.formattedText.style.textDecoration = fmt.underline ? 'underline' : 'none';
+        }
+
+        // Calculate similarity
+        function calculateSimilarity(str1, str2) {
+            const s1 = str1.toLowerCase().trim();
+            const s2 = str2.toLowerCase().trim();
+            if (s1 === s2) return 1;
+            
+            const longer = s1.length > s2.length ? s1 : s2;
+            const shorter = s1.length > s2.length ? s2 : s1;
+            
+            if (longer.length === 0) return 1;
+            
+            let matches = 0;
+            for (let i = 0; i < shorter.length; i++) {
+                if (shorter[i] === longer[i]) matches++;
+            }
+            
+            return matches / longer.length;
+        }
+
+        // Check task
+        function checkTask() {
+            const task = tasks[state.currentTask];
+            let isCorrect = false;
+            let score = 0;
+            
+            if (task.type === 'formatting') {
+                const fmt = state.formatting[task.id] || {};
+                if (task.formatRequired === 'bold') {
+                    isCorrect = fmt.bold === true;
+                } else if (task.formatRequired === 'italic') {
+                    isCorrect = fmt.italic === true;
+                } else if (task.formatRequired === 'underline') {
+                    isCorrect = fmt.underline === true;
+                } else if (task.formatRequired === 'all') {
+                    isCorrect = fmt.bold && fmt.italic && fmt.underline;
+                }
+                score = isCorrect ? task.points : 0;
+                
+            } else if (task.type === 'alignment') {
+                const align = state.alignment[task.id] || 'left';
+                isCorrect = align === task.formatRequired;
+                score = isCorrect ? task.points : 0;
+                
+            } else {
+                const userInput = elements.userInput.value.trim();
+                state.userInputs[task.id] = userInput;
+                
+                const acceptableAnswers = task.acceptableAnswers || [task.targetText];
+                isCorrect = acceptableAnswers.some(ans => 
+                    userInput.toLowerCase() === ans.toLowerCase()
+                );
+                
+                if (isCorrect) {
+                    score = task.points;
+                } else {
+                    const similarity = calculateSimilarity(userInput, task.targetText);
+                    if (similarity > 0.8) {
+                        score = Math.round(task.points * 0.7);
+                    } else if (similarity > 0.5) {
+                        score = Math.round(task.points * 0.4);
+                    }
+                }
+            }
+            
+            state.taskResults[task.id] = { isCorrect, score, maxScore: task.points, checked: true };
+            showFeedback(task.id);
+            updateNavigation();
+        }
+
+        // Show feedback
+        function showFeedback(taskId) {
+            const task = tasks.find(t => t.id === taskId);
+            const result = state.taskResults[taskId];
+            
+            elements.feedbackBox.classList.remove('correct', 'incorrect');
+            elements.feedbackBox.classList.add('show', result.isCorrect ? 'correct' : 'incorrect');
+            
+            elements.feedbackTitle.textContent = result.isCorrect ? '✅ Correct!' : '⚠️ Review Needed';
+            elements.feedbackScore.textContent = `${result.score}/${result.maxScore} pts`;
+            
+            if (!result.isCorrect && task.targetText) {
+                elements.correctAnswerBox.classList.remove('hidden');
+                elements.correctAnswerText.textContent = task.targetText;
+            } else {
+                elements.correctAnswerBox.classList.add('hidden');
+            }
+        }
+
+        // Go to task
+        function goToTask(index) {
+            // Save current input
+            const currentTask = tasks[state.currentTask];
+            if (currentTask.type !== 'formatting' && currentTask.type !== 'alignment') {
+                state.userInputs[currentTask.id] = elements.userInput.value;
+            }
+            
+            state.currentTask = index;
+            loadTask();
+        }
+
+        // Calculate total score
+        function calculateTotalScore() {
+            let earned = 0;
+            let possible = 0;
+            
+            tasks.forEach(task => {
+                possible += task.points;
+                if (state.taskResults[task.id]) {
+                    earned += state.taskResults[task.id].score || 0;
+                }
+            });
+            
+            return { earned, possible, percentage: possible > 0 ? Math.round((earned / possible) * 100) : 0 };
+        }
+
+        // Show results
+        function showResults() {
+            clearInterval(state.timerInterval);
+            
+            const score = calculateTotalScore();
+            const passed = score.percentage >= 50;
+            const timeUsed = 2 * 60 * 60 - state.timeRemaining;
+            
+            document.getElementById('resultStatus').textContent = passed ? '🎉 PASSED!' : '📚 Keep Practicing';
+            document.getElementById('resultStatus').className = 'result-status ' + (passed ? 'passed' : 'failed');
+            document.getElementById('resultStudentName').textContent = state.studentName;
+            document.getElementById('timeTaken').textContent = `Time Used: ${formatTime(timeUsed)} / 2:00:00`;
+            document.getElementById('bigScore').textContent = score.percentage + '%';
+            document.getElementById('scoreDetail').textContent = `${score.earned} / ${score.possible} points`;
+            
+            // Day breakdown
+            const days = {};
+            tasks.forEach(task => {
+                if (!days[task.day]) days[task.day] = { earned: 0, possible: 0 };
+                days[task.day].possible += task.points;
+                if (state.taskResults[task.id]) {
+                    days[task.day].earned += state.taskResults[task.id].score || 0;
+                }
+            });
+            
+            let breakdownHtml = '';
+            Object.entries(days).forEach(([day, data]) => {
+                const percent = Math.round((data.earned / data.possible) * 100);
+                const color = percent >= 50 ? '#10b981' : percent >= 30 ? '#f59e0b' : '#ef4444';
+                breakdownHtml += `
+                    <div class="day-row">
+                        <span class="day-label">Day ${day}</span>
+                        <div class="day-bar">
+                            <div class="day-fill" style="width: ${percent}%; background: ${color};"></div>
+                        </div>
+                        <span class="day-score">${data.earned}/${data.possible}</span>
+                    </div>
+                `;
+            });
+            document.getElementById('dayBreakdown').innerHTML = breakdownHtml;
+            
+            document.getElementById('certificateMessage').textContent = passed 
+                ? '✅ Congratulations! You have demonstrated proficiency in Microsoft Word.'
+                : '💪 Review the tasks you missed and try again. Practice makes perfect!';
+            
+            elements.examScreen.style.display = 'none';
+            elements.resultsScreen.style.display = 'flex';
+            
+            // Save results to MTTI system
+            if (typeof submitExamToMTTI === 'function') {
+                const questionResults = tasks.map(task => ({
+                    question: task.title || task.instruction,
+                    correct: state.taskResults[task.id] ? state.taskResults[task.id].correct : false
+                }));
+                
+                submitExamToMTTI(
+                    document.title.split('|')[0].trim(),
+                    score.earned,
+                    score.possible,
+                    questionResults,
+                    Math.floor(timeUsed / 60)
+                ).then(result => {
+                    if (result.success) console.log('✅ Results saved to MTTI:', result.data);
+                    else console.error('❌ Failed to save results:', result.message);
+                });
+            }
+        }
+
+        // Event Listeners
+        elements.studentNameInput.addEventListener('input', (e) => {
+            state.studentName = e.target.value.trim();
+            elements.startBtn.disabled = !state.studentName;
+        });
+
+        elements.startBtn.addEventListener('click', () => {
+            elements.avatarInitial.textContent = state.studentName.charAt(0).toUpperCase();
+            elements.studentNameDisplay.textContent = state.studentName;
+            
+            buildNavigation();
+            loadTask();
+            startTimer();
+            
+            elements.startScreen.style.display = 'none';
+            elements.examScreen.style.display = 'block';
+        });
+
+        elements.checkBtn.addEventListener('click', checkTask);
+
+        elements.prevBtn.addEventListener('click', () => {
+            if (state.currentTask > 0) {
+                goToTask(state.currentTask - 1);
+            }
+        });
+
+        elements.nextBtn.addEventListener('click', () => {
+            if (state.currentTask < tasks.length - 1) {
+                goToTask(state.currentTask + 1);
+            } else {
+                showResults();
+            }
+        });
+
+        elements.finishBtn.addEventListener('click', showResults);
+
+        // Formatting buttons
+        elements.boldBtn.addEventListener('click', () => {
+            const task = tasks[state.currentTask];
+            if (!state.formatting[task.id]) state.formatting[task.id] = {};
+            state.formatting[task.id].bold = !state.formatting[task.id].bold;
+            elements.boldBtn.classList.toggle('active');
+            updateFormattedTextStyle();
+        });
+
+        elements.italicBtn.addEventListener('click', () => {
+            const task = tasks[state.currentTask];
+            if (!state.formatting[task.id]) state.formatting[task.id] = {};
+            state.formatting[task.id].italic = !state.formatting[task.id].italic;
+            elements.italicBtn.classList.toggle('active');
+            updateFormattedTextStyle();
+        });
+
+        elements.underlineBtn.addEventListener('click', () => {
+            const task = tasks[state.currentTask];
+            if (!state.formatting[task.id]) state.formatting[task.id] = {};
+            state.formatting[task.id].underline = !state.formatting[task.id].underline;
+            elements.underlineBtn.classList.toggle('active');
+            updateFormattedTextStyle();
+        });
+
+        // Alignment buttons
+        elements.leftBtn.addEventListener('click', () => {
+            const task = tasks[state.currentTask];
+            state.alignment[task.id] = 'left';
+            elements.leftBtn.classList.add('active');
+            elements.centerBtn.classList.remove('active');
+            elements.rightBtn.classList.remove('active');
+            elements.formattedText.style.textAlign = 'left';
+        });
+
+        elements.centerBtn.addEventListener('click', () => {
+            const task = tasks[state.currentTask];
+            state.alignment[task.id] = 'center';
+            elements.leftBtn.classList.remove('active');
+            elements.centerBtn.classList.add('active');
+            elements.rightBtn.classList.remove('active');
+            elements.formattedText.style.textAlign = 'center';
+        });
+
+        elements.rightBtn.addEventListener('click', () => {
+            const task = tasks[state.currentTask];
+            state.alignment[task.id] = 'right';
+            elements.leftBtn.classList.remove('active');
+            elements.centerBtn.classList.remove('active');
+            elements.rightBtn.classList.add('active');
+            elements.formattedText.style.textAlign = 'right';
+        });
+
+        // Results buttons
+        document.getElementById('reviewBtn').addEventListener('click', () => {
+            elements.resultsScreen.style.display = 'none';
+            elements.examScreen.style.display = 'block';
+            state.currentTask = 0;
+            loadTask();
+        });
+
+        document.getElementById('restartBtn').addEventListener('click', () => {
+            // Reset state
+            state = {
+                studentName: '',
+                currentTask: 0,
+                timeRemaining: 2 * 60 * 60,
+                timerInterval: null,
+                userInputs: {},
+                taskResults: {},
+                formatting: {},
+                alignment: {}
+            };
+            
+            elements.studentNameInput.value = '';
+            elements.startBtn.disabled = true;
+            elements.timer.classList.remove('warning');
+            elements.timer.textContent = '⏱️ 02:00:00';
+            
+            elements.resultsScreen.style.display = 'none';
+            elements.startScreen.style.display = 'flex';
+        });
+
+        // Save input on change
+        elements.userInput.addEventListener('input', () => {
+            const task = tasks[state.currentTask];
+            state.userInputs[task.id] = elements.userInput.value;
+        });
+    </script>
+</body>
+</html>

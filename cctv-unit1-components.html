@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Unit 1: CCTV Components | M.T.T.I</title>
+    <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <style>
+        :root { --primary: #00b894; --secondary: #6c5ce7; --success: #00b894; --error: #d63031; --warning: #fdcb6e; --bg-dark: #0a0a0f; --bg-card: #12121a; --bg-input: #1a1a24; --bg-hover: #22222e; --text-primary: #f5f5f7; --text-secondary: #a0a0b0; --text-muted: #6a6a7a; --border: #2a2a3a; --accent: #00b894; --accent-glow: rgba(0, 184, 148, 0.15); }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'IBM Plex Sans', sans-serif; background: var(--bg-dark); color: var(--text-primary); min-height: 100vh; line-height: 1.7; }
+        .header { background: linear-gradient(135deg, var(--bg-card) 0%, var(--bg-dark) 100%); border-bottom: 1px solid var(--border); padding: 1.5rem 2rem; position: sticky; top: 0; z-index: 100; }
+        .header-content { max-width: 900px; margin: 0 auto; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem; }
+        .logo { display: flex; align-items: center; gap: 0.75rem; }
+        .logo-icon { width: 48px; height: 48px; background: linear-gradient(135deg, var(--accent) 0%, var(--secondary) 100%); border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 1.5rem; }
+        .logo h1 { font-size: 1.1rem; font-weight: 700; background: linear-gradient(135deg, var(--accent) 0%, var(--secondary) 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+        .logo span { font-size: 0.65rem; color: var(--text-muted); letter-spacing: 1.5px; text-transform: uppercase; display: block; }
+        .score-display { background: var(--bg-card); border: 1px solid var(--border); padding: 0.75rem 1.5rem; border-radius: 10px; text-align: center; }
+        .score-value { font-family: 'IBM Plex Mono', monospace; font-size: 1.5rem; font-weight: 700; color: var(--accent); }
+        .score-label { font-size: 0.65rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: 1px; }
+        .main-container { max-width: 900px; margin: 0 auto; padding: 2rem; }
+        .exam-header { background: var(--bg-card); border: 1px solid var(--border); border-radius: 16px; padding: 2rem; margin-bottom: 2rem; position: relative; overflow: hidden; }
+        .exam-header::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 4px; background: linear-gradient(90deg, var(--accent) 0%, var(--secondary) 100%); }
+        .unit-badge { display: inline-block; background: linear-gradient(135deg, var(--accent) 0%, var(--secondary) 100%); color: white; padding: 0.35rem 1rem; border-radius: 6px; font-size: 0.75rem; font-weight: 600; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 1rem; }
+        .exam-title { font-size: 1.75rem; font-weight: 700; margin-bottom: 0.75rem; }
+        .exam-desc { color: var(--text-secondary); font-size: 0.95rem; margin-bottom: 1.5rem; }
+        .exam-stats { display: flex; gap: 2rem; flex-wrap: wrap; }
+        .stat-item { display: flex; align-items: center; gap: 0.5rem; color: var(--text-secondary); font-size: 0.9rem; }
+        .scenarios { display: flex; flex-direction: column; gap: 1.5rem; }
+        .scenario-card { background: var(--bg-card); border: 1px solid var(--border); border-radius: 14px; overflow: hidden; transition: all 0.3s; }
+        .scenario-card.correct { border-color: var(--success); }
+        .scenario-card.incorrect { border-color: var(--error); }
+        .scenario-header { background: var(--bg-input); padding: 1rem 1.5rem; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--border); }
+        .scenario-num { display: flex; align-items: center; gap: 0.5rem; font-size: 0.85rem; color: var(--text-secondary); }
+        .scenario-num strong { background: var(--accent); color: var(--bg-dark); padding: 0.25rem 0.65rem; border-radius: 5px; font-family: 'IBM Plex Mono', monospace; }
+        .scenario-type { font-size: 0.7rem; padding: 0.3rem 0.75rem; background: var(--bg-hover); border-radius: 5px; color: var(--accent); text-transform: uppercase; letter-spacing: 0.5px; font-weight: 600; }
+        .scenario-body { padding: 1.5rem; }
+        .job-brief { background: linear-gradient(135deg, rgba(0, 184, 148, 0.1) 0%, rgba(108, 92, 231, 0.1) 100%); border: 1px solid rgba(0, 184, 148, 0.3); border-radius: 12px; padding: 1.25rem; margin-bottom: 1.25rem; }
+        .brief-label { display: flex; align-items: center; gap: 0.5rem; font-size: 0.7rem; color: var(--accent); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 0.75rem; font-weight: 600; }
+        .brief-text { font-size: 0.95rem; line-height: 1.7; }
+        .site-info { display: inline-flex; align-items: center; gap: 0.5rem; background: var(--bg-dark); padding: 0.5rem 0.85rem; border-radius: 6px; font-size: 0.8rem; color: var(--text-secondary); margin-top: 0.75rem; font-family: 'IBM Plex Mono', monospace; }
+        .requirements-box { background: var(--bg-input); border-radius: 10px; padding: 1rem 1.25rem; margin-bottom: 1.25rem; }
+        .requirements-label { font-size: 0.7rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 0.75rem; }
+        .requirements-list { display: flex; flex-wrap: wrap; gap: 0.5rem; }
+        .req-tag { background: var(--bg-hover); border: 1px solid var(--border); padding: 0.4rem 0.75rem; border-radius: 6px; font-size: 0.8rem; }
+        .question-section { margin-top: 1.25rem; }
+        .question-text { font-size: 1rem; font-weight: 600; margin-bottom: 1rem; color: var(--text-primary); }
+        .diagnostic-options { display: flex; flex-direction: column; gap: 0.6rem; }
+        .diagnostic-option { display: flex; align-items: flex-start; gap: 0.75rem; padding: 1rem 1.25rem; background: var(--bg-input); border: 2px solid var(--border); border-radius: 10px; cursor: pointer; transition: all 0.2s; }
+        .diagnostic-option:hover:not(.disabled) { border-color: var(--accent); background: var(--accent-glow); }
+        .diagnostic-option.selected { border-color: var(--accent); background: var(--accent-glow); }
+        .diagnostic-option.correct { border-color: var(--success); background: rgba(0, 184, 148, 0.15); }
+        .diagnostic-option.incorrect { border-color: var(--error); background: rgba(214, 48, 49, 0.15); }
+        .diagnostic-option.disabled { cursor: not-allowed; opacity: 0.7; }
+        .option-marker { width: 24px; height: 24px; border: 2px solid var(--border); border-radius: 50%; flex-shrink: 0; display: flex; align-items: center; justify-content: center; margin-top: 2px; }
+        .diagnostic-option.selected .option-marker { border-color: var(--accent); background: var(--accent); color: var(--bg-dark); }
+        .diagnostic-option.correct .option-marker { border-color: var(--success); background: var(--success); color: white; }
+        .diagnostic-option.incorrect .option-marker { border-color: var(--error); background: var(--error); color: white; }
+        .option-content { flex: 1; }
+        .option-title { font-weight: 600; font-size: 0.9rem; margin-bottom: 0.25rem; }
+        .option-desc { font-size: 0.8rem; color: var(--text-secondary); line-height: 1.5; }
+        .fill-blanks { background: var(--bg-input); border-radius: 10px; padding: 1.25rem; }
+        .blank-row { display: flex; align-items: center; flex-wrap: wrap; gap: 0.5rem; margin-bottom: 1rem; line-height: 2.2; }
+        .fill-text { font-size: 0.9rem; }
+        .blank-input { width: 150px; padding: 0.5rem 0.75rem; background: var(--bg-dark); border: 2px solid var(--border); border-radius: 6px; color: var(--text-primary); font-family: 'IBM Plex Mono', monospace; font-size: 0.85rem; text-align: center; }
+        .blank-input:focus { outline: none; border-color: var(--accent); }
+        .blank-input.correct { border-color: var(--success); background: rgba(0, 184, 148, 0.1); }
+        .blank-input.incorrect { border-color: var(--error); background: rgba(214, 48, 49, 0.1); }
+        .component-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(130px, 1fr)); gap: 0.75rem; }
+        .component-card { background: var(--bg-input); border: 2px solid var(--border); border-radius: 10px; padding: 1rem; text-align: center; cursor: pointer; transition: all 0.2s; }
+        .component-card:hover:not(.disabled) { border-color: var(--accent); transform: translateY(-2px); }
+        .component-card.selected { border-color: var(--accent); background: var(--accent-glow); }
+        .component-card.correct { border-color: var(--success); background: rgba(0, 184, 148, 0.1); }
+        .component-card.incorrect { border-color: var(--error); background: rgba(214, 48, 49, 0.1); }
+        .component-card.disabled { cursor: not-allowed; opacity: 0.7; }
+        .component-icon { font-size: 2rem; margin-bottom: 0.5rem; }
+        .component-name { font-size: 0.8rem; font-weight: 500; }
+        .calc-group { background: var(--bg-input); border-radius: 10px; padding: 1.25rem; }
+        .calc-row { display: flex; align-items: center; gap: 0.75rem; margin-bottom: 0.75rem; flex-wrap: wrap; }
+        .calc-label { min-width: 220px; font-size: 0.85rem; color: var(--text-secondary); }
+        .calc-input { width: 100px; padding: 0.6rem; background: var(--bg-dark); border: 2px solid var(--border); border-radius: 6px; color: var(--text-primary); font-family: 'IBM Plex Mono', monospace; text-align: center; }
+        .calc-input:focus { outline: none; border-color: var(--accent); }
+        .calc-input.correct { border-color: var(--success); }
+        .calc-input.incorrect { border-color: var(--error); }
+        .calc-unit { font-size: 0.85rem; color: var(--text-muted); }
+        .calc-readonly { font-weight: 600; color: var(--text-primary); }
+        .troubleshoot-tree { display: flex; flex-direction: column; gap: 1rem; }
+        .tree-step { background: var(--bg-input); border: 1px solid var(--border); border-radius: 10px; padding: 1.25rem; }
+        .tree-question { font-size: 0.9rem; margin-bottom: 0.875rem; font-weight: 500; }
+        .tree-options { display: flex; gap: 0.5rem; flex-wrap: wrap; }
+        .tree-btn { padding: 0.6rem 1rem; background: var(--bg-hover); border: 1px solid var(--border); border-radius: 6px; color: var(--text-primary); font-family: inherit; font-size: 0.85rem; cursor: pointer; }
+        .tree-btn:hover:not(.disabled) { border-color: var(--accent); }
+        .tree-btn.selected { border-color: var(--accent); background: var(--accent-glow); }
+        .tree-btn.correct { border-color: var(--success); background: rgba(0, 184, 148, 0.15); }
+        .tree-btn.incorrect { border-color: var(--error); background: rgba(214, 48, 49, 0.15); }
+        .tree-btn.disabled { cursor: not-allowed; opacity: 0.6; }
+        .tree-followup { margin-top: 0.875rem; padding: 0.875rem; background: var(--bg-dark); border-radius: 8px; font-size: 0.85rem; color: var(--text-secondary); border-left: 3px solid var(--accent); }
+        .feedback-box { margin-top: 1.25rem; padding: 1.25rem; border-radius: 10px; display: none; }
+        .feedback-box.show { display: block; }
+        .feedback-box.correct { background: rgba(0, 184, 148, 0.1); border: 1px solid var(--success); }
+        .feedback-box.incorrect { background: rgba(214, 48, 49, 0.1); border: 1px solid var(--error); }
+        .feedback-header { display: flex; align-items: center; gap: 0.5rem; font-weight: 600; margin-bottom: 0.5rem; }
+        .feedback-header.correct { color: var(--success); }
+        .feedback-header.incorrect { color: var(--error); }
+        .feedback-text { font-size: 0.85rem; color: var(--text-secondary); line-height: 1.7; }
+        .correct-answer { margin-top: 0.75rem; padding: 0.625rem; background: var(--bg-dark); border-radius: 6px; font-family: 'IBM Plex Mono', monospace; font-size: 0.85rem; }
+        .actions { margin-top: 2rem; display: flex; justify-content: space-between; gap: 1rem; flex-wrap: wrap; }
+        .btn { padding: 1rem 2.5rem; border: none; border-radius: 10px; font-family: inherit; font-size: 1rem; font-weight: 600; cursor: pointer; }
+        .btn-primary { background: linear-gradient(135deg, var(--accent) 0%, var(--secondary) 100%); color: white; }
+        .btn-primary:hover:not(:disabled) { transform: translateY(-2px); }
+        .btn-primary:disabled { opacity: 0.5; cursor: not-allowed; }
+        .btn-secondary { background: var(--bg-hover); color: var(--text-primary); border: 1px solid var(--border); }
+        .btn-secondary:hover { border-color: var(--error); color: var(--error); }
+        .results-panel { background: var(--bg-card); border: 1px solid var(--border); border-radius: 16px; padding: 2.5rem; margin-top: 2rem; text-align: center; display: none; }
+        .results-panel.show { display: block; }
+        .results-score { font-size: 4.5rem; font-weight: 700; font-family: 'IBM Plex Mono', monospace; background: linear-gradient(135deg, var(--accent) 0%, var(--secondary) 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+        .results-label { color: var(--text-secondary); margin-bottom: 1rem; }
+        .results-grade { display: inline-block; padding: 0.6rem 2rem; border-radius: 25px; font-weight: 600; margin-bottom: 1.5rem; }
+        .results-grade.excellent { background: rgba(0, 184, 148, 0.2); color: var(--success); }
+        .results-grade.good { background: rgba(108, 92, 231, 0.2); color: var(--secondary); }
+        .results-grade.average { background: rgba(253, 203, 110, 0.2); color: var(--warning); }
+        .results-grade.poor { background: rgba(214, 48, 49, 0.2); color: var(--error); }
+        .results-stats { display: flex; justify-content: center; gap: 4rem; }
+        .stat-box-value { font-size: 2rem; font-weight: 700; font-family: 'IBM Plex Mono', monospace; }
+        .stat-box-value.correct { color: var(--success); }
+        .stat-box-value.incorrect { color: var(--error); }
+        .stat-box-label { font-size: 0.8rem; color: var(--text-muted); text-transform: uppercase; }
+        @media (max-width: 600px) { .main-container { padding: 1rem; } .component-grid { grid-template-columns: repeat(2, 1fr); } .calc-label { min-width: 100%; } }
+    </style>
+<meta name="description" content="Professional training courses at MTTI Eldoret. TVETA-accredited programs in IT, healthcare, and creative fields. Enroll today.">
+<script type="text/javascript">(function(c,l,a,r,i,t,y){c[a]=c[a]||function(){(c[a].q=c[a].q||[]).push(arguments)};t=l.createElement(r);t.async=1;t.src="https://www.clarity.ms/tag/"+i;y=l.getElementsByTagName(r)[0];y.parentNode.insertBefore(t,y);})(window,document,"clarity","script","wg31zlwbt9");</script>\n</head>
+<body>
+    <header class="header"><div class="header-content"><div class="logo"><div class="logo-icon">📹</div><div><h1>M.T.T.I</h1><span>CCTV Installation</span></div></div><div class="score-display"><div class="score-value" id="currentScore">0%</div><div class="score-label">Score</div></div></div></header>
+    <main class="main-container">
+        <div class="exam-header"><div class="unit-badge">Unit 1</div><h2 class="exam-title">CCTV Components (Cameras, Lenses, Cabling)</h2><p class="exam-desc">Master the identification and selection of cameras, lenses, cables, and accessories for various surveillance applications.</p><div class="exam-stats"><div class="stat-item"><span>📋</span> 8 Scenarios</div><div class="stat-item"><span>⏱️</span> ~25 minutes</div><div class="stat-item"><span>🎯</span> 70% to pass</div></div></div>
+        <div class="scenarios" id="scenarios"></div>
+        <div class="actions"><button class="btn btn-secondary" onclick="resetExam()">Reset Exam</button><button class="btn btn-primary" id="submitBtn" onclick="submitExam()">Submit Answers</button></div>
+        <div class="results-panel" id="results"><div class="results-score" id="finalScore">0%</div><div class="results-label">Your Final Score</div><div class="results-grade" id="grade"></div><div class="results-stats"><div class="stat-box"><div class="stat-box-value correct" id="correctCount">0</div><div class="stat-box-label">Correct</div></div><div class="stat-box"><div class="stat-box-value incorrect" id="incorrectCount">0</div><div class="stat-box-label">Incorrect</div></div></div></div>
+    </main>
+    <script>
+        const examData = [
+            { type: "diagnosis", client: "We need to monitor our warehouse entrance at night. The area has no lighting and we need to identify faces at 10 meters.", site: "Warehouse - Outdoor entrance, no lighting", requirements: ["Night vision required", "Face identification at 10m", "Outdoor rated"], question: "Which camera type is MOST appropriate?", options: [{ title: "IR Bullet Camera with 2.8-12mm Varifocal Lens", desc: "Weatherproof with built-in infrared LEDs, adjustable focal length" },{ title: "Standard Box Camera without IR", desc: "Indoor camera requiring separate housing" },{ title: "Fisheye Panoramic Camera", desc: "180° wide-angle view, fixed lens" },{ title: "PTZ Camera without IR", desc: "Pan-Tilt-Zoom, requires external lighting" }], correct: 0, explanation: "IR Bullet cameras are ideal for outdoor night surveillance. Built-in IR LEDs provide illumination up to 30-50m in complete darkness. The varifocal 2.8-12mm lens allows adjustment for face identification at 10m. IP66/67 weatherproofing handles outdoor conditions." },
+            { type: "fill-blank", client: "I need to understand camera specifications before ordering equipment.", site: "Commercial office building", requirements: ["Understanding specifications"], question: "Complete the camera specification terminology:", blanks: [{ text: "Camera resolution is measured in ", answer: ["megapixels", "mp"], hint: "MP" },{ text: "Lens focal length is measured in ", answer: ["mm", "millimeters"], hint: "millimeters" },{ text: "Minimum light sensitivity is measured in ", answer: ["lux"], hint: "light unit" },{ text: "Outdoor protection rating prefix: ", answer: ["ip", "ip66", "ip67"], hint: "Ingress Protection" }], explanation: "Key specs: Resolution in megapixels (2MP=1080p, 4MP=1440p, 8MP=4K). Focal length in mm (lower=wider angle). Lux rating indicates low-light performance. IP rating: IP66=dust tight + water resistant, IP67=submersible." },
+            { type: "component-select", client: "We're setting up a 16-camera system. What components do I need?", site: "Retail store - complete new system", requirements: ["16 camera system", "30 days recording", "Remote viewing"], question: "Select ALL essential components for a complete IP CCTV system:", options: [{ icon: "📹", name: "IP Cameras (16x)", correct: true },{ icon: "💾", name: "NVR 16-Channel", correct: true },{ icon: "🔌", name: "PoE Network Switch", correct: true },{ icon: "📀", name: "Surveillance HDDs", correct: true },{ icon: "📺", name: "Monitor", correct: true },{ icon: "🔊", name: "Speakers (16x)", correct: false },{ icon: "🔗", name: "CAT6 Ethernet Cable", correct: true },{ icon: "📻", name: "FM Radio", correct: false }], explanation: "Complete IP system: IP cameras, NVR for recording, PoE switch (power + data through one cable), surveillance HDDs (WD Purple/Seagate SkyHawk), monitor for live view, CAT5e/CAT6 cabling. Speakers are optional for two-way audio." },
+            { type: "calculation", client: "I need to calculate the correct lens for our parking lot camera.", site: "Parking lot - 15m coverage width, 10m distance", requirements: ["Cover 15m wide", "Camera 10m away", "1/2.8\" sensor"], question: "Calculate the approximate lens focal length:", calculations: [{ label: "Horizontal coverage needed", value: "15", unit: "meters", readonly: true },{ label: "Camera distance", value: "10", unit: "meters", readonly: true },{ label: "Sensor size (1/2.8\")", value: "6.4", unit: "mm", readonly: true },{ label: "Focal length = (Distance × Sensor) ÷ Width", value: "", unit: "mm", answer: ["4", "4.3", "4.27"] }], explanation: "Lens formula: FL = (Distance × Sensor Width) ÷ Scene Width. For 1/2.8\" sensor (6.4mm): FL = (10m × 6.4mm) ÷ 15m ≈ 4.27mm. A 2.8mm or 4mm lens would provide coverage." },
+            { type: "troubleshoot-tree", client: "The image from our new camera is blurry and out of focus.", site: "Office reception - new varifocal camera", requirements: ["Varifocal lens camera", "Image quality issue"], question: "Diagnose and fix the focus issue:", steps: [{ question: "Camera image is blurry. What first?", options: ["Replace the camera", "Adjust the varifocal lens focus ring", "Upgrade internet"], correct: 1, followup: "You locate the zoom and focus adjustment rings on the lens." },{ question: "How do you properly adjust a varifocal lens?", options: ["Turn both rings randomly", "Set zoom first, then adjust focus", "Only adjust zoom"], correct: 1, followup: "You set zoom to frame the area, then adjust focus while watching live feed." },{ question: "After adjustment, still slightly soft. What next?", options: ["Accept it", "Use camera's web interface for fine focus", "Buy new camera"], correct: 1, followup: "Camera's web interface has focus assist with sharpness indicator." }], explanation: "Varifocal lenses require both zoom and focus adjustment. Set zoom first, then focus. Many IP cameras have digital focus assist in their web interface." },
+            { type: "diagnosis", client: "We need maximum cable run from server room to the furthest camera - 150 meters.", site: "Large warehouse - 150m cable runs", requirements: ["Long distance", "PoE IP cameras"], question: "What solution for 150m cable runs with PoE cameras?", options: [{ title: "CAT6 cable with PoE extender at 100m", desc: "Extends data and power beyond standard limits" },{ title: "Standard CAT5e for full 150m directly", desc: "Single cable connection" },{ title: "RG59 coaxial with baluns", desc: "Analog CCTV method" },{ title: "Wireless for full distance", desc: "Eliminate cables" }], correct: 0, explanation: "Ethernet limits: 100m maximum. Beyond this, signal degrades and PoE voltage drops. For 150m: PoE extender at 100m regenerates signal and power. Fiber optic also works but costs more." },
+            { type: "diagnosis", client: "I need cameras for a jewelry store. Image quality is critical for faces and small items.", site: "Jewelry retail - high security", requirements: ["Face identification", "Small item detail", "Evidence quality"], question: "What resolution should you recommend?", options: [{ title: "4MP or higher resolution cameras", desc: "2K+ for facial features and small object detail" },{ title: "1MP (720p) cameras", desc: "Basic HD, budget-friendly" },{ title: "VGA resolution analog", desc: "Traditional CCTV" },{ title: "Any resolution with digital zoom", desc: "Software enhancement" }], correct: 0, explanation: "High-value environments need 4MP+ for: clear facial ID for evidence, reading small text on merchandise, sufficient pixels when zooming footage. 4K (8MP) on display cases provides best detail." },
+            { type: "fill-blank", client: "Explain camera types for different locations.", site: "Multi-location planning", requirements: ["Various mounting locations"], question: "Match camera types to applications:", blanks: [{ text: "Outdoor perimeter with long-range IR: ", answer: ["bullet", "ir bullet"], hint: "elongated shape" },{ text: "Indoor ceiling, discreet coverage: ", answer: ["dome", "dome camera"], hint: "rounded shape" },{ text: "Remote directional control: ", answer: ["ptz", "pan tilt zoom"], hint: "motorized" },{ text: "Covert/hidden surveillance: ", answer: ["pinhole", "hidden", "covert"], hint: "concealed" }], explanation: "Camera selection: BULLET - outdoor, visible deterrent, long IR. DOME - indoor/outdoor, vandal-resistant, discreet. PTZ - active monitoring, zoom capability. PINHOLE - hidden surveillance." }
+        ];
+        let answers = new Array(examData.length).fill(null);
+        function init() { renderScenarios(); }
+        function renderScenarios() { document.getElementById('scenarios').innerHTML = examData.map((s, i) => renderScenario(s, i)).join(''); }
+        function renderScenario(s, idx) {
+            let html = '';
+            if (s.type === 'diagnosis') html = `<div class="diagnostic-options">${s.options.map((o, i) => `<div class="diagnostic-option" data-idx="${idx}" data-opt="${i}" onclick="selectOption(${idx},${i})"><div class="option-marker"></div><div class="option-content"><div class="option-title">${o.title}</div><div class="option-desc">${o.desc}</div></div></div>`).join('')}</div>`;
+            else if (s.type === 'fill-blank') html = `<div class="fill-blanks">${s.blanks.map((b, i) => `<div class="blank-row"><span class="fill-text">${b.text}</span><input type="text" class="blank-input" data-idx="${idx}" data-b="${i}" placeholder="${b.hint}" onchange="updateBlank(${idx})"></div>`).join('')}</div>`;
+            else if (s.type === 'component-select') html = `<div class="component-grid">${s.options.map((o, i) => `<div class="component-card" data-idx="${idx}" data-opt="${i}" onclick="toggleComp(${idx},${i})"><div class="component-icon">${o.icon}</div><div class="component-name">${o.name}</div></div>`).join('')}</div>`;
+            else if (s.type === 'calculation') html = `<div class="calc-group">${s.calculations.map((c, i) => `<div class="calc-row"><span class="calc-label">${c.label}:</span>${c.readonly ? `<span class="calc-readonly">${c.value}</span>` : `<input type="text" class="calc-input" data-idx="${idx}" data-c="${i}" placeholder="?" onchange="updateCalc(${idx})">`}<span class="calc-unit">${c.unit}</span></div>`).join('')}</div>`;
+            else if (s.type === 'troubleshoot-tree') html = `<div class="troubleshoot-tree">${s.steps.map((st, i) => `<div class="tree-step" id="ts${idx}_${i}" ${i > 0 ? 'style="display:none"' : ''}><div class="tree-question">${st.question}</div><div class="tree-options">${st.options.map((o, oi) => `<button class="tree-btn" data-idx="${idx}" data-s="${i}" data-o="${oi}" onclick="selectTree(${idx},${i},${oi})">${o}</button>`).join('')}</div><div class="tree-followup" id="tf${idx}_${i}" style="display:none"></div></div>`).join('')}</div>`;
+            return `<div class="scenario-card" id="card${idx}"><div class="scenario-header"><div class="scenario-num"><strong>${idx + 1}</strong> of ${examData.length}</div><div class="scenario-type">${{'diagnosis':'🔍 Diagnosis','fill-blank':'✏️ Fill Blanks','component-select':'🎯 Select All','calculation':'🧮 Calculation','troubleshoot-tree':'🌳 Decision Tree'}[s.type]}</div></div><div class="scenario-body">${s.client ? `<div class="job-brief"><div class="brief-label">📋 Client Request</div><div class="brief-text">"${s.client}"</div>${s.site ? `<div class="site-info">📍 ${s.site}</div>` : ''}</div>` : ''}${s.requirements?.length ? `<div class="requirements-box"><div class="requirements-label">Requirements</div><div class="requirements-list">${s.requirements.map(r => `<span class="req-tag">• ${r}</span>`).join('')}</div></div>` : ''}<div class="question-section"><div class="question-text">${s.question}</div>${html}</div><div class="feedback-box" id="fb${idx}"><div class="feedback-header"><span class="feedback-icon"></span><span class="feedback-title"></span></div><div class="feedback-text">${s.explanation}</div><div class="correct-answer" id="ca${idx}"></div></div></div></div>`;
+        }
+        function selectOption(idx, opt) { if (document.querySelector(`.diagnostic-option[data-idx="${idx}"]`)?.classList.contains('disabled')) return; document.querySelectorAll(`.diagnostic-option[data-idx="${idx}"]`).forEach(e => e.classList.remove('selected')); document.querySelector(`.diagnostic-option[data-idx="${idx}"][data-opt="${opt}"]`).classList.add('selected'); answers[idx] = opt; }
+        function updateBlank(idx) { answers[idx] = Array.from(document.querySelectorAll(`.blank-input[data-idx="${idx}"]`)).map(e => e.value.trim().toLowerCase()); }
+        function toggleComp(idx, opt) { const c = document.querySelector(`.component-card[data-idx="${idx}"][data-opt="${opt}"]`); if (c.classList.contains('disabled')) return; c.classList.toggle('selected'); answers[idx] = Array.from(document.querySelectorAll(`.component-card[data-idx="${idx}"].selected`)).map(e => parseInt(e.dataset.opt)); }
+        function updateCalc(idx) { answers[idx] = Array.from(document.querySelectorAll(`.calc-input[data-idx="${idx}"]`)).map(e => e.value.trim().toLowerCase()); }
+        function selectTree(idx, step, opt) { const s = examData[idx]; const btns = document.querySelectorAll(`.tree-btn[data-idx="${idx}"][data-s="${step}"]`); if (btns[0].classList.contains('disabled')) return; btns.forEach(b => b.classList.remove('selected')); btns[opt].classList.add('selected'); if (!answers[idx]) answers[idx] = []; answers[idx][step] = opt; document.getElementById(`tf${idx}_${step}`).textContent = s.steps[step].followup; document.getElementById(`tf${idx}_${step}`).style.display = 'block'; if (step < s.steps.length - 1) setTimeout(() => document.getElementById(`ts${idx}_${step + 1}`).style.display = 'block', 400); }
+        function submitExam() {
+            let correct = 0;
+            examData.forEach((s, idx) => {
+                const ans = answers[idx], card = document.getElementById(`card${idx}`), fb = document.getElementById(`fb${idx}`), ca = document.getElementById(`ca${idx}`);
+                let ok = false;
+                if (s.type === 'diagnosis') { ok = ans === s.correct; document.querySelectorAll(`.diagnostic-option[data-idx="${idx}"]`).forEach((e, i) => { e.classList.add('disabled'); if (i === s.correct) e.classList.add('correct'); else if (i === ans && !ok) e.classList.add('incorrect'); }); ca.textContent = `✓ ${s.options[s.correct].title}`; }
+                else if (s.type === 'fill-blank') { let all = true; document.querySelectorAll(`.blank-input[data-idx="${idx}"]`).forEach((e, i) => { e.disabled = true; const acc = s.blanks[i].answer.map(a => a.toLowerCase()); if (ans && acc.some(a => ans[i]?.includes(a) || a.includes(ans[i] || ''))) e.classList.add('correct'); else { e.classList.add('incorrect'); all = false; } }); ok = all; ca.textContent = `Answers: ${s.blanks.map(b => b.answer[0]).join(', ')}`; }
+                else if (s.type === 'component-select') { const corr = s.options.map((o, i) => o.correct ? i : -1).filter(i => i !== -1), sel = ans || []; ok = corr.length === sel.length && corr.every(i => sel.includes(i)); document.querySelectorAll(`.component-card[data-idx="${idx}"]`).forEach((e, i) => { e.classList.add('disabled'); if (s.options[i].correct) e.classList.add('correct'); else if (sel.includes(i)) e.classList.add('incorrect'); }); ca.textContent = `Correct: ${s.options.filter(o => o.correct).map(o => o.name).join(', ')}`; }
+                else if (s.type === 'calculation') { let cok = true, ci = 0; document.querySelectorAll(`.calc-input[data-idx="${idx}"]`).forEach(e => { e.disabled = true; const ed = s.calculations.filter(c => !c.readonly); if (ci < ed.length) { const acc = ed[ci].answer.map(a => a.toString().toLowerCase()); const ua = (ans && ans[ci]) ? ans[ci] : ''; if (acc.some(a => a === ua || a.includes(ua) || ua.includes(a))) e.classList.add('correct'); else { e.classList.add('incorrect'); cok = false; } ci++; } }); ok = cok; ca.textContent = `Answer: ${s.calculations.filter(c => !c.readonly).map(c => c.answer[0] + ' ' + c.unit).join(', ')}`; }
+                else if (s.type === 'troubleshoot-tree') { ok = ans && ans.length === s.steps.length && s.steps.every((st, i) => ans[i] === st.correct); document.querySelectorAll(`.tree-btn[data-idx="${idx}"]`).forEach(b => { b.classList.add('disabled'); if (parseInt(b.dataset.o) === s.steps[parseInt(b.dataset.s)].correct) b.classList.add('correct'); else if (b.classList.contains('selected')) b.classList.add('incorrect'); }); s.steps.forEach((_, i) => { document.getElementById(`ts${idx}_${i}`).style.display = 'block'; document.getElementById(`tf${idx}_${i}`).style.display = 'block'; }); }
+                if (ok) { correct++; card.classList.add('correct'); fb.classList.add('correct', 'show'); fb.querySelector('.feedback-header').classList.add('correct'); fb.querySelector('.feedback-icon').textContent = '✓'; fb.querySelector('.feedback-title').textContent = 'Correct!'; }
+                else { card.classList.add('incorrect'); fb.classList.add('incorrect', 'show'); fb.querySelector('.feedback-header').classList.add('incorrect'); fb.querySelector('.feedback-icon').textContent = '✗'; fb.querySelector('.feedback-title').textContent = 'Incorrect'; }
+            });
+            const pct = Math.round((correct / examData.length) * 100);
+            document.getElementById('currentScore').textContent = `${pct}%`; document.getElementById('finalScore').textContent = `${pct}%`; document.getElementById('correctCount').textContent = correct; document.getElementById('incorrectCount').textContent = examData.length - correct;
+            const g = document.getElementById('grade'); if (pct >= 90) { g.textContent = 'Excellent!'; g.className = 'results-grade excellent'; } else if (pct >= 70) { g.textContent = 'Good Job!'; g.className = 'results-grade good'; } else if (pct >= 50) { g.textContent = 'Average'; g.className = 'results-grade average'; } else { g.textContent = 'Needs Practice'; g.className = 'results-grade poor'; }
+            document.getElementById('results').classList.add('show'); document.getElementById('submitBtn').disabled = true;
+        }
+        function resetExam() { answers = new Array(examData.length).fill(null); document.getElementById('currentScore').textContent = '0%'; document.getElementById('results').classList.remove('show'); document.getElementById('submitBtn').disabled = false; renderScenarios(); }
+        document.addEventListener('DOMContentLoaded', init);
+    </script>
+</body>
+</html>

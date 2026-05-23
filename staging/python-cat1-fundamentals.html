@@ -1,0 +1,557 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CAT 1: Programming Fundamentals | M.T.T.I</title>
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&family=Segoe+UI:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Segoe UI', Tahoma, sans-serif; background: #0d1117; color: #c9d1d9; min-height: 100vh; }
+        
+        .start-screen { min-height: 100vh; display: flex; align-items: center; justify-content: center; background: linear-gradient(135deg, #0d1117 0%, #161b22 50%, #21262d 100%); padding: 20px; }
+        .start-card { background: #161b22; border: 1px solid #30363d; border-radius: 16px; padding: 40px; max-width: 600px; width: 100%; text-align: center; }
+        .cat-badge { background: linear-gradient(135deg, #238636, #2ea043); color: #fff; padding: 8px 20px; border-radius: 20px; font-size: 0.85rem; font-weight: 600; display: inline-block; margin-bottom: 20px; }
+        .start-icon { font-size: 4rem; margin-bottom: 15px; }
+        .start-card h1 { font-size: 1.6rem; color: #58a6ff; margin-bottom: 8px; }
+        .start-card h2 { font-size: 1rem; color: #8b949e; margin-bottom: 25px; font-weight: 400; }
+        .unit-topics { background: #21262d; border-radius: 10px; padding: 20px; margin-bottom: 25px; text-align: left; }
+        .unit-topics h3 { color: #58a6ff; font-size: 0.9rem; margin-bottom: 12px; }
+        .unit-topics ul { list-style: none; }
+        .unit-topics li { color: #8b949e; font-size: 0.85rem; padding: 6px 0; border-bottom: 1px solid #30363d; }
+        .unit-topics li:last-child { border-bottom: none; }
+        .unit-topics li::before { content: "✓ "; color: #238636; }
+        .exam-info { display: grid; grid-template-columns: repeat(3, 1fr); gap: 15px; margin-bottom: 25px; }
+        .info-box { background: #21262d; padding: 15px; border-radius: 8px; }
+        .info-box .label { color: #8b949e; font-size: 0.75rem; }
+        .info-box .value { color: #58a6ff; font-size: 1.2rem; font-weight: 700; margin-top: 5px; }
+        .name-input { margin-bottom: 20px; }
+        .name-input input { width: 100%; padding: 14px; background: #21262d; border: 1px solid #30363d; border-radius: 8px; color: #c9d1d9; font-size: 1rem; text-align: center; }
+        .name-input input:focus { outline: none; border-color: #58a6ff; }
+        .start-btn { width: 100%; padding: 16px; font-size: 1.1rem; font-weight: 600; background: linear-gradient(135deg, #238636, #2ea043); color: #fff; border: none; border-radius: 10px; cursor: pointer; transition: all 0.3s; }
+        .start-btn:hover:not(:disabled) { transform: translateY(-2px); box-shadow: 0 8px 25px rgba(35, 134, 54, 0.4); }
+        .start-btn:disabled { opacity: 0.5; cursor: not-allowed; }
+
+        .ide-container { display: none; height: 100vh; flex-direction: column; }
+        .title-bar { background: #161b22; padding: 10px 20px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #30363d; }
+        .title-bar-left { display: flex; align-items: center; gap: 15px; }
+        .title-bar h1 { font-size: 1rem; color: #58a6ff; font-weight: 600; }
+        .title-bar-right { display: flex; align-items: center; gap: 20px; }
+        .timer { background: #238636; padding: 6px 15px; border-radius: 15px; font-family: 'JetBrains Mono', monospace; color: #fff; font-size: 0.9rem; }
+        .timer.warning { background: #da3633; animation: pulse 1s infinite; }
+        @keyframes pulse { 0%,100% { opacity: 1; } 50% { opacity: 0.7; } }
+        .progress-text { color: #8b949e; font-size: 0.85rem; }
+
+        .main-content { display: flex; flex: 1; overflow: hidden; }
+        
+        .task-panel { width: 350px; background: #161b22; border-right: 1px solid #30363d; display: flex; flex-direction: column; }
+        .task-header { background: #21262d; padding: 20px; border-bottom: 1px solid #30363d; }
+        .task-num { color: #8b949e; font-size: 0.8rem; }
+        .task-title { color: #c9d1d9; font-size: 1.1rem; font-weight: 600; margin-top: 5px; }
+        .task-points { color: #238636; font-size: 0.85rem; margin-top: 5px; }
+        .task-content { flex: 1; overflow-y: auto; padding: 20px; }
+        .scenario-box { background: rgba(88, 166, 255, 0.1); border-left: 3px solid #58a6ff; padding: 15px; border-radius: 0 8px 8px 0; margin-bottom: 15px; }
+        .scenario-box h4 { color: #58a6ff; font-size: 0.8rem; margin-bottom: 8px; }
+        .scenario-box p { color: #8b949e; font-size: 0.9rem; line-height: 1.5; }
+        .requirements { background: #21262d; border-radius: 8px; padding: 15px; margin-bottom: 15px; }
+        .requirements h4 { color: #c9d1d9; font-size: 0.85rem; margin-bottom: 10px; }
+        .requirements ul { padding-left: 18px; }
+        .requirements li { color: #8b949e; font-size: 0.85rem; margin-bottom: 8px; line-height: 1.5; }
+        .requirements code { background: #0d1117; padding: 2px 6px; border-radius: 4px; color: #7ee787; font-family: 'JetBrains Mono', monospace; font-size: 0.8rem; }
+        .expected-box { background: #0d1117; border: 1px solid #30363d; border-radius: 8px; padding: 12px; margin-bottom: 15px; }
+        .expected-box h5 { color: #7ee787; font-size: 0.75rem; margin-bottom: 8px; text-transform: uppercase; letter-spacing: 1px; }
+        .expected-box pre { color: #c9d1d9; font-family: 'JetBrains Mono', monospace; font-size: 0.85rem; white-space: pre-wrap; }
+        .hint-box { border: 1px solid #30363d; border-radius: 8px; overflow: hidden; }
+        .hint-box summary { background: #21262d; padding: 10px 15px; cursor: pointer; color: #8b949e; font-size: 0.85rem; }
+        .hint-box summary:hover { color: #c9d1d9; }
+        .hint-box p { padding: 15px; color: #8b949e; font-size: 0.85rem; line-height: 1.5; }
+        .hint-box code { background: #0d1117; padding: 2px 5px; border-radius: 3px; color: #7ee787; }
+        .task-nav { padding: 15px; border-top: 1px solid #30363d; display: flex; gap: 10px; }
+        .task-nav button { flex: 1; padding: 12px; border: none; border-radius: 8px; cursor: pointer; font-weight: 600; font-size: 0.9rem; transition: all 0.2s; }
+        .btn-run { background: #21262d; color: #7ee787; border: 1px solid #238636 !important; }
+        .btn-run:hover { background: #238636; color: #fff; }
+        .btn-check { background: #238636; color: #fff; }
+        .btn-check:hover { background: #2ea043; }
+        .btn-next { background: #21262d; color: #c9d1d9; }
+        .btn-next:hover { background: #30363d; }
+
+        .editor-area { flex: 1; display: flex; flex-direction: column; background: #0d1117; }
+        .editor-tabs { display: flex; background: #161b22; border-bottom: 1px solid #30363d; }
+        .editor-tab { padding: 12px 20px; color: #8b949e; font-size: 0.85rem; display: flex; align-items: center; gap: 8px; border-right: 1px solid #30363d; }
+        .editor-tab.active { background: #0d1117; color: #c9d1d9; }
+        .editor-tab .dot { width: 12px; height: 12px; background: #3572A5; border-radius: 50%; }
+        .editor-container { flex: 1; display: flex; overflow: hidden; }
+        .line-numbers { background: #0d1117; color: #484f58; padding: 15px 10px; text-align: right; font-family: 'JetBrains Mono', monospace; font-size: 0.9rem; line-height: 1.7; border-right: 1px solid #21262d; min-width: 50px; user-select: none; }
+        .code-editor { flex: 1; padding: 15px; background: #0d1117; color: #c9d1d9; font-family: 'JetBrains Mono', monospace; font-size: 0.95rem; line-height: 1.7; border: none; resize: none; outline: none; }
+        .code-editor::placeholder { color: #484f58; }
+        
+        .output-panel { height: 180px; background: #161b22; border-top: 1px solid #30363d; display: flex; flex-direction: column; }
+        .output-header { padding: 10px 15px; border-bottom: 1px solid #30363d; display: flex; align-items: center; gap: 10px; }
+        .output-header span { color: #8b949e; font-size: 0.85rem; }
+        .output-content { flex: 1; padding: 15px; overflow: auto; font-family: 'JetBrains Mono', monospace; font-size: 0.85rem; }
+        .output-line { margin-bottom: 3px; }
+        .output-line.error { color: #f85149; }
+        .output-line.success { color: #7ee787; }
+        .output-line.info { color: #58a6ff; }
+
+        .feedback-overlay { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.8); display: none; align-items: center; justify-content: center; z-index: 1000; }
+        .feedback-overlay.show { display: flex; }
+        .feedback-card { background: #161b22; border: 1px solid #30363d; border-radius: 16px; padding: 30px; max-width: 420px; width: 90%; text-align: center; }
+        .feedback-icon { font-size: 4rem; margin-bottom: 15px; }
+        .feedback-title { font-size: 1.4rem; font-weight: 700; margin-bottom: 10px; }
+        .feedback-title.correct { color: #7ee787; }
+        .feedback-title.incorrect { color: #f85149; }
+        .feedback-score { color: #8b949e; margin-bottom: 20px; font-family: 'JetBrains Mono', monospace; }
+        .feedback-btn { padding: 12px 40px; background: #238636; color: #fff; border: none; border-radius: 8px; font-weight: 600; cursor: pointer; }
+
+        .results-screen { display: none; min-height: 100vh; background: linear-gradient(135deg, #0d1117, #161b22); align-items: center; justify-content: center; padding: 20px; }
+        .results-card { background: #161b22; border: 1px solid #30363d; border-radius: 16px; padding: 40px; max-width: 500px; width: 100%; text-align: center; }
+        .result-badge { display: inline-block; padding: 8px 20px; border-radius: 20px; font-weight: 600; margin-bottom: 20px; }
+        .result-badge.passed { background: rgba(35, 134, 54, 0.2); color: #7ee787; }
+        .result-badge.failed { background: rgba(248, 81, 73, 0.2); color: #f85149; }
+        .result-score { font-size: 4rem; font-weight: 800; color: #58a6ff; font-family: 'JetBrains Mono', monospace; }
+        .result-label { color: #8b949e; margin-bottom: 30px; }
+        .result-stats { display: grid; grid-template-columns: repeat(2, 1fr); gap: 15px; margin-bottom: 30px; }
+        .stat-box { background: #21262d; padding: 15px; border-radius: 8px; }
+        .stat-box .label { color: #8b949e; font-size: 0.75rem; }
+        .stat-box .value { color: #c9d1d9; font-size: 1.2rem; font-weight: 600; margin-top: 5px; }
+        .result-actions { display: flex; gap: 15px; }
+        .result-actions button { flex: 1; padding: 14px; font-size: 0.95rem; font-weight: 600; border: none; border-radius: 8px; cursor: pointer; }
+        .btn-review { background: #21262d; color: #c9d1d9; }
+        .btn-retry { background: #238636; color: #fff; }
+
+        @media (max-width: 900px) { .task-panel { width: 280px; } }
+        @media (max-width: 700px) { .task-panel { display: none; } }
+    </style>
+</head>
+<body>
+    <div id="startScreen" class="start-screen">
+        <div class="start-card">
+            <div class="cat-badge">📝 CAT 1</div>
+            <div class="start-icon">🧠</div>
+            <h1>Programming Fundamentals & Logic</h1>
+            <h2>Masomotele Technical Training Institute</h2>
+            
+            <div class="unit-topics">
+                <h3>Topics Covered</h3>
+                <ul>
+                    <li>What is programming and why learn it</li>
+                    <li>How computers execute instructions</li>
+                    <li>Basic programming concepts</li>
+                    <li>Writing your first programs</li>
+                    <li>Understanding program flow</li>
+                    <li>Comments and code documentation</li>
+                </ul>
+            </div>
+            
+            <div class="exam-info">
+                <div class="info-box">
+                    <div class="label">Questions</div>
+                    <div class="value">5</div>
+                </div>
+                <div class="info-box">
+                    <div class="label">Duration</div>
+                    <div class="value">30 min</div>
+                </div>
+                <div class="info-box">
+                    <div class="label">Pass Mark</div>
+                    <div class="value">50%</div>
+                </div>
+            </div>
+            
+            <div class="name-input">
+                <input type="text" id="studentName" placeholder="Enter Your Full Name">
+            </div>
+            
+            <button class="start-btn" id="startBtn" disabled>Start CAT 1</button>
+        </div>
+    </div>
+
+    <div id="ideContainer" class="ide-container">
+        <div class="title-bar">
+            <div class="title-bar-left">
+                <h1>🧠 CAT 1: Programming Fundamentals & Logic</h1>
+            </div>
+            <div class="title-bar-right">
+                <span class="progress-text">Question <span id="taskNum">1</span>/5</span>
+                <span class="timer" id="timer">30:00</span>
+                <button onclick="showResults()" style="padding:8px 16px;background:#21262d;border:1px solid #30363d;border-radius:6px;color:#c9d1d9;cursor:pointer;font-size:0.85rem;">Submit CAT</button>
+            </div>
+        </div>
+
+        <div class="main-content">
+            <div class="task-panel">
+                <div class="task-header">
+                    <div class="task-num">Question <span id="taskNumPanel">1</span></div>
+                    <div class="task-title" id="taskTitle">Hello World</div>
+                    <div class="task-points" id="taskPoints">10 points</div>
+                </div>
+                <div class="task-content" id="taskContent"></div>
+                <div class="task-nav">
+                    <button class="btn-run" onclick="runCode()">▶ Run</button>
+                    <button class="btn-check" onclick="checkTask()">✓ Check</button>
+                    <button class="btn-next" id="nextBtn" onclick="nextTask()">Next →</button>
+                </div>
+            </div>
+
+            <div class="editor-area">
+                <div class="editor-tabs">
+                    <div class="editor-tab active"><span class="dot"></span>solution.py</div>
+                </div>
+                <div class="editor-container">
+                    <div class="line-numbers" id="lineNumbers">1</div>
+                    <textarea class="code-editor" id="codeEditor" placeholder="# Write your Python code here..." spellcheck="false"></textarea>
+                </div>
+                <div class="output-panel">
+                    <div class="output-header">
+                        <span>OUTPUT</span>
+                    </div>
+                    <div class="output-content" id="outputContent">
+                        <div class="output-line info">Python 3.11 Ready</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="feedback-overlay" id="feedbackOverlay">
+        <div class="feedback-card">
+            <div class="feedback-icon" id="feedbackIcon">✅</div>
+            <div class="feedback-title" id="feedbackTitle">Correct!</div>
+            <div class="feedback-score" id="feedbackScore">10/10 points</div>
+            <button class="feedback-btn" onclick="closeFeedback()">Continue</button>
+        </div>
+    </div>
+
+    <div id="resultsScreen" class="results-screen">
+        <div class="results-card">
+            <div class="result-badge" id="resultBadge">PASSED</div>
+            <div class="result-score" id="resultScore">80%</div>
+            <div class="result-label" id="resultLabel">40/50 points</div>
+            <div class="result-stats">
+                <div class="stat-box">
+                    <div class="label">Correct</div>
+                    <div class="value" id="correctCount">4/5</div>
+                </div>
+                <div class="stat-box">
+                    <div class="label">Time</div>
+                    <div class="value" id="timeUsed">12:34</div>
+                </div>
+            </div>
+            <div class="result-actions">
+                <button class="btn-review" onclick="reviewTasks()">Review</button>
+                <button class="btn-retry" onclick="location.reload()">Retry</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Simple Python Interpreter
+        class SimplePython {
+            constructor() { this.reset(); }
+            reset() { this.vars = {}; this.output = []; }
+            
+            run(code) {
+                this.reset();
+                const lines = code.split('\n');
+                try {
+                    for (let line of lines) {
+                        line = line.trim();
+                        if (!line || line.startsWith('#')) continue;
+                        
+                        if (line.startsWith('print(')) {
+                            const content = line.slice(6, -1);
+                            this.output.push(this.eval(content));
+                        } else if (line.includes('=') && !line.includes('==')) {
+                            const [name, val] = line.split('=').map(s => s.trim());
+                            this.vars[name] = this.eval(val);
+                        }
+                    }
+                    return { success: true, output: this.output };
+                } catch (e) {
+                    return { success: false, output: this.output, error: e.message };
+                }
+            }
+            
+            eval(expr) {
+                expr = expr.trim();
+                if ((expr.startsWith('"') && expr.endsWith('"')) || (expr.startsWith("'") && expr.endsWith("'")))
+                    return expr.slice(1, -1);
+                if (!isNaN(Number(expr))) return Number(expr);
+                if (this.vars[expr] !== undefined) return this.vars[expr];
+                
+                // String concat
+                if (expr.includes('+')) {
+                    const parts = expr.split('+').map(p => this.eval(p.trim()));
+                    if (parts.some(p => typeof p === 'string')) return parts.join('');
+                    return parts.reduce((a, b) => a + b, 0);
+                }
+                return expr;
+            }
+        }
+        
+        const python = new SimplePython();
+        
+        const tasks = [
+            {
+                id: 1,
+                title: "Hello World",
+                points: 10,
+                scenario: "Every programmer's journey starts with 'Hello World'. This simple program proves you can write and run code!",
+                requirements: [
+                    "Use the <code>print()</code> function",
+                    "Display exactly: <code>Hello, World!</code>",
+                    "Pay attention to spelling and punctuation"
+                ],
+                expected: "Hello, World!",
+                starter: "# Your first Python program!\n# Type your code below:\n\n",
+                hint: "Type exactly: <code>print(\"Hello, World!\")</code>",
+                check: (code, result) => {
+                    let score = 0;
+                    if (code.includes('print(')) score += 5;
+                    if (result.output.some(o => o.includes('Hello') && o.includes('World'))) score += 5;
+                    return { score, max: 10, correct: score >= 8 };
+                }
+            },
+            {
+                id: 2,
+                title: "Print Your Name",
+                points: 10,
+                scenario: "Make Python introduce you! Programs often display personalized messages.",
+                requirements: [
+                    "Print: <code>My name is [Your Name]</code>",
+                    "Replace [Your Name] with your actual name",
+                    "Use the print() function"
+                ],
+                expected: "My name is John",
+                starter: "# Introduce yourself\n\n",
+                hint: "Example: <code>print(\"My name is Mary\")</code>",
+                check: (code, result) => {
+                    let score = 0;
+                    if (code.includes('print(')) score += 5;
+                    if (result.output.some(o => o.toLowerCase().includes('my name is'))) score += 5;
+                    return { score, max: 10, correct: score >= 8 };
+                }
+            },
+            {
+                id: 3,
+                title: "Multiple Lines",
+                points: 10,
+                scenario: "Programs often need to display multiple pieces of information. Each print() creates a new line.",
+                requirements: [
+                    "Print line 1: <code>Welcome to M.T.T.I</code>",
+                    "Print line 2: <code>Start Learning, Start Earning</code>",
+                    "Use TWO separate print statements"
+                ],
+                expected: "Welcome to M.T.T.I\nStart Learning, Start Earning",
+                starter: "# Print two lines\n\n",
+                hint: "Use two print() statements, one after another",
+                check: (code, result) => {
+                    let score = 0;
+                    const prints = (code.match(/print\(/g) || []).length;
+                    if (prints >= 2) score += 4;
+                    if (result.output.some(o => o.toLowerCase().includes('mtti') || o.includes('M.T.T.I'))) score += 3;
+                    if (result.output.some(o => o.toLowerCase().includes('learning'))) score += 3;
+                    return { score, max: 10, correct: score >= 7 };
+                }
+            },
+            {
+                id: 4,
+                title: "Using Comments",
+                points: 10,
+                scenario: "Comments explain your code to other programmers (and your future self!). Python ignores lines starting with #",
+                requirements: [
+                    "Write a comment explaining what the program does",
+                    "Comments start with <code>#</code>",
+                    "Then print: <code>Python is fun!</code>"
+                ],
+                expected: "Python is fun!",
+                starter: "# Write your comment here:\n\n# Then your print statement:\n",
+                hint: "Comments start with #. Example: <code># This prints a message</code>",
+                check: (code, result) => {
+                    let score = 0;
+                    if (code.includes('#')) score += 5;
+                    if (result.output.some(o => o.toLowerCase().includes('python') && o.toLowerCase().includes('fun'))) score += 5;
+                    return { score, max: 10, correct: score >= 8 };
+                }
+            },
+            {
+                id: 5,
+                title: "Program Information",
+                points: 10,
+                scenario: "Create a complete program with proper documentation. Good programmers always explain their code!",
+                requirements: [
+                    "Add a comment with your name",
+                    "Add a comment with today's date",
+                    "Print: <code>Program complete!</code>"
+                ],
+                expected: "Program complete!",
+                starter: "# Author: \n# Date: \n\n",
+                hint: "Fill in the comments, then add <code>print(\"Program complete!\")</code>",
+                check: (code, result) => {
+                    let score = 0;
+                    const comments = (code.match(/#/g) || []).length;
+                    if (comments >= 2) score += 5;
+                    if (result.output.some(o => o.toLowerCase().includes('program') && o.toLowerCase().includes('complete'))) score += 5;
+                    return { score, max: 10, correct: score >= 8 };
+                }
+            }
+        ];
+
+        let state = {
+            currentTask: 0,
+            timeRemaining: 30 * 60,
+            results: {},
+            savedCode: {},
+            timerInterval: null
+        };
+
+        const $ = id => document.getElementById(id);
+
+        $('studentName').addEventListener('input', e => {
+            $('startBtn').disabled = !e.target.value.trim();
+        });
+
+        $('startBtn').addEventListener('click', () => {
+            $('startScreen').style.display = 'none';
+            $('ideContainer').style.display = 'flex';
+            loadTask(0);
+            startTimer();
+        });
+
+        $('codeEditor').addEventListener('input', updateLines);
+        $('codeEditor').addEventListener('keydown', e => {
+            if (e.key === 'Tab') {
+                e.preventDefault();
+                const s = e.target.selectionStart;
+                e.target.value = e.target.value.substring(0, s) + '    ' + e.target.value.substring(e.target.selectionEnd);
+                e.target.selectionStart = e.target.selectionEnd = s + 4;
+            }
+        });
+
+        function updateLines() {
+            const lines = $('codeEditor').value.split('\n').length;
+            $('lineNumbers').innerHTML = Array.from({length: lines}, (_, i) => i + 1).join('<br>');
+        }
+
+        function startTimer() {
+            state.timerInterval = setInterval(() => {
+                state.timeRemaining--;
+                const m = Math.floor(state.timeRemaining / 60);
+                const s = state.timeRemaining % 60;
+                $('timer').textContent = `${m}:${s.toString().padStart(2, '0')}`;
+                if (state.timeRemaining <= 300) $('timer').classList.add('warning');
+                if (state.timeRemaining <= 0) { clearInterval(state.timerInterval); showResults(); }
+            }, 1000);
+        }
+
+        function loadTask(index) {
+            if (state.currentTask !== undefined) {
+                state.savedCode[tasks[state.currentTask].id] = $('codeEditor').value;
+            }
+            state.currentTask = index;
+            const task = tasks[index];
+
+            $('taskNum').textContent = index + 1;
+            $('taskNumPanel').textContent = index + 1;
+            $('taskTitle').textContent = task.title;
+            $('taskPoints').textContent = task.points + ' points';
+
+            $('taskContent').innerHTML = `
+                <div class="scenario-box">
+                    <h4>📖 Scenario</h4>
+                    <p>${task.scenario}</p>
+                </div>
+                <div class="requirements">
+                    <h4>Requirements</h4>
+                    <ul>${task.requirements.map(r => `<li>${r}</li>`).join('')}</ul>
+                </div>
+                <div class="expected-box">
+                    <h5>Expected Output</h5>
+                    <pre>${task.expected}</pre>
+                </div>
+                <details class="hint-box">
+                    <summary>💡 Hint</summary>
+                    <p>${task.hint}</p>
+                </details>
+            `;
+
+            $('codeEditor').value = state.savedCode[task.id] || task.starter;
+            updateLines();
+            $('outputContent').innerHTML = '<div class="output-line info">Ready to run...</div>';
+            $('nextBtn').textContent = index === tasks.length - 1 ? 'Finish' : 'Next →';
+        }
+
+        function runCode() {
+            const code = $('codeEditor').value;
+            const result = python.run(code);
+
+            let html = '<div class="output-line info">>>> Running...</div>';
+            if (result.success) {
+                if (result.output.length === 0) {
+                    html += '<div class="output-line" style="color:#f0883e;">No output. Use print()</div>';
+                } else {
+                    result.output.forEach(o => html += `<div class="output-line">${o}</div>`);
+                }
+                html += '<div class="output-line success">✓ Done</div>';
+            } else {
+                html += `<div class="output-line error">Error: ${result.error}</div>`;
+            }
+            $('outputContent').innerHTML = html;
+            return result;
+        }
+
+        function checkTask() {
+            const code = $('codeEditor').value;
+            const result = runCode();
+            const task = tasks[state.currentTask];
+            const check = task.check(code, result);
+            state.results[task.id] = check;
+
+            $('feedbackIcon').textContent = check.correct ? '✅' : '❌';
+            $('feedbackTitle').textContent = check.correct ? 'Correct!' : 'Not Quite';
+            $('feedbackTitle').className = 'feedback-title ' + (check.correct ? 'correct' : 'incorrect');
+            $('feedbackScore').textContent = `${check.score}/${check.max} points`;
+            $('feedbackOverlay').classList.add('show');
+        }
+
+        function closeFeedback() { $('feedbackOverlay').classList.remove('show'); }
+
+        function nextTask() {
+            state.savedCode[tasks[state.currentTask].id] = $('codeEditor').value;
+            if (state.currentTask < tasks.length - 1) loadTask(state.currentTask + 1);
+            else showResults();
+        }
+
+        function showResults() {
+            clearInterval(state.timerInterval);
+            let total = 0, max = 0, correct = 0;
+            tasks.forEach(t => {
+                max += t.points;
+                const r = state.results[t.id];
+                if (r) { total += r.score; if (r.correct) correct++; }
+            });
+
+            const pct = Math.round((total / max) * 100);
+            const passed = pct >= 50;
+            const used = 30 * 60 - state.timeRemaining;
+
+            $('resultBadge').textContent = passed ? 'PASSED' : 'FAILED';
+            $('resultBadge').className = 'result-badge ' + (passed ? 'passed' : 'failed');
+            $('resultScore').textContent = pct + '%';
+            $('resultLabel').textContent = `${total}/${max} points`;
+            $('correctCount').textContent = `${correct}/${tasks.length}`;
+            $('timeUsed').textContent = `${Math.floor(used/60)}:${(used%60).toString().padStart(2,'0')}`;
+
+            $('ideContainer').style.display = 'none';
+            $('resultsScreen').style.display = 'flex';
+        }
+
+        function reviewTasks() {
+            $('resultsScreen').style.display = 'none';
+            $('ideContainer').style.display = 'flex';
+            loadTask(0);
+        }
+    </script>
+</body>
+</html>

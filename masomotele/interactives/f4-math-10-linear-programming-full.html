@@ -1,0 +1,275 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Mathematics Form 4 | Linear Programming</title>
+<style>
+:root{--pri:#0a5e2a;--pri-l:#0d7a38;--acc:#f5a623;--ok:#2e7d32;--no:#c62828;--bg:#f4f7f5;--txt:#1a1a1a;}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Segoe UI',system-ui,sans-serif;background:var(--bg);color:var(--txt);min-height:100vh;display:flex;flex-direction:column}
+#topbar{position:sticky;top:0;z-index:100;background:linear-gradient(135deg,var(--pri) 0%,var(--pri-l) 100%);color:#fff;padding:10px 16px;display:flex;align-items:center;gap:10px;box-shadow:0 2px 8px rgba(0,0,0,.25)}
+#topbar .sub{font-size:.7rem;opacity:.8;text-transform:uppercase;letter-spacing:1px}
+#topbar .ttl{font-size:.95rem;font-weight:700;flex:1}
+#slide-badge{background:var(--acc);color:#000;font-weight:700;font-size:.78rem;padding:3px 10px;border-radius:20px;white-space:nowrap}
+.slide{display:none;padding:16px 16px 80px;animation:fi .3s ease}
+.slide.active{display:block}
+@keyframes fi{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+.slide-title{font-size:1.2rem;font-weight:800;color:var(--pri);margin-bottom:14px;padding-bottom:8px;border-bottom:3px solid var(--acc)}
+.lo-box{background:#e8f5e9;border-left:5px solid var(--pri);border-radius:8px;padding:14px 16px;margin-bottom:12px}
+.lo-box h3{color:var(--pri);font-size:.95rem;margin-bottom:8px}
+.lo-box ol{padding-left:18px;font-size:.9rem;line-height:1.8}
+.inquiry{background:#fff8e1;border:1.5px solid var(--acc);border-radius:8px;padding:10px 14px;font-size:.88rem;color:#5d4037;margin-top:10px}
+.inquiry strong{color:#e65100}
+.teach-block{margin-bottom:18px}
+.teach-block h3{font-size:1rem;font-weight:700;color:var(--pri);margin-bottom:8px;padding-bottom:4px;border-bottom:2px solid var(--acc);display:inline-block}
+.teach-block p,.teach-block li{font-size:.9rem;line-height:1.7}
+.teach-block ul,.teach-block ol{padding-left:18px;margin-top:6px}
+.key-term{background:#fff8e1;border-left:4px solid var(--acc);border-radius:6px;padding:10px 14px;margin:10px 0;font-size:.88rem}
+.key-term strong{color:#e65100}
+.info-table{width:100%;border-collapse:collapse;margin:10px 0;font-size:.88rem}
+.info-table th{background:var(--pri);color:#fff;padding:8px 10px;text-align:left}
+.info-table td{padding:7px 10px;border-bottom:1px solid #e0e0e0}
+.info-table tr:nth-child(even) td{background:#f1f8e9}
+.example-box{background:#f1f8e9;border:1.5px solid var(--ok);border-radius:8px;padding:12px 14px;margin:10px 0;font-size:.88rem}
+.example-box strong{color:var(--ok);display:block;margin-bottom:6px}
+.formula-box{background:#e3f2fd;border:2px solid #1976d2;border-radius:10px;padding:14px;margin:12px 0;text-align:center}
+.formula-box .formula{font-size:1.1rem;font-weight:800;color:#1565c0;font-family:Georgia,serif;margin:6px 0}
+.warn-box{background:#fff3e0;border-left:4px solid #e65100;border-radius:6px;padding:10px 14px;margin:10px 0;font-size:.88rem;color:#5d4037}
+.quiz-section{margin-bottom:20px}
+.quiz-section h3{font-size:1rem;font-weight:700;color:var(--pri);margin-bottom:12px}
+.q-item{background:#fff;border:1.5px solid #c8e6c9;border-radius:10px;padding:14px;margin-bottom:12px}
+.q-item p{font-size:.9rem;font-weight:600;margin-bottom:10px}
+.fill-blank{border:none;border-bottom:2.5px dashed var(--pri);background:transparent;font-size:.9rem;padding:2px 6px;width:110px;outline:none;text-align:center}
+.fb-result{font-size:.82rem;font-weight:600;margin-top:6px;padding:4px 8px;border-radius:4px;display:inline-block}
+.fb-result.ok{background:#e8f5e9;color:var(--ok)}
+.fb-result.no{background:#ffebee;color:var(--no)}
+.sa-box{width:100%;border:1.5px solid #c8e6c9;border-radius:8px;padding:10px;font-size:.88rem;font-family:inherit;resize:vertical;min-height:80px;outline:none}
+.grade-btn{background:var(--pri);color:#fff;border:none;border-radius:8px;padding:8px 18px;font-size:.85rem;font-weight:700;cursor:pointer;margin-top:8px}
+.sa-feedback{font-size:.82rem;margin-top:8px;padding:10px;border-radius:8px;line-height:1.6;display:none}
+.sa-feedback.ok{background:#e8f5e9;border:1px solid #a5d6a7;color:#1b5e20}
+.sa-feedback.partial{background:#fff8e1;border:1px solid #ffe082;color:#5d4037}
+.sa-feedback.no{background:#ffebee;border:1px solid #ef9a9a;color:#b71c1c}
+.kw-found{color:var(--ok);font-weight:700}
+.kw-miss{color:var(--no);font-weight:700}
+.model-ans{margin-top:6px;padding-top:6px;border-top:1px solid #ccc;font-style:italic}
+#score-result{background:linear-gradient(135deg,var(--pri),var(--pri-l));color:#fff;border-radius:12px;padding:20px;text-align:center;margin-top:16px;display:none}
+#score-result .big{font-size:2rem;font-weight:900;margin:8px 0}
+.submit-btn{background:var(--acc);color:#000;border:none;border-radius:10px;padding:12px 32px;font-size:1rem;font-weight:800;cursor:pointer;margin-top:16px;width:100%}
+#navbar{position:fixed;bottom:0;left:0;right:0;background:#fff;border-top:1px solid #e0e0e0;padding:10px 16px;display:flex;align-items:center;justify-content:space-between;gap:8px;z-index:100;box-shadow:0 -2px 8px rgba(0,0,0,.1)}
+.nav-btn{background:var(--pri);color:#fff;border:none;border-radius:8px;padding:9px 22px;font-size:.88rem;font-weight:700;cursor:pointer}
+.nav-btn:disabled{background:#ccc;cursor:not-allowed}
+#dot-nav{display:flex;gap:6px;flex-wrap:wrap;justify-content:center;flex:1}
+.dot{width:10px;height:10px;border-radius:50%;background:#c8e6c9;cursor:pointer;transition:all .2s}
+.dot.active{background:var(--pri);transform:scale(1.3)}
+.dot.done{background:var(--acc)}
+</style>
+<script type="text/javascript">(function(c,l,a,r,i,t,y){c[a]=c[a]||function(){(c[a].q=c[a].q||[]).push(arguments)};t=l.createElement(r);t.async=1;t.src="https://www.clarity.ms/tag/"+i;y=l.getElementsByTagName(r)[0];y.parentNode.insertBefore(t,y);})(window,document,"clarity","script","wg31zlwbt9");</script>\n</head>
+<body>
+<div id="topbar">
+  <div><div class="sub">Mathematics · Form 4</div><div class="ttl">Linear Programming</div></div>
+  <div id="slide-badge">Slide 1 / 10</div>
+</div>
+
+<div class="slide active" id="s1">
+  <div class="slide-title">📋 Learning Outcomes</div>
+  <div class="lo-box"><h3>By the end of this lesson, you should be able to:</h3>
+    <ol>
+      <li>Formulate linear programming problems from word descriptions</li>
+      <li>Write constraint inequalities for a problem</li>
+      <li>Draw and shade the feasible region</li>
+      <li>Identify the objective function</li>
+      <li>Find the optimal solution graphically</li>
+      <li>Maximise or minimise an objective function</li>
+      <li>Apply linear programming to real-life business problems</li>
+    </ol>
+  </div>
+  <div class="inquiry"><strong>🔍 Key Inquiry Question:</strong> How can businesses use mathematics to make the best decisions with limited resources?</div>
+</div>
+<div class="slide" id="s2">
+  <div class="slide-title">📐 Introduction to Linear Programming</div>
+  <div class="teach-block"><h3>Key Terms</h3>
+    <table class="info-table">
+      <tr><th>Term</th><th>Meaning</th></tr>
+      <tr><td>Decision variables</td><td>The unknowns we want to find (x and y)</td></tr>
+      <tr><td>Objective function</td><td>What we want to maximise or minimise (e.g. profit P = 3x+2y)</td></tr>
+      <tr><td>Constraints</td><td>The limiting conditions (inequalities)</td></tr>
+      <tr><td>Feasible region</td><td>The shaded area satisfying all constraints</td></tr>
+      <tr><td>Optimal solution</td><td>The best point in the feasible region</td></tr>
+    </table>
+  </div>
+  <div class="teach-block"><h3>General Approach</h3>
+    <ol>
+      <li>Define variables (let x = ..., y = ...)</li>
+      <li>Write the objective function</li>
+      <li>Write all constraints as inequalities</li>
+      <li>Draw the feasible region</li>
+      <li>Test vertices of feasible region in objective function</li>
+      <li>State the optimal solution</li>
+    </ol>
+  </div>
+</div>
+<div class="slide" id="s3">
+  <div class="slide-title">📝 Formulating LP Problems</div>
+  <div class="teach-block"><h3>Worked Example — Formulation</h3>
+    <div class="example-box"><strong>Problem:</strong>
+      <p>A factory makes tables (x) and chairs (y). Each table needs 3 hrs carpentry and 2 hrs finishing. Each chair needs 1 hr carpentry and 2 hrs finishing. Available: 12 hrs carpentry and 16 hrs finishing. Profit: Ksh 400 per table, Ksh 250 per chair. Maximise profit.</p>
+      <p><strong>Variables:</strong> x = tables, y = chairs</p>
+      <p><strong>Objective:</strong> Maximise P = 400x + 250y</p>
+      <p><strong>Constraints:</strong></p>
+      <ul>
+        <li>3x + y ≤ 12 (carpentry)</li>
+        <li>2x + 2y ≤ 16, i.e. x + y ≤ 8 (finishing)</li>
+        <li>x ≥ 0, y ≥ 0 (non-negative)</li>
+      </ul>
+    </div>
+  </div>
+</div>
+<div class="slide" id="s4">
+  <div class="slide-title">📊 Drawing the Feasible Region</div>
+  <div class="teach-block"><h3>Steps for Drawing</h3>
+    <ol>
+      <li>Convert each inequality to an equation (boundary line)</li>
+      <li>Find x and y intercepts of each line</li>
+      <li>Draw the lines on a graph</li>
+      <li>Test a point (usually origin) to determine which side to shade</li>
+      <li>The feasible region is where ALL shaded regions overlap</li>
+    </ol>
+    <div class="example-box"><strong>For 3x + y ≤ 12:</strong>
+      <p>When x=0: y=12 → point (0,12)</p>
+      <p>When y=0: x=4 → point (4,0)</p>
+      <p>Test (0,0): 0 ≤ 12 ✓ → shade side containing origin</p>
+    </div>
+    <div class="example-box"><strong>For x + y ≤ 8:</strong>
+      <p>Points: (0,8) and (8,0)</p>
+      <p>Test (0,0): 0 ≤ 8 ✓ → shade side containing origin</p>
+    </div>
+  </div>
+</div>
+<div class="slide" id="s5">
+  <div class="slide-title">🎯 Finding the Optimal Solution</div>
+  <div class="teach-block"><h3>Vertex (Corner Point) Method</h3>
+    <p>The maximum or minimum of the objective function always occurs at a <strong>vertex</strong> (corner point) of the feasible region.</p>
+    <div class="example-box"><strong>Finding vertices for our example:</strong>
+      <p>Vertices of feasible region (read from graph or solve simultaneous equations):</p>
+      <p>O(0,0), A(4,0), B(2,6), C(0,8)</p>
+      <p>Test P = 400x + 250y at each:</p>
+      <table class="info-table">
+        <tr><th>Vertex</th><th>P = 400x+250y</th></tr>
+        <tr><td>O(0,0)</td><td>0</td></tr>
+        <tr><td>A(4,0)</td><td>1600</td></tr>
+        <tr><td>B(2,6)</td><td>800+1500=<strong>2300</strong></td></tr>
+        <tr><td>C(0,8)</td><td>2000</td></tr>
+      </table>
+      <p style="color:var(--ok);font-weight:700">Maximum profit = Ksh 2,300 at B(2,6): Make 2 tables and 6 chairs.</p>
+    </div>
+  </div>
+</div>
+<div class="slide" id="s6">
+  <div class="slide-title">📉 Minimisation Problems</div>
+  <div class="teach-block"><h3>Minimising Cost</h3>
+    <div class="example-box"><strong>Example:</strong>
+      <p>A diet must contain at least 30g protein and 20g fat. Food A costs Ksh 5/g protein and Ksh 8/g fat. Food B costs Ksh 7/g protein and Ksh 4/g fat.</p>
+      <p><strong>Minimise:</strong> C = 5x + 7y (cost of protein) subject to constraints.</p>
+      <p>The minimum occurs at a vertex of the feasible region — test all vertices and take the smallest value.</p>
+    </div>
+  </div>
+  <div class="teach-block"><h3>Iso-profit/Iso-cost Line Method</h3>
+    <p>Alternative to vertex method:</p>
+    <ol>
+      <li>Draw the objective function line (P = constant)</li>
+      <li>Move the line parallel to itself</li>
+      <li>The last vertex it touches before leaving feasible region is optimal</li>
+    </ol>
+  </div>
+</div>
+<div class="slide" id="s7">
+  <div class="slide-title">📊 Integer Programming</div>
+  <div class="teach-block"><h3>When Solutions Must Be Whole Numbers</h3>
+    <p>In many real problems, you can't make 2.5 tables — solutions must be integers.</p>
+    <div class="key-term"><strong>Integer LP:</strong> If the optimal vertex gives non-integer values, test all nearby integer points within the feasible region and pick the best one.</div>
+    <div class="example-box"><strong>Example:</strong>
+      <p>Optimal solution is x=2.5, y=3.5. Test nearby integers in feasible region:</p>
+      <p>(2,3), (2,4), (3,3) — calculate P for each and pick maximum.</p>
+    </div>
+  </div>
+</div>
+<div class="slide" id="s8">
+  <div class="slide-title">💡 Real-Life Applications</div>
+  <div class="teach-block"><h3>Business Production Planning</h3>
+    <div class="example-box"><strong>Example — Crop Planting:</strong>
+      <p>A farmer has 10 acres and Ksh 20,000 to plant maize (x) and beans (y). Maize: 2 acres, Ksh 3000/acre. Beans: 1 acre, Ksh 1500/acre. Expected profit: Ksh 4000/acre maize, Ksh 2500/acre beans.</p>
+      <p>Constraints: 2x+y≤10, 3000x+1500y≤20000, x≥0, y≥0</p>
+      <p>Maximise: P = 4000x + 2500y</p>
+    </div>
+  </div>
+  <div class="teach-block"><h3>Transport and Logistics</h3>
+    <div class="example-box"><strong>Example:</strong>
+      <p>A truck can carry max 5 tonnes. Small boxes weigh 0.5T, large boxes 1T. Profit: Ksh 200/small box, Ksh 350/large box. At least 2 of each type must be carried.</p>
+      <p>Maximise: P = 200x + 350y subject to 0.5x+y≤5, x≥2, y≥2</p>
+    </div>
+  </div>
+</div>
+<div class="slide" id="s9">
+  <div class="slide-title">✏️ Practice Problems</div>
+  <div class="teach-block"><h3>Problem 1</h3>
+    <p>Maximise P = 3x+2y subject to: x+y≤4, x+2y≤6, x≥0, y≥0.</p>
+    <div class="example-box"><strong>Solution:</strong>
+      <p>Vertices: O(0,0), A(4,0), B(2,2), C(0,3)</p>
+      <p>P values: 0, 12, 10, 6</p>
+      <p>Maximum P = <strong>12 at (4,0)</strong></p>
+    </div>
+  </div>
+  <div class="teach-block"><h3>Problem 2</h3>
+    <p>Minimise C = 2x+3y subject to: x+y≥6, 2x+y≥8, x≥0, y≥0.</p>
+    <div class="example-box"><strong>Solution:</strong>
+      <p>Vertices: A(8,0), B(2,4), C(0,8)</p>
+      <p>C values: 16, 16, 24</p>
+      <p>Minimum C = <strong>16 at (8,0) or (2,4)</strong></p>
+    </div>
+  </div>
+</div>
+<div class="slide" id="s10">
+  <div class="slide-title">📝 Quiz — Linear Programming</div>
+  <div class="quiz-section"><h3>Part A: Fill in the Blanks (5 marks)</h3>
+    <div class="q-item"><p>1. The expression to be maximised or minimised is called the <input class="fill-blank" id="f1" style="width:170px">.</p><div id="f1r" class="fb-result" style="display:none"></div></div>
+    <div class="q-item"><p>2. The limiting inequalities in a linear programming problem are called <input class="fill-blank" id="f2" style="width:120px">.</p><div id="f2r" class="fb-result" style="display:none"></div></div>
+    <div class="q-item"><p>3. The shaded area satisfying all constraints is called the <input class="fill-blank" id="f3" style="width:150px">.</p><div id="f3r" class="fb-result" style="display:none"></div></div>
+    <div class="q-item"><p>4. The optimal solution always occurs at one of the <input class="fill-blank" id="f4" style="width:80px"> of the feasible region.</p><div id="f4r" class="fb-result" style="display:none"></div></div>
+    <div class="q-item"><p>5. In a profit problem, we want to <input class="fill-blank" id="f5"> the objective function.</p><div id="f5r" class="fb-result" style="display:none"></div></div>
+  </div>
+  <div class="quiz-section"><h3>Part B: Short Answer (10 marks)</h3>
+    <div class="q-item"><p>6. (4 marks) A baker makes bread (x) and cakes (y). Bread needs 2kg flour and 1 egg. Cakes need 1kg flour and 2 eggs. Available: 10kg flour and 14 eggs. Profit: Ksh 50/bread, Ksh 80/cake. Write all constraints and the objective function.</p>
+      <textarea class="sa-box" id="sa1" placeholder="Define variables and write constraints..."></textarea>
+      <button class="grade-btn" onclick="gradeAnswer('sa1','fb1',{keywords:['2x+y','x+2y','≤10','≤14','p=50x+80y','objective','constraint','x≥0','y≥0'],required:4,marks:4,model:'Let x=loaves, y=cakes. Constraints: 2x+y≤10 (flour), x+2y≤14 (eggs), x≥0, y≥0. Objective: Maximise P=50x+80y.'})">✓ Grade My Answer</button>
+      <div id="fb1" class="sa-feedback"></div></div>
+    <div class="q-item"><p>7. (3 marks) For the LP: Maximise P=5x+4y subject to x+y≤5, 2x+y≤8, x≥0, y≥0. Find the vertices and maximum P.</p>
+      <textarea class="sa-box" id="sa2" placeholder="Find vertices and test in objective function..."></textarea>
+      <button class="grade-btn" onclick="gradeAnswer('sa2','fb2',{keywords:['3','2','vertices','(3,2)','(0,5)','(4,0)','p=23','maximum'],required:3,marks:3,model:'Lines intersect: x+y=5 and 2x+y=8 → x=3,y=2. Vertices: O(0,0)→0, A(4,0)→20, B(3,2)→23, C(0,5)→20. Maximum P=23 at (3,2).'})">✓ Grade My Answer</button>
+      <div id="fb2" class="sa-feedback"></div></div>
+    <div class="q-item"><p>8. (3 marks) A company makes two products X and Y. Product X takes 3 hours machine time and 1 hour labour. Product Y takes 1 hour machine time and 2 hours labour. Available: 12 machine hours and 8 labour hours. If profit is Ksh 300 for X and Ksh 200 for Y, find the production plan that maximises profit.</p>
+      <textarea class="sa-box" id="sa3" placeholder="Formulate and solve..."></textarea>
+      <button class="grade-btn" onclick="gradeAnswer('sa3','fb3',{keywords:['3x+y≤12','x+2y≤8','vertices','(4,0)','(0,4)','(3.2,2.4)','profit','1200','maximise'],required:3,marks:3,model:'Constraints: 3x+y≤12, x+2y≤8, x≥0,y≥0. Vertices: O(0,0), A(4,0)→1200, B(3.2,2.4)→1440, C(0,4)→800. Maximum profit=Ksh 1440 at approximately x=3, y=2 (integer solution).'})">✓ Grade My Answer</button>
+      <div id="fb3" class="sa-feedback"></div></div>
+  </div>
+  <button class="submit-btn" onclick="submitQuiz()">📊 Submit & See My Score</button>
+  <div id="score-result"></div>
+</div>
+<div id="navbar">
+  <button class="nav-btn" id="prev-btn" onclick="changeSlide(-1)" disabled>◀ Prev</button>
+  <div id="dot-nav"></div>
+  <button class="nav-btn" id="next-btn" onclick="changeSlide(1)">Next ▶</button>
+</div>
+<script>
+const TOTAL=10;let cur=1;const visited=new Set([1]);
+function buildDots(){const dn=document.getElementById('dot-nav');dn.innerHTML='';for(let i=1;i<=TOTAL;i++){const d=document.createElement('div');d.className='dot'+(i===cur?' active':visited.has(i)&&i!==cur?' done':'');d.onclick=(()=>{const n=i;return()=>goTo(n)})();dn.appendChild(d);}}
+function goTo(n){document.getElementById('s'+cur).classList.remove('active');cur=n;visited.add(n);document.getElementById('s'+n).classList.add('active');document.getElementById('slide-badge').textContent='Slide '+n+' / '+TOTAL;document.getElementById('prev-btn').disabled=(n===1);document.getElementById('next-btn').disabled=(n===TOTAL);buildDots();window.scrollTo(0,0);}
+function changeSlide(d){goTo(cur+d);}
+buildDots();
+const fillAnswers={f1:['objective function'],f2:['constraints'],f3:['feasible region'],f4:['vertices'],f5:['maximize']};
+function gradeAnswer(saId,fbId,cfg){const txt=document.getElementById(saId).value.toLowerCase().trim();if(!txt){alert('Please write your answer first.');return;}const found=cfg.keywords.filter(k=>txt.includes(k.toLowerCase()));const missed=cfg.keywords.filter(k=>!txt.includes(k.toLowerCase())).slice(0,4);const hitRate=Math.min(1,found.length/cfg.required);const marks=Math.round(hitRate*cfg.marks);const fb=document.getElementById(fbId);fb.style.display='block';const cls=marks>=cfg.marks?'ok':marks>0?'partial':'no';fb.className='sa-feedback '+cls;fb.innerHTML=`<strong>Score: ${marks} / ${cfg.marks}</strong><br>✅ Found: <span class="kw-found">${found.length>0?found.join(', '):'none'}</span><br>❌ Missed: <span class="kw-miss">${missed.length>0?missed.join(', '):'none'}</span><div class="model-ans">📖 ${cfg.model}</div>`;}
+function submitQuiz(){let fillScore=0;Object.keys(fillAnswers).forEach(id=>{const val=(document.getElementById(id).value||'').toLowerCase().trim();const correct=fillAnswers[id].some(a=>val===a||val.includes(a));const res=document.getElementById(id+'r');res.style.display='inline-block';if(correct){res.className='fb-result ok';res.textContent='✓ Correct! (1 mark)';fillScore++;}else{res.className='fb-result no';res.textContent='✗ Expected: '+fillAnswers[id][0];}});let saTotal=0;['fb1','fb2','fb3'].forEach(id=>{const fb=document.getElementById(id);if(fb.style.display!=='none'){const m=fb.innerHTML.match(/Score:\s*(\d+)\s*\//);if(m)saTotal+=parseInt(m[1]);}});const total=fillScore+saTotal;const pct=Math.round((total/15)*100);const grade=pct>=80?'Excellent (A)':pct>=60?'Good (B)':pct>=50?'Average (C)':'Needs Improvement';const emoji=pct>=80?'🏆':pct>=60?'👍':pct>=50?'📚':'💪';const res=document.getElementById('score-result');res.style.display='block';res.innerHTML=`${emoji}<div class="big">${total}/15 (${pct}%)</div><strong>${grade}</strong><br><small>Fill: ${fillScore}/5 | SA: ${saTotal}/10</small>`;submitExamToMTTI(total,15,pct);res.scrollIntoView({behavior:'smooth'});}
+function submitExamToMTTI(score,total,percent){try{fetch('/wp-json/mtti/v1/exam-result',{method:'POST',headers:{'Content-Type':'application/json','X-WP-Nonce':window.mtti_nonce||''},body:JSON.stringify({lesson_id:'f4-math-10-linear-programming',score,total,percent,timestamp:new Date().toISOString()})}).then(r=>r.json()).then(d=>{if(d&&d.success)console.log('[MTTI] Saved',d);}).catch(e=>console.log('[MTTI] Offline',e));}catch(e){console.log('[MTTI] Error',e);}}
+</script>
+</body>
+</html>

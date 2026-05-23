@@ -1,0 +1,1116 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Masomotele Technical Training Institute - Start Learning, Start Earning</title>
+    <meta name="description" content="TVETA-accredited technical training in Eldoret. Computer Applications, Web Development, Graphic Design, Digital Marketing & more. Affordable fees, modern labs.">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            overflow-x: hidden;
+        }
+        
+        /* Navigation */
+        .navbar {
+            position: fixed;
+            top: 0;
+            width: 100%;
+            background: rgba(27, 94, 32, 0.95);
+            backdrop-filter: blur(10px);
+            padding: 15px 0;
+            z-index: 1000;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            transition: all 0.3s;
+        }
+        
+        .navbar.scrolled {
+            background: rgba(27, 94, 32, 1);
+            padding: 10px 0;
+        }
+        
+        .nav-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .logo {
+            color: white;
+            font-size: 1.5rem;
+            font-weight: bold;
+            text-decoration: none;
+        }
+        
+        .nav-menu {
+            display: flex;
+            list-style: none;
+            gap: 30px;
+        }
+        
+        .nav-menu a {
+            color: white;
+            text-decoration: none;
+            font-weight: 500;
+            transition: color 0.3s;
+        }
+        
+        .nav-menu a:hover {
+            color: #FF9800;
+        }
+        
+        .mobile-toggle {
+            display: none;
+            background: none;
+            border: none;
+            color: white;
+            font-size: 1.5rem;
+            cursor: pointer;
+        }
+        
+        /* Hero Section */
+        .hero {
+            position: relative;
+            height: 100vh;
+            background: linear-gradient(rgba(46, 125, 50, 0.75), rgba(27, 94, 32, 0.85)),
+                        url('hero-lab.jpg');
+            background-size: cover;
+            background-position: center;
+            background-attachment: fixed;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            text-align: center;
+            padding-top: 60px;
+        }
+        
+        .hero-content {
+            max-width: 900px;
+            padding: 40px;
+            animation: fadeInUp 1s ease-out;
+        }
+        
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(50px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        .hero h1 {
+            font-size: 3.5rem;
+            margin-bottom: 20px;
+            text-shadow: 3px 3px 10px rgba(0,0,0,0.5);
+            font-weight: 900;
+        }
+        
+        .hero .tagline {
+            font-size: 2.5rem;
+            color: #FF9800;
+            font-weight: bold;
+            margin-bottom: 20px;
+            text-shadow: 2px 2px 8px rgba(0,0,0,0.5);
+        }
+        
+        .hero p {
+            font-size: 1.3rem;
+            margin-bottom: 40px;
+            line-height: 1.8;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
+        }
+        
+        .cta-buttons {
+            display: flex;
+            gap: 20px;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+        
+        .btn {
+            padding: 16px 40px;
+            font-size: 1.1rem;
+            font-weight: bold;
+            text-decoration: none;
+            border-radius: 50px;
+            transition: all 0.3s;
+            border: none;
+            cursor: pointer;
+            display: inline-block;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        
+        .btn-primary {
+            background: #FF9800;
+            color: white;
+            box-shadow: 0 5px 15px rgba(255, 152, 0, 0.4);
+        }
+        
+        .btn-primary:hover {
+            background: #F57C00;
+            transform: translateY(-3px);
+            box-shadow: 0 8px 25px rgba(255, 152, 0, 0.6);
+        }
+        
+        .btn-secondary {
+            background: transparent;
+            color: white;
+            border: 3px solid white;
+        }
+        
+        .btn-secondary:hover {
+            background: white;
+            color: #2E7D32;
+            transform: translateY(-3px);
+        }
+        
+        /* Stats Section */
+        .stats {
+            background: linear-gradient(135deg, #2E7D32 0%, #1B5E20 100%);
+            padding: 80px 20px;
+            color: white;
+        }
+        
+        .stats-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 40px;
+            text-align: center;
+        }
+        
+        .stat-box {
+            padding: 20px;
+        }
+        
+        .stat-number {
+            font-size: 3.5rem;
+            font-weight: bold;
+            color: #FF9800;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+        
+        .stat-label {
+            font-size: 1.1rem;
+            opacity: 0.95;
+        }
+        
+        /* About Section */
+        .about {
+            padding: 100px 20px;
+            background: white;
+        }
+        
+        .about-container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        
+        .section-title {
+            text-align: center;
+            font-size: 2.8rem;
+            color: #2E7D32;
+            margin-bottom: 20px;
+            font-weight: bold;
+        }
+        
+        .section-subtitle {
+            text-align: center;
+            font-size: 1.2rem;
+            color: #666;
+            margin-bottom: 60px;
+            max-width: 700px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+        
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 35px;
+            margin-top: 50px;
+        }
+        
+        .feature-card {
+            background: white;
+            padding: 35px;
+            border-radius: 15px;
+            text-align: center;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.08);
+            transition: all 0.3s;
+            border: 2px solid transparent;
+        }
+        
+        .feature-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 15px 40px rgba(46, 125, 50, 0.15);
+            border-color: #2E7D32;
+        }
+        
+        .feature-icon {
+            font-size: 3.5rem;
+            margin-bottom: 20px;
+            display: inline-block;
+        }
+        
+        .feature-card h3 {
+            font-size: 1.4rem;
+            color: #2E7D32;
+            margin-bottom: 15px;
+            font-weight: bold;
+        }
+        
+        .feature-card p {
+            color: #666;
+            line-height: 1.7;
+        }
+        
+        /* Courses Section */
+        .courses {
+            padding: 100px 20px;
+            background: #f9f9f9;
+        }
+        
+        .courses-container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        
+        .courses-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 30px;
+            margin-top: 50px;
+        }
+        
+        .course-card {
+            background: white;
+            border-radius: 15px;
+            overflow: hidden;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+            transition: all 0.3s;
+        }
+        
+        .course-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 15px 40px rgba(46, 125, 50, 0.2);
+        }
+        
+        .course-header {
+            background: linear-gradient(135deg, #2E7D32, #1B5E20);
+            color: white;
+            padding: 25px;
+            text-align: center;
+        }
+        
+        .course-card h3 {
+            font-size: 1.4rem;
+            margin-bottom: 10px;
+        }
+        
+        .course-price {
+            font-size: 2rem;
+            font-weight: bold;
+            color: #FF9800;
+        }
+        
+        .course-duration {
+            font-size: 0.9rem;
+            opacity: 0.9;
+            margin-top: 5px;
+        }
+        
+        .course-body {
+            padding: 25px;
+        }
+        
+        .course-features {
+            list-style: none;
+            margin-bottom: 25px;
+        }
+        
+        .course-features li {
+            padding: 10px 0;
+            border-bottom: 1px solid #eee;
+            color: #666;
+            display: flex;
+            align-items: center;
+        }
+        
+        .course-features li:last-child {
+            border-bottom: none;
+        }
+        
+        .course-features li:before {
+            content: "✓";
+            color: #2E7D32;
+            font-weight: bold;
+            margin-right: 10px;
+            font-size: 1.2rem;
+        }
+        
+        .course-btn {
+            width: 100%;
+            text-align: center;
+        }
+        
+        /* Testimonials */
+        .testimonials {
+            padding: 100px 20px;
+            background: white;
+        }
+        
+        .testimonials-container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        
+        .testimonials-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 30px;
+            margin-top: 50px;
+        }
+        
+        .testimonial-card {
+            background: #f9f9f9;
+            padding: 35px;
+            border-radius: 15px;
+            border-left: 5px solid #FF9800;
+            transition: all 0.3s;
+        }
+        
+        .testimonial-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+        }
+        
+        .testimonial-text {
+            font-size: 1.05rem;
+            line-height: 1.8;
+            color: #555;
+            margin-bottom: 20px;
+            font-style: italic;
+        }
+        
+        .testimonial-author {
+            font-weight: bold;
+            color: #2E7D32;
+            margin-bottom: 5px;
+        }
+        
+        .testimonial-course {
+            color: #666;
+            font-size: 0.9rem;
+        }
+        
+        /* CTA Section */
+        .cta-section {
+            padding: 100px 20px;
+            background: linear-gradient(135deg, #FF9800, #F57C00);
+            color: white;
+            text-align: center;
+        }
+        
+        .cta-section h2 {
+            font-size: 2.8rem;
+            margin-bottom: 20px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.2);
+        }
+        
+        .cta-section p {
+            font-size: 1.3rem;
+            margin-bottom: 40px;
+            max-width: 700px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+        
+        .cta-section .btn {
+            background: white;
+            color: #FF9800;
+            font-size: 1.2rem;
+            padding: 18px 50px;
+        }
+        
+        .cta-section .btn:hover {
+            background: #2E7D32;
+            color: white;
+            transform: scale(1.05);
+        }
+        
+        /* Contact Section */
+        .contact {
+            padding: 100px 20px;
+            background: white;
+        }
+        
+        .contact-container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        
+        .contact-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 30px;
+            margin-top: 50px;
+        }
+        
+        .contact-card {
+            text-align: center;
+            padding: 30px;
+            background: #f9f9f9;
+            border-radius: 15px;
+            transition: all 0.3s;
+        }
+        
+        .contact-card:hover {
+            background: white;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            transform: translateY(-5px);
+        }
+        
+        .contact-icon {
+            font-size: 3rem;
+            color: #FF9800;
+            margin-bottom: 15px;
+        }
+        
+        .contact-card h3 {
+            color: #2E7D32;
+            margin-bottom: 15px;
+            font-size: 1.3rem;
+        }
+        
+        .contact-card p {
+            color: #666;
+            line-height: 1.7;
+        }
+        
+        .contact-card a {
+            color: #2E7D32;
+            text-decoration: none;
+            font-weight: 500;
+        }
+        
+        .contact-card a:hover {
+            color: #FF9800;
+        }
+        
+        /* Footer */
+        footer {
+            background: #1B5E20;
+            color: white;
+            padding: 60px 20px 30px;
+        }
+        
+        .footer-container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        
+        .footer-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 40px;
+            margin-bottom: 40px;
+        }
+        
+        .footer-section h3 {
+            color: #FF9800;
+            margin-bottom: 20px;
+            font-size: 1.3rem;
+        }
+        
+        .footer-section p,
+        .footer-section ul {
+            color: rgba(255,255,255,0.9);
+            line-height: 1.8;
+        }
+        
+        .footer-section ul {
+            list-style: none;
+        }
+        
+        .footer-section ul li {
+            margin-bottom: 10px;
+        }
+        
+        .footer-section a {
+            color: rgba(255,255,255,0.9);
+            text-decoration: none;
+            transition: color 0.3s;
+        }
+        
+        .footer-section a:hover {
+            color: #FF9800;
+        }
+        
+        .social-links {
+            display: flex;
+            gap: 15px;
+            margin-top: 20px;
+        }
+        
+        .social-links a {
+            display: inline-block;
+            width: 45px;
+            height: 45px;
+            background: rgba(255,255,255,0.1);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.3rem;
+            transition: all 0.3s;
+        }
+        
+        .social-links a:hover {
+            background: #FF9800;
+            transform: translateY(-3px);
+        }
+        
+        .footer-bottom {
+            text-align: center;
+            padding-top: 30px;
+            border-top: 1px solid rgba(255,255,255,0.1);
+            color: rgba(255,255,255,0.8);
+        }
+        
+        /* Scroll to top button */
+        .scroll-top {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            width: 50px;
+            height: 50px;
+            background: #FF9800;
+            color: white;
+            border: none;
+            border-radius: 50%;
+            font-size: 1.5rem;
+            cursor: pointer;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+            transition: all 0.3s;
+            z-index: 999;
+        }
+        
+        .scroll-top:hover {
+            background: #2E7D32;
+            transform: translateY(-5px);
+        }
+        
+        .scroll-top.visible {
+            display: flex;
+        }
+        
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .mobile-toggle {
+                display: block;
+            }
+            
+            .nav-menu {
+                position: absolute;
+                top: 100%;
+                left: 0;
+                right: 0;
+                background: #1B5E20;
+                flex-direction: column;
+                padding: 20px;
+                gap: 15px;
+                display: none;
+            }
+            
+            .nav-menu.active {
+                display: flex;
+            }
+            
+            .hero h1 {
+                font-size: 2.2rem;
+            }
+            
+            .hero .tagline {
+                font-size: 1.6rem;
+            }
+            
+            .hero p {
+                font-size: 1rem;
+            }
+            
+            .section-title {
+                font-size: 2rem;
+            }
+            
+            .stat-number {
+                font-size: 2.5rem;
+            }
+            
+            .cta-buttons {
+                flex-direction: column;
+            }
+            
+            .btn {
+                width: 100%;
+            }
+        }
+        
+        /* Animations */
+        .fade-in {
+            opacity: 0;
+            transform: translateY(30px);
+            transition: all 0.6s ease-out;
+        }
+        
+        .fade-in.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    </style>
+<script type="text/javascript">(function(c,l,a,r,i,t,y){c[a]=c[a]||function(){(c[a].q=c[a].q||[]).push(arguments)};t=l.createElement(r);t.async=1;t.src="https://www.clarity.ms/tag/"+i;y=l.getElementsByTagName(r)[0];y.parentNode.insertBefore(t,y);})(window,document,"clarity","script","wg31zlwbt9");</script>\n</head>
+<body>
+    <!-- Navigation -->
+    <nav class="navbar">
+        <div class="nav-container">
+            <a href="#" class="logo">M.T.T.I</a>
+            <button class="mobile-toggle" onclick="toggleMenu()">☰</button>
+            <ul class="nav-menu" id="navMenu">
+                <li><a href="#home">Home</a></li>
+                <li><a href="#about">About</a></li>
+                <li><a href="#courses">Courses</a></li>
+                <li><a href="#testimonials">Testimonials</a></li>
+                <li><a href="#contact">Contact</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section class="hero" id="home">
+        <div class="hero-content">
+            <h1>Masomotele Technical Training Institute</h1>
+            <div class="tagline">Start Learning, Start Earning</div>
+            <p>Transform your future with hands-on technical training in our modern computer labs. TVETA-accredited courses designed to get you working fast.</p>
+            <div class="cta-buttons">
+                <a href="#courses" class="btn btn-primary">Explore Courses</a>
+                <a href="#contact" class="btn btn-secondary">Enroll Today</a>
+            </div>
+        </div>
+    </section>
+
+    <!-- Stats Section -->
+    <section class="stats">
+        <div class="stats-container">
+            <div class="stat-box fade-in">
+                <div class="stat-number">500+</div>
+                <div class="stat-label">Students Trained</div>
+            </div>
+            <div class="stat-box fade-in">
+                <div class="stat-number">15+</div>
+                <div class="stat-label">Expert Instructors</div>
+            </div>
+            <div class="stat-box fade-in">
+                <div class="stat-number">10+</div>
+                <div class="stat-label">Technical Courses</div>
+            </div>
+            <div class="stat-box fade-in">
+                <div class="stat-number">85%</div>
+                <div class="stat-label">Employment Rate</div>
+            </div>
+        </div>
+    </section>
+
+    <!-- About Section -->
+    <section class="about" id="about">
+        <div class="about-container">
+            <h2 class="section-title">Why Choose M.T.T.I?</h2>
+            <p class="section-subtitle">We're committed to providing quality technical education that transforms lives and creates opportunities</p>
+            
+            <div class="features-grid">
+                <div class="feature-card fade-in">
+                    <div class="feature-icon">🖥️</div>
+                    <h3>Modern Computer Labs</h3>
+                    <p>Train on industry-standard equipment in our fully-equipped facilities</p>
+                </div>
+                
+                <div class="feature-card fade-in">
+                    <div class="feature-icon">⚡</div>
+                    <h3>Fast Track Learning</h3>
+                    <p>Complete courses in 1-2 months and start earning immediately</p>
+                </div>
+                
+                <div class="feature-card fade-in">
+                    <div class="feature-icon">🏅</div>
+                    <h3>TVETA Accredited</h3>
+                    <p>Government-recognized certificates trusted by employers nationwide</p>
+                </div>
+                
+                <div class="feature-card fade-in">
+                    <div class="feature-icon">💰</div>
+                    <h3>Affordable Fees</h3>
+                    <p>Quality education at prices everyone can afford with flexible payment plans</p>
+                </div>
+                
+                <div class="feature-card fade-in">
+                    <div class="feature-icon">👨‍🏫</div>
+                    <h3>Expert Instructors</h3>
+                    <p>Learn from experienced professionals with real industry knowledge</p>
+                </div>
+                
+                <div class="feature-card fade-in">
+                    <div class="feature-icon">🎯</div>
+                    <h3>Hands-On Training</h3>
+                    <p>Practical projects and real-world applications, not just theory</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Courses Section -->
+    <section class="courses" id="courses">
+        <div class="courses-container">
+            <h2 class="section-title">Our Popular Courses</h2>
+            <p class="section-subtitle">Choose from our range of practical, market-driven technical courses</p>
+            
+            <div class="courses-grid">
+                <!-- Computer Applications -->
+                <div class="course-card fade-in">
+                    <div class="course-header">
+                        <h3>Computer Applications</h3>
+                        <div class="course-price">KES 8,000</div>
+                        <div class="course-duration">Duration: 1-2 months</div>
+                    </div>
+                    <div class="course-body">
+                        <ul class="course-features">
+                            <li>MS Office Suite</li>
+                            <li>Internet & Email</li>
+                            <li>Typing Skills</li>
+                            <li>File Management</li>
+                        </ul>
+                        <a href="#contact" class="btn btn-primary course-btn">Enroll Now</a>
+                    </div>
+                </div>
+
+                <!-- Web Development -->
+                <div class="course-card fade-in">
+                    <div class="course-header">
+                        <h3>Web Design & Development</h3>
+                        <div class="course-price">KES 15,000</div>
+                        <div class="course-duration">Duration: 2 months</div>
+                    </div>
+                    <div class="course-body">
+                        <ul class="course-features">
+                            <li>HTML, CSS, JavaScript</li>
+                            <li>Responsive Design</li>
+                            <li>WordPress Development</li>
+                            <li>Portfolio Projects</li>
+                        </ul>
+                        <a href="#contact" class="btn btn-primary course-btn">Enroll Now</a>
+                    </div>
+                </div>
+
+                <!-- Graphic Design -->
+                <div class="course-card fade-in">
+                    <div class="course-header">
+                        <h3>Graphic Design</h3>
+                        <div class="course-price">KES 12,000</div>
+                        <div class="course-duration">Duration: 2 months</div>
+                    </div>
+                    <div class="course-body">
+                        <ul class="course-features">
+                            <li>Adobe Photoshop</li>
+                            <li>Adobe Illustrator</li>
+                            <li>Branding & Identity</li>
+                            <li>Portfolio Building</li>
+                        </ul>
+                        <a href="#contact" class="btn btn-primary course-btn">Enroll Now</a>
+                    </div>
+                </div>
+
+                <!-- Digital Marketing -->
+                <div class="course-card fade-in">
+                    <div class="course-header">
+                        <h3>Digital Marketing</h3>
+                        <div class="course-price">KES 10,000</div>
+                        <div class="course-duration">Duration: 1-2 months</div>
+                    </div>
+                    <div class="course-body">
+                        <ul class="course-features">
+                            <li>Social Media Strategy</li>
+                            <li>Content Creation</li>
+                            <li>Facebook & Instagram Ads</li>
+                            <li>Analytics & ROI</li>
+                        </ul>
+                        <a href="#contact" class="btn btn-primary course-btn">Enroll Now</a>
+                    </div>
+                </div>
+
+                <!-- CCTV Installation -->
+                <div class="course-card fade-in">
+                    <div class="course-header">
+                        <h3>CCTV Installation</h3>
+                        <div class="course-price">KES 18,000</div>
+                        <div class="course-duration">Duration: 2 months</div>
+                    </div>
+                    <div class="course-body">
+                        <ul class="course-features">
+                            <li>Camera Types & Setup</li>
+                            <li>Network Configuration</li>
+                            <li>DVR/NVR Systems</li>
+                            <li>Practical Installation</li>
+                        </ul>
+                        <a href="#contact" class="btn btn-primary course-btn">Enroll Now</a>
+                    </div>
+                </div>
+
+                <!-- Computer Repair -->
+                <div class="course-card fade-in">
+                    <div class="course-header">
+                        <h3>Computer & Mobile Repair</h3>
+                        <div class="course-price">KES 12,000</div>
+                        <div class="course-duration">Duration: 2 months</div>
+                    </div>
+                    <div class="course-body">
+                        <ul class="course-features">
+                            <li>Hardware Diagnostics</li>
+                            <li>Component Replacement</li>
+                            <li>Software Troubleshooting</li>
+                            <li>Mobile Phone Repair</li>
+                        </ul>
+                        <a href="#contact" class="btn btn-primary course-btn">Enroll Now</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Testimonials Section -->
+    <section class="testimonials" id="testimonials">
+        <div class="testimonials-container">
+            <h2 class="section-title">What Our Students Say</h2>
+            <p class="section-subtitle">Real success stories from our graduates</p>
+            
+            <div class="testimonials-grid">
+                <div class="testimonial-card fade-in">
+                    <div class="testimonial-text">
+                        "The web development course changed my life. Within 3 months of completing, I got my first freelance client. The instructors were patient and the curriculum was practical."
+                    </div>
+                    <div class="testimonial-author">Sarah Wanjiku</div>
+                    <div class="testimonial-course">Web Design & Development Graduate</div>
+                </div>
+                
+                <div class="testimonial-card fade-in">
+                    <div class="testimonial-text">
+                        "I came in knowing nothing about computers. The Computer Applications course started from the basics and now I'm confidently working as a data entry clerk. Thank you M.T.T.I!"
+                    </div>
+                    <div class="testimonial-author">John Kamau</div>
+                    <div class="testimonial-course">Computer Applications Graduate</div>
+                </div>
+                
+                <div class="testimonial-card fade-in">
+                    <div class="testimonial-text">
+                        "The CCTV installation training was hands-on and comprehensive. I now run my own security systems installation business. Best investment I ever made!"
+                    </div>
+                    <div class="testimonial-author">David Omondi</div>
+                    <div class="testimonial-course">CCTV Installation Graduate</div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- CTA Section -->
+    <section class="cta-section">
+        <h2>Ready to Transform Your Career?</h2>
+        <p>Join hundreds of successful graduates who changed their lives with practical technical skills</p>
+        <a href="#contact" class="btn">Get Started Today</a>
+    </section>
+
+    <!-- Contact Section -->
+    <section class="contact" id="contact">
+        <div class="contact-container">
+            <h2 class="section-title">Get In Touch</h2>
+            <p class="section-subtitle">Visit us or reach out - we're here to help you start your journey</p>
+            
+            <div class="contact-grid">
+                <div class="contact-card fade-in">
+                    <div class="contact-icon">📍</div>
+                    <h3>Location</h3>
+                    <p>Sagaas Center, Fourth Floor<br>Eldoret, Kenya</p>
+                </div>
+                
+                <div class="contact-card fade-in">
+                    <div class="contact-icon">📞</div>
+                    <h3>Phone</h3>
+                    <p><a href="tel:+254712464936">+254 712 464 936</a></p>
+                </div>
+                
+                <div class="contact-card fade-in">
+                    <div class="contact-icon">📧</div>
+                    <h3>Email</h3>
+                    <p><a href="mailto:info@masomotele.ac.ke">info@masomotele.ac.ke</a></p>
+                </div>
+                
+                <div class="contact-card fade-in">
+                    <div class="contact-icon">🕒</div>
+                    <h3>Hours</h3>
+                    <p>Monday - Friday: 8:00 AM - 6:00 PM<br>Saturday: 9:00 AM - 3:00 PM</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer>
+        <div class="footer-container">
+            <div class="footer-grid">
+                <div class="footer-section">
+                    <h3>About M.T.T.I</h3>
+                    <p>Masomotele Technical Training Institute is a TVETA-accredited institution dedicated to providing quality technical education in Eldoret, Kenya.</p>
+                    <div class="social-links">
+                        <a href="#" title="Facebook">📘</a>
+                        <a href="#" title="Instagram">📷</a>
+                        <a href="#" title="Twitter">🐦</a>
+                        <a href="#" title="LinkedIn">💼</a>
+                        <a href="https://wa.me/254712464936" title="WhatsApp">💬</a>
+                    </div>
+                </div>
+                
+                <div class="footer-section">
+                    <h3>Quick Links</h3>
+                    <ul>
+                        <li><a href="#about">About Us</a></li>
+                        <li><a href="#courses">Our Courses</a></li>
+                        <li><a href="#testimonials">Testimonials</a></li>
+                        <li><a href="#contact">Contact Us</a></li>
+                        <li><a href="#">Verify Certificate</a></li>
+                    </ul>
+                </div>
+                
+                <div class="footer-section">
+                    <h3>Popular Courses</h3>
+                    <ul>
+                        <li><a href="#courses">Computer Applications</a></li>
+                        <li><a href="#courses">Web Development</a></li>
+                        <li><a href="#courses">Graphic Design</a></li>
+                        <li><a href="#courses">Digital Marketing</a></li>
+                        <li><a href="#courses">CCTV Installation</a></li>
+                    </ul>
+                </div>
+                
+                <div class="footer-section">
+                    <h3>Contact Info</h3>
+                    <p>📍 Sagaas Center, Fourth Floor<br>Eldoret, Kenya</p>
+                    <p>📞 +254 712 464 936</p>
+                    <p>📧 info@masomotele.ac.ke</p>
+                    <p style="margin-top: 20px; color: #FF9800; font-weight: bold;">"Start Learning, Start Earning"</p>
+                </div>
+            </div>
+            
+            <div class="footer-bottom">
+                <p>&copy; 2025 Masomotele Technical Training Institute. All rights reserved. | TVETA Accredited</p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Scroll to Top Button -->
+    <button class="scroll-top" id="scrollTop" onclick="scrollToTop()">↑</button>
+
+    <script>
+        // Mobile menu toggle
+        function toggleMenu() {
+            const navMenu = document.getElementById('navMenu');
+            navMenu.classList.toggle('active');
+        }
+
+        // Close mobile menu when clicking a link
+        document.querySelectorAll('.nav-menu a').forEach(link => {
+            link.addEventListener('click', () => {
+                document.getElementById('navMenu').classList.remove('active');
+            });
+        });
+
+        // Smooth scrolling
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) {
+                    target.scrollIntoView({
+                        behavior: 'smooth',
+                        block: 'start'
+                    });
+                }
+            });
+        });
+
+        // Navbar scroll effect
+        window.addEventListener('scroll', function() {
+            const navbar = document.querySelector('.navbar');
+            const scrollTop = document.getElementById('scrollTop');
+            
+            if (window.scrollY > 100) {
+                navbar.classList.add('scrolled');
+                scrollTop.classList.add('visible');
+            } else {
+                navbar.classList.remove('scrolled');
+                scrollTop.classList.remove('visible');
+            }
+        });
+
+        // Scroll to top function
+        function scrollToTop() {
+            window.scrollTo({
+                top: 0,
+                behavior: 'smooth'
+            });
+        }
+
+        // Intersection Observer for fade-in animations
+        const observerOptions = {
+            threshold: 0.1,
+            rootMargin: '0px 0px -50px 0px'
+        };
+
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('visible');
+                }
+            });
+        }, observerOptions);
+
+        // Observe all fade-in elements
+        document.querySelectorAll('.fade-in').forEach(el => {
+            observer.observe(el);
+        });
+
+        // Parallax effect for hero
+        window.addEventListener('scroll', function() {
+            const hero = document.querySelector('.hero');
+            const scrolled = window.pageYOffset;
+            hero.style.backgroundPositionY = scrolled * 0.5 + 'px';
+        });
+    </script>
+</body>
+</html>

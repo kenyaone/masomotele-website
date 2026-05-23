@@ -1,0 +1,292 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Mathematics Form 4 | Vectors (2)</title>
+<style>
+:root{--pri:#0a5e2a;--pri-l:#0d7a38;--acc:#f5a623;--ok:#2e7d32;--no:#c62828;--bg:#f4f7f5;--txt:#1a1a1a;}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Segoe UI',system-ui,sans-serif;background:var(--bg);color:var(--txt);min-height:100vh;display:flex;flex-direction:column}
+#topbar{position:sticky;top:0;z-index:100;background:linear-gradient(135deg,var(--pri) 0%,var(--pri-l) 100%);color:#fff;padding:10px 16px;display:flex;align-items:center;gap:10px;box-shadow:0 2px 8px rgba(0,0,0,.25)}
+#topbar .sub{font-size:.7rem;opacity:.8;text-transform:uppercase;letter-spacing:1px}
+#topbar .ttl{font-size:.95rem;font-weight:700;flex:1}
+#slide-badge{background:var(--acc);color:#000;font-weight:700;font-size:.78rem;padding:3px 10px;border-radius:20px;white-space:nowrap}
+.slide{display:none;padding:16px 16px 80px;animation:fi .3s ease}
+.slide.active{display:block}
+@keyframes fi{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+.slide-title{font-size:1.2rem;font-weight:800;color:var(--pri);margin-bottom:14px;padding-bottom:8px;border-bottom:3px solid var(--acc)}
+.lo-box{background:#e8f5e9;border-left:5px solid var(--pri);border-radius:8px;padding:14px 16px;margin-bottom:12px}
+.lo-box h3{color:var(--pri);font-size:.95rem;margin-bottom:8px}
+.lo-box ol{padding-left:18px;font-size:.9rem;line-height:1.8}
+.inquiry{background:#fff8e1;border:1.5px solid var(--acc);border-radius:8px;padding:10px 14px;font-size:.88rem;color:#5d4037;margin-top:10px}
+.inquiry strong{color:#e65100}
+.teach-block{margin-bottom:18px}
+.teach-block h3{font-size:1rem;font-weight:700;color:var(--pri);margin-bottom:8px;padding-bottom:4px;border-bottom:2px solid var(--acc);display:inline-block}
+.teach-block p,.teach-block li{font-size:.9rem;line-height:1.7}
+.teach-block ul,.teach-block ol{padding-left:18px;margin-top:6px}
+.key-term{background:#fff8e1;border-left:4px solid var(--acc);border-radius:6px;padding:10px 14px;margin:10px 0;font-size:.88rem}
+.key-term strong{color:#e65100}
+.info-table{width:100%;border-collapse:collapse;margin:10px 0;font-size:.88rem}
+.info-table th{background:var(--pri);color:#fff;padding:8px 10px;text-align:left}
+.info-table td{padding:7px 10px;border-bottom:1px solid #e0e0e0}
+.info-table tr:nth-child(even) td{background:#f1f8e9}
+.example-box{background:#f1f8e9;border:1.5px solid var(--ok);border-radius:8px;padding:12px 14px;margin:10px 0;font-size:.88rem}
+.example-box strong{color:var(--ok);display:block;margin-bottom:6px}
+.formula-box{background:#e3f2fd;border:2px solid #1976d2;border-radius:10px;padding:14px;margin:12px 0;text-align:center}
+.formula-box .formula{font-size:1.1rem;font-weight:800;color:#1565c0;font-family:Georgia,serif;margin:6px 0}
+.warn-box{background:#fff3e0;border-left:4px solid #e65100;border-radius:6px;padding:10px 14px;margin:10px 0;font-size:.88rem;color:#5d4037}
+.diagram-wrap{background:#fff;border:1.5px solid #c8e6c9;border-radius:8px;padding:12px;margin:10px 0;text-align:center}
+.quiz-section{margin-bottom:20px}
+.quiz-section h3{font-size:1rem;font-weight:700;color:var(--pri);margin-bottom:12px}
+.q-item{background:#fff;border:1.5px solid #c8e6c9;border-radius:10px;padding:14px;margin-bottom:12px}
+.q-item p{font-size:.9rem;font-weight:600;margin-bottom:10px}
+.fill-blank{border:none;border-bottom:2.5px dashed var(--pri);background:transparent;font-size:.9rem;padding:2px 6px;width:110px;outline:none;text-align:center}
+.fb-result{font-size:.82rem;font-weight:600;margin-top:6px;padding:4px 8px;border-radius:4px;display:inline-block}
+.fb-result.ok{background:#e8f5e9;color:var(--ok)}
+.fb-result.no{background:#ffebee;color:var(--no)}
+.sa-box{width:100%;border:1.5px solid #c8e6c9;border-radius:8px;padding:10px;font-size:.88rem;font-family:inherit;resize:vertical;min-height:80px;outline:none}
+.grade-btn{background:var(--pri);color:#fff;border:none;border-radius:8px;padding:8px 18px;font-size:.85rem;font-weight:700;cursor:pointer;margin-top:8px}
+.sa-feedback{font-size:.82rem;margin-top:8px;padding:10px;border-radius:8px;line-height:1.6;display:none}
+.sa-feedback.ok{background:#e8f5e9;border:1px solid #a5d6a7;color:#1b5e20}
+.sa-feedback.partial{background:#fff8e1;border:1px solid #ffe082;color:#5d4037}
+.sa-feedback.no{background:#ffebee;border:1px solid #ef9a9a;color:#b71c1c}
+.kw-found{color:var(--ok);font-weight:700}
+.kw-miss{color:var(--no);font-weight:700}
+.model-ans{margin-top:6px;padding-top:6px;border-top:1px solid #ccc;font-style:italic}
+#score-result{background:linear-gradient(135deg,var(--pri),var(--pri-l));color:#fff;border-radius:12px;padding:20px;text-align:center;margin-top:16px;display:none}
+#score-result .big{font-size:2rem;font-weight:900;margin:8px 0}
+.submit-btn{background:var(--acc);color:#000;border:none;border-radius:10px;padding:12px 32px;font-size:1rem;font-weight:800;cursor:pointer;margin-top:16px;width:100%}
+#navbar{position:fixed;bottom:0;left:0;right:0;background:#fff;border-top:1px solid #e0e0e0;padding:10px 16px;display:flex;align-items:center;justify-content:space-between;gap:8px;z-index:100;box-shadow:0 -2px 8px rgba(0,0,0,.1)}
+.nav-btn{background:var(--pri);color:#fff;border:none;border-radius:8px;padding:9px 22px;font-size:.88rem;font-weight:700;cursor:pointer}
+.nav-btn:disabled{background:#ccc;cursor:not-allowed}
+#dot-nav{display:flex;gap:6px;flex-wrap:wrap;justify-content:center;flex:1}
+.dot{width:10px;height:10px;border-radius:50%;background:#c8e6c9;cursor:pointer;transition:all .2s}
+.dot.active{background:var(--pri);transform:scale(1.3)}
+.dot.done{background:var(--acc)}
+</style>
+<script type="text/javascript">(function(c,l,a,r,i,t,y){c[a]=c[a]||function(){(c[a].q=c[a].q||[]).push(arguments)};t=l.createElement(r);t.async=1;t.src="https://www.clarity.ms/tag/"+i;y=l.getElementsByTagName(r)[0];y.parentNode.insertBefore(t,y);})(window,document,"clarity","script","wg31zlwbt9");</script>\n</head>
+<body>
+<div id="topbar">
+  <div><div class="sub">Mathematics · Form 4</div><div class="ttl">Vectors (2)</div></div>
+  <div id="slide-badge">Slide 1 / 10</div>
+</div>
+
+<div class="slide active" id="s1">
+  <div class="slide-title">📋 Learning Outcomes</div>
+  <div class="lo-box"><h3>By the end of this lesson, you should be able to:</h3>
+    <ol>
+      <li>Express vectors in column notation and component form</li>
+      <li>Find the magnitude and direction of a vector</li>
+      <li>Add, subtract and multiply vectors by scalars</li>
+      <li>Use position vectors to describe points in a plane</li>
+      <li>Apply the section formula (dividing a line in a given ratio)</li>
+      <li>Prove geometric properties using vectors</li>
+      <li>Apply vectors to solve real-life navigation problems</li>
+    </ol>
+  </div>
+  <div class="inquiry"><strong>🔍 Key Inquiry Question:</strong> How can vectors be used to describe movement, position and geometric relationships precisely?</div>
+</div>
+
+<div class="slide" id="s2">
+  <div class="slide-title">📐 Vector Notation and Magnitude</div>
+  <div class="teach-block"><h3>Vector Representation</h3>
+    <p>A vector has both <strong>magnitude</strong> (size) and <strong>direction</strong>.</p>
+    <div class="key-term"><strong>Column vector:</strong> a = (x, y) where x = horizontal component, y = vertical component</div>
+    <div class="formula-box"><div class="formula">|a| = √(x² + y²) &nbsp;&nbsp; (magnitude/modulus)</div></div>
+    <div class="example-box"><strong>Example:</strong>
+      <p>a = (3, 4): |a| = √(9+16) = √25 = <strong>5</strong></p>
+      <p>b = (−5, 12): |b| = √(25+144) = √169 = <strong>13</strong></p>
+    </div>
+  </div>
+  <div class="teach-block"><h3>Unit Vector</h3>
+    <div class="formula-box"><div class="formula">â = a / |a|</div><p>Unit vector has magnitude = 1</p></div>
+    <div class="example-box"><strong>Example:</strong>
+      <p>Find unit vector of a = (3, 4). |a| = 5</p>
+      <p>â = (3/5, 4/5) = <strong>(0.6, 0.8)</strong></p>
+    </div>
+  </div>
+</div>
+
+<div class="slide" id="s3">
+  <div class="slide-title">➕ Vector Operations</div>
+  <div class="teach-block"><h3>Addition and Subtraction</h3>
+    <div class="example-box"><strong>a = (3,2), b = (1,−4)</strong>
+      <p>a + b = (3+1, 2+(−4)) = <strong>(4, −2)</strong></p>
+      <p>a − b = (3−1, 2−(−4)) = <strong>(2, 6)</strong></p>
+    </div>
+  </div>
+  <div class="teach-block"><h3>Scalar Multiplication</h3>
+    <div class="example-box"><strong>k·a = k(x, y) = (kx, ky)</strong>
+      <p>3a = 3(3,2) = <strong>(9, 6)</strong></p>
+      <p>−2b = −2(1,−4) = <strong>(−2, 8)</strong></p>
+    </div>
+  </div>
+  <div class="teach-block"><h3>Parallel Vectors</h3>
+    <div class="key-term"><strong>Vectors are parallel</strong> if one is a scalar multiple of the other: a = kb for some scalar k</div>
+    <div class="example-box"><strong>Example:</strong>
+      <p>Are (4, 6) and (6, 9) parallel?</p>
+      <p>6/4 = 1.5 and 9/6 = 1.5 → ratio equal → <strong>Yes, parallel (k = 1.5)</strong></p>
+    </div>
+  </div>
+</div>
+
+<div class="slide" id="s4">
+  <div class="slide-title">📍 Position Vectors</div>
+  <div class="teach-block"><h3>Definition</h3>
+    <p>The position vector of point P(x,y) relative to origin O is OP = (x, y).</p>
+    <div class="key-term"><strong>Vector AB = OB − OA = b − a</strong> (position vector of B minus position vector of A)</div>
+    <div class="example-box"><strong>Example:</strong>
+      <p>A(2,3), B(5,7). Find AB and |AB|.</p>
+      <p>AB = OB − OA = (5,7) − (2,3) = <strong>(3, 4)</strong></p>
+      <p>|AB| = √(9+16) = <strong>5 units</strong></p>
+    </div>
+  </div>
+  <div class="teach-block"><h3>Midpoint of AB</h3>
+    <div class="formula-box"><div class="formula">M = ½(a + b) = ((x₁+x₂)/2, (y₁+y₂)/2)</div></div>
+    <div class="example-box"><strong>Example:</strong>
+      <p>Midpoint of A(2,3) and B(6,7): M = (4, 5)</p>
+    </div>
+  </div>
+</div>
+
+<div class="slide" id="s5">
+  <div class="slide-title">✂️ Section Formula</div>
+  <div class="teach-block"><h3>Dividing a Line in a Given Ratio</h3>
+    <p>If P divides AB in ratio m:n internally:</p>
+    <div class="formula-box"><div class="formula">OP = (na + mb) / (m + n)</div></div>
+    <div class="example-box"><strong>Example 1:</strong>
+      <p>A(1,2), B(7,8). P divides AB in ratio 2:1. Find OP.</p>
+      <p>OP = (1×(1,2) + 2×(7,8)) / (2+1) = ((1,2)+(14,16))/3 = (15,18)/3 = <strong>(5, 6)</strong></p>
+    </div>
+    <div class="example-box"><strong>Example 2 — Midpoint check:</strong>
+      <p>Ratio 1:1 → OP = (a+b)/2 = midpoint ✓</p>
+    </div>
+  </div>
+  <div class="teach-block"><h3>External Division</h3>
+    <div class="formula-box"><div class="formula">OP = (mb − na) / (m − n) &nbsp; (m ≠ n)</div></div>
+  </div>
+</div>
+
+<div class="slide" id="s6">
+  <div class="slide-title">📐 Geometric Proofs Using Vectors</div>
+  <div class="teach-block"><h3>Key Vector Facts for Proofs</h3>
+    <ul>
+      <li>If AB = kCD, then AB is parallel to CD</li>
+      <li>If AB = AC then B = C (same endpoint)</li>
+      <li>Collinear points: AB = kAC (scalar multiple)</li>
+    </ul>
+  </div>
+  <div class="teach-block"><h3>Worked Proof</h3>
+    <div class="example-box"><strong>Example: Prove midpoints form a parallelogram</strong>
+      <p>Let ABCD be a quadrilateral. P, Q, R, S are midpoints of AB, BC, CD, DA.</p>
+      <p>PQ = AQ − AP = ½AC (using midpoint theorem)</p>
+      <p>SR = AR − AS = ½AC</p>
+      <p>Since PQ = SR, PQRS is a <strong>parallelogram</strong> ✓</p>
+    </div>
+  </div>
+  <div class="teach-block"><h3>Collinearity Proof</h3>
+    <div class="example-box"><strong>Example:</strong>
+      <p>OA = 2i + 3j, OB = 4i + 6j. Show A, O, B are collinear.</p>
+      <p>OB = 2(2i+3j) = 2·OA → OB is a scalar multiple of OA</p>
+      <p>Therefore A, O, B are <strong>collinear</strong> ✓</p>
+    </div>
+  </div>
+</div>
+
+<div class="slide" id="s7">
+  <div class="slide-title">🧭 Navigation Problems</div>
+  <div class="teach-block"><h3>Bearing and Velocity Vectors</h3>
+    <div class="example-box"><strong>Example 1: Resultant displacement</strong>
+      <p>A ship sails 30 km East then 40 km North. Find resultant displacement.</p>
+      <p>d₁ = (30, 0), d₂ = (0, 40)</p>
+      <p>Resultant = (30, 40), |d| = √(900+1600) = <strong>50 km</strong></p>
+      <p>Direction = tan⁻¹(40/30) = 53.1° from East = N36.9°E</p>
+    </div>
+    <div class="example-box"><strong>Example 2: Relative velocity</strong>
+      <p>Wind velocity = (10, 5) km/h, plane velocity = (200, 0) km/h</p>
+      <p>Resultant = (210, 5) km/h</p>
+      <p>Speed = √(210²+5²) ≈ <strong>210.06 km/h</strong></p>
+    </div>
+  </div>
+</div>
+
+<div class="slide" id="s8">
+  <div class="slide-title">📊 Vector Summary</div>
+  <div class="teach-block"><h3>Key Formulas</h3>
+    <table class="info-table">
+      <tr><th>Concept</th><th>Formula</th></tr>
+      <tr><td>Magnitude</td><td>|a| = √(x²+y²)</td></tr>
+      <tr><td>Unit vector</td><td>â = a/|a|</td></tr>
+      <tr><td>Vector AB</td><td>AB = OB − OA</td></tr>
+      <tr><td>Midpoint</td><td>M = ½(a+b)</td></tr>
+      <tr><td>Section (m:n)</td><td>P = (na+mb)/(m+n)</td></tr>
+      <tr><td>Parallel</td><td>a = kb</td></tr>
+      <tr><td>Collinear</td><td>AB = kAC</td></tr>
+    </table>
+  </div>
+</div>
+
+<div class="slide" id="s9">
+  <div class="slide-title">✏️ Practice Problems</div>
+  <div class="teach-block"><h3>Problem 1</h3>
+    <p>a = (4,3), b = (−1,2). Find: a+b, 2a−3b, |a|, unit vector of b.</p>
+    <div class="example-box"><strong>Solution:</strong>
+      <p>a+b = (3,5) &nbsp;|&nbsp; 2a−3b = (8,6)−(−3,6) = (11,0)</p>
+      <p>|a| = √(16+9) = 5 &nbsp;|&nbsp; |b| = √5, b̂ = (−1/√5, 2/√5)</p>
+    </div>
+  </div>
+  <div class="teach-block"><h3>Problem 2</h3>
+    <p>P(1,2) and Q(7,5). Find: PQ, midpoint M, point R that divides PQ in ratio 2:1.</p>
+    <div class="example-box"><strong>Solution:</strong>
+      <p>PQ = (6,3) &nbsp;|&nbsp; M = (4, 3.5)</p>
+      <p>R = (1×(1,2) + 2×(7,5))/3 = ((1,2)+(14,10))/3 = (5, 4)</p>
+    </div>
+  </div>
+</div>
+
+<div class="slide" id="s10">
+  <div class="slide-title">📝 Quiz — Vectors (2)</div>
+  <div class="quiz-section"><h3>Part A: Fill in the Blanks (5 marks)</h3>
+    <div class="q-item"><p>1. The magnitude of vector (5, 12) is <input class="fill-blank" id="f1" style="width:60px">.</p><div id="f1r" class="fb-result" style="display:none"></div></div>
+    <div class="q-item"><p>2. Vector AB = OB <input class="fill-blank" id="f2" style="width:50px"> OA.</p><div id="f2r" class="fb-result" style="display:none"></div></div>
+    <div class="q-item"><p>3. Two vectors are parallel if one is a <input class="fill-blank" id="f3"> multiple of the other.</p><div id="f3r" class="fb-result" style="display:none"></div></div>
+    <div class="q-item"><p>4. The midpoint of A(2,4) and B(6,8) is <input class="fill-blank" id="f4" style="width:90px">.</p><div id="f4r" class="fb-result" style="display:none"></div></div>
+    <div class="q-item"><p>5. A unit vector has magnitude equal to <input class="fill-blank" id="f5" style="width:50px">.</p><div id="f5r" class="fb-result" style="display:none"></div></div>
+  </div>
+  <div class="quiz-section"><h3>Part B: Short Answer (10 marks)</h3>
+    <div class="q-item"><p>6. (4 marks) OA = (2,3), OB = (8,9). Find AB, |AB|, midpoint M of AB, and the point P that divides AB in ratio 1:2.</p>
+      <textarea class="sa-box" id="sa1" placeholder="Show working..."></textarea>
+      <button class="grade-btn" onclick="gradeAnswer('sa1','fb1',{keywords:['6','6,6','ab','6√2','4','4,5','midpoint','section','ratio'],required:4,marks:4,model:'AB=OB-OA=(6,6). |AB|=√72=6√2. M=½((2,3)+(8,9))=(5,6). P=(2×(2,3)+1×(8,9))/3=(12,15)/3=(4,5).'})">✓ Grade My Answer</button>
+      <div id="fb1" class="sa-feedback"></div></div>
+    <div class="q-item"><p>7. (3 marks) Show that A(1,2), B(3,5), C(7,11) are collinear.</p>
+      <textarea class="sa-box" id="sa2" placeholder="Use vector method..."></textarea>
+      <button class="grade-btn" onclick="gradeAnswer('sa2','fb2',{keywords:['ab','ac','2,3','6,9','scalar','multiple','collinear','3ab'],required:3,marks:3,model:'AB=(2,3). AC=(6,9)=3(2,3)=3AB. Since AC is a scalar multiple of AB and they share point A, A,B,C are collinear.'})">✓ Grade My Answer</button>
+      <div id="fb2" class="sa-feedback"></div></div>
+    <div class="q-item"><p>8. (3 marks) A plane flies with velocity (300,0) km/h. Wind blows at (−20,50) km/h. Find the resultant velocity and speed.</p>
+      <textarea class="sa-box" id="sa3" placeholder="Add vectors..."></textarea>
+      <button class="grade-btn" onclick="gradeAnswer('sa3','fb3',{keywords:['280','50','resultant','speed','285','√(280','√82500'],required:3,marks:3,model:'Resultant=(300-20, 0+50)=(280,50). Speed=√(280²+50²)=√(78400+2500)=√80900≈284.4 km/h.'})">✓ Grade My Answer</button>
+      <div id="fb3" class="sa-feedback"></div></div>
+  </div>
+  <button class="submit-btn" onclick="submitQuiz()">📊 Submit & See My Score</button>
+  <div id="score-result"></div>
+</div>
+
+<div id="navbar">
+  <button class="nav-btn" id="prev-btn" onclick="changeSlide(-1)" disabled>◀ Prev</button>
+  <div id="dot-nav"></div>
+  <button class="nav-btn" id="next-btn" onclick="changeSlide(1)">Next ▶</button>
+</div>
+<script>
+const TOTAL=10;let cur=1;const visited=new Set([1]);
+function buildDots(){const dn=document.getElementById('dot-nav');dn.innerHTML='';for(let i=1;i<=TOTAL;i++){const d=document.createElement('div');d.className='dot'+(i===cur?' active':visited.has(i)&&i!==cur?' done':'');d.onclick=(()=>{const n=i;return()=>goTo(n)})();dn.appendChild(d);}}
+function goTo(n){document.getElementById('s'+cur).classList.remove('active');cur=n;visited.add(n);document.getElementById('s'+n).classList.add('active');document.getElementById('slide-badge').textContent='Slide '+n+' / '+TOTAL;document.getElementById('prev-btn').disabled=(n===1);document.getElementById('next-btn').disabled=(n===TOTAL);buildDots();window.scrollTo(0,0);}
+function changeSlide(d){goTo(cur+d);}
+buildDots();
+const fillAnswers={f1:['13'],f2:['-','minus'],f3:['scalar'],f4:['(4, 6)','(4,6)'],f5:['1']};
+function gradeAnswer(saId,fbId,cfg){const txt=document.getElementById(saId).value.toLowerCase().trim();if(!txt){alert('Please write your answer first.');return;}const found=cfg.keywords.filter(k=>txt.includes(k.toLowerCase()));const missed=cfg.keywords.filter(k=>!txt.includes(k.toLowerCase())).slice(0,4);const hitRate=Math.min(1,found.length/cfg.required);const marks=Math.round(hitRate*cfg.marks);const fb=document.getElementById(fbId);fb.style.display='block';const cls=marks>=cfg.marks?'ok':marks>0?'partial':'no';fb.className='sa-feedback '+cls;fb.innerHTML=`<strong>Score: ${marks} / ${cfg.marks}</strong><br>✅ Found: <span class="kw-found">${found.length>0?found.join(', '):'none'}</span><br>❌ Missed: <span class="kw-miss">${missed.length>0?missed.join(', '):'none'}</span><div class="model-ans">📖 ${cfg.model}</div>`;}
+function submitQuiz(){let fillScore=0;Object.keys(fillAnswers).forEach(id=>{const val=(document.getElementById(id).value||'').toLowerCase().trim();const correct=fillAnswers[id].some(a=>val===a||val.includes(a));const res=document.getElementById(id+'r');res.style.display='inline-block';if(correct){res.className='fb-result ok';res.textContent='✓ Correct! (1 mark)';fillScore++;}else{res.className='fb-result no';res.textContent='✗ Expected: '+fillAnswers[id][0];}});let saTotal=0;['fb1','fb2','fb3'].forEach(id=>{const fb=document.getElementById(id);if(fb.style.display!=='none'){const m=fb.innerHTML.match(/Score:\s*(\d+)\s*\//);if(m)saTotal+=parseInt(m[1]);}});const total=fillScore+saTotal;const pct=Math.round((total/15)*100);const grade=pct>=80?'Excellent (A)':pct>=60?'Good (B)':pct>=50?'Average (C)':'Needs Improvement';const emoji=pct>=80?'🏆':pct>=60?'👍':pct>=50?'📚':'💪';const res=document.getElementById('score-result');res.style.display='block';res.innerHTML=`${emoji}<div class="big">${total}/15 (${pct}%)</div><strong>${grade}</strong><br><small>Fill: ${fillScore}/5 | SA: ${saTotal}/10</small>`;submitExamToMTTI(total,15,pct);res.scrollIntoView({behavior:'smooth'});}
+function submitExamToMTTI(score,total,percent){try{fetch('/wp-json/mtti/v1/exam-result',{method:'POST',headers:{'Content-Type':'application/json','X-WP-Nonce':window.mtti_nonce||''},body:JSON.stringify({lesson_id:'f4-math-6-vectors-2',score,total,percent,timestamp:new Date().toISOString()})}).then(r=>r.json()).then(d=>{if(d&&d.success)console.log('[MTTI] Saved',d);}).catch(e=>console.log('[MTTI] Offline',e));}catch(e){console.log('[MTTI] Error',e);}}
+</script>
+</body>
+</html>

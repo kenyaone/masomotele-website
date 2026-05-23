@@ -1,0 +1,584 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Keyboard & Mouse Skills - Practical Exam | M.T.T.I</title>
+    <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'IBM Plex Sans', sans-serif; background: linear-gradient(145deg, #1a0a2e 0%, #2d1b4e 50%, #1a0a2e 100%); color: #eee; min-height: 100vh; }
+        
+        .header { background: rgba(45, 27, 78, 0.95); border-bottom: 2px solid #a855f7; padding: 15px 30px; display: flex; justify-content: space-between; align-items: center; position: sticky; top: 0; z-index: 100; }
+        .logo { font-size: 1.2rem; font-weight: 700; color: #a855f7; }
+        .exam-info { text-align: center; }
+        .exam-title { font-size: 0.85rem; color: #fff; }
+        .exam-unit { font-size: 0.7rem; color: #aaa; }
+        .header-right { display: flex; align-items: center; gap: 20px; }
+        .timer { font-family: 'IBM Plex Mono', monospace; background: rgba(168, 85, 247, 0.1); padding: 8px 16px; border-radius: 20px; border: 1px solid #a855f7; color: #a855f7; }
+        .timer.warning { border-color: #ff6b6b; color: #ff6b6b; animation: pulse 1s infinite; }
+        @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.5; } }
+        
+        .start-screen { min-height: 100vh; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 20px; }
+        .start-card { background: rgba(45, 27, 78, 0.9); border: 1px solid rgba(168, 85, 247, 0.3); border-radius: 16px; padding: 40px; max-width: 500px; width: 100%; text-align: center; }
+        .start-icon { font-size: 4rem; margin-bottom: 20px; }
+        .start-card h1 { font-size: 1.5rem; color: #fff; margin-bottom: 5px; }
+        .start-card h2 { font-size: 1rem; color: #a855f7; margin-bottom: 20px; font-weight: 500; }
+        .exam-meta { display: grid; grid-template-columns: repeat(3, 1fr); gap: 15px; margin-bottom: 25px; }
+        .meta-item { background: rgba(168, 85, 247, 0.1); padding: 15px; border-radius: 10px; }
+        .meta-item .value { font-size: 1.3rem; font-weight: 700; color: #a855f7; }
+        .meta-item .label { font-size: 0.75rem; color: #aaa; }
+        .name-input { margin-bottom: 20px; }
+        .name-input label { display: block; margin-bottom: 8px; color: #aaa; font-size: 0.9rem; text-align: left; }
+        .name-input input { width: 100%; padding: 12px 16px; background: rgba(10, 5, 20, 0.8); border: 2px solid rgba(168, 85, 247, 0.3); border-radius: 8px; color: #fff; font-size: 1rem; }
+        .name-input input:focus { outline: none; border-color: #a855f7; }
+        .start-btn { width: 100%; padding: 14px; font-size: 1.1rem; font-weight: 600; background: linear-gradient(135deg, #a855f7, #7c3aed); color: #fff; border: none; border-radius: 8px; cursor: pointer; }
+        .start-btn:hover:not(:disabled) { transform: translateY(-2px); box-shadow: 0 10px 30px rgba(168, 85, 247, 0.3); }
+        .start-btn:disabled { opacity: 0.5; cursor: not-allowed; }
+        
+        .exam-container { display: none; }
+        .main-content { display: flex; min-height: calc(100vh - 70px); }
+        
+        .sidebar { width: 200px; background: rgba(45, 27, 78, 0.5); border-right: 1px solid rgba(168, 85, 247, 0.1); padding: 20px; }
+        .student-name { font-weight: 600; color: #fff; font-size: 0.9rem; margin-bottom: 20px; padding-bottom: 15px; border-bottom: 1px solid rgba(168, 85, 247, 0.1); }
+        .question-nav { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
+        .nav-btn { width: 100%; aspect-ratio: 1; background: rgba(10, 5, 20, 0.8); border: 1px solid rgba(168, 85, 247, 0.2); border-radius: 8px; color: #888; font-family: 'IBM Plex Mono', monospace; font-size: 0.8rem; cursor: pointer; }
+        .nav-btn:hover { border-color: #a855f7; color: #a855f7; }
+        .nav-btn.active { background: rgba(168, 85, 247, 0.2); border-color: #a855f7; color: #a855f7; }
+        .nav-btn.correct { background: rgba(0, 200, 100, 0.2); border-color: #00c864; color: #00c864; }
+        .nav-btn.incorrect { background: rgba(255, 100, 100, 0.2); border-color: #ff6464; color: #ff6464; }
+        
+        .task-area { flex: 1; padding: 30px; overflow-y: auto; }
+        .task-card { background: rgba(45, 27, 78, 0.6); border: 1px solid rgba(168, 85, 247, 0.15); border-radius: 16px; padding: 30px; max-width: 800px; margin: 0 auto; }
+        .task-header { display: flex; justify-content: space-between; margin-bottom: 20px; }
+        .task-number { font-family: 'IBM Plex Mono', monospace; color: #a855f7; font-size: 0.85rem; }
+        .task-points { background: rgba(168, 85, 247, 0.15); color: #a855f7; padding: 4px 12px; border-radius: 12px; font-size: 0.8rem; }
+        .task-title { font-size: 1.3rem; color: #fff; margin-bottom: 15px; }
+        .task-instruction { background: rgba(10, 5, 20, 0.6); border-left: 3px solid #a855f7; padding: 15px 20px; border-radius: 0 8px 8px 0; margin-bottom: 20px; }
+        .task-instruction p { color: #ccc; line-height: 1.6; }
+        .target-display { background: rgba(168, 85, 247, 0.1); border: 1px dashed rgba(168, 85, 247, 0.4); padding: 15px; border-radius: 8px; margin-top: 15px; text-align: center; }
+        .target-display .target-text { font-size: 1.2rem; font-family: 'IBM Plex Mono', monospace; color: #a855f7; letter-spacing: 1px; }
+        
+        .hint-toggle { background: none; border: 1px solid rgba(255, 193, 7, 0.4); color: #ffc107; padding: 8px 16px; border-radius: 6px; cursor: pointer; font-size: 0.85rem; margin-bottom: 15px; }
+        .hint-content { background: rgba(255, 193, 7, 0.1); border: 1px solid rgba(255, 193, 7, 0.3); padding: 12px 16px; border-radius: 8px; margin-bottom: 15px; color: #ffc107; font-size: 0.9rem; display: none; }
+        .hint-content.show { display: block; }
+        
+        .input-area { margin-bottom: 20px; }
+        .input-area label { display: block; color: #888; font-size: 0.85rem; margin-bottom: 8px; text-transform: uppercase; }
+        .input-area input[type="text"] { width: 100%; padding: 14px; background: rgba(255, 255, 255, 0.95); border: 2px solid rgba(168, 85, 247, 0.3); border-radius: 8px; font-size: 1rem; font-family: 'IBM Plex Mono', monospace; color: #222; }
+        .input-area input:focus { outline: none; border-color: #a855f7; }
+        
+        .typing-test-area { margin-bottom: 20px; }
+        .typing-target { background: rgba(10, 5, 20, 0.8); padding: 20px; border-radius: 10px; margin-bottom: 15px; text-align: center; }
+        .typing-target p { font-size: 1.1rem; font-family: 'IBM Plex Mono', monospace; color: #a855f7; letter-spacing: 0.5px; line-height: 1.8; }
+        .typing-input { width: 100%; padding: 15px; background: #fff; border: 2px solid rgba(168, 85, 247, 0.3); border-radius: 8px; font-size: 1rem; font-family: 'IBM Plex Mono', monospace; color: #222; }
+        .typing-input:focus { outline: none; border-color: #a855f7; }
+        .typing-input.correct { border-color: #00c864; background: rgba(0, 200, 100, 0.05); }
+        .typing-input.incorrect { border-color: #ff6464; background: rgba(255, 100, 100, 0.05); }
+        
+        .matching-area { margin-bottom: 20px; }
+        .match-row { display: flex; align-items: center; gap: 15px; margin-bottom: 12px; padding: 12px; background: rgba(10, 5, 20, 0.4); border-radius: 8px; }
+        .match-left { flex: 1; color: #ddd; font-size: 0.95rem; }
+        .match-select { flex: 1; padding: 10px; background: #fff; border: 2px solid rgba(168, 85, 247, 0.3); border-radius: 6px; font-size: 0.9rem; color: #222; }
+        
+        .keyboard-visual { background: rgba(10, 5, 20, 0.8); border-radius: 12px; padding: 20px; margin-bottom: 20px; }
+        .key-row { display: flex; justify-content: center; gap: 5px; margin-bottom: 5px; }
+        .key { min-width: 40px; height: 40px; background: rgba(168, 85, 247, 0.2); border: 1px solid rgba(168, 85, 247, 0.4); border-radius: 6px; display: flex; align-items: center; justify-content: center; font-family: 'IBM Plex Mono', monospace; font-size: 0.8rem; color: #ddd; }
+        .key.highlight { background: #a855f7; color: #fff; animation: keyPulse 1s infinite; }
+        @keyframes keyPulse { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.05); } }
+        .key.wide { min-width: 80px; }
+        .key.space { min-width: 200px; }
+        
+        .mouse-visual { text-align: center; margin-bottom: 20px; }
+        .mouse-diagram { font-size: 6rem; margin-bottom: 10px; }
+        .mouse-labels { display: flex; justify-content: center; gap: 40px; color: #aaa; font-size: 0.85rem; }
+        
+        .feedback-box { padding: 15px 20px; border-radius: 10px; margin-bottom: 20px; display: none; }
+        .feedback-box.show { display: block; }
+        .feedback-box.correct { background: rgba(0, 200, 100, 0.15); border: 1px solid rgba(0, 200, 100, 0.4); }
+        .feedback-box.incorrect { background: rgba(255, 100, 100, 0.15); border: 1px solid rgba(255, 100, 100, 0.4); }
+        .feedback-title { font-weight: 600; }
+        .feedback-box.correct .feedback-title { color: #00c864; }
+        .feedback-box.incorrect .feedback-title { color: #ff6464; }
+        .correct-answer { margin-top: 10px; padding-top: 10px; border-top: 1px solid rgba(255,255,255,0.1); }
+        .correct-answer strong { color: #888; font-size: 0.85rem; }
+        .correct-answer p { color: #a855f7; font-family: 'IBM Plex Mono', monospace; margin-top: 5px; }
+        
+        .action-buttons { display: flex; justify-content: space-between; padding-top: 20px; border-top: 1px solid rgba(168, 85, 247, 0.1); }
+        .check-btn { padding: 12px 30px; background: linear-gradient(135deg, #a855f7, #7c3aed); color: #fff; font-weight: 600; border: none; border-radius: 8px; cursor: pointer; }
+        .nav-buttons { display: flex; gap: 10px; }
+        .nav-buttons button { padding: 12px 24px; background: rgba(168, 85, 247, 0.1); border: 1px solid rgba(168, 85, 247, 0.3); color: #a855f7; border-radius: 8px; cursor: pointer; }
+        .nav-buttons button:disabled { opacity: 0.4; cursor: not-allowed; }
+        
+        .results-screen { display: none; min-height: 100vh; align-items: center; justify-content: center; padding: 20px; }
+        .results-card { background: rgba(45, 27, 78, 0.95); border: 1px solid rgba(168, 85, 247, 0.2); border-radius: 20px; padding: 40px; max-width: 500px; width: 100%; text-align: center; }
+        .result-icon { font-size: 4rem; margin-bottom: 15px; }
+        .result-status { font-size: 1.5rem; font-weight: 700; margin-bottom: 20px; }
+        .result-status.passed { color: #00c864; }
+        .result-status.failed { color: #ff6464; }
+        .score-display { font-size: 3rem; font-weight: 700; color: #a855f7; margin-bottom: 20px; }
+        .result-details { display: grid; grid-template-columns: repeat(3, 1fr); gap: 15px; margin-bottom: 25px; }
+        .detail-box { background: rgba(10, 5, 20, 0.6); padding: 15px; border-radius: 10px; }
+        .detail-value { font-size: 1.3rem; font-weight: 700; color: #a855f7; }
+        .detail-label { font-size: 0.75rem; color: #888; }
+        .result-actions { display: flex; gap: 15px; }
+        .result-actions button { flex: 1; padding: 14px; font-size: 1rem; font-weight: 600; border-radius: 8px; cursor: pointer; }
+        .review-btn { background: rgba(168, 85, 247, 0.2); color: #a855f7; border: 1px solid rgba(168, 85, 247, 0.4); }
+        .retry-btn { background: linear-gradient(135deg, #a855f7, #7c3aed); color: #fff; border: none; }
+
+        @media (max-width: 768px) {
+            .main-content { flex-direction: column; }
+            .sidebar { width: 100%; }
+            .question-nav { grid-template-columns: repeat(5, 1fr); }
+            .key { min-width: 30px; height: 30px; font-size: 0.7rem; }
+            .key.space { min-width: 120px; }
+        }
+    </style>
+<meta name="description" content="Professional training courses at MTTI Eldoret. TVETA-accredited programs in IT, healthcare, and creative fields. Enroll today.">
+<script type="text/javascript">(function(c,l,a,r,i,t,y){c[a]=c[a]||function(){(c[a].q=c[a].q||[]).push(arguments)};t=l.createElement(r);t.async=1;t.src="https://www.clarity.ms/tag/"+i;y=l.getElementsByTagName(r)[0];y.parentNode.insertBefore(t,y);})(window,document,"clarity","script","wg31zlwbt9");</script>\n</head>
+<body>
+    <div id="startScreen" class="start-screen">
+        <div class="start-card">
+            <div class="start-icon">⌨️</div>
+            <h1>Computer Essentials</h1>
+            <h2>Unit 4: Keyboard & Mouse Skills</h2>
+            <p style="color: #888; margin-bottom: 20px;">Masomotele Technical Training Institute</p>
+            
+            <div class="exam-meta">
+                <div class="meta-item"><div class="value">15</div><div class="label">Questions</div></div>
+                <div class="meta-item"><div class="value">2 Hrs</div><div class="label">Duration</div></div>
+                <div class="meta-item"><div class="value">50%</div><div class="label">Pass Mark</div></div>
+            </div>
+            
+            <div class="name-input">
+                <label>Enter Your Full Name:</label>
+                <input type="text" id="studentName" placeholder="e.g., John Kamau">
+            </div>
+            
+            <button class="start-btn" id="startBtn" disabled>Start Examination</button>
+        </div>
+    </div>
+    
+    <div id="examContainer" class="exam-container">
+        <header class="header">
+            <div class="logo">⌨️ M.T.T.I</div>
+            <div class="exam-info">
+                <div class="exam-title">Keyboard & Mouse Skills</div>
+                <div class="exam-unit">Computer Essentials - Unit 4</div>
+            </div>
+            <div class="header-right">
+                <div class="timer" id="timer">02:00:00</div>
+                <div style="color:#888;font-family:monospace;"><span id="currentQ">1</span>/15</div>
+                <button onclick="showResults()" style="padding:8px 16px;background:rgba(168,85,247,0.2);border:1px solid #a855f7;color:#a855f7;border-radius:8px;cursor:pointer;">Finish</button>
+            </div>
+        </header>
+        
+        <div class="main-content">
+            <aside class="sidebar">
+                <div class="student-name" id="displayName">Student</div>
+                <div class="question-nav" id="questionNav"></div>
+            </aside>
+            <main class="task-area">
+                <div class="task-card" id="taskCard"></div>
+            </main>
+        </div>
+    </div>
+    
+    <div id="resultsScreen" class="results-screen">
+        <div class="results-card">
+            <div class="result-icon" id="resultIcon">🎉</div>
+            <div class="result-status" id="resultStatus">PASSED</div>
+            <div class="score-display" id="scorePercent">0%</div>
+            <div class="result-details">
+                <div class="detail-box"><div class="detail-value" id="correctCount">0</div><div class="detail-label">Correct</div></div>
+                <div class="detail-box"><div class="detail-value" id="wrongCount">0</div><div class="detail-label">Wrong</div></div>
+                <div class="detail-box"><div class="detail-value" id="timeUsed">00:00</div><div class="detail-label">Time</div></div>
+            </div>
+            <div class="result-actions">
+                <button class="review-btn" onclick="reviewAnswers()">📝 Review</button>
+                <button class="retry-btn" onclick="retryExam()">🔄 Retry</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const questions = [
+            {
+                id: 1, type: "typing-test", title: "Home Row Keys Practice",
+                instruction: "The home row keys are where your fingers rest. Type these letters exactly:",
+                targetText: "asdf jkl;",
+                hint: "Left hand: A S D F | Right hand: J K L ;",
+                points: 10
+            },
+            {
+                id: 2, type: "typing", title: "Caps Lock Key",
+                instruction: "Which key do you press to type in ALL CAPITAL LETTERS continuously?",
+                targetText: "Caps Lock",
+                acceptableAnswers: ["Caps Lock", "caps lock", "CAPS LOCK", "CapsLock", "capslock"],
+                hint: "It 'locks' the capitals on",
+                points: 10
+            },
+            {
+                id: 3, type: "typing", title: "Shift Key Function",
+                instruction: "To type ONE capital letter without Caps Lock, you hold this key and press the letter:",
+                targetText: "Shift",
+                acceptableAnswers: ["Shift", "shift", "SHIFT"],
+                hint: "It 'shifts' between lowercase and uppercase",
+                points: 10
+            },
+            {
+                id: 4, type: "typing-test", title: "Number Row Practice",
+                instruction: "Type these numbers using the number row above the letters:",
+                targetText: "1234567890",
+                hint: "The numbers are in order from left to right above QWERTY",
+                points: 10
+            },
+            {
+                id: 5, type: "matching", title: "Special Keys Functions",
+                instruction: "Match each key to its function:",
+                pairs: [
+                    { left: "Enter", right: "Confirm/New line", id: "enter" },
+                    { left: "Backspace", right: "Delete left", id: "backspace" },
+                    { left: "Delete", right: "Delete right", id: "delete" },
+                    { left: "Tab", right: "Indent/Next field", id: "tab" }
+                ],
+                hint: "Think about what happens when you press each key while typing",
+                points: 10
+            },
+            {
+                id: 6, type: "typing", title: "Space Bar",
+                instruction: "The longest key at the bottom of the keyboard that creates spaces between words is called the:",
+                targetText: "Space Bar",
+                acceptableAnswers: ["Space Bar", "space bar", "Spacebar", "spacebar", "Space", "space"],
+                hint: "It creates 'space' between words",
+                points: 10
+            },
+            {
+                id: 7, type: "typing", title: "Escape Key",
+                instruction: "Which key is used to cancel operations or close menus? (usually top-left of keyboard)",
+                targetText: "Escape",
+                acceptableAnswers: ["Escape", "escape", "ESC", "Esc", "esc"],
+                hint: "You 'escape' from something - abbreviated as Esc",
+                points: 10
+            },
+            {
+                id: 8, type: "matching", title: "Mouse Buttons",
+                instruction: "Match each mouse action to its common function:",
+                pairs: [
+                    { left: "Left Click", right: "Select/Open items", id: "left" },
+                    { left: "Right Click", right: "Show context menu", id: "right" },
+                    { left: "Double Click", right: "Open files/programs", id: "double" },
+                    { left: "Scroll Wheel", right: "Scroll up and down", id: "scroll" }
+                ],
+                hint: "Think about what each action does when you use the mouse",
+                points: 10
+            },
+            {
+                id: 9, type: "typing", title: "Mouse Action - Select Multiple",
+                instruction: "To select multiple files, you hold this key while clicking each file:",
+                targetText: "Ctrl",
+                acceptableAnswers: ["Ctrl", "ctrl", "CTRL", "Control", "control"],
+                hint: "The Control key - used for many shortcuts",
+                points: 10
+            },
+            {
+                id: 10, type: "typing", title: "Drag and Drop",
+                instruction: "To move a file to another folder, you click and hold the mouse button while moving. This is called:",
+                targetText: "Drag and Drop",
+                acceptableAnswers: ["Drag and Drop", "drag and drop", "Drag & Drop", "drag & drop", "dragging", "Dragging"],
+                hint: "You 'drag' the file and 'drop' it somewhere else",
+                points: 10
+            },
+            {
+                id: 11, type: "typing-test", title: "Typing Accuracy Test",
+                instruction: "Type this sentence exactly as shown (including punctuation):",
+                targetText: "The quick brown fox jumps.",
+                hint: "Focus on accuracy - watch for capitals and the period",
+                points: 10
+            },
+            {
+                id: 12, type: "matching", title: "Arrow Keys",
+                instruction: "Match each arrow key direction to its movement:",
+                pairs: [
+                    { left: "↑ Up Arrow", right: "Move cursor up", id: "up" },
+                    { left: "↓ Down Arrow", right: "Move cursor down", id: "down" },
+                    { left: "← Left Arrow", right: "Move cursor left", id: "left" },
+                    { left: "→ Right Arrow", right: "Move cursor right", id: "right" }
+                ],
+                hint: "The arrows point in the direction they move",
+                points: 10
+            },
+            {
+                id: 13, type: "typing", title: "Function Keys",
+                instruction: "The keys F1 through F12 at the top of the keyboard are called:",
+                targetText: "Function Keys",
+                acceptableAnswers: ["Function Keys", "function keys", "Function keys", "F keys", "f keys"],
+                hint: "They perform special 'functions' in different programs",
+                points: 10
+            },
+            {
+                id: 14, type: "typing", title: "Help Key",
+                instruction: "In most Windows programs, which function key opens the Help menu?",
+                targetText: "F1",
+                acceptableAnswers: ["F1", "f1"],
+                hint: "It's the first function key",
+                points: 10
+            },
+            {
+                id: 15, type: "typing-test", title: "Final Typing Challenge",
+                instruction: "Type this complete sentence with proper capitalization and punctuation:",
+                targetText: "I am learning keyboard skills at MTTI.",
+                hint: "Capital I at start, MTTI in capitals, period at end",
+                points: 10
+            }
+        ];
+
+        let state = { studentName: '', currentQuestion: 0, answers: {}, results: {}, timeRemaining: 2*60*60, timerInterval: null };
+
+        document.getElementById('studentName').addEventListener('input', function() {
+            state.studentName = this.value.trim();
+            document.getElementById('startBtn').disabled = !state.studentName;
+        });
+        document.getElementById('startBtn').addEventListener('click', startExam);
+
+        function startExam() {
+            document.getElementById('startScreen').style.display = 'none';
+            document.getElementById('examContainer').style.display = 'block';
+            document.getElementById('displayName').textContent = state.studentName;
+            buildNavigation(); loadQuestion(0); startTimer();
+        }
+
+        function buildNavigation() {
+            const nav = document.getElementById('questionNav');
+            nav.innerHTML = '';
+            questions.forEach((q, i) => {
+                const btn = document.createElement('button');
+                btn.className = 'nav-btn' + (i === 0 ? ' active' : '');
+                btn.textContent = i + 1;
+                btn.onclick = () => loadQuestion(i);
+                nav.appendChild(btn);
+            });
+        }
+
+        function updateNavigation() {
+            document.querySelectorAll('.nav-btn').forEach((btn, i) => {
+                btn.classList.remove('active', 'correct', 'incorrect');
+                if (i === state.currentQuestion) btn.classList.add('active');
+                else if (state.results[i]?.correct) btn.classList.add('correct');
+                else if (state.results[i]?.checked) btn.classList.add('incorrect');
+            });
+        }
+
+        function startTimer() {
+            state.timerInterval = setInterval(() => {
+                state.timeRemaining--;
+                const h = Math.floor(state.timeRemaining / 3600);
+                const m = Math.floor((state.timeRemaining % 3600) / 60);
+                const s = state.timeRemaining % 60;
+                document.getElementById('timer').textContent = `${h.toString().padStart(2,'0')}:${m.toString().padStart(2,'0')}:${s.toString().padStart(2,'0')}`;
+                if (state.timeRemaining <= 300) document.getElementById('timer').classList.add('warning');
+                if (state.timeRemaining <= 0) { clearInterval(state.timerInterval); showResults(); }
+            }, 1000);
+        }
+
+        function loadQuestion(index) {
+            state.currentQuestion = index;
+            const q = questions[index];
+            document.getElementById('currentQ').textContent = index + 1;
+            
+            let html = `
+                <div class="task-header">
+                    <span class="task-number">Question ${index + 1} of ${questions.length}</span>
+                    <span class="task-points">${q.points} pts</span>
+                </div>
+                <h2 class="task-title">${q.title}</h2>
+                <div class="task-instruction"><p>${q.instruction}</p></div>
+                <button class="hint-toggle" onclick="document.getElementById('hintContent').classList.toggle('show')">💡 Show Hint</button>
+                <div class="hint-content" id="hintContent">${q.hint}</div>
+            `;
+
+            if (q.type === 'typing') {
+                html += `<div class="input-area"><label>Your Answer:</label><input type="text" id="userAnswer" placeholder="Type your answer..." value="${state.answers[index] || ''}"></div>`;
+            } else if (q.type === 'typing-test') {
+                html += `
+                    <div class="typing-test-area">
+                        <div class="typing-target"><p>${q.targetText}</p></div>
+                        <input type="text" class="typing-input" id="userAnswer" placeholder="Type the text above exactly..." value="${state.answers[index] || ''}" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false">
+                    </div>
+                `;
+            } else if (q.type === 'matching') {
+                html += `<div class="matching-area">`;
+                const shuffled = [...q.pairs].map(p => p.right).sort(() => Math.random() - 0.5);
+                q.pairs.forEach(pair => {
+                    const saved = state.answers[index]?.[pair.id] || '';
+                    html += `<div class="match-row"><div class="match-left">${pair.left}</div><select class="match-select" data-id="${pair.id}"><option value="">-- Select --</option>${shuffled.map(r => `<option value="${r}" ${saved === r ? 'selected' : ''}>${r}</option>`).join('')}</select></div>`;
+                });
+                html += `</div>`;
+            }
+
+            html += `
+                <div class="feedback-box" id="feedbackBox">
+                    <div style="display:flex;justify-content:space-between;margin-bottom:8px;">
+                        <span class="feedback-title" id="feedbackTitle"></span>
+                        <span style="color:#888;font-size:0.85rem;" id="feedbackScore"></span>
+                    </div>
+                    <div class="correct-answer" id="correctAnswerBox"><strong>Correct Answer:</strong><p id="correctAnswerText"></p></div>
+                </div>
+                <div class="action-buttons">
+                    <button class="check-btn" onclick="checkAnswer()">✓ Check Answer</button>
+                    <div class="nav-buttons">
+                        <button onclick="prevQuestion()" ${index === 0 ? 'disabled' : ''}>← Previous</button>
+                        <button onclick="nextQuestion()">${index === questions.length - 1 ? 'Finish →' : 'Next →'}</button>
+                    </div>
+                </div>
+            `;
+
+            document.getElementById('taskCard').innerHTML = html;
+            
+            // Add real-time typing feedback for typing-test
+            if (q.type === 'typing-test') {
+                const input = document.getElementById('userAnswer');
+                input.addEventListener('input', function() {
+                    const target = q.targetText;
+                    const value = this.value;
+                    if (value === target) {
+                        this.classList.add('correct');
+                        this.classList.remove('incorrect');
+                    } else if (target.startsWith(value)) {
+                        this.classList.remove('correct', 'incorrect');
+                    } else {
+                        this.classList.add('incorrect');
+                        this.classList.remove('correct');
+                    }
+                });
+            }
+            
+            if (state.results[index]?.checked) showFeedback(index);
+            updateNavigation();
+        }
+
+        function saveAnswer() {
+            const q = questions[state.currentQuestion];
+            if (q.type === 'typing' || q.type === 'typing-test') {
+                const input = document.getElementById('userAnswer');
+                if (input) state.answers[state.currentQuestion] = input.value;
+            } else if (q.type === 'matching') {
+                state.answers[state.currentQuestion] = {};
+                document.querySelectorAll('.match-select').forEach(sel => {
+                    state.answers[state.currentQuestion][sel.dataset.id] = sel.value;
+                });
+            }
+        }
+
+        function checkAnswer() {
+            saveAnswer();
+            const q = questions[state.currentQuestion];
+            let correct = false, score = 0;
+
+            if (q.type === 'typing') {
+                const ans = (state.answers[state.currentQuestion] || '').trim();
+                correct = q.acceptableAnswers.some(a => ans.toLowerCase() === a.toLowerCase());
+                score = correct ? q.points : 0;
+            } else if (q.type === 'typing-test') {
+                const ans = (state.answers[state.currentQuestion] || '');
+                correct = ans === q.targetText;
+                // Partial credit based on accuracy
+                if (!correct) {
+                    let matches = 0;
+                    const target = q.targetText;
+                    for (let i = 0; i < Math.min(ans.length, target.length); i++) {
+                        if (ans[i] === target[i]) matches++;
+                    }
+                    const accuracy = target.length > 0 ? matches / target.length : 0;
+                    score = Math.round(accuracy * q.points);
+                } else {
+                    score = q.points;
+                }
+            } else if (q.type === 'matching') {
+                let cnt = 0;
+                const ans = state.answers[state.currentQuestion] || {};
+                q.pairs.forEach(p => { if (ans[p.id] === p.right) cnt++; });
+                correct = cnt === q.pairs.length;
+                score = Math.round((cnt / q.pairs.length) * q.points);
+            }
+
+            state.results[state.currentQuestion] = { correct, score, maxScore: q.points, checked: true };
+            showFeedback(state.currentQuestion);
+            updateNavigation();
+        }
+
+        function showFeedback(index) {
+            const result = state.results[index];
+            const q = questions[index];
+            const box = document.getElementById('feedbackBox');
+            box.classList.remove('correct', 'incorrect');
+            box.classList.add('show', result.correct ? 'correct' : 'incorrect');
+            document.getElementById('feedbackTitle').textContent = result.correct ? '✅ Correct!' : '❌ Incorrect';
+            document.getElementById('feedbackScore').textContent = `${result.score}/${result.maxScore} points`;
+            
+            if (!result.correct) {
+                document.getElementById('correctAnswerBox').style.display = 'block';
+                let text = '';
+                if (q.type === 'typing') text = q.targetText;
+                else if (q.type === 'typing-test') text = q.targetText;
+                else if (q.type === 'matching') text = q.pairs.map(p => `${p.left} → ${p.right}`).join('<br>');
+                document.getElementById('correctAnswerText').innerHTML = text;
+            } else {
+                document.getElementById('correctAnswerBox').style.display = 'none';
+            }
+        }
+
+        function prevQuestion() { saveAnswer(); if (state.currentQuestion > 0) loadQuestion(state.currentQuestion - 1); }
+        function nextQuestion() { saveAnswer(); if (state.currentQuestion < questions.length - 1) loadQuestion(state.currentQuestion + 1); else showResults(); }
+
+        function showResults() {
+            clearInterval(state.timerInterval);
+            let total = 0, max = 0, correctCount = 0;
+            questions.forEach((q, i) => { max += q.points; if (state.results[i]) { total += state.results[i].score; if (state.results[i].correct) correctCount++; } });
+            
+            const pct = Math.round((total / max) * 100);
+            const passed = pct >= 50;
+            const used = 2*60*60 - state.timeRemaining;
+            
+            document.getElementById('examContainer').style.display = 'none';
+            document.getElementById('resultsScreen').style.display = 'flex';
+            document.getElementById('resultIcon').textContent = passed ? '🎉' : '📚';
+            document.getElementById('resultStatus').textContent = passed ? 'PASSED!' : 'Keep Practicing';
+            document.getElementById('resultStatus').className = 'result-status ' + (passed ? 'passed' : 'failed');
+            document.getElementById('scorePercent').textContent = pct + '%';
+            document.getElementById('correctCount').textContent = correctCount;
+            document.getElementById('wrongCount').textContent = questions.length - correctCount;
+            document.getElementById('timeUsed').textContent = `${Math.floor(used/60)}:${(used%60).toString().padStart(2,'0')}`;
+            
+            // Save results to MTTI system
+            if (typeof submitExamToMTTI === 'function') {
+                const questionResults = questions.map((q, i) => ({
+                    question: q.question || q.title,
+                    correct: state.results[i] ? state.results[i].correct : false
+                }));
+                
+                submitExamToMTTI(
+                    document.title.split('|')[0].trim(),
+                    total,
+                    max,
+                    questionResults,
+                    Math.floor(used / 60)
+                ).then(result => {
+                    if (result.success) console.log('✅ Results saved to MTTI:', result.data);
+                    else console.error('❌ Failed to save results:', result.message);
+                });
+            }
+        }
+
+        function reviewAnswers() { document.getElementById('resultsScreen').style.display = 'none'; document.getElementById('examContainer').style.display = 'block'; loadQuestion(0); }
+        function retryExam() {
+            state = { studentName: state.studentName, currentQuestion: 0, answers: {}, results: {}, timeRemaining: 2*60*60, timerInterval: null };
+            document.getElementById('resultsScreen').style.display = 'none';
+            document.getElementById('examContainer').style.display = 'block';
+            document.getElementById('timer').textContent = '02:00:00';
+            document.getElementById('timer').classList.remove('warning');
+            buildNavigation(); loadQuestion(0); startTimer();
+        }
+    </script>
+</body>
+</html>

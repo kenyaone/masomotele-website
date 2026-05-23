@@ -1,0 +1,1604 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ICDL Advanced Presentation - Hands-On Practical Exam | M.T.T.I</title>
+    <link href="https://fonts.googleapis.com/css2?family=Segoe+UI:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Segoe UI', Tahoma, sans-serif; background: #1e1e1e; color: #fff; min-height: 100vh; }
+        
+        /* Start Screen */
+        .start-screen { min-height: 100vh; display: flex; align-items: center; justify-content: center; background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%); padding: 20px; }
+        .start-card { background: rgba(30, 30, 50, 0.95); border: 2px solid #d35400; border-radius: 20px; padding: 40px; max-width: 600px; width: 100%; text-align: center; box-shadow: 0 20px 60px rgba(0,0,0,0.5); }
+        .start-icon { font-size: 5rem; margin-bottom: 20px; }
+        .start-card h1 { font-size: 1.8rem; color: #d35400; margin-bottom: 10px; }
+        .start-card h2 { font-size: 1.1rem; color: #aaa; margin-bottom: 30px; font-weight: 400; }
+        .features { display: grid; grid-template-columns: repeat(2, 1fr); gap: 15px; margin-bottom: 30px; text-align: left; }
+        .feature { background: rgba(211, 84, 0, 0.1); border: 1px solid rgba(211, 84, 0, 0.3); border-radius: 10px; padding: 15px; }
+        .feature .icon { font-size: 1.5rem; margin-bottom: 5px; }
+        .feature strong { color: #d35400; display: block; margin-bottom: 3px; }
+        .feature small { color: #888; font-size: 0.8rem; }
+        .name-input { margin-bottom: 20px; }
+        .name-input input { width: 100%; padding: 15px; background: rgba(0,0,0,0.3); border: 2px solid rgba(211, 84, 0, 0.3); border-radius: 10px; color: #fff; font-size: 1.1rem; text-align: center; }
+        .name-input input:focus { outline: none; border-color: #d35400; }
+        .start-btn { width: 100%; padding: 18px; font-size: 1.2rem; font-weight: 700; background: linear-gradient(135deg, #d35400, #e67e22); color: #fff; border: none; border-radius: 12px; cursor: pointer; transition: all 0.3s; }
+        .start-btn:hover:not(:disabled) { transform: translateY(-3px); box-shadow: 0 10px 30px rgba(211, 84, 0, 0.4); }
+        .start-btn:disabled { opacity: 0.5; cursor: not-allowed; }
+        
+        /* Main Exam Interface - PowerPoint Style */
+        .exam-container { display: none; height: 100vh; flex-direction: column; }
+        
+        /* Ribbon Header */
+        .ribbon { background: linear-gradient(180deg, #d35400 0%, #c0392b 100%); padding: 5px 15px; }
+        .ribbon-top { display: flex; justify-content: space-between; align-items: center; padding: 5px 0; border-bottom: 1px solid rgba(255,255,255,0.2); margin-bottom: 5px; }
+        .ribbon-brand { font-weight: 700; color: #fff; font-size: 0.9rem; }
+        .ribbon-info { display: flex; align-items: center; gap: 20px; }
+        .timer { background: rgba(0,0,0,0.3); padding: 6px 15px; border-radius: 15px; font-family: 'IBM Plex Mono', monospace; color: #fff; }
+        .timer.warning { background: #c0392b; animation: pulse 1s infinite; }
+        @keyframes pulse { 0%,100% { opacity: 1; } 50% { opacity: 0.6; } }
+        .task-progress { color: #fff; font-size: 0.85rem; }
+        
+        /* Ribbon Tabs */
+        .ribbon-tabs { display: flex; gap: 5px; }
+        .ribbon-tab { padding: 8px 20px; background: rgba(255,255,255,0.1); border: none; border-radius: 5px 5px 0 0; color: #fff; cursor: pointer; font-size: 0.85rem; }
+        .ribbon-tab.active { background: #2d2d30; color: #fff; }
+        
+        /* Ribbon Tools */
+        .ribbon-tools { background: #2d2d30; padding: 10px 15px; display: flex; gap: 20px; flex-wrap: wrap; border-bottom: 1px solid #3e3e42; }
+        .tool-group { display: flex; flex-direction: column; }
+        .tool-group-label { font-size: 0.65rem; color: #888; text-align: center; margin-top: 5px; }
+        .tool-buttons { display: flex; gap: 3px; }
+        .tool-btn { width: 36px; height: 36px; background: transparent; border: 1px solid transparent; border-radius: 4px; color: #ccc; cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 1rem; transition: all 0.15s; }
+        .tool-btn:hover { background: #3e3e42; border-color: #555; }
+        .tool-btn.active { background: #094771; border-color: #1177bb; color: #fff; }
+        .tool-btn-wide { width: auto; padding: 0 12px; font-size: 0.8rem; gap: 5px; }
+        .tool-separator { width: 1px; background: #3e3e42; margin: 0 10px; }
+        
+        /* Font Controls */
+        .font-select { padding: 5px 10px; background: #3e3e42; border: 1px solid #555; border-radius: 4px; color: #fff; font-size: 0.85rem; }
+        .font-size-input { width: 50px; padding: 5px; background: #3e3e42; border: 1px solid #555; border-radius: 4px; color: #fff; text-align: center; }
+        
+        /* Color Picker */
+        .color-picker-btn { position: relative; }
+        .color-bar { position: absolute; bottom: 3px; left: 6px; right: 6px; height: 3px; background: #ff0000; border-radius: 2px; }
+        
+        /* Main Content Area */
+        .main-area { display: flex; flex: 1; overflow: hidden; }
+        
+        /* Task Panel (Left) */
+        .task-panel { width: 320px; background: #252526; border-right: 1px solid #3e3e42; display: flex; flex-direction: column; }
+        .task-header { background: #d35400; padding: 15px; color: #fff; }
+        .task-number { font-size: 0.8rem; opacity: 0.8; }
+        .task-title { font-size: 1.1rem; font-weight: 600; margin-top: 5px; }
+        .task-content { flex: 1; overflow-y: auto; padding: 15px; }
+        .task-instruction { background: rgba(211, 84, 0, 0.1); border-left: 3px solid #d35400; padding: 15px; border-radius: 0 8px 8px 0; margin-bottom: 15px; }
+        .task-instruction h4 { color: #d35400; font-size: 0.85rem; margin-bottom: 8px; }
+        .task-instruction p { color: #ccc; font-size: 0.9rem; line-height: 1.6; }
+        .task-instruction ul { margin-top: 10px; padding-left: 20px; }
+        .task-instruction li { color: #aaa; font-size: 0.85rem; margin-bottom: 5px; }
+        .task-checklist { margin-top: 15px; }
+        .checklist-item { display: flex; align-items: flex-start; gap: 10px; padding: 10px; background: #2d2d30; border-radius: 6px; margin-bottom: 8px; }
+        .checklist-icon { width: 24px; height: 24px; border-radius: 50%; border: 2px solid #555; display: flex; align-items: center; justify-content: center; flex-shrink: 0; font-size: 0.8rem; }
+        .checklist-icon.done { background: #27ae60; border-color: #27ae60; }
+        .checklist-text { color: #ccc; font-size: 0.85rem; }
+        .task-nav { padding: 15px; border-top: 1px solid #3e3e42; display: flex; gap: 10px; }
+        .task-nav button { flex: 1; padding: 12px; border: none; border-radius: 8px; cursor: pointer; font-weight: 600; transition: all 0.2s; }
+        .btn-check { background: #27ae60; color: #fff; }
+        .btn-check:hover { background: #2ecc71; }
+        .btn-next { background: #3e3e42; color: #fff; }
+        .btn-next:hover { background: #4e4e52; }
+        
+        /* Slide Area (Center) */
+        .slide-area { flex: 1; background: #1e1e1e; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 30px; overflow: auto; }
+        
+        /* Slide Canvas */
+        .slide-canvas { width: 100%; max-width: 800px; aspect-ratio: 16/9; background: #fff; border-radius: 4px; box-shadow: 0 10px 40px rgba(0,0,0,0.5); position: relative; overflow: hidden; }
+        .slide-canvas.master-view { border: 3px dashed #d35400; }
+        
+        /* Slide Content Elements */
+        .slide-title-box { position: absolute; top: 8%; left: 5%; right: 5%; height: 18%; border: 2px dashed #ccc; display: flex; align-items: center; justify-content: center; cursor: text; transition: all 0.2s; }
+        .slide-title-box:hover, .slide-title-box:focus-within { border-color: #d35400; background: rgba(211, 84, 0, 0.05); }
+        .slide-title-box.has-content { border-color: transparent; }
+        .slide-title-input { width: 100%; height: 100%; border: none; background: transparent; text-align: center; font-size: 2rem; font-weight: bold; color: #333; padding: 10px; }
+        .slide-title-input:focus { outline: none; }
+        .slide-title-input::placeholder { color: #aaa; }
+        
+        .slide-content-box { position: absolute; top: 30%; left: 5%; right: 5%; bottom: 8%; border: 2px dashed #ccc; display: flex; flex-direction: column; padding: 15px; cursor: text; transition: all 0.2s; }
+        .slide-content-box:hover, .slide-content-box:focus-within { border-color: #d35400; background: rgba(211, 84, 0, 0.05); }
+        .slide-content-box.has-content { border-color: transparent; }
+        .slide-content-input { width: 100%; flex: 1; border: none; background: transparent; font-size: 1.2rem; color: #333; resize: none; line-height: 1.8; }
+        .slide-content-input:focus { outline: none; }
+        .slide-content-input::placeholder { color: #aaa; }
+        
+        /* Formatted Text Preview */
+        .formatted-preview { padding: 10px; font-size: 1.2rem; line-height: 1.8; color: #333; min-height: 100%; white-space: pre-wrap; }
+        .formatted-preview.bold { font-weight: bold; }
+        .formatted-preview.italic { font-style: italic; }
+        .formatted-preview.underline { text-decoration: underline; }
+        .formatted-preview.center { text-align: center; }
+        .formatted-preview.right { text-align: right; }
+        
+        /* Chart Container */
+        .chart-container { position: absolute; top: 30%; left: 10%; right: 10%; bottom: 10%; background: #f9f9f9; border: 1px solid #ddd; border-radius: 8px; display: flex; flex-direction: column; }
+        .chart-title-input { padding: 10px; border: none; border-bottom: 1px solid #ddd; font-size: 1rem; font-weight: 600; text-align: center; }
+        .chart-title-input:focus { outline: none; background: #fff3e0; }
+        .chart-area { flex: 1; display: flex; align-items: flex-end; justify-content: center; gap: 20px; padding: 20px; }
+        .chart-bar { width: 60px; background: linear-gradient(180deg, #d35400, #e67e22); border-radius: 4px 4px 0 0; transition: height 0.3s; cursor: pointer; position: relative; }
+        .chart-bar:hover { background: linear-gradient(180deg, #e67e22, #f39c12); }
+        .chart-bar-label { position: absolute; bottom: -25px; left: 50%; transform: translateX(-50%); font-size: 0.75rem; color: #666; white-space: nowrap; }
+        .chart-bar-value { position: absolute; top: -25px; left: 50%; transform: translateX(-50%); font-size: 0.8rem; font-weight: 600; color: #333; }
+        
+        /* SmartArt Container */
+        .smartart-container { position: absolute; top: 25%; left: 5%; right: 5%; bottom: 10%; display: flex; align-items: center; justify-content: center; gap: 10px; }
+        .smartart-item { background: linear-gradient(135deg, #d35400, #e67e22); color: #fff; padding: 20px 30px; border-radius: 10px; font-weight: 600; min-width: 120px; text-align: center; cursor: pointer; transition: all 0.2s; }
+        .smartart-item:hover { transform: scale(1.05); }
+        .smartart-item input { background: transparent; border: none; color: #fff; text-align: center; width: 100%; font-weight: 600; font-size: 1rem; }
+        .smartart-item input::placeholder { color: rgba(255,255,255,0.7); }
+        .smartart-item input:focus { outline: none; }
+        .smartart-arrow { font-size: 2rem; color: #d35400; }
+        
+        /* Animation Preview */
+        .animation-preview { position: absolute; top: 30%; left: 10%; right: 10%; }
+        .anim-bullet { padding: 15px 20px; font-size: 1.1rem; color: #333; opacity: 0; transform: translateX(-50px); transition: all 0.5s; }
+        .anim-bullet.visible { opacity: 1; transform: translateX(0); }
+        .anim-bullet.dimmed { opacity: 0.4; color: #888; }
+        
+        /* Shapes */
+        .shape { position: absolute; cursor: move; display: flex; align-items: center; justify-content: center; }
+        .shape-rect { background: #3498db; border-radius: 4px; }
+        .shape-circle { background: #e74c3c; border-radius: 50%; }
+        .shape-arrow { width: 0; height: 0; border-left: 30px solid transparent; border-right: 30px solid transparent; border-bottom: 50px solid #2ecc71; }
+        .shape.selected { outline: 2px solid #d35400; outline-offset: 3px; }
+        
+        /* Slide Thumbnails (Right) */
+        .slides-panel { width: 150px; background: #252526; border-left: 1px solid #3e3e42; padding: 15px 10px; overflow-y: auto; }
+        .slide-thumb { width: 100%; aspect-ratio: 16/9; background: #fff; border-radius: 4px; margin-bottom: 10px; cursor: pointer; border: 2px solid transparent; transition: all 0.2s; position: relative; overflow: hidden; }
+        .slide-thumb:hover { border-color: #555; }
+        .slide-thumb.active { border-color: #d35400; }
+        .slide-thumb-number { position: absolute; bottom: 5px; right: 5px; background: rgba(0,0,0,0.6); color: #fff; font-size: 0.7rem; padding: 2px 6px; border-radius: 3px; }
+        .slide-thumb-content { padding: 5px; font-size: 0.4rem; color: #333; overflow: hidden; }
+        .add-slide-btn { width: 100%; padding: 10px; background: #3e3e42; border: 2px dashed #555; border-radius: 4px; color: #888; cursor: pointer; text-align: center; font-size: 0.8rem; }
+        .add-slide-btn:hover { border-color: #d35400; color: #d35400; }
+        
+        /* Results Screen */
+        .results-screen { display: none; min-height: 100vh; background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%); align-items: center; justify-content: center; padding: 20px; }
+        .results-card { background: rgba(30, 30, 50, 0.95); border: 2px solid #d35400; border-radius: 20px; padding: 40px; max-width: 550px; width: 100%; text-align: center; }
+        .result-icon { font-size: 5rem; margin-bottom: 15px; }
+        .result-status { font-size: 1.8rem; font-weight: 700; margin-bottom: 10px; }
+        .result-status.passed { color: #27ae60; }
+        .result-status.failed { color: #e74c3c; }
+        .result-score { font-size: 4rem; font-weight: 800; color: #d35400; font-family: 'IBM Plex Mono', monospace; }
+        .result-detail { color: #888; margin-bottom: 25px; }
+        .result-breakdown { display: grid; grid-template-columns: repeat(2, 1fr); gap: 15px; margin-bottom: 25px; }
+        .breakdown-item { background: rgba(0,0,0,0.3); padding: 15px; border-radius: 10px; }
+        .breakdown-item h4 { color: #888; font-size: 0.75rem; margin-bottom: 5px; }
+        .breakdown-item .value { color: #d35400; font-size: 1.3rem; font-weight: 700; }
+        .result-actions { display: flex; gap: 15px; }
+        .result-actions button { flex: 1; padding: 15px; font-size: 1rem; font-weight: 600; border: none; border-radius: 10px; cursor: pointer; }
+        .review-btn { background: rgba(211, 84, 0, 0.2); color: #d35400; border: 2px solid rgba(211, 84, 0, 0.4) !important; }
+        .restart-btn { background: linear-gradient(135deg, #d35400, #e67e22); color: #fff; }
+        
+        /* Feedback Overlay */
+        .feedback-overlay { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.8); display: none; align-items: center; justify-content: center; z-index: 1000; }
+        .feedback-overlay.show { display: flex; }
+        .feedback-card { background: #2d2d30; border-radius: 16px; padding: 30px; max-width: 450px; width: 90%; text-align: center; animation: popIn 0.3s ease; }
+        @keyframes popIn { from { transform: scale(0.8); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+        .feedback-icon { font-size: 4rem; margin-bottom: 15px; }
+        .feedback-title { font-size: 1.5rem; font-weight: 700; margin-bottom: 10px; }
+        .feedback-title.correct { color: #27ae60; }
+        .feedback-title.incorrect { color: #e74c3c; }
+        .feedback-score { color: #888; margin-bottom: 15px; }
+        .feedback-detail { background: rgba(0,0,0,0.3); padding: 15px; border-radius: 8px; margin-bottom: 20px; text-align: left; }
+        .feedback-detail h4 { color: #d35400; font-size: 0.85rem; margin-bottom: 10px; }
+        .feedback-detail p { color: #aaa; font-size: 0.9rem; line-height: 1.5; }
+        .feedback-close { padding: 12px 40px; background: #d35400; color: #fff; border: none; border-radius: 8px; font-weight: 600; cursor: pointer; }
+        
+        /* Color Palette Popup */
+        .color-palette { position: absolute; top: 100%; left: 0; background: #3e3e42; border: 1px solid #555; border-radius: 8px; padding: 10px; display: none; z-index: 100; }
+        .color-palette.show { display: block; }
+        .color-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 5px; }
+        .color-swatch { width: 25px; height: 25px; border-radius: 4px; cursor: pointer; border: 2px solid transparent; }
+        .color-swatch:hover { border-color: #fff; }
+        
+        /* Task-specific styles */
+        .master-placeholder { border: 2px dashed #d35400; padding: 20px; margin: 10px; color: #d35400; text-align: center; font-style: italic; }
+        
+        @media (max-width: 1024px) {
+            .task-panel { width: 280px; }
+            .slides-panel { width: 120px; }
+        }
+        
+        @media (max-width: 768px) {
+            .task-panel, .slides-panel { display: none; }
+            .ribbon-tools { overflow-x: auto; }
+        }
+    </style>
+</head>
+<body>
+    <!-- Start Screen -->
+    <div id="startScreen" class="start-screen">
+        <div class="start-card">
+            <div class="start-icon">📊</div>
+            <h1>ICDL Advanced Presentation</h1>
+            <h2>Masomotele Technical Training Institute<br>Hands-On Practical Exam</h2>
+            
+            <div class="features">
+                <div class="feature">
+                    <div class="icon">🎨</div>
+                    <strong>Create Slides</strong>
+                    <small>Build real slides with titles & content</small>
+                </div>
+                <div class="feature">
+                    <div class="icon">📝</div>
+                    <strong>Format Text</strong>
+                    <small>Apply bold, italic, colors, alignment</small>
+                </div>
+                <div class="feature">
+                    <div class="icon">📊</div>
+                    <strong>Build Charts</strong>
+                    <small>Create & customize data charts</small>
+                </div>
+                <div class="feature">
+                    <div class="icon">✨</div>
+                    <strong>Add Animations</strong>
+                    <small>Apply entrance & emphasis effects</small>
+                </div>
+            </div>
+            
+            <div class="name-input">
+                <input type="text" id="studentName" placeholder="Enter Your Full Name">
+            </div>
+            
+            <button class="start-btn" id="startBtn" disabled>🚀 Start Hands-On Exam</button>
+            
+            <p style="color: #666; margin-top: 20px; font-size: 0.85rem;">20 Tasks • 2 Hours • 50% Pass Mark</p>
+        </div>
+    </div>
+    
+    <!-- Main Exam Interface -->
+    <div id="examContainer" class="exam-container">
+        <!-- Ribbon Header -->
+        <div class="ribbon">
+            <div class="ribbon-top">
+                <div class="ribbon-brand">📊 M.T.T.I - ICDL Advanced Presentation Exam</div>
+                <div class="ribbon-info">
+                    <span class="task-progress">Task <span id="currentTask">1</span>/20</span>
+                    <span class="timer" id="timer">02:00:00</span>
+                    <button onclick="showResults()" style="padding:6px 15px;background:#c0392b;border:none;border-radius:5px;color:#fff;cursor:pointer;font-size:0.85rem;">Finish Exam</button>
+                </div>
+            </div>
+            <div class="ribbon-tabs">
+                <button class="ribbon-tab active">Home</button>
+                <button class="ribbon-tab">Insert</button>
+                <button class="ribbon-tab">Design</button>
+                <button class="ribbon-tab">Transitions</button>
+                <button class="ribbon-tab">Animations</button>
+                <button class="ribbon-tab">Slide Show</button>
+            </div>
+        </div>
+        
+        <!-- Ribbon Tools -->
+        <div class="ribbon-tools" id="ribbonTools">
+            <!-- Tools will be loaded dynamically based on task -->
+        </div>
+        
+        <!-- Main Content -->
+        <div class="main-area">
+            <!-- Task Panel -->
+            <div class="task-panel">
+                <div class="task-header">
+                    <div class="task-number">Task <span id="taskNum">1</span> of 20</div>
+                    <div class="task-title" id="taskTitle">Create Title Slide</div>
+                </div>
+                <div class="task-content" id="taskContent">
+                    <!-- Task instructions load here -->
+                </div>
+                <div class="task-nav">
+                    <button class="btn-check" id="checkBtn" onclick="checkTask()">✓ Check</button>
+                    <button class="btn-next" id="nextBtn" onclick="nextTask()">Next →</button>
+                </div>
+            </div>
+            
+            <!-- Slide Canvas -->
+            <div class="slide-area">
+                <div class="slide-canvas" id="slideCanvas">
+                    <!-- Slide content loads here -->
+                </div>
+            </div>
+            
+            <!-- Slide Thumbnails -->
+            <div class="slides-panel" id="slidesPanel">
+                <div class="slide-thumb active">
+                    <div class="slide-thumb-number">1</div>
+                </div>
+                <div class="add-slide-btn">+ Add Slide</div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Feedback Overlay -->
+    <div class="feedback-overlay" id="feedbackOverlay">
+        <div class="feedback-card">
+            <div class="feedback-icon" id="feedbackIcon">✅</div>
+            <div class="feedback-title" id="feedbackTitle">Correct!</div>
+            <div class="feedback-score" id="feedbackScore">10/10 points</div>
+            <div class="feedback-detail" id="feedbackDetail">
+                <h4>Feedback</h4>
+                <p id="feedbackText">Great job!</p>
+            </div>
+            <button class="feedback-close" onclick="closeFeedback()">Continue</button>
+        </div>
+    </div>
+    
+    <!-- Results Screen -->
+    <div id="resultsScreen" class="results-screen">
+        <div class="results-card">
+            <div class="result-icon" id="resultIcon">🎉</div>
+            <div class="result-status" id="resultStatus">PASSED!</div>
+            <div class="result-score" id="resultScore">75%</div>
+            <div class="result-detail" id="resultDetail">150/200 points</div>
+            
+            <div class="result-breakdown">
+                <div class="breakdown-item">
+                    <h4>Correct Tasks</h4>
+                    <div class="value" id="correctTasks">15/20</div>
+                </div>
+                <div class="breakdown-item">
+                    <h4>Time Used</h4>
+                    <div class="value" id="timeUsed">1:23:45</div>
+                </div>
+            </div>
+            
+            <div class="result-actions">
+                <button class="review-btn" onclick="reviewTasks()">📝 Review</button>
+                <button class="restart-btn" onclick="restartExam()">🔄 Retake</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Task definitions - truly hands-on tasks
+        const tasks = [
+            {
+                id: 1,
+                title: "Create Title Slide",
+                type: "title-slide",
+                instruction: "Create a professional title slide for M.T.T.I's presentation.",
+                requirements: [
+                    "Type the title: <strong>Masomotele Technical Training Institute</strong>",
+                    "Type the subtitle: <strong>Start Learning, Start Earning</strong>",
+                    "The title should be centered"
+                ],
+                check: (data) => {
+                    const title = data.title?.toLowerCase() || '';
+                    const subtitle = data.subtitle?.toLowerCase() || '';
+                    let score = 0;
+                    if (title.includes('masomotele') && title.includes('technical')) score += 4;
+                    if (subtitle.includes('start learning') || subtitle.includes('start earning')) score += 3;
+                    if (data.centered) score += 3;
+                    return { score, max: 10, correct: score >= 7 };
+                },
+                points: 10
+            },
+            {
+                id: 2,
+                title: "Apply Text Formatting",
+                type: "text-format",
+                instruction: "Format the text as specified using the toolbar.",
+                requirements: [
+                    "Make the title <strong>BOLD</strong>",
+                    "Make the subtitle <em>Italic</em>",
+                    "Center align both"
+                ],
+                preloadTitle: "Computer Courses",
+                preloadContent: "Professional Training Programs",
+                check: (data) => {
+                    let score = 0;
+                    if (data.titleBold) score += 4;
+                    if (data.subtitleItalic) score += 3;
+                    if (data.centered) score += 3;
+                    return { score, max: 10, correct: score >= 7 };
+                },
+                points: 10
+            },
+            {
+                id: 3,
+                title: "Create Bullet Points",
+                type: "bullet-list",
+                instruction: "Create a slide with bullet points listing M.T.T.I courses.",
+                requirements: [
+                    "Title: <strong>Our Courses</strong>",
+                    "Add at least 4 bullet points for courses",
+                    "Examples: Web Design, Graphic Design, Cyber Security, etc."
+                ],
+                check: (data) => {
+                    let score = 0;
+                    const title = data.title?.toLowerCase() || '';
+                    const bullets = data.bullets || [];
+                    if (title.includes('course')) score += 3;
+                    if (bullets.length >= 4) score += 4;
+                    else if (bullets.length >= 2) score += 2;
+                    if (bullets.some(b => b.toLowerCase().includes('design') || b.toLowerCase().includes('web') || b.toLowerCase().includes('cyber'))) score += 3;
+                    return { score, max: 10, correct: score >= 7 };
+                },
+                points: 10
+            },
+            {
+                id: 4,
+                title: "Change Font & Size",
+                type: "font-change",
+                instruction: "Change the font style and size of the text.",
+                requirements: [
+                    "Change title font to <strong>Arial Black</strong> or <strong>Impact</strong>",
+                    "Set title size to <strong>44pt</strong>",
+                    "Set content size to <strong>24pt</strong>"
+                ],
+                preloadTitle: "Training Programs",
+                preloadContent: "Learn practical skills",
+                check: (data) => {
+                    let score = 0;
+                    if (data.titleFont === 'impact' || data.titleFont === 'arial black') score += 4;
+                    if (data.titleSize >= 40 && data.titleSize <= 48) score += 3;
+                    if (data.contentSize >= 22 && data.contentSize <= 26) score += 3;
+                    return { score, max: 10, correct: score >= 7 };
+                },
+                points: 10
+            },
+            {
+                id: 5,
+                title: "Apply Color Scheme",
+                type: "color-scheme",
+                instruction: "Apply M.T.T.I brand colors to the slide.",
+                requirements: [
+                    "Change title color to <strong>Orange (#D35400)</strong>",
+                    "Change content color to <strong>Dark Blue (#2C3E50)</strong>",
+                    "Use the color picker in the toolbar"
+                ],
+                preloadTitle: "Why Choose M.T.T.I?",
+                preloadContent: "Quality practical training",
+                check: (data) => {
+                    let score = 0;
+                    if (data.titleColor === '#D35400' || data.titleColor === '#d35400' || data.titleColor === 'orange') score += 5;
+                    if (data.contentColor === '#2C3E50' || data.contentColor === '#2c3e50' || data.contentColor === 'darkblue') score += 5;
+                    return { score, max: 10, correct: score >= 7 };
+                },
+                points: 10
+            },
+            {
+                id: 6,
+                title: "Create Column Chart",
+                type: "chart-column",
+                instruction: "Create a column chart showing student enrollment.",
+                requirements: [
+                    "Chart title: <strong>Student Enrollment 2020-2024</strong>",
+                    "Set values: 2020=<strong>150</strong>, 2021=<strong>200</strong>, 2022=<strong>280</strong>, 2023=<strong>350</strong>, 2024=<strong>420</strong>",
+                    "Click on bars to adjust heights"
+                ],
+                check: (data) => {
+                    let score = 0;
+                    const title = data.chartTitle?.toLowerCase() || '';
+                    if (title.includes('enrollment') || title.includes('student')) score += 3;
+                    const values = data.values || [];
+                    const expected = [150, 200, 280, 350, 420];
+                    let correctValues = 0;
+                    values.forEach((v, i) => {
+                        if (Math.abs(v - expected[i]) < 30) correctValues++;
+                    });
+                    score += Math.round((correctValues / 5) * 7);
+                    return { score, max: 10, correct: score >= 7 };
+                },
+                points: 10
+            },
+            {
+                id: 7,
+                title: "Create Process SmartArt",
+                type: "smartart-process",
+                instruction: "Create a SmartArt showing the enrollment process.",
+                requirements: [
+                    "Create 4 process steps",
+                    "Step 1: <strong>Apply</strong>",
+                    "Step 2: <strong>Interview</strong>",
+                    "Step 3: <strong>Register</strong>",
+                    "Step 4: <strong>Start Classes</strong>"
+                ],
+                check: (data) => {
+                    let score = 0;
+                    const steps = data.steps || [];
+                    const expected = ['apply', 'interview', 'register', 'start'];
+                    let matches = 0;
+                    steps.forEach((s, i) => {
+                        const lower = s.toLowerCase();
+                        if (expected.some(e => lower.includes(e))) matches++;
+                    });
+                    score = Math.round((matches / 4) * 10);
+                    return { score, max: 10, correct: score >= 7 };
+                },
+                points: 10
+            },
+            {
+                id: 8,
+                title: "Add Entrance Animation",
+                type: "animation-entrance",
+                instruction: "Add entrance animations to bullet points.",
+                requirements: [
+                    "Select <strong>Fade</strong> animation from the toolbar",
+                    "Apply to all bullet points",
+                    "Click 'Play' to preview the animation"
+                ],
+                preloadBullets: ["Practical Training", "Expert Instructors", "Job Placement", "Affordable Fees"],
+                check: (data) => {
+                    let score = 0;
+                    if (data.animationType === 'fade') score += 5;
+                    else if (data.animationType) score += 2;
+                    if (data.animated) score += 5;
+                    return { score, max: 10, correct: score >= 7 };
+                },
+                points: 10
+            },
+            {
+                id: 9,
+                title: "Apply Slide Transition",
+                type: "transition",
+                instruction: "Apply a professional transition to the slide.",
+                requirements: [
+                    "Select <strong>Push</strong> or <strong>Fade</strong> transition",
+                    "Set duration to <strong>1 second</strong>",
+                    "Preview the transition"
+                ],
+                check: (data) => {
+                    let score = 0;
+                    if (data.transition === 'push' || data.transition === 'fade') score += 5;
+                    else if (data.transition) score += 2;
+                    if (data.duration >= 0.8 && data.duration <= 1.5) score += 5;
+                    return { score, max: 10, correct: score >= 7 };
+                },
+                points: 10
+            },
+            {
+                id: 10,
+                title: "Insert & Format Shape",
+                type: "shape-format",
+                instruction: "Insert and format a shape for emphasis.",
+                requirements: [
+                    "Insert a <strong>Rectangle</strong> shape",
+                    "Fill color: <strong>Orange</strong>",
+                    "Add text: <strong>ENROLL NOW!</strong>"
+                ],
+                check: (data) => {
+                    let score = 0;
+                    if (data.shapeType === 'rectangle') score += 3;
+                    if (data.fillColor === 'orange' || data.fillColor === '#d35400') score += 3;
+                    const text = data.shapeText?.toLowerCase() || '';
+                    if (text.includes('enroll')) score += 4;
+                    return { score, max: 10, correct: score >= 7 };
+                },
+                points: 10
+            },
+            {
+                id: 11,
+                title: "Create Comparison Slide",
+                type: "two-column",
+                instruction: "Create a two-column comparison slide.",
+                requirements: [
+                    "Title: <strong>Before vs After Training</strong>",
+                    "Left column: At least 2 'before' points",
+                    "Right column: At least 2 'after' points"
+                ],
+                check: (data) => {
+                    let score = 0;
+                    if (data.title?.toLowerCase().includes('before') || data.title?.toLowerCase().includes('after')) score += 3;
+                    if (data.leftItems?.length >= 2) score += 3;
+                    if (data.rightItems?.length >= 2) score += 4;
+                    return { score, max: 10, correct: score >= 7 };
+                },
+                points: 10
+            },
+            {
+                id: 12,
+                title: "Add Hyperlink",
+                type: "hyperlink",
+                instruction: "Add a hyperlink to text.",
+                requirements: [
+                    "Type: <strong>Visit our website</strong>",
+                    "Add hyperlink to: <strong>www.mtti.ac.ke</strong>",
+                    "Text should appear underlined and blue"
+                ],
+                check: (data) => {
+                    let score = 0;
+                    if (data.text?.toLowerCase().includes('visit') || data.text?.toLowerCase().includes('website')) score += 3;
+                    if (data.url?.includes('mtti')) score += 5;
+                    if (data.styled) score += 2;
+                    return { score, max: 10, correct: score >= 7 };
+                },
+                points: 10
+            },
+            {
+                id: 13,
+                title: "Create Picture Slide",
+                type: "picture-slide",
+                instruction: "Create a slide with image and caption.",
+                requirements: [
+                    "Click to 'insert' the placeholder image",
+                    "Add caption: <strong>Students in Computer Lab</strong>",
+                    "Position caption below the image"
+                ],
+                check: (data) => {
+                    let score = 0;
+                    if (data.imageInserted) score += 4;
+                    if (data.caption?.toLowerCase().includes('student') || data.caption?.toLowerCase().includes('lab')) score += 4;
+                    if (data.captionPosition === 'below') score += 2;
+                    return { score, max: 10, correct: score >= 7 };
+                },
+                points: 10
+            },
+            {
+                id: 14,
+                title: "Apply Animation Timing",
+                type: "animation-timing",
+                instruction: "Set up animation timing for bullet points.",
+                requirements: [
+                    "Set each bullet to appear <strong>On Click</strong>",
+                    "Set delay of <strong>0.5 seconds</strong> between items",
+                    "Add <strong>Dim after animation</strong> effect"
+                ],
+                preloadBullets: ["Point 1", "Point 2", "Point 3", "Point 4"],
+                check: (data) => {
+                    let score = 0;
+                    if (data.trigger === 'onclick') score += 4;
+                    if (data.delay >= 0.3 && data.delay <= 0.7) score += 3;
+                    if (data.dimAfter) score += 3;
+                    return { score, max: 10, correct: score >= 7 };
+                },
+                points: 10
+            },
+            {
+                id: 15,
+                title: "Create Pie Chart",
+                type: "chart-pie",
+                instruction: "Create a pie chart showing course distribution.",
+                requirements: [
+                    "Chart title: <strong>Course Enrollment by Program</strong>",
+                    "Add 4 slices with percentages",
+                    "Total should equal 100%"
+                ],
+                check: (data) => {
+                    let score = 0;
+                    if (data.chartTitle?.toLowerCase().includes('course') || data.chartTitle?.toLowerCase().includes('enrollment')) score += 3;
+                    const slices = data.slices || [];
+                    if (slices.length >= 4) score += 3;
+                    const total = slices.reduce((a, b) => a + b, 0);
+                    if (total >= 95 && total <= 105) score += 4;
+                    return { score, max: 10, correct: score >= 7 };
+                },
+                points: 10
+            },
+            {
+                id: 16,
+                title: "Design Slide Master",
+                type: "slide-master",
+                instruction: "Customize the slide master layout.",
+                requirements: [
+                    "Add a <strong>logo placeholder</strong> in top-right",
+                    "Set footer text: <strong>M.T.T.I © 2024</strong>",
+                    "Apply orange accent color to title area"
+                ],
+                check: (data) => {
+                    let score = 0;
+                    if (data.logoPlaced) score += 3;
+                    if (data.footer?.toLowerCase().includes('mtti') || data.footer?.includes('2024')) score += 4;
+                    if (data.accentColor === 'orange') score += 3;
+                    return { score, max: 10, correct: score >= 7 };
+                },
+                points: 10
+            },
+            {
+                id: 17,
+                title: "Add Speaker Notes",
+                type: "speaker-notes",
+                instruction: "Add speaker notes for the presenter.",
+                requirements: [
+                    "Write at least 2 sentences of speaker notes",
+                    "Notes should relate to the slide content",
+                    "Include a reminder about key points to mention"
+                ],
+                preloadTitle: "Our Achievements",
+                preloadContent: "• 500+ Graduates\n• 90% Employment Rate\n• Industry Partnerships",
+                check: (data) => {
+                    let score = 0;
+                    const notes = data.notes || '';
+                    if (notes.length >= 50) score += 4;
+                    else if (notes.length >= 20) score += 2;
+                    if (notes.toLowerCase().includes('mention') || notes.toLowerCase().includes('point') || notes.toLowerCase().includes('highlight')) score += 3;
+                    if (notes.includes('.') && notes.split('.').length >= 2) score += 3;
+                    return { score, max: 10, correct: score >= 7 };
+                },
+                points: 10
+            },
+            {
+                id: 18,
+                title: "Create Table",
+                type: "table",
+                instruction: "Create a table showing course fees.",
+                requirements: [
+                    "Create a 3-column table: Course, Duration, Fee",
+                    "Add at least 3 rows of data",
+                    "Format header row with orange background"
+                ],
+                check: (data) => {
+                    let score = 0;
+                    if (data.columns >= 3) score += 3;
+                    if (data.rows >= 3) score += 4;
+                    if (data.headerFormatted) score += 3;
+                    return { score, max: 10, correct: score >= 7 };
+                },
+                points: 10
+            },
+            {
+                id: 19,
+                title: "Motion Path Animation",
+                type: "motion-path",
+                instruction: "Create a motion path animation for a shape.",
+                requirements: [
+                    "Draw a curved motion path for the shape",
+                    "Set animation duration to <strong>2 seconds</strong>",
+                    "Preview the animation"
+                ],
+                check: (data) => {
+                    let score = 0;
+                    if (data.pathType === 'curve' || data.pathType === 'custom') score += 4;
+                    else if (data.pathType) score += 2;
+                    if (data.duration >= 1.5 && data.duration <= 2.5) score += 4;
+                    if (data.previewed) score += 2;
+                    return { score, max: 10, correct: score >= 7 };
+                },
+                points: 10
+            },
+            {
+                id: 20,
+                title: "Final Slide - Contact",
+                type: "contact-slide",
+                instruction: "Create a professional contact/closing slide.",
+                requirements: [
+                    "Title: <strong>Contact Us</strong> or <strong>Thank You</strong>",
+                    "Include: Location (<strong>Eldoret</strong>), Phone, Email",
+                    "Add the tagline: <strong>Start Learning, Start Earning</strong>"
+                ],
+                check: (data) => {
+                    let score = 0;
+                    const title = data.title?.toLowerCase() || '';
+                    if (title.includes('contact') || title.includes('thank')) score += 2;
+                    const content = data.content?.toLowerCase() || '';
+                    if (content.includes('eldoret')) score += 2;
+                    if (content.includes('phone') || content.includes('tel') || /\d{10}/.test(content)) score += 2;
+                    if (content.includes('email') || content.includes('@')) score += 2;
+                    if (content.includes('start learning') || content.includes('start earning')) score += 2;
+                    return { score, max: 10, correct: score >= 7 };
+                },
+                points: 10
+            }
+        ];
+
+        // State
+        let state = {
+            studentName: '',
+            currentTask: 0,
+            timeRemaining: 2 * 60 * 60,
+            timerInterval: null,
+            startTime: null,
+            taskData: {},
+            results: {},
+            formatting: {
+                bold: false,
+                italic: false,
+                underline: false,
+                align: 'left',
+                fontFamily: 'Segoe UI',
+                fontSize: 24,
+                color: '#333333'
+            }
+        };
+
+        // DOM Elements
+        const $ = id => document.getElementById(id);
+        
+        // Initialize
+        $('studentName').addEventListener('input', e => {
+            state.studentName = e.target.value.trim();
+            $('startBtn').disabled = !state.studentName;
+        });
+
+        $('startBtn').addEventListener('click', startExam);
+
+        function startExam() {
+            state.startTime = Date.now();
+            $('startScreen').style.display = 'none';
+            $('examContainer').style.display = 'flex';
+            loadTask(0);
+            startTimer();
+        }
+
+        function startTimer() {
+            state.timerInterval = setInterval(() => {
+                state.timeRemaining--;
+                const h = Math.floor(state.timeRemaining / 3600);
+                const m = Math.floor((state.timeRemaining % 3600) / 60);
+                const s = state.timeRemaining % 60;
+                $('timer').textContent = `${h.toString().padStart(2,'0')}:${m.toString().padStart(2,'0')}:${s.toString().padStart(2,'0')}`;
+                
+                if (state.timeRemaining <= 300) $('timer').classList.add('warning');
+                if (state.timeRemaining <= 0) {
+                    clearInterval(state.timerInterval);
+                    showResults();
+                }
+            }, 1000);
+        }
+
+        function loadTask(index) {
+            state.currentTask = index;
+            const task = tasks[index];
+            
+            $('currentTask').textContent = index + 1;
+            $('taskNum').textContent = index + 1;
+            $('taskTitle').textContent = task.title;
+            
+            // Load task instructions
+            let instructionHtml = `
+                <div class="task-instruction">
+                    <h4>📋 Instructions</h4>
+                    <p>${task.instruction}</p>
+                    <ul>${task.requirements.map(r => `<li>${r}</li>`).join('')}</ul>
+                </div>
+            `;
+            $('taskContent').innerHTML = instructionHtml;
+            
+            // Load appropriate slide canvas and toolbar
+            loadSlideCanvas(task);
+            loadToolbar(task);
+            
+            // Update navigation
+            $('nextBtn').textContent = index === tasks.length - 1 ? 'Finish' : 'Next →';
+        }
+
+        function loadSlideCanvas(task) {
+            const canvas = $('slideCanvas');
+            let html = '';
+            
+            // Initialize task data if not exists
+            if (!state.taskData[task.id]) {
+                state.taskData[task.id] = {};
+            }
+            const data = state.taskData[task.id];
+            
+            switch(task.type) {
+                case 'title-slide':
+                case 'text-format':
+                case 'font-change':
+                case 'color-scheme':
+                    html = `
+                        <div class="slide-title-box ${data.title ? 'has-content' : ''}">
+                            <input type="text" class="slide-title-input" id="slideTitle" 
+                                placeholder="Click to add title" 
+                                value="${data.title || task.preloadTitle || ''}"
+                                style="font-weight: ${data.titleBold ? 'bold' : 'normal'}; 
+                                       font-style: ${data.titleItalic ? 'italic' : 'normal'};
+                                       color: ${data.titleColor || '#333'};
+                                       font-family: ${data.titleFont || 'Segoe UI'};
+                                       font-size: ${data.titleSize || 32}px;">
+                        </div>
+                        <div class="slide-content-box ${data.content ? 'has-content' : ''}">
+                            <textarea class="slide-content-input" id="slideContent" 
+                                placeholder="Click to add content"
+                                style="font-weight: ${data.contentBold ? 'bold' : 'normal'}; 
+                                       font-style: ${data.contentItalic ? 'italic' : 'normal'};
+                                       color: ${data.contentColor || '#333'};
+                                       font-size: ${data.contentSize || 18}px;">${data.content || task.preloadContent || ''}</textarea>
+                        </div>
+                    `;
+                    break;
+                    
+                case 'bullet-list':
+                    const bullets = data.bullets || ['', '', '', ''];
+                    html = `
+                        <div class="slide-title-box">
+                            <input type="text" class="slide-title-input" id="slideTitle" 
+                                placeholder="Click to add title" value="${data.title || ''}">
+                        </div>
+                        <div class="slide-content-box" style="padding: 20px;">
+                            ${bullets.map((b, i) => `
+                                <div style="display: flex; align-items: center; margin-bottom: 10px;">
+                                    <span style="color: #d35400; margin-right: 15px; font-size: 1.5rem;">•</span>
+                                    <input type="text" class="bullet-input" data-index="${i}" 
+                                        placeholder="Add bullet point ${i+1}" value="${b}"
+                                        style="flex: 1; padding: 10px; border: 1px solid #ddd; border-radius: 4px; font-size: 1.1rem;">
+                                </div>
+                            `).join('')}
+                            <button onclick="addBullet()" style="margin-top: 10px; padding: 8px 15px; background: #f0f0f0; border: 1px dashed #999; border-radius: 4px; cursor: pointer;">+ Add more</button>
+                        </div>
+                    `;
+                    break;
+                    
+                case 'chart-column':
+                    const chartValues = data.values || [150, 200, 280, 350, 420];
+                    const years = ['2020', '2021', '2022', '2023', '2024'];
+                    html = `
+                        <div class="slide-title-box">
+                            <input type="text" class="slide-title-input" id="slideTitle" 
+                                placeholder="Click to add chart title" value="${data.title || ''}" style="font-size: 1.5rem;">
+                        </div>
+                        <div class="chart-container">
+                            <input type="text" class="chart-title-input" id="chartTitle" 
+                                placeholder="Enter chart title" value="${data.chartTitle || ''}">
+                            <div class="chart-area">
+                                ${years.map((year, i) => `
+                                    <div class="chart-bar" style="height: ${chartValues[i] / 5}px;" 
+                                        data-index="${i}" onclick="adjustBar(${i})">
+                                        <div class="chart-bar-value">
+                                            <input type="number" class="bar-value-input" data-index="${i}" 
+                                                value="${chartValues[i]}" 
+                                                style="width: 50px; border: none; text-align: center; font-weight: bold; background: transparent;">
+                                        </div>
+                                        <div class="chart-bar-label">${year}</div>
+                                    </div>
+                                `).join('')}
+                            </div>
+                        </div>
+                    `;
+                    break;
+                    
+                case 'smartart-process':
+                    const steps = data.steps || ['', '', '', ''];
+                    html = `
+                        <div class="slide-title-box">
+                            <input type="text" class="slide-title-input" id="slideTitle" 
+                                placeholder="Process Title" value="${data.title || 'Enrollment Process'}" style="font-size: 1.5rem;">
+                        </div>
+                        <div class="smartart-container">
+                            ${steps.map((step, i) => `
+                                <div class="smartart-item">
+                                    <input type="text" class="step-input" data-index="${i}" 
+                                        placeholder="Step ${i+1}" value="${step}">
+                                </div>
+                                ${i < steps.length - 1 ? '<span class="smartart-arrow">→</span>' : ''}
+                            `).join('')}
+                        </div>
+                    `;
+                    break;
+                    
+                case 'animation-entrance':
+                case 'animation-timing':
+                    const animBullets = task.preloadBullets || data.bullets || [];
+                    html = `
+                        <div class="slide-title-box">
+                            <input type="text" class="slide-title-input" id="slideTitle" 
+                                value="Benefits of M.T.T.I" readonly style="font-size: 1.5rem;">
+                        </div>
+                        <div class="animation-preview" id="animPreview">
+                            ${animBullets.map((b, i) => `
+                                <div class="anim-bullet ${data.animated && i <= (data.currentAnim || 0) ? 'visible' : ''} ${data.dimAfter && i < (data.currentAnim || 0) ? 'dimmed' : ''}" data-index="${i}">
+                                    • ${b}
+                                </div>
+                            `).join('')}
+                        </div>
+                        <div style="position: absolute; bottom: 20px; left: 50%; transform: translateX(-50%); display: flex; gap: 10px;">
+                            <button onclick="playAnimation()" style="padding: 10px 25px; background: #27ae60; color: #fff; border: none; border-radius: 5px; cursor: pointer; font-weight: 600;">▶ Play Animation</button>
+                            <button onclick="resetAnimation()" style="padding: 10px 25px; background: #e74c3c; color: #fff; border: none; border-radius: 5px; cursor: pointer; font-weight: 600;">↺ Reset</button>
+                        </div>
+                    `;
+                    break;
+                    
+                case 'shape-format':
+                    html = `
+                        <div class="slide-title-box">
+                            <input type="text" class="slide-title-input" id="slideTitle" 
+                                value="Special Offer" readonly style="font-size: 1.5rem;">
+                        </div>
+                        <div style="position: absolute; top: 35%; left: 50%; transform: translateX(-50%); text-align: center;">
+                            <div id="shapeContainer" style="display: inline-block;">
+                                ${data.shapeCreated ? `
+                                    <div class="shape shape-rect" style="width: 250px; height: 80px; background: ${data.fillColor || '#d35400'}; display: flex; align-items: center; justify-content: center; border-radius: 10px; cursor: pointer;">
+                                        <input type="text" id="shapeText" value="${data.shapeText || ''}" placeholder="Add text" 
+                                            style="background: transparent; border: none; color: #fff; font-size: 1.3rem; font-weight: bold; text-align: center; width: 90%;">
+                                    </div>
+                                ` : `
+                                    <button onclick="insertShape('rectangle')" style="padding: 20px 40px; background: #f0f0f0; border: 2px dashed #999; border-radius: 10px; cursor: pointer; font-size: 1rem;">
+                                        📦 Click to Insert Rectangle Shape
+                                    </button>
+                                `}
+                            </div>
+                        </div>
+                    `;
+                    break;
+                    
+                case 'two-column':
+                    html = `
+                        <div class="slide-title-box">
+                            <input type="text" class="slide-title-input" id="slideTitle" 
+                                placeholder="Enter comparison title" value="${data.title || ''}" style="font-size: 1.5rem;">
+                        </div>
+                        <div style="position: absolute; top: 28%; left: 5%; right: 5%; bottom: 8%; display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
+                            <div style="background: #fff3e0; padding: 15px; border-radius: 8px;">
+                                <h3 style="color: #e74c3c; margin-bottom: 10px; font-size: 1rem;">❌ Before</h3>
+                                <textarea id="leftColumn" placeholder="Add before points..." style="width: 100%; height: 80%; border: none; background: transparent; font-size: 0.9rem; resize: none;">${data.leftItems?.join('\n') || ''}</textarea>
+                            </div>
+                            <div style="background: #e8f5e9; padding: 15px; border-radius: 8px;">
+                                <h3 style="color: #27ae60; margin-bottom: 10px; font-size: 1rem;">✓ After</h3>
+                                <textarea id="rightColumn" placeholder="Add after points..." style="width: 100%; height: 80%; border: none; background: transparent; font-size: 0.9rem; resize: none;">${data.rightItems?.join('\n') || ''}</textarea>
+                            </div>
+                        </div>
+                    `;
+                    break;
+                    
+                case 'speaker-notes':
+                    html = `
+                        <div class="slide-title-box">
+                            <input type="text" class="slide-title-input" id="slideTitle" 
+                                value="${task.preloadTitle}" readonly style="font-size: 1.5rem;">
+                        </div>
+                        <div class="slide-content-box" style="white-space: pre-line; padding: 20px; font-size: 1.1rem; color: #333;">
+                            ${task.preloadContent}
+                        </div>
+                        <div style="position: absolute; bottom: 0; left: 0; right: 0; background: #2d2d30; padding: 15px; border-top: 3px solid #d35400;">
+                            <label style="color: #d35400; font-size: 0.8rem; display: block; margin-bottom: 8px;">📝 SPEAKER NOTES</label>
+                            <textarea id="speakerNotes" placeholder="Type your speaker notes here... (What will you say when presenting this slide?)" 
+                                style="width: 100%; height: 80px; background: #1e1e1e; border: 1px solid #555; border-radius: 5px; color: #fff; padding: 10px; font-size: 0.9rem; resize: none;">${data.notes || ''}</textarea>
+                        </div>
+                    `;
+                    break;
+                    
+                case 'contact-slide':
+                    html = `
+                        <div class="slide-title-box">
+                            <input type="text" class="slide-title-input" id="slideTitle" 
+                                placeholder="Contact Us / Thank You" value="${data.title || ''}" style="font-size: 2rem; color: #d35400;">
+                        </div>
+                        <div class="slide-content-box" style="display: flex; flex-direction: column; justify-content: center; align-items: center;">
+                            <textarea id="slideContent" placeholder="Add contact details:&#10;📍 Location&#10;📞 Phone&#10;✉️ Email&#10;&#10;And the tagline!" 
+                                style="width: 80%; height: 70%; border: 1px solid #ddd; border-radius: 8px; padding: 20px; font-size: 1.1rem; text-align: center; resize: none;">${data.content || ''}</textarea>
+                        </div>
+                    `;
+                    break;
+                    
+                default:
+                    html = `
+                        <div class="slide-title-box">
+                            <input type="text" class="slide-title-input" id="slideTitle" placeholder="Click to add title" value="${data.title || ''}">
+                        </div>
+                        <div class="slide-content-box">
+                            <textarea class="slide-content-input" id="slideContent" placeholder="Click to add content">${data.content || ''}</textarea>
+                        </div>
+                    `;
+            }
+            
+            canvas.innerHTML = html;
+            
+            // Add event listeners for input changes
+            setupInputListeners(task);
+        }
+
+        function loadToolbar(task) {
+            const toolbar = $('ribbonTools');
+            let html = '';
+            
+            // Common formatting tools
+            html += `
+                <div class="tool-group">
+                    <div class="tool-buttons">
+                        <button class="tool-btn ${state.formatting.bold ? 'active' : ''}" onclick="toggleFormat('bold')" title="Bold (Ctrl+B)"><b>B</b></button>
+                        <button class="tool-btn ${state.formatting.italic ? 'active' : ''}" onclick="toggleFormat('italic')" title="Italic (Ctrl+I)"><i>I</i></button>
+                        <button class="tool-btn ${state.formatting.underline ? 'active' : ''}" onclick="toggleFormat('underline')" title="Underline (Ctrl+U)"><u>U</u></button>
+                    </div>
+                    <div class="tool-group-label">Font</div>
+                </div>
+                <div class="tool-separator"></div>
+            `;
+            
+            // Font selection
+            html += `
+                <div class="tool-group">
+                    <div class="tool-buttons">
+                        <select class="font-select" id="fontSelect" onchange="changeFont(this.value)">
+                            <option value="Segoe UI">Segoe UI</option>
+                            <option value="Arial">Arial</option>
+                            <option value="Arial Black">Arial Black</option>
+                            <option value="Impact">Impact</option>
+                            <option value="Times New Roman">Times New Roman</option>
+                            <option value="Georgia">Georgia</option>
+                        </select>
+                        <input type="number" class="font-size-input" id="fontSizeInput" value="${state.formatting.fontSize}" min="8" max="96" onchange="changeFontSize(this.value)">
+                    </div>
+                    <div class="tool-group-label">Font Style</div>
+                </div>
+                <div class="tool-separator"></div>
+            `;
+            
+            // Alignment
+            html += `
+                <div class="tool-group">
+                    <div class="tool-buttons">
+                        <button class="tool-btn ${state.formatting.align === 'left' ? 'active' : ''}" onclick="setAlign('left')" title="Align Left">⫷</button>
+                        <button class="tool-btn ${state.formatting.align === 'center' ? 'active' : ''}" onclick="setAlign('center')" title="Center">☰</button>
+                        <button class="tool-btn ${state.formatting.align === 'right' ? 'active' : ''}" onclick="setAlign('right')" title="Align Right">⫸</button>
+                    </div>
+                    <div class="tool-group-label">Alignment</div>
+                </div>
+                <div class="tool-separator"></div>
+            `;
+            
+            // Colors
+            html += `
+                <div class="tool-group">
+                    <div class="tool-buttons">
+                        <div style="position: relative;">
+                            <button class="tool-btn color-picker-btn" onclick="toggleColorPicker('title')" title="Title Color">
+                                A<div class="color-bar" id="titleColorBar" style="background: ${state.taskData[tasks[state.currentTask].id]?.titleColor || '#333'}"></div>
+                            </button>
+                            <div class="color-palette" id="titleColorPalette">
+                                <div class="color-grid">
+                                    ${['#D35400', '#E74C3C', '#2C3E50', '#27AE60', '#3498DB', '#9B59B6', '#F39C12', '#1ABC9C', '#333333', '#FFFFFF'].map(c => 
+                                        `<div class="color-swatch" style="background: ${c};" onclick="setColor('title', '${c}')"></div>`
+                                    ).join('')}
+                                </div>
+                            </div>
+                        </div>
+                        <div style="position: relative;">
+                            <button class="tool-btn color-picker-btn" onclick="toggleColorPicker('content')" title="Content Color">
+                                A<div class="color-bar" id="contentColorBar" style="background: ${state.taskData[tasks[state.currentTask].id]?.contentColor || '#333'}"></div>
+                            </button>
+                            <div class="color-palette" id="contentColorPalette">
+                                <div class="color-grid">
+                                    ${['#D35400', '#E74C3C', '#2C3E50', '#27AE60', '#3498DB', '#9B59B6', '#F39C12', '#1ABC9C', '#333333', '#666666'].map(c => 
+                                        `<div class="color-swatch" style="background: ${c};" onclick="setColor('content', '${c}')"></div>`
+                                    ).join('')}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="tool-group-label">Colors</div>
+                </div>
+            `;
+            
+            // Animation tools for animation tasks
+            if (task.type.includes('animation')) {
+                html += `
+                    <div class="tool-separator"></div>
+                    <div class="tool-group">
+                        <div class="tool-buttons">
+                            <select class="font-select" id="animSelect" onchange="setAnimation(this.value)">
+                                <option value="">Select Animation</option>
+                                <option value="fade">Fade</option>
+                                <option value="fly-in">Fly In</option>
+                                <option value="zoom">Zoom</option>
+                                <option value="bounce">Bounce</option>
+                            </select>
+                            <select class="font-select" id="triggerSelect" onchange="setTrigger(this.value)">
+                                <option value="onclick">On Click</option>
+                                <option value="withprevious">With Previous</option>
+                                <option value="afterprevious">After Previous</option>
+                            </select>
+                        </div>
+                        <div class="tool-group-label">Animation</div>
+                    </div>
+                `;
+            }
+            
+            // Transition tools
+            if (task.type === 'transition') {
+                html += `
+                    <div class="tool-separator"></div>
+                    <div class="tool-group">
+                        <div class="tool-buttons">
+                            <select class="font-select" id="transitionSelect" onchange="setTransition(this.value)">
+                                <option value="">Select Transition</option>
+                                <option value="fade">Fade</option>
+                                <option value="push">Push</option>
+                                <option value="wipe">Wipe</option>
+                                <option value="split">Split</option>
+                            </select>
+                            <input type="number" class="font-size-input" id="durationInput" value="1" min="0.1" max="5" step="0.1" style="width: 60px;" onchange="setDuration(this.value)">
+                            <span style="color: #888; font-size: 0.8rem;">sec</span>
+                        </div>
+                        <div class="tool-group-label">Transition</div>
+                    </div>
+                `;
+            }
+            
+            toolbar.innerHTML = html;
+        }
+
+        function setupInputListeners(task) {
+            const data = state.taskData[task.id];
+            
+            // Title input
+            const titleInput = $('slideTitle');
+            if (titleInput) {
+                titleInput.addEventListener('input', e => {
+                    data.title = e.target.value;
+                    e.target.parentElement.classList.toggle('has-content', e.target.value.length > 0);
+                });
+            }
+            
+            // Content input
+            const contentInput = $('slideContent');
+            if (contentInput) {
+                contentInput.addEventListener('input', e => {
+                    data.content = e.target.value;
+                });
+            }
+            
+            // Chart title
+            const chartTitle = $('chartTitle');
+            if (chartTitle) {
+                chartTitle.addEventListener('input', e => {
+                    data.chartTitle = e.target.value;
+                });
+            }
+            
+            // Bar values
+            document.querySelectorAll('.bar-value-input').forEach(input => {
+                input.addEventListener('input', e => {
+                    const index = parseInt(e.target.dataset.index);
+                    if (!data.values) data.values = [150, 200, 280, 350, 420];
+                    data.values[index] = parseInt(e.target.value) || 0;
+                    // Update bar height
+                    const bar = e.target.closest('.chart-bar');
+                    bar.style.height = (data.values[index] / 5) + 'px';
+                });
+            });
+            
+            // Bullet inputs
+            document.querySelectorAll('.bullet-input').forEach(input => {
+                input.addEventListener('input', e => {
+                    const index = parseInt(e.target.dataset.index);
+                    if (!data.bullets) data.bullets = ['', '', '', ''];
+                    data.bullets[index] = e.target.value;
+                });
+            });
+            
+            // Step inputs (SmartArt)
+            document.querySelectorAll('.step-input').forEach(input => {
+                input.addEventListener('input', e => {
+                    const index = parseInt(e.target.dataset.index);
+                    if (!data.steps) data.steps = ['', '', '', ''];
+                    data.steps[index] = e.target.value;
+                });
+            });
+            
+            // Speaker notes
+            const notesInput = $('speakerNotes');
+            if (notesInput) {
+                notesInput.addEventListener('input', e => {
+                    data.notes = e.target.value;
+                });
+            }
+            
+            // Two column inputs
+            const leftCol = $('leftColumn');
+            const rightCol = $('rightColumn');
+            if (leftCol) {
+                leftCol.addEventListener('input', e => {
+                    data.leftItems = e.target.value.split('\n').filter(x => x.trim());
+                });
+            }
+            if (rightCol) {
+                rightCol.addEventListener('input', e => {
+                    data.rightItems = e.target.value.split('\n').filter(x => x.trim());
+                });
+            }
+            
+            // Shape text
+            const shapeText = $('shapeText');
+            if (shapeText) {
+                shapeText.addEventListener('input', e => {
+                    data.shapeText = e.target.value;
+                });
+            }
+        }
+
+        // Formatting functions
+        function toggleFormat(format) {
+            state.formatting[format] = !state.formatting[format];
+            const task = tasks[state.currentTask];
+            const data = state.taskData[task.id];
+            
+            const titleInput = $('slideTitle');
+            const contentInput = $('slideContent');
+            
+            if (format === 'bold') {
+                if (document.activeElement === titleInput) {
+                    data.titleBold = state.formatting.bold;
+                    titleInput.style.fontWeight = state.formatting.bold ? 'bold' : 'normal';
+                } else {
+                    data.contentBold = state.formatting.bold;
+                    if (contentInput) contentInput.style.fontWeight = state.formatting.bold ? 'bold' : 'normal';
+                }
+            } else if (format === 'italic') {
+                if (document.activeElement === titleInput) {
+                    data.titleItalic = state.formatting.italic;
+                    titleInput.style.fontStyle = state.formatting.italic ? 'italic' : 'normal';
+                } else {
+                    data.subtitleItalic = state.formatting.italic;
+                    data.contentItalic = state.formatting.italic;
+                    if (contentInput) contentInput.style.fontStyle = state.formatting.italic ? 'italic' : 'normal';
+                }
+            }
+            
+            loadToolbar(task);
+        }
+
+        function setAlign(align) {
+            state.formatting.align = align;
+            const task = tasks[state.currentTask];
+            const data = state.taskData[task.id];
+            data.centered = align === 'center';
+            
+            const titleInput = $('slideTitle');
+            const contentInput = $('slideContent');
+            
+            if (titleInput) titleInput.style.textAlign = align;
+            if (contentInput) contentInput.style.textAlign = align;
+            
+            loadToolbar(task);
+        }
+
+        function changeFont(font) {
+            const task = tasks[state.currentTask];
+            const data = state.taskData[task.id];
+            const titleInput = $('slideTitle');
+            
+            if (titleInput) {
+                titleInput.style.fontFamily = font;
+                data.titleFont = font.toLowerCase();
+            }
+        }
+
+        function changeFontSize(size) {
+            const task = tasks[state.currentTask];
+            const data = state.taskData[task.id];
+            const titleInput = $('slideTitle');
+            const contentInput = $('slideContent');
+            
+            if (document.activeElement === titleInput || !contentInput) {
+                if (titleInput) {
+                    titleInput.style.fontSize = size + 'px';
+                    data.titleSize = parseInt(size);
+                }
+            } else {
+                if (contentInput) {
+                    contentInput.style.fontSize = size + 'px';
+                    data.contentSize = parseInt(size);
+                }
+            }
+        }
+
+        function toggleColorPicker(type) {
+            const palette = $(type + 'ColorPalette');
+            document.querySelectorAll('.color-palette').forEach(p => {
+                if (p !== palette) p.classList.remove('show');
+            });
+            palette.classList.toggle('show');
+        }
+
+        function setColor(type, color) {
+            const task = tasks[state.currentTask];
+            const data = state.taskData[task.id];
+            
+            if (type === 'title') {
+                data.titleColor = color;
+                const titleInput = $('slideTitle');
+                if (titleInput) titleInput.style.color = color;
+                $('titleColorBar').style.background = color;
+            } else {
+                data.contentColor = color;
+                const contentInput = $('slideContent');
+                if (contentInput) contentInput.style.color = color;
+                $('contentColorBar').style.background = color;
+            }
+            
+            document.querySelectorAll('.color-palette').forEach(p => p.classList.remove('show'));
+        }
+
+        // Animation functions
+        function setAnimation(type) {
+            const task = tasks[state.currentTask];
+            const data = state.taskData[task.id];
+            data.animationType = type;
+        }
+
+        function setTrigger(trigger) {
+            const task = tasks[state.currentTask];
+            const data = state.taskData[task.id];
+            data.trigger = trigger;
+        }
+
+        function playAnimation() {
+            const task = tasks[state.currentTask];
+            const data = state.taskData[task.id];
+            data.animated = true;
+            data.currentAnim = 0;
+            
+            const bullets = document.querySelectorAll('.anim-bullet');
+            bullets.forEach(b => {
+                b.classList.remove('visible', 'dimmed');
+            });
+            
+            let i = 0;
+            const interval = setInterval(() => {
+                if (i > 0 && data.dimAfter) {
+                    bullets[i-1].classList.add('dimmed');
+                }
+                bullets[i].classList.add('visible');
+                data.currentAnim = i;
+                i++;
+                if (i >= bullets.length) {
+                    clearInterval(interval);
+                }
+            }, 500);
+        }
+
+        function resetAnimation() {
+            const task = tasks[state.currentTask];
+            const data = state.taskData[task.id];
+            data.currentAnim = -1;
+            
+            document.querySelectorAll('.anim-bullet').forEach(b => {
+                b.classList.remove('visible', 'dimmed');
+            });
+        }
+
+        // Shape functions
+        function insertShape(type) {
+            const task = tasks[state.currentTask];
+            const data = state.taskData[task.id];
+            data.shapeCreated = true;
+            data.shapeType = type;
+            data.fillColor = 'orange';
+            loadSlideCanvas(task);
+        }
+
+        // Add bullet
+        function addBullet() {
+            const task = tasks[state.currentTask];
+            const data = state.taskData[task.id];
+            if (!data.bullets) data.bullets = ['', '', '', ''];
+            data.bullets.push('');
+            loadSlideCanvas(task);
+        }
+
+        // Transition functions
+        function setTransition(type) {
+            const task = tasks[state.currentTask];
+            const data = state.taskData[task.id];
+            data.transition = type;
+        }
+
+        function setDuration(duration) {
+            const task = tasks[state.currentTask];
+            const data = state.taskData[task.id];
+            data.duration = parseFloat(duration);
+        }
+
+        // Task checking
+        function checkTask() {
+            const task = tasks[state.currentTask];
+            const data = state.taskData[task.id] || {};
+            const result = task.check(data);
+            
+            state.results[task.id] = result;
+            
+            // Show feedback
+            $('feedbackIcon').textContent = result.correct ? '✅' : '❌';
+            $('feedbackTitle').textContent = result.correct ? 'Correct!' : 'Not Quite';
+            $('feedbackTitle').className = 'feedback-title ' + (result.correct ? 'correct' : 'incorrect');
+            $('feedbackScore').textContent = `${result.score}/${result.max} points`;
+            $('feedbackText').textContent = result.correct 
+                ? 'Great job! You completed this task successfully.' 
+                : 'Check the requirements and try to complete all items. You can still proceed to the next task.';
+            
+            $('feedbackOverlay').classList.add('show');
+        }
+
+        function closeFeedback() {
+            $('feedbackOverlay').classList.remove('show');
+        }
+
+        function nextTask() {
+            if (state.currentTask < tasks.length - 1) {
+                loadTask(state.currentTask + 1);
+            } else {
+                showResults();
+            }
+        }
+
+        function showResults() {
+            clearInterval(state.timerInterval);
+            
+            let totalScore = 0;
+            let maxScore = 0;
+            let correctCount = 0;
+            
+            tasks.forEach(task => {
+                maxScore += task.points;
+                const result = state.results[task.id];
+                if (result) {
+                    totalScore += result.score;
+                    if (result.correct) correctCount++;
+                }
+            });
+            
+            const percentage = Math.round((totalScore / maxScore) * 100);
+            const passed = percentage >= 50;
+            const timeUsed = 2 * 60 * 60 - state.timeRemaining;
+            const mins = Math.floor(timeUsed / 60);
+            const secs = timeUsed % 60;
+            
+            $('resultIcon').textContent = passed ? '🎉' : '📚';
+            $('resultStatus').textContent = passed ? 'PASSED!' : 'Keep Practicing';
+            $('resultStatus').className = 'result-status ' + (passed ? 'passed' : 'failed');
+            $('resultScore').textContent = percentage + '%';
+            $('resultDetail').textContent = `${totalScore}/${maxScore} points`;
+            $('correctTasks').textContent = `${correctCount}/${tasks.length}`;
+            $('timeUsed').textContent = `${mins}:${secs.toString().padStart(2, '0')}`;
+            
+            $('examContainer').style.display = 'none';
+            $('resultsScreen').style.display = 'flex';
+            
+            // Save results to MTTI system
+            if (typeof submitExamToMTTI === 'function') {
+                const questionResults = tasks.map(task => ({
+                    question: task.title || task.instruction,
+                    correct: state.results[task.id] ? state.results[task.id].correct : false
+                }));
+                
+                submitExamToMTTI(
+                    document.title.split('|')[0].trim(),
+                    totalScore,
+                    maxScore,
+                    questionResults,
+                    mins
+                ).then(result => {
+                    if (result.success) console.log('✅ Results saved to MTTI:', result.data);
+                    else console.error('❌ Failed to save results:', result.message);
+                });
+            }
+        }
+
+        function reviewTasks() {
+            $('resultsScreen').style.display = 'none';
+            $('examContainer').style.display = 'flex';
+            loadTask(0);
+        }
+
+        function restartExam() {
+            state = {
+                studentName: '',
+                currentTask: 0,
+                timeRemaining: 2 * 60 * 60,
+                timerInterval: null,
+                startTime: null,
+                taskData: {},
+                results: {},
+                formatting: {
+                    bold: false, italic: false, underline: false,
+                    align: 'left', fontFamily: 'Segoe UI', fontSize: 24, color: '#333333'
+                }
+            };
+            
+            $('studentName').value = '';
+            $('startBtn').disabled = true;
+            $('timer').textContent = '02:00:00';
+            $('timer').classList.remove('warning');
+            $('resultsScreen').style.display = 'none';
+            $('startScreen').style.display = 'flex';
+        }
+
+        // Close color palettes when clicking outside
+        document.addEventListener('click', e => {
+            if (!e.target.closest('.color-picker-btn') && !e.target.closest('.color-palette')) {
+                document.querySelectorAll('.color-palette').forEach(p => p.classList.remove('show'));
+            }
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,264 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Mathematics Form 4 | Trigonometry (3)</title>
+<style>
+:root{--pri:#0a5e2a;--pri-l:#0d7a38;--acc:#f5a623;--ok:#2e7d32;--no:#c62828;--bg:#f4f7f5;--txt:#1a1a1a;}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Segoe UI',system-ui,sans-serif;background:var(--bg);color:var(--txt);min-height:100vh;display:flex;flex-direction:column}
+#topbar{position:sticky;top:0;z-index:100;background:linear-gradient(135deg,var(--pri) 0%,var(--pri-l) 100%);color:#fff;padding:10px 16px;display:flex;align-items:center;gap:10px;box-shadow:0 2px 8px rgba(0,0,0,.25)}
+#topbar .sub{font-size:.7rem;opacity:.8;text-transform:uppercase;letter-spacing:1px}
+#topbar .ttl{font-size:.95rem;font-weight:700;flex:1}
+#slide-badge{background:var(--acc);color:#000;font-weight:700;font-size:.78rem;padding:3px 10px;border-radius:20px;white-space:nowrap}
+.slide{display:none;padding:16px 16px 80px;animation:fi .3s ease}
+.slide.active{display:block}
+@keyframes fi{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+.slide-title{font-size:1.2rem;font-weight:800;color:var(--pri);margin-bottom:14px;padding-bottom:8px;border-bottom:3px solid var(--acc)}
+.lo-box{background:#e8f5e9;border-left:5px solid var(--pri);border-radius:8px;padding:14px 16px;margin-bottom:12px}
+.lo-box h3{color:var(--pri);font-size:.95rem;margin-bottom:8px}
+.lo-box ol{padding-left:18px;font-size:.9rem;line-height:1.8}
+.inquiry{background:#fff8e1;border:1.5px solid var(--acc);border-radius:8px;padding:10px 14px;font-size:.88rem;color:#5d4037;margin-top:10px}
+.inquiry strong{color:#e65100}
+.teach-block{margin-bottom:18px}
+.teach-block h3{font-size:1rem;font-weight:700;color:var(--pri);margin-bottom:8px;padding-bottom:4px;border-bottom:2px solid var(--acc);display:inline-block}
+.teach-block p,.teach-block li{font-size:.9rem;line-height:1.7}
+.teach-block ul,.teach-block ol{padding-left:18px;margin-top:6px}
+.key-term{background:#fff8e1;border-left:4px solid var(--acc);border-radius:6px;padding:10px 14px;margin:10px 0;font-size:.88rem}
+.key-term strong{color:#e65100}
+.info-table{width:100%;border-collapse:collapse;margin:10px 0;font-size:.88rem}
+.info-table th{background:var(--pri);color:#fff;padding:8px 10px;text-align:left}
+.info-table td{padding:7px 10px;border-bottom:1px solid #e0e0e0}
+.info-table tr:nth-child(even) td{background:#f1f8e9}
+.example-box{background:#f1f8e9;border:1.5px solid var(--ok);border-radius:8px;padding:12px 14px;margin:10px 0;font-size:.88rem}
+.example-box strong{color:var(--ok);display:block;margin-bottom:6px}
+.formula-box{background:#e3f2fd;border:2px solid #1976d2;border-radius:10px;padding:14px;margin:12px 0;text-align:center}
+.formula-box .formula{font-size:1.1rem;font-weight:800;color:#1565c0;font-family:Georgia,serif;margin:6px 0}
+.warn-box{background:#fff3e0;border-left:4px solid #e65100;border-radius:6px;padding:10px 14px;margin:10px 0;font-size:.88rem;color:#5d4037}
+.quiz-section{margin-bottom:20px}
+.quiz-section h3{font-size:1rem;font-weight:700;color:var(--pri);margin-bottom:12px}
+.q-item{background:#fff;border:1.5px solid #c8e6c9;border-radius:10px;padding:14px;margin-bottom:12px}
+.q-item p{font-size:.9rem;font-weight:600;margin-bottom:10px}
+.fill-blank{border:none;border-bottom:2.5px dashed var(--pri);background:transparent;font-size:.9rem;padding:2px 6px;width:110px;outline:none;text-align:center}
+.fb-result{font-size:.82rem;font-weight:600;margin-top:6px;padding:4px 8px;border-radius:4px;display:inline-block}
+.fb-result.ok{background:#e8f5e9;color:var(--ok)}
+.fb-result.no{background:#ffebee;color:var(--no)}
+.sa-box{width:100%;border:1.5px solid #c8e6c9;border-radius:8px;padding:10px;font-size:.88rem;font-family:inherit;resize:vertical;min-height:80px;outline:none}
+.grade-btn{background:var(--pri);color:#fff;border:none;border-radius:8px;padding:8px 18px;font-size:.85rem;font-weight:700;cursor:pointer;margin-top:8px}
+.sa-feedback{font-size:.82rem;margin-top:8px;padding:10px;border-radius:8px;line-height:1.6;display:none}
+.sa-feedback.ok{background:#e8f5e9;border:1px solid #a5d6a7;color:#1b5e20}
+.sa-feedback.partial{background:#fff8e1;border:1px solid #ffe082;color:#5d4037}
+.sa-feedback.no{background:#ffebee;border:1px solid #ef9a9a;color:#b71c1c}
+.kw-found{color:var(--ok);font-weight:700}
+.kw-miss{color:var(--no);font-weight:700}
+.model-ans{margin-top:6px;padding-top:6px;border-top:1px solid #ccc;font-style:italic}
+#score-result{background:linear-gradient(135deg,var(--pri),var(--pri-l));color:#fff;border-radius:12px;padding:20px;text-align:center;margin-top:16px;display:none}
+#score-result .big{font-size:2rem;font-weight:900;margin:8px 0}
+.submit-btn{background:var(--acc);color:#000;border:none;border-radius:10px;padding:12px 32px;font-size:1rem;font-weight:800;cursor:pointer;margin-top:16px;width:100%}
+#navbar{position:fixed;bottom:0;left:0;right:0;background:#fff;border-top:1px solid #e0e0e0;padding:10px 16px;display:flex;align-items:center;justify-content:space-between;gap:8px;z-index:100;box-shadow:0 -2px 8px rgba(0,0,0,.1)}
+.nav-btn{background:var(--pri);color:#fff;border:none;border-radius:8px;padding:9px 22px;font-size:.88rem;font-weight:700;cursor:pointer}
+.nav-btn:disabled{background:#ccc;cursor:not-allowed}
+#dot-nav{display:flex;gap:6px;flex-wrap:wrap;justify-content:center;flex:1}
+.dot{width:10px;height:10px;border-radius:50%;background:#c8e6c9;cursor:pointer;transition:all .2s}
+.dot.active{background:var(--pri);transform:scale(1.3)}
+.dot.done{background:var(--acc)}
+</style>
+<script type="text/javascript">(function(c,l,a,r,i,t,y){c[a]=c[a]||function(){(c[a].q=c[a].q||[]).push(arguments)};t=l.createElement(r);t.async=1;t.src="https://www.clarity.ms/tag/"+i;y=l.getElementsByTagName(r)[0];y.parentNode.insertBefore(t,y);})(window,document,"clarity","script","wg31zlwbt9");</script>\n</head>
+<body>
+<div id="topbar">
+  <div><div class="sub">Mathematics · Form 4</div><div class="ttl">Trigonometry (3)</div></div>
+  <div id="slide-badge">Slide 1 / 10</div>
+</div>
+
+<div class="slide active" id="s1">
+  <div class="slide-title">📋 Learning Outcomes</div>
+  <div class="lo-box"><h3>By the end of this lesson, you should be able to:</h3>
+    <ol>
+      <li>State and apply the sine rule</li>
+      <li>State and apply the cosine rule</li>
+      <li>Calculate the area of a triangle using trigonometry</li>
+      <li>Solve problems involving bearings and angles of elevation/depression</li>
+      <li>Apply trigonometry to 3D problems</li>
+      <li>Use the unit circle to define trig ratios for all angles</li>
+      <li>Solve trigonometric equations</li>
+    </ol>
+  </div>
+  <div class="inquiry"><strong>🔍 Key Inquiry Question:</strong> How can we find unknown sides and angles in any triangle using trigonometric rules?</div>
+</div>
+<div class="slide" id="s2">
+  <div class="slide-title">📐 The Sine Rule</div>
+  <div class="teach-block"><h3>Sine Rule Formula</h3>
+    <div class="formula-box"><div class="formula">a/sin A = b/sin B = c/sin C</div><p>Use when you know: 2 angles + 1 side (AAS/ASA) or 2 sides + non-included angle (SSA)</p></div>
+    <div class="example-box"><strong>Example:</strong>
+      <p>In △ABC: A=35°, B=65°, a=8 cm. Find b and C.</p>
+      <p>C = 180°−35°−65° = 80°</p>
+      <p>b/sin65° = 8/sin35° → b = 8×sin65°/sin35° = <strong>12.65 cm</strong></p>
+    </div>
+  </div>
+  <div class="teach-block"><h3>Ambiguous Case (SSA)</h3>
+    <div class="warn-box">⚠️ When given 2 sides and a non-included angle, there may be 0, 1 or 2 solutions!</div>
+    <div class="example-box"><strong>Example:</strong>
+      <p>a=7, b=10, A=30°. Find B.</p>
+      <p>sinB = 10×sin30°/7 = 5/7 → B = 45.6° or B = 134.4°</p>
+      <p>Both solutions are valid (ambiguous case) → <strong>Two triangles possible</strong></p>
+    </div>
+  </div>
+</div>
+<div class="slide" id="s3">
+  <div class="slide-title">📐 The Cosine Rule</div>
+  <div class="teach-block"><h3>Cosine Rule Formulae</h3>
+    <div class="formula-box">
+      <div class="formula">a² = b² + c² − 2bc·cos A</div>
+      <div class="formula" style="margin-top:6px">cos A = (b²+c²−a²) / 2bc</div>
+      <p>Use when: 3 sides known (SSS) or 2 sides + included angle (SAS)</p>
+    </div>
+    <div class="example-box"><strong>Example 1 (SAS):</strong>
+      <p>b=5, c=7, A=60°. Find a.</p>
+      <p>a² = 25+49−2(5)(7)cos60° = 74−35 = 39</p>
+      <p>a = √39 ≈ <strong>6.24 cm</strong></p>
+    </div>
+    <div class="example-box"><strong>Example 2 (SSS):</strong>
+      <p>a=6, b=8, c=10. Find angle A.</p>
+      <p>cosA = (64+100−36)/(2×8×10) = 128/160 = 0.8</p>
+      <p>A = cos⁻¹(0.8) ≈ <strong>36.87°</strong></p>
+    </div>
+  </div>
+</div>
+<div class="slide" id="s4">
+  <div class="slide-title">📐 Area of a Triangle</div>
+  <div class="teach-block"><h3>Trigonometric Area Formula</h3>
+    <div class="formula-box"><div class="formula">Area = ½ab·sin C</div><p>where a, b are two sides and C is the included angle</p></div>
+    <div class="example-box"><strong>Example:</strong>
+      <p>a=8 cm, b=10 cm, C=45°. Find area.</p>
+      <p>Area = ½×8×10×sin45° = 40×0.7071 = <strong>28.28 cm²</strong></p>
+    </div>
+    <div class="teach-block"><h3>Heron's Formula (SSS)</h3>
+      <div class="formula-box"><div class="formula">Area = √[s(s−a)(s−b)(s−c)] &nbsp; where s = (a+b+c)/2</div></div>
+      <div class="example-box"><strong>Example:</strong>
+        <p>a=5, b=6, c=7. s = 9. Area = √[9×4×3×2] = √216 ≈ <strong>14.7 cm²</strong></p>
+      </div>
+    </div>
+  </div>
+</div>
+<div class="slide" id="s5">
+  <div class="slide-title">🧭 Bearings and Angles</div>
+  <div class="teach-block"><h3>Bearings</h3>
+    <p>Bearings are measured clockwise from North (000° to 360°).</p>
+    <div class="example-box"><strong>Example:</strong>
+      <p>Ship sails from A on bearing 060° for 20 km to B. Then on bearing 150° for 15 km to C. Find AC and bearing of C from A.</p>
+      <p>Angle ABC = 150°−60° = 90° (or use geometry)</p>
+      <p>AC = √(20²+15²) = √625 = <strong>25 km</strong></p>
+    </div>
+  </div>
+  <div class="teach-block"><h3>Angles of Elevation and Depression</h3>
+    <div class="example-box"><strong>Example:</strong>
+      <p>From a point 50m from base of a tower, angle of elevation of top is 40°. Find height.</p>
+      <p>h = 50×tan40° = 50×0.839 = <strong>41.95 m</strong></p>
+    </div>
+  </div>
+</div>
+<div class="slide" id="s6">
+  <div class="slide-title">🔢 Trig Graphs and Equations</div>
+  <div class="teach-block"><h3>Solving Trig Equations</h3>
+    <div class="key-term"><strong>CAST Rule:</strong> All trig ratios positive in Q1. Sin+ in Q2. Tan+ in Q3. Cos+ in Q4.</div>
+    <div class="example-box"><strong>Example: Solve sin x = 0.5 for 0° ≤ x ≤ 360°</strong>
+      <p>Reference angle = sin⁻¹(0.5) = 30°</p>
+      <p>Sin positive in Q1 and Q2: x = 30° or x = 180°−30° = <strong>30° or 150°</strong></p>
+    </div>
+    <div class="example-box"><strong>Example: Solve 2cos x − 1 = 0 for 0° ≤ x ≤ 360°</strong>
+      <p>cos x = 0.5 → reference = 60°</p>
+      <p>Cos positive in Q1 and Q4: x = <strong>60° or 300°</strong></p>
+    </div>
+  </div>
+</div>
+<div class="slide" id="s7">
+  <div class="slide-title">📊 Trig Identities</div>
+  <div class="teach-block"><h3>Key Identities</h3>
+    <table class="info-table">
+      <tr><th>Identity</th><th>Formula</th></tr>
+      <tr><td>Pythagorean</td><td>sin²θ + cos²θ = 1</td></tr>
+      <tr><td>Quotient</td><td>tan θ = sin θ / cos θ</td></tr>
+      <tr><td>From Pythag</td><td>1 + tan²θ = sec²θ</td></tr>
+      <tr><td>From Pythag</td><td>1 + cot²θ = cosec²θ</td></tr>
+    </table>
+    <div class="example-box"><strong>Prove: (sin θ + cos θ)² = 1 + 2sin θ cos θ</strong>
+      <p>LHS = sin²θ + 2sinθcosθ + cos²θ = (sin²θ+cos²θ) + 2sinθcosθ = 1 + 2sinθcosθ = RHS ✓</p>
+    </div>
+  </div>
+</div>
+<div class="slide" id="s8">
+  <div class="slide-title">📦 3D Trigonometry</div>
+  <div class="teach-block"><h3>Problems in Three Dimensions</h3>
+    <div class="example-box"><strong>Example — Diagonal of a cuboid:</strong>
+      <p>Cuboid 6m × 4m × 3m. Find length of space diagonal AG.</p>
+      <p>Face diagonal AC = √(6²+4²) = √52 = 2√13</p>
+      <p>Space diagonal AG = √(AC²+3²) = √(52+9) = √61 ≈ <strong>7.81 m</strong></p>
+    </div>
+    <div class="example-box"><strong>Angle of elevation in 3D:</strong>
+      <p>The angle of elevation of point P from point A on the ground where AP = 10 m and the height of P = 6 m:</p>
+      <p>tan θ = 6/10 → θ = tan⁻¹(0.6) ≈ <strong>30.96°</strong></p>
+    </div>
+  </div>
+</div>
+<div class="slide" id="s9">
+  <div class="slide-title">✏️ Practice Problems</div>
+  <div class="teach-block"><h3>Problem 1</h3>
+    <p>In △PQR: PQ=8, QR=10, angle Q=50°. Find PR and area of △PQR.</p>
+    <div class="example-box"><strong>Solution:</strong>
+      <p>PR² = 8²+10²−2(8)(10)cos50° = 64+100−102.8 = 61.2 → PR = <strong>7.82</strong></p>
+      <p>Area = ½×8×10×sin50° = <strong>30.64 cm²</strong></p>
+    </div>
+  </div>
+  <div class="teach-block"><h3>Problem 2</h3>
+    <p>Solve: tan x = −1 for 0° ≤ x ≤ 360°</p>
+    <div class="example-box"><strong>Solution:</strong>
+      <p>Reference = 45°. Tan negative in Q2 and Q4.</p>
+      <p>x = 180°−45° = 135° or x = 360°−45° = <strong>135° or 315°</strong></p>
+    </div>
+  </div>
+</div>
+<div class="slide" id="s10">
+  <div class="slide-title">📝 Quiz — Trigonometry (3)</div>
+  <div class="quiz-section"><h3>Part A: Fill in the Blanks (5 marks)</h3>
+    <div class="q-item"><p>1. The rule a/sinA = b/sinB is called the <input class="fill-blank" id="f1">.</p><div id="f1r" class="fb-result" style="display:none"></div></div>
+    <div class="q-item"><p>2. The rule a² = b²+c²−2bc·cosA is called the <input class="fill-blank" id="f2">.</p><div id="f2r" class="fb-result" style="display:none"></div></div>
+    <div class="q-item"><p>3. The angles of a triangle sum to <input class="fill-blank" id="f3" style="width:60px"> degrees.</p><div id="f3r" class="fb-result" style="display:none"></div></div>
+    <div class="q-item"><p>4. The area formula ½ab·sinC uses <input class="fill-blank" id="f4" style="width:60px"> sides and their included angle.</p><div id="f4r" class="fb-result" style="display:none"></div></div>
+    <div class="q-item"><p>5. The formula ½ab·sinC is used to find the <input class="fill-blank" id="f5"> of a triangle.</p><div id="f5r" class="fb-result" style="display:none"></div></div>
+  </div>
+  <div class="quiz-section"><h3>Part B: Short Answer (10 marks)</h3>
+    <div class="q-item"><p>6. (4 marks) In △ABC: a=9, b=12, C=60°. Find c and the area of the triangle.</p>
+      <textarea class="sa-box" id="sa1" placeholder="Show working..."></textarea>
+      <button class="grade-btn" onclick="gradeAnswer('sa1','fb1',{keywords:['108','cosine','c=','√108','area','46.77','½','sin60'],required:4,marks:4,model:'c²=81+144-2(9)(12)cos60°=225-108=117. c=√117≈10.82. Area=½×9×12×sin60°=54×0.866=46.77 cm².'})">✓ Grade My Answer</button>
+      <div id="fb1" class="sa-feedback"></div></div>
+    <div class="q-item"><p>7. (3 marks) Solve: 2sin x = 1 for 0° ≤ x ≤ 360°.</p>
+      <textarea class="sa-box" id="sa2" placeholder="Show working..."></textarea>
+      <button class="grade-btn" onclick="gradeAnswer('sa2','fb2',{keywords:['30','150','sin x = 0.5','0.5','reference','cast'],required:3,marks:3,model:'sinx=0.5. Reference=30°. Sin positive in Q1 and Q2. x=30° or x=150°.'})">✓ Grade My Answer</button>
+      <div id="fb2" class="sa-feedback"></div></div>
+    <div class="q-item"><p>8. (3 marks) From the top of a cliff 80m high, the angle of depression of a boat is 25°. Find the distance of the boat from the base of the cliff.</p>
+      <textarea class="sa-box" id="sa3" placeholder="Draw diagram and solve..."></textarea>
+      <button class="grade-btn" onclick="gradeAnswer('sa3','fb3',{keywords:['171','tan25','80/tan','depression','angle','distance'],required:3,marks:3,model:'tan25°=80/d → d=80/tan25°=80/0.4663≈171.6 m.'})">✓ Grade My Answer</button>
+      <div id="fb3" class="sa-feedback"></div></div>
+  </div>
+  <button class="submit-btn" onclick="submitQuiz()">📊 Submit & See My Score</button>
+  <div id="score-result"></div>
+</div>
+<div id="navbar">
+  <button class="nav-btn" id="prev-btn" onclick="changeSlide(-1)" disabled>◀ Prev</button>
+  <div id="dot-nav"></div>
+  <button class="nav-btn" id="next-btn" onclick="changeSlide(1)">Next ▶</button>
+</div>
+<script>
+const TOTAL=10;let cur=1;const visited=new Set([1]);
+function buildDots(){const dn=document.getElementById('dot-nav');dn.innerHTML='';for(let i=1;i<=TOTAL;i++){const d=document.createElement('div');d.className='dot'+(i===cur?' active':visited.has(i)&&i!==cur?' done':'');d.onclick=(()=>{const n=i;return()=>goTo(n)})();dn.appendChild(d);}}
+function goTo(n){document.getElementById('s'+cur).classList.remove('active');cur=n;visited.add(n);document.getElementById('s'+n).classList.add('active');document.getElementById('slide-badge').textContent='Slide '+n+' / '+TOTAL;document.getElementById('prev-btn').disabled=(n===1);document.getElementById('next-btn').disabled=(n===TOTAL);buildDots();window.scrollTo(0,0);}
+function changeSlide(d){goTo(cur+d);}
+buildDots();
+const fillAnswers={f1:['sine rule'],f2:['cosine rule'],f3:['180'],f4:['2'],f5:['area']};
+function gradeAnswer(saId,fbId,cfg){const txt=document.getElementById(saId).value.toLowerCase().trim();if(!txt){alert('Please write your answer first.');return;}const found=cfg.keywords.filter(k=>txt.includes(k.toLowerCase()));const missed=cfg.keywords.filter(k=>!txt.includes(k.toLowerCase())).slice(0,4);const hitRate=Math.min(1,found.length/cfg.required);const marks=Math.round(hitRate*cfg.marks);const fb=document.getElementById(fbId);fb.style.display='block';const cls=marks>=cfg.marks?'ok':marks>0?'partial':'no';fb.className='sa-feedback '+cls;fb.innerHTML=`<strong>Score: ${marks} / ${cfg.marks}</strong><br>✅ Found: <span class="kw-found">${found.length>0?found.join(', '):'none'}</span><br>❌ Missed: <span class="kw-miss">${missed.length>0?missed.join(', '):'none'}</span><div class="model-ans">📖 ${cfg.model}</div>`;}
+function submitQuiz(){let fillScore=0;Object.keys(fillAnswers).forEach(id=>{const val=(document.getElementById(id).value||'').toLowerCase().trim();const correct=fillAnswers[id].some(a=>val===a||val.includes(a));const res=document.getElementById(id+'r');res.style.display='inline-block';if(correct){res.className='fb-result ok';res.textContent='✓ Correct! (1 mark)';fillScore++;}else{res.className='fb-result no';res.textContent='✗ Expected: '+fillAnswers[id][0];}});let saTotal=0;['fb1','fb2','fb3'].forEach(id=>{const fb=document.getElementById(id);if(fb.style.display!=='none'){const m=fb.innerHTML.match(/Score:\s*(\d+)\s*\//);if(m)saTotal+=parseInt(m[1]);}});const total=fillScore+saTotal;const pct=Math.round((total/15)*100);const grade=pct>=80?'Excellent (A)':pct>=60?'Good (B)':pct>=50?'Average (C)':'Needs Improvement';const emoji=pct>=80?'🏆':pct>=60?'👍':pct>=50?'📚':'💪';const res=document.getElementById('score-result');res.style.display='block';res.innerHTML=`${emoji}<div class="big">${total}/15 (${pct}%)</div><strong>${grade}</strong><br><small>Fill: ${fillScore}/5 | SA: ${saTotal}/10</small>`;submitExamToMTTI(total,15,pct);res.scrollIntoView({behavior:'smooth'});}
+function submitExamToMTTI(score,total,percent){try{fetch('/wp-json/mtti/v1/exam-result',{method:'POST',headers:{'Content-Type':'application/json','X-WP-Nonce':window.mtti_nonce||''},body:JSON.stringify({lesson_id:'f4-math-7-trigonometry-3',score,total,percent,timestamp:new Date().toISOString()})}).then(r=>r.json()).then(d=>{if(d&&d.success)console.log('[MTTI] Saved',d);}).catch(e=>console.log('[MTTI] Offline',e));}catch(e){console.log('[MTTI] Error',e);}}
+</script>
+</body>
+</html>

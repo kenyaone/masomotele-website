@@ -1,0 +1,11 @@
+Options -Indexes
+DirectoryIndex public.html
+
+# Protect sensitive directories
+<FilesMatch "\.(db|sqlite|json)$">
+    Deny from all
+</FilesMatch>
+
+# Allow API
+RewriteEngine On
+RewriteRule ^api/?$ api/index.php [L]

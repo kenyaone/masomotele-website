@@ -1,0 +1,876 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>Linear Programming — Form 4 Maths</title>
+<style>
+:root{
+  --pri:#0a5e2a;--pri-d:#064a1f;--pri-l:#e6f5ec;--pri-ll:#f0faf3;
+  --acc:#f5a623;--acc-d:#b8760a;--acc-l:#fff8e6;
+  --ink:#141f18;--dim:#4a5c50;--mid:#8fa897;
+  --sur:#f3f8f4;--bdr:#d6ead9;--wht:#fff;
+  --red:#c62828;--red-l:#ffeaea;--red-ll:#fff5f5;
+  --grn:#2e7d32;--grn-l:#e8f5e9;
+  --amb:#e65100;--amb-l:#fff3e0;
+  --blue:#1565c0;--blue-l:#e3f2fd;
+  --rad:14px;--rad-sm:9px;
+  --sh:0 2px 16px rgba(0,0,0,.07);
+  --sh-lg:0 8px 32px rgba(0,0,0,.14);
+}
+*{margin:0;padding:0;box-sizing:border-box;}
+html{overflow-x:hidden;scroll-behavior:smooth;}
+body{font-family:'Segoe UI',system-ui,sans-serif;background:var(--sur);color:var(--ink);-webkit-font-smoothing:antialiased;min-height:100vh;}
+button{font-family:inherit;cursor:pointer;border:none;}
+input,textarea{font-family:inherit;}
+code{background:var(--pri-l);color:var(--pri-d);padding:1px 6px;border-radius:4px;font-family:monospace;font-size:.85em;}
+
+/* ═══ HEADER ═══════════════════════════════ */
+.hdr{background:var(--pri-d);padding:0 18px;height:56px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:100;box-shadow:0 2px 12px rgba(0,0,0,.25);}
+.hdr-brand{display:flex;align-items:center;gap:10px;}
+.hdr-logo{width:34px;height:34px;border-radius:8px;background:white;display:flex;align-items:center;justify-content:center;font-weight:900;color:var(--pri);font-size:.78rem;flex-shrink:0;}
+.hdr-name{color:white;font-size:.9rem;font-weight:800;line-height:1.2;}
+.hdr-name small{display:block;font-size:.58rem;font-weight:400;opacity:.6;}
+.hdr-score{background:rgba(255,255,255,.13);border-radius:50px;padding:6px 15px;color:white;font-size:.75rem;font-weight:700;display:none;align-items:center;gap:5px;}
+.hdr-score b{color:var(--acc);font-size:.9rem;}
+
+/* ═══ HERO ══════════════════════════════════ */
+.hero{background:linear-gradient(135deg,var(--pri-d) 0%,var(--pri) 60%,#1a7a3a 100%);padding:26px 18px 36px;text-align:center;position:relative;overflow:hidden;}
+.hero::before{content:'';position:absolute;right:-40px;top:-40px;width:160px;height:160px;border-radius:50%;background:rgba(255,255,255,.04);}
+.hero::after{content:'';position:absolute;bottom:-1px;left:0;right:0;height:32px;background:var(--sur);clip-path:polygon(0 100%,100% 0,100% 100%);}
+.hero-tag{display:inline-flex;align-items:center;gap:6px;background:rgba(245,166,35,.18);border:1px solid rgba(245,166,35,.4);color:var(--acc);padding:4px 13px;border-radius:50px;font-size:.63rem;font-weight:700;text-transform:uppercase;letter-spacing:.07em;margin-bottom:11px;}
+.hero-dot{width:5px;height:5px;border-radius:50%;background:var(--acc);animation:pulse 2s infinite;}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.4}}
+.hero h1{font-size:clamp(1.2rem,4.5vw,1.65rem);font-weight:900;color:white;margin-bottom:6px;line-height:1.2;}
+.hero-sub{font-size:.78rem;color:rgba(255,255,255,.68);margin-bottom:20px;line-height:1.6;}
+.stage-pills{display:flex;justify-content:center;gap:9px;flex-wrap:wrap;}
+.sp{display:flex;align-items:center;gap:5px;padding:6px 14px;border-radius:50px;font-size:.7rem;font-weight:700;background:rgba(255,255,255,.1);color:rgba(255,255,255,.5);transition:all .25s;}
+.sp .dot{width:6px;height:6px;border-radius:50%;background:currentColor;}
+.sp.active-basic{background:var(--grn-l);color:var(--grn);}
+.sp.active-medium{background:var(--amb-l);color:var(--amb);}
+.sp.active-hard{background:var(--red-l);color:var(--red);}
+.sp.done{background:rgba(255,255,255,.2);color:white;}
+.sp.done::after{content:' ✓';}
+
+/* ═══ BODY ══════════════════════════════════ */
+.body{max-width:680px;margin:0 auto;padding:18px 15px 90px;}
+
+/* ═══ START SCREEN ══════════════════════════ */
+.prev-row{display:flex;align-items:center;gap:9px;background:var(--pri-l);border:1px solid var(--bdr);border-radius:var(--rad-sm);padding:9px 14px;margin-bottom:13px;font-size:.78rem;color:var(--pri-d);}
+.prev-row b{font-weight:800;}
+.start-card{background:white;border-radius:var(--rad);padding:24px;box-shadow:var(--sh);margin-bottom:13px;}
+.start-card h2{font-size:1.02rem;font-weight:900;color:var(--pri-d);margin-bottom:8px;}
+.start-card p{font-size:.83rem;color:var(--dim);line-height:1.75;margin-bottom:15px;}
+.info-grid{display:grid;grid-template-columns:1fr 1fr;gap:9px;margin-bottom:15px;}
+.info-box{background:var(--sur);border-radius:var(--rad-sm);padding:9px 13px;border:1px solid var(--bdr);}
+.info-box strong{display:block;font-size:.6rem;font-weight:700;text-transform:uppercase;letter-spacing:.05em;color:var(--mid);margin-bottom:2px;}
+.info-box span{font-size:.84rem;font-weight:700;color:var(--ink);}
+.stage-info{display:grid;grid-template-columns:1fr 1fr 1fr;gap:9px;margin-bottom:18px;}
+.si{border-radius:var(--rad-sm);padding:12px;text-align:center;border:1.5px solid transparent;}
+.si-b{background:var(--grn-l);border-color:#c8e6c9;}
+.si-m{background:var(--amb-l);border-color:#ffccbc;}
+.si-h{background:var(--red-l);border-color:#ffcdd2;}
+.si-name{font-size:.68rem;font-weight:900;text-transform:uppercase;letter-spacing:.05em;margin-bottom:4px;}
+.si-b .si-name{color:var(--grn);}
+.si-m .si-name{color:var(--amb);}
+.si-h .si-name{color:var(--red);}
+.si-pts{font-size:1.2rem;font-weight:900;color:var(--ink);}
+.si-qs{font-size:.63rem;color:var(--dim);margin-top:2px;}
+.btn-start{display:block;width:100%;padding:15px;background:var(--pri);color:white;border-radius:50px;font-size:.95rem;font-weight:900;text-align:center;transition:all .2s;letter-spacing:.01em;}
+.btn-start:active{background:var(--pri-d);transform:scale(.98);}
+
+/* ═══ CONCEPT BOX (learning aid) ════════════ */
+.concept-box{background:var(--blue-l);border:1.5px solid #90caf9;border-radius:var(--rad-sm);padding:13px 15px;margin-bottom:11px;}
+.concept-box h4{font-size:.75rem;font-weight:800;color:var(--blue);text-transform:uppercase;letter-spacing:.05em;margin-bottom:7px;}
+.concept-box p,.concept-box li{font-size:.79rem;color:#1a2e50;line-height:1.7;}
+.concept-box ol,.concept-box ul{padding-left:18px;}
+.concept-box li{margin-bottom:3px;}
+
+/* ═══ QUIZ SCREEN ═══════════════════════════ */
+.quiz-hd{display:flex;align-items:center;justify-content:space-between;margin-bottom:13px;gap:9px;}
+.stage-badge{display:inline-flex;align-items:center;gap:5px;padding:5px 13px;border-radius:50px;font-size:.67rem;font-weight:900;text-transform:uppercase;letter-spacing:.05em;}
+.sb-b{background:var(--grn-l);color:var(--grn);}
+.sb-m{background:var(--amb-l);color:var(--amb);}
+.sb-h{background:var(--red-l);color:var(--red);}
+.q-counter{font-size:.73rem;color:var(--dim);font-weight:600;}
+.prog-bar{height:5px;background:var(--bdr);border-radius:3px;overflow:hidden;margin-bottom:15px;}
+.prog-fill{height:100%;background:linear-gradient(90deg,var(--pri),#2e9e4a);border-radius:3px;transition:width .4s cubic-bezier(.4,0,.2,1);}
+
+/* ═══ QUESTION CARD ════════════════════════ */
+.q-card{background:white;border-radius:var(--rad);padding:20px;box-shadow:var(--sh);margin-bottom:12px;}
+.q-type-tag{display:inline-block;font-size:.6rem;font-weight:900;text-transform:uppercase;letter-spacing:.07em;padding:3px 9px;border-radius:50px;background:var(--pri-l);color:var(--pri);margin-bottom:10px;}
+.q-text{font-size:.91rem;font-weight:700;color:var(--ink);line-height:1.65;margin-bottom:14px;}
+.q-context{background:var(--sur);border:1.5px solid var(--bdr);border-radius:var(--rad-sm);padding:11px 13px;margin-bottom:13px;font-size:.8rem;color:var(--dim);line-height:1.75;}
+.q-context b{color:var(--ink);font-weight:700;}
+.q-context table{width:100%;border-collapse:collapse;margin-top:8px;font-size:.78rem;}
+.q-context table th{background:var(--pri-l);color:var(--pri-d);padding:5px 9px;text-align:left;font-weight:700;}
+.q-context table td{padding:5px 9px;border-bottom:1px solid var(--bdr);}
+.q-context table tr:last-child td{border-bottom:none;}
+
+/* OPTIONS */
+.options{display:flex;flex-direction:column;gap:8px;}
+.opt{display:flex;align-items:flex-start;gap:11px;padding:11px 14px;border-radius:var(--rad-sm);border:1.5px solid var(--bdr);background:var(--sur);cursor:pointer;font-size:.85rem;font-weight:600;color:var(--ink);transition:all .15s;line-height:1.5;}
+.opt-ltr{width:26px;height:26px;border-radius:7px;background:var(--bdr);display:flex;align-items:center;justify-content:center;font-size:.72rem;font-weight:900;color:var(--dim);flex-shrink:0;transition:all .15s;margin-top:1px;}
+.opt.sel{border-color:var(--pri);background:var(--pri-l);}
+.opt.sel .opt-ltr{background:var(--pri);color:white;}
+.opt.corr{border-color:var(--grn);background:var(--grn-l);color:var(--grn);}
+.opt.corr .opt-ltr{background:var(--grn);color:white;}
+.opt.wrong{border-color:var(--red);background:var(--red-l);color:var(--red);}
+.opt.wrong .opt-ltr{background:var(--red);color:white;}
+
+/* TRUE/FALSE */
+.tf-row{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
+.tf-btn{padding:13px;border-radius:var(--rad-sm);border:1.5px solid var(--bdr);background:var(--sur);font-size:.9rem;font-weight:900;text-align:center;cursor:pointer;color:var(--dim);transition:all .15s;}
+.tf-btn.sel{border-color:var(--pri);background:var(--pri-l);color:var(--pri);}
+.tf-btn.corr{border-color:var(--grn);background:var(--grn-l);color:var(--grn);}
+.tf-btn.wrong{border-color:var(--red);background:var(--red-l);color:var(--red);}
+
+/* FILL */
+.fill-in{width:100%;padding:11px 14px;border:1.5px solid var(--bdr);border-radius:var(--rad-sm);font-size:.9rem;outline:none;background:var(--sur);color:var(--ink);transition:border .2s;}
+.fill-in:focus{border-color:var(--pri);background:white;}
+.fill-in.corr{border-color:var(--grn);background:var(--grn-l);}
+.fill-in.wrong{border-color:var(--red);background:var(--red-l);}
+
+/* SHORT ANSWER */
+.short-ta{width:100%;padding:11px 14px;border:1.5px solid var(--bdr);border-radius:var(--rad-sm);font-size:.86rem;outline:none;background:var(--sur);color:var(--ink);resize:vertical;min-height:100px;line-height:1.7;transition:border .2s;}
+.short-ta:focus{border-color:var(--pri);background:white;}
+.kw-wrap{margin-top:9px;}
+.kw-label{font-size:.68rem;font-weight:700;color:var(--dim);margin-bottom:5px;}
+.kw-tag{display:inline-block;padding:2px 9px;border-radius:50px;font-size:.64rem;font-weight:700;margin:2px;}
+.kw-found{background:var(--grn-l);color:var(--grn);}
+.kw-miss{background:var(--red-l);color:var(--red);}
+.override-box{margin-top:10px;padding:11px 13px;background:var(--acc-l);border:1px solid rgba(245,166,35,.3);border-radius:var(--rad-sm);}
+.ov-label{font-size:.67rem;font-weight:700;color:var(--acc-d);text-transform:uppercase;letter-spacing:.04em;margin-bottom:7px;}
+.ov-btns{display:flex;gap:7px;flex-wrap:wrap;align-items:center;}
+.ov-btn{padding:5px 14px;border-radius:50px;font-size:.72rem;font-weight:800;cursor:pointer;border:none;}
+.ov-full{background:var(--grn);color:white;}
+.ov-half{background:var(--amb);color:white;}
+.ov-zero{background:var(--red);color:white;}
+.ov-set{font-size:.72rem;font-weight:700;color:var(--acc-d);margin-left:4px;}
+
+/* EXPLANATION */
+.expl{margin-top:12px;padding:12px 14px;border-left:3px solid var(--pri);background:var(--pri-l);border-radius:0 var(--rad-sm) var(--rad-sm) 0;font-size:.79rem;line-height:1.75;color:var(--pri-d);display:none;}
+.expl.show{display:block;}
+.expl b{font-weight:800;}
+.expl .step{display:flex;gap:8px;margin-top:6px;}
+.expl .step-num{width:20px;height:20px;border-radius:50%;background:var(--pri);color:white;font-size:.65rem;font-weight:800;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:2px;}
+.expl .step-txt{font-size:.79rem;color:var(--pri-d);line-height:1.65;}
+
+/* HINT */
+.hint-row{margin-top:10px;}
+.hint-btn{display:inline-flex;align-items:center;gap:6px;background:var(--acc-l);border:1px solid rgba(245,166,35,.35);color:var(--acc-d);padding:6px 13px;border-radius:50px;font-size:.69rem;font-weight:700;cursor:pointer;transition:all .15s;}
+.hint-txt{margin-top:8px;padding:9px 13px;background:var(--acc-l);border:1px solid rgba(245,166,35,.35);border-radius:var(--rad-sm);font-size:.76rem;color:var(--acc-d);line-height:1.65;display:none;}
+.hint-txt.show{display:block;}
+
+/* ACTIONS */
+.q-actions{display:flex;gap:10px;margin-top:13px;}
+.btn-sub{flex:1;padding:12px;background:var(--pri);color:white;border-radius:50px;font-size:.85rem;font-weight:800;transition:all .18s;}
+.btn-sub:disabled{opacity:.35;cursor:not-allowed;}
+.btn-nxt{flex:1;padding:12px;background:var(--acc);color:var(--pri-d);border-radius:50px;font-size:.85rem;font-weight:800;transition:all .18s;display:none;}
+.btn-nxt:active{background:var(--acc-d);color:white;}
+
+/* ═══ STAGE RESULT ══════════════════════════ */
+.sr-card{background:white;border-radius:var(--rad);padding:26px;text-align:center;box-shadow:var(--sh);margin-bottom:13px;}
+.sr-ring{width:92px;height:92px;border-radius:50%;margin:0 auto 14px;display:flex;align-items:center;justify-content:center;flex-direction:column;border:5px solid;}
+.sr-ring.pass{border-color:var(--grn);background:var(--grn-l);}
+.sr-ring.fail{border-color:var(--red);background:var(--red-l);}
+.sr-pct{font-size:1.4rem;font-weight:900;line-height:1;}
+.sr-ring.pass .sr-pct{color:var(--grn);}
+.sr-ring.fail .sr-pct{color:var(--red);}
+.sr-pts-lbl{font-size:.6rem;font-weight:700;text-transform:uppercase;opacity:.7;}
+.sr-title{font-size:1.02rem;font-weight:900;margin-bottom:5px;}
+.sr-sub{font-size:.78rem;color:var(--dim);margin-bottom:17px;line-height:1.6;}
+.sr-btns{display:flex;flex-direction:column;gap:9px;}
+.btn-ns{padding:13px;background:var(--pri);color:white;border-radius:50px;font-size:.85rem;font-weight:800;cursor:pointer;}
+.btn-rt{padding:13px;background:var(--pri-l);color:var(--pri);border:1.5px solid var(--bdr);border-radius:50px;font-size:.85rem;font-weight:800;cursor:pointer;}
+.att-left{font-size:.69rem;color:var(--dim);text-align:center;margin-top:4px;}
+.btn-skip{padding:11px;background:transparent;color:var(--dim);border:1px solid var(--bdr);border-radius:50px;font-size:.77rem;font-weight:700;cursor:pointer;margin-top:3px;}
+
+/* ═══ FINAL RESULT ══════════════════════════ */
+.fr-card{background:white;border-radius:var(--rad);padding:26px;box-shadow:var(--sh);margin-bottom:13px;}
+.fr-top{text-align:center;margin-bottom:20px;}
+.fr-ring-wrap{width:112px;height:112px;margin:0 auto 13px;position:relative;}
+.fr-ring-wrap svg{transform:rotate(-90deg);}
+.fr-inner{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;}
+.fr-pct{font-size:1.6rem;font-weight:900;color:var(--pri-d);line-height:1;}
+.fr-of{font-size:.63rem;color:var(--dim);font-weight:600;}
+.fr-name{font-size:1rem;font-weight:900;margin-bottom:3px;}
+.fr-lesson{font-size:.77rem;color:var(--dim);margin-bottom:16px;}
+.sb-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:9px;margin-bottom:17px;}
+.sb-cell{border-radius:var(--rad-sm);padding:11px;text-align:center;}
+.sb-cell.b{background:var(--grn-l);}
+.sb-cell.m{background:var(--amb-l);}
+.sb-cell.h{background:var(--red-l);}
+.sb-num{font-size:1.15rem;font-weight:900;}
+.sb-cell.b .sb-num{color:var(--grn);}
+.sb-cell.m .sb-num{color:var(--amb);}
+.sb-cell.h .sb-num{color:var(--red);}
+.sb-lbl{font-size:.62rem;font-weight:700;text-transform:uppercase;color:var(--dim);margin-top:2px;}
+.fr-btns{display:flex;flex-direction:column;gap:10px;}
+.btn-cert{padding:14px;background:var(--acc);color:var(--pri-d);border-radius:50px;font-size:.88rem;font-weight:900;cursor:pointer;text-align:center;}
+.btn-rev{padding:13px;background:var(--pri-l);color:var(--pri);border:1.5px solid var(--bdr);border-radius:50px;font-size:.85rem;font-weight:800;cursor:pointer;}
+.btn-bk{padding:13px;background:var(--sur);color:var(--dim);border:1.5px solid var(--bdr);border-radius:50px;font-size:.85rem;font-weight:800;cursor:pointer;}
+
+/* ═══ CERTIFICATE ═══════════════════════════ */
+#certOverlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.75);z-index:999;align-items:center;justify-content:center;padding:16px;}
+#certOverlay.show{display:flex;}
+.cert{background:white;border-radius:18px;padding:28px 24px;max-width:430px;width:100%;box-shadow:var(--sh-lg);text-align:center;position:relative;border:2px solid var(--bdr);}
+.cert-x{position:absolute;top:12px;right:14px;background:var(--sur);border:none;border-radius:50%;width:30px;height:30px;font-size:.88rem;cursor:pointer;color:var(--dim);}
+.cert-logo{width:48px;height:48px;border-radius:11px;background:var(--pri);color:white;font-size:.7rem;font-weight:900;display:flex;align-items:center;justify-content:center;margin:0 auto 12px;}
+.cert-t{font-size:.6rem;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:var(--mid);margin-bottom:3px;}
+.cert-h{font-size:1.2rem;font-weight:900;color:var(--pri-d);margin-bottom:3px;}
+.cert-org{font-size:.73rem;color:var(--dim);margin-bottom:15px;}
+.cert-name{font-size:1.3rem;font-weight:900;color:var(--ink);margin-bottom:3px;}
+.cert-lesson{font-size:.8rem;color:var(--pri);font-weight:700;margin-bottom:13px;}
+.cert-row{display:flex;justify-content:center;gap:14px;margin-bottom:15px;}
+.cert-box{text-align:center;padding:10px 16px;border-radius:10px;background:var(--sur);border:1px solid var(--bdr);}
+.cert-box b{display:block;font-size:1.3rem;font-weight:900;color:var(--pri);}
+.cert-box span{font-size:.63rem;color:var(--dim);font-weight:600;}
+.cert-foot{font-size:.63rem;color:var(--mid);line-height:1.8;border-top:1px solid var(--bdr);padding-top:10px;margin-top:3px;}
+.btn-print{display:block;width:100%;padding:11px;background:var(--pri);color:white;border-radius:50px;font-size:.82rem;font-weight:800;cursor:pointer;margin-top:12px;border:none;}
+@media print{body *{visibility:hidden;}.cert,.cert *{visibility:visible;}.cert{position:fixed;inset:0;margin:auto;border-radius:0;box-shadow:none;border:none;}.cert-x,.btn-print{display:none;}}
+
+/* ═══ TOAST ═════════════════════════════════ */
+#toast{position:fixed;bottom:22px;left:50%;transform:translateX(-50%);background:var(--ink);color:white;padding:9px 20px;border-radius:50px;font-size:.77rem;font-weight:700;display:none;z-index:300;white-space:nowrap;box-shadow:var(--sh-lg);}
+#toast.on{display:block;}
+
+/* SCREENS */
+.screen{display:none;}.screen.on{display:block;}
+</style>
+<script type="text/javascript">(function(c,l,a,r,i,t,y){c[a]=c[a]||function(){(c[a].q=c[a].q||[]).push(arguments)};t=l.createElement(r);t.async=1;t.src="https://www.clarity.ms/tag/"+i;y=l.getElementsByTagName(r)[0];y.parentNode.insertBefore(t,y);})(window,document,"clarity","script","wg31zlwbt9");</script>\n</head>
+<body>
+
+<header class="hdr">
+  <div class="hdr-brand">
+    <div class="hdr-logo">M</div>
+    <div class="hdr-name">Masomotele<small>Start Learning, Start Earning</small></div>
+  </div>
+  <div class="hdr-score" id="hdrScore">Score: <b id="hdrPts">0</b>/100</div>
+</header>
+
+<div class="hero">
+  <div class="hero-tag"><div class="hero-dot"></div>Form 4 Mathematics</div>
+  <h1>Linear Programming</h1>
+  <p class="hero-sub">Forming Inequalities · Feasible Regions · Objective Functions · Optimisation<br>Based on your Form 4 Notes — including all KCSE past questions</p>
+  <div class="stage-pills">
+    <div class="sp" id="sp-basic"><div class="dot"></div>Basic · 30 pts</div>
+    <div class="sp" id="sp-medium"><div class="dot"></div>Medium · 40 pts</div>
+    <div class="sp" id="sp-hard"><div class="dot"></div>Hard · 30 pts</div>
+  </div>
+</div>
+
+<div class="body">
+  <!-- START -->
+  <div class="screen on" id="screenStart">
+    <div class="prev-row" id="prevRow" style="display:none">🏅 Previous best: <b id="prevTxt"></b></div>
+    <div class="start-card">
+      <h2>Linear Programming — Detailed Assessment</h2>
+      <p>This interactive covers everything in your Form 4 notes: forming inequalities from real-life situations (Esha's age, books and pens, cement contractor, gadget company), graphing to find feasible regions, writing objective functions, and optimising by testing corner points. The Hard stage uses actual KCSE exam questions from your notes. Each question shows a full worked explanation after you answer.</p>
+      <div class="info-grid">
+        <div class="info-box"><strong>Subject</strong><span>Mathematics</span></div>
+        <div class="info-box"><strong>Class</strong><span>Form 4</span></div>
+        <div class="info-box"><strong>Total Marks</strong><span>100</span></div>
+        <div class="info-box"><strong>Duration</strong><span>25–35 minutes</span></div>
+      </div>
+      <div class="stage-info">
+        <div class="si si-b"><div class="si-name">Basic</div><div class="si-pts">30</div><div class="si-qs">6 questions · Recall & definitions</div></div>
+        <div class="si si-m"><div class="si-name">Medium</div><div class="si-pts">40</div><div class="si-qs">8 questions · Application & calculation</div></div>
+        <div class="si si-h"><div class="si-name">Hard</div><div class="si-pts">30</div><div class="si-qs">3 questions · KCSE past papers</div></div>
+      </div>
+      <button class="btn-start" onclick="startQuiz()">Begin Assessment →</button>
+    </div>
+  </div>
+
+  <!-- QUIZ -->
+  <div class="screen" id="screenQuiz">
+    <div class="quiz-hd">
+      <div>
+        <div class="stage-badge sb-b" id="stageBadge">Basic</div>
+        <div class="q-counter" id="qCount">Question 1 of 6</div>
+      </div>
+      <div style="font-size:.73rem;color:var(--dim);font-weight:600">Stage pts: <b id="stagePts">0</b></div>
+    </div>
+    <div class="prog-bar"><div class="prog-fill" id="progFill"></div></div>
+    <div id="qWrap"></div>
+  </div>
+
+  <div class="screen" id="screenSR"></div>
+  <div class="screen" id="screenFinal"></div>
+</div>
+
+<!-- CERTIFICATE -->
+<div id="certOverlay">
+  <div class="cert">
+    <button class="cert-x" onclick="closeCert()">✕</button>
+    <div class="cert-logo">MTTI</div>
+    <div class="cert-t">Certificate of Achievement</div>
+    <div class="cert-h">Masomotele</div>
+    <div class="cert-org">M.T.T.I Eldoret · Free Learning Portal</div>
+    <div class="cert-name" id="cName">Student</div>
+    <div class="cert-lesson" id="cLesson"></div>
+    <div class="cert-row">
+      <div class="cert-box"><b id="cPct">0%</b><span>Score</span></div>
+      <div class="cert-box"><b id="cPts">0/100</b><span>Marks</span></div>
+      <div class="cert-box"><b id="cDate">—</b><span>Date</span></div>
+    </div>
+    <div class="cert-foot">Masomotele Technical Training Institute · Sagaas Centre, 4th Floor, Eldoret<br>masomoteletraining.co.ke · 0712 464 936 · Start Learning, Start Earning</div>
+    <button class="btn-print" onclick="window.print()">🖨 Print Certificate</button>
+  </div>
+</div>
+<div id="toast"></div>
+
+<script>
+/* ══════════════════════════════════════════════════
+   LESSON DATA — Built from Form 4 Notes PDF content
+   ══════════════════════════════════════════════════ */
+const LESSON = {
+  id:'f4-math-linear-programming-v2',
+  title:'Linear Programming',
+  classLevel:'Form 4',
+  learnerName:'',
+
+  stages:{
+    basic:{
+      totalPts:30, maxAttempts:0,
+      questions:[
+        {
+          type:'mcq',
+          concept:'What is Linear Programming?',
+          text:'According to the Form 4 notes, linear programming is best described as:',
+          options:[
+            'Solving simultaneous equations algebraically to find x and y',
+            'Taking various linear inequalities relating to a situation and finding the best value obtainable under those conditions',
+            'Drawing straight lines on a Cartesian plane to show data',
+            'Calculating the gradient and y-intercept of a constraint line'
+          ],
+          answer:1,
+          explanation:'The Form 4 notes define it precisely: <b>"Linear programming is the process of taking various linear inequalities relating to some situation, and finding the best value obtainable under those conditions."</b> A typical example is taking limitations of materials and labour, then finding the best production levels for maximum profit.',
+          hint:'The definition focuses on finding the BEST outcome within given limitations or constraints.'
+        },
+        {
+          type:'mcq',
+          concept:'The Feasible Region',
+          text:'When you graph all the constraints of a linear programming problem, the walled-off area on the x,y-plane that contains all possible solutions is called the:',
+          options:[
+            'Objective region',
+            'Optimal zone',
+            'Feasibility region (feasible region)',
+            'Search area'
+          ],
+          answer:2,
+          explanation:'From the notes: <b>"Graph the inequalities (called the constraints) to form a walled-off area on the x,y-plane (called the feasibility region)."</b> All points in the unshaded (feasible) region represent possible solutions. For example, the point (3, 10) in the books-and-pens problem means 3 books and 10 pens.',
+          hint:'The word "feasible" means possible or achievable — it is the region where ALL constraints are satisfied.'
+        },
+        {
+          type:'tf',
+          concept:'Corner Point Theorem',
+          text:'The optimal (maximum or minimum) value of the objective function always occurs at one of the corner points (vertices) of the feasible region.',
+          answer:'true',
+          explanation:'This is fundamental to linear programming. The notes state: <b>"Figure out the coordinates of the corners of the feasibility region (the intersection points of the various pairs of lines), and test these corner points in the objective function for which you are trying to find the highest or lowest value."</b> You never need to test interior points — only corners.',
+          hint:'Think about what happens as you slide the search line — where is the last (or first) point it touches the feasible region?'
+        },
+        {
+          type:'mcq',
+          concept:'The Objective Function',
+          text:'In the cement contractor example (lorry cost Ksh 2000/trip, pickup cost Ksh 900/trip), the total transportation cost is written as 2000x + 900y. What is the name for this expression?',
+          options:[
+            'The constraint equation',
+            'The boundary function',
+            'The feasibility equation',
+            'The objective function'
+          ],
+          answer:3,
+          explanation:'Directly from the notes: <b>"The total cost of transporting the cement is given by sh 2000x + 900y. This is called the objective function."</b> An objective function is the equation we want to either maximise (e.g. profit) or minimise (e.g. cost). It is always of the form ax + by.',
+          hint:'The "objective" is what you are trying to achieve — maximum profit or minimum cost.'
+        },
+        {
+          type:'tf',
+          concept:'The 4 Steps of Linear Programming',
+          text:'The four steps of solving a linear programming problem are: (1) Form the inequalities, (2) Formulate the objective function, (3) Graph the inequalities, (4) Optimise the objective function.',
+          answer:'true',
+          explanation:'The Form 4 notes list these exact steps: <b>(i) Forming the inequalities satisfying given conditions, (ii) Formulating the objective function, (iii) Graphing the inequalities, (iv) Optimising the objective function.</b> The notes conclude: "This whole process is called linear programming."',
+          hint:'Remember the order: first form, then formulate, then graph, then optimise.'
+        },
+        {
+          type:'mcq',
+          concept:'The Search Line Method',
+          text:'When using the search line method to optimise, what do you do after drawing the initial search line l₁?',
+          options:[
+            'Find the x-intercept of l₁ and read off the answer',
+            'Slide a set square keeping one edge parallel to l₁ until it strikes the feasible point nearest to l₁ (for minimum) or furthest from l₁ (for maximum)',
+            'Draw perpendicular lines from the origin to l₁',
+            'Find where l₁ crosses the y-axis and that is the optimal point'
+          ],
+          answer:1,
+          explanation:'From the notes: <b>"Using a ruler and a set square, slide the set square keeping one edge parallel to l₁ until the edge strikes the feasible point nearest l₁ (this gives minimum). The feasible point furthest from l₁ gives the maximum value of the objective function."</b> In the cement example, the chosen point (5,10) gave 2000(5)+900(10)=19000 as the initial search line value.',
+          hint:'Parallel sliding — nearest point = minimum, furthest point = maximum.'
+        }
+      ]
+    },
+
+    medium:{
+      totalPts:40, maxAttempts:2,
+      questions:[
+        {
+          type:'mcq',
+          concept:'Forming Inequalities — Age Problem',
+          context:'<b>From the notes:</b> Esha is five years younger than his sister. The sum of their ages is less than 36. Esha\'s age = x years.',
+          text:'Which pair of inequalities correctly represents this situation?',
+          options:[
+            'x > 5 and x + (x−5) < 36, giving 2x < 41',
+            'x > 0 and x + (x+5) < 36, giving 2x + 5 < 36',
+            'x < 5 and 2x > 36',
+            'x + 5 < 36 and x > 0'
+          ],
+          answer:1,
+          explanation:'<b>Step-by-step:</b><br>Esha\'s sister is (x + 5) years old (she is 5 years OLDER than Esha).<br>Sum of ages = x + (x + 5) = 2x + 5.<br>Condition: 2x + 5 < 36 → 2x < 31 → x < 15.5<br>Also x > 0 (age cannot be negative or zero).<br><b>So the inequalities are: x > 0 and 2x + 5 < 36.</b>',
+          hint:'Esha is YOUNGER, so his sister is (x + 5). Add both ages and apply the "less than 36" condition.'
+        },
+        {
+          type:'mcq',
+          concept:'Budget Constraint — Books and Pens',
+          context:'<b>From the notes:</b> A student buys books (x) at Ksh 20 each and pens (y) at Ksh 10 each. Budget = Ksh 220.',
+          text:'The budget constraint 20x + 10y ≤ 220 simplifies to:',
+          options:[
+            'x + y ≤ 22',
+            '2x + y ≤ 22',
+            'x + 2y ≤ 22',
+            '20x + 10y ≤ 22'
+          ],
+          answer:1,
+          explanation:'<b>Working:</b> 20x + 10y ≤ 220<br>Divide every term by 10:<br><b>2x + y ≤ 22</b><br>This is exactly the simplification shown in the Form 4 notes. The complete set of constraints for this problem is: x + y ≥ 10 (at least 10 items), 2x + y ≤ 22 (budget), x > 0, y > 0.',
+          hint:'Divide every term of 20x + 10y ≤ 220 by the GCD of 20, 10 and 220.'
+        },
+        {
+          type:'fill',
+          concept:'Cement Contractor Constraints',
+          context:'<b>From the notes:</b> A lorry (x trips) carries max 80 bags. A pickup (y trips) carries max 20 bags. Total bags needed ≥ 1000. The second constraint 80x + 20y ≥ 1000 simplifies to:',
+          text:'80x + 20y ≥ 1000 simplifies to ___ (write in the form ax + y ≥ n)',
+          answer:'4x + y ≥ 50',
+          accept:['4x + y ≥ 50','4x+y≥50','4x + y >= 50','4x+y>=50'],
+          explanation:'<b>Working:</b> 80x + 20y ≥ 1000<br>Divide every term by 20:<br><b>4x + y ≥ 50</b><br>This is the simplification shown in the Form 4 notes. The lorry and pickup together must carry at least 1000 bags of cement total.',
+          hint:'Divide 80x + 20y ≥ 1000 by 20 to simplify.'
+        },
+        {
+          type:'mcq',
+          concept:'Calculating Cost at Corner Points',
+          context:'<b>From the notes:</b> The cement contractor\'s possible corner points are: (7,22), (8,18), (8,19), (8,20), (8,21), (9,19), (9,20). Objective function: C = 2000x + 900y.',
+          text:'The minimum cost occurs at which corner point, and what is that minimum cost?',
+          options:[
+            'At (7,22): C = 2000(7) + 900(22) = Ksh 33,800',
+            'At (8,18): C = 2000(8) + 900(18) = Ksh 32,200',
+            'At (9,19): C = 2000(9) + 900(19) = Ksh 35,100',
+            'At (8,20): C = 2000(8) + 900(20) = Ksh 34,000'
+          ],
+          answer:1,
+          explanation:'<b>Testing all corners:</b><br>(7,22): 14000+19800 = <b>33,800</b><br>(8,18): 16000+16200 = <b>32,200 ← MINIMUM</b><br>(8,19): 16000+17100 = 33,100<br>(8,20): 16000+18000 = 34,000<br>(8,21): 16000+18900 = 34,900<br>(9,19): 18000+17100 = 35,100<br>(9,20): 18000+18000 = 36,000<br>The notes confirm: <b>"The least amount is Ksh 32,200 — when the lorry makes 8 trips and the pickup 18 trips."</b>',
+          hint:'Substitute each corner point into C = 2000x + 900y. The smallest result is the minimum.'
+        },
+        {
+          type:'mcq',
+          concept:'Gadget Company — Objective Function',
+          context:'<b>From the notes:</b> A company makes red gadgets (x₁) sold at Ksh 30 each and blue gadgets (x₂) sold at Ksh 50 each. Constraints: x₁ ≤ 50 (steel), 2x₂ ≤ 120 (wood), 3x₁ + 2x₂ ≤ 180 (labour).',
+          text:'The objective function to MAXIMISE revenue R is:',
+          options:[
+            'R = 50x₁ + 30x₂',
+            'R = x₁ + x₂',
+            'R = 30x₁ + 50x₂',
+            'R = 3x₁ + 2x₂'
+          ],
+          answer:2,
+          explanation:'From the notes Step 2: <b>"Maximize R = 30x₁ + 50x₂ (total revenue in Ksh)."</b> Each red gadget contributes Ksh 30 and each blue gadget contributes Ksh 50 to revenue. The objective function is always (price per unit) × (number of units), summed for all products.',
+          hint:'Revenue = price × quantity for each product, then add them together.'
+        },
+        {
+          type:'mcq',
+          concept:'Gadget Company — Optimal Corner',
+          context:'<b>From the notes:</b> The gadget company problem has these corner points to test in R = 30x₁ + 50x₂:<br>(0,0), (50,0), (0,60), (20,60), (50,15)',
+          text:'Which corner point gives the MAXIMUM revenue, and what is that revenue?',
+          options:[
+            '(0,60): R = 30(0) + 50(60) = Ksh 3,000',
+            '(50,15): R = 30(50) + 50(15) = Ksh 2,250',
+            '(20,60): R = 30(20) + 50(60) = Ksh 3,600',
+            '(50,0): R = 30(50) + 50(0) = Ksh 1,500'
+          ],
+          answer:2,
+          explanation:'<b>Testing all corners in R = 30x₁ + 50x₂:</b><br>(0,0): 0+0 = 0<br>(50,0): 1500+0 = 1,500<br>(0,60): 0+3000 = 3,000<br>(20,60): 600+3000 = <b>3,600 ← MAXIMUM</b><br>(50,15): 1500+750 = 2,250<br>The notes confirm: <b>"x₁=20, x₂=60: R = 3600 (the optimal solution)."</b> The company should produce 20 red and 60 blue gadgets.',
+          hint:'Test all 5 corner points in R = 30x₁ + 50x₂. Which gives the largest value?'
+        },
+        {
+          type:'tf',
+          concept:'Non-Negativity Constraints',
+          text:'In every linear programming problem involving physical quantities (items, people, trips), the constraints x ≥ 0 and y ≥ 0 must always be included.',
+          answer:'true',
+          explanation:'From the notes: <b>"x, x₂ ≥ 0 (non-negativity requirement)"</b> and in the age example: <b>"x > 0 (age is always positive)."</b> You cannot produce a negative number of gadgets, make a negative number of trips, or have a negative age. These constraints ensure solutions are physically meaningful.',
+          hint:'Can you make -5 gadgets or transport -10 bags? Physical quantities cannot be negative.'
+        },
+        {
+          type:'mcq',
+          concept:'Writing Constraints from a Table',
+          context:'<b>From the notes — Calculator Factory:</b>\n<table><tr><th>Type</th><th>Cost (Ksh)</th><th>Labour (hrs)</th><th>Profit (Ksh)</th></tr><tr><td>A (x₁)</td><td>30</td><td>1</td><td>10</td></tr><tr><td>B (x₂)</td><td>20</td><td>4</td><td>8</td></tr></table>\nAvailable: Ksh 18,000 and 1,600 labour hours.',
+          text:'The TWO resource constraints (excluding non-negativity) are:',
+          options:[
+            '10x₁ + 8x₂ ≤ 18000 and x₁ + 4x₂ ≤ 1600',
+            '30x₁ + 20x₂ ≤ 18000 and x₁ + 4x₂ ≤ 1600',
+            '30x₁ + 20x₂ ≥ 18000 and x₁ + 4x₂ ≥ 1600',
+            '1x₁ + 4x₂ ≤ 18000 and 30x₁ + 20x₂ ≤ 1600'
+          ],
+          answer:1,
+          explanation:'<b>Cost constraint:</b> Cost of A units + Cost of B units ≤ budget<br>30x₁ + 20x₂ ≤ 18,000<br><b>Labour constraint:</b> Labour for A + Labour for B ≤ available hours<br>1·x₁ + 4·x₂ ≤ 1,600 → x₁ + 4x₂ ≤ 1,600<br>The <b>objective function</b> to maximise is: P = 10x₁ + 8x₂ (profit).',
+          hint:'For each resource (money, labour), multiply usage per unit by number of units, then apply the available limit.'
+        }
+      ]
+    },
+
+    hard:{
+      totalPts:30, maxAttempts:1,
+      questions:[
+        {
+          type:'short',
+          concept:'KCSE Q1 — School Tour Buses',
+          context:'<b>KCSE Past Question:</b> A school must transport 384 people for a tour. Type X buses carry 64 passengers (cost Ksh 25,000 each). Type Y buses carry 48 passengers (cost Ksh 20,000 each). They must use at least 7 buses. Let x = number of Type X buses, y = number of Type Y buses.',
+          text:'(a) Write ALL four linear inequalities representing the above information.\n(b) Write the objective function C to MINIMISE the hiring cost.\n(c) Explain how you would use your graph to find the optimal solution.',
+          keywords:['64x','48y','384','≥384','>=384','x+y','≥7','>=7','x≥0','x>=0','y≥0','y>=0','25000x','20000y','25000','20000','C=','minimise','minimize','minimum','corner','search line','feasible'],
+          minKeywords:6,
+          maxPts:10,
+          explanation:'<b>Full solution:</b><br>(a) Four inequalities:<br>① 64x + 48y ≥ 384 (capacity — must carry all 384 people). Simplifies to 4x + 3y ≥ 24.<br>② x + y ≥ 7 (must use at least 7 buses)<br>③ x ≥ 0 (non-negativity)<br>④ y ≥ 0 (non-negativity)<br><br>(b) Objective function: <b>Minimise C = 25000x + 20000y</b><br><br>(c) Graph all constraints, identify the feasible region. Draw a search line (e.g. 25000x + 20000y = k for a convenient k). Slide a set square parallel to the search line toward the feasible region — the NEAREST feasible corner point gives the minimum cost.',
+          hint:'Write one inequality for total passengers (must be ≥ 384), one for total buses (must be ≥ 7), and two non-negativity constraints. Cost function = (cost of X × number of X) + (cost of Y × number of Y).'
+        },
+        {
+          type:'short',
+          concept:'KCSE Q2 — Institute Courses',
+          context:'<b>KCSE Past Question:</b> An institute trains technical students (x) and business students (y). Capacity = 500 students. Business must outnumber technical. At least 200 must be technical. Profit: Ksh 2,500 per technical student, Ksh 1,000 per business student.',
+          text:'(a) Write the THREE inequalities describing the constraints.\n(b) Write the objective function P to MAXIMISE profit.\n(c) The corner points of the feasible region include (200, 300). Calculate P at this point and state what it represents.',
+          keywords:['x+y','500','≤500','<=500','y>x','y>x','x≥200','x>=200','2500','1000','P=','maximise','maximize','200','300','profit','800000','corner','feasible'],
+          minKeywords:6,
+          maxPts:10,
+          explanation:'<b>Full solution:</b><br>(a) Three inequalities:<br>① x + y ≤ 500 (capacity limit)<br>② y > x (business students outnumber technical)<br>③ x ≥ 200 (at least 200 technical students)<br><br>(b) Objective function: <b>Maximise P = 2500x + 1000y</b><br><br>(c) At corner (200, 300):<br>P = 2500(200) + 1000(300) = 500,000 + 300,000 = <b>Ksh 800,000</b><br>This means: enrol 200 technical and 300 business students for a profit of Ksh 800,000. (Test other corners to confirm or deny this is the maximum.)',
+          hint:'Three conditions: total ≤ 500, y > x (more business than technical), x ≥ 200. Profit = 2500 per technical + 1000 per business.'
+        },
+        {
+          type:'short',
+          concept:'KCSE Q6 — Machines A and B',
+          context:'<b>KCSE Past Question:</b> A company installs x machines of Type A and y machines of Type B.\n<table><tr><th>Machine</th><th>Operators</th><th>Floor space</th><th>Daily profit</th></tr><tr><td>A</td><td>2</td><td>5 m²</td><td>Ksh 1,500</td></tr><tr><td>B</td><td>5</td><td>8 m²</td><td>Ksh 2,500</td></tr></table>\nConditions: operators available = 40, floor space = 80 m², at least 3 Type A machines, Type B must be more than one-third of Type A.',
+          text:'(a) Write the FOUR constraint inequalities.\n(b) Write the objective function P to MAXIMISE daily profit.\n(c) Identify the corner point that gives maximum profit and state that maximum daily profit.',
+          keywords:['2x+5y','2x + 5y','40','≤40','<=40','5x+8y','5x + 8y','80','≤80','<=80','x≥3','x>=3','y>x/3','1500x','2500y','P=','maximise','maximize','corner','maximum','profit'],
+          minKeywords:6,
+          maxPts:10,
+          explanation:'<b>Full solution:</b><br>(a) Four constraints:<br>① 2x + 5y ≤ 40 (operators: 2 per A, 5 per B, max 40)<br>② 5x + 8y ≤ 80 (floor space: 5m² per A, 8m² per B, max 80m²)<br>③ x ≥ 3 (at least 3 Type A machines)<br>④ y > x/3, i.e. 3y > x (Type B more than one-third of Type A)<br><br>(b) Objective: <b>Maximise P = 1500x + 2500y</b><br><br>(c) Find corner points by solving pairs of boundary equations simultaneously. Test each in P = 1500x + 2500y. Pick the corner giving the highest P. (Graph to confirm feasible region boundary intersections.)',
+          hint:'Write one inequality for operators (2x + 5y ≤ 40), one for floor space (5x + 8y ≤ 80), one for minimum A machines (x ≥ 3), one for the B vs A ratio (y > x/3). Then P = 1500x + 2500y.'
+        }
+      ]
+    }
+  }
+};
+
+/* ══════════════════════════════════════════════════
+   ENGINE
+   ══════════════════════════════════════════════════ */
+const SL=['basic','medium','hard'];
+const SN={basic:'Basic',medium:'Medium',hard:'Hard'};
+
+let S={stage:'basic',qi:0,pts:{basic:0,medium:0,hard:0},attempts:{basic:0,medium:0,hard:0},done:{basic:false,medium:false,hard:false},ans:{},hint:{},ov:{},fresh:true};
+
+function init(){
+  try{const l=JSON.parse(localStorage.getItem('mtti_learner')||'{}');if(l.name)LESSON.learnerName=l.name.split(' ')[0];}catch(_){}
+  loadProg();
+  const best=getBest();
+  if(best){const r=document.getElementById('prevRow');r.style.display='flex';document.getElementById('prevTxt').textContent=best.pts+'/100 ('+best.pct+'%)';}
+  pills();
+  document.title='Linear Programming — Form 4 Maths';
+}
+
+function saveProg(){try{localStorage.setItem('mtti_p_'+LESSON.id,JSON.stringify({S,ts:Date.now()}));}catch(_){}}
+function loadProg(){try{const r=localStorage.getItem('mtti_p_'+LESSON.id);if(!r)return;const d=JSON.parse(r);if(Date.now()-d.ts>86400000)return;S=d.S;S.fresh=false;}catch(_){}}
+function clearProg(){try{localStorage.removeItem('mtti_p_'+LESSON.id);}catch(_){}}
+function getBest(){try{return JSON.parse(localStorage.getItem('mtti_s_'+LESSON.id)||'null');}catch(_){return null;}}
+function saveBest(pts){
+  try{
+    const e=getBest();if(!e||pts>e.pts){
+      localStorage.setItem('mtti_s_'+LESSON.id,JSON.stringify({pts,pct:Math.round(pts),date:new Date().toLocaleDateString('en-KE'),learner:LESSON.learnerName||''}));
+      try{let idx=JSON.parse(localStorage.getItem('mtti_scores_idx')||'{}');idx[LESSON.id]={pts,pct:Math.round(pts)};localStorage.setItem('mtti_scores_idx',JSON.stringify(idx));}catch(_){}
+    }
+  }catch(_){}
+}
+
+function qpts(stg,qi){const q=LESSON.stages[stg].questions[qi];if(q.pts)return q.pts;if(q.type==='short')return q.maxPts||10;return Math.round(LESSON.stages[stg].totalPts/LESSON.stages[stg].questions.length*10)/10;}
+function totalScore(){return S.pts.basic+S.pts.medium+S.pts.hard;}
+
+function screen(id){document.querySelectorAll('.screen').forEach(s=>s.classList.remove('on'));document.getElementById(id).classList.add('on');window.scrollTo(0,0);}
+
+function pills(){
+  SL.forEach(s=>{
+    const el=document.getElementById('sp-'+s);
+    el.className='sp';
+    if(S.done[s])el.classList.add('done');
+    else if(s===S.stage)el.classList.add('active-'+s);
+  });
+}
+
+function hdrScore(){const el=document.getElementById('hdrScore');el.style.display='inline-flex';document.getElementById('hdrPts').textContent=Math.round(totalScore());}
+
+function startQuiz(){
+  if(!S.fresh){S.fresh=false;if(S.done[S.stage]||S.qi>=LESSON.stages[S.stage].questions.length){showSR(S.stage);return;}screen('screenQuiz');renderQ();return;}
+  S.stage='basic';S.qi=0;screen('screenQuiz');renderQ();pills();
+}
+
+function renderQ(){
+  const stg=S.stage,qi=S.qi;
+  const q=LESSON.stages[stg].questions[qi];
+  const pts=qpts(stg,qi);
+  const total=LESSON.stages[stg].questions.length;
+  const key=stg+'_'+qi;
+  const saved=S.ans[key];
+  const isAns=saved!==undefined;
+
+  document.getElementById('stageBadge').textContent=SN[stg];
+  document.getElementById('stageBadge').className='stage-badge sb-'+stg.charAt(0);
+  document.getElementById('qCount').textContent='Question '+(qi+1)+' of '+total;
+  document.getElementById('stagePts').textContent=Math.round(S.pts[stg]);
+  document.getElementById('progFill').style.width=(qi/total*100)+'%';
+
+  let h='';
+
+  // Concept label (learning aid)
+  if(q.concept){
+    h+='<div class="concept-box"><h4>'+q.concept+'</h4>';
+    if(q.context){h+='<p>'+q.context+'</p>';}
+    h+='</div>';
+  }
+
+  h+='<div class="q-card">';
+  h+='<div class="q-type-tag">'+q.type.toUpperCase()+' · '+pts+' marks</div>';
+  h+='<div class="q-text">'+q.text.replace(/\n/g,'<br>')+'</div>';
+
+  if(q.type==='mcq'){
+    h+='<div class="options">';
+    ['A','B','C','D'].forEach((L,i)=>{
+      let cls='opt';
+      if(isAns){if(i===q.answer)cls+=' corr';else if(i===saved&&saved!==q.answer)cls+=' wrong';}
+      else if(saved===i)cls+=' sel';
+      h+='<div class="'+cls+'" onclick="pickMCQ('+i+')">';
+      h+='<div class="opt-ltr">'+L+'</div><div>'+q.options[i]+'</div></div>';
+    });
+    h+='</div>';
+  }
+
+  if(q.type==='tf'){
+    h+='<div class="tf-row">';
+    ['true','false'].forEach(v=>{
+      let cls='tf-btn';
+      if(isAns){if(v===q.answer)cls+=' corr';else if(v===saved&&saved!==q.answer)cls+=' wrong';}
+      else if(saved===v)cls+=' sel';
+      h+='<div class="'+cls+'" onclick="pickTF(\''+v+'\')">'+v.charAt(0).toUpperCase()+v.slice(1)+'</div>';
+    });
+    h+='</div>';
+  }
+
+  if(q.type==='fill'){
+    let cls='fill-in';
+    if(isAns){const ok=(q.accept||[q.answer]).some(a=>a.toLowerCase().trim()===saved.toLowerCase().trim());cls+=ok?' corr':' wrong';}
+    h+='<input type="text" class="'+cls+'" id="fillIn" placeholder="Type your answer…" value="'+(isAns?saved:'')+'"'+(isAns?' readonly':'')+' onkeydown="if(event.key===\'Enter\')doSubmit()">';
+  }
+
+  if(q.type==='short'){
+    const ov=S.ov[key];
+    h+='<textarea class="short-ta" id="shortTA" placeholder="Write your full answer here. Show all working — write the inequalities, objective function, and explain your method."'+(isAns?' readonly':'')+'>'+( saved||'')+'</textarea>';
+    if(isAns){
+      h+='<div class="kw-wrap"><div class="kw-label">Keywords found in your answer:</div>';
+      q.keywords.forEach(kw=>{
+        const found=saved.toLowerCase().includes(kw.toLowerCase());
+        h+='<span class="kw-tag '+(found?'kw-found':'kw-miss')+'">'+kw+'</span>';
+      });
+      h+='</div>';
+      h+='<div class="override-box"><div class="ov-label">Teacher override</div><div class="ov-btns">';
+      h+='<button class="ov-btn ov-full" onclick="setOv(this.dataset.k,'+pts+')" data-k="'+key+'">Full ('+pts+' pts)</button>';
+      h+='<button class="ov-btn ov-half" onclick="setOv(this.dataset.k,'+Math.round(pts/2)+')" data-k="'+key+'">Half ('+Math.round(pts/2)+' pts)</button>';
+      h+='<button class="ov-btn ov-zero" onclick="setOv(this.dataset.k,0)" data-k="'+key+'">Zero</button>';
+      if(ov!==undefined)h+='<span class="ov-set">Currently set: '+ov+' pts</span>';
+      h+='</div></div>';
+    }
+  }
+
+  // Hint
+  if(q.hint&&!isAns){
+    const used=S.hint[key];
+    h+='<div class="hint-row">';
+    if(!used)h+='<button class="hint-btn" onclick="useHint(this.dataset.k)" data-k="'+key+'">💡 Use Hint (−2 marks)</button>';
+    h+='</div>';
+    h+='<div class="hint-txt'+(used?' show':'')+'" id="hintTxt">'+(used?'💡 '+q.hint:'')+'</div>';
+  }
+
+  // Explanation (shown after answering)
+  if(isAns&&q.explanation){
+    h+='<div class="expl show"><b>Full Explanation:</b><br>'+q.explanation+'</div>';
+  }
+
+  h+='</div>';
+
+  // Action buttons
+  var actParts=['<div class="q-actions">'];
+  if(!isAns){
+    actParts.push('<button class="btn-sub" id="btnSub" onclick="doSubmit()">Submit Answer</button>');
+  }else{
+    var isLast=qi>=LESSON.stages[stg].questions.length-1;
+    var nxtFn=isLast?'finishStage()':'nextQ()';
+    var nxtLbl=isLast?'Finish Stage →':'Next Question →';
+    actParts.push('<button class="btn-nxt" id="btnNxt" style="display:inline-flex" onclick="'+nxtFn+'">'+nxtLbl+'</button>');
+  }
+  actParts.push('</div>');
+  h+=actParts.join('');
+
+  document.getElementById('qWrap').innerHTML=h;
+  hdrScore();saveProg();
+}
+
+function pickMCQ(i){if(S.ans[S.stage+'_'+S.qi]!==undefined)return;document.querySelectorAll('.opt').forEach((o,j)=>{o.classList.toggle('sel',j===i);});document.getElementById('btnSub').dataset.sel=i;}
+function pickTF(v){if(S.ans[S.stage+'_'+S.qi]!==undefined)return;document.querySelectorAll('.tf-btn').forEach(b=>b.classList.toggle('sel',b.textContent.toLowerCase()===v));document.getElementById('btnSub').dataset.sel=v;}
+
+function useHint(key){
+  const parts=key.split('_');const stg=parts[0];const qi=parseInt(parts[1]);
+  const q=LESSON.stages[stg].questions[qi];
+  S.hint[key]=true;S.pts[stg]=Math.max(0,S.pts[stg]-2);
+  const ht=document.getElementById('hintTxt');ht.textContent='💡 '+q.hint;ht.classList.add('show');
+  const hb=document.querySelector('.hint-btn');if(hb)hb.remove();
+  hdrScore();toast('Hint used — 2 marks deducted');saveProg();
+}
+
+function doSubmit(){
+  const stg=S.stage,qi=S.qi;
+  const q=LESSON.stages[stg].questions[qi];
+  const key=stg+'_'+qi;
+  const pts=qpts(stg,qi);
+  let earned=0,val;
+
+  if(q.type==='mcq'){
+    const sel=parseInt(document.getElementById('btnSub').dataset.sel);
+    if(isNaN(sel)){toast('Please select an answer.');return;}
+    val=sel;earned=sel===q.answer?pts:0;
+  }
+  if(q.type==='tf'){
+    val=document.getElementById('btnSub').dataset.sel;
+    if(!val){toast('Please select True or False.');return;}
+    earned=val===q.answer?pts:0;
+  }
+  if(q.type==='fill'){
+    val=(document.getElementById('fillIn').value||'').trim();
+    if(!val){toast('Please type your answer.');return;}
+    earned=(q.accept||[q.answer]).some(a=>a.toLowerCase().trim()===val.toLowerCase().trim())?pts:0;
+  }
+  if(q.type==='short'){
+    val=(document.getElementById('shortTA').value||'').trim();
+    if(val.length<15){toast('Please write a more complete answer with working.');return;}
+    const found=q.keywords.filter(kw=>val.toLowerCase().includes(kw.toLowerCase())).length;
+    earned=Math.min(pts,Math.round(pts*Math.min(found/(q.minKeywords||q.keywords.length),1)*10)/10);
+  }
+
+  S.ans[key]=val;
+  S.pts[stg]=(S.pts[stg]||0)+earned;
+  saveProg();renderQ();
+}
+
+function setOv(key,newPts){
+  const stg=key.split('_')[0];
+  const old=S.ov[key];
+  if(old!==undefined)S.pts[stg]=Math.max(0,S.pts[stg]-old+newPts);
+  else S.pts[stg]=(S.pts[stg]||0)+newPts;
+  S.ov[key]=newPts;
+  hdrScore();toast('Score set to '+newPts+' pts');saveProg();renderQ();
+}
+
+function nextQ(){S.qi++;renderQ();window.scrollTo(0,0);}
+function finishStage(){S.done[S.stage]=true;S.attempts[S.stage]++;pills();showSR(S.stage);saveProg();}
+
+function showSR(stg){
+  var earned=Math.round(S.pts[stg]);
+  var total=LESSON.stages[stg].totalPts;
+  var pct=Math.round(earned/total*100);
+  var pass=pct>=50;
+  var maxAtt=stg==='basic'?0:(LESSON.stages[stg].maxAttempts||1);
+  var attLeft=maxAtt===0?99:maxAtt-S.attempts[stg];
+  var nxt=SL[SL.indexOf(stg)+1];
+  var parts=[];
+  parts.push('<div class="sr-card">');
+  parts.push('<div class="sr-ring '+(pass?'pass':'fail')+'">');
+  parts.push('<div class="sr-pct">'+pct+'%</div>');
+  parts.push('<div class="sr-pts-lbl">'+earned+'/'+total+' pts</div></div>');
+  parts.push('<div class="sr-title">'+SN[stg]+' '+(pass?'Passed ✅':'— Try Again')+'</div>');
+  parts.push('<div class="sr-sub">'+(LESSON.learnerName?LESSON.learnerName+' · ':'')+LESSON.title+'<br>'+(pass?'Great work! Keep going.':'Good try! You can retry or move on.')+' </div>');
+  parts.push('<div class="sr-btns">');
+  if(nxt){
+    parts.push('<button class="btn-ns" onclick="goStage(this.dataset.s)" data-s="'+nxt+'">Continue to '+SN[nxt]+' →</button>');
+  }
+  var canRetry=maxAtt===0||attLeft>0;
+  if(canRetry){
+    parts.push('<button class="btn-rt" onclick="retryStage(this.dataset.s)" data-s="'+stg+'">Retry '+SN[stg]+' ↺</button>');
+    if(maxAtt>0)parts.push('<div class="att-left">'+attLeft+' attempt'+(attLeft!==1?'s':'')+' remaining</div>');
+  }
+  if(!nxt){
+    parts.push('<button class="btn-ns" onclick="showFinal()">View Final Results →</button>');
+  } else {
+    parts.push('<button class="btn-skip" onclick="showFinal()">Skip to Final Results</button>');
+  }
+  parts.push('</div></div>');
+  document.getElementById('screenSR').innerHTML=parts.join('');
+  screen('screenSR');
+}
+
+function goStage(stg){S.stage=stg;S.qi=0;pills();screen('screenQuiz');renderQ();}
+function retryStage(stg){
+  Object.keys(S.ans).forEach(k=>{if(k.startsWith(stg+'_'))delete S.ans[k];});
+  Object.keys(S.hint).forEach(k=>{if(k.startsWith(stg+'_'))delete S.hint[k];});
+  S.pts[stg]=0;S.done[stg]=false;S.qi=0;
+  pills();screen('screenQuiz');renderQ();saveProg();
+}
+
+function showFinal(){
+  const tot=Math.round(totalScore());
+  saveBest(tot);clearProg();
+  const circ=2*Math.PI*45;
+  const off=circ-(tot/100)*circ;
+  const col=tot>=70?'#2e7d32':tot>=50?'#e65100':'#c62828';
+
+  let h='<div class="fr-card"><div class="fr-top">';
+  h+='<div class="fr-ring-wrap"><svg width="112" height="112" viewBox="0 0 112 112"><circle cx="56" cy="56" r="45" fill="none" stroke="var(--bdr)" stroke-width="9"/><circle cx="56" cy="56" r="45" fill="none" stroke="'+col+'" stroke-width="9" stroke-linecap="round" stroke-dasharray="'+circ+'" stroke-dashoffset="'+off+'" style="transition:stroke-dashoffset 1.2s ease"/></svg><div class="fr-inner"><div class="fr-pct">'+tot+'</div><div class="fr-of">/ 100</div></div></div>';
+  h+='<div class="fr-name">'+(LESSON.learnerName||'Well done!')+'</div>';
+  h+='<div class="fr-lesson">'+LESSON.title+' · '+LESSON.classLevel+'</div>';
+  h+='</div>';
+  h+='<div class="sb-grid">';
+  h+='<div class="sb-cell b"><div class="sb-num">'+Math.round(S.pts.basic)+'</div><div class="sb-lbl">Basic</div></div>';
+  h+='<div class="sb-cell m"><div class="sb-num">'+Math.round(S.pts.medium)+'</div><div class="sb-lbl">Medium</div></div>';
+  h+='<div class="sb-cell h"><div class="sb-num">'+Math.round(S.pts.hard)+'</div><div class="sb-lbl">Hard</div></div>';
+  h+='</div>';
+  h+='<div class="fr-btns">';
+  h+='<button class="btn-cert" onclick="showCert()">🎓 Get Certificate</button>';
+  h+='<button class="btn-rev" onclick="reviewAnss()">Review My Answers</button>';
+  h+='<button class="btn-bk" onclick="backStart()">↩ Try Again</button>';
+  h+='</div></div>';
+  document.getElementById('screenFinal').innerHTML=h;
+  screen('screenFinal');pills();
+}
+
+function reviewAnss(){S.stage='basic';S.qi=0;screen('screenQuiz');renderQ();}
+function backStart(){
+  S={stage:'basic',qi:0,pts:{basic:0,medium:0,hard:0},attempts:{basic:0,medium:0,hard:0},done:{basic:false,medium:false,hard:false},ans:{},hint:{},ov:{},fresh:true};
+  pills();document.getElementById('hdrScore').style.display='none';
+  screen('screenStart');
+  const best=getBest();if(best){const r=document.getElementById('prevRow');r.style.display='flex';document.getElementById('prevTxt').textContent=best.pts+'/100 ('+best.pct+'%)';}
+}
+
+function showCert(){
+  const tot=Math.round(totalScore());
+  document.getElementById('cName').textContent=LESSON.learnerName||'Student';
+  document.getElementById('cLesson').textContent=LESSON.title+' · '+LESSON.classLevel;
+  document.getElementById('cPct').textContent=tot+'%';
+  document.getElementById('cPts').textContent=tot+'/100';
+  document.getElementById('cDate').textContent=new Date().toLocaleDateString('en-KE',{day:'numeric',month:'short',year:'numeric'});
+  document.getElementById('certOverlay').classList.add('show');
+}
+function closeCert(){document.getElementById('certOverlay').classList.remove('show');}
+
+function toast(msg){const t=document.getElementById('toast');t.textContent=msg;t.classList.add('on');setTimeout(()=>t.classList.remove('on'),2500);}
+
+init();
+</script>
+</body>
+</html>

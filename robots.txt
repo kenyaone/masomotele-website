@@ -1,0 +1,23 @@
+User-agent: *
+Allow: /
+Allow: /wp-content/
+
+# Disallow private/admin pages
+Disallow: /wp-admin/
+Disallow: /wp-login.php
+Disallow: /wp-includes/
+Disallow: /cgi-bin/
+Disallow: /*.php$
+
+# Allow public PHP files
+Allow: /index.php
+Allow: /check-exam.php
+Allow: /verify-certificate-custom.php
+
+# Crawl delay (optional, in seconds)
+Crawl-delay: 1
+
+# Sitemaps
+Sitemap: https://masomoteletraining.co.ke/sitemap.xml
+Sitemap: https://masomoteletraining.co.ke/sitemap-courses.xml
+Sitemap: https://masomoteletraining.co.ke/sitemap-units.xml

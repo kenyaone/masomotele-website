@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Unit 2: Brand Management | M.T.T.I</title>
+    <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <style>
+        :root { --primary: #9b59b6; --secondary: #00b894; --success: #00b894; --error: #e74c3c; --warning: #f39c12; --bg-dark: #0a0a0f; --bg-card: #12121a; --bg-input: #1a1a24; --bg-hover: #22222e; --text-primary: #f5f5f7; --text-secondary: #a0a0b0; --text-muted: #6a6a7a; --border: #2a2a3a; --accent: #9b59b6; --accent-glow: rgba(155, 89, 182, 0.15); }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'IBM Plex Sans', sans-serif; background: var(--bg-dark); color: var(--text-primary); min-height: 100vh; line-height: 1.7; }
+        .header { background: linear-gradient(135deg, var(--bg-card) 0%, var(--bg-dark) 100%); border-bottom: 1px solid var(--border); padding: 1.5rem 2rem; position: sticky; top: 0; z-index: 100; }
+        .header-content { max-width: 900px; margin: 0 auto; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem; }
+        .logo { display: flex; align-items: center; gap: 0.75rem; }
+        .logo-icon { width: 48px; height: 48px; background: linear-gradient(135deg, var(--accent) 0%, var(--secondary) 100%); border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 1.5rem; }
+        .logo h1 { font-size: 1.1rem; font-weight: 700; background: linear-gradient(135deg, var(--accent) 0%, var(--secondary) 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+        .logo span { font-size: 0.65rem; color: var(--text-muted); letter-spacing: 1.5px; text-transform: uppercase; display: block; }
+        .score-display { background: var(--bg-card); border: 1px solid var(--border); padding: 0.75rem 1.5rem; border-radius: 10px; text-align: center; }
+        .score-value { font-family: 'IBM Plex Mono', monospace; font-size: 1.5rem; font-weight: 700; color: var(--accent); }
+        .score-label { font-size: 0.65rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: 1px; }
+        .main-container { max-width: 900px; margin: 0 auto; padding: 2rem; }
+        .exam-header { background: var(--bg-card); border: 1px solid var(--border); border-radius: 16px; padding: 2rem; margin-bottom: 2rem; position: relative; overflow: hidden; }
+        .exam-header::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 4px; background: linear-gradient(90deg, var(--accent) 0%, var(--secondary) 100%); }
+        .unit-badge { display: inline-block; background: linear-gradient(135deg, var(--accent) 0%, var(--secondary) 100%); color: white; padding: 0.35rem 1rem; border-radius: 6px; font-size: 0.75rem; font-weight: 600; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 1rem; }
+        .exam-title { font-size: 1.75rem; font-weight: 700; margin-bottom: 0.75rem; }
+        .exam-desc { color: var(--text-secondary); font-size: 0.95rem; margin-bottom: 1.5rem; }
+        .exam-stats { display: flex; gap: 2rem; flex-wrap: wrap; }
+        .stat-item { display: flex; align-items: center; gap: 0.5rem; color: var(--text-secondary); font-size: 0.9rem; }
+        .scenarios { display: flex; flex-direction: column; gap: 1.5rem; }
+        .scenario-card { background: var(--bg-card); border: 1px solid var(--border); border-radius: 14px; overflow: hidden; }
+        .scenario-card.correct { border-color: var(--success); }
+        .scenario-card.incorrect { border-color: var(--error); }
+        .scenario-header { background: var(--bg-input); padding: 1rem 1.5rem; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--border); }
+        .scenario-num { display: flex; align-items: center; gap: 0.5rem; font-size: 0.85rem; color: var(--text-secondary); }
+        .scenario-num strong { background: var(--accent); color: white; padding: 0.25rem 0.65rem; border-radius: 5px; font-family: 'IBM Plex Mono', monospace; }
+        .scenario-type { font-size: 0.7rem; padding: 0.3rem 0.75rem; background: var(--bg-hover); border-radius: 5px; color: var(--accent); text-transform: uppercase; font-weight: 600; }
+        .scenario-body { padding: 1.5rem; }
+        .job-brief { background: linear-gradient(135deg, rgba(155, 89, 182, 0.1) 0%, rgba(0, 184, 148, 0.1) 100%); border: 1px solid rgba(155, 89, 182, 0.3); border-radius: 12px; padding: 1.25rem; margin-bottom: 1.25rem; }
+        .brief-label { font-size: 0.7rem; color: var(--accent); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 0.75rem; font-weight: 600; }
+        .brief-text { font-size: 0.95rem; line-height: 1.7; }
+        .site-info { display: inline-flex; align-items: center; gap: 0.5rem; background: var(--bg-dark); padding: 0.5rem 0.85rem; border-radius: 6px; font-size: 0.8rem; color: var(--text-secondary); margin-top: 0.75rem; font-family: 'IBM Plex Mono', monospace; }
+        .requirements-box { background: var(--bg-input); border-radius: 10px; padding: 1rem 1.25rem; margin-bottom: 1.25rem; }
+        .requirements-label { font-size: 0.7rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 0.75rem; }
+        .requirements-list { display: flex; flex-wrap: wrap; gap: 0.5rem; }
+        .req-tag { background: var(--bg-hover); border: 1px solid var(--border); padding: 0.4rem 0.75rem; border-radius: 6px; font-size: 0.8rem; }
+        .question-section { margin-top: 1.25rem; }
+        .question-text { font-size: 1rem; font-weight: 600; margin-bottom: 1rem; }
+        .diagnostic-options { display: flex; flex-direction: column; gap: 0.6rem; }
+        .diagnostic-option { display: flex; align-items: flex-start; gap: 0.75rem; padding: 1rem 1.25rem; background: var(--bg-input); border: 2px solid var(--border); border-radius: 10px; cursor: pointer; transition: all 0.2s; }
+        .diagnostic-option:hover:not(.disabled) { border-color: var(--accent); background: var(--accent-glow); }
+        .diagnostic-option.selected { border-color: var(--accent); background: var(--accent-glow); }
+        .diagnostic-option.correct { border-color: var(--success); background: rgba(0, 184, 148, 0.15); }
+        .diagnostic-option.incorrect { border-color: var(--error); background: rgba(231, 76, 60, 0.15); }
+        .diagnostic-option.disabled { cursor: not-allowed; opacity: 0.7; }
+        .option-marker { width: 24px; height: 24px; border: 2px solid var(--border); border-radius: 50%; flex-shrink: 0; display: flex; align-items: center; justify-content: center; margin-top: 2px; }
+        .diagnostic-option.selected .option-marker { border-color: var(--accent); background: var(--accent); color: white; }
+        .diagnostic-option.correct .option-marker { border-color: var(--success); background: var(--success); color: white; }
+        .diagnostic-option.incorrect .option-marker { border-color: var(--error); background: var(--error); color: white; }
+        .option-content { flex: 1; }
+        .option-title { font-weight: 600; font-size: 0.9rem; margin-bottom: 0.25rem; }
+        .option-desc { font-size: 0.8rem; color: var(--text-secondary); }
+        .fill-blanks { background: var(--bg-input); border-radius: 10px; padding: 1.25rem; }
+        .blank-row { display: flex; align-items: center; flex-wrap: wrap; gap: 0.5rem; margin-bottom: 1rem; line-height: 2.2; }
+        .fill-text { font-size: 0.9rem; }
+        .blank-input { width: 150px; padding: 0.5rem; background: var(--bg-dark); border: 2px solid var(--border); border-radius: 6px; color: var(--text-primary); font-family: 'IBM Plex Mono', monospace; font-size: 0.85rem; text-align: center; }
+        .blank-input:focus { outline: none; border-color: var(--accent); }
+        .blank-input.correct { border-color: var(--success); background: rgba(0, 184, 148, 0.1); }
+        .blank-input.incorrect { border-color: var(--error); background: rgba(231, 76, 60, 0.1); }
+        .procedure-list { display: flex; flex-direction: column; gap: 0.5rem; }
+        .procedure-item { display: flex; align-items: center; gap: 0.75rem; padding: 0.875rem 1rem; background: var(--bg-input); border: 1px solid var(--border); border-radius: 8px; cursor: grab; user-select: none; }
+        .procedure-item:hover:not(.disabled) { border-color: var(--accent); }
+        .procedure-item.dragging { opacity: 0.5; }
+        .procedure-item.drag-over { border-color: var(--accent); background: var(--accent-glow); }
+        .procedure-item.correct { border-color: var(--success); background: rgba(0, 184, 148, 0.1); }
+        .procedure-item.incorrect { border-color: var(--error); background: rgba(231, 76, 60, 0.1); }
+        .procedure-item.disabled { cursor: not-allowed; }
+        .procedure-num { width: 28px; height: 28px; background: var(--bg-hover); border-radius: 6px; display: flex; align-items: center; justify-content: center; font-size: 0.8rem; font-weight: 600; font-family: 'IBM Plex Mono', monospace; }
+        .procedure-item.correct .procedure-num { background: var(--success); color: white; }
+        .procedure-item.incorrect .procedure-num { background: var(--error); color: white; }
+        .drag-handle { color: var(--text-muted); }
+        .procedure-text { flex: 1; font-size: 0.85rem; }
+        .troubleshoot-tree { display: flex; flex-direction: column; gap: 1rem; }
+        .tree-step { background: var(--bg-input); border: 1px solid var(--border); border-radius: 10px; padding: 1.25rem; }
+        .tree-question { font-size: 0.9rem; margin-bottom: 0.875rem; font-weight: 500; }
+        .tree-options { display: flex; gap: 0.5rem; flex-wrap: wrap; }
+        .tree-btn { padding: 0.6rem 1rem; background: var(--bg-hover); border: 1px solid var(--border); border-radius: 6px; color: var(--text-primary); font-family: inherit; font-size: 0.85rem; cursor: pointer; }
+        .tree-btn:hover:not(.disabled) { border-color: var(--accent); }
+        .tree-btn.selected { border-color: var(--accent); background: var(--accent-glow); }
+        .tree-btn.correct { border-color: var(--success); background: rgba(0, 184, 148, 0.15); }
+        .tree-btn.incorrect { border-color: var(--error); background: rgba(231, 76, 60, 0.15); }
+        .tree-btn.disabled { cursor: not-allowed; opacity: 0.6; }
+        .tree-followup { margin-top: 0.875rem; padding: 0.875rem; background: var(--bg-dark); border-radius: 8px; font-size: 0.85rem; color: var(--text-secondary); border-left: 3px solid var(--accent); }
+        .component-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(130px, 1fr)); gap: 0.75rem; }
+        .component-card { background: var(--bg-input); border: 2px solid var(--border); border-radius: 10px; padding: 1rem; text-align: center; cursor: pointer; transition: all 0.2s; }
+        .component-card:hover:not(.disabled) { border-color: var(--accent); transform: translateY(-2px); }
+        .component-card.selected { border-color: var(--accent); background: var(--accent-glow); }
+        .component-card.correct { border-color: var(--success); background: rgba(0, 184, 148, 0.1); }
+        .component-card.incorrect { border-color: var(--error); background: rgba(231, 76, 60, 0.1); }
+        .component-card.disabled { cursor: not-allowed; opacity: 0.7; }
+        .component-icon { font-size: 2rem; margin-bottom: 0.5rem; }
+        .component-name { font-size: 0.8rem; font-weight: 500; }
+        .feedback-box { margin-top: 1.25rem; padding: 1.25rem; border-radius: 10px; display: none; }
+        .feedback-box.show { display: block; }
+        .feedback-box.correct { background: rgba(0, 184, 148, 0.1); border: 1px solid var(--success); }
+        .feedback-box.incorrect { background: rgba(231, 76, 60, 0.1); border: 1px solid var(--error); }
+        .feedback-header { display: flex; align-items: center; gap: 0.5rem; font-weight: 600; margin-bottom: 0.5rem; }
+        .feedback-header.correct { color: var(--success); }
+        .feedback-header.incorrect { color: var(--error); }
+        .feedback-text { font-size: 0.85rem; color: var(--text-secondary); line-height: 1.7; }
+        .correct-answer { margin-top: 0.75rem; padding: 0.625rem; background: var(--bg-dark); border-radius: 6px; font-family: 'IBM Plex Mono', monospace; font-size: 0.85rem; }
+        .actions { margin-top: 2rem; display: flex; justify-content: space-between; gap: 1rem; flex-wrap: wrap; }
+        .btn { padding: 1rem 2.5rem; border: none; border-radius: 10px; font-family: inherit; font-size: 1rem; font-weight: 600; cursor: pointer; }
+        .btn-primary { background: linear-gradient(135deg, var(--accent) 0%, var(--secondary) 100%); color: white; }
+        .btn-primary:hover:not(:disabled) { transform: translateY(-2px); }
+        .btn-primary:disabled { opacity: 0.5; cursor: not-allowed; }
+        .btn-secondary { background: var(--bg-hover); color: var(--text-primary); border: 1px solid var(--border); }
+        .btn-secondary:hover { border-color: var(--error); color: var(--error); }
+        .results-panel { background: var(--bg-card); border: 1px solid var(--border); border-radius: 16px; padding: 2.5rem; margin-top: 2rem; text-align: center; display: none; }
+        .results-panel.show { display: block; }
+        .results-score { font-size: 4.5rem; font-weight: 700; font-family: 'IBM Plex Mono', monospace; background: linear-gradient(135deg, var(--accent) 0%, var(--secondary) 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+        .results-label { color: var(--text-secondary); margin-bottom: 1rem; }
+        .results-grade { display: inline-block; padding: 0.6rem 2rem; border-radius: 25px; font-weight: 600; margin-bottom: 1.5rem; }
+        .results-grade.excellent { background: rgba(0, 184, 148, 0.2); color: var(--success); }
+        .results-grade.good { background: rgba(155, 89, 182, 0.2); color: var(--accent); }
+        .results-grade.average { background: rgba(243, 156, 18, 0.2); color: var(--warning); }
+        .results-grade.poor { background: rgba(231, 76, 60, 0.2); color: var(--error); }
+        .results-stats { display: flex; justify-content: center; gap: 4rem; }
+        .stat-box-value { font-size: 2rem; font-weight: 700; font-family: 'IBM Plex Mono', monospace; }
+        .stat-box-value.correct { color: var(--success); }
+        .stat-box-value.incorrect { color: var(--error); }
+        .stat-box-label { font-size: 0.8rem; color: var(--text-muted); text-transform: uppercase; }
+        @media (max-width: 600px) { .main-container { padding: 1rem; } .component-grid { grid-template-columns: repeat(2, 1fr); } }
+    </style>
+<meta name="description" content="Professional training courses at MTTI Eldoret. TVETA-accredited programs in IT, healthcare, and creative fields. Enroll today.">
+<script type="text/javascript">(function(c,l,a,r,i,t,y){c[a]=c[a]||function(){(c[a].q=c[a].q||[]).push(arguments)};t=l.createElement(r);t.async=1;t.src="https://www.clarity.ms/tag/"+i;y=l.getElementsByTagName(r)[0];y.parentNode.insertBefore(t,y);})(window,document,"clarity","script","wg31zlwbt9");</script>\n</head>
+<body>
+    <header class="header"><div class="header-content"><div class="logo"><div class="logo-icon">🎨</div><div><h1>M.T.T.I</h1><span>Social Media Marketing</span></div></div><div class="score-display"><div class="score-value" id="currentScore">0%</div><div class="score-label">Score</div></div></div></header>
+    <main class="main-container">
+        <div class="exam-header"><div class="unit-badge">Unit 2</div><h2 class="exam-title">Brand Management</h2><p class="exam-desc">Build and maintain strong brand identity, develop brand guidelines, manage brand reputation, and create consistent brand experiences across all touchpoints.</p><div class="exam-stats"><div class="stat-item"><span>📋</span> 8 Scenarios</div><div class="stat-item"><span>⏱️</span> ~25 minutes</div><div class="stat-item"><span>🎯</span> 70% to pass</div></div></div>
+        <div class="scenarios" id="scenarios"></div>
+        <div class="actions"><button class="btn btn-secondary" onclick="resetExam()">Reset Exam</button><button class="btn btn-primary" id="submitBtn" onclick="submitExam()">Submit Answers</button></div>
+        <div class="results-panel" id="results"><div class="results-score" id="finalScore">0%</div><div class="results-label">Your Final Score</div><div class="results-grade" id="grade"></div><div class="results-stats"><div class="stat-box"><div class="stat-box-value correct" id="correctCount">0</div><div class="stat-box-label">Correct</div></div><div class="stat-box"><div class="stat-box-value incorrect" id="incorrectCount">0</div><div class="stat-box-label">Incorrect</div></div></div></div>
+    </main>
+    <script>
+        const examData = [
+            { type: "component-select", client: "I'm starting a new fashion brand. What elements do I need for a complete brand identity?", site: "New fashion startup", requirements: ["Building from scratch", "Complete brand package"], question: "Select ALL essential elements of a brand identity system:", options: [{ icon: "🎨", name: "Logo Design", correct: true },{ icon: "🎭", name: "Color Palette", correct: true },{ icon: "✍️", name: "Typography", correct: true },{ icon: "📢", name: "Brand Voice", correct: true },{ icon: "🌙", name: "Horoscope", correct: false },{ icon: "📖", name: "Brand Story", correct: true },{ icon: "🎯", name: "Mission Statement", correct: true },{ icon: "🍕", name: "Pizza Recipe", correct: false }], explanation: "Complete brand identity includes: Logo, Color Palette, Typography, Brand Voice (how you communicate), Brand Story (your narrative), and Mission Statement. These create consistency and recognition across all touchpoints." },
+            { type: "diagnosis", client: "A customer posted a 1-star review on Google saying our service was terrible and they'll never come back. It's getting attention.", site: "Restaurant business - negative review crisis", requirements: ["Public negative review", "Needs immediate response", "Reputation at stake"], question: "What is the BEST way to handle this brand crisis?", options: [{ title: "Respond publicly with empathy, apologize, and offer to make it right offline", desc: "Acknowledge the issue and show you care about fixing it" },{ title: "Delete the review or report it as spam", desc: "Remove negative content to protect the brand" },{ title: "Ignore it - responding draws more attention", desc: "Let it fade away naturally" },{ title: "Respond defensively explaining why they're wrong", desc: "Protect your brand by correcting false claims" }], correct: 0, explanation: "Best practice: Respond publicly with empathy and professionalism. Thank them for feedback, apologize sincerely, take conversation offline to resolve. This shows OTHER customers you care. Never delete, ignore, or argue publicly." },
+            { type: "fill-blank", client: "Explain the key components of brand positioning to me.", site: "Brand strategy session", requirements: ["Understanding positioning", "Strategic planning"], question: "Complete the brand positioning framework:", blanks: [{ text: "Target audience defines WHO you're ", answer: ["serving", "targeting", "reaching"], hint: "____" },{ text: "Unique Value Proposition explains WHY customers should ", answer: ["choose", "buy", "pick"], hint: "____ you" },{ text: "Brand differentiation shows HOW you're ", answer: ["different", "unique", "special"], hint: "____ from competitors" },{ text: "Brand promise is WHAT you consistently ", answer: ["deliver", "provide", "offer"], hint: "____" }], explanation: "Brand positioning framework: WHO (target audience) + WHY (unique value proposition) + HOW (differentiation) + WHAT (brand promise). Clear positioning helps customers understand and remember your brand." },
+            { type: "procedure", client: "Walk me through developing a brand style guide from scratch.", site: "New brand development project", requirements: ["Professional deliverable", "Comprehensive guidelines"], question: "Arrange the brand style guide development steps in CORRECT order:", steps: ["Define brand values, mission, and personality", "Create visual identity (logo, colors, typography)", "Document usage rules and examples", "Conduct brand audit and market research", "Develop brand voice and messaging guidelines", "Distribute guide and train team"], correctOrder: [3, 0, 1, 4, 2, 5], explanation: "Correct process: Research first → Define values/personality → Create visuals → Develop voice → Document rules → Train team. Always start with research to understand market position before creating assets." },
+            { type: "troubleshoot-tree", client: "Our brand looks different everywhere - website, social media, packaging all look like different companies!", site: "Brand consistency audit", requirements: ["Inconsistent visuals", "Multiple platforms", "Brand confusion"], question: "Diagnose and fix the brand inconsistency problem:", steps: [{ question: "Brand looks different everywhere. What's the root cause?", options: ["No brand style guide exists", "Team is intentionally creative", "Different platforms need different looks"], correct: 0, followup: "Without documented guidelines, each designer makes their own interpretation of the brand." },{ question: "You need to create a style guide. What's included FIRST?", options: ["Logo usage rules with clear space and minimum sizes", "Social media post templates", "Employee dress code"], correct: 0, followup: "You document primary logo, variations, clear space rules, minimum sizes, and incorrect usage examples." },{ question: "How do you ensure the team follows the new guidelines?", options: ["Send PDF and hope they read it", "Training session + accessible templates + regular audits", "Fire anyone who doesn't follow rules"], correct: 1, followup: "You conduct training, provide Canva/template access, and schedule quarterly consistency audits." }], explanation: "Brand inconsistency = lack of documentation + training. Fix: Create comprehensive style guide → Make templates accessible → Train team → Audit regularly. Consistency builds trust and recognition." },
+            { type: "diagnosis", client: "We want to rebrand our 15-year-old company. Our logo looks outdated but customers recognize it.", site: "Established business - rebrand decision", requirements: ["15 years brand equity", "Outdated visual identity", "Strong customer recognition"], question: "What is the SAFEST rebranding approach?", options: [{ title: "Evolution: Modernize gradually while keeping recognizable elements", desc: "Update the look while preserving brand equity" },{ title: "Revolution: Complete change to fresh new identity", desc: "Start completely fresh with new everything" },{ title: "Keep everything exactly the same", desc: "If it's not broken, don't fix it" },{ title: "Copy a successful competitor's brand", desc: "Use proven successful branding" }], correct: 0, explanation: "For established brands, EVOLUTION beats revolution. Modernize colors, refine logo, update typography - but keep recognizable elements. Complete rebrands lose years of brand equity. Example: Starbucks evolved their logo, kept the siren." },
+            { type: "component-select", client: "What brand touchpoints should we ensure are consistent?", site: "Brand consistency audit", requirements: ["Multi-channel presence", "Customer journey mapping"], question: "Select ALL customer touchpoints that need brand consistency:", options: [{ icon: "🌐", name: "Website", correct: true },{ icon: "📱", name: "Social Media", correct: true },{ icon: "📧", name: "Email Signatures", correct: true },{ icon: "📦", name: "Packaging", correct: true },{ icon: "🌧️", name: "Weather", correct: false },{ icon: "🏪", name: "Physical Store", correct: true },{ icon: "📞", name: "Customer Service", correct: true },{ icon: "🧾", name: "Invoices/Receipts", correct: true }], explanation: "Every customer interaction is a brand touchpoint: Website, Social Media, Emails, Packaging, Physical locations, Customer service (phone manner, scripts), and even invoices. Consistency across ALL builds trust and professionalism." },
+            { type: "diagnosis", client: "A competitor is copying our brand colors, style, and even similar taglines. What should we do?", site: "Brand infringement situation", requirements: ["Competitor copying brand", "Protect brand assets", "Legal considerations"], question: "What is the FIRST step to protect your brand?", options: [{ title: "Document everything and consult with a trademark attorney", desc: "Gather evidence and understand legal options" },{ title: "Immediately post about them on social media", desc: "Publicly shame the competitor" },{ title: "Copy their branding back", desc: "If they copy you, copy them" },{ title: "Completely change your brand to be different", desc: "Avoid conflict by rebranding yourself" }], correct: 0, explanation: "First step: Document infringement (screenshots, dates) and consult a trademark attorney. If you have registered trademarks, you have legal protection. Never publicly shame or copy back - it damages YOUR brand. Prevention: Register trademarks early!" }
+        ];
+        let answers = new Array(examData.length).fill(null);
+        function init() { renderScenarios(); initDragDrop(); }
+        function renderScenarios() { document.getElementById('scenarios').innerHTML = examData.map((s, i) => renderScenario(s, i)).join(''); }
+        function renderScenario(s, idx) {
+            let html = '';
+            if (s.type === 'diagnosis') html = `<div class="diagnostic-options">${s.options.map((o, i) => `<div class="diagnostic-option" data-idx="${idx}" data-opt="${i}" onclick="selectOption(${idx},${i})"><div class="option-marker"></div><div class="option-content"><div class="option-title">${o.title}</div><div class="option-desc">${o.desc}</div></div></div>`).join('')}</div>`;
+            else if (s.type === 'fill-blank') html = `<div class="fill-blanks">${s.blanks.map((b, i) => `<div class="blank-row"><span class="fill-text">${b.text}</span><input type="text" class="blank-input" data-idx="${idx}" data-b="${i}" placeholder="${b.hint}" onchange="updateBlank(${idx})"></div>`).join('')}</div>`;
+            else if (s.type === 'component-select') html = `<div class="component-grid">${s.options.map((o, i) => `<div class="component-card" data-idx="${idx}" data-opt="${i}" onclick="toggleComp(${idx},${i})"><div class="component-icon">${o.icon}</div><div class="component-name">${o.name}</div></div>`).join('')}</div>`;
+            else if (s.type === 'troubleshoot-tree') html = `<div class="troubleshoot-tree">${s.steps.map((st, i) => `<div class="tree-step" id="ts${idx}_${i}" ${i > 0 ? 'style="display:none"' : ''}><div class="tree-question">${st.question}</div><div class="tree-options">${st.options.map((o, oi) => `<button class="tree-btn" data-idx="${idx}" data-s="${i}" data-o="${oi}" onclick="selectTree(${idx},${i},${oi})">${o}</button>`).join('')}</div><div class="tree-followup" id="tf${idx}_${i}" style="display:none"></div></div>`).join('')}</div>`;
+            else if (s.type === 'procedure') { const sh = s.steps.map((t, i) => ({text: t, orig: i})).sort(() => Math.random() - 0.5); html = `<div class="procedure-list" id="proc${idx}">${sh.map((t, i) => `<div class="procedure-item" draggable="true" data-idx="${idx}" data-orig="${t.orig}"><span class="drag-handle">⋮⋮</span><div class="procedure-num">${i + 1}</div><div class="procedure-text">${t.text}</div></div>`).join('')}</div>`; }
+            return `<div class="scenario-card" id="card${idx}"><div class="scenario-header"><div class="scenario-num"><strong>${idx + 1}</strong> of ${examData.length}</div><div class="scenario-type">${{'diagnosis':'🔍 Analysis','fill-blank':'✏️ Fill Blanks','component-select':'🎯 Select All','troubleshoot-tree':'🌳 Decision Tree','procedure':'📋 Ordering'}[s.type]}</div></div><div class="scenario-body">${s.client ? `<div class="job-brief"><div class="brief-label">📋 Client Brief</div><div class="brief-text">"${s.client}"</div>${s.site ? `<div class="site-info">🏢 ${s.site}</div>` : ''}</div>` : ''}${s.requirements?.length ? `<div class="requirements-box"><div class="requirements-label">Context</div><div class="requirements-list">${s.requirements.map(r => `<span class="req-tag">• ${r}</span>`).join('')}</div></div>` : ''}<div class="question-section"><div class="question-text">${s.question}</div>${html}</div><div class="feedback-box" id="fb${idx}"><div class="feedback-header"><span class="feedback-icon"></span><span class="feedback-title"></span></div><div class="feedback-text">${s.explanation}</div><div class="correct-answer" id="ca${idx}"></div></div></div></div>`;
+        }
+        function selectOption(idx, opt) { if (document.querySelector(`.diagnostic-option[data-idx="${idx}"]`)?.classList.contains('disabled')) return; document.querySelectorAll(`.diagnostic-option[data-idx="${idx}"]`).forEach(e => e.classList.remove('selected')); document.querySelector(`.diagnostic-option[data-idx="${idx}"][data-opt="${opt}"]`).classList.add('selected'); answers[idx] = opt; }
+        function updateBlank(idx) { answers[idx] = Array.from(document.querySelectorAll(`.blank-input[data-idx="${idx}"]`)).map(e => e.value.trim().toLowerCase()); }
+        function toggleComp(idx, opt) { const c = document.querySelector(`.component-card[data-idx="${idx}"][data-opt="${opt}"]`); if (c.classList.contains('disabled')) return; c.classList.toggle('selected'); answers[idx] = Array.from(document.querySelectorAll(`.component-card[data-idx="${idx}"].selected`)).map(e => parseInt(e.dataset.opt)); }
+        function selectTree(idx, step, opt) { const s = examData[idx]; const btns = document.querySelectorAll(`.tree-btn[data-idx="${idx}"][data-s="${step}"]`); if (btns[0].classList.contains('disabled')) return; btns.forEach(b => b.classList.remove('selected')); btns[opt].classList.add('selected'); if (!answers[idx]) answers[idx] = []; answers[idx][step] = opt; document.getElementById(`tf${idx}_${step}`).textContent = s.steps[step].followup; document.getElementById(`tf${idx}_${step}`).style.display = 'block'; if (step < s.steps.length - 1) setTimeout(() => document.getElementById(`ts${idx}_${step + 1}`).style.display = 'block', 400); }
+        let draggedItem = null;
+        function initDragDrop() { document.querySelectorAll('.procedure-item').forEach(item => { item.addEventListener('dragstart', () => { draggedItem = item; item.classList.add('dragging'); }); item.addEventListener('dragend', () => { item.classList.remove('dragging'); document.querySelectorAll('.procedure-item').forEach(i => i.classList.remove('drag-over')); }); item.addEventListener('dragover', e => { e.preventDefault(); if (item !== draggedItem && !item.classList.contains('disabled')) item.classList.add('drag-over'); }); item.addEventListener('dragleave', () => item.classList.remove('drag-over')); item.addEventListener('drop', e => { e.preventDefault(); if (item !== draggedItem && !item.classList.contains('disabled')) { const container = item.parentNode, all = [...container.querySelectorAll('.procedure-item')]; if (all.indexOf(draggedItem) < all.indexOf(item)) item.after(draggedItem); else item.before(draggedItem); container.querySelectorAll('.procedure-item').forEach((el, i) => el.querySelector('.procedure-num').textContent = i + 1); answers[item.dataset.idx] = [...container.querySelectorAll('.procedure-item')].map(el => parseInt(el.dataset.orig)); } item.classList.remove('drag-over'); }); }); }
+        function submitExam() {
+            let correct = 0;
+            examData.forEach((s, idx) => {
+                const ans = answers[idx], card = document.getElementById(`card${idx}`), fb = document.getElementById(`fb${idx}`), ca = document.getElementById(`ca${idx}`);
+                let ok = false;
+                if (s.type === 'diagnosis') { ok = ans === s.correct; document.querySelectorAll(`.diagnostic-option[data-idx="${idx}"]`).forEach((e, i) => { e.classList.add('disabled'); if (i === s.correct) e.classList.add('correct'); else if (i === ans && !ok) e.classList.add('incorrect'); }); ca.textContent = `✓ ${s.options[s.correct].title}`; }
+                else if (s.type === 'fill-blank') { let all = true; document.querySelectorAll(`.blank-input[data-idx="${idx}"]`).forEach((e, i) => { e.disabled = true; const acc = s.blanks[i].answer.map(a => a.toLowerCase()); if (ans && acc.some(a => ans[i]?.includes(a) || a.includes(ans[i] || ''))) e.classList.add('correct'); else { e.classList.add('incorrect'); all = false; } }); ok = all; ca.textContent = `Answers: ${s.blanks.map(b => b.answer[0]).join(', ')}`; }
+                else if (s.type === 'component-select') { const corr = s.options.map((o, i) => o.correct ? i : -1).filter(i => i !== -1), sel = ans || []; ok = corr.length === sel.length && corr.every(i => sel.includes(i)); document.querySelectorAll(`.component-card[data-idx="${idx}"]`).forEach((e, i) => { e.classList.add('disabled'); if (s.options[i].correct) e.classList.add('correct'); else if (sel.includes(i)) e.classList.add('incorrect'); }); ca.textContent = `Correct: ${s.options.filter(o => o.correct).map(o => o.name).join(', ')}`; }
+                else if (s.type === 'troubleshoot-tree') { ok = ans && ans.length === s.steps.length && s.steps.every((st, i) => ans[i] === st.correct); document.querySelectorAll(`.tree-btn[data-idx="${idx}"]`).forEach(b => { b.classList.add('disabled'); if (parseInt(b.dataset.o) === s.steps[parseInt(b.dataset.s)].correct) b.classList.add('correct'); else if (b.classList.contains('selected')) b.classList.add('incorrect'); }); s.steps.forEach((_, i) => { document.getElementById(`ts${idx}_${i}`).style.display = 'block'; document.getElementById(`tf${idx}_${i}`).style.display = 'block'; }); }
+                else if (s.type === 'procedure') { ok = JSON.stringify(ans || []) === JSON.stringify(s.correctOrder); document.querySelectorAll(`#proc${idx} .procedure-item`).forEach((el, i) => { el.classList.add('disabled'); el.draggable = false; if ((ans || [])[i] === s.correctOrder[i]) el.classList.add('correct'); else el.classList.add('incorrect'); }); ca.textContent = `Correct order: ${s.correctOrder.map(i => i + 1).join(' → ')}`; }
+                if (ok) { correct++; card.classList.add('correct'); fb.classList.add('correct', 'show'); fb.querySelector('.feedback-header').classList.add('correct'); fb.querySelector('.feedback-icon').textContent = '✓'; fb.querySelector('.feedback-title').textContent = 'Correct!'; }
+                else { card.classList.add('incorrect'); fb.classList.add('incorrect', 'show'); fb.querySelector('.feedback-header').classList.add('incorrect'); fb.querySelector('.feedback-icon').textContent = '✗'; fb.querySelector('.feedback-title').textContent = 'Incorrect'; }
+            });
+            const pct = Math.round((correct / examData.length) * 100);
+            document.getElementById('currentScore').textContent = `${pct}%`; document.getElementById('finalScore').textContent = `${pct}%`; document.getElementById('correctCount').textContent = correct; document.getElementById('incorrectCount').textContent = examData.length - correct;
+            const g = document.getElementById('grade'); if (pct >= 90) { g.textContent = 'Excellent!'; g.className = 'results-grade excellent'; } else if (pct >= 70) { g.textContent = 'Good Job!'; g.className = 'results-grade good'; } else if (pct >= 50) { g.textContent = 'Average'; g.className = 'results-grade average'; } else { g.textContent = 'Needs Practice'; g.className = 'results-grade poor'; }
+            document.getElementById('results').classList.add('show'); document.getElementById('submitBtn').disabled = true;
+        }
+        function resetExam() { answers = new Array(examData.length).fill(null); document.getElementById('currentScore').textContent = '0%'; document.getElementById('results').classList.remove('show'); document.getElementById('submitBtn').disabled = false; renderScenarios(); initDragDrop(); }
+        document.addEventListener('DOMContentLoaded', init);
+    </script>
+</body>
+</html>

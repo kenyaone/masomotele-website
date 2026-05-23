@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CAT 1: Video Formats & Codecs | M.T.T.I</title>
+    <style>
+        :root{--c:#e11d48;--c2:#be123c;--bg:#1a0a10;--card:#2d1520}
+        *{margin:0;padding:0;box-sizing:border-box}body{font-family:'Segoe UI',system-ui,sans-serif;background:linear-gradient(135deg,var(--bg),var(--card));color:#fecdd3;min-height:100vh}
+        .screen{min-height:100vh;display:flex;align-items:center;justify-content:center;padding:20px}.card{background:var(--card);border:1px solid var(--c);border-radius:20px;padding:40px;max-width:650px;width:100%;text-align:center}
+        .badge{background:linear-gradient(135deg,var(--c),var(--c2));color:#fff;padding:8px 24px;border-radius:20px;font-size:0.85rem;font-weight:600;display:inline-block;margin-bottom:15px}
+        .icon{font-size:4rem;margin-bottom:15px}h1{font-size:1.8rem;color:var(--c);margin-bottom:8px}h2{font-size:1rem;color:#fb7185;margin-bottom:25px;font-weight:400}
+        .topics{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:25px;text-align:left}.topic{background:rgba(225,29,72,0.1);border:1px solid rgba(225,29,72,0.3);padding:10px 12px;border-radius:8px;font-size:0.85rem;color:#fb7185}
+        .info{display:grid;grid-template-columns:repeat(3,1fr);gap:15px;margin-bottom:25px}.info-box{background:rgba(225,29,72,0.1);padding:15px;border-radius:10px}.info-box span{display:block;color:#fb7185;font-size:0.75rem;text-transform:uppercase}.info-box b{color:var(--c);font-size:1.4rem}
+        input[type=text]{width:100%;padding:15px;background:rgba(0,0,0,0.3);border:2px solid #4a1525;border-radius:10px;color:#fff;font-size:1rem;text-align:center;margin-bottom:20px}input:focus{outline:none;border-color:var(--c)}
+        .btn{width:100%;padding:16px;font-size:1.1rem;font-weight:600;background:linear-gradient(135deg,var(--c),var(--c2));color:#fff;border:none;border-radius:12px;cursor:pointer}.btn:disabled{opacity:0.5;cursor:not-allowed}
+        .exam{display:none;padding:20px}.container{max-width:900px;margin:0 auto}
+        .header{background:var(--card);border:1px solid var(--c);border-radius:16px;padding:15px 20px;margin-bottom:20px;display:flex;justify-content:space-between;align-items:center;position:sticky;top:10px;z-index:100}
+        .header h1{font-size:1rem;color:var(--c)}.timer{background:linear-gradient(135deg,var(--c),var(--c2));padding:8px 20px;border-radius:20px;font-weight:600;font-size:0.95rem;color:#fff}.timer.warn{background:#ef4444;animation:pulse 1s infinite}@keyframes pulse{50%{opacity:0.7}}
+        .qcard{background:var(--card);border:1px solid #4a1525;border-radius:16px;padding:25px;margin-bottom:20px}
+        .qnum{background:linear-gradient(135deg,var(--c),var(--c2));color:#fff;padding:5px 14px;border-radius:15px;font-size:0.8rem;font-weight:600;display:inline-block;margin-bottom:15px}
+        .scenario{background:rgba(225,29,72,0.1);border-left:4px solid var(--c);padding:12px 15px;border-radius:0 8px 8px 0;margin-bottom:15px;color:#fb7185;font-size:0.9rem}
+        .qtext{font-size:1.1rem;margin-bottom:20px;line-height:1.5}
+        .opts{display:flex;flex-direction:column;gap:10px}.opt{background:rgba(0,0,0,0.2);border:2px solid #4a1525;border-radius:10px;padding:14px 16px;cursor:pointer;display:flex;align-items:center;gap:12px;transition:all 0.2s}
+        .opt:hover{border-color:var(--c);background:rgba(225,29,72,0.1)}.opt.sel{border-color:var(--c);background:rgba(225,29,72,0.2)}.opt.correct{border-color:#22c55e;background:rgba(34,197,94,0.2)}.opt.wrong{border-color:#ef4444;background:rgba(239,68,68,0.2)}
+        .letter{width:32px;height:32px;border-radius:50%;background:rgba(225,29,72,0.2);display:flex;align-items:center;justify-content:center;font-weight:600;color:var(--c);flex-shrink:0}
+        .opt.sel .letter{background:var(--c);color:#fff}.opt.correct .letter{background:#22c55e;color:#fff}.opt.wrong .letter{background:#ef4444;color:#fff}
+        .nav{display:flex;gap:15px;margin-top:20px}.nav button{flex:1;padding:14px;border:none;border-radius:10px;font-size:1rem;font-weight:600;cursor:pointer}
+        .nav .sec{background:rgba(225,29,72,0.2);color:var(--c)}.nav .pri{background:linear-gradient(135deg,var(--c),var(--c2));color:#fff}.nav .sub{background:linear-gradient(135deg,#22c55e,#16a34a);color:#fff}
+        .results{display:none}.results .card{max-width:480px}.res-icon{font-size:5rem;margin-bottom:15px}.res-status{font-size:2rem;font-weight:800}.res-status.pass{color:#22c55e}.res-status.fail{color:#ef4444}
+        .res-score{font-size:4rem;font-weight:800;color:var(--c);margin:10px 0}.res-detail{color:#fb7185;margin-bottom:25px}
+        .breakdown{display:grid;grid-template-columns:1fr 1fr;gap:15px;margin-bottom:25px}.breakdown div{background:rgba(225,29,72,0.1);padding:15px;border-radius:10px}.breakdown span{color:#fb7185;font-size:0.8rem;display:block}.breakdown b{font-size:1.3rem}
+        .res-btns{display:flex;gap:15px}.res-btns button{flex:1;padding:14px;border:none;border-radius:10px;font-weight:600;cursor:pointer}.res-btns .rev{background:rgba(225,29,72,0.2);color:var(--c)}.res-btns .retry{background:linear-gradient(135deg,var(--c),var(--c2));color:#fff}
+        .explain{margin-top:15px;padding:12px;background:rgba(34,197,94,0.1);border-radius:8px;border-left:4px solid #22c55e;text-align:left}.explain b{color:#22c55e}.explain p{color:#fb7185;margin-top:5px;font-size:0.9rem}
+    </style>
+<meta name="description" content="Professional training courses at MTTI Eldoret. TVETA-accredited programs in IT, healthcare, and creative fields. Enroll today.">
+<script type="text/javascript">(function(c,l,a,r,i,t,y){c[a]=c[a]||function(){(c[a].q=c[a].q||[]).push(arguments)};t=l.createElement(r);t.async=1;t.src="https://www.clarity.ms/tag/"+i;y=l.getElementsByTagName(r)[0];y.parentNode.insertBefore(t,y);})(window,document,"clarity","script","wg31zlwbt9");</script>\n</head>
+<body>
+    <div id="start" class="screen"><div class="card">
+        <div class="badge">🎬 CAT 1</div><div class="icon">📹</div>
+        <h1>Video Formats & Codecs</h1><h2>Masomotele Technical Training Institute - Web Design</h2>
+        <div class="topics"><div class="topic">🎬 Container Formats</div><div class="topic">🎬 Video Codecs</div><div class="topic">🎬 Audio Codecs</div><div class="topic">🎬 Resolution & Bitrate</div><div class="topic">🎬 Web Video Formats</div><div class="topic">🎬 Compression Types</div></div>
+        <div class="info"><div class="info-box"><span>Questions</span><b>10</b></div><div class="info-box"><span>Duration</span><b>20 min</b></div><div class="info-box"><span>Pass Mark</span><b>50%</b></div></div>
+        <input type="text" id="name" placeholder="Enter Your Full Name"><button class="btn" id="startBtn" disabled>Start Exam</button>
+    </div></div>
+    <div id="exam" class="exam"><div class="container">
+        <div class="header"><div style="display:flex;align-items:center;gap:10px"><span style="font-size:1.3rem">📹</span><h1>Video Formats & Codecs</h1></div><div style="display:flex;align-items:center;gap:15px"><span id="prog">1/10</span><div class="timer" id="timer">20:00</div></div></div>
+        <div id="qbox"></div>
+        <div class="nav"><button class="sec" id="prev" onclick="prev()">← Previous</button><button class="pri" id="next" onclick="next()">Next →</button></div>
+    </div></div>
+    <div id="results" class="results screen"><div class="card">
+        <div class="res-icon" id="resIcon">🏆</div><div class="res-status" id="resStatus">PASSED</div><div class="res-score" id="resScore">80%</div><div class="res-detail" id="resDetail">8/10 correct</div>
+        <div class="breakdown"><div><span>Correct</span><b id="corr">8</b></div><div><span>Time Used</span><b id="time">15:30</b></div></div>
+        <div class="res-btns"><button class="rev" onclick="review()">📝 Review</button><button class="retry" onclick="location.reload()">🔄 Retry</button></div>
+    </div></div>
+<script>
+const Q=[
+    {q:"What is the difference between a container format and a codec?",s:"You're explaining video file structure to a client.",o:["They are the same thing","Container holds data, codec compresses/decompresses it","Container compresses, codec holds data","Neither relates to video"],a:1,e:"Container formats (MP4, MKV) hold video/audio streams; codecs (H.264, AAC) compress the actual data."},
+    {q:"Which video format is best supported across all modern web browsers?",s:"You need to embed a video that works everywhere without plugins.",o:["AVI","WMV","MP4 (H.264)","FLV"],a:2,e:"MP4 with H.264 codec has universal browser support and is the web standard."},
+    {q:"What does 1080p resolution mean?",s:"A client asks about video quality options.",o:["1080 pixels wide","1080 horizontal lines, progressive scan","1080 frames per second","1080 megabytes"],a:1,e:"1080p = 1920x1080 pixels, where 'p' means progressive (non-interlaced) scanning."},
+    {q:"Which codec offers better compression than H.264 at the same quality?",s:"You want to reduce video file sizes for faster web loading.",o:["MPEG-2","H.265/HEVC","DivX","Cinepak"],a:1,e:"H.265/HEVC provides 50% better compression than H.264 at equivalent quality."},
+    {q:"What is bitrate in video?",s:"You're optimizing videos for different internet speeds.",o:["Screen resolution","Number of colors","Amount of data per second","Frame dimensions"],a:2,e:"Bitrate (kbps/Mbps) is data transferred per second - higher means better quality but larger files."},
+    {q:"Which format is best for transparent video/animations on web?",s:"You need a video with a transparent background for a website.",o:["MP4","WebM with VP9/Alpha","AVI","MPEG"],a:1,e:"WebM with VP9 codec supports alpha channel transparency for web videos."},
+    {q:"What's the difference between lossy and lossless compression?",s:"A photographer asks about video compression for archival.",o:["Lossy is larger files","Lossless loses quality, lossy doesn't","Lossy discards data permanently, lossless preserves all","They're identical"],a:2,e:"Lossy permanently removes data for smaller files; lossless preserves everything but larger files."},
+    {q:"What frame rate is standard for most web videos?",s:"You're exporting a video for YouTube.",o:["10 fps","24-30 fps","60-120 fps","5 fps"],a:1,e:"24-30 fps is standard for web; 24fps for cinematic, 30fps for general content."},
+    {q:"Which audio codec is commonly paired with H.264 in MP4 files?",s:"You're encoding a video with audio for web delivery.",o:["MP3","WAV","AAC","FLAC"],a:2,e:"AAC (Advanced Audio Coding) is the standard audio codec paired with H.264 in MP4."},
+    {q:"What does 'transcoding' mean?",s:"A client sends you a video in an incompatible format.",o:["Playing a video","Converting from one codec/format to another","Uploading to the web","Adding subtitles"],a:1,e:"Transcoding converts video from one format/codec to another for compatibility."}
+];
+let cur=0,ans=Array(Q.length).fill(null),left=1200,tmr,start,reviewing=false;
+const $=id=>document.getElementById(id);
+$('name').oninput=e=>$('startBtn').disabled=!e.target.value.trim();
+$('startBtn').onclick=()=>{start=Date.now();$('start').style.display='none';$('exam').style.display='block';render();tmr=setInterval(tick,1000)};
+function tick(){left--;$('timer').textContent=`${Math.floor(left/60)}:${(left%60).toString().padStart(2,'0')}`;if(left<=300)$('timer').classList.add('warn');if(left<=0)end()}
+function render(){const q=Q[cur];$('prog').textContent=`${cur+1}/${Q.length}`;$('qbox').innerHTML=`<div class="qcard"><div class="qnum">Question ${cur+1}</div>${q.s?`<div class="scenario">📋 ${q.s}</div>`:''}<div class="qtext">${q.q}</div><div class="opts">${q.o.map((o,i)=>`<div class="opt ${ans[cur]===i?'sel':''} ${reviewing?(i===q.a?'correct':ans[cur]===i?'wrong':''):''}" onclick="${reviewing?'':`sel(${i})`}"><div class="letter">${'ABCD'[i]}</div><div>${o}</div></div>`).join('')}</div>${reviewing?`<div class="explain"><b>✓ Explanation:</b><p>${q.e}</p></div>`:''}</div>`;$('prev').style.visibility=cur===0?'hidden':'visible';$('next').textContent=cur===Q.length-1?(reviewing?'Finish':'Submit'):'Next →';$('next').className=`${cur===Q.length-1&&!reviewing?'sub':'pri'}`}
+function sel(i){if(!reviewing){ans[cur]=i;render()}}
+function prev(){if(cur>0){cur--;render()}}
+function next(){if(cur<Q.length-1){cur++;render()}else if(reviewing)location.reload();else end()}
+function end(){clearInterval(tmr);const c=ans.filter((a,i)=>a===Q[i].a).length,p=Math.round(c/Q.length*100),pass=p>=50,used=Math.floor((Date.now()-start)/1000);$('resIcon').textContent=pass?'🏆':'📚';$('resStatus').textContent=pass?'PASSED':'KEEP STUDYING';$('resStatus').className=`res-status ${pass?'pass':'fail'}`;$('resScore').textContent=p+'%';$('resDetail').textContent=`${c}/${Q.length} correct`;$('corr').textContent=c;$('time').textContent=`${Math.floor(used/60)}:${(used%60).toString().padStart(2,'0')}`;$('exam').style.display='none';$('results').style.display='flex'}
+function review(){reviewing=true;cur=0;$('results').style.display='none';$('exam').style.display='block';$('timer').textContent='Review';render()}
+</script>
+</body>
+</html>

@@ -1,0 +1,894 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Computer Hardware & Basic Components - Practical Exam | M.T.T.I</title>
+    <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'IBM Plex Sans', sans-serif; background: linear-gradient(145deg, #0a192f 0%, #112240 50%, #0a192f 100%); color: #e6f1ff; min-height: 100vh; }
+        
+        .header { background: rgba(17, 34, 64, 0.95); border-bottom: 2px solid #64ffda; padding: 15px 30px; display: flex; justify-content: space-between; align-items: center; position: sticky; top: 0; z-index: 100; backdrop-filter: blur(10px); }
+        .logo { font-size: 1.2rem; font-weight: 700; color: #64ffda; }
+        .exam-info { text-align: center; }
+        .exam-title { font-size: 0.85rem; color: #ccd6f6; }
+        .exam-unit { font-size: 0.7rem; color: #8892b0; }
+        .header-right { display: flex; align-items: center; gap: 20px; }
+        .timer { font-family: 'IBM Plex Mono', monospace; background: rgba(100, 255, 218, 0.1); padding: 8px 16px; border-radius: 20px; border: 1px solid #64ffda; color: #64ffda; }
+        .timer.warning { border-color: #ff6b6b; color: #ff6b6b; animation: pulse 1s infinite; }
+        @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.5; } }
+        .progress { font-family: 'IBM Plex Mono', monospace; color: #8892b0; font-size: 0.9rem; }
+        
+        .start-screen { min-height: 100vh; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 20px; }
+        .start-card { background: rgba(17, 34, 64, 0.9); border: 1px solid rgba(100, 255, 218, 0.2); border-radius: 16px; padding: 40px; max-width: 500px; width: 100%; text-align: center; }
+        .start-icon { font-size: 4rem; margin-bottom: 20px; }
+        .start-card h1 { font-size: 1.5rem; color: #ccd6f6; margin-bottom: 5px; }
+        .start-card h2 { font-size: 1rem; color: #64ffda; margin-bottom: 20px; font-weight: 500; }
+        .start-card p { color: #8892b0; margin-bottom: 20px; font-size: 0.9rem; }
+        .exam-meta { display: grid; grid-template-columns: repeat(3, 1fr); gap: 15px; margin-bottom: 25px; }
+        .meta-item { background: rgba(100, 255, 218, 0.05); padding: 15px; border-radius: 10px; }
+        .meta-item .value { font-size: 1.3rem; font-weight: 700; color: #64ffda; }
+        .meta-item .label { font-size: 0.75rem; color: #8892b0; }
+        .name-input { margin-bottom: 20px; }
+        .name-input label { display: block; margin-bottom: 8px; color: #8892b0; font-size: 0.9rem; text-align: left; }
+        .name-input input { width: 100%; padding: 12px 16px; background: rgba(10, 25, 47, 0.8); border: 2px solid rgba(100, 255, 218, 0.3); border-radius: 8px; color: #e6f1ff; font-size: 1rem; font-family: inherit; transition: all 0.3s; }
+        .name-input input:focus { outline: none; border-color: #64ffda; box-shadow: 0 0 20px rgba(100, 255, 218, 0.15); }
+        .start-btn { width: 100%; padding: 14px; font-size: 1.1rem; font-weight: 600; background: linear-gradient(135deg, #64ffda, #00bfa5); color: #0a192f; border: none; border-radius: 8px; cursor: pointer; transition: all 0.3s; }
+        .start-btn:hover:not(:disabled) { transform: translateY(-2px); box-shadow: 0 10px 30px rgba(100, 255, 218, 0.3); }
+        .start-btn:disabled { opacity: 0.5; cursor: not-allowed; }
+        
+        .exam-container { display: none; }
+        .main-content { display: flex; min-height: calc(100vh - 70px); }
+        
+        .sidebar { width: 200px; background: rgba(17, 34, 64, 0.5); border-right: 1px solid rgba(100, 255, 218, 0.1); padding: 20px; }
+        .sidebar-header { margin-bottom: 20px; padding-bottom: 15px; border-bottom: 1px solid rgba(100, 255, 218, 0.1); }
+        .student-name { font-weight: 600; color: #ccd6f6; font-size: 0.9rem; }
+        .question-nav { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
+        .nav-btn { width: 100%; aspect-ratio: 1; background: rgba(10, 25, 47, 0.8); border: 1px solid rgba(100, 255, 218, 0.2); border-radius: 8px; color: #8892b0; font-family: 'IBM Plex Mono', monospace; font-size: 0.8rem; cursor: pointer; transition: all 0.2s; }
+        .nav-btn:hover { border-color: #64ffda; color: #64ffda; }
+        .nav-btn.active { background: rgba(100, 255, 218, 0.2); border-color: #64ffda; color: #64ffda; }
+        .nav-btn.correct { background: rgba(0, 255, 136, 0.2); border-color: #00ff88; color: #00ff88; }
+        .nav-btn.incorrect { background: rgba(255, 107, 107, 0.2); border-color: #ff6b6b; color: #ff6b6b; }
+        
+        .task-area { flex: 1; padding: 30px; overflow-y: auto; }
+        .task-card { background: rgba(17, 34, 64, 0.6); border: 1px solid rgba(100, 255, 218, 0.15); border-radius: 16px; padding: 30px; max-width: 800px; margin: 0 auto; }
+        .task-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
+        .task-number { font-family: 'IBM Plex Mono', monospace; color: #64ffda; font-size: 0.85rem; }
+        .task-points { background: rgba(100, 255, 218, 0.15); color: #64ffda; padding: 4px 12px; border-radius: 12px; font-size: 0.8rem; font-weight: 600; }
+        .task-title { font-size: 1.3rem; color: #ccd6f6; margin-bottom: 15px; }
+        .task-instruction { background: rgba(10, 25, 47, 0.6); border-left: 3px solid #64ffda; padding: 15px 20px; border-radius: 0 8px 8px 0; margin-bottom: 20px; }
+        .task-instruction p { color: #a8b2d1; line-height: 1.6; }
+        .target-text { background: rgba(100, 255, 218, 0.08); border: 1px dashed rgba(100, 255, 218, 0.3); padding: 12px 16px; border-radius: 8px; margin-top: 10px; font-family: 'IBM Plex Mono', monospace; color: #64ffda; }
+        
+        .hint-toggle { background: none; border: 1px solid rgba(255, 193, 7, 0.4); color: #ffc107; padding: 8px 16px; border-radius: 6px; cursor: pointer; font-size: 0.85rem; margin-bottom: 15px; transition: all 0.2s; }
+        .hint-toggle:hover { background: rgba(255, 193, 7, 0.1); }
+        .hint-content { background: rgba(255, 193, 7, 0.1); border: 1px solid rgba(255, 193, 7, 0.3); padding: 12px 16px; border-radius: 8px; margin-bottom: 15px; color: #ffc107; font-size: 0.9rem; display: none; }
+        .hint-content.show { display: block; }
+        
+        .input-area { margin-bottom: 20px; }
+        .input-area label { display: block; color: #8892b0; font-size: 0.85rem; margin-bottom: 8px; text-transform: uppercase; letter-spacing: 0.5px; }
+        .input-area textarea, .input-area input[type="text"] { width: 100%; padding: 14px; background: rgba(255, 255, 255, 0.95); border: 2px solid rgba(100, 255, 218, 0.3); border-radius: 8px; font-size: 1rem; font-family: 'IBM Plex Mono', monospace; color: #0a192f; resize: vertical; transition: all 0.3s; }
+        .input-area textarea:focus, .input-area input[type="text"]:focus { outline: none; border-color: #64ffda; box-shadow: 0 0 20px rgba(100, 255, 218, 0.2); }
+        
+        .drag-drop-area { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 20px; }
+        .drag-column { background: rgba(10, 25, 47, 0.6); border-radius: 10px; padding: 15px; min-height: 200px; }
+        .drag-column h4 { color: #64ffda; font-size: 0.85rem; margin-bottom: 12px; text-transform: uppercase; letter-spacing: 1px; }
+        .drag-item { background: rgba(100, 255, 218, 0.1); border: 1px solid rgba(100, 255, 218, 0.3); padding: 10px 14px; border-radius: 6px; margin-bottom: 8px; cursor: grab; transition: all 0.2s; color: #ccd6f6; font-size: 0.9rem; }
+        .drag-item:hover { background: rgba(100, 255, 218, 0.2); }
+        .drag-item.dragging { opacity: 0.5; }
+        .drop-zone { border: 2px dashed rgba(100, 255, 218, 0.3); border-radius: 8px; padding: 10px; min-height: 50px; margin-bottom: 10px; transition: all 0.2s; }
+        .drop-zone.over { border-color: #64ffda; background: rgba(100, 255, 218, 0.1); }
+        .drop-zone .label { color: #8892b0; font-size: 0.8rem; margin-bottom: 5px; }
+        
+        .matching-area { margin-bottom: 20px; }
+        .match-row { display: flex; align-items: center; gap: 15px; margin-bottom: 12px; padding: 12px; background: rgba(10, 25, 47, 0.4); border-radius: 8px; }
+        .match-left { flex: 1; color: #ccd6f6; font-size: 0.95rem; }
+        .match-select { flex: 1; padding: 10px; background: rgba(255, 255, 255, 0.95); border: 2px solid rgba(100, 255, 218, 0.3); border-radius: 6px; font-size: 0.9rem; color: #0a192f; cursor: pointer; }
+        .match-select:focus { outline: none; border-color: #64ffda; }
+        
+        .image-area { text-align: center; margin-bottom: 20px; }
+        .component-image { max-width: 100%; height: auto; border-radius: 10px; border: 2px solid rgba(100, 255, 218, 0.2); }
+        .image-placeholder { background: rgba(10, 25, 47, 0.8); border: 2px dashed rgba(100, 255, 218, 0.3); border-radius: 10px; padding: 40px; color: #8892b0; }
+        .image-placeholder .icon { font-size: 3rem; margin-bottom: 10px; }
+        
+        .feedback-box { padding: 15px 20px; border-radius: 10px; margin-bottom: 20px; display: none; }
+        .feedback-box.show { display: block; }
+        .feedback-box.correct { background: rgba(0, 255, 136, 0.15); border: 1px solid rgba(0, 255, 136, 0.4); }
+        .feedback-box.incorrect { background: rgba(255, 107, 107, 0.15); border: 1px solid rgba(255, 107, 107, 0.4); }
+        .feedback-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; }
+        .feedback-title { font-weight: 600; }
+        .feedback-box.correct .feedback-title { color: #00ff88; }
+        .feedback-box.incorrect .feedback-title { color: #ff6b6b; }
+        .feedback-score { font-family: 'IBM Plex Mono', monospace; font-size: 0.85rem; color: #8892b0; }
+        .correct-answer { margin-top: 10px; padding-top: 10px; border-top: 1px solid rgba(255, 255, 255, 0.1); }
+        .correct-answer strong { color: #8892b0; font-size: 0.85rem; }
+        .correct-answer p { color: #64ffda; font-family: 'IBM Plex Mono', monospace; margin-top: 5px; }
+        
+        .action-buttons { display: flex; justify-content: space-between; align-items: center; padding-top: 20px; border-top: 1px solid rgba(100, 255, 218, 0.1); }
+        .check-btn { padding: 12px 30px; background: linear-gradient(135deg, #64ffda, #00bfa5); color: #0a192f; font-weight: 600; border: none; border-radius: 8px; cursor: pointer; font-size: 1rem; transition: all 0.3s; }
+        .check-btn:hover { transform: translateY(-2px); box-shadow: 0 5px 20px rgba(100, 255, 218, 0.3); }
+        .nav-buttons { display: flex; gap: 10px; }
+        .nav-buttons button { padding: 12px 24px; background: rgba(100, 255, 218, 0.1); border: 1px solid rgba(100, 255, 218, 0.3); color: #64ffda; border-radius: 8px; cursor: pointer; font-size: 0.95rem; transition: all 0.2s; }
+        .nav-buttons button:hover:not(:disabled) { background: rgba(100, 255, 218, 0.2); }
+        .nav-buttons button:disabled { opacity: 0.4; cursor: not-allowed; }
+        .finish-btn { background: rgba(255, 107, 107, 0.2); border-color: rgba(255, 107, 107, 0.4); color: #ff6b6b; }
+        
+        .results-screen { display: none; min-height: 100vh; align-items: center; justify-content: center; padding: 20px; }
+        .results-card { background: rgba(17, 34, 64, 0.95); border: 1px solid rgba(100, 255, 218, 0.2); border-radius: 20px; padding: 40px; max-width: 500px; width: 100%; text-align: center; }
+        .result-icon { font-size: 4rem; margin-bottom: 15px; }
+        .result-status { font-size: 1.5rem; font-weight: 700; margin-bottom: 5px; }
+        .result-status.passed { color: #00ff88; }
+        .result-status.failed { color: #ff6b6b; }
+        .result-course { color: #8892b0; margin-bottom: 25px; }
+        .score-circle { width: 150px; height: 150px; margin: 0 auto 25px; position: relative; }
+        .score-circle svg { transform: rotate(-90deg); }
+        .score-circle .bg { fill: none; stroke: rgba(100, 255, 218, 0.1); stroke-width: 10; }
+        .score-circle .progress { fill: none; stroke: #64ffda; stroke-width: 10; stroke-linecap: round; transition: stroke-dashoffset 1s ease; }
+        .score-text { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); text-align: center; }
+        .score-percent { font-size: 2.5rem; font-weight: 700; color: #64ffda; font-family: 'IBM Plex Mono', monospace; }
+        .score-label { font-size: 0.8rem; color: #8892b0; }
+        .result-details { display: grid; grid-template-columns: repeat(3, 1fr); gap: 15px; margin-bottom: 25px; }
+        .detail-box { background: rgba(10, 25, 47, 0.6); padding: 15px; border-radius: 10px; }
+        .detail-value { font-size: 1.3rem; font-weight: 700; color: #64ffda; }
+        .detail-label { font-size: 0.75rem; color: #8892b0; }
+        .result-actions { display: flex; gap: 15px; }
+        .result-actions button { flex: 1; padding: 14px; font-size: 1rem; font-weight: 600; border: none; border-radius: 8px; cursor: pointer; transition: all 0.3s; }
+        .review-btn { background: rgba(100, 255, 218, 0.2); color: #64ffda; border: 1px solid rgba(100, 255, 218, 0.4); }
+        .retry-btn { background: linear-gradient(135deg, #64ffda, #00bfa5); color: #0a192f; }
+        
+        .hidden { display: none !important; }
+        
+        @media (max-width: 768px) {
+            .header { flex-direction: column; gap: 10px; padding: 10px 15px; }
+            .main-content { flex-direction: column; }
+            .sidebar { width: 100%; border-right: none; border-bottom: 1px solid rgba(100, 255, 218, 0.1); }
+            .question-nav { grid-template-columns: repeat(5, 1fr); }
+            .task-area { padding: 15px; }
+            .drag-drop-area { grid-template-columns: 1fr; }
+            .exam-meta { grid-template-columns: 1fr; }
+        }
+    </style>
+<meta name="description" content="Professional training courses at MTTI Eldoret. TVETA-accredited programs in IT, healthcare, and creative fields. Enroll today.">
+<script type="text/javascript">(function(c,l,a,r,i,t,y){c[a]=c[a]||function(){(c[a].q=c[a].q||[]).push(arguments)};t=l.createElement(r);t.async=1;t.src="https://www.clarity.ms/tag/"+i;y=l.getElementsByTagName(r)[0];y.parentNode.insertBefore(t,y);})(window,document,"clarity","script","wg31zlwbt9");</script>\n</head>
+<body>
+    <!-- Start Screen -->
+    <div id="startScreen" class="start-screen">
+        <div class="start-card">
+            <div class="start-icon">🖥️</div>
+            <h1>Computer Essentials</h1>
+            <h2>Unit 1: Computer Hardware & Basic Components</h2>
+            <p>Masomotele Technical Training Institute</p>
+            
+            <div class="exam-meta">
+                <div class="meta-item">
+                    <div class="value">15</div>
+                    <div class="label">Questions</div>
+                </div>
+                <div class="meta-item">
+                    <div class="value">2 Hrs</div>
+                    <div class="label">Duration</div>
+                </div>
+                <div class="meta-item">
+                    <div class="value">50%</div>
+                    <div class="label">Pass Mark</div>
+                </div>
+            </div>
+            
+            <div class="name-input">
+                <label>Enter Your Full Name:</label>
+                <input type="text" id="studentName" placeholder="e.g., John Kamau">
+            </div>
+            
+            <button class="start-btn" id="startBtn" disabled>Start Examination</button>
+        </div>
+    </div>
+    
+    <!-- Exam Screen -->
+    <div id="examContainer" class="exam-container">
+        <header class="header">
+            <div class="logo">⌨️ M.T.T.I</div>
+            <div class="exam-info">
+                <div class="exam-title">Computer Hardware & Basic Components</div>
+                <div class="exam-unit">Computer Essentials - Unit 1</div>
+            </div>
+            <div class="header-right">
+                <div class="timer" id="timer">02:00:00</div>
+                <div class="progress"><span id="currentQ">1</span>/15</div>
+                <button class="finish-btn" onclick="showResults()" style="padding: 8px 16px; font-size: 0.85rem;">Finish</button>
+            </div>
+        </header>
+        
+        <div class="main-content">
+            <aside class="sidebar">
+                <div class="sidebar-header">
+                    <div class="student-name" id="displayName">Student</div>
+                </div>
+                <div class="question-nav" id="questionNav"></div>
+            </aside>
+            
+            <main class="task-area">
+                <div class="task-card" id="taskCard">
+                    <!-- Task content loaded dynamically -->
+                </div>
+            </main>
+        </div>
+    </div>
+    
+    <!-- Results Screen -->
+    <div id="resultsScreen" class="results-screen">
+        <div class="results-card">
+            <div class="result-icon" id="resultIcon">🎉</div>
+            <div class="result-status" id="resultStatus">PASSED</div>
+            <div class="result-course">Computer Hardware & Basic Components</div>
+            
+            <div class="score-circle">
+                <svg width="150" height="150">
+                    <circle class="bg" cx="75" cy="75" r="60"></circle>
+                    <circle class="progress" id="scoreProgress" cx="75" cy="75" r="60" 
+                        stroke-dasharray="377" stroke-dashoffset="377"></circle>
+                </svg>
+                <div class="score-text">
+                    <div class="score-percent" id="scorePercent">0%</div>
+                    <div class="score-label">Score</div>
+                </div>
+            </div>
+            
+            <div class="result-details">
+                <div class="detail-box">
+                    <div class="detail-value" id="correctCount">0</div>
+                    <div class="detail-label">Correct</div>
+                </div>
+                <div class="detail-box">
+                    <div class="detail-value" id="wrongCount">0</div>
+                    <div class="detail-label">Wrong</div>
+                </div>
+                <div class="detail-box">
+                    <div class="detail-value" id="timeUsed">00:00</div>
+                    <div class="detail-label">Time Used</div>
+                </div>
+            </div>
+            
+            <div class="result-actions">
+                <button class="review-btn" onclick="reviewAnswers()">📝 Review</button>
+                <button class="retry-btn" onclick="retryExam()">🔄 Retry</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Questions Data
+        const questions = [
+            {
+                id: 1,
+                type: "typing",
+                title: "Identify the Brain of the Computer",
+                instruction: "The component that processes all instructions and calculations in a computer is called the Central Processing Unit. Type the abbreviation:",
+                targetText: "CPU",
+                acceptableAnswers: ["CPU", "cpu", "C.P.U", "c.p.u"],
+                hint: "It stands for Central Processing Unit - use capital letters",
+                points: 10
+            },
+            {
+                id: 2,
+                type: "typing",
+                title: "Temporary Memory",
+                instruction: "This type of memory is volatile and stores data temporarily while the computer is running. Type its abbreviation:",
+                targetText: "RAM",
+                acceptableAnswers: ["RAM", "ram", "R.A.M"],
+                hint: "Random Access Memory - it loses data when power is off",
+                points: 10
+            },
+            {
+                id: 3,
+                type: "typing",
+                title: "Permanent Storage",
+                instruction: "The component that stores data permanently even when the computer is turned off (traditional spinning disk). Type its abbreviation:",
+                targetText: "HDD",
+                acceptableAnswers: ["HDD", "hdd", "H.D.D", "hard disk", "Hard Disk", "hard drive", "Hard Drive"],
+                hint: "Hard Disk Drive - has spinning platters",
+                points: 10
+            },
+            {
+                id: 4,
+                type: "matching",
+                title: "Match Components to Functions",
+                instruction: "Match each hardware component to its primary function:",
+                pairs: [
+                    { left: "Monitor", right: "Displays visual output", id: "monitor" },
+                    { left: "Keyboard", right: "Text input device", id: "keyboard" },
+                    { left: "Mouse", right: "Pointing and clicking", id: "mouse" },
+                    { left: "Printer", right: "Produces hard copies", id: "printer" }
+                ],
+                hint: "Think about what each device does when you use it",
+                points: 10
+            },
+            {
+                id: 5,
+                type: "typing",
+                title: "Graphics Processing",
+                instruction: "This component handles rendering images and videos, essential for gaming and video editing. Type its abbreviation:",
+                targetText: "GPU",
+                acceptableAnswers: ["GPU", "gpu", "G.P.U", "graphics card", "Graphics Card", "video card"],
+                hint: "Graphics Processing Unit - handles visual rendering",
+                points: 10
+            },
+            {
+                id: 6,
+                type: "matching",
+                title: "Input vs Output Devices",
+                instruction: "Classify each device as either INPUT or OUTPUT:",
+                pairs: [
+                    { left: "Microphone", right: "INPUT", id: "mic" },
+                    { left: "Speaker", right: "OUTPUT", id: "speaker" },
+                    { left: "Scanner", right: "INPUT", id: "scanner" },
+                    { left: "Projector", right: "OUTPUT", id: "projector" }
+                ],
+                hint: "INPUT sends data TO the computer, OUTPUT receives data FROM the computer",
+                points: 10
+            },
+            {
+                id: 7,
+                type: "typing",
+                title: "Main Circuit Board",
+                instruction: "The main circuit board that connects all computer components together is called the:",
+                targetText: "Motherboard",
+                acceptableAnswers: ["Motherboard", "motherboard", "MOTHERBOARD", "mainboard", "Mainboard", "system board"],
+                hint: "It's the 'mother' of all boards - everything connects to it",
+                points: 10
+            },
+            {
+                id: 8,
+                type: "typing",
+                title: "Power Component",
+                instruction: "This component converts AC power from the wall outlet to DC power for computer components. Type its abbreviation:",
+                targetText: "PSU",
+                acceptableAnswers: ["PSU", "psu", "P.S.U", "power supply", "Power Supply"],
+                hint: "Power Supply Unit - converts electricity for the computer",
+                points: 10
+            },
+            {
+                id: 9,
+                type: "matching",
+                title: "Storage Types",
+                instruction: "Match each storage type to its characteristic:",
+                pairs: [
+                    { left: "SSD", right: "Faster, no moving parts", id: "ssd" },
+                    { left: "HDD", right: "Slower, spinning platters", id: "hdd" },
+                    { left: "USB Flash Drive", right: "Portable, plug and play", id: "usb" },
+                    { left: "DVD", right: "Optical disc storage", id: "dvd" }
+                ],
+                hint: "Think about how each storage device works physically",
+                points: 10
+            },
+            {
+                id: 10,
+                type: "typing",
+                title: "Read-Only Memory",
+                instruction: "This type of memory contains permanent instructions for starting up the computer and cannot be modified. Type its abbreviation:",
+                targetText: "ROM",
+                acceptableAnswers: ["ROM", "rom", "R.O.M"],
+                hint: "Read Only Memory - contains BIOS/firmware",
+                points: 10
+            },
+            {
+                id: 11,
+                type: "typing",
+                title: "Universal Connector",
+                instruction: "This universal port type is used to connect keyboards, mice, flash drives, and many other peripherals. Type its abbreviation:",
+                targetText: "USB",
+                acceptableAnswers: ["USB", "usb", "U.S.B"],
+                hint: "Universal Serial Bus - the most common connector",
+                points: 10
+            },
+            {
+                id: 12,
+                type: "matching",
+                title: "Port Identification",
+                instruction: "Match each port to what it's commonly used for:",
+                pairs: [
+                    { left: "HDMI", right: "Video and audio to displays", id: "hdmi" },
+                    { left: "Ethernet/RJ45", right: "Wired network connection", id: "ethernet" },
+                    { left: "3.5mm Audio Jack", right: "Headphones and microphones", id: "audio" },
+                    { left: "VGA", right: "Older video connection (blue)", id: "vga" }
+                ],
+                hint: "Think about what cable you plug into each port",
+                points: 10
+            },
+            {
+                id: 13,
+                type: "typing",
+                title: "Startup Program",
+                instruction: "This firmware initializes hardware during startup and is stored on the motherboard. Type its abbreviation (older systems):",
+                targetText: "BIOS",
+                acceptableAnswers: ["BIOS", "bios", "B.I.O.S", "UEFI", "uefi"],
+                hint: "Basic Input/Output System - runs before the OS loads",
+                points: 10
+            },
+            {
+                id: 14,
+                type: "typing",
+                title: "Cooling Component",
+                instruction: "This component prevents the CPU from overheating by dissipating heat. It usually has a fan attached. Type its name:",
+                targetText: "Heatsink",
+                acceptableAnswers: ["Heatsink", "heatsink", "heat sink", "Heat Sink", "cooler", "CPU cooler", "CPU Cooler"],
+                hint: "It 'sinks' the heat away from the processor",
+                points: 10
+            },
+            {
+                id: 15,
+                type: "labeling",
+                title: "Computer Components Identification",
+                instruction: "Label the following computer components by typing their names in the correct boxes:",
+                components: [
+                    { label: "The component that displays images (screen):", answer: "Monitor", acceptable: ["Monitor", "monitor", "display", "Display", "screen", "Screen"] },
+                    { label: "The box containing CPU, RAM, HDD (desktop):", answer: "System Unit", acceptable: ["System Unit", "system unit", "CPU case", "computer case", "tower", "Tower", "Case", "case"] },
+                    { label: "Device for typing text:", answer: "Keyboard", acceptable: ["Keyboard", "keyboard"] },
+                    { label: "Pointing device with buttons:", answer: "Mouse", acceptable: ["Mouse", "mouse"] }
+                ],
+                hint: "These are the basic parts you see on any desktop computer",
+                points: 10
+            }
+        ];
+
+        // State
+        let state = {
+            studentName: '',
+            currentQuestion: 0,
+            answers: {},
+            results: {},
+            timeRemaining: 2 * 60 * 60,
+            timerInterval: null,
+            startTime: null
+        };
+
+        // Initialize when DOM is ready
+        document.addEventListener('DOMContentLoaded', function() {
+            // Check if MTTI config was injected by exam.php
+            if (window.MTTI_EXAM_CONFIG) {
+                // Pre-fill student name
+                const nameInput = document.getElementById('studentName');
+                if (nameInput && window.MTTI_EXAM_CONFIG.studentName) {
+                    nameInput.value = window.MTTI_EXAM_CONFIG.studentName;
+                    state.studentName = window.MTTI_EXAM_CONFIG.studentName;
+                    document.getElementById('startBtn').disabled = false;
+                    nameInput.style.backgroundColor = '#e8f5e9';
+                }
+            }
+            
+            // Also check URL parameters directly
+            const urlParams = new URLSearchParams(window.location.search);
+            const nameFromUrl = urlParams.get('student_name') || urlParams.get('name');
+            if (nameFromUrl && !state.studentName) {
+                const nameInput = document.getElementById('studentName');
+                nameInput.value = decodeURIComponent(nameFromUrl);
+                state.studentName = decodeURIComponent(nameFromUrl);
+                document.getElementById('startBtn').disabled = false;
+            }
+            
+            // Name input listener
+            document.getElementById('studentName').addEventListener('input', function() {
+                state.studentName = this.value.trim();
+                document.getElementById('startBtn').disabled = !state.studentName;
+            });
+            
+            // Allow Enter key to start exam
+            document.getElementById('studentName').addEventListener('keypress', function(e) {
+                if (e.key === 'Enter' && state.studentName) {
+                    startExam();
+                }
+            });
+
+            // Start button listener
+            document.getElementById('startBtn').addEventListener('click', startExam);
+        });
+
+        function startExam() {
+            if (!state.studentName) {
+                alert('Please enter your name first');
+                document.getElementById('studentName').focus();
+                return;
+            }
+            state.startTime = Date.now();
+            document.getElementById('startScreen').style.display = 'none';
+            document.getElementById('examContainer').style.display = 'block';
+            document.getElementById('displayName').textContent = state.studentName;
+            
+            buildNavigation();
+            loadQuestion(0);
+            startTimer();
+        }
+
+        function buildNavigation() {
+            const nav = document.getElementById('questionNav');
+            nav.innerHTML = '';
+            questions.forEach((q, i) => {
+                const btn = document.createElement('button');
+                btn.className = 'nav-btn' + (i === 0 ? ' active' : '');
+                btn.textContent = i + 1;
+                btn.onclick = () => loadQuestion(i);
+                nav.appendChild(btn);
+            });
+        }
+
+        function updateNavigation() {
+            document.querySelectorAll('.nav-btn').forEach((btn, i) => {
+                btn.classList.remove('active', 'correct', 'incorrect');
+                if (i === state.currentQuestion) btn.classList.add('active');
+                else if (state.results[i]?.correct) btn.classList.add('correct');
+                else if (state.results[i]?.checked) btn.classList.add('incorrect');
+            });
+        }
+
+        function startTimer() {
+            state.timerInterval = setInterval(() => {
+                state.timeRemaining--;
+                const h = Math.floor(state.timeRemaining / 3600);
+                const m = Math.floor((state.timeRemaining % 3600) / 60);
+                const s = state.timeRemaining % 60;
+                const display = `${h.toString().padStart(2,'0')}:${m.toString().padStart(2,'0')}:${s.toString().padStart(2,'0')}`;
+                document.getElementById('timer').textContent = display;
+                
+                if (state.timeRemaining <= 300) {
+                    document.getElementById('timer').classList.add('warning');
+                }
+                if (state.timeRemaining <= 0) {
+                    clearInterval(state.timerInterval);
+                    showResults();
+                }
+            }, 1000);
+        }
+
+        function loadQuestion(index) {
+            state.currentQuestion = index;
+            const q = questions[index];
+            document.getElementById('currentQ').textContent = index + 1;
+            
+            let html = `
+                <div class="task-header">
+                    <span class="task-number">Question ${index + 1} of ${questions.length}</span>
+                    <span class="task-points">${q.points} pts</span>
+                </div>
+                <h2 class="task-title">${q.title}</h2>
+                <div class="task-instruction">
+                    <p>${q.instruction}</p>
+                    ${q.targetText && q.type === 'typing' ? `<div class="target-text">Answer: Type the correct term</div>` : ''}
+                </div>
+                <button class="hint-toggle" onclick="toggleHint()">💡 Show Hint</button>
+                <div class="hint-content" id="hintContent">${q.hint}</div>
+            `;
+
+            // Render based on question type
+            if (q.type === 'typing') {
+                html += `
+                    <div class="input-area">
+                        <label>Your Answer:</label>
+                        <input type="text" id="userAnswer" placeholder="Type your answer here..." value="${state.answers[index] || ''}">
+                    </div>
+                `;
+            } else if (q.type === 'matching') {
+                html += `<div class="matching-area">`;
+                const shuffledRight = [...q.pairs].map(p => p.right).sort(() => Math.random() - 0.5);
+                q.pairs.forEach((pair, i) => {
+                    const savedAnswer = state.answers[index]?.[pair.id] || '';
+                    html += `
+                        <div class="match-row">
+                            <div class="match-left">${pair.left}</div>
+                            <select class="match-select" data-id="${pair.id}">
+                                <option value="">-- Select --</option>
+                                ${shuffledRight.map(r => `<option value="${r}" ${savedAnswer === r ? 'selected' : ''}>${r}</option>`).join('')}
+                            </select>
+                        </div>
+                    `;
+                });
+                html += `</div>`;
+            } else if (q.type === 'labeling') {
+                html += `<div class="input-area">`;
+                q.components.forEach((comp, i) => {
+                    const savedAnswer = state.answers[index]?.[i] || '';
+                    html += `
+                        <div style="margin-bottom: 15px;">
+                            <label>${comp.label}</label>
+                            <input type="text" class="label-input" data-index="${i}" placeholder="Type component name..." value="${savedAnswer}">
+                        </div>
+                    `;
+                });
+                html += `</div>`;
+            }
+
+            // Feedback area
+            html += `
+                <div class="feedback-box" id="feedbackBox">
+                    <div class="feedback-header">
+                        <span class="feedback-title" id="feedbackTitle"></span>
+                        <span class="feedback-score" id="feedbackScore"></span>
+                    </div>
+                    <div class="correct-answer" id="correctAnswerBox">
+                        <strong>Correct Answer:</strong>
+                        <p id="correctAnswerText"></p>
+                    </div>
+                </div>
+            `;
+
+            // Action buttons
+            html += `
+                <div class="action-buttons">
+                    <button class="check-btn" onclick="checkAnswer()">✓ Check Answer</button>
+                    <div class="nav-buttons">
+                        <button onclick="prevQuestion()" ${index === 0 ? 'disabled' : ''}>← Previous</button>
+                        <button onclick="nextQuestion()">${index === questions.length - 1 ? 'Finish →' : 'Next →'}</button>
+                    </div>
+                </div>
+            `;
+
+            document.getElementById('taskCard').innerHTML = html;
+            
+            // Show feedback if already answered
+            if (state.results[index]?.checked) {
+                showFeedback(index);
+            }
+            
+            updateNavigation();
+        }
+
+        function toggleHint() {
+            document.getElementById('hintContent').classList.toggle('show');
+        }
+
+        function saveAnswer() {
+            const q = questions[state.currentQuestion];
+            
+            if (q.type === 'typing') {
+                const input = document.getElementById('userAnswer');
+                if (input) state.answers[state.currentQuestion] = input.value;
+            } else if (q.type === 'matching') {
+                const selects = document.querySelectorAll('.match-select');
+                state.answers[state.currentQuestion] = {};
+                selects.forEach(sel => {
+                    state.answers[state.currentQuestion][sel.dataset.id] = sel.value;
+                });
+            } else if (q.type === 'labeling') {
+                const inputs = document.querySelectorAll('.label-input');
+                state.answers[state.currentQuestion] = {};
+                inputs.forEach(inp => {
+                    state.answers[state.currentQuestion][inp.dataset.index] = inp.value;
+                });
+            }
+        }
+
+        function checkAnswer() {
+            saveAnswer();
+            const q = questions[state.currentQuestion];
+            let correct = false;
+            let score = 0;
+            let correctAnswer = '';
+
+            if (q.type === 'typing') {
+                const userAnswer = state.answers[state.currentQuestion] || '';
+                correct = q.acceptableAnswers.some(ans => 
+                    userAnswer.toLowerCase().trim() === ans.toLowerCase()
+                );
+                score = correct ? q.points : 0;
+                correctAnswer = q.targetText;
+            } else if (q.type === 'matching') {
+                let matchCorrect = 0;
+                const answers = state.answers[state.currentQuestion] || {};
+                q.pairs.forEach(pair => {
+                    if (answers[pair.id] === pair.right) matchCorrect++;
+                });
+                correct = matchCorrect === q.pairs.length;
+                score = Math.round((matchCorrect / q.pairs.length) * q.points);
+                correctAnswer = q.pairs.map(p => `${p.left} → ${p.right}`).join(', ');
+            } else if (q.type === 'labeling') {
+                let labelCorrect = 0;
+                const answers = state.answers[state.currentQuestion] || {};
+                q.components.forEach((comp, i) => {
+                    const userAns = answers[i] || '';
+                    if (comp.acceptable.some(a => userAns.toLowerCase().trim() === a.toLowerCase())) {
+                        labelCorrect++;
+                    }
+                });
+                correct = labelCorrect === q.components.length;
+                score = Math.round((labelCorrect / q.components.length) * q.points);
+                correctAnswer = q.components.map(c => c.answer).join(', ');
+            }
+
+            state.results[state.currentQuestion] = { correct, score, maxScore: q.points, checked: true };
+            showFeedback(state.currentQuestion);
+            updateNavigation();
+        }
+
+        function showFeedback(index) {
+            const result = state.results[index];
+            const q = questions[index];
+            const feedbackBox = document.getElementById('feedbackBox');
+            
+            feedbackBox.classList.remove('correct', 'incorrect');
+            feedbackBox.classList.add('show', result.correct ? 'correct' : 'incorrect');
+            
+            document.getElementById('feedbackTitle').textContent = result.correct ? '✅ Correct!' : '❌ Incorrect';
+            document.getElementById('feedbackScore').textContent = `${result.score}/${result.maxScore} points`;
+            
+            if (!result.correct) {
+                document.getElementById('correctAnswerBox').style.display = 'block';
+                let correctText = '';
+                if (q.type === 'typing') {
+                    correctText = q.targetText;
+                } else if (q.type === 'matching') {
+                    correctText = q.pairs.map(p => `${p.left} → ${p.right}`).join('<br>');
+                } else if (q.type === 'labeling') {
+                    correctText = q.components.map(c => `${c.label.replace(':', '')} = ${c.answer}`).join('<br>');
+                }
+                document.getElementById('correctAnswerText').innerHTML = correctText;
+            } else {
+                document.getElementById('correctAnswerBox').style.display = 'none';
+            }
+        }
+
+        function prevQuestion() {
+            saveAnswer();
+            if (state.currentQuestion > 0) {
+                loadQuestion(state.currentQuestion - 1);
+            }
+        }
+
+        function nextQuestion() {
+            saveAnswer();
+            if (state.currentQuestion < questions.length - 1) {
+                loadQuestion(state.currentQuestion + 1);
+            } else {
+                showResults();
+            }
+        }
+
+        function showResults() {
+            clearInterval(state.timerInterval);
+            
+            let totalScore = 0;
+            let maxScore = 0;
+            let correctCount = 0;
+            
+            // Build question results for submission
+            const questionResults = [];
+            
+            questions.forEach((q, i) => {
+                maxScore += q.points;
+                if (state.results[i]) {
+                    totalScore += state.results[i].score;
+                    if (state.results[i].correct) correctCount++;
+                }
+                questionResults.push({
+                    question: q.title,
+                    type: q.type,
+                    correct: state.results[i]?.correct || false,
+                    score: state.results[i]?.score || 0,
+                    max_score: q.points
+                });
+            });
+            
+            const percentage = Math.round((totalScore / maxScore) * 100);
+            const passed = percentage >= 50;
+            const timeUsed = 2 * 60 * 60 - state.timeRemaining;
+            const minutes = Math.floor(timeUsed / 60);
+            const seconds = timeUsed % 60;
+            
+            // Determine grade
+            let grade, remarks;
+            if (percentage >= 80) { grade = 'A'; remarks = 'DISTINCTION'; }
+            else if (percentage >= 70) { grade = 'B+'; remarks = 'CREDIT'; }
+            else if (percentage >= 60) { grade = 'B'; remarks = 'CREDIT'; }
+            else if (percentage >= 50) { grade = 'C'; remarks = 'PASS'; }
+            else { grade = 'D'; remarks = 'REFER'; }
+            
+            document.getElementById('examContainer').style.display = 'none';
+            document.getElementById('resultsScreen').style.display = 'flex';
+            
+            document.getElementById('resultIcon').textContent = passed ? '🎉' : '📚';
+            document.getElementById('resultStatus').textContent = passed ? 'PASSED!' : 'Keep Practicing';
+            document.getElementById('resultStatus').className = 'result-status ' + (passed ? 'passed' : 'failed');
+            document.getElementById('scorePercent').textContent = percentage + '%';
+            document.getElementById('correctCount').textContent = correctCount;
+            document.getElementById('wrongCount').textContent = questions.length - correctCount;
+            document.getElementById('timeUsed').textContent = `${minutes}:${seconds.toString().padStart(2, '0')}`;
+            
+            // Animate progress circle
+            const circumference = 2 * Math.PI * 60;
+            const offset = circumference - (percentage / 100) * circumference;
+            setTimeout(() => {
+                document.getElementById('scoreProgress').style.strokeDashoffset = offset;
+            }, 100);
+            
+            // Submit results to WordPress
+            submitResultsToWordPress({
+                student_name: state.studentName,
+                exam_name: 'Computer Essentials Unit 1: Hardware',
+                course: 'Computer Essentials',
+                unit_name: 'Unit 1: Computer Hardware & Basic Components',
+                score: totalScore,
+                max_score: maxScore,
+                percentage: percentage,
+                grade: grade,
+                remarks: remarks,
+                duration_minutes: minutes,
+                question_results: questionResults
+            });
+        }
+        
+        // Function to submit results to WordPress
+        async function submitResultsToWordPress(resultData) {
+            // Get config from exam.php injection or URL params
+            const config = window.MTTI_EXAM_CONFIG || {};
+            const urlParams = new URLSearchParams(window.location.search);
+            
+            const admission = config.admissionNumber || urlParams.get('admission_number') || urlParams.get('admission') || 'GUEST';
+            const scheduleId = config.scheduleId || urlParams.get('schedule_id') || 0;
+            const apiUrl = config.apiUrl || window.location.origin + '/wp-json/mtti-exam/v1';
+            
+            const payload = {
+                admission_number: admission,
+                student_name: resultData.student_name,
+                schedule_id: parseInt(scheduleId),
+                exam_name: resultData.exam_name,
+                course: resultData.course,
+                unit_name: resultData.unit_name,
+                score: resultData.score,
+                max_score: resultData.max_score,
+                grade: resultData.grade,
+                duration_minutes: resultData.duration_minutes,
+                question_results: resultData.question_results
+            };
+            
+            console.log('Submitting to WordPress:', apiUrl, payload);
+            
+            try {
+                const response = await fetch(apiUrl + '/exam-results', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+                
+                const result = await response.json();
+                console.log('WordPress response:', result);
+                
+                if (result.success) {
+                    // Show success indicator
+                    const statusDiv = document.createElement('div');
+                    statusDiv.innerHTML = '<div style="background: rgba(0,255,136,0.2); border: 1px solid #00ff88; padding: 10px 15px; border-radius: 8px; margin-top: 15px; color: #00ff88; font-size: 0.9rem;">✅ Result saved to server (ID: ' + result.result_id + ')</div>';
+                    document.querySelector('.result-actions').before(statusDiv);
+                } else {
+                    console.error('Save failed:', result.message);
+                }
+            } catch (error) {
+                console.error('Network error:', error);
+            }
+        }
+
+        function reviewAnswers() {
+            document.getElementById('resultsScreen').style.display = 'none';
+            document.getElementById('examContainer').style.display = 'block';
+            loadQuestion(0);
+        }
+
+        function retryExam() {
+            state = {
+                studentName: state.studentName,
+                currentQuestion: 0,
+                answers: {},
+                results: {},
+                timeRemaining: 2 * 60 * 60,
+                timerInterval: null,
+                startTime: Date.now()
+            };
+            
+            document.getElementById('resultsScreen').style.display = 'none';
+            document.getElementById('examContainer').style.display = 'block';
+            document.getElementById('timer').classList.remove('warning');
+            document.getElementById('timer').textContent = '02:00:00';
+            
+            buildNavigation();
+            loadQuestion(0);
+            startTimer();
+        }
+    </script>
+</body>
+</html>

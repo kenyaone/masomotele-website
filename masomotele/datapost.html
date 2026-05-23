@@ -1,0 +1,687 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<title>M.T.T.I DataPost v2</title>
+<style>
+:root{--pri:#0a5e2a;--pri-d:#064a1f;--acc:#f5a623;--ok:#2e7d32;--no:#c62828;--warn:#e65100;--bg:#f0f4f0;--card:#fff;--border:#d0e4d8;--text:#1a2e1a;--gray:#6b8c6b;--blue:#1565c0;--purple:#6a1b9a}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+body{font-family:'Segoe UI',sans-serif;background:var(--bg);color:var(--text);min-height:100vh}
+.topbar{background:linear-gradient(135deg,var(--pri-d),var(--pri));padding:10px 16px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:100;box-shadow:0 2px 8px rgba(0,0,0,.25)}
+.tb-left{display:flex;flex-direction:column;gap:1px}
+.tb-brand{color:#fff;font-weight:900;font-size:1rem;letter-spacing:.5px}.tb-brand span{color:var(--acc)}
+.tb-school{color:rgba(255,255,255,.75);font-size:.65rem;font-weight:600;letter-spacing:.3px}
+.tb-right{display:flex;flex-direction:column;align-items:flex-end;gap:2px}
+.tb-net{display:flex;align-items:center;gap:5px;font-size:.7rem;color:rgba(255,255,255,.8)}
+.net-dot{width:8px;height:8px;border-radius:50%;background:#ccc}
+.net-dot.on{background:#4caf50;animation:pulse 2s infinite}.net-dot.off{background:#f44336}
+.tb-sync{font-size:.6rem;color:rgba(255,255,255,.55)}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.4}}
+.tabs{display:flex;background:var(--pri-d);border-bottom:2px solid rgba(255,255,255,.1);overflow-x:auto}
+.tab{flex:1;min-width:80px;padding:10px 6px;border:none;background:none;color:rgba(255,255,255,.55);font-family:'Segoe UI',sans-serif;font-size:.7rem;font-weight:700;cursor:pointer;transition:all .2s;text-align:center;border-bottom:3px solid transparent;margin-bottom:-2px;white-space:nowrap}
+.tab.active{color:var(--acc);border-bottom-color:var(--acc)}
+.main{padding:12px;max-width:700px;margin:0 auto}
+.panel{display:none}.panel.active{display:block}
+.card{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:14px;margin-bottom:12px;box-shadow:0 2px 6px rgba(10,94,42,.05)}
+.card-title{font-size:.82rem;font-weight:800;color:var(--pri);margin-bottom:10px;display:flex;align-items:center;gap:6px}
+.stat-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:8px;margin-bottom:12px}
+.stat-box{background:var(--card);border:1px solid var(--border);border-radius:10px;padding:12px;text-align:center}
+.stat-num{font-size:1.5rem;font-weight:900;color:var(--pri)}
+.stat-lbl{font-size:.62rem;color:var(--gray);font-weight:600;margin-top:2px}
+.action-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:12px}
+.act-btn{padding:12px 8px;border:none;border-radius:10px;font-family:'Segoe UI',sans-serif;font-weight:700;font-size:.78rem;cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:3px;transition:all .2s}
+.act-btn .ico{font-size:1.3rem}
+.act-btn:active{transform:scale(.96)}.act-btn:disabled{opacity:.5;cursor:not-allowed;transform:none}
+.btn-green{background:var(--pri);color:#fff}.btn-orange{background:var(--acc);color:var(--pri-d)}
+.btn-light{background:#e8f5e9;color:var(--ok);border:1.5px solid var(--ok)}
+.btn-pale{background:#fff3e0;color:var(--warn);border:1.5px solid var(--warn)}
+.btn-blue{background:#e3f2fd;color:var(--blue);border:1.5px solid var(--blue)}
+.btn-purple{background:#f3e5f5;color:var(--purple);border:1.5px solid var(--purple)}
+.status{background:var(--card);border:1px solid var(--border);border-radius:10px;padding:10px 14px;margin-bottom:12px;font-size:.78rem;display:flex;align-items:center;gap:8px;min-height:38px}
+.spinner{width:14px;height:14px;border:2px solid var(--border);border-top-color:var(--pri);border-radius:50%;animation:sp .7s linear infinite;flex-shrink:0}
+@keyframes sp{to{transform:rotate(360deg)}}
+.status-txt{color:var(--gray);font-style:italic}
+.tbl{width:100%;border-collapse:collapse;font-size:.75rem}
+.tbl th{background:var(--pri);color:#fff;padding:7px 8px;text-align:left;white-space:nowrap}
+.tbl td{padding:7px 8px;border-bottom:1px solid var(--border);vertical-align:middle}
+.tbl tr:nth-child(even) td{background:#f8fdf8}
+.badge{display:inline-block;padding:2px 7px;border-radius:10px;font-size:.65rem;font-weight:700}
+.badge-g{background:#e8f5e9;color:var(--ok)}.badge-o{background:#fff3e0;color:var(--warn)}
+.badge-b{background:#e3f2fd;color:#1565c0}.badge-r{background:#ffebee;color:var(--no)}
+.badge-p{background:#f3e5f5;color:var(--purple)}
+/* File items */
+.file-item{background:var(--card);border:1px solid var(--border);border-radius:8px;padding:8px 10px;display:flex;align-items:center;gap:8px;margin-bottom:5px;transition:all .15s}
+.file-item.fnew{border-left:3px solid var(--ok)}
+.file-item.fupdated{border-left:3px solid var(--acc)}
+.file-item.fsynced{border-left:3px solid #ccc;opacity:.55}
+.file-item.ferror{border-left:3px solid var(--no)}
+.fchk{width:16px;height:16px;cursor:pointer;accent-color:var(--pri);flex-shrink:0}
+.fname{flex:1;font-size:.73rem;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.fmeta{font-size:.6rem;color:var(--gray)}
+.fpush{border:none;border-radius:5px;padding:4px 8px;font-size:.65rem;font-weight:700;cursor:pointer;white-space:nowrap}
+.fpush.new{background:var(--pri);color:#fff}
+.fpush.updated{background:var(--acc);color:var(--pri-d)}
+.fpush.synced{background:#eee;color:#999;cursor:not-allowed}
+/* Sub-tabs */
+.subtabs{display:flex;gap:4px;margin-bottom:10px;flex-wrap:wrap}
+.stab{padding:5px 12px;border-radius:20px;font-size:.7rem;font-weight:700;cursor:pointer;border:1.5px solid var(--border);background:var(--card);color:var(--gray);transition:all .2s}
+.stab.on{background:var(--pri);color:#fff;border-color:var(--pri)}
+.stab.on.sql{background:#1565c0;border-color:#1565c0}
+.stab.on.php{background:#6a1b9a;border-color:#6a1b9a}
+.stab.on.data{background:#e65100;border-color:#e65100}
+/* Pills */
+.pills{display:flex;gap:5px;flex-wrap:wrap;margin-bottom:8px}
+.pill{padding:4px 10px;border-radius:20px;font-size:.68rem;font-weight:700;cursor:pointer;border:1.5px solid var(--border);background:var(--card);color:var(--gray)}
+.pill.on{background:var(--pri);color:#fff;border-color:var(--pri)}
+/* Bulk bar */
+.bulk{background:var(--pri);border-radius:8px;padding:8px 12px;display:none;justify-content:space-between;align-items:center;margin-bottom:8px}
+.bulk.show{display:flex}.bulk-txt{color:#fff;font-size:.78rem;font-weight:700}
+.bulk-btn{background:var(--acc);color:var(--pri-d);border:none;border-radius:6px;padding:6px 14px;font-weight:800;font-size:.75rem;cursor:pointer}
+/* Log */
+.log{background:#1a2e1a;border-radius:8px;padding:10px;margin-top:10px;max-height:160px;overflow-y:auto;display:none}
+.log.show{display:block}.log-ln{font-size:.68rem;font-family:monospace;margin-bottom:3px}
+.log-ok{color:#69f0ae}.log-err{color:#ff5252}.log-info{color:#80cbc4}.log-warn{color:#ffd740}
+/* Config */
+.cfg-row{display:flex;gap:6px;align-items:center;margin-bottom:8px}
+.cfg-lbl{color:var(--gray);font-size:.72rem;min-width:80px;font-weight:600}
+.cfg-in{flex:1;background:var(--bg);border:1.5px solid var(--border);border-radius:6px;padding:7px 10px;font-size:.78rem;outline:none;color:var(--text)}
+.cfg-in:focus{border-color:var(--pri)}
+/* Toast */
+.toast{position:fixed;bottom:18px;left:50%;transform:translateX(-50%) translateY(80px);background:var(--text);color:#fff;padding:8px 18px;border-radius:50px;font-size:.78rem;font-weight:600;transition:transform .3s;z-index:999;white-space:nowrap}
+.toast.show{transform:translateX(-50%) translateY(0)}
+.empty{text-align:center;padding:24px;color:var(--gray);font-size:.8rem}
+.empty-ico{font-size:1.8rem;margin-bottom:8px}
+/* Diff summary bar */
+.diff-bar{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:10px}
+.diff-chip{padding:4px 10px;border-radius:8px;font-size:.68rem;font-weight:700}
+.dc-new{background:#e8f5e9;color:var(--ok)}.dc-upd{background:#fff3e0;color:var(--warn)}.dc-syn{background:#f5f5f5;color:#999}
+/* Progress bar */
+.prog-wrap{background:#e0e0e0;border-radius:10px;height:6px;margin:8px 0;overflow:hidden;display:none}
+.prog-wrap.show{display:block}
+.prog-bar{height:100%;background:var(--pri);border-radius:10px;transition:width .3s;width:0%}
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <div class="tb-left">
+    <div class="tb-brand">M.T.T.I <span>DataPost</span> <span style="font-size:.6rem;opacity:.6">v2</span></div>
+    <div class="tb-school" id="schoolName">Masomotele Technical Training Institute</div>
+  </div>
+  <div class="tb-right">
+    <div class="tb-net"><div class="net-dot" id="netDot"></div><span id="netTxt">Checking...</span></div>
+    <div class="tb-sync" id="lastSyncTxt">Never synced</div>
+  </div>
+</div>
+
+<div class="tabs">
+  <button class="tab active" onclick="switchTab('Stats',this)">📊 Statistics</button>
+  <button class="tab" onclick="switchTab('Sync',this)">🔄 Sync Files</button>
+  <button class="tab" onclick="switchTab('Cfg',this)">⚙️ Settings</button>
+</div>
+
+<!-- STATS PANEL -->
+<div class="panel active" id="panelStats">
+<div class="main">
+  <div class="action-grid">
+    <button class="act-btn btn-green" onclick="fetchStats()"><span class="ico">📊</span>Fetch Stats</button>
+    <button class="act-btn btn-orange" onclick="exportCSV()"><span class="ico">📥</span>Export Excel</button>
+    <button class="act-btn btn-light" onclick="syncAnalytics()"><span class="ico">☁️</span>Sync to Cloud</button>
+    <button class="act-btn btn-pale" onclick="pingServer()"><span class="ico">📡</span>Ping Server</button>
+  </div>
+  <div class="status" id="statsStatus"><span class="status-txt">Tap Fetch Stats to load learning data</span></div>
+  <div id="statsDash" style="display:none">
+    <div class="stat-grid" id="summaryCards"></div>
+    <div class="card">
+      <div class="card-title">📚 Lesson Views & Time</div>
+      <div style="overflow-x:auto"><table class="tbl"><thead><tr><th>Lesson</th><th>Class</th><th>Views</th><th>Mins</th></tr></thead><tbody id="lessonBody"></tbody></table></div>
+    </div>
+    <div class="card">
+      <div class="card-title">🏆 Quiz Performance</div>
+      <div style="overflow-x:auto"><table class="tbl"><thead><tr><th>Quiz</th><th>Attempts</th><th>Avg %</th><th>Passed</th></tr></thead><tbody id="quizBody"></tbody></table></div>
+    </div>
+    <div class="card">
+      <div class="card-title">🎓 Class Enrollments</div>
+      <div style="overflow-x:auto"><table class="tbl"><thead><tr><th>Class</th><th>Students</th><th>Lessons</th></tr></thead><tbody id="classBody"></tbody></table></div>
+    </div>
+  </div>
+</div>
+</div>
+
+<!-- SYNC PANEL -->
+<div class="panel" id="panelSync">
+<div class="main">
+  <div class="action-grid">
+    <button class="act-btn btn-green" onclick="checkAll()"><span class="ico">🔍</span>Check All</button>
+    <button class="act-btn btn-orange" onclick="pushSelected()"><span class="ico">🚀</span>Push Selected</button>
+    <button class="act-btn btn-light" onclick="clearSynced()"><span class="ico">🔄</span>Reset Log</button>
+    <button class="act-btn btn-pale" onclick="pingServer()"><span class="ico">📡</span>Ping Server</button>
+  </div>
+  <div class="status" id="syncStatus"><span class="status-txt">Tap Check All to compare GitHub vs Server</span></div>
+  <div class="prog-wrap" id="progWrap"><div class="prog-bar" id="progBar"></div></div>
+
+  <!-- Content type sub-tabs -->
+  <div class="subtabs">
+    <div class="stab on" onclick="switchType('html',this)">🌐 HTML (0)</div>
+    <div class="stab" onclick="switchType('sql',this)">🗄 SQL (0)</div>
+    <div class="stab" onclick="switchType('php',this)">⚙️ PHP (0)</div>
+    <div class="stab" onclick="switchType('data',this)">📋 Data (0)</div>
+  </div>
+
+  <!-- Diff summary -->
+  <div class="diff-bar" id="diffBar" style="display:none">
+    <span class="diff-chip dc-new" id="dcNew">🆕 0 New</span>
+    <span class="diff-chip dc-upd" id="dcUpd">🔄 0 Updated</span>
+    <span class="diff-chip dc-syn" id="dcSyn">✅ 0 Synced</span>
+  </div>
+
+  <!-- Subject filter (HTML only) -->
+  <div class="pills" id="subjectPills" style="display:none"></div>
+
+  <!-- Bulk bar -->
+  <div class="bulk" id="bulkBar">
+    <span class="bulk-txt" id="bulkTxt">0 selected</span>
+    <button class="bulk-btn" onclick="pushSelected()">🚀 Push to Server</button>
+  </div>
+
+  <div id="fileList"><div class="empty"><div class="empty-ico">📂</div><p>No files loaded.<br>Tap Check All.</p></div></div>
+
+  <div style="margin-top:10px;display:flex;justify-content:space-between;align-items:center;font-size:.72rem;font-weight:700;color:var(--pri)">
+    <span>📋 Activity Log</span>
+    <span style="cursor:pointer;color:var(--gray);font-weight:400" onclick="document.getElementById('logP').classList.toggle('show')">Show/Hide</span>
+  </div>
+  <div class="log" id="logP"></div>
+</div>
+</div>
+
+<!-- CONFIG PANEL -->
+<div class="panel" id="panelCfg">
+<div class="main">
+  <div class="card">
+    <div class="card-title">🖥 Server Settings</div>
+    <div class="cfg-row"><span class="cfg-lbl">School Name</span><input class="cfg-in" id="cfgSchool" placeholder="Masomotele Technical Training Institute"></div>
+    <div class="cfg-row"><span class="cfg-lbl">Receiver URL</span><input class="cfg-in" id="cfgServer" placeholder="http://192.168.0.63/mtti-lms/api/datapost-receive.php"></div>
+    <div class="cfg-row"><span class="cfg-lbl">Stats URL</span><input class="cfg-in" id="cfgStats" placeholder="http://192.168.0.63/mtti-lms/datapost.php?api=sync_package"></div>
+    <div class="cfg-row"><span class="cfg-lbl">Secret Key</span><input class="cfg-in" id="cfgKey" type="password" placeholder="MTTI_SAGAAS_DP_K3Y_2026"></div>
+  </div>
+  <div class="card">
+    <div class="card-title">🐙 GitHub Settings</div>
+    <div class="cfg-row"><span class="cfg-lbl">Repo</span><input class="cfg-in" id="cfgRepo" placeholder="kenyaone/mtti-lms-content"></div>
+    <div class="cfg-row"><span class="cfg-lbl">Branch</span><input class="cfg-in" id="cfgBranch" placeholder="main"></div>
+  </div>
+  <div class="card">
+    <div class="card-title">☁️ Cloud Sync</div>
+    <div class="cfg-row"><span class="cfg-lbl">Email</span><input class="cfg-in" id="cfgEmail" placeholder="musilwabonface@gmail.com"></div>
+    <div class="cfg-row"><span class="cfg-lbl">Sheets URL</span><input class="cfg-in" id="cfgSheets" placeholder="Google Sheets Apps Script URL"></div>
+  </div>
+  <div class="card">
+    <div class="card-title">📹 Video Settings</div>
+    <div style="font-size:.72rem;color:var(--gray);margin-bottom:8px">Videos are too large for GitHub. Recommended: YouTube (unlisted) or Cloudflare R2.</div>
+    <div class="cfg-row"><span class="cfg-lbl">Video Host</span>
+      <select class="cfg-in" id="cfgVidHost">
+        <option value="youtube">YouTube (Unlisted)</option>
+        <option value="r2">Cloudflare R2</option>
+        <option value="gdrive">Google Drive</option>
+      </select>
+    </div>
+    <div class="cfg-row"><span class="cfg-lbl">Base URL</span><input class="cfg-in" id="cfgVidBase" placeholder="e.g. R2 bucket URL or Drive folder"></div>
+  </div>
+  <button class="act-btn btn-green" style="width:100%;flex-direction:row;gap:8px;padding:14px" onclick="saveConfig()">💾 Save Settings</button>
+  <div style="margin-top:10px;text-align:center;font-size:.68rem;color:var(--gray)">M.T.T.I DataPost v2 · Masomotele Technical Training Institute</div>
+</div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+// ── State ──────────────────────────────────────────────
+let STATS=null, SYNCED={}, FILES={html:[],sql:[],php:[],data:[]};
+let CURRENT_TYPE='html', CURRENT_SUBJ='all', SERVER_FILES={};
+
+// ── Init ───────────────────────────────────────────────
+window.addEventListener('load',()=>{
+  if('serviceWorker' in navigator){navigator.serviceWorker.getRegistrations().then(r=>r.forEach(x=>x.unregister()));}
+  loadCfg(); checkNet(); setInterval(checkNet,4000);
+  SYNCED=JSON.parse(localStorage.getItem('dp_synced')||'{}');
+  const l=localStorage.getItem('dp_last'); if(l)document.getElementById('lastSyncTxt').textContent='Last: '+l;
+});
+
+// ── Tab switching ──────────────────────────────────────
+function switchTab(id,el){
+  document.querySelectorAll('.panel').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
+  document.getElementById('panel'+id).classList.add('active'); el.classList.add('active');
+}
+function switchType(type,el){
+  CURRENT_TYPE=type; CURRENT_SUBJ='all';
+  document.querySelectorAll('.stab').forEach(s=>s.classList.remove('on','sql','php','data'));
+  el.classList.add('on');
+  if(type!=='html')el.classList.add(type);
+  renderFiles();
+  document.getElementById('subjectPills').style.display=type==='html'?'flex':'none';
+}
+
+// ── Config ─────────────────────────────────────────────
+function loadCfg(){
+  const h=location.protocol+'//'+location.hostname;
+  const c=JSON.parse(localStorage.getItem('dp_cfg')||'{}');
+  document.getElementById('cfgSchool').value=c.school||'Masomotele Technical Training Institute';
+  document.getElementById('cfgServer').value=c.server||(h+'/mtti-lms/api/datapost-receive.php');
+  document.getElementById('cfgStats').value=c.stats||(h+'/mtti-lms/datapost.php?api=sync_package');
+  document.getElementById('cfgKey').value=c.key||'MTTI_SAGAAS_DP_K3Y_2026';
+  document.getElementById('cfgRepo').value=c.repo||'kenyaone/mtti-lms-content';
+  document.getElementById('cfgBranch').value=c.branch||'main';
+  document.getElementById('cfgEmail').value=c.email||'';
+  document.getElementById('cfgSheets').value=c.sheets||'';
+  document.getElementById('cfgVidHost').value=c.vid_host||'youtube';
+  document.getElementById('cfgVidBase').value=c.vid_base||'';
+  document.getElementById('schoolName').textContent=c.school||'Masomotele Technical Training Institute';
+}
+function getCfg(){return JSON.parse(localStorage.getItem('dp_cfg')||'{}');}
+function saveConfig(){
+  const cfg={
+    school:document.getElementById('cfgSchool').value.trim(),
+    server:document.getElementById('cfgServer').value.trim(),
+    stats:document.getElementById('cfgStats').value.trim(),
+    key:document.getElementById('cfgKey').value.trim(),
+    repo:document.getElementById('cfgRepo').value.trim(),
+    branch:document.getElementById('cfgBranch').value.trim()||'main',
+    email:document.getElementById('cfgEmail').value.trim(),
+    sheets:document.getElementById('cfgSheets').value.trim(),
+    vid_host:document.getElementById('cfgVidHost').value,
+    vid_base:document.getElementById('cfgVidBase').value.trim(),
+  };
+  localStorage.setItem('dp_cfg',JSON.stringify(cfg));
+  document.getElementById('schoolName').textContent=cfg.school||'Masomotele Technical Training Institute';
+  toast('✅ Settings saved!');
+}
+
+// ── Network ────────────────────────────────────────────
+function checkNet(){
+  const on=navigator.onLine;
+  document.getElementById('netDot').className='net-dot '+(on?'on':'off');
+  document.getElementById('netTxt').textContent=on?'Online':'Offline';
+}
+
+// ── Status helpers ─────────────────────────────────────
+function setStat(id,msg,spin=false){
+  document.getElementById(id).innerHTML=spin
+    ?`<div class="spinner"></div><span>${msg}</span>`
+    :`<span class="status-txt">${msg}</span>`;
+}
+function setProgress(pct){
+  const w=document.getElementById('progWrap'),b=document.getElementById('progBar');
+  if(pct>=0){w.classList.add('show');b.style.width=pct+'%';}else{w.classList.remove('show');b.style.width='0%';}
+}
+function log(msg,type='info'){
+  const p=document.getElementById('logP'); p.classList.add('show');
+  const l=document.createElement('div'); l.className='log-ln log-'+type;
+  l.textContent=`[${new Date().toLocaleTimeString()}] ${msg}`; p.appendChild(l); p.scrollTop=p.scrollHeight;
+}
+function toast(msg){const t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),3000);}
+
+// ── CHECK ALL: GitHub manifest + server scan diff ──────
+async function checkAll(){
+  const c=getCfg(); const repo=c.repo||'kenyaone/mtti-lms-content'; const branch=c.branch||'main';
+  setStat('syncStatus','Fetching GitHub manifest...',true); log('Fetching manifest from GitHub...','info');
+  setProgress(10);
+  try{
+    // 1. Fetch manifest from GitHub
+    const mres=await fetch(`https://raw.githubusercontent.com/${repo}/${branch}/manifest.json?t=${Date.now()}`);
+    if(!mres.ok) throw new Error('manifest.json not found in GitHub repo');
+    const manifest=await mres.json();
+    setProgress(40); log(`✅ Manifest: ${manifest.files.length} files`,'ok');
+
+    // 2. Get server file list
+    setStat('syncStatus','Scanning server files...',true);
+    let serverList={html:[],sql:[],php:[],data:[]};
+    try{
+      const sr=await postSrv({action:'list_files'});
+      if(sr.success) serverList=sr.data;
+      log(`✅ Server scan: ${Object.values(serverList).flat().length} files`,'ok');
+    }catch(e){ log('⚠ Server scan failed — assuming all new','warn'); }
+    SERVER_FILES=serverList;
+    setProgress(70);
+
+    // 3. Diff
+    FILES={html:[],sql:[],php:[],data:[]};
+    for(const f of manifest.files){
+      const type=f.type||'html';
+      if(!FILES[type]) FILES[type]=[];
+      const serverArr=serverList[type]||[];
+      const match=serverArr.find(s=>s.name===f.name);
+      let status='fnew';
+      if(match){
+        status=match.hash&&f.hash&&match.hash!==f.hash?'fupdated':'fsynced';
+      }
+      FILES[type].push({...f,status});
+    }
+
+    // Update sub-tab counts
+    updateSubTabCounts();
+    setProgress(100); setTimeout(()=>setProgress(-1),800);
+
+    const total=manifest.files.length;
+    const nw=Object.values(FILES).flat().filter(f=>f.status==='fnew').length;
+    const upd=Object.values(FILES).flat().filter(f=>f.status==='fupdated').length;
+    const syn=Object.values(FILES).flat().filter(f=>f.status==='fsynced').length;
+    setStat('syncStatus',`✅ ${total} files — 🆕 ${nw} new · 🔄 ${upd} updated · ✅ ${syn} synced`);
+    log(`Diff: ${nw} new, ${upd} updated, ${syn} synced`,'ok');
+
+    document.getElementById('diffBar').style.display='flex';
+    document.getElementById('dcNew').textContent=`🆕 ${nw} New`;
+    document.getElementById('dcUpd').textContent=`🔄 ${upd} Updated`;
+    document.getElementById('dcSyn').textContent=`✅ ${syn} Synced`;
+
+    buildSubjectPills(); renderFiles();
+
+  }catch(e){
+    setStat('syncStatus','❌ '+e.message); log('❌ '+e.message,'err'); toast('❌ Check failed');
+    setProgress(-1);
+  }
+}
+
+function updateSubTabCounts(){
+  const labels=['🌐 HTML','🗄 SQL','⚙️ PHP','📋 Data'];
+  const types=['html','sql','php','data'];
+  document.querySelectorAll('.stab').forEach((el,i)=>{
+    const t=types[i]; const cnt=(FILES[t]||[]).length;
+    const nw=(FILES[t]||[]).filter(f=>f.status==='fnew'||f.status==='fupdated').length;
+    el.textContent=`${labels[i]} (${cnt})${nw?' 🔴':''}`;
+  });
+}
+
+// ── Subject pills (HTML only) ──────────────────────────
+function buildSubjectPills(){
+  const htmlFiles=FILES.html||[];
+  // Extract subject from filename prefix e.g. "1.1-intro-to-chem" → detect keywords
+  const subjects=new Set(['all']);
+  const keywords={
+    'chemistry':['chem','acid','base','salt','metal','periodic','atom','bond','react','mole','organic','nitrogen','sulphur','titrat'],
+    'biology':['bio','cell','plant','animal','genetics','ecology','enzyme','photosyn','respir','digest','reproduct','evol','classif'],
+    'physics':['physics','phys','motion','force','energy','wave','electric','magnet','optic','nuclear','heat','light','sound'],
+    'math':['math','algebra','geom','calcul','statist','probab','trigon','vector','matrix','number','fraction','longitude','latitude'],
+    'computer':['computer','ict','digital','program','network','database','spreadsheet','internet','software','hardware','algorithm'],
+    'business':['business','commerce','account','market','entrepre','finance','economic','trade','supply'],
+    'electrical':['electric','circuit','wiring','volt','current','resist','capacit','transformer','motor','power'],
+    'mechanics':['mechan','engine','piston','torque','gear','bearing','hydraul','pneumat','welding','fabricat'],
+    'biology-arise':['cannabis','cocaine','alcohol','shisha','miraa','drug','substance','gbv','fgm','reproduct','hiv'],
+  };
+  htmlFiles.forEach(f=>{
+    const name=f.name.toLowerCase();
+    for(const[subj,kws]of Object.entries(keywords)){
+      if(kws.some(k=>name.includes(k))){ subjects.add(subj); break; }
+    }
+  });
+  const container=document.getElementById('subjectPills');
+  container.innerHTML=[...subjects].map(s=>`<div class="pill${s===CURRENT_SUBJ?' on':''}" onclick="filterSubj('${s}',this)">${s==='all'?'All':s.charAt(0).toUpperCase()+s.slice(1)}</div>`).join('');
+  container.style.display=subjects.size>1?'flex':'none';
+}
+
+function filterSubj(subj,el){
+  CURRENT_SUBJ=subj;
+  document.querySelectorAll('.pill').forEach(p=>p.classList.remove('on'));
+  el.classList.add('on'); renderFiles();
+}
+
+// ── Render files ───────────────────────────────────────
+function renderFiles(){
+  const list=document.getElementById('fileList');
+  let files=FILES[CURRENT_TYPE]||[];
+
+  // Apply subject filter for HTML
+  if(CURRENT_TYPE==='html' && CURRENT_SUBJ!=='all'){
+    const keywords={
+      'chemistry':['chem','acid','base','salt','metal','periodic','atom','bond','react','mole','organic','nitrogen','sulphur','titrat'],
+      'biology':['bio','cell','plant','animal','genetics','ecology','enzyme','photosyn','respir','digest','reproduct','evol','classif'],
+      'physics':['physics','phys','motion','force','energy','wave','electric','magnet','optic','nuclear','heat','light','sound'],
+      'math':['math','algebra','geom','calcul','statist','probab','trigon','vector','matrix','number','fraction','longitude','latitude'],
+      'computer':['computer','ict','digital','program','network','database','spreadsheet','internet','software','hardware','algorithm'],
+      'business':['business','commerce','account','market','entrepre','finance','economic','trade','supply'],
+      'electrical':['electric','circuit','wiring','volt','current','resist','capacit','transformer','motor','power'],
+      'mechanics':['mechan','engine','piston','torque','gear','bearing','hydraul','pneumat','welding','fabricat'],
+      'biology-arise':['cannabis','cocaine','alcohol','shisha','miraa','drug','substance','gbv','fgm','reproduct','hiv'],
+    };
+    const kws=keywords[CURRENT_SUBJ]||[];
+    files=files.filter(f=>kws.some(k=>f.name.toLowerCase().includes(k)));
+  }
+
+  if(!files.length){
+    list.innerHTML='<div class="empty"><div class="empty-ico">✅</div><p>No files to show.</p></div>';
+    updateBulk(); return;
+  }
+
+  const statusLabel={fnew:'🆕 New',fupdated:'🔄 Updated',fsynced:'✅ Synced',ferror:'❌ Error'};
+  const btnClass={fnew:'new',fupdated:'updated',fsynced:'synced'};
+  const btnLabel={fnew:'Push',fupdated:'Update',fsynced:'Done'};
+
+  list.innerHTML=files.map(f=>`
+    <div class="file-item ${f.status}" id="fi_${f.name.replace(/\W/g,'_')}">
+      <input type="checkbox" class="fchk" data-file="${f.name}" data-type="${CURRENT_TYPE}" onchange="updateBulk()" ${f.status!=='fsynced'?'checked':''}>
+      <div style="flex:1;min-width:0">
+        <div class="fname">${f.name}</div>
+        <div class="fmeta">${((f.size||0)/1024).toFixed(1)}KB · ${statusLabel[f.status]||f.status}</div>
+      </div>
+      <button class="fpush ${btnClass[f.status]||'new'}" onclick="pushOne('${f.name}','${CURRENT_TYPE}')" ${f.status==='fsynced'?'disabled':''}>
+        ${btnLabel[f.status]||'Push'}
+      </button>
+    </div>`).join('');
+  updateBulk();
+}
+
+function updateBulk(){
+  const n=document.querySelectorAll('.fchk:checked').length;
+  const b=document.getElementById('bulkBar');
+  b.style.display=n?'flex':'none';
+  document.getElementById('bulkTxt').textContent=n+' selected';
+}
+
+// ── Push single file ───────────────────────────────────
+async function pushOne(name,type){
+  const c=getCfg(); const repo=c.repo||'kenyaone/mtti-lms-content'; const branch=c.branch||'main';
+  const folder=type; // html/sql/php/data match repo folder names
+  log(`Downloading ${name}...`,'info');
+  try{
+    const res=await fetch(`https://raw.githubusercontent.com/${repo}/${branch}/${folder}/${name}?t=${Date.now()}`);
+    if(!res.ok) throw new Error('Download failed: '+res.status);
+    const content=ab64(await res.arrayBuffer());
+    // Include manifest metadata for auto DB insert
+    const meta=FILES[type]?.find(f=>f.name===name)||{};
+    const fileObj={name,content,type};
+    if(meta.class)         fileObj.class=meta.class;
+    if(meta.subject)       fileObj.subject=meta.subject;
+    if(meta.topic)         fileObj.topic=meta.topic;
+    if(meta.lesson_title)  fileObj.lesson_title=meta.lesson_title;
+    if(meta.content_type)  fileObj.content_type=meta.content_type;
+    const srv=await postSrv({action:'upload_files',files:[fileObj]});
+    if(srv.success){
+      markSynced([name],type); renderFiles();
+      log(`✅ ${name} pushed`,'ok'); toast('✅ Pushed!');
+    } else throw new Error(srv.message);
+  }catch(e){ log('❌ '+name+': '+e.message,'err'); toast('❌ '+e.message); }
+}
+
+// ── Push selected ──────────────────────────────────────
+async function pushSelected(){
+  const checked=Array.from(document.querySelectorAll('.fchk:checked'));
+  if(!checked.length){toast('Nothing selected');return;}
+  const c=getCfg(); const repo=c.repo||'kenyaone/mtti-lms-content'; const branch=c.branch||'main';
+
+  // Group by type
+  const byType={};
+  checked.forEach(el=>{
+    const t=el.dataset.type||CURRENT_TYPE;
+    if(!byType[t]) byType[t]=[];
+    byType[t].push(el.dataset.file);
+  });
+
+  const total=checked.length; let done=0;
+  setStat('syncStatus',`Downloading ${total} files...`,true); setProgress(0);
+
+  for(const [type,names] of Object.entries(byType)){
+    const payload=[];
+    for(const name of names){
+      try{
+        const r=await fetch(`https://raw.githubusercontent.com/${repo}/${branch}/${type}/${name}?t=${Date.now()}`);
+        if(!r.ok){ log(`Skip ${name}: HTTP ${r.status}`,'warn'); continue; }
+        const meta=(FILES[type]||[]).find(f=>f.name===name)||{};
+        const fileObj={name,content:ab64(await r.arrayBuffer()),type};
+        if(meta.class)        fileObj.class=meta.class;
+        if(meta.subject)      fileObj.subject=meta.subject;
+        if(meta.topic)        fileObj.topic=meta.topic;
+        if(meta.lesson_title) fileObj.lesson_title=meta.lesson_title;
+        if(meta.content_type) fileObj.content_type=meta.content_type;
+        payload.push(fileObj);
+        done++; setProgress(Math.round(done/total*70));
+        setStat('syncStatus',`Downloaded ${done}/${total}...`,true);
+      }catch(e){ log('Skip '+name+': '+e.message,'warn'); }
+    }
+    if(!payload.length) continue;
+    setStat('syncStatus',`Pushing ${payload.length} ${type.toUpperCase()} files...`,true);
+    try{
+      const srv=await postSrv({action:'upload_files',files:payload});
+      if(srv.success){
+        markSynced(payload.map(f=>f.name),type);
+        log(`✅ ${type.toUpperCase()}: ${srv.data.count} pushed`,'ok');
+        if(srv.data.sql_results)    srv.data.sql_results.forEach(r=>log(r.name+': '+r.result,r.ok?'ok':'err'));
+        if(srv.data.lesson_results) srv.data.lesson_results.forEach(r=>log('📚 '+r.file+': '+r.msg,r.ok?'ok':'warn'));
+      } else throw new Error(srv.message);
+    }catch(e){ log('❌ '+type+': '+e.message,'err'); }
+    setProgress(100);
+  }
+  setStat('syncStatus',`✅ Push complete!`);
+  setTimeout(()=>setProgress(-1),800);
+  renderFiles(); toast(`✅ Done!`);
+  updateSubTabCounts();
+}
+
+// ── Mark synced ────────────────────────────────────────
+function markSynced(names,type){
+  names.forEach(n=>{
+    SYNCED[type+'::'+n]=new Date().toISOString();
+    const f=(FILES[type]||[]).find(x=>x.name===n);
+    if(f) f.status='fsynced';
+  });
+  localStorage.setItem('dp_synced',JSON.stringify(SYNCED));
+  const now=new Date().toLocaleString('en-KE');
+  localStorage.setItem('dp_last',now);
+  document.getElementById('lastSyncTxt').textContent='Last: '+now;
+  updateSubTabCounts();
+}
+
+function clearSynced(){
+  SYNCED={};localStorage.removeItem('dp_synced');
+  Object.keys(FILES).forEach(t=>FILES[t].forEach(f=>{ if(f.status==='fsynced')f.status='fnew'; }));
+  renderFiles(); updateSubTabCounts(); toast('🔄 Sync log cleared');
+}
+
+// ── Stats ──────────────────────────────────────────────
+async function fetchStats(){
+  const c=getCfg();
+  const url=c.stats||(location.protocol+'//'+location.hostname+'/mtti-lms/datapost.php?api=sync_package');
+  setStat('statsStatus','Fetching learning stats...',true);
+  try{
+    const res=await fetch(url,{credentials:'include'});
+    if(!res.ok) throw new Error('HTTP '+res.status+' — Login to LMS first');
+    const data=await res.json();
+    if(!data.success) throw new Error(data.error||'Server error');
+    STATS=data; renderStats(data.summary);
+    setStat('statsStatus','✅ Stats loaded — '+data.summary.generated_at);
+    toast('✅ Stats loaded!');
+    syncAnalytics(true);
+  }catch(e){ setStat('statsStatus','❌ '+e.message); toast('❌ Connect to school WiFi & login LMS'); }
+}
+
+function renderStats(s){
+  document.getElementById('statsDash').style.display='block';
+  document.getElementById('summaryCards').innerHTML=`
+    <div class="stat-box"><div class="stat-num">${s.total_students||0}</div><div class="stat-lbl">👨‍🎓 Students</div></div>
+    <div class="stat-box"><div class="stat-num">${s.total_enrolments||0}</div><div class="stat-lbl">📋 Enrollments</div></div>
+    <div class="stat-box"><div class="stat-num">${s.active_today||0}</div><div class="stat-lbl">🟢 Active Today</div></div>
+    <div class="stat-box"><div class="stat-num">${s.active_this_week||0}</div><div class="stat-lbl">📅 This Week</div></div>
+    <div class="stat-box"><div class="stat-num">${s.unsynced_events||0}</div><div class="stat-lbl">⏳ Pending Events</div></div>
+    <div class="stat-box"><div class="stat-num" style="font-size:.9rem">${s.server_name||'MTTI'}</div><div class="stat-lbl">🖥 School</div></div>`;
+
+  const lv=s.lesson_views||[];
+  document.getElementById('lessonBody').innerHTML=lv.length
+    ?lv.map(l=>`<tr><td>${(l.lesson||'').substring(0,26)}</td><td><small style="color:var(--gray)">${(l.class_name||'').substring(0,14)}</small></td><td><span class="badge badge-b">${l.views}</span></td><td>${Math.round((l.total_time||0)/60)}</td></tr>`).join('')
+    :'<tr><td colspan="4" style="padding:10px;color:var(--gray);text-align:center">No lesson views yet</td></tr>';
+
+  const qp=s.quiz_scores||[];
+  document.getElementById('quizBody').innerHTML=qp.length
+    ?qp.map(q=>`<tr><td>${(q.quiz||'').substring(0,26)}</td><td><span class="badge badge-b">${q.attempts}</span></td><td><span class="badge ${(q.avg_score||0)>=60?'badge-g':'badge-r'}">${q.avg_score||0}%</span></td><td><span class="badge badge-g">${q.passed||0}</span></td></tr>`).join('')
+    :'<tr><td colspan="4" style="padding:10px;color:var(--gray);text-align:center">No quiz attempts yet</td></tr>';
+
+  const ce=s.class_enrolments||[];
+  document.getElementById('classBody').innerHTML=ce.length
+    ?ce.map(c=>`<tr><td><strong>${c.title||''}</strong></td><td><span class="badge badge-b">${c.students||0}</span></td><td>${c.total_lessons||0}</td></tr>`).join('')
+    :'<tr><td colspan="3" style="padding:10px;color:var(--gray);text-align:center">No enrollments found</td></tr>';
+}
+
+async function syncAnalytics(silent=false){
+  if(!STATS){if(!silent)toast('Fetch stats first!');return;}
+  const c=getCfg(); const s=STATS.summary; let sent=false;
+  if(c.sheets){
+    try{
+      await fetch(c.sheets,{method:'POST',mode:'no-cors',body:JSON.stringify({school:s.server_name,date:s.generated_at,students:s.total_students,enrollments:s.total_enrolments,active_today:s.active_today,active_week:s.active_this_week,events:s.unsynced_events})});
+      sent=true; if(!silent)toast('✅ Sent to Google Sheets!');
+    }catch(e){}
+  }
+  if(c.email&&!silent){
+    const body=`M.T.T.I LMS Statistics\n${'='.repeat(40)}\nSchool: ${s.server_name}\nGenerated: ${s.generated_at}\n\nStudents: ${s.total_students}\nEnrollments: ${s.total_enrolments}\nActive Today: ${s.active_today}\nActive This Week: ${s.active_this_week}\nPending Events: ${s.unsynced_events}`;
+    window.open(`mailto:${c.email}?subject=${encodeURIComponent('M.T.T.I DataPost: '+s.server_name+' — '+s.generated_at)}&body=${encodeURIComponent(body)}`);
+    sent=true; toast('✅ Email opened!');
+  }
+  if(!sent&&!silent) toast('Set email or Sheets URL in Settings');
+  if(sent){localStorage.setItem('dp_last',new Date().toLocaleString('en-KE'));document.getElementById('lastSyncTxt').textContent='Last: '+new Date().toLocaleString('en-KE');}
+}
+
+function exportCSV(){
+  if(!STATS){toast('Fetch stats first!');return;}
+  const s=STATS.summary;
+  const rows=[
+    ['M.T.T.I LMS — Learning Statistics Report'],
+    ['School',s.server_name||'M.T.T.I'],['Generated',s.generated_at||new Date().toLocaleString()],[''],
+    ['SUMMARY'],['Total Students',s.total_students||0],['Total Enrollments',s.total_enrolments||0],
+    ['Active Today',s.active_today||0],['Active This Week',s.active_this_week||0],['Pending Events',s.unsynced_events||0],[''],
+    ['LESSON VIEWS'],['Lesson','Class','Views','Time (min)'],
+    ...(s.lesson_views||[]).map(l=>[l.lesson,l.class_name,l.views,Math.round((l.total_time||0)/60)]),[''],
+    ['QUIZ PERFORMANCE'],['Quiz','Attempts','Avg Score (%)','Passed'],
+    ...(s.quiz_scores||[]).map(q=>[q.quiz,q.attempts,q.avg_score,q.passed]),[''],
+    ['CLASS ENROLLMENTS'],['Class','Students','Total Lessons'],
+    ...(s.class_enrolments||[]).map(c=>[c.title,c.students,c.total_lessons||0]),
+  ];
+  const csv=rows.map(r=>r.map(v=>`"${String(v||'').replace(/"/g,'""')}"`).join(',')).join('\n');
+  const a=document.createElement('a');
+  a.href=URL.createObjectURL(new Blob(['\ufeff'+csv],{type:'text/csv;charset=utf-8'}));
+  a.download=`mtti-stats-${new Date().toISOString().slice(0,10)}.csv`; a.click();
+  toast('✅ CSV exported!');
+}
+
+// ── Server comms ───────────────────────────────────────
+async function postSrv(payload){
+  const c=getCfg();
+  const url=c.server||(location.protocol+'//'+location.hostname+'/mtti-lms/api/datapost-receive.php');
+  const res=await fetch(url,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({...payload,key:c.key||'MTTI_SAGAAS_DP_K3Y_2026'})});
+  if(!res.ok) throw new Error('HTTP '+res.status);
+  return res.json();
+}
+
+async function pingServer(){
+  setStat('statsStatus','Pinging server...',true); setStat('syncStatus','Pinging server...',true); log('Pinging...','info');
+  try{
+    const r=await postSrv({action:'ping'});
+    setStat('statsStatus','✅ Server online — '+r.data.time);
+    setStat('syncStatus','✅ Server online — '+r.data.time);
+    log('✅ Online','ok'); toast('✅ Server reachable!');
+  }catch(e){
+    setStat('statsStatus','❌ '+e.message); setStat('syncStatus','❌ '+e.message);
+    log('❌ '+e.message,'err'); toast('❌ Connect to school WiFi');
+  }
+}
+
+function ab64(buf){let b='',bt=new Uint8Array(buf);for(let i=0;i<bt.byteLength;i++)b+=String.fromCharCode(bt[i]);return btoa(b);}
+</script>
+</body>
+</html>

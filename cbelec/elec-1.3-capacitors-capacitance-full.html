@@ -1,0 +1,781 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Electrical Technology Gr.10 | 1.3 Capacitors & Capacitance</title>
+<style>
+:root{
+  --pri:#0a5e2a;--pri-l:#0d7a38;--acc:#f5a623;
+  --ok:#2e7d32;--no:#c62828;--bg:#f4f7f5;
+  --border:#d0e0d4;--txt:#1a2e1f;--warn-bg:#fff3e0;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Segoe UI',system-ui,sans-serif;background:var(--bg);color:var(--txt);min-height:100vh;display:flex;flex-direction:column}
+.top-bar{position:sticky;top:0;z-index:100;background:linear-gradient(135deg,var(--pri),var(--pri-l));color:#fff;padding:10px 16px;display:flex;align-items:center;gap:12px;box-shadow:0 2px 8px rgba(0,0,0,.25)}
+.top-bar .logo{font-weight:800;font-size:1rem;white-space:nowrap}
+.top-bar .title{font-size:.85rem;opacity:.9;flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.slide-badge{background:var(--acc);color:#000;font-weight:700;font-size:.8rem;padding:3px 10px;border-radius:20px;white-space:nowrap}
+.slides-wrap{flex:1;overflow:hidden}
+.slide{display:none;padding:16px;max-width:860px;margin:0 auto;animation:fadeIn .3s ease}
+.slide.active{display:block}
+@keyframes fadeIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+.slide-header{background:linear-gradient(135deg,var(--pri),var(--pri-l));color:#fff;padding:14px 18px;border-radius:10px;margin-bottom:16px}
+.slide-header h2{font-size:1.1rem;font-weight:700}
+.slide-header .strand{font-size:.78rem;opacity:.85;margin-top:3px}
+.lo-box{background:#fff;border-left:5px solid var(--acc);border-radius:8px;padding:14px 16px;margin-bottom:14px;box-shadow:0 1px 4px rgba(0,0,0,.06)}
+.lo-box h3{color:var(--pri);font-size:.95rem;margin-bottom:8px}
+.lo-box ol{padding-left:18px}
+.lo-box ol li{margin-bottom:5px;font-size:.88rem;line-height:1.5}
+.inquiry{margin-top:12px;background:var(--pri);color:#fff;border-radius:6px;padding:10px 14px;font-size:.85rem}
+.inquiry strong{display:block;margin-bottom:3px;color:var(--acc)}
+.teach-block{margin-bottom:18px}
+.teach-block h3{color:var(--pri);font-size:1rem;font-weight:700;padding-bottom:5px;border-bottom:2.5px solid var(--acc);margin-bottom:10px}
+.key-term{border-left:4px solid var(--acc);background:#fffbf0;padding:10px 14px;border-radius:0 6px 6px 0;margin:8px 0;font-size:.87rem}
+.key-term strong{color:var(--pri)}
+.info-table{width:100%;border-collapse:collapse;margin:10px 0;font-size:.84rem}
+.info-table th{background:var(--pri);color:#fff;padding:8px 10px;text-align:left}
+.info-table td{padding:7px 10px;border-bottom:1px solid var(--border)}
+.info-table tr:nth-child(even) td{background:#eef5f0}
+.example-box{background:#f0faf2;border:1.5px solid var(--ok);border-radius:8px;padding:12px 14px;margin:10px 0;font-size:.86rem}
+.example-box h4{color:var(--ok);margin-bottom:7px;font-size:.9rem}
+.warn-box{background:var(--warn-bg);border:1.5px solid #e65100;border-radius:8px;padding:11px 14px;margin:10px 0;font-size:.85rem}
+.warn-box h4{color:#e65100;margin-bottom:5px}
+.diagram-wrap{text-align:center;margin:14px 0;overflow-x:auto}
+.calc-box{background:#fff;border:1.5px solid var(--pri-l);border-radius:8px;padding:14px;margin:10px 0}
+.calc-box h4{color:var(--pri);margin-bottom:10px;font-size:.9rem}
+.practice-q{background:#fff;border-radius:8px;border:1px solid var(--border);padding:14px;margin-bottom:12px;box-shadow:0 1px 3px rgba(0,0,0,.05)}
+.practice-q .qnum{font-weight:700;color:var(--pri);font-size:.85rem;margin-bottom:5px}
+.fill-blank{border:none;border-bottom:2px dashed var(--pri);background:transparent;outline:none;font-size:.9rem;padding:2px 6px;min-width:110px;color:var(--txt)}
+.fill-blank.correct{border-bottom-color:var(--ok);background:#f0faf2;border-radius:4px}
+.fill-blank.wrong{border-bottom-color:var(--no);background:#fff0f0;border-radius:4px}
+.fb-feedback{font-size:.8rem;display:inline-block;margin-left:4px;font-weight:600}
+.sa-box{width:100%;min-height:80px;padding:8px 10px;border:1.5px solid var(--border);border-radius:6px;font-size:.86rem;font-family:inherit;resize:vertical}
+.grade-btn{background:var(--pri);color:#fff;border:none;padding:7px 18px;border-radius:6px;cursor:pointer;font-size:.84rem;margin-top:7px}
+.grade-btn:hover{background:var(--pri-l)}
+.sa-feedback{margin-top:8px;padding:10px;border-radius:6px;background:#f9f9f9;border:1px solid #ddd;font-size:.82rem;display:none}
+.kw-found{color:var(--ok);font-weight:600}
+.kw-missed{color:var(--no);font-weight:600}
+.model-ans{margin-top:6px;font-style:italic;color:#555}
+.check-btn{background:var(--ok);color:#fff;border:none;padding:8px 18px;border-radius:6px;cursor:pointer;font-size:.84rem;margin-top:8px}
+.check-btn:hover{background:#256427}
+.score-btn{display:block;margin:18px auto 0;background:var(--acc);color:#000;font-weight:700;border:none;padding:11px 32px;border-radius:8px;cursor:pointer;font-size:.95rem}
+.score-btn:hover{background:#e0951a}
+.next-lesson-box{margin-top:18px;text-align:center;display:none}.next-lesson-btn{display:inline-block;background:linear-gradient(135deg,var(--pri),var(--pri-l));color:#fff;font-weight:700;border:none;padding:14px 32px;border-radius:10px;cursor:pointer;font-size:.95rem;text-decoration:none;transition:all .3s;box-shadow:0 4px 15px rgba(10,94,42,.25)}.next-lesson-btn:hover{transform:translateY(-2px);box-shadow:0 8px 25px rgba(10,94,42,.35)}.next-lesson-sub{font-size:.78rem;color:#666;margin-top:8px}
+.total-result{margin-top:14px;text-align:center;font-size:1rem;font-weight:700;padding:12px;border-radius:8px;background:#fff;border:2px solid var(--pri)}
+.tag{display:inline-block;background:var(--pri);color:#fff;font-size:.72rem;padding:2px 8px;border-radius:10px;margin:2px}
+.calc-row{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin:6px 0;font-size:.87rem}
+.calc-row label{min-width:130px;font-weight:600;color:var(--pri)}
+.calc-row input{padding:6px 10px;border:1.5px solid var(--border);border-radius:6px;font-size:.87rem;width:110px}
+.calc-row select{padding:6px 10px;border:1.5px solid var(--border);border-radius:6px;font-size:.87rem}
+.calc-result{background:var(--pri);color:#fff;padding:10px 14px;border-radius:6px;margin-top:8px;font-size:.88rem;font-weight:600;display:none;white-space:pre-line}
+.calc-err{background:#fff0f0;color:var(--no);padding:8px 12px;border-radius:6px;margin-top:8px;font-size:.85rem;display:none}
+.nav-bar{position:sticky;bottom:0;background:#fff;border-top:2px solid var(--border);padding:10px 16px;display:flex;align-items:center;justify-content:space-between;gap:10px;z-index:90}
+.nav-btn{background:var(--pri);color:#fff;border:none;padding:9px 22px;border-radius:8px;font-size:.88rem;cursor:pointer;font-weight:600}
+.nav-btn:disabled{background:#b0b0b0;cursor:not-allowed}
+.nav-btn:hover:not(:disabled){background:var(--pri-l)}
+.dots{display:flex;gap:6px;flex-wrap:wrap;justify-content:center;flex:1}
+.dot{width:9px;height:9px;border-radius:50%;background:#ccc;cursor:pointer;transition:background .2s}
+.dot.active{background:var(--pri)}
+
+/* Charging animation */
+.cap-anim{display:flex;gap:20px;align-items:center;justify-content:center;flex-wrap:wrap;margin:12px 0}
+.cap-visual{text-align:center}
+.cap-plates{display:flex;gap:10px;align-items:center;justify-content:center;margin-bottom:6px}
+.plate{width:10px;height:60px;border-radius:3px;transition:background .5s}
+.plate-pos{background:#c62828}
+.plate-neg{background:#0a5e2a}
+.charge-bar{height:14px;border-radius:6px;background:#e0e0e0;overflow:hidden;width:120px;margin:4px auto}
+.charge-fill{height:100%;background:var(--acc);transition:width .5s;width:0%}
+.cap-label{font-size:.8rem;color:#555;margin-top:4px}
+
+@media(max-width:600px){
+  .top-bar .title{display:none}
+  .slide{padding:10px}
+  .info-table{font-size:.78rem}
+  .nav-btn{padding:8px 14px;font-size:.82rem}
+  .calc-row{flex-direction:column;align-items:flex-start}
+}
+</style>
+<script type="text/javascript">(function(c,l,a,r,i,t,y){c[a]=c[a]||function(){(c[a].q=c[a].q||[]).push(arguments)};t=l.createElement(r);t.async=1;t.src="https://www.clarity.ms/tag/"+i;y=l.getElementsByTagName(r)[0];y.parentNode.insertBefore(t,y);})(window,document,"clarity","script","wg31zlwbt9");</script>\n</head>
+<body>
+
+<div class="top-bar">
+  <div class="logo">M.T.T.I</div>
+  <div class="title">Electrical Technology Gr.10 · 1.3 Capacitors & Capacitance</div>
+  <div class="slide-badge" id="slideLabel">1 / 10</div>
+</div>
+
+<div class="slides-wrap">
+
+<!-- ===== SLIDE 1: LEARNING OUTCOMES ===== -->
+<div class="slide active" id="s1">
+  <div class="slide-header">
+    <h2>Learning Outcomes</h2>
+    <div class="strand">Strand 1.0 Fundamentals · Sub-strand 1.3 Capacitors & Capacitance · 8 Lessons</div>
+  </div>
+  <div class="lo-box">
+    <h3>By the end of this sub-strand, you should be able to:</h3>
+    <ol>
+      <li>Describe the <strong>principle of operation</strong> of a capacitor in an electric circuit.</li>
+      <li>Explain the <strong>characteristics</strong> of capacitive circuits (voltage-time, current-time).</li>
+      <li>Select appropriate capacitors for a given application using <strong>datasheets</strong>.</li>
+      <li>Analyse <strong>series and parallel</strong> connections of capacitors in electric circuits.</li>
+      <li>Appreciate the <strong>importance of capacitors</strong> in electrical appliances.</li>
+    </ol>
+    <div class="inquiry">
+      <strong>🔍 Key Inquiry Questions</strong>
+      How do capacitors work? &nbsp;|&nbsp; Why are capacitors important in electrical technology?
+    </div>
+  </div>
+  <div class="teach-block">
+    <h3>Topics Covered</h3>
+    <div style="display:flex;flex-wrap:wrap;gap:8px;margin-top:6px">
+      <span class="tag">Capacitor Structure</span>
+      <span class="tag">Capacitance Formula</span>
+      <span class="tag">Charging & Discharging</span>
+      <span class="tag">Series Capacitors</span>
+      <span class="tag">Parallel Capacitors</span>
+      <span class="tag">Applications</span>
+    </div>
+  </div>
+</div>
+
+<!-- ===== SLIDE 2: WHAT IS A CAPACITOR ===== -->
+<div class="slide" id="s2">
+  <div class="slide-header">
+    <h2>What is a Capacitor?</h2>
+    <div class="strand">Structure, symbol and principle of operation</div>
+  </div>
+  <div class="teach-block">
+    <h3>Definition & Structure</h3>
+    <div class="key-term"><strong>Capacitor:</strong> An electrical component that stores electrical energy in an electric field. It consists of two conducting plates separated by an insulating material called a <strong>dielectric</strong>.</div>
+    <div class="key-term"><strong>Dielectric:</strong> The insulating material between the plates of a capacitor (e.g. air, paper, ceramic, electrolyte). It prevents current from flowing between the plates but allows the electric field to form.</div>
+    <div class="key-term"><strong>Capacitance (C):</strong> The ability of a capacitor to store electric charge. Measured in <strong>Farads (F)</strong>. In practice: microfarads (µF = 10⁻⁶F), nanofarads (nF = 10⁻⁹F), picofarads (pF = 10⁻¹²F).</div>
+  </div>
+  <div class="teach-block">
+    <h3>Capacitor Structure & Symbol</h3>
+    <div class="diagram-wrap">
+      <svg viewBox="0 0 580 160" xmlns="http://www.w3.org/2000/svg" style="font-family:'Segoe UI',sans-serif;max-width:580px">
+        <rect width="580" height="160" rx="8" fill="#f4f7f5"/>
+        <!-- Physical structure -->
+        <text x="130" y="20" text-anchor="middle" fill="#0a5e2a" font-size="11" font-weight="700">Physical Structure</text>
+        <!-- Plate 1 -->
+        <rect x="100" y="30" width="12" height="90" rx="2" fill="#c62828"/>
+        <text x="88" y="58" text-anchor="end" fill="#c62828" font-size="9">Plate 1</text>
+        <text x="88" y="70" text-anchor="end" fill="#c62828" font-size="9">(+)</text>
+        <!-- Dielectric -->
+        <rect x="112" y="30" width="36" height="90" rx="0" fill="#f5a623" opacity=".4"/>
+        <text x="130" y="80" text-anchor="middle" fill="#8b5e00" font-size="9" font-weight="700">Dielectric</text>
+        <!-- Plate 2 -->
+        <rect x="148" y="30" width="12" height="90" rx="2" fill="#0a5e2a"/>
+        <text x="172" y="58" fill="#0a5e2a" font-size="9">Plate 2</text>
+        <text x="172" y="70" fill="#0a5e2a" font-size="9">(-)</text>
+        <!-- Leads -->
+        <line x1="50" y1="75" x2="100" y2="75" stroke="#333" stroke-width="2"/>
+        <line x1="160" y1="75" x2="210" y2="75" stroke="#333" stroke-width="2"/>
+        <!-- Labels -->
+        <text x="130" y="140" text-anchor="middle" fill="#555" font-size="9">Two plates + Dielectric</text>
+
+        <!-- Divider -->
+        <line x1="260" y1="20" x2="260" y2="150" stroke="#ccc" stroke-width="1" stroke-dasharray="4"/>
+
+        <!-- Circuit symbol -->
+        <text x="420" y="20" text-anchor="middle" fill="#0a5e2a" font-size="11" font-weight="700">Circuit Symbol</text>
+        <line x1="310" y1="75" x2="390" y2="75" stroke="#0a5e2a" stroke-width="2.5"/>
+        <line x1="390" y1="50" x2="390" y2="100" stroke="#0a5e2a" stroke-width="4"/>
+        <line x1="402" y1="50" x2="402" y2="100" stroke="#0a5e2a" stroke-width="4"/>
+        <line x1="402" y1="75" x2="480" y2="75" stroke="#0a5e2a" stroke-width="2.5"/>
+        <text x="396" y="120" text-anchor="middle" fill="#555" font-size="9">Non-polarised</text>
+
+        <!-- Electrolytic symbol -->
+        <line x1="490" y1="75" x2="520" y2="75" stroke="#0a5e2a" stroke-width="2.5"/>
+        <line x1="520" y1="50" x2="520" y2="100" stroke="#0a5e2a" stroke-width="4"/>
+        <!-- Curved plate -->
+        <path d="M534,50 Q540,75 534,100" fill="none" stroke="#0a5e2a" stroke-width="3"/>
+        <line x1="534" y1="75" x2="570" y2="75" stroke="#0a5e2a" stroke-width="2.5"/>
+        <text x="15" y="115" fill="#c62828" font-size="9">+</text>
+        <text x="545" y="48" fill="#c62828" font-size="9">+</text>
+        <text x="496" y="120" text-anchor="middle" fill="#555" font-size="9">Electrolytic (+)</text>
+      </svg>
+    </div>
+  </div>
+  <div class="teach-block">
+    <h3>The Capacitance Formula</h3>
+    <div class="example-box">
+      <h4>📐 Key Formulas</h4>
+      <p><strong>Q = C × V</strong> &nbsp;→&nbsp; Charge (Coulombs) = Capacitance (F) × Voltage (V)</p>
+      <p style="margin-top:6px"><strong>C = Q / V</strong> &nbsp;→&nbsp; Capacitance = Charge ÷ Voltage</p>
+      <p style="margin-top:6px"><strong>C = ε₀ × εᵣ × A / d</strong> &nbsp;→&nbsp; depends on plate area (A), separation (d), dielectric constant (εᵣ)</p>
+    </div>
+  </div>
+</div>
+
+<!-- ===== SLIDE 3: TYPES OF CAPACITORS ===== -->
+<div class="slide" id="s3">
+  <div class="slide-header">
+    <h2>Types of Capacitors</h2>
+    <div class="strand">Selecting the right capacitor for the job</div>
+  </div>
+  <div class="teach-block">
+    <h3>Common Capacitor Types</h3>
+    <table class="info-table">
+      <tr><th>Type</th><th>Dielectric</th><th>Range</th><th>Polarised?</th><th>Application</th></tr>
+      <tr><td>Ceramic</td><td>Ceramic</td><td>1pF–1µF</td><td>No</td><td>High-frequency circuits, decoupling</td></tr>
+      <tr><td>Electrolytic</td><td>Aluminium oxide</td><td>1µF–10,000µF</td><td>Yes ⚠️</td><td>Power supplies, audio amplifiers</td></tr>
+      <tr><td>Tantalum</td><td>Tantalum pentoxide</td><td>0.1µF–1000µF</td><td>Yes ⚠️</td><td>Mobile devices, computers</td></tr>
+      <tr><td>Film (Polyester)</td><td>Polyester film</td><td>1nF–10µF</td><td>No</td><td>Motor start, timing circuits</td></tr>
+      <tr><td>Mica</td><td>Mica mineral</td><td>1pF–10nF</td><td>No</td><td>RF circuits, precision applications</td></tr>
+      <tr><td>Variable</td><td>Air/ceramic</td><td>Adjustable</td><td>No</td><td>Radio tuning circuits</td></tr>
+    </table>
+  </div>
+  <div class="warn-box">
+    <h4>⚠️ Polarised Capacitors</h4>
+    <p>Electrolytic and tantalum capacitors are <strong>polarised</strong> — they have a positive (+) and negative (−) terminal. Connecting them the wrong way around can cause <strong>explosion or fire</strong>. Always check the polarity before connecting.</p>
+  </div>
+  <div class="teach-block">
+    <h3>Reading Capacitor Values</h3>
+    <table class="info-table">
+      <tr><th>Marking</th><th>Value</th><th>Unit</th></tr>
+      <tr><td>100</td><td>10 pF</td><td>Code: 1st+2nd digits = value, 3rd = multiplier (×10ⁿ pF)</td></tr>
+      <tr><td>104</td><td>100,000 pF = 100 nF = 0.1 µF</td><td>Most common bypass cap</td></tr>
+      <tr><td>47µF 25V</td><td>47 microfarads, max 25 volts</td><td>Electrolytic — always check voltage rating</td></tr>
+      <tr><td>2n2</td><td>2.2 nF</td><td>Letter replaces decimal point</td></tr>
+    </table>
+  </div>
+</div>
+
+<!-- ===== SLIDE 4: CHARGING & DISCHARGING ===== -->
+<div class="slide" id="s4">
+  <div class="slide-header">
+    <h2>Charging & Discharging a Capacitor</h2>
+    <div class="strand">Voltage-time and current-time characteristics</div>
+  </div>
+  <div class="teach-block">
+    <h3>How a Capacitor Charges</h3>
+    <p style="font-size:.87rem;line-height:1.6;margin-bottom:10px">When a capacitor is connected to a DC supply through a resistor, it charges up. Current flows initially at maximum, then decreases as the capacitor voltage builds up. The capacitor is fully charged when its voltage equals the supply voltage — at which point current stops flowing.</p>
+    <div class="key-term"><strong>Time Constant (τ):</strong> τ = R × C &nbsp;(seconds). The time for the capacitor to charge to approximately <strong>63.2%</strong> of the supply voltage. After 5τ the capacitor is considered fully charged (≈99.3%).</div>
+    <div class="diagram-wrap">
+      <svg viewBox="0 0 560 150" xmlns="http://www.w3.org/2000/svg" style="font-family:'Segoe UI',sans-serif;max-width:560px">
+        <rect width="560" height="150" rx="8" fill="#f4f7f5"/>
+        <!-- Charging voltage curve -->
+        <text x="130" y="18" text-anchor="middle" fill="#0a5e2a" font-size="11" font-weight="700">Voltage vs Time (Charging)</text>
+        <line x1="30" y1="120" x2="240" y2="120" stroke="#333" stroke-width="1.5" marker-end="url(#arr1)"/>
+        <line x1="30" y1="120" x2="30" y2="20" stroke="#333" stroke-width="1.5" marker-end="url(#arr2)"/>
+        <defs>
+          <marker id="arr1" markerWidth="6" markerHeight="6" refX="5" refY="3" orient="auto"><path d="M0,0 L6,3 L0,6 Z" fill="#333"/></marker>
+          <marker id="arr2" markerWidth="6" markerHeight="6" refX="3" refY="5" orient="auto"><path d="M0,0 L6,0 L3,6 Z" fill="#333"/></marker>
+        </defs>
+        <path d="M30,120 Q80,30 240,28" fill="none" stroke="#0a5e2a" stroke-width="2.5"/>
+        <text x="245" y="124" fill="#333" font-size="9">t</text>
+        <text x="22" y="18" fill="#333" font-size="9">V</text>
+        <line x1="30" y1="28" x2="240" y2="28" stroke="#f5a623" stroke-width="1" stroke-dasharray="4"/>
+        <text x="242" y="31" fill="#f5a623" font-size="8">Vs</text>
+        <line x1="80" y1="120" x2="80" y2="83" stroke="#c62828" stroke-width="1" stroke-dasharray="3"/>
+        <text x="78" y="132" text-anchor="middle" fill="#c62828" font-size="8">τ</text>
+        <text x="78" y="80" text-anchor="middle" fill="#c62828" font-size="8">63.2%</text>
+
+        <!-- Discharging current curve -->
+        <text x="410" y="18" text-anchor="middle" fill="#0a5e2a" font-size="11" font-weight="700">Current vs Time (Charging)</text>
+        <line x1="300" y1="120" x2="520" y2="120" stroke="#333" stroke-width="1.5" marker-end="url(#arr3)"/>
+        <line x1="300" y1="120" x2="300" y2="20" stroke="#333" stroke-width="1.5" marker-end="url(#arr4)"/>
+        <defs>
+          <marker id="arr3" markerWidth="6" markerHeight="6" refX="5" refY="3" orient="auto"><path d="M0,0 L6,3 L0,6 Z" fill="#333"/></marker>
+          <marker id="arr4" markerWidth="6" markerHeight="6" refX="3" refY="5" orient="auto"><path d="M0,0 L6,0 L3,6 Z" fill="#333"/></marker>
+        </defs>
+        <path d="M300,30 Q350,100 520,118" fill="none" stroke="#c62828" stroke-width="2.5"/>
+        <text x="525" y="124" fill="#333" font-size="9">t</text>
+        <text x="292" y="18" fill="#333" font-size="9">I</text>
+        <text x="297" y="33" fill="#c62828" font-size="8">I₀</text>
+        <line x1="350" y1="120" x2="350" y2="67" stroke="#0a5e2a" stroke-width="1" stroke-dasharray="3"/>
+        <text x="348" y="132" text-anchor="middle" fill="#0a5e2a" font-size="8">τ</text>
+        <text x="348" y="63" text-anchor="middle" fill="#0a5e2a" font-size="8">36.8%</text>
+      </svg>
+    </div>
+  </div>
+  <div class="example-box">
+    <h4>✏️ Time Constant Example</h4>
+    <p>A 100µF capacitor charges through a 10kΩ resistor from a 12V supply.</p>
+    <p>τ = R × C = 10,000 × 100×10⁻⁶ = <strong>1 second</strong></p>
+    <p>After 1τ: V = 0.632 × 12 = <strong>7.58V</strong></p>
+    <p>After 5τ = 5 seconds: fully charged ≈ <strong>12V</strong></p>
+  </div>
+</div>
+
+<!-- ===== SLIDE 5: SERIES CAPACITORS ===== -->
+<div class="slide" id="s5">
+  <div class="slide-header">
+    <h2>Capacitors in Series</h2>
+    <div class="strand">Total capacitance decreases in series</div>
+  </div>
+  <div class="teach-block">
+    <h3>Series Capacitor Formula</h3>
+    <div class="key-term"><strong>Series connection:</strong> Capacitors connected end-to-end. The same charge Q is stored on each capacitor. The total capacitance is <em>less</em> than any individual capacitor.</div>
+    <div class="diagram-wrap">
+      <svg viewBox="0 0 500 100" xmlns="http://www.w3.org/2000/svg" style="font-family:'Segoe UI',sans-serif;max-width:500px">
+        <rect width="500" height="100" rx="8" fill="#f4f7f5"/>
+        <line x1="20" y1="50" x2="80" y2="50" stroke="#0a5e2a" stroke-width="2.5"/>
+        <!-- C1 -->
+        <line x1="80" y1="30" x2="80" y2="70" stroke="#0a5e2a" stroke-width="4"/>
+        <line x1="92" y1="30" x2="92" y2="70" stroke="#0a5e2a" stroke-width="4"/>
+        <text x="86" y="22" text-anchor="middle" fill="#0a5e2a" font-size="10" font-weight="700">C1</text>
+        <line x1="92" y1="50" x2="180" y2="50" stroke="#0a5e2a" stroke-width="2.5"/>
+        <!-- C2 -->
+        <line x1="180" y1="30" x2="180" y2="70" stroke="#0a5e2a" stroke-width="4"/>
+        <line x1="192" y1="30" x2="192" y2="70" stroke="#0a5e2a" stroke-width="4"/>
+        <text x="186" y="22" text-anchor="middle" fill="#0a5e2a" font-size="10" font-weight="700">C2</text>
+        <line x1="192" y1="50" x2="280" y2="50" stroke="#0a5e2a" stroke-width="2.5"/>
+        <!-- C3 -->
+        <line x1="280" y1="30" x2="280" y2="70" stroke="#0a5e2a" stroke-width="4"/>
+        <line x1="292" y1="30" x2="292" y2="70" stroke="#0a5e2a" stroke-width="4"/>
+        <text x="286" y="22" text-anchor="middle" fill="#0a5e2a" font-size="10" font-weight="700">C3</text>
+        <line x1="292" y1="50" x2="400" y2="50" stroke="#0a5e2a" stroke-width="2.5"/>
+        <!-- Battery -->
+        <line x1="400" y1="50" x2="400" y2="20" stroke="#0a5e2a" stroke-width="2.5"/>
+        <line x1="20" y1="50" x2="20" y2="20" stroke="#0a5e2a" stroke-width="2.5"/>
+        <line x1="20" y1="20" x2="400" y2="20" stroke="#0a5e2a" stroke-width="2.5"/>
+        <line x1="195" y1="10" x2="225" y2="10" stroke="#0a5e2a" stroke-width="4"/>
+        <line x1="199" y1="20" x2="221" y2="20" stroke="#0a5e2a" stroke-width="2"/>
+        <text x="210" y="6" text-anchor="middle" fill="#0a5e2a" font-size="9">V</text>
+        <!-- Formula -->
+        <text x="450" y="45" text-anchor="middle" fill="#0a5e2a" font-size="10" font-weight="700">1/CT =</text>
+        <text x="450" y="58" text-anchor="middle" fill="#0a5e2a" font-size="10">1/C1+1/C2+1/C3</text>
+      </svg>
+    </div>
+    <table class="info-table">
+      <tr><th>Property</th><th>Series Capacitors</th></tr>
+      <tr><td>Total Capacitance</td><td><strong>1/C<sub>T</sub> = 1/C1 + 1/C2 + 1/C3</strong> (decreases)</td></tr>
+      <tr><td>Charge</td><td>Same on each capacitor: Q<sub>T</sub> = Q1 = Q2 = Q3</td></tr>
+      <tr><td>Voltage</td><td>Splits: V<sub>T</sub> = V1 + V2 + V3</td></tr>
+      <tr><td>2 capacitors only</td><td><strong>C<sub>T</sub> = (C1 × C2) / (C1 + C2)</strong></td></tr>
+    </table>
+  </div>
+  <div class="example-box">
+    <h4>✏️ Worked Example — Series</h4>
+    <p>C1=4µF, C2=6µF, C3=12µF in series with 24V supply.</p>
+    <p>1/C<sub>T</sub> = 1/4 + 1/6 + 1/12 = 3/12 + 2/12 + 1/12 = 6/12 = 1/2</p>
+    <p>C<sub>T</sub> = <strong>2µF</strong> (less than smallest = 4µF ✓)</p>
+    <p>Q = C<sub>T</sub> × V = 2×10⁻⁶ × 24 = <strong>48µC</strong> on each</p>
+    <p>V1=Q/C1=48/4=<strong>12V</strong> | V2=48/6=<strong>8V</strong> | V3=48/12=<strong>4V</strong> | Check: 12+8+4=24V ✓</p>
+  </div>
+</div>
+
+<!-- ===== SLIDE 6: PARALLEL CAPACITORS ===== -->
+<div class="slide" id="s6">
+  <div class="slide-header">
+    <h2>Capacitors in Parallel</h2>
+    <div class="strand">Total capacitance increases in parallel</div>
+  </div>
+  <div class="teach-block">
+    <h3>Parallel Capacitor Formula</h3>
+    <div class="key-term"><strong>Parallel connection:</strong> All capacitors connected across the same two nodes. The same voltage appears across each. Total capacitance is the <em>sum</em> of all individual capacitances.</div>
+    <div class="diagram-wrap">
+      <svg viewBox="0 0 440 160" xmlns="http://www.w3.org/2000/svg" style="font-family:'Segoe UI',sans-serif;max-width:440px">
+        <rect width="440" height="160" rx="8" fill="#f4f7f5"/>
+        <line x1="30" y1="30" x2="360" y2="30" stroke="#0a5e2a" stroke-width="2.5"/>
+        <line x1="30" y1="130" x2="360" y2="130" stroke="#0a5e2a" stroke-width="2.5"/>
+        <line x1="30" y1="30" x2="30" y2="130" stroke="#0a5e2a" stroke-width="2.5"/>
+        <line x1="360" y1="30" x2="360" y2="130" stroke="#0a5e2a" stroke-width="2.5"/>
+        <!-- Battery -->
+        <line x1="18" y1="65" x2="42" y2="65" stroke="#0a5e2a" stroke-width="4"/>
+        <line x1="22" y1="78" x2="38" y2="78" stroke="#0a5e2a" stroke-width="2"/>
+        <text x="10" y="88" fill="#0a5e2a" font-size="9">V</text>
+        <!-- C1 -->
+        <line x1="120" y1="30" x2="120" y2="65" stroke="#0a5e2a" stroke-width="2"/>
+        <line x1="104" y1="65" x2="136" y2="65" stroke="#0a5e2a" stroke-width="4"/>
+        <line x1="104" y1="78" x2="136" y2="78" stroke="#0a5e2a" stroke-width="4"/>
+        <line x1="120" y1="78" x2="120" y2="130" stroke="#0a5e2a" stroke-width="2"/>
+        <text x="120" y="22" text-anchor="middle" fill="#0a5e2a" font-size="10" font-weight="700">C1</text>
+        <!-- C2 -->
+        <line x1="220" y1="30" x2="220" y2="65" stroke="#0a5e2a" stroke-width="2"/>
+        <line x1="204" y1="65" x2="236" y2="65" stroke="#0a5e2a" stroke-width="4"/>
+        <line x1="204" y1="78" x2="236" y2="78" stroke="#0a5e2a" stroke-width="4"/>
+        <line x1="220" y1="78" x2="220" y2="130" stroke="#0a5e2a" stroke-width="2"/>
+        <text x="220" y="22" text-anchor="middle" fill="#0a5e2a" font-size="10" font-weight="700">C2</text>
+        <!-- C3 -->
+        <line x1="320" y1="30" x2="320" y2="65" stroke="#0a5e2a" stroke-width="2"/>
+        <line x1="304" y1="65" x2="336" y2="65" stroke="#0a5e2a" stroke-width="4"/>
+        <line x1="304" y1="78" x2="336" y2="78" stroke="#0a5e2a" stroke-width="4"/>
+        <line x1="320" y1="78" x2="320" y2="130" stroke="#0a5e2a" stroke-width="2"/>
+        <text x="320" y="22" text-anchor="middle" fill="#0a5e2a" font-size="10" font-weight="700">C3</text>
+        <!-- Formula -->
+        <text x="410" y="75" text-anchor="middle" fill="#0a5e2a" font-size="10" font-weight="700">CT =</text>
+        <text x="410" y="88" text-anchor="middle" fill="#0a5e2a" font-size="10">C1+C2+C3</text>
+        <text x="220" y="152" text-anchor="middle" fill="#c62828" font-size="9" font-weight="700">Same voltage across all branches</text>
+      </svg>
+    </div>
+    <table class="info-table">
+      <tr><th>Property</th><th>Parallel Capacitors</th></tr>
+      <tr><td>Total Capacitance</td><td><strong>C<sub>T</sub> = C1 + C2 + C3</strong> (increases)</td></tr>
+      <tr><td>Voltage</td><td>Same across all: V<sub>T</sub> = V1 = V2 = V3</td></tr>
+      <tr><td>Charge</td><td>Splits: Q<sub>T</sub> = Q1 + Q2 + Q3</td></tr>
+    </table>
+  </div>
+  <div class="example-box">
+    <h4>✏️ Worked Example — Parallel</h4>
+    <p>C1=3µF, C2=5µF, C3=2µF in parallel with 10V supply.</p>
+    <p>C<sub>T</sub> = 3+5+2 = <strong>10µF</strong> (greater than any individual ✓)</p>
+    <p>Q<sub>T</sub> = C<sub>T</sub> × V = 10×10⁻⁶ × 10 = <strong>100µC</strong></p>
+    <p>Q1=3×10=30µC | Q2=5×10=50µC | Q3=2×10=20µC | Check: 30+50+20=100µC ✓</p>
+  </div>
+  <div class="teach-block">
+    <h3>Series vs Parallel — Quick Comparison</h3>
+    <table class="info-table">
+      <tr><th>Property</th><th>Series</th><th>Parallel</th></tr>
+      <tr><td>Total C</td><td>Less than smallest</td><td>Greater than largest</td></tr>
+      <tr><td>Voltage</td><td>Splits across caps</td><td>Same across all</td></tr>
+      <tr><td>Charge Q</td><td>Same on each</td><td>Splits among caps</td></tr>
+      <tr><td>Use</td><td>Increase voltage rating</td><td>Increase capacitance</td></tr>
+    </table>
+  </div>
+</div>
+
+<!-- ===== SLIDE 7: APPLICATIONS ===== -->
+<div class="slide" id="s7">
+  <div class="slide-header">
+    <h2>Applications of Capacitors</h2>
+    <div class="strand">Where capacitors are used in real life</div>
+  </div>
+  <div class="teach-block">
+    <h3>Key Applications</h3>
+    <table class="info-table">
+      <tr><th>Application</th><th>How Capacitor is Used</th><th>Example</th></tr>
+      <tr><td>Energy Storage</td><td>Stores charge, releases quickly</td><td>Camera flash, UPS systems</td></tr>
+      <tr><td>Power Supply Filtering</td><td>Smooths out ripple in DC power supplies</td><td>Phone chargers, computer PSUs</td></tr>
+      <tr><td>Motor Starting</td><td>Provides phase shift to start single-phase motors</td><td>Fans, fridges, washing machines</td></tr>
+      <tr><td>Timing Circuits</td><td>RC time constant controls timing</td><td>Traffic lights, timers, oscillators</td></tr>
+      <tr><td>Signal Coupling</td><td>Passes AC signals while blocking DC</td><td>Audio amplifiers, radios</td></tr>
+      <tr><td>Tuning</td><td>Variable capacitor selects frequency</td><td>Radio receivers, TV tuners</td></tr>
+      <tr><td>Power Factor Correction</td><td>Compensates for inductive loads</td><td>Industrial motors, factories</td></tr>
+    </table>
+  </div>
+  <div class="example-box">
+    <h4>💡 Kenya Context — Traffic Light Timer</h4>
+    <p>Many traffic light systems use <strong>RC timing circuits</strong> to control how long each light stays on. A capacitor charges through a resistor — when the voltage across the capacitor reaches a threshold level, the circuit switches the light. The time delay is controlled by the values of R and C: <strong>t = R × C</strong>.</p>
+  </div>
+  <div class="warn-box">
+    <h4>⚠️ Capacitor Safety</h4>
+    <p>Large capacitors (especially in power supplies and motor circuits) can store <strong>dangerous amounts of energy</strong> even after the power is switched off. Always discharge capacitors before working on a circuit. Use a discharge resistor — never short circuit directly.</p>
+  </div>
+</div>
+
+<!-- ===== SLIDE 8: INTERACTIVE CALCULATOR ===== -->
+<div class="slide" id="s8">
+  <div class="slide-header">
+    <h2>Interactive Capacitor Calculator</h2>
+    <div class="strand">Calculate capacitance, charge, voltage & time constant</div>
+  </div>
+
+  <div class="calc-box">
+    <h4>🔧 Tool 1: Charge / Voltage / Capacitance (Q = CV)</h4>
+    <p style="font-size:.83rem;margin-bottom:10px">Enter any TWO values — the third is calculated.</p>
+    <div class="calc-row"><label>Charge Q (µC)</label><input type="number" id="qcv_q" placeholder="microfarads"></div>
+    <div class="calc-row"><label>Capacitance C (µF)</label><input type="number" id="qcv_c" placeholder="µF"></div>
+    <div class="calc-row"><label>Voltage V (V)</label><input type="number" id="qcv_v" placeholder="Volts"></div>
+    <button class="check-btn" onclick="calcQCV()">⚡ Calculate</button>
+    <button class="check-btn" style="background:#888;margin-left:8px" onclick="clearQCV()">↺ Clear</button>
+    <div class="calc-result" id="qcv-result"></div>
+    <div class="calc-err" id="qcv-err"></div>
+  </div>
+
+  <div class="calc-box" style="margin-top:14px">
+    <h4>🔧 Tool 2: Capacitor Network Calculator</h4>
+    <div class="calc-row">
+      <label>Connection</label>
+      <select id="cap_type"><option value="series">Series</option><option value="parallel">Parallel</option></select>
+    </div>
+    <div class="calc-row"><label>C1 (µF)</label><input type="number" id="cap_c1" placeholder="e.g. 4"></div>
+    <div class="calc-row"><label>C2 (µF)</label><input type="number" id="cap_c2" placeholder="e.g. 6"></div>
+    <div class="calc-row"><label>C3 (µF) <small style="color:#888">optional</small></label><input type="number" id="cap_c3" placeholder="e.g. 12"></div>
+    <div class="calc-row"><label>Supply V (V)</label><input type="number" id="cap_v" placeholder="e.g. 24"></div>
+    <button class="check-btn" onclick="calcCapNet()">⚡ Calculate Network</button>
+    <button class="check-btn" style="background:#888;margin-left:8px" onclick="clearCapNet()">↺ Clear</button>
+    <div class="calc-result" id="cap-result"></div>
+    <div class="calc-err" id="cap-err"></div>
+  </div>
+
+  <div class="calc-box" style="margin-top:14px">
+    <h4>🔧 Tool 3: RC Time Constant Calculator</h4>
+    <div class="calc-row"><label>Resistance R (kΩ)</label><input type="number" id="rc_r" placeholder="e.g. 10"></div>
+    <div class="calc-row"><label>Capacitance C (µF)</label><input type="number" id="rc_c" placeholder="e.g. 100"></div>
+    <button class="check-btn" onclick="calcRC()">⚡ Calculate τ</button>
+    <div class="calc-result" id="rc-result"></div>
+  </div>
+</div>
+
+<!-- ===== SLIDE 9: PRACTICE ===== -->
+<div class="slide" id="s9">
+  <div class="slide-header">
+    <h2>Practice Problems</h2>
+    <div class="strand">Apply capacitor calculations</div>
+  </div>
+
+  <div class="practice-q">
+    <div class="qnum">Problem 1: Basic Capacitance</div>
+    <p style="font-size:.86rem">A capacitor stores a charge of 120µC when connected to a 24V supply. Calculate the capacitance.</p>
+    <div class="example-box" style="margin-top:8px">
+      <h4>📌 Solution</h4>
+      <p>C = Q ÷ V = 120×10⁻⁶ ÷ 24 = <strong>5µF</strong></p>
+    </div>
+  </div>
+
+  <div class="practice-q">
+    <div class="qnum">Problem 2: Series Capacitors</div>
+    <p style="font-size:.86rem">Three capacitors C1=2µF, C2=4µF, C3=8µF are connected in series to a 28V supply. Find: (a) total capacitance, (b) charge on each, (c) voltage across C1.</p>
+    <div class="example-box" style="margin-top:8px">
+      <h4>📌 Solution</h4>
+      <p>(a) 1/C<sub>T</sub> = 1/2+1/4+1/8 = 4/8+2/8+1/8 = 7/8 → C<sub>T</sub> = <strong>8/7 ≈ 1.14µF</strong></p>
+      <p>(b) Q = C<sub>T</sub> × V = 1.14×10⁻⁶ × 28 = <strong>32µC</strong> (same on each)</p>
+      <p>(c) V1 = Q/C1 = 32/2 = <strong>16V</strong></p>
+    </div>
+  </div>
+
+  <div class="practice-q">
+    <div class="qnum">Problem 3: Parallel Capacitors</div>
+    <p style="font-size:.86rem">C1=10µF and C2=15µF are connected in parallel to a 20V supply. Find total capacitance and total charge stored.</p>
+    <div class="example-box" style="margin-top:8px">
+      <h4>📌 Solution</h4>
+      <p>C<sub>T</sub> = 10+15 = <strong>25µF</strong></p>
+      <p>Q<sub>T</sub> = C<sub>T</sub> × V = 25×10⁻⁶ × 20 = <strong>500µC</strong></p>
+    </div>
+  </div>
+
+  <div class="practice-q">
+    <div class="qnum">Problem 4: Time Constant</div>
+    <p style="font-size:.86rem">A 470µF capacitor charges through a 4.7kΩ resistor from a 9V supply. Find: (a) the time constant, (b) voltage after one time constant, (c) time to fully charge.</p>
+    <div class="example-box" style="margin-top:8px">
+      <h4>📌 Solution</h4>
+      <p>(a) τ = R×C = 4700 × 470×10⁻⁶ = <strong>2.21 seconds</strong></p>
+      <p>(b) V = 0.632 × 9 = <strong>5.69V</strong></p>
+      <p>(c) 5τ = 5 × 2.21 = <strong>11.05 seconds</strong></p>
+    </div>
+  </div>
+</div>
+
+<!-- ===== SLIDE 10: QUIZ ===== -->
+<div class="slide" id="s10">
+  <div class="slide-header">
+    <h2>End-of-Lesson Quiz</h2>
+    <div class="strand">Sub-strand 1.3 · Capacitors & Capacitance</div>
+  </div>
+  <p style="font-size:.83rem;color:#555;margin-bottom:14px">Part A: 5 fill-in-the-blank (5 marks) &nbsp;|&nbsp; Part B: 3 short answer (10 marks) &nbsp;|&nbsp; <strong>Total: 15 marks</strong></p>
+
+  <div class="practice-q">
+    <div class="qnum">Part A: Fill in the Blank (1 mark each)</div>
+    <div style="font-size:.87rem">
+      <p style="margin:10px 0">1. The unit of capacitance is the <input class="fill-blank" id="f1" placeholder="...">. <span class="fb-feedback" id="ff1"></span></p>
+      <p style="margin:10px 0">2. The insulating material between the plates of a capacitor is called the <input class="fill-blank" id="f2" placeholder="...">. <span class="fb-feedback" id="ff2"></span></p>
+      <p style="margin:10px 0">3. In a parallel capacitor circuit, total capacitance equals the <input class="fill-blank" id="f3" placeholder="..."> of all individual capacitances. <span class="fb-feedback" id="ff3"></span></p>
+      <p style="margin:10px 0">4. The time constant τ of an RC circuit is calculated using the formula τ = <input class="fill-blank" id="f4" placeholder="...">. <span class="fb-feedback" id="ff4"></span></p>
+      <p style="margin:10px 0">5. A capacitor is considered fully charged after approximately <input class="fill-blank" id="f5" placeholder="..."> time constants. <span class="fb-feedback" id="ff5"></span></p>
+    </div>
+    <button class="check-btn" onclick="checkFills()" style="margin-top:12px">✓ Check Part A</button>
+  </div>
+
+  <div class="practice-q" style="margin-top:12px">
+    <div class="qnum">Part B: Short Answer</div>
+
+    <div style="margin-bottom:14px">
+      <p style="font-size:.87rem"><strong>B1.</strong> Two capacitors, C1=6µF and C2=3µF, are connected in series to a 12V supply. Calculate the total capacitance and the voltage across C1. <em>(3 marks)</em></p>
+      <textarea class="sa-box" id="sa1" placeholder="Show your working..."></textarea>
+      <button class="grade-btn" onclick="gradeAnswer('sa1','fb1',{keywords:['2µf','2 µf','2uf','2 uf','8v','8 v','series','charge','voltage','total'],required:4,marks:3,model:'CT = (C1×C2)/(C1+C2) = (6×3)/(6+3) = 18/9 = 2µF. Q = CT×V = 2×10⁻⁶×12 = 24µC. V1 = Q/C1 = 24/6 = 4V. V2 = Q/C2 = 24/3 = 8V. Check: 4+8=12V ✓'})">✓ Grade My Answer</button>
+      <div class="sa-feedback" id="fb1"></div>
+    </div>
+
+    <div style="margin-bottom:14px">
+      <p style="font-size:.87rem"><strong>B2.</strong> Explain why capacitors are connected in parallel in a power supply filter circuit. What happens to the total capacitance and why is this desirable? <em>(4 marks)</em></p>
+      <textarea class="sa-box" id="sa2" placeholder="Type your answer here..."></textarea>
+      <button class="grade-btn" onclick="gradeAnswer('sa2','fb2',{keywords:['parallel','increases','sum','smooth','ripple','filter','larger','more charge','voltage','stable','dc'],required:5,marks:4,model:'Capacitors are connected in parallel to increase the total capacitance (CT = C1+C2+...). A larger capacitance stores more charge and can supply current for longer during voltage dips, resulting in a smoother, more stable DC output with less ripple. This is desirable because electronic circuits require a steady DC voltage to operate correctly.'})">✓ Grade My Answer</button>
+      <div class="sa-feedback" id="fb2"></div>
+    </div>
+
+    <div style="margin-bottom:14px">
+      <p style="font-size:.87rem"><strong>B3.</strong> State THREE applications of capacitors in everyday electrical appliances and explain the role of the capacitor in each application. <em>(3 marks)</em></p>
+      <textarea class="sa-box" id="sa3" placeholder="Type your answer here..."></textarea>
+      <button class="grade-btn" onclick="gradeAnswer('sa3','fb3',{keywords:['motor','starting','fridge','fan','timer','traffic','flash','camera','filter','power supply','radio','tuning','audio','coupling'],required:4,marks:3,model:'1. Motor starting (fridge/fan): capacitor provides phase shift to start single-phase motors. 2. Timer circuit (traffic lights): RC time constant controls switching delay. 3. Power supply filter: smooths ripple in DC output. 4. Camera flash: stores energy and releases it quickly as a bright flash.'})">✓ Grade My Answer</button>
+      <div class="sa-feedback" id="fb3"></div>
+    </div>
+  </div>
+
+  <button class="score-btn" onclick="showTotalScore()">📊 View My Total Score</button>
+  <div class="total-result" id="totalResult" style="display:none"></div>
+  <div class="next-lesson-box" id="nextLessonBox">
+    <a href="elec-1.4-cells-batteries-full.html" class="next-lesson-btn">➡️ Next Lesson: 1.4 Cells &amp; Batteries</a>
+    <div class="next-lesson-sub">You've completed this lesson! Keep going 🎉</div>
+  </div>
+</div>
+
+</div><!-- end slides-wrap -->
+
+<div class="nav-bar">
+  <button class="nav-btn" id="prevBtn" onclick="goSlide(-1)" disabled>← Prev</button>
+  <div class="dots" id="dotsWrap"></div>
+  <button class="nav-btn" id="nextBtn" onclick="goSlide(1)">Next →</button>
+</div>
+
+<script>
+// ── NAVIGATION ────────────────────────────────────────────────
+const TOTAL=10; let cur=0;
+const dotsWrap=document.getElementById('dotsWrap');
+for(let i=0;i<TOTAL;i++){
+  const d=document.createElement('div');
+  d.className='dot'+(i===0?' active':'');
+  d.onclick=()=>showSlide(i);
+  dotsWrap.appendChild(d);
+}
+function showSlide(n){
+  document.querySelectorAll('.slide').forEach((s,i)=>s.classList.toggle('active',i===n));
+  document.querySelectorAll('.dot').forEach((d,i)=>d.classList.toggle('active',i===n));
+  document.getElementById('prevBtn').disabled=(n===0);
+  document.getElementById('nextBtn').disabled=(n===TOTAL-1);
+  document.getElementById('slideLabel').textContent=(n+1)+' / '+TOTAL;
+  cur=n; window.scrollTo(0,0);
+}
+function goSlide(d){showSlide(Math.max(0,Math.min(TOTAL-1,cur+d)))}
+
+// ── Q=CV CALCULATOR ───────────────────────────────────────────
+function calcQCV(){
+  const q=parseFloat(document.getElementById('qcv_q').value);
+  const c=parseFloat(document.getElementById('qcv_c').value);
+  const v=parseFloat(document.getElementById('qcv_v').value);
+  const res=document.getElementById('qcv-result');
+  const err=document.getElementById('qcv-err');
+  res.style.display='none'; err.style.display='none';
+  const known=[!isNaN(q),!isNaN(c),!isNaN(v)].filter(Boolean).length;
+  if(known<2){err.textContent='Enter at least TWO values.';err.style.display='block';return;}
+  let out='';
+  if(!isNaN(c)&&!isNaN(v)&&isNaN(q)){
+    const Q=(c*v).toFixed(3);
+    document.getElementById('qcv_q').value=Q;
+    out=`Q = C × V = ${c}µF × ${v}V = ${Q} µC`;
+  } else if(!isNaN(q)&&!isNaN(v)&&isNaN(c)){
+    const C=(q/v).toFixed(4);
+    document.getElementById('qcv_c').value=C;
+    out=`C = Q ÷ V = ${q}µC ÷ ${v}V = ${C} µF`;
+  } else if(!isNaN(q)&&!isNaN(c)&&isNaN(v)){
+    const V=(q/c).toFixed(3);
+    document.getElementById('qcv_v').value=V;
+    out=`V = Q ÷ C = ${q}µC ÷ ${c}µF = ${V} V`;
+  } else {
+    out=`Verification: Q = C×V = ${c}×${v} = ${(c*v).toFixed(3)} µC. Entered Q = ${q} µC.`;
+  }
+  res.textContent=out; res.style.display='block';
+}
+function clearQCV(){
+  ['qcv_q','qcv_c','qcv_v'].forEach(id=>document.getElementById(id).value='');
+  document.getElementById('qcv-result').style.display='none';
+  document.getElementById('qcv-err').style.display='none';
+}
+
+// ── CAPACITOR NETWORK ─────────────────────────────────────────
+function calcCapNet(){
+  const type=document.getElementById('cap_type').value;
+  const c1=parseFloat(document.getElementById('cap_c1').value);
+  const c2=parseFloat(document.getElementById('cap_c2').value);
+  const c3=parseFloat(document.getElementById('cap_c3').value);
+  const vs=parseFloat(document.getElementById('cap_v').value);
+  const res=document.getElementById('cap-result');
+  const err=document.getElementById('cap-err');
+  res.style.display='none'; err.style.display='none';
+  if(isNaN(c1)||isNaN(c2)){err.textContent='Enter at least C1 and C2.';err.style.display='block';return;}
+  const caps=[c1,c2]; if(!isNaN(c3)) caps.push(c3);
+  let CT, lines='';
+  if(type==='parallel'){
+    CT=caps.reduce((a,b)=>a+b,0);
+    lines=`Type: PARALLEL\nCT = ${caps.join(' + ')} = ${CT.toFixed(3)} µF`;
+    if(!isNaN(vs)){
+      const QT=(CT*vs);
+      lines+=`\nVoltage = ${vs}V (same across all)\nTotal Q = ${CT.toFixed(3)} × ${vs} = ${QT.toFixed(3)} µC`;
+      caps.forEach((c,i)=>{ lines+=`\nQ${i+1} = ${c} × ${vs} = ${(c*vs).toFixed(3)} µC`; });
+    }
+  } else {
+    const recip=caps.reduce((a,b)=>a+1/b,0);
+    CT=1/recip;
+    lines=`Type: SERIES\n1/CT = ${caps.map(c=>'1/'+c).join(' + ')} = ${recip.toFixed(5)}\nCT = ${CT.toFixed(4)} µF`;
+    if(!isNaN(vs)){
+      const Q=(CT*vs);
+      lines+=`\nCharge Q = CT × V = ${CT.toFixed(4)} × ${vs} = ${Q.toFixed(3)} µC (same on each)`;
+      caps.forEach((c,i)=>{ lines+=`\nV${i+1} = Q/C${i+1} = ${Q.toFixed(3)}/${c} = ${(Q/c).toFixed(3)} V`; });
+    }
+  }
+  res.textContent=lines; res.style.display='block';
+}
+function clearCapNet(){
+  ['cap_c1','cap_c2','cap_c3','cap_v'].forEach(id=>document.getElementById(id).value='');
+  document.getElementById('cap-result').style.display='none';
+  document.getElementById('cap-err').style.display='none';
+}
+
+// ── RC TIME CONSTANT ──────────────────────────────────────────
+function calcRC(){
+  const R=parseFloat(document.getElementById('rc_r').value);
+  const C=parseFloat(document.getElementById('rc_c').value);
+  const res=document.getElementById('rc-result');
+  if(isNaN(R)||isNaN(C)){res.textContent='Enter both R and C.';res.style.display='block';return;}
+  const tau=(R*1000)*(C/1000000);
+  res.textContent=`τ = R × C = ${R}kΩ × ${C}µF = ${tau.toFixed(4)} seconds\nFully charged after 5τ = ${(5*tau).toFixed(3)} seconds\nVoltage at 1τ = 63.2% of supply`;
+  res.style.display='block';
+}
+
+// ── FILL BLANK ────────────────────────────────────────────────
+const fbAns={
+  f1:['farad','farads','f'],
+  f2:['dielectric'],
+  f3:['sum','total','addition','added'],
+  f4:['r x c','r × c','rc','r*c','resistance times capacitance'],
+  f5:['5','five']
+};
+let fillScore=0, saScores={};
+function checkFills(){
+  fillScore=0;
+  Object.entries(fbAns).forEach(([id,ans])=>{
+    const inp=document.getElementById(id);
+    const fb=document.getElementById('f'+id.slice(1));
+    const val=inp.value.trim().toLowerCase();
+    const ok=ans.some(a=>val===a||val.includes(a));
+    if(ok){fillScore++;inp.className='fill-blank correct';fb.textContent='✓ +1';fb.style.color='#2e7d32';}
+    else{inp.className='fill-blank wrong';fb.textContent='✗ ('+ans[0]+')';fb.style.color='#c62828';}
+    fb.style.display='inline';
+  });
+}
+function gradeAnswer(saId,fbId,cfg){
+  const ans=document.getElementById(saId).value.trim().toLowerCase();
+  const found=cfg.keywords.filter(k=>ans.includes(k.toLowerCase()));
+  const missed=cfg.keywords.filter(k=>!ans.includes(k.toLowerCase()));
+  const hitRate=Math.min(found.length/cfg.required,1.0);
+  const marks=Math.round(hitRate*cfg.marks);
+  saScores[saId]=marks;
+  const grade=marks>=cfg.marks?'🌟 Excellent!':marks>=cfg.marks*0.5?'👍 Good attempt':'📖 Needs improvement';
+  const fbEl=document.getElementById(fbId);
+  fbEl.style.display='block';
+  fbEl.innerHTML=`<strong>${grade} — ${marks}/${cfg.marks} marks</strong><br>
+  <span class="kw-found">✅ Keywords found: ${found.join(', ')||'none'}</span><br>
+  <span class="kw-missed">❌ Missed keywords: ${missed.join(', ')||'none'}</span>
+  <div class="model-ans"><strong>Model Answer:</strong> ${cfg.model}</div>`;
+}
+function showTotalScore(){
+  const saTotal=Object.values(saScores).reduce((a,b)=>a+b,0);
+  const total=fillScore+saTotal;
+  const pct=Math.round(total/15*100);
+  const grade=pct>=80?'Exceeds Expectation 🎉':pct>=60?'Meets Expectation 👍':pct>=40?'Approaches Expectation 📖':'Below Expectation 💪';
+  const el=document.getElementById('totalResult');
+  el.style.display='block';
+  el.innerHTML=`<strong>Total Score: ${total} / 15 (${pct}%)</strong><br>
+  Part A: ${fillScore}/5 &nbsp;|&nbsp; Part B: ${saTotal}/10<br>
+  <span style="color:var(--pri);font-size:1.05rem">${grade}</span><br>
+  <span style="font-size:.8rem;color:#666;margin-top:4px;display:block">CBE Rubric — ${pct>=80?'Exceeds':pct>=60?'Meets':pct>=40?'Approaches':'Below'} Expectation</span>`;
+  submitExamToMTTI(total,15,pct);
+  document.getElementById('nextLessonBox').style.display='block';
+}
+function submitExamToMTTI(score,total,percent){
+  try{
+    fetch('/wp-json/mtti/v1/exam-result',{
+      method:'POST',
+      headers:{'Content-Type':'application/json','X-WP-Nonce':window.mtti_nonce||''},
+      body:JSON.stringify({lesson_id:'elec-1.3-capacitors-capacitance',score,total,percent,timestamp:new Date().toISOString()})
+    }).then(r=>r.json()).then(d=>{if(d&&d.success)console.log('[MTTI] Result saved:',d);}).catch(e=>console.log('[MTTI] Offline:',e));
+  }catch(e){console.log('[MTTI] Error:',e);}
+}
+</script>
+</body>
+</html>

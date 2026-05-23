@@ -1,0 +1,412 @@
+<?php
+/**
+ * M.T.T.I LMS - Student Portal
+ * Flow: Login → Auto-class → Subjects → Lessons
+ * Place in: /var/www/html/mtti-lms/student-portal.php
+ */
+require_once __DIR__ . '/includes/init.php';
+$auth = new Auth(); $auth->requireLogin();
+$db = Database::getInstance();
+$userId = $auth->getUserId();
+$role = $auth->getRole();
+
+// Admin/teacher go to regular dashboard
+if (in_array($role, ['admin', 'teacher'])) { header('Location: ' . SITE_URL . '/dashboard.php'); exit; }
+
+// Get enrolled classes
+$myClasses = $db->fetchAll("SELECT c.*, 
+    (SELECT COUNT(*) FROM lessons WHERE class_id=c.id AND status='published') as lesson_count,
+    (SELECT COUNT(*) FROM completions WHERE class_id=c.id AND user_id=?) as completed
+    FROM classes c JOIN enrolments e ON c.id=e.class_id 
+    WHERE e.user_id=? AND c.status='active' ORDER BY c.title", [$userId, $userId]);
+
+// Auto-redirect if only 1 class
+if (count($myClasses) === 1 && !isset($_GET['view'])) {
+    header('Location: ' . SITE_URL . '/student-portal.php?view=subjects&class_id=' . $myClasses[0]['id']);
+    exit;
+}
+
+$view = $_GET['view'] ?? 'classes';
+$classId = intval($_GET['class_id'] ?? 0);
+$subjectId = intval($_GET['subject_id'] ?? 0);
+$lessonId = intval($_GET['lesson_id'] ?? 0);
+
+$classInfo = $classId ? $db->fetchOne("SELECT * FROM classes WHERE id=? AND status='active'", [$classId]) : null;
+$userName = $_SESSION['user_name'] ?? 'Student';
+$firstName = explode(' ', $userName)[0];
+
+$pageTitle = 'My Learning - ' . SITE_NAME;
+require_once __DIR__ . '/templates/header.php';
+?>
+<style>
+:root{--bg:#f5f6f8;--pri:#1a5632;--pri2:#2d7a4c;--blu:#2563eb;--txt:#1e293b;--mut:#94a3b8;--brd:#e2e8f0;--grn:#16a34a;--amb:#f59e0b}
+body{background:var(--bg)}
+.sp-hero{background:linear-gradient(135deg,var(--pri),var(--pri2));color:#fff;padding:16px 20px;border-radius:0 0 14px 14px;margin:-1rem -12px 16px}
+.sp-hero h4{margin:0;font-weight:800;font-size:1.1rem}.sp-hero .sub{opacity:.7;font-size:.82rem}
+.sp-bc{display:flex;align-items:center;gap:6px;font-size:.82rem;margin-bottom:14px;flex-wrap:wrap;padding:0 4px}
+.sp-bc a{color:var(--pri);text-decoration:none;font-weight:600}.sp-bc a:hover{text-decoration:underline}.sp-bc .sep{color:var(--mut)}
+
+/* Subject cards */
+.subj-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:12px}
+.subj-card{background:#fff;border-radius:12px;border:1px solid var(--brd);padding:18px 16px;text-decoration:none;color:var(--txt);transition:all .2s;position:relative;overflow:hidden}
+.subj-card:hover{transform:translateY(-3px);box-shadow:0 8px 20px rgba(0,0,0,.08);border-color:var(--pri)}
+.subj-card .icon{width:44px;height:44px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:1.2rem;margin-bottom:10px}
+.subj-card h6{font-weight:700;font-size:.92rem;margin:0 0 4px}.subj-card .meta{font-size:.75rem;color:var(--mut)}
+.subj-card .prog{height:4px;background:#e2e8f0;border-radius:2px;margin-top:8px;overflow:hidden}
+.subj-card .prog-fill{height:100%;border-radius:2px}
+.pg{background:var(--grn)}.pa{background:var(--amb)}.pr{background:#dc2626}
+
+/* Lesson list */
+.lesson-list{display:flex;flex-direction:column;gap:6px}
+.lesson-item{display:flex;align-items:center;gap:12px;padding:12px 16px;background:#fff;border-radius:10px;border:1px solid var(--brd);text-decoration:none;color:var(--txt);transition:all .15s}
+.lesson-item:hover{border-color:var(--pri);background:#f0fdf4}
+.lesson-item.active{border-color:var(--pri);background:var(--pri);color:#fff}
+.lesson-item.active .lm{color:rgba(255,255,255,.6)}
+.lesson-item .lnum{width:28px;height:28px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:.75rem;flex-shrink:0}
+.lnum-done{background:#dcfce7;color:var(--grn)}.lnum-pending{background:#f1f5f9;color:var(--mut)}
+.lesson-item.active .lnum{background:rgba(255,255,255,.2);color:#fff}
+.lesson-item .lt{flex:1;font-weight:600;font-size:.88rem}
+.lesson-item .lm{font-size:.72rem;color:var(--mut)}
+.lesson-item .type-icon{font-size:.85rem;color:var(--mut);flex-shrink:0}
+.lesson-item.active .type-icon{color:rgba(255,255,255,.6)}
+
+/* Lesson viewer */
+.viewer{background:#fff;border-radius:14px;border:1px solid var(--brd);overflow:hidden}
+.viewer-bar{display:flex;justify-content:space-between;align-items:center;padding:12px 16px;border-bottom:1px solid var(--brd)}
+.viewer-bar h5{margin:0;font-weight:700;font-size:1rem}
+.viewer-frame{background:#f0f0f0}
+.viewer-frame iframe,.viewer-frame video{display:block;width:100%;border:none}
+.viewer-frame iframe{height:78vh}
+.viewer-frame video{max-height:70vh}
+.viewer-nav{display:flex;justify-content:space-between;align-items:center;padding:12px 16px;border-top:1px solid var(--brd)}
+.vn-btn{padding:8px 18px;border-radius:8px;font-weight:600;font-size:.85rem;text-decoration:none;transition:all .15s;border:none;cursor:pointer}
+.vn-prev{background:#f1f5f9;color:#475569}.vn-prev:hover{background:#e2e8f0}
+.vn-next{background:var(--pri);color:#fff}.vn-next:hover{background:#155d33}
+.vn-done{background:var(--grn);color:#fff}
+
+/* Revision section */
+.rev-section{margin-top:20px}
+.rev-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:10px}
+.rev-card{background:#fff;border-radius:10px;border:1px solid var(--brd);padding:14px;text-decoration:none;color:var(--txt);transition:all .15s}
+.rev-card:hover{border-color:var(--blu);box-shadow:0 4px 12px rgba(0,0,0,.06)}
+.rev-card .rev-type{font-size:.68rem;font-weight:700;padding:2px 8px;border-radius:6px}
+.rt-paper{background:#fef3c7;color:#92400e}.rt-interactive{background:#dbeafe;color:#1d4ed8}
+
+/* Class selector */
+.class-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:14px}
+.class-card{background:#fff;border-radius:14px;border:1px solid var(--brd);padding:20px;text-decoration:none;color:var(--txt);transition:all .2s;text-align:center}
+.class-card:hover{transform:translateY(-3px);box-shadow:0 8px 24px rgba(0,0,0,.08);border-color:var(--pri)}
+.class-card h5{font-weight:800;margin:10px 0 6px}.class-card .cm{font-size:.82rem;color:var(--mut)}
+
+/* Progress ring */
+.mini-ring{width:50px;height:50px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:.82rem;margin:0 auto 8px}
+.empty-state{text-align:center;padding:50px 20px;color:var(--mut)}.empty-state i{font-size:3rem}
+
+/* Category label */
+.cat-label{font-size:.7rem;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--mut);margin:16px 0 8px;padding-left:4px}
+</style>
+
+<div class="container-fluid">
+<div class="sp-hero">
+    <h4>👋 Hi <?= htmlspecialchars($firstName) ?>!</h4>
+    <div class="sub"><?= $classInfo ? htmlspecialchars($classInfo['title']) : 'My Learning Portal' ?></div>
+</div>
+
+<?php if ($view === 'classes'): ?>
+<!-- ═══ CLASS SELECTOR (only if multiple classes) ═══ -->
+<div class="sp-bc"><span style="font-weight:700">My Classes</span></div>
+<?php if (empty($myClasses)): ?>
+<div class="empty-state"><i class="bi bi-book"></i><h5 class="mt-2">No classes yet</h5><p>You haven't been enrolled in any class. Contact your teacher.</p></div>
+<?php else: ?>
+<div class="class-grid">
+    <?php foreach ($myClasses as $c):
+        $pct = $c['lesson_count'] > 0 ? round(($c['completed'] / $c['lesson_count']) * 100) : 0;
+        $ringCol = $pct >= 70 ? '#16a34a' : ($pct >= 30 ? '#f59e0b' : '#dc2626');
+    ?>
+    <a href="?view=subjects&class_id=<?= $c['id'] ?>" class="class-card">
+        <div class="mini-ring" style="background:<?= $ringCol ?>20;color:<?= $ringCol ?>"><?= $pct ?>%</div>
+        <h5><?= htmlspecialchars($c['title']) ?></h5>
+        <div class="cm"><?= $c['lesson_count'] ?> lessons · <?= $c['completed'] ?> completed</div>
+    </a>
+    <?php endforeach; ?>
+</div>
+<?php endif; ?>
+
+<?php elseif ($view === 'subjects' && $classId): ?>
+<!-- ═══ SUBJECTS VIEW ═══ -->
+<?php
+$parentSubs = $db->fetchAll("SELECT s.id, s.title, s.level_type FROM subjects s WHERE s.class_id=? AND s.parent_id IS NULL AND s.level_type='subject' AND s.status='active' ORDER BY s.sort_order", [$classId]);
+
+// Subject colors
+$colors = ['#2563eb','#dc2626','#16a34a','#7c3aed','#ea580c','#0891b2','#be185d','#4f46e5','#b45309','#0d9488','#6d28d9','#c2410c','#0369a1','#a21caf','#15803d','#b91c1c','#1d4ed8','#7e22ce','#047857','#9333ea'];
+$icons = ['bi-calculator','bi-book','bi-chat-text','bi-bug','bi-droplet','bi-lightning','bi-globe','bi-geo-alt','bi-heart','bi-flower1','bi-pc-display','bi-house','bi-palette','bi-music-note','bi-translate','bi-flag','bi-graph-up','bi-eye','bi-cpu','bi-stars'];
+?>
+
+<div class="sp-bc">
+    <?php if (count($myClasses) > 1): ?><a href="?view=classes">My Classes</a><span class="sep">›</span><?php endif; ?>
+    <span style="font-weight:700"><?= htmlspecialchars($classInfo['title']) ?> — Subjects</span>
+</div>
+
+<?php
+// Overall progress
+$totalLessons = (int)$db->fetchColumn("SELECT COUNT(*) FROM lessons WHERE class_id=? AND status='published'", [$classId]);
+$totalDone = (int)$db->fetchColumn("SELECT COUNT(*) FROM completions WHERE class_id=? AND user_id=?", [$classId, $userId]);
+$overallPct = $totalLessons > 0 ? round(($totalDone / $totalLessons) * 100) : 0;
+?>
+<div style="background:#fff;border-radius:10px;padding:12px 16px;margin-bottom:16px;border:1px solid var(--brd);display:flex;align-items:center;gap:12px">
+    <div style="flex:1">
+        <div style="font-size:.82rem;color:var(--mut)">Overall Progress</div>
+        <div style="height:8px;background:#e2e8f0;border-radius:4px;margin-top:4px;overflow:hidden"><div style="height:100%;width:<?= $overallPct ?>%;background:<?= $overallPct>=70?'var(--grn)':($overallPct>=30?'var(--amb)':'#dc2626') ?>;border-radius:4px"></div></div>
+    </div>
+    <div style="font-weight:800;font-size:1.1rem;color:<?= $overallPct>=70?'var(--grn)':($overallPct>=30?'var(--amb)':'#dc2626') ?>"><?= $overallPct ?>%</div>
+    <div style="font-size:.78rem;color:var(--mut)"><?= $totalDone ?>/<?= $totalLessons ?></div>
+</div>
+
+<div class="subj-grid">
+<?php foreach ($parentSubs as $si => $sub):
+    // Count lessons under this subject + children
+    // Count lessons in learning area + all strands + all sub-strands
+    $descendantIds = [$sub['id']];
+    $strands = $db->fetchAll("SELECT id FROM subjects WHERE parent_id=? AND class_id=? AND status='active'", [$sub['id'], $classId]);
+    foreach ($strands as $str) {
+        $descendantIds[] = $str['id'];
+        $subStrands = $db->fetchAll("SELECT id FROM subjects WHERE parent_id=? AND class_id=? AND status='active'", [$str['id'], $classId]);
+        foreach ($subStrands as $ss) { $descendantIds[] = $ss['id']; }
+    }
+    $ph2 = implode(',', array_fill(0, count($descendantIds), '?'));
+    $subLessons = $db->fetchAll("SELECT l.id FROM lessons l WHERE l.subject_id IN ($ph2) AND l.status='published'", $descendantIds);
+    $subTotal = count($subLessons);
+    if ($subTotal === 0) continue; // Hide empty subjects
+    $subIds = array_column($subLessons, 'id');
+    $subDone = 0;
+    if (!empty($subIds)) {
+        $ph = implode(',', array_fill(0, count($subIds), '?'));
+        $subDone = (int)$db->fetchColumn("SELECT COUNT(*) FROM completions WHERE user_id=? AND lesson_id IN ($ph)", array_merge([$userId], $subIds));
+    }
+    $subPct = $subTotal > 0 ? round(($subDone / $subTotal) * 100) : 0;
+    $col = $colors[$si % count($colors)];
+    $icon = $icons[$si % count($icons)];
+    $fillClass = $subPct >= 70 ? 'pg' : ($subPct >= 30 ? 'pa' : 'pr');
+?>
+<a href="?view=lessons&class_id=<?= $classId ?>&subject_id=<?= $sub['id'] ?>" class="subj-card">
+    <div class="icon" style="background:<?= $col ?>15;color:<?= $col ?>"><i class="bi <?= $icon ?>"></i></div>
+    <h6><?= htmlspecialchars($sub['title']) ?></h6>
+    <div class="meta"><?= $subTotal ?> lessons · <?= $subDone ?> done</div>
+    <div class="prog"><div class="prog-fill <?= $fillClass ?>" style="width:<?= max($subPct, 2) ?>%"></div></div>
+</a>
+<?php endforeach; ?>
+</div>
+
+<!-- Quick Access Cards -->
+<?php
+$myAssignments = $db->fetchAll("SELECT a.id, a.title, a.due_date, a.assignment_type,
+    sub.status as sub_status
+    FROM assignments a
+    JOIN enrolments e ON e.class_id = a.class_id AND e.user_id = ?
+    LEFT JOIN assignment_submissions sub ON sub.assignment_id = a.id AND sub.student_id = ?
+    WHERE a.status = 'active' AND a.class_id = ?
+    ORDER BY a.due_date ASC LIMIT 5", [$userId, $userId, $classId]);
+
+$pendingAssignments = array_filter($myAssignments, fn($a) => !$a['sub_status'] || $a['sub_status'] === 'resubmit');
+$pendingCount = count($pendingAssignments);
+?>
+
+<div style="margin-top:20px">
+    <div class="cat-label">📌 Quick Access</div>
+    <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:10px">
+
+        <!-- Assignments -->
+        <a href="<?= SITE_URL ?>/assignments.php" style="background:#fff;border:1px solid var(--brd);border-radius:12px;padding:16px;text-decoration:none;color:var(--txt);display:flex;flex-direction:column;align-items:center;gap:6px;text-align:center;transition:all .2s;<?= $pendingCount > 0 ? 'border-color:#f59e0b;border-width:2px' : '' ?>">
+            <div style="width:44px;height:44px;border-radius:10px;background:<?= $pendingCount > 0 ? '#fef3c7' : '#f1f5f9' ?>;display:flex;align-items:center;justify-content:center;font-size:1.3rem">📋</div>
+            <div style="font-weight:700;font-size:.85rem">Assignments</div>
+            <?php if ($pendingCount > 0): ?>
+            <div style="background:#f59e0b;color:#fff;border-radius:8px;padding:1px 8px;font-size:.68rem;font-weight:700"><?= $pendingCount ?> pending</div>
+            <?php else: ?>
+            <div style="font-size:.72rem;color:var(--mut)"><?= count($myAssignments) ?> total</div>
+            <?php endif; ?>
+        </a>
+
+        <!-- Assessments/Quizzes -->
+        <a href="<?= SITE_URL ?>/assessments.php" style="background:#fff;border:1px solid var(--brd);border-radius:12px;padding:16px;text-decoration:none;color:var(--txt);display:flex;flex-direction:column;align-items:center;gap:6px;text-align:center;transition:all .2s">
+            <div style="width:44px;height:44px;border-radius:10px;background:#ede9fe;display:flex;align-items:center;justify-content:center;font-size:1.3rem">📝</div>
+            <div style="font-weight:700;font-size:.85rem">Quizzes</div>
+            <div style="font-size:.72rem;color:var(--mut)">Take a quiz</div>
+        </a>
+
+        <!-- Past Papers -->
+        <a href="<?= SITE_URL ?>/past-papers.php" style="background:#fff;border:1px solid var(--brd);border-radius:12px;padding:16px;text-decoration:none;color:var(--txt);display:flex;flex-direction:column;align-items:center;gap:6px;text-align:center;transition:all .2s">
+            <div style="width:44px;height:44px;border-radius:10px;background:#fef3c7;display:flex;align-items:center;justify-content:center;font-size:1.3rem">📄</div>
+            <div style="font-weight:700;font-size:.85rem">Past Papers</div>
+            <div style="font-size:.72rem;color:var(--mut)">KCSE revision</div>
+        </a>
+
+        <!-- Interactives -->
+        <a href="<?= SITE_URL ?>/interactives.php" style="background:#fff;border:1px solid var(--brd);border-radius:12px;padding:16px;text-decoration:none;color:var(--txt);display:flex;flex-direction:column;align-items:center;gap:6px;text-align:center;transition:all .2s">
+            <div style="width:44px;height:44px;border-radius:10px;background:#dbeafe;display:flex;align-items:center;justify-content:center;font-size:1.3rem">⚡</div>
+            <div style="font-weight:700;font-size:.85rem">Interactives</div>
+            <div style="font-size:.72rem;color:var(--mut)">Practice exercises</div>
+        </a>
+
+        <!-- Leaderboard -->
+        <a href="<?= SITE_URL ?>/leaderboard.php" style="background:#fff;border:1px solid var(--brd);border-radius:12px;padding:16px;text-decoration:none;color:var(--txt);display:flex;flex-direction:column;align-items:center;gap:6px;text-align:center;transition:all .2s">
+            <div style="width:44px;height:44px;border-radius:10px;background:#dcfce7;display:flex;align-items:center;justify-content:center;font-size:1.3rem">🏆</div>
+            <div style="font-weight:700;font-size:.85rem">Leaderboard</div>
+            <div style="font-size:.72rem;color:var(--mut)">Top students</div>
+        </a>
+
+        <!-- Forum -->
+        <a href="<?= SITE_URL ?>/forum.php" style="background:#fff;border:1px solid var(--brd);border-radius:12px;padding:16px;text-decoration:none;color:var(--txt);display:flex;flex-direction:column;align-items:center;gap:6px;text-align:center;transition:all .2s">
+            <div style="width:44px;height:44px;border-radius:10px;background:#fce7f3;display:flex;align-items:center;justify-content:center;font-size:1.3rem">💬</div>
+            <div style="font-weight:700;font-size:.85rem">Forum</div>
+            <div style="font-size:.72rem;color:var(--mut)">Ask questions</div>
+        </a>
+
+    </div>
+</div>
+
+<!-- Pending Assignments Preview -->
+<?php if ($pendingCount > 0): ?>
+<div style="margin-top:16px">
+    <div class="cat-label" style="color:#92400e">⚠️ Pending Assignments</div>
+    <?php foreach ($pendingAssignments as $pa):
+        $due = $pa['due_date'] ? date('M j', strtotime($pa['due_date'])) : 'No deadline';
+        $isOverdue = $pa['due_date'] && strtotime($pa['due_date']) < time();
+        $aTypeIcon = match($pa['assignment_type'] ?? 'file_upload') { 'essay' => '✍️', 'structured' => '📋', default => '📎' };
+    ?>
+    <a href="<?= SITE_URL ?>/assignments.php" style="display:flex;align-items:center;gap:12px;padding:12px 14px;background:#fff;border-radius:10px;border:1px solid <?= $isOverdue ? '#fca5a5' : '#fde68a' ?>;text-decoration:none;color:var(--txt);margin-bottom:6px">
+        <span style="font-size:1.2rem"><?= $aTypeIcon ?></span>
+        <div style="flex:1">
+            <div style="font-weight:600;font-size:.88rem"><?= htmlspecialchars($pa['title']) ?></div>
+            <div style="font-size:.72rem;color:<?= $isOverdue ? '#dc2626' : '#92400e' ?>"><?= $isOverdue ? '⚠️ Overdue · ' : '📅 Due ' ?><?= $due ?></div>
+        </div>
+        <i class="bi bi-chevron-right" style="color:var(--mut)"></i>
+    </a>
+    <?php endforeach; ?>
+</div>
+<?php endif; ?>
+
+<?php elseif ($view === 'lessons' && $classId && $subjectId): ?>
+<!-- ═══ LESSONS VIEW ═══ -->
+<?php
+$subjectInfo = $db->fetchOne("SELECT * FROM subjects WHERE id=?", [$subjectId]);
+if (!$subjectInfo) { header('Location: ?view=subjects&class_id=' . $classId); exit; }
+
+// Get ALL descendant subject IDs (learning area → strands → sub-strands)
+$allSubIds = [$subjectId];
+$childStrands = $db->fetchAll("SELECT id, title FROM subjects WHERE parent_id=? AND class_id=? AND status='active' ORDER BY sort_order", [$subjectId, $classId]);
+foreach ($childStrands as $str) {
+    $allSubIds[] = $str['id'];
+    $grandchildren = $db->fetchAll("SELECT id FROM subjects WHERE parent_id=? AND class_id=? AND status='active'", [$str['id'], $classId]);
+    foreach ($grandchildren as $gc) { $allSubIds[] = $gc['id']; }
+}
+$phAll = implode(',', array_fill(0, count($allSubIds), '?'));
+
+// Get ALL lessons under this learning area and its strands/sub-strands
+$directLessons = $db->fetchAll("SELECT l.*, s.title as strand_name, s.level_type as strand_level FROM lessons l JOIN subjects s ON l.subject_id=s.id WHERE l.subject_id IN ($phAll) AND l.class_id=? AND l.status='published' ORDER BY s.sort_order, l.sort_order", array_merge($allSubIds, [$classId]));
+
+// Group lessons by strand for display
+$topics = $childStrands;
+$topicLessons = [];
+foreach ($childStrands as $str) {
+    $strSubIds = [$str['id']];
+    $subs = $db->fetchAll("SELECT id FROM subjects WHERE parent_id=? AND class_id=? AND status='active'", [$str['id'], $classId]);
+    foreach ($subs as $ss) { $strSubIds[] = $ss['id']; }
+    $phS = implode(',', array_fill(0, count($strSubIds), '?'));
+    $tL = $db->fetchAll("SELECT * FROM lessons WHERE subject_id IN ($phS) AND class_id=? AND status='published' ORDER BY sort_order", array_merge($strSubIds, [$classId]));
+    if (!empty($tL)) $topicLessons[$str['id']] = $tL;
+}
+// Direct lessons = only those directly on the learning area itself (usually none after cleanup)
+$directLessons = $db->fetchAll("SELECT * FROM lessons WHERE subject_id=? AND class_id=? AND status='published' ORDER BY sort_order", [$subjectId, $classId]);
+
+$completedIds = array_column($db->fetchAll("SELECT lesson_id FROM completions WHERE user_id=? AND class_id=?", [$userId, $classId]), 'lesson_id');
+
+// Revision materials for this subject
+// Only show past papers for non-Grade 10 classes (KCSE papers not relevant to CBE Grade 10)
+$revPapers = [];
+if ($classId != 4) {
+    $revPapers = $db->fetchAll("SELECT * FROM past_papers WHERE subject=? AND status='active' ORDER BY year DESC LIMIT 10", [$subjectInfo['title']]);
+}
+$revInteractives = $db->fetchAll("SELECT * FROM interactives WHERE subject=? AND status='active' ORDER BY title LIMIT 10", [$subjectInfo['title']]);
+?>
+
+<div class="sp-bc">
+    <?php if (count($myClasses) > 1): ?><a href="?view=classes">Classes</a><span class="sep">›</span><?php endif; ?>
+    <a href="?view=subjects&class_id=<?= $classId ?>"><?= htmlspecialchars($classInfo['title']) ?></a>
+    <span class="sep">›</span>
+    <span style="font-weight:700"><?= htmlspecialchars($subjectInfo['title']) ?></span>
+</div>
+
+<!-- Lessons -->
+<?php if (!empty($directLessons)): ?>
+<div class="lesson-list">
+<?php $num = 0; foreach ($directLessons as $l): $num++; $done = in_array($l['id'], $completedIds);
+    $file = $db->fetchOne("SELECT filetype FROM lesson_files WHERE lesson_id=? LIMIT 1", [$l['id']]);
+    $ft = $file['filetype'] ?? '';
+    $ti = 'bi-file-text';
+    if (in_array($ft, ['mp4','webm','video'])) $ti = 'bi-camera-video';
+    elseif ($ft === 'pdf') $ti = 'bi-file-pdf';
+    elseif (in_array($ft, ['html','htm'])) $ti = 'bi-code-slash';
+    elseif (in_array($ft, ['jpg','jpeg','png','image'])) $ti = 'bi-image';
+?>
+<a href="<?= SITE_URL ?>/class.php?id=<?= $classId ?>&lesson=<?= $l['id'] ?>" class="lesson-item">
+    <div class="lnum <?= $done ? 'lnum-done' : 'lnum-pending' ?>"><?= $done ? '✓' : $num ?></div>
+    <span class="lt"><?= htmlspecialchars($l['title']) ?></span>
+    <i class="bi <?= $ti ?> type-icon"></i>
+</a>
+<?php endforeach; ?>
+</div>
+<?php endif; ?>
+
+<?php foreach ($topics as $t):
+    $tLessons = $topicLessons[$t['id']] ?? [];
+    if (empty($tLessons)) continue;
+?>
+<div class="cat-label"><?= htmlspecialchars($t['title']) ?></div>
+<div class="lesson-list">
+<?php foreach ($tLessons as $l): $num++; $done = in_array($l['id'], $completedIds);
+    $file = $db->fetchOne("SELECT filetype FROM lesson_files WHERE lesson_id=? LIMIT 1", [$l['id']]);
+    $ft = $file['filetype'] ?? '';
+    $ti = 'bi-file-text';
+    if (in_array($ft, ['mp4','webm','video'])) $ti = 'bi-camera-video';
+    elseif ($ft === 'pdf') $ti = 'bi-file-pdf';
+    elseif (in_array($ft, ['html','htm'])) $ti = 'bi-code-slash';
+?>
+<a href="<?= SITE_URL ?>/class.php?id=<?= $classId ?>&lesson=<?= $l['id'] ?>" class="lesson-item">
+    <div class="lnum <?= $done ? 'lnum-done' : 'lnum-pending' ?>"><?= $done ? '✓' : $num ?></div>
+    <span class="lt"><?= htmlspecialchars($l['title']) ?></span>
+    <i class="bi <?= $ti ?> type-icon"></i>
+</a>
+<?php endforeach; ?>
+</div>
+<?php endforeach; ?>
+
+<?php if (empty($directLessons) && empty($topicLessons)): ?>
+<div class="empty-state"><i class="bi bi-journal-x"></i><h5 class="mt-2">No lessons yet</h5><p>Lessons for <?= htmlspecialchars($subjectInfo['title']) ?> are being prepared.</p></div>
+<?php endif; ?>
+
+<!-- ═══ REVISION TAB ═══ -->
+<?php if (!empty($revPapers) || !empty($revInteractives)): ?>
+<div class="rev-section">
+    <div class="cat-label">📚 Revision Materials — <?= htmlspecialchars($subjectInfo['title']) ?></div>
+    <div class="rev-grid">
+        <?php foreach ($revPapers as $p): ?>
+        <a href="<?= SITE_URL ?>/past-papers.php?download=<?= $p['id'] ?>" target="_blank" class="rev-card">
+            <span class="rev-type rt-paper">Past Paper</span>
+            <div style="font-weight:700;font-size:.88rem;margin-top:6px"><?= htmlspecialchars($p['title']) ?></div>
+            <div style="font-size:.72rem;color:var(--mut)"><?= $p['year'] ?> · <?= strtoupper($p['format']) ?></div>
+        </a>
+        <?php endforeach; ?>
+        <?php foreach ($revInteractives as $it): ?>
+        <a href="<?= SITE_URL ?>/interactives.php?play=<?= $it['id'] ?>" target="_blank" class="rev-card">
+            <span class="rev-type rt-interactive">Interactive</span>
+            <div style="font-weight:700;font-size:.88rem;margin-top:6px"><?= htmlspecialchars($it['title']) ?></div>
+            <div style="font-size:.72rem;color:var(--mut)"><?= ucfirst($it['type']) ?></div>
+        </a>
+        <?php endforeach; ?>
+    </div>
+</div>
+<?php endif; ?>
+
+<?php endif; ?>
+</div>
+<?php require_once __DIR__ . '/templates/footer.php'; ?>

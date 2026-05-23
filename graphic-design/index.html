@@ -1,0 +1,1227 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Learn Graphic Design in 8 Weeks | M.T.T.I Eldoret - TVETA Accredited</title>
+    <meta name="description" content="Master Photoshop, Illustrator & brand design in just 8 weeks. TVETA certified, hands-on training. Start earning KES 50,000+/month as a designer. Enroll now!">
+    
+    <!-- Open Graph for Social Sharing -->
+    <meta property="og:title" content="Learn Graphic Design in 8 Weeks | M.T.T.I Eldoret">
+    <meta property="og:description" content="Master Photoshop & Illustrator. Start earning as a freelance designer. TVETA certified. Only KES 12,000.">
+    <meta property="og:image" content="https://masomoteletraining.co.ke/wp-content/uploads/2026/02/graphic-design-og.jpg">
+    <meta property="og:url" content="https://masomoteletraining.co.ke/graphic-design/">
+    <meta property="og:type" content="website">
+    
+    <!-- Google Analytics with UTM Tracking -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-8ZEH42CBVL"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+      gtag('config', 'G-8ZEH42CBVL');
+      
+      // UTM Parameter Tracking
+      function getUTMParams() {
+        var params = new URLSearchParams(window.location.search);
+        return {
+          utm_source: params.get('utm_source') || 'direct',
+          utm_medium: params.get('utm_medium') || 'none',
+          utm_campaign: params.get('utm_campaign') || 'none',
+          utm_content: params.get('utm_content') || 'none',
+          utm_term: params.get('utm_term') || 'none',
+          landing_page: 'graphic-design'
+        };
+      }
+      
+      var utmData = getUTMParams();
+      sessionStorage.setItem('mtti_utm', JSON.stringify(utmData));
+      console.log('📊 Landing Page UTM:', utmData);
+      
+      function trackEvent(category, action, label) {
+        gtag('event', action, {
+          'event_category': category,
+          'event_label': label,
+          'utm_source': utmData.utm_source,
+          'utm_campaign': utmData.utm_campaign
+        });
+      }
+    </script>
+    
+    <!-- Meta Pixel (Facebook & Instagram) -->
+    <script>
+      !function(f,b,e,v,n,t,s)
+      {if(f.fbq)return;n=f.fbq=function(){n.callMethod?
+      n.callMethod.apply(n,arguments):n.queue.push(arguments)};
+      if(!f._fbq)f._fbq=n;n.push=n;n.loaded=!0;n.version='2.0';
+      n.queue=[];t=b.createElement(e);t.async=!0;
+      t.src=v;s=b.getElementsByTagName(e)[0];
+      s.parentNode.insertBefore(t,s)}(window, document,'script',
+      'https://connect.facebook.net/en_US/fbevents.js');
+      fbq('init', '893318556963600');
+      fbq('track', 'PageView');
+      fbq('track', 'ViewContent', {
+        content_name: 'Graphic Design Course',
+        content_category: 'landing_page',
+        value: 12000,
+        currency: 'KES'
+      });
+    </script>
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+    
+    <style>
+        :root {
+            --primary-green: #2E7D32;
+            --dark-green: #1B5E20;
+            --light-green: #4CAF50;
+            --accent-orange: #FF9800;
+            --dark-orange: #F57C00;
+            --creative-purple: #7B1FA2;
+            --creative-pink: #E91E63;
+            --white: #ffffff;
+            --off-white: #f8f9fa;
+            --dark: #1a1a2e;
+            --gray: #666;
+        }
+        
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        
+        body {
+            font-family: 'Poppins', sans-serif;
+            line-height: 1.7;
+            color: var(--dark);
+        }
+        
+        /* ===== MINIMAL HEADER ===== */
+        .lp-header {
+            background: linear-gradient(135deg, var(--creative-purple), var(--creative-pink));
+            padding: 15px 30px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .lp-logo {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            text-decoration: none;
+        }
+        
+        .lp-logo-icon {
+            width: 45px;
+            height: 45px;
+            background: var(--accent-orange);
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 800;
+            font-size: 1rem;
+            color: white;
+        }
+        
+        .lp-logo-text {
+            color: white;
+            font-size: 1.2rem;
+            font-weight: 700;
+        }
+        
+        .lp-phone {
+            color: white;
+            text-decoration: none;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        /* ===== HERO SECTION ===== */
+        .lp-hero {
+            background: linear-gradient(135deg, var(--creative-purple) 0%, var(--creative-pink) 50%, var(--dark-orange) 100%);
+            padding: 60px 30px 80px;
+            text-align: center;
+            color: white;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .lp-hero::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.05'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+        }
+        
+        .lp-hero-content {
+            position: relative;
+            z-index: 1;
+            max-width: 800px;
+            margin: 0 auto;
+        }
+        
+        .lp-badge {
+            display: inline-block;
+            background: var(--accent-orange);
+            padding: 8px 20px;
+            border-radius: 50px;
+            font-size: 0.9rem;
+            font-weight: 600;
+            margin-bottom: 25px;
+        }
+        
+        .lp-hero h1 {
+            font-size: 2.8rem;
+            font-weight: 800;
+            margin-bottom: 20px;
+            line-height: 1.2;
+        }
+        
+        .lp-hero h1 span {
+            color: var(--accent-orange);
+        }
+        
+        .lp-hero p {
+            font-size: 1.2rem;
+            opacity: 0.95;
+            margin-bottom: 30px;
+            max-width: 600px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+        
+        .lp-highlights {
+            display: flex;
+            justify-content: center;
+            gap: 30px;
+            flex-wrap: wrap;
+            margin-top: 30px;
+        }
+        
+        .lp-highlight {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            background: rgba(255,255,255,0.15);
+            padding: 12px 20px;
+            border-radius: 50px;
+        }
+        
+        .lp-highlight-icon {
+            font-size: 1.3rem;
+        }
+        
+        /* ===== SOCIAL PROOF BAR ===== */
+        .lp-social-proof {
+            background: white;
+            padding: 20px 30px;
+            display: flex;
+            justify-content: center;
+            gap: 40px;
+            flex-wrap: wrap;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+        }
+        
+        .lp-proof-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 0.95rem;
+            color: var(--dark);
+        }
+        
+        .lp-proof-item strong {
+            color: var(--creative-purple);
+        }
+        
+        /* ===== VIDEO SECTION ===== */
+        .lp-video-section {
+            padding: 60px 30px;
+            background: linear-gradient(135deg, #fce4ec, #f3e5f5);
+        }
+        
+        .lp-video-container {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+        
+        .lp-video-header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        
+        .lp-video-header h2 {
+            font-size: 1.8rem;
+            color: var(--dark);
+            margin-bottom: 10px;
+        }
+        
+        .lp-video-header h2 span {
+            color: var(--creative-purple);
+        }
+        
+        .lp-video-wrapper {
+            position: relative;
+            border-radius: 20px;
+            overflow: hidden;
+            box-shadow: 0 20px 60px rgba(123, 31, 162, 0.3);
+        }
+        
+        .lp-video {
+            width: 100%;
+            display: block;
+        }
+        
+        .lp-video-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(135deg, rgba(123, 31, 162, 0.6), rgba(233, 30, 99, 0.6));
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: background 0.3s;
+            gap: 15px;
+        }
+        
+        .lp-video-overlay:hover {
+            background: linear-gradient(135deg, rgba(123, 31, 162, 0.4), rgba(233, 30, 99, 0.4));
+        }
+        
+        .lp-video-overlay.hidden {
+            opacity: 0;
+            pointer-events: none;
+        }
+        
+        .lp-play-btn {
+            width: 80px;
+            height: 80px;
+            background: var(--accent-orange);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 10px 40px rgba(255,152,0,0.5);
+            transition: transform 0.3s;
+        }
+        
+        .lp-play-btn:hover {
+            transform: scale(1.1);
+        }
+        
+        .lp-play-btn svg {
+            width: 30px;
+            height: 30px;
+            fill: white;
+            margin-left: 5px;
+        }
+        
+        .lp-video-label {
+            color: white;
+            font-weight: 600;
+            font-size: 1.1rem;
+            text-shadow: 0 2px 10px rgba(0,0,0,0.3);
+        }
+        
+        /* ===== EARNINGS SECTION ===== */
+        .lp-earnings {
+            padding: 60px 30px;
+            background: white;
+        }
+        
+        .lp-earnings-container {
+            max-width: 900px;
+            margin: 0 auto;
+            text-align: center;
+        }
+        
+        .lp-earnings h2 {
+            font-size: 2rem;
+            margin-bottom: 40px;
+            color: var(--dark);
+        }
+        
+        .lp-earnings h2 span {
+            color: var(--creative-purple);
+        }
+        
+        .lp-earnings-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 25px;
+        }
+        
+        .lp-earning-card {
+            background: linear-gradient(135deg, #f3e5f5, #fce4ec);
+            padding: 30px 20px;
+            border-radius: 20px;
+            transition: transform 0.3s;
+        }
+        
+        .lp-earning-card:hover {
+            transform: translateY(-5px);
+        }
+        
+        .lp-earning-icon {
+            font-size: 2.5rem;
+            margin-bottom: 15px;
+        }
+        
+        .lp-earning-title {
+            font-weight: 700;
+            color: var(--dark);
+            margin-bottom: 8px;
+        }
+        
+        .lp-earning-price {
+            font-size: 1.4rem;
+            font-weight: 800;
+            color: var(--creative-purple);
+            margin-bottom: 5px;
+        }
+        
+        .lp-earning-note {
+            font-size: 0.85rem;
+            color: var(--gray);
+        }
+        
+        /* ===== FORM SECTION ===== */
+        .lp-form-section {
+            padding: 60px 30px;
+            background: linear-gradient(135deg, var(--creative-purple), var(--creative-pink));
+        }
+        
+        .lp-form-container {
+            max-width: 500px;
+            margin: 0 auto;
+        }
+        
+        .lp-form-card {
+            background: white;
+            border-radius: 24px;
+            overflow: hidden;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+        }
+        
+        .lp-form-header {
+            background: linear-gradient(135deg, var(--accent-orange), var(--dark-orange));
+            padding: 30px;
+            text-align: center;
+            color: white;
+        }
+        
+        .lp-form-header h2 {
+            font-size: 1.6rem;
+            margin-bottom: 8px;
+        }
+        
+        .lp-form-header p {
+            opacity: 0.95;
+        }
+        
+        .lp-form {
+            padding: 35px;
+            display: flex;
+            flex-direction: column;
+            gap: 18px;
+        }
+        
+        .lp-form input,
+        .lp-form select {
+            padding: 16px 20px;
+            border: 2px solid #e0e0e0;
+            border-radius: 12px;
+            font-size: 1rem;
+            font-family: inherit;
+            transition: all 0.3s;
+        }
+        
+        .lp-form input:focus,
+        .lp-form select:focus {
+            outline: none;
+            border-color: var(--creative-purple);
+            box-shadow: 0 0 0 4px rgba(123, 31, 162, 0.1);
+        }
+        
+        .lp-form button {
+            background: linear-gradient(135deg, var(--creative-purple), var(--creative-pink));
+            color: white;
+            border: none;
+            padding: 18px;
+            border-radius: 12px;
+            font-size: 1.1rem;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .lp-form button:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 12px 35px rgba(123, 31, 162, 0.4);
+        }
+        
+        .lp-form-footer {
+            text-align: center;
+            padding: 0 35px 25px;
+            color: var(--gray);
+            font-size: 0.85rem;
+        }
+        
+        .lp-form-or {
+            text-align: center;
+            padding: 10px 35px;
+            color: var(--gray);
+            font-size: 0.9rem;
+        }
+        
+        .lp-whatsapp-btn {
+            display: block;
+            margin: 0 35px 25px;
+            background: #25D366;
+            color: white;
+            text-decoration: none;
+            padding: 16px;
+            border-radius: 12px;
+            text-align: center;
+            font-weight: 600;
+            font-size: 1rem;
+            transition: background 0.3s;
+        }
+        
+        .lp-whatsapp-btn:hover {
+            background: #128C7E;
+        }
+        
+        .lp-success {
+            display: none;
+            text-align: center;
+            padding: 50px 35px;
+        }
+        
+        .lp-success.show {
+            display: block;
+        }
+        
+        .lp-success-icon {
+            font-size: 4rem;
+            margin-bottom: 20px;
+        }
+        
+        .lp-success h3 {
+            color: var(--creative-purple);
+            margin-bottom: 10px;
+        }
+        
+        /* ===== CURRICULUM SECTION ===== */
+        .lp-curriculum {
+            padding: 70px 30px;
+            background: var(--off-white);
+        }
+        
+        .lp-curriculum-container {
+            max-width: 900px;
+            margin: 0 auto;
+        }
+        
+        .lp-curriculum h2 {
+            text-align: center;
+            font-size: 2rem;
+            margin-bottom: 40px;
+            color: var(--dark);
+        }
+        
+        .lp-curriculum h2 span {
+            color: var(--creative-purple);
+        }
+        
+        .lp-curriculum-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 25px;
+        }
+        
+        .lp-curriculum-item {
+            display: flex;
+            gap: 15px;
+            padding: 25px;
+            background: white;
+            border-radius: 16px;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.05);
+            transition: all 0.3s;
+            border-left: 4px solid var(--creative-purple);
+        }
+        
+        .lp-curriculum-item:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 30px rgba(123, 31, 162, 0.15);
+        }
+        
+        .lp-curriculum-week {
+            background: linear-gradient(135deg, var(--creative-purple), var(--creative-pink));
+            color: white;
+            width: 50px;
+            height: 50px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            flex-shrink: 0;
+        }
+        
+        .lp-curriculum-content h4 {
+            font-size: 1.1rem;
+            margin-bottom: 5px;
+            color: var(--dark);
+        }
+        
+        .lp-curriculum-content p {
+            color: var(--gray);
+            font-size: 0.9rem;
+        }
+        
+        /* ===== TESTIMONIAL ===== */
+        .lp-testimonial {
+            padding: 60px 30px;
+            background: white;
+        }
+        
+        .lp-testimonial-container {
+            max-width: 700px;
+            margin: 0 auto;
+            text-align: center;
+        }
+        
+        .lp-testimonial-quote {
+            font-size: 1.2rem;
+            font-style: italic;
+            color: var(--dark);
+            margin-bottom: 25px;
+            position: relative;
+            padding: 0 20px;
+        }
+        
+        .lp-testimonial-quote::before {
+            content: '"';
+            font-size: 4rem;
+            color: var(--creative-purple);
+            opacity: 0.3;
+            position: absolute;
+            top: -20px;
+            left: 0;
+        }
+        
+        .lp-testimonial-author {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 15px;
+        }
+        
+        .lp-testimonial-avatar {
+            width: 60px;
+            height: 60px;
+            background: linear-gradient(135deg, var(--creative-purple), var(--creative-pink));
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: 700;
+        }
+        
+        .lp-testimonial-info h4 {
+            color: var(--dark);
+            margin-bottom: 2px;
+        }
+        
+        .lp-testimonial-info span {
+            color: var(--gray);
+            font-size: 0.9rem;
+        }
+        
+        /* ===== FAQ SECTION ===== */
+        .lp-faq {
+            padding: 60px 30px;
+            background: linear-gradient(135deg, #f3e5f5, #fce4ec);
+        }
+        
+        .lp-faq-container {
+            max-width: 700px;
+            margin: 0 auto;
+        }
+        
+        .lp-faq h2 {
+            text-align: center;
+            font-size: 1.8rem;
+            margin-bottom: 30px;
+            color: var(--dark);
+        }
+        
+        .lp-faq-item {
+            background: white;
+            border-radius: 12px;
+            margin-bottom: 15px;
+            overflow: hidden;
+        }
+        
+        .lp-faq-question {
+            padding: 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            cursor: pointer;
+            font-weight: 600;
+            color: var(--dark);
+        }
+        
+        .lp-faq-icon {
+            width: 28px;
+            height: 28px;
+            background: var(--creative-purple);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 1.2rem;
+            transition: transform 0.3s;
+        }
+        
+        .lp-faq-item.active .lp-faq-icon {
+            transform: rotate(45deg);
+        }
+        
+        .lp-faq-answer {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.3s;
+        }
+        
+        .lp-faq-item.active .lp-faq-answer {
+            max-height: 200px;
+        }
+        
+        .lp-faq-answer p {
+            padding: 0 20px 20px;
+            color: var(--gray);
+        }
+        
+        /* ===== URGENCY BAR ===== */
+        .lp-urgency {
+            background: var(--accent-orange);
+            color: white;
+            text-align: center;
+            padding: 15px 30px;
+            font-weight: 600;
+        }
+        
+        .lp-urgency span {
+            background: rgba(255,255,255,0.2);
+            padding: 5px 12px;
+            border-radius: 20px;
+            margin-left: 10px;
+        }
+        
+        /* ===== FOOTER CTA ===== */
+        .lp-footer-cta {
+            background: linear-gradient(135deg, var(--creative-purple), var(--creative-pink));
+            padding: 50px 30px;
+            text-align: center;
+            color: white;
+        }
+        
+        .lp-footer-cta h3 {
+            font-size: 1.8rem;
+            margin-bottom: 20px;
+        }
+        
+        .lp-footer-cta-buttons {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            flex-wrap: wrap;
+        }
+        
+        .lp-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            padding: 16px 30px;
+            border-radius: 50px;
+            font-weight: 600;
+            font-size: 1rem;
+            text-decoration: none;
+            transition: all 0.3s;
+        }
+        
+        .lp-btn-primary {
+            background: var(--accent-orange);
+            color: white;
+        }
+        
+        .lp-btn-primary:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 30px rgba(255, 152, 0, 0.4);
+        }
+        
+        .lp-btn-outline {
+            background: transparent;
+            color: white;
+            border: 2px solid white;
+        }
+        
+        .lp-btn-outline:hover {
+            background: white;
+            color: var(--creative-purple);
+        }
+        
+        /* ===== FOOTER ===== */
+        .lp-footer {
+            background: var(--dark);
+            color: rgba(255,255,255,0.7);
+            text-align: center;
+            padding: 25px;
+            font-size: 0.9rem;
+        }
+        
+        /* ===== STICKY MOBILE CTA ===== */
+        .lp-sticky-cta {
+            display: none;
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: #25D366;
+            padding: 15px 20px;
+            z-index: 1000;
+            box-shadow: 0 -4px 20px rgba(0,0,0,0.2);
+        }
+        
+        .lp-sticky-cta a {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            color: white;
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 1rem;
+        }
+        
+        /* ===== RESPONSIVE ===== */
+        @media (max-width: 768px) {
+            .lp-hero h1 { font-size: 2rem; }
+            .lp-hero p { font-size: 1rem; }
+            .lp-highlights { gap: 15px; }
+            .lp-highlight { padding: 10px 15px; font-size: 0.9rem; }
+            .lp-earnings-grid { grid-template-columns: 1fr; }
+            .lp-curriculum-grid { grid-template-columns: 1fr; }
+            .lp-social-proof { gap: 20px; }
+            .lp-sticky-cta { display: block; }
+            body { padding-bottom: 70px; }
+            .lp-phone { display: none; }
+        }
+    </style>
+<script type="text/javascript">(function(c,l,a,r,i,t,y){c[a]=c[a]||function(){(c[a].q=c[a].q||[]).push(arguments)};t=l.createElement(r);t.async=1;t.src="https://www.clarity.ms/tag/"+i;y=l.getElementsByTagName(r)[0];y.parentNode.insertBefore(t,y);})(window,document,"clarity","script","wg31zlwbt9");</script>\n</head>
+<body>
+    <!-- Minimal Header -->
+    <header class="lp-header">
+        <a href="/" class="lp-logo">
+            <div class="lp-logo-icon">MT</div>
+            <div class="lp-logo-text">M.T.T.I</div>
+        </a>
+        <a href="tel:+254712464936" class="lp-phone">
+            📞 +254 712 464 936
+        </a>
+    </header>
+    
+    <!-- Urgency Bar -->
+    <div class="lp-urgency">
+        🔥 February Intake Now Open! <span>Only 12 Slots Left</span>
+    </div>
+    
+    <!-- Hero Section -->
+    <section class="lp-hero">
+        <div class="lp-hero-content">
+            <div class="lp-badge">🎓 TVETA Accredited</div>
+            <h1>Become a <span>Graphic Designer</span> in Just 8 Weeks</h1>
+            <p>Master Photoshop, Illustrator & brand design. Start earning KES 30,000 - 100,000/month as a freelancer or get employed.</p>
+            
+            <div class="lp-highlights">
+                <div class="lp-highlight">
+                    <span class="lp-highlight-icon">⏱️</span>
+                    <span>8 Weeks</span>
+                </div>
+                <div class="lp-highlight">
+                    <span class="lp-highlight-icon">💰</span>
+                    <span>KES 12,000</span>
+                </div>
+                <div class="lp-highlight">
+                    <span class="lp-highlight-icon">💼</span>
+                    <span>Portfolio Included</span>
+                </div>
+            </div>
+        </div>
+    </section>
+    
+    <!-- Social Proof Bar -->
+    <section class="lp-social-proof">
+        <div class="lp-proof-item">
+            <span>🎓</span>
+            <span><strong>50+</strong> Designers Trained</span>
+        </div>
+        <div class="lp-proof-item">
+            <span>💼</span>
+            <span><strong>85%</strong> Now Earning</span>
+        </div>
+        <div class="lp-proof-item">
+            <span>⭐</span>
+            <span><strong>4.9/5</strong> Student Rating</span>
+        </div>
+    </section>
+    
+    <!-- Video Section -->
+    <section class="lp-video-section">
+        <div class="lp-video-container">
+            <div class="lp-video-header">
+                <h2>Watch: What You'll <span>Learn</span></h2>
+            </div>
+            <div class="lp-video-wrapper">
+                <video class="lp-video" id="lpVideo" poster="" muted playsinline preload="metadata">
+                    <source src="https://masomoteletraining.co.ke/wp-content/uploads/2026/02/Web-English.mp4" type="video/mp4">
+                </video>
+                <div class="lp-video-overlay" id="lpVideoOverlay" onclick="playLPVideo()">
+                    <div class="lp-play-btn">
+                        <svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
+                    </div>
+                    <span class="lp-video-label">▶ Watch Course Preview</span>
+                </div>
+            </div>
+        </div>
+    </section>
+    
+    <!-- Earnings Potential Section -->
+    <section class="lp-earnings">
+        <div class="lp-earnings-container">
+            <h2>Start <span>Earning</span> With These Skills</h2>
+            
+            <div class="lp-earnings-grid">
+                <div class="lp-earning-card">
+                    <div class="lp-earning-icon">🎨</div>
+                    <div class="lp-earning-title">Logo Design</div>
+                    <div class="lp-earning-price">KES 3,000 - 15,000</div>
+                    <div class="lp-earning-note">per logo</div>
+                </div>
+                <div class="lp-earning-card">
+                    <div class="lp-earning-icon">📱</div>
+                    <div class="lp-earning-title">Social Media Graphics</div>
+                    <div class="lp-earning-price">KES 500 - 2,000</div>
+                    <div class="lp-earning-note">per post</div>
+                </div>
+                <div class="lp-earning-card">
+                    <div class="lp-earning-icon">🏢</div>
+                    <div class="lp-earning-title">Brand Identity</div>
+                    <div class="lp-earning-price">KES 20,000 - 50,000</div>
+                    <div class="lp-earning-note">per project</div>
+                </div>
+                <div class="lp-earning-card">
+                    <div class="lp-earning-icon">📄</div>
+                    <div class="lp-earning-title">Flyers & Posters</div>
+                    <div class="lp-earning-price">KES 1,000 - 5,000</div>
+                    <div class="lp-earning-note">per design</div>
+                </div>
+                <div class="lp-earning-card">
+                    <div class="lp-earning-icon">👔</div>
+                    <div class="lp-earning-title">Business Cards</div>
+                    <div class="lp-earning-price">KES 1,500 - 3,000</div>
+                    <div class="lp-earning-note">per design</div>
+                </div>
+                <div class="lp-earning-card">
+                    <div class="lp-earning-icon">📦</div>
+                    <div class="lp-earning-title">Packaging Design</div>
+                    <div class="lp-earning-price">KES 10,000 - 30,000</div>
+                    <div class="lp-earning-note">per project</div>
+                </div>
+            </div>
+        </div>
+    </section>
+    
+    <!-- Lead Capture Form -->
+    <section class="lp-form-section" id="enroll">
+        <div class="lp-form-container">
+            <div class="lp-form-card">
+                <div class="lp-form-header">
+                    <h2>🎁 Get 10% OFF Today!</h2>
+                    <p>Fill the form & we'll call you within 24 hours</p>
+                </div>
+                
+                <form class="lp-form" id="lpForm" onsubmit="submitLPForm(event)">
+                    <input type="text" name="name" placeholder="Your Full Name" required>
+                    <input type="tel" name="phone" placeholder="Phone Number (07XX XXX XXX)" required>
+                    <input type="text" name="location" placeholder="Your Town/Area">
+                    <input type="hidden" name="course" value="Graphic Design">
+                    <button type="submit">🎨 Start My Design Career</button>
+                </form>
+                
+                <div class="lp-form-or">— OR —</div>
+                
+                <a href="https://wa.me/254712464936?text=Hello%20M.T.T.I,%20I'm%20interested%20in%20the%20Graphic%20Design%20course.%20Please%20send%20me%20more%20information." 
+                   class="lp-whatsapp-btn" target="_blank" onclick="trackWhatsAppClick()">
+                    💬 Chat on WhatsApp Now
+                </a>
+                
+                <div class="lp-form-footer">
+                    🔒 We respect your privacy. No spam, ever.
+                </div>
+                
+                <div class="lp-success" id="lpSuccess">
+                    <div class="lp-success-icon">🎉</div>
+                    <h3>Thank You!</h3>
+                    <p>We'll call you within 24 hours to discuss your enrollment and discount.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+    
+    <!-- Curriculum Section -->
+    <section class="lp-curriculum">
+        <div class="lp-curriculum-container">
+            <h2>What You'll <span>Learn</span> (8 Weeks)</h2>
+            
+            <div class="lp-curriculum-grid">
+                <div class="lp-curriculum-item">
+                    <div class="lp-curriculum-week">1-2</div>
+                    <div class="lp-curriculum-content">
+                        <h4>Adobe Photoshop Mastery</h4>
+                        <p>Photo editing, manipulation, retouching, and social media graphics</p>
+                    </div>
+                </div>
+                <div class="lp-curriculum-item">
+                    <div class="lp-curriculum-week">3-4</div>
+                    <div class="lp-curriculum-content">
+                        <h4>Adobe Illustrator</h4>
+                        <p>Vector graphics, logo design, illustrations, and scalable artwork</p>
+                    </div>
+                </div>
+                <div class="lp-curriculum-item">
+                    <div class="lp-curriculum-week">5-6</div>
+                    <div class="lp-curriculum-content">
+                        <h4>Brand Identity Design</h4>
+                        <p>Creating complete brand packages: logos, colors, typography, guidelines</p>
+                    </div>
+                </div>
+                <div class="lp-curriculum-item">
+                    <div class="lp-curriculum-week">7-8</div>
+                    <div class="lp-curriculum-content">
+                        <h4>Portfolio & Business</h4>
+                        <p>Build your portfolio, pricing strategies, finding clients, freelancing tips</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+    
+    <!-- Testimonial -->
+    <section class="lp-testimonial">
+        <div class="lp-testimonial-container">
+            <p class="lp-testimonial-quote">
+                I joined MTTI with zero design experience. After 8 weeks, I designed my first logo for a real client and got paid KES 5,000! Now I have a steady stream of clients from social media. This course changed my life.
+            </p>
+            <div class="lp-testimonial-author">
+                <div class="lp-testimonial-avatar">AM</div>
+                <div class="lp-testimonial-info">
+                    <h4>Ann Muthoni</h4>
+                    <span>Graphic Design Graduate, Now Freelancer</span>
+                </div>
+            </div>
+        </div>
+    </section>
+    
+    <!-- FAQ Section -->
+    <section class="lp-faq">
+        <div class="lp-faq-container">
+            <h2>Common Questions</h2>
+            
+            <div class="lp-faq-item">
+                <div class="lp-faq-question" onclick="toggleFAQ(this)">
+                    <span>Do I need any design experience?</span>
+                    <div class="lp-faq-icon">+</div>
+                </div>
+                <div class="lp-faq-answer">
+                    <p>No! We start from zero. Many of our successful graduates had never used Photoshop before joining.</p>
+                </div>
+            </div>
+            
+            <div class="lp-faq-item">
+                <div class="lp-faq-question" onclick="toggleFAQ(this)">
+                    <span>Do I need my own laptop?</span>
+                    <div class="lp-faq-icon">+</div>
+                </div>
+                <div class="lp-faq-answer">
+                    <p>No! We provide all computers with Adobe software installed. Just come ready to learn.</p>
+                </div>
+            </div>
+            
+            <div class="lp-faq-item">
+                <div class="lp-faq-question" onclick="toggleFAQ(this)">
+                    <span>Can I pay in installments?</span>
+                    <div class="lp-faq-icon">+</div>
+                </div>
+                <div class="lp-faq-answer">
+                    <p>Yes! Pay a deposit to start, then complete the balance in weekly or monthly installments.</p>
+                </div>
+            </div>
+            
+            <div class="lp-faq-item">
+                <div class="lp-faq-question" onclick="toggleFAQ(this)">
+                    <span>Will I get a certificate?</span>
+                    <div class="lp-faq-icon">+</div>
+                </div>
+                <div class="lp-faq-answer">
+                    <p>Yes! You'll receive a TVETA-accredited certificate recognized by employers across Kenya.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+    
+    <!-- Footer CTA -->
+    <section class="lp-footer-cta">
+        <h3>Ready to Become a Graphic Designer?</h3>
+        <div class="lp-footer-cta-buttons">
+            <a href="#enroll" class="lp-btn lp-btn-primary">
+                🎨 Enroll Now - Get 10% OFF
+            </a>
+            <a href="tel:+254712464936" class="lp-btn lp-btn-outline">
+                📞 Call Us
+            </a>
+        </div>
+    </section>
+    
+    <!-- Footer -->
+    <footer class="lp-footer">
+        <p>© 2026 Masomotele Technical Training Institute | Sagaas Center, 4th Floor, Eldoret</p>
+    </footer>
+    
+    <!-- Sticky Mobile CTA -->
+    <div class="lp-sticky-cta">
+        <a href="https://wa.me/254712464936?text=Hello%20M.T.T.I,%20I'm%20interested%20in%20the%20Graphic%20Design%20course.%20Please%20send%20me%20more%20information." target="_blank">
+            💬 Chat on WhatsApp - Graphic Design
+        </a>
+    </div>
+    
+    <!-- JavaScript -->
+    <script>
+        // Video Player
+        function playLPVideo() {
+            var video = document.getElementById('lpVideo');
+            var overlay = document.getElementById('lpVideoOverlay');
+            video.muted = false;
+            video.play();
+            overlay.classList.add('hidden');
+            video.addEventListener('ended', function() {
+                overlay.classList.remove('hidden');
+            });
+            
+            trackEvent('Video', 'play', 'graphic_design_preview');
+        }
+        
+        // FAQ Toggle
+        function toggleFAQ(element) {
+            var item = element.parentElement;
+            var isActive = item.classList.contains('active');
+            
+            document.querySelectorAll('.lp-faq-item').forEach(function(faq) {
+                faq.classList.remove('active');
+            });
+            
+            if (!isActive) {
+                item.classList.add('active');
+            }
+        }
+        
+        // Form Submission
+        function submitLPForm(e) {
+            e.preventDefault();
+            var form = e.target;
+            var data = {
+                name: form.name.value,
+                phone: form.phone.value,
+                location: form.location.value,
+                course: form.course.value,
+                source: 'landing_page',
+                utm: JSON.parse(sessionStorage.getItem('mtti_utm') || '{}'),
+                timestamp: new Date().toISOString(),
+                page: '/graphic-design'
+            };
+            
+            // Track conversion
+            trackEvent('Lead', 'captured', 'graphic_design_landing');
+            if (typeof fbq === 'function') {
+                fbq('track', 'Lead', { 
+                    content_name: 'Graphic Design',
+                    content_category: 'landing_page',
+                    value: 12000,
+                    currency: 'KES'
+                });
+            }
+            
+            // Send to backend
+            sendToSheet(data);
+            
+            // Show success
+            form.style.display = 'none';
+            document.querySelector('.lp-form-or').style.display = 'none';
+            document.querySelector('.lp-whatsapp-btn').style.display = 'none';
+            document.getElementById('lpSuccess').classList.add('show');
+        }
+        
+        // Send to Google Sheets
+        function sendToSheet(data) {
+            console.log('📝 Lead captured:', data);
+            
+            // Store locally as backup
+            var leads = JSON.parse(localStorage.getItem('mtti_leads') || '[]');
+            leads.push(data);
+            localStorage.setItem('mtti_leads', JSON.stringify(leads));
+            
+            // Replace with your Google Apps Script Web App URL
+            var sheetURL = 'https://script.google.com/macros/s/YOUR_SCRIPT_ID/exec';
+            
+            fetch(sheetURL, {
+                method: 'POST',
+                mode: 'no-cors',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(data)
+            }).catch(function(err) {
+                console.log('Sheet submission queued');
+            });
+        }
+        
+        // Track WhatsApp clicks
+        function trackWhatsAppClick() {
+            trackEvent('WhatsApp', 'click', 'graphic_design_landing');
+            if (typeof fbq === 'function') {
+                fbq('track', 'Contact', { content_name: 'Graphic Design' });
+            }
+        }
+        
+        // Smooth scroll to form
+        document.querySelectorAll('a[href="#enroll"]').forEach(function(link) {
+            link.addEventListener('click', function(e) {
+                e.preventDefault();
+                document.querySelector('.lp-form-section').scrollIntoView({ behavior: 'smooth' });
+            });
+        });
+    </script>
+</body>
+</html>

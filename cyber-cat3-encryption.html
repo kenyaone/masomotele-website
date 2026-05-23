@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CAT 3: Encryption & Cryptography | M.T.T.I</title>
+    <style>
+        :root{--c:#8b5cf6;--c2:#7c3aed;--bg:#0f0a1e;--card:#1a1333}
+        *{margin:0;padding:0;box-sizing:border-box}body{font-family:'Segoe UI',system-ui,sans-serif;background:linear-gradient(135deg,var(--bg),var(--card));color:#e0d4ff;min-height:100vh}
+        .screen{min-height:100vh;display:flex;align-items:center;justify-content:center;padding:20px}.card{background:var(--card);border:1px solid var(--c);border-radius:20px;padding:40px;max-width:650px;width:100%;text-align:center}
+        .badge{background:linear-gradient(135deg,var(--c),var(--c2));color:#fff;padding:8px 24px;border-radius:20px;font-size:0.85rem;font-weight:600;display:inline-block;margin-bottom:15px}
+        .icon{font-size:4rem;margin-bottom:15px}h1{font-size:1.8rem;color:var(--c);margin-bottom:8px}h2{font-size:1rem;color:#a78bfa;margin-bottom:25px;font-weight:400}
+        .topics{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:25px;text-align:left}.topic{background:rgba(139,92,246,0.1);border:1px solid rgba(139,92,246,0.3);padding:10px 12px;border-radius:8px;font-size:0.85rem;color:#a78bfa}
+        .info{display:grid;grid-template-columns:repeat(3,1fr);gap:15px;margin-bottom:25px}.info-box{background:rgba(139,92,246,0.1);padding:15px;border-radius:10px}.info-box span{display:block;color:#a78bfa;font-size:0.75rem;text-transform:uppercase}.info-box b{color:var(--c);font-size:1.4rem}
+        input[type=text]{width:100%;padding:15px;background:rgba(0,0,0,0.3);border:2px solid #3d2a6f;border-radius:10px;color:#fff;font-size:1rem;text-align:center;margin-bottom:20px}input:focus{outline:none;border-color:var(--c)}
+        .btn{width:100%;padding:16px;font-size:1.1rem;font-weight:600;background:linear-gradient(135deg,var(--c),var(--c2));color:#fff;border:none;border-radius:12px;cursor:pointer}.btn:disabled{opacity:0.5;cursor:not-allowed}
+        .exam{display:none;padding:20px}.container{max-width:900px;margin:0 auto}
+        .header{background:var(--card);border:1px solid var(--c);border-radius:16px;padding:15px 20px;margin-bottom:20px;display:flex;justify-content:space-between;align-items:center;position:sticky;top:10px;z-index:100}
+        .header h1{font-size:1rem;color:var(--c)}.timer{background:linear-gradient(135deg,var(--c),var(--c2));padding:8px 20px;border-radius:20px;font-weight:600;font-size:0.95rem;color:#fff}.timer.warn{background:#ef4444;animation:pulse 1s infinite}@keyframes pulse{50%{opacity:0.7}}
+        .qcard{background:var(--card);border:1px solid #3d2a6f;border-radius:16px;padding:25px;margin-bottom:20px}
+        .qnum{background:linear-gradient(135deg,var(--c),var(--c2));color:#fff;padding:5px 14px;border-radius:15px;font-size:0.8rem;font-weight:600;display:inline-block;margin-bottom:15px}
+        .scenario{background:rgba(139,92,246,0.1);border-left:4px solid var(--c);padding:12px 15px;border-radius:0 8px 8px 0;margin-bottom:15px;color:#a78bfa;font-size:0.9rem}
+        .qtext{font-size:1.1rem;margin-bottom:20px;line-height:1.5}
+        .opts{display:flex;flex-direction:column;gap:10px}.opt{background:rgba(0,0,0,0.2);border:2px solid #3d2a6f;border-radius:10px;padding:14px 16px;cursor:pointer;display:flex;align-items:center;gap:12px;transition:all 0.2s}
+        .opt:hover{border-color:var(--c);background:rgba(139,92,246,0.1)}.opt.sel{border-color:var(--c);background:rgba(139,92,246,0.2)}.opt.correct{border-color:#22c55e;background:rgba(34,197,94,0.2)}.opt.wrong{border-color:#ef4444;background:rgba(239,68,68,0.2)}
+        .letter{width:32px;height:32px;border-radius:50%;background:rgba(139,92,246,0.2);display:flex;align-items:center;justify-content:center;font-weight:600;color:var(--c);flex-shrink:0}
+        .opt.sel .letter{background:var(--c);color:#fff}.opt.correct .letter{background:#22c55e;color:#fff}.opt.wrong .letter{background:#ef4444;color:#fff}
+        .nav{display:flex;gap:15px;margin-top:20px}.nav button{flex:1;padding:14px;border:none;border-radius:10px;font-size:1rem;font-weight:600;cursor:pointer}
+        .nav .sec{background:rgba(139,92,246,0.2);color:var(--c)}.nav .pri{background:linear-gradient(135deg,var(--c),var(--c2));color:#fff}.nav .sub{background:linear-gradient(135deg,#22c55e,#16a34a);color:#fff}
+        .results{display:none}.results .card{max-width:480px}.res-icon{font-size:5rem;margin-bottom:15px}.res-status{font-size:2rem;font-weight:800}.res-status.pass{color:#22c55e}.res-status.fail{color:#ef4444}
+        .res-score{font-size:4rem;font-weight:800;color:var(--c);margin:10px 0}.res-detail{color:#a78bfa;margin-bottom:25px}
+        .breakdown{display:grid;grid-template-columns:1fr 1fr;gap:15px;margin-bottom:25px}.breakdown div{background:rgba(139,92,246,0.1);padding:15px;border-radius:10px}.breakdown span{color:#a78bfa;font-size:0.8rem;display:block}.breakdown b{font-size:1.3rem}
+        .res-btns{display:flex;gap:15px}.res-btns button{flex:1;padding:14px;border:none;border-radius:10px;font-weight:600;cursor:pointer}.res-btns .rev{background:rgba(139,92,246,0.2);color:var(--c)}.res-btns .retry{background:linear-gradient(135deg,var(--c),var(--c2));color:#fff}
+        .explain{margin-top:15px;padding:12px;background:rgba(34,197,94,0.1);border-radius:8px;border-left:4px solid #22c55e;text-align:left}.explain b{color:#22c55e}.explain p{color:#a78bfa;margin-top:5px;font-size:0.9rem}
+    </style>
+<meta name="description" content="Professional training courses at MTTI Eldoret. TVETA-accredited programs in IT, healthcare, and creative fields. Enroll today.">
+<script type="text/javascript">(function(c,l,a,r,i,t,y){c[a]=c[a]||function(){(c[a].q=c[a].q||[]).push(arguments)};t=l.createElement(r);t.async=1;t.src="https://www.clarity.ms/tag/"+i;y=l.getElementsByTagName(r)[0];y.parentNode.insertBefore(t,y);})(window,document,"clarity","script","wg31zlwbt9");</script>\n</head>
+<body>
+    <div id="start" class="screen"><div class="card">
+        <div class="badge">🔐 CAT 3</div><div class="icon">🔑</div>
+        <h1>Encryption & Cryptography</h1><h2>Masomotele Technical Training Institute</h2>
+        <div class="topics"><div class="topic">🔐 Symmetric Encryption</div><div class="topic">🔐 Asymmetric Encryption</div><div class="topic">🔐 Hashing Algorithms</div><div class="topic">🔐 Digital Signatures</div><div class="topic">🔐 SSL/TLS Certificates</div><div class="topic">🔐 PKI Infrastructure</div></div>
+        <div class="info"><div class="info-box"><span>Questions</span><b>10</b></div><div class="info-box"><span>Duration</span><b>20 min</b></div><div class="info-box"><span>Pass Mark</span><b>50%</b></div></div>
+        <input type="text" id="name" placeholder="Enter Your Full Name"><button class="btn" id="startBtn" disabled>Start Exam</button>
+    </div></div>
+    <div id="exam" class="exam"><div class="container">
+        <div class="header"><div style="display:flex;align-items:center;gap:10px"><span style="font-size:1.3rem">🔑</span><h1>Encryption & Cryptography</h1></div><div style="display:flex;align-items:center;gap:15px"><span id="prog">1/10</span><div class="timer" id="timer">20:00</div></div></div>
+        <div id="qbox"></div>
+        <div class="nav"><button class="sec" id="prev" onclick="prev()">← Previous</button><button class="pri" id="next" onclick="next()">Next →</button></div>
+    </div></div>
+    <div id="results" class="results screen"><div class="card">
+        <div class="res-icon" id="resIcon">🏆</div><div class="res-status" id="resStatus">PASSED</div><div class="res-score" id="resScore">80%</div><div class="res-detail" id="resDetail">8/10 correct</div>
+        <div class="breakdown"><div><span>Correct</span><b id="corr">8</b></div><div><span>Time Used</span><b id="time">15:30</b></div></div>
+        <div class="res-btns"><button class="rev" onclick="review()">📝 Review</button><button class="retry" onclick="location.reload()">🔄 Retry</button></div>
+    </div></div>
+<script>
+const Q=[
+    {q:"What type of encryption uses the SAME key for encryption and decryption?",s:"M.T.T.I needs fast encryption for large backup files.",o:["Asymmetric encryption","Symmetric encryption","Hashing","Digital signatures"],a:1,e:"Symmetric encryption uses one shared key for both encrypting and decrypting data."},
+    {q:"In asymmetric encryption, which key encrypts data for a specific recipient?",s:"You want to send a confidential message to a colleague.",o:["Your private key","Your public key","Recipient's private key","Recipient's public key"],a:3,e:"Use the recipient's public key to encrypt; only their private key can decrypt it."},
+    {q:"What is the PRIMARY purpose of a hash function like SHA-256?",s:"You need to verify a downloaded file wasn't tampered with.",o:["Encrypt data for transmission","Create a fixed-size fingerprint for integrity","Generate encryption keys","Establish secure connections"],a:1,e:"Hash functions create unique fixed-size outputs to verify data integrity."},
+    {q:"Which statement about hashing is TRUE?",o:["Hashing is reversible","Same input produces different outputs","Hashing is a one-way function","Hash output lengths vary by input size"],a:2,e:"Hashing is one-way - you cannot reverse a hash to get the original data."},
+    {q:"What does SSL/TLS primarily provide for websites?",s:"You see a padlock icon when visiting your bank's website.",o:["Faster page loading","Encryption and authentication","Better search rankings","Malware protection"],a:1,e:"SSL/TLS encrypts data in transit and authenticates the website's identity."},
+    {q:"Which algorithm is an example of SYMMETRIC encryption?",o:["RSA","AES","Diffie-Hellman","ECC"],a:1,e:"AES (Advanced Encryption Standard) uses the same key for encryption/decryption."},
+    {q:"What is a digital signature used for?",s:"You receive a software update and need to verify it's genuine.",o:["Encrypting files for storage","Verifying authenticity and integrity","Creating strong passwords","Blocking malicious websites"],a:1,e:"Digital signatures verify the sender's identity and that content wasn't altered."},
+    {q:"What does PKI stand for?",o:["Private Key Infrastructure","Public Key Infrastructure","Protected Key Index","Primary Key Identifier"],a:1,e:"PKI (Public Key Infrastructure) manages certificates and public-key encryption."},
+    {q:"What is the BEST way to store user passwords?",s:"You're designing M.T.T.I's login system database.",o:["Plain text in database","Encrypted with AES","Hashed with salt (bcrypt/Argon2)","Base64 encoded"],a:2,e:"Passwords should be hashed with salt using bcrypt or Argon2, never stored plain or simply encrypted."},
+    {q:"What is the purpose of a Certificate Authority (CA)?",s:"Your browser warns about an untrusted website certificate.",o:["Generate encryption keys","Issue and verify digital certificates","Create hash values","Manage firewall rules"],a:1,e:"CAs issue digital certificates that verify the identity of websites and organizations."}
+];
+let cur=0,ans=Array(Q.length).fill(null),left=1200,tmr,start,reviewing=false;
+const $=id=>document.getElementById(id);
+$('name').oninput=e=>$('startBtn').disabled=!e.target.value.trim();
+$('startBtn').onclick=()=>{start=Date.now();$('start').style.display='none';$('exam').style.display='block';render();tmr=setInterval(tick,1000)};
+function tick(){left--;$('timer').textContent=`${Math.floor(left/60)}:${(left%60).toString().padStart(2,'0')}`;if(left<=300)$('timer').classList.add('warn');if(left<=0)end()}
+function render(){const q=Q[cur];$('prog').textContent=`${cur+1}/${Q.length}`;$('qbox').innerHTML=`<div class="qcard"><div class="qnum">Question ${cur+1}</div>${q.s?`<div class="scenario">📋 ${q.s}</div>`:''}<div class="qtext">${q.q}</div><div class="opts">${q.o.map((o,i)=>`<div class="opt ${ans[cur]===i?'sel':''} ${reviewing?(i===q.a?'correct':ans[cur]===i?'wrong':''):''}" onclick="${reviewing?'':`sel(${i})`}"><div class="letter">${'ABCD'[i]}</div><div>${o}</div></div>`).join('')}</div>${reviewing?`<div class="explain"><b>✓ Explanation:</b><p>${q.e}</p></div>`:''}</div>`;$('prev').style.visibility=cur===0?'hidden':'visible';$('next').textContent=cur===Q.length-1?(reviewing?'Finish':'Submit'):'Next →';$('next').className=`${cur===Q.length-1&&!reviewing?'sub':'pri'}`}
+function sel(i){if(!reviewing){ans[cur]=i;render()}}
+function prev(){if(cur>0){cur--;render()}}
+function next(){if(cur<Q.length-1){cur++;render()}else if(reviewing)location.reload();else end()}
+function end(){clearInterval(tmr);const c=ans.filter((a,i)=>a===Q[i].a).length,p=Math.round(c/Q.length*100),pass=p>=50,used=Math.floor((Date.now()-start)/1000);$('resIcon').textContent=pass?'🏆':'📚';$('resStatus').textContent=pass?'PASSED':'KEEP STUDYING';$('resStatus').className=`res-status ${pass?'pass':'fail'}`;$('resScore').textContent=p+'%';$('resDetail').textContent=`${c}/${Q.length} correct`;$('corr').textContent=c;$('time').textContent=`${Math.floor(used/60)}:${(used%60).toString().padStart(2,'0')}`;$('exam').style.display='none';$('results').style.display='flex'}
+function review(){reviewing=true;cur=0;$('results').style.display='none';$('exam').style.display='block';$('timer').textContent='Review';render()}
+</script>
+</body>
+</html>

@@ -1,0 +1,327 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>M.T.T.I Video Upload</title>
+<style>
+:root{--pri:#0a5e2a;--pri-d:#064a1f;--acc:#f5a623;--bg:#f0f4f0;--card:#fff;--border:#d0e4d8;--text:#1a2e1a;--gray:#6b8c6b;--ok:#2e7d32;--no:#c62828}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Segoe UI',sans-serif;background:var(--bg);color:var(--text);min-height:100vh}
+.topbar{background:linear-gradient(135deg,var(--pri-d),var(--pri));padding:12px 18px;display:flex;align-items:center;justify-content:space-between;box-shadow:0 2px 8px rgba(0,0,0,.2)}
+.tb-brand{color:#fff;font-weight:900;font-size:1rem}.tb-brand span{color:var(--acc)}
+.tb-sub{color:rgba(255,255,255,.7);font-size:.65rem;margin-top:2px}
+.main{padding:16px;max-width:500px;margin:0 auto}
+.card{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:18px;margin-bottom:14px;box-shadow:0 2px 8px rgba(10,94,42,.06)}
+.card-title{font-size:.85rem;font-weight:800;color:var(--pri);margin-bottom:14px;display:flex;align-items:center;gap:6px}
+.field{margin-bottom:12px}
+.field label{display:block;font-size:.72rem;font-weight:700;color:var(--gray);margin-bottom:4px}
+.field input,.field select,.field textarea{width:100%;background:var(--bg);border:1.5px solid var(--border);border-radius:8px;padding:9px 12px;font-size:.82rem;font-family:'Segoe UI',sans-serif;color:var(--text);outline:none;transition:border .2s}
+.field input:focus,.field select:focus,.field textarea:focus{border-color:var(--pri)}
+.drop-zone{border:2.5px dashed var(--border);border-radius:12px;padding:28px 16px;text-align:center;cursor:pointer;transition:all .2s;background:var(--bg);margin-bottom:12px}
+.drop-zone.drag{border-color:var(--pri);background:#e8f5e9}
+.drop-zone.has-file{border-color:var(--ok);background:#f1f8f1}
+.drop-ico{font-size:2.2rem;margin-bottom:8px}
+.drop-txt{font-size:.8rem;color:var(--gray);font-weight:600}
+.drop-sub{font-size:.68rem;color:var(--gray);margin-top:4px}
+.file-info{background:#e8f5e9;border:1px solid var(--ok);border-radius:8px;padding:10px 12px;margin-bottom:12px;display:none}
+.fi-name{font-size:.78rem;font-weight:700;color:var(--ok)}
+.fi-size{font-size:.65rem;color:var(--gray);margin-top:2px}
+.btn{width:100%;padding:14px;border:none;border-radius:10px;font-family:'Segoe UI',sans-serif;font-weight:800;font-size:.88rem;cursor:pointer;transition:all .2s}
+.btn-upload{background:var(--pri);color:#fff}
+.btn-upload:hover{background:var(--pri-d)}
+.btn-upload:disabled{opacity:.5;cursor:not-allowed}
+.prog-wrap{background:#e0e0e0;border-radius:10px;height:8px;margin:12px 0;overflow:hidden;display:none}
+.prog-wrap.show{display:block}
+.prog-bar{height:100%;background:var(--pri);border-radius:10px;transition:width .3s;width:0%}
+.prog-txt{text-align:center;font-size:.72rem;color:var(--gray);margin-top:4px;display:none}
+.prog-txt.show{display:block}
+.result{border-radius:10px;padding:12px 14px;margin-top:12px;font-size:.8rem;font-weight:600;display:none}
+.result.ok{background:#e8f5e9;border:1px solid var(--ok);color:var(--ok);display:block}
+.result.err{background:#ffebee;border:1px solid var(--no);color:var(--no);display:block}
+/* Video list */
+.vid-item{display:flex;align-items:center;gap:10px;padding:9px 10px;border:1px solid var(--border);border-radius:8px;margin-bottom:6px;background:var(--card)}
+.vid-ico{font-size:1.4rem;flex-shrink:0}
+.vid-info{flex:1;min-width:0}
+.vid-name{font-size:.75rem;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.vid-meta{font-size:.62rem;color:var(--gray);margin-top:2px}
+.vid-play{background:var(--acc);color:var(--pri-d);border:none;border-radius:6px;padding:5px 10px;font-size:.65rem;font-weight:700;cursor:pointer;white-space:nowrap;text-decoration:none}
+/* Auth screen */
+#authScreen{position:fixed;inset:0;background:var(--bg);z-index:200;display:flex;align-items:center;justify-content:center;padding:20px}
+.auth-box{background:var(--card);border:1px solid var(--border);border-radius:16px;padding:28px 24px;max-width:320px;width:100%;text-align:center;box-shadow:0 4px 20px rgba(10,94,42,.1)}
+.auth-logo{font-size:2.5rem;margin-bottom:8px}
+.auth-title{font-weight:900;color:var(--pri);font-size:1.1rem;margin-bottom:4px}
+.auth-sub{font-size:.72rem;color:var(--gray);margin-bottom:20px}
+.auth-input{width:100%;padding:12px;border:2px solid var(--border);border-radius:10px;font-size:1rem;text-align:center;letter-spacing:4px;font-weight:700;outline:none;font-family:'Segoe UI',sans-serif}
+.auth-input:focus{border-color:var(--pri)}
+.auth-btn{width:100%;margin-top:10px;padding:13px;background:var(--pri);color:#fff;border:none;border-radius:10px;font-weight:800;font-size:.9rem;cursor:pointer}
+.auth-err{color:var(--no);font-size:.72rem;margin-top:8px;display:none}
+.toast{position:fixed;bottom:18px;left:50%;transform:translateX(-50%) translateY(80px);background:var(--text);color:#fff;padding:8px 18px;border-radius:50px;font-size:.78rem;font-weight:600;transition:transform .3s;z-index:999}
+.toast.show{transform:translateX(-50%) translateY(0)}
+</style>
+</head>
+<body>
+
+<!-- Auth screen -->
+<div id="authScreen">
+  <div class="auth-box">
+    <div class="auth-logo">🎬</div>
+    <div class="auth-title">M.T.T.I Video Upload</div>
+    <div class="auth-sub">Enter the upload code to continue</div>
+    <input class="auth-input" type="password" id="codeInput" placeholder="••••" maxlength="10" onkeydown="if(event.key==='Enter')checkCode()">
+    <button class="auth-btn" onclick="checkCode()">Enter →</button>
+    <div class="auth-err" id="authErr">❌ Wrong code. Ask admin.</div>
+  </div>
+</div>
+
+<div class="topbar">
+  <div>
+    <div class="tb-brand">M.T.T.I <span>Video Upload</span></div>
+    <div class="tb-sub">Masomotele Technical Training Institute</div>
+  </div>
+  <div style="color:rgba(255,255,255,.7);font-size:.7rem">📡 LAN Only</div>
+</div>
+
+<div class="main">
+
+  <!-- Upload card -->
+  <div class="card">
+    <div class="card-title">🎬 Upload Video</div>
+
+    <div class="field">
+      <label>Video Title</label>
+      <input type="text" id="vidTitle" placeholder="e.g. Introduction to Chemistry F3">
+    </div>
+
+    <div class="field">
+      <label>Subject</label>
+      <select id="vidSubject">
+        <option value="">-- Select Subject --</option>
+        <option>Chemistry</option>
+        <option>Biology</option>
+        <option>Physics</option>
+        <option>Mathematics</option>
+        <option>Computer Studies</option>
+        <option>Business Studies</option>
+        <option>Electrical Technology</option>
+        <option>Power Mechanics</option>
+        <option>English</option>
+        <option>Kiswahili</option>
+        <option>ARISE Health Education</option>
+        <option>General / Other</option>
+      </select>
+    </div>
+
+    <div class="field">
+      <label>Uploaded by</label>
+      <input type="text" id="vidUploader" placeholder="Your name">
+    </div>
+
+    <div class="drop-zone" id="dropZone" onclick="document.getElementById('vidFile').click()">
+      <div class="drop-ico">📁</div>
+      <div class="drop-txt">Tap to select video</div>
+      <div class="drop-sub">or drag and drop here</div>
+      <div class="drop-sub" style="margin-top:4px;font-size:.62rem">MP4 only · Max 2GB</div>
+    </div>
+    <input type="file" id="vidFile" accept="video/mp4,.mp4" style="display:none" onchange="fileSelected(this)">
+
+    <div class="file-info" id="fileInfo">
+      <div class="fi-name" id="fiName"></div>
+      <div class="fi-size" id="fiSize"></div>
+    </div>
+
+    <div class="prog-wrap" id="progWrap">
+      <div class="prog-bar" id="progBar"></div>
+    </div>
+    <div class="prog-txt" id="progTxt"></div>
+
+    <button class="btn btn-upload" id="uploadBtn" onclick="uploadVideo()" disabled>🚀 Upload Video</button>
+    <div class="result" id="result"></div>
+  </div>
+
+  <!-- Video library -->
+  <div class="card">
+    <div class="card-title" style="justify-content:space-between">
+      <span>📚 Videos on Server</span>
+      <span style="font-size:.68rem;font-weight:400;color:var(--gray);cursor:pointer" onclick="loadVideos()">🔄 Refresh</span>
+    </div>
+    <div id="vidList"><div style="text-align:center;padding:16px;color:var(--gray);font-size:.78rem">Loading...</div></div>
+  </div>
+
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+const ACCESS_CODE = 'mtti2026'; // Change this
+const BASE = location.protocol+'//'+location.hostname;
+const UPLOAD_URL = BASE+'/mtti-lms/api/video-upload.php';
+
+// ── Auth ───────────────────────────────────────────────
+function checkCode(){
+  const v=document.getElementById('codeInput').value.trim();
+  if(v===ACCESS_CODE){
+    document.getElementById('authScreen').style.display='none';
+    loadVideos();
+    // Remember for session
+    sessionStorage.setItem('dp_auth','1');
+  } else {
+    document.getElementById('authErr').style.display='block';
+    document.getElementById('codeInput').value='';
+    document.getElementById('codeInput').focus();
+  }
+}
+
+window.addEventListener('load',()=>{
+  if(sessionStorage.getItem('dp_auth')==='1'){
+    document.getElementById('authScreen').style.display='none';
+    loadVideos();
+  } else {
+    document.getElementById('codeInput').focus();
+  }
+
+  // Drag and drop
+  const dz=document.getElementById('dropZone');
+  dz.addEventListener('dragover',e=>{e.preventDefault();dz.classList.add('drag');});
+  dz.addEventListener('dragleave',()=>dz.classList.remove('drag'));
+  dz.addEventListener('drop',e=>{
+    e.preventDefault(); dz.classList.remove('drag');
+    const f=e.dataTransfer.files[0];
+    if(f) setFile(f);
+  });
+});
+
+// ── File selection ─────────────────────────────────────
+function fileSelected(input){
+  if(input.files[0]) setFile(input.files[0]);
+}
+
+let selectedFile=null;
+function setFile(f){
+  if(!f.name.toLowerCase().endsWith('.mp4')&&f.type!=='video/mp4'){
+    toast('❌ Only MP4 files allowed'); return;
+  }
+  selectedFile=f;
+  const dz=document.getElementById('dropZone');
+  dz.classList.add('has-file');
+  dz.querySelector('.drop-txt').textContent=f.name;
+  dz.querySelector('.drop-sub').textContent=formatSize(f.size);
+  document.getElementById('fileInfo').style.display='block';
+  document.getElementById('fiName').textContent='📹 '+f.name;
+  document.getElementById('fiSize').textContent=formatSize(f.size);
+  document.getElementById('uploadBtn').disabled=false;
+  // Pre-fill title if empty
+  if(!document.getElementById('vidTitle').value){
+    document.getElementById('vidTitle').value=f.name.replace(/\.mp4$/i,'').replace(/[-_]/g,' ');
+  }
+}
+
+// ── Upload ─────────────────────────────────────────────
+async function uploadVideo(){
+  if(!selectedFile){toast('Select a file first');return;}
+  const title=document.getElementById('vidTitle').value.trim()||selectedFile.name;
+  const subject=document.getElementById('vidSubject').value||'General';
+  const uploader=document.getElementById('vidUploader').value.trim()||'Anonymous';
+
+  const fd=new FormData();
+  fd.append('video',selectedFile);
+  fd.append('title',title);
+  fd.append('subject',subject);
+  fd.append('uploader',uploader);
+  fd.append('key','MTTI_SAGAAS_DP_K3Y_2026');
+
+  document.getElementById('uploadBtn').disabled=true;
+  document.getElementById('result').className='result';
+  document.getElementById('progWrap').classList.add('show');
+  document.getElementById('progTxt').classList.add('show');
+
+  const xhr=new XMLHttpRequest();
+  xhr.open('POST',UPLOAD_URL);
+
+  xhr.upload.onprogress=e=>{
+    if(e.lengthComputable){
+      const pct=Math.round(e.loaded/e.total*100);
+      document.getElementById('progBar').style.width=pct+'%';
+      document.getElementById('progTxt').textContent=`Uploading... ${pct}% (${formatSize(e.loaded)} / ${formatSize(e.total)})`;
+    }
+  };
+
+  xhr.onload=()=>{
+    document.getElementById('uploadBtn').disabled=false;
+    try{
+      const r=JSON.parse(xhr.responseText);
+      if(r.success){
+        document.getElementById('result').className='result ok';
+        document.getElementById('result').textContent='✅ '+r.message;
+        toast('✅ Video uploaded!');
+        resetForm(); loadVideos();
+      } else {
+        document.getElementById('result').className='result err';
+        document.getElementById('result').textContent='❌ '+r.message;
+      }
+    }catch(e){
+      document.getElementById('result').className='result err';
+      document.getElementById('result').textContent='❌ Server error';
+    }
+  };
+
+  xhr.onerror=()=>{
+    document.getElementById('uploadBtn').disabled=false;
+    document.getElementById('result').className='result err';
+    document.getElementById('result').textContent='❌ Upload failed — check WiFi connection';
+  };
+
+  xhr.send(fd);
+}
+
+function resetForm(){
+  selectedFile=null;
+  document.getElementById('vidFile').value='';
+  document.getElementById('vidTitle').value='';
+  document.getElementById('vidSubject').value='';
+  document.getElementById('vidUploader').value='';
+  document.getElementById('fileInfo').style.display='none';
+  document.getElementById('progWrap').classList.remove('show');
+  document.getElementById('progTxt').classList.remove('show');
+  document.getElementById('progBar').style.width='0%';
+  const dz=document.getElementById('dropZone');
+  dz.classList.remove('has-file','drag');
+  dz.querySelector('.drop-txt').textContent='Tap to select video';
+  dz.querySelector('.drop-sub').textContent='or drag and drop here';
+  document.getElementById('uploadBtn').disabled=true;
+}
+
+// ── Video library ──────────────────────────────────────
+async function loadVideos(){
+  try{
+    const r=await fetch(UPLOAD_URL+'?action=list&key=MTTI_SAGAAS_DP_K3Y_2026');
+    const data=await r.json();
+    const list=document.getElementById('vidList');
+    if(!data.success||!data.files.length){
+      list.innerHTML='<div style="text-align:center;padding:16px;color:var(--gray);font-size:.78rem">📭 No videos uploaded yet</div>';
+      return;
+    }
+    list.innerHTML=data.files.map(v=>`
+      <div class="vid-item">
+        <div class="vid-ico">🎬</div>
+        <div class="vid-info">
+          <div class="vid-name">${v.title||v.name}</div>
+          <div class="vid-meta">${v.subject||''} · ${formatSize(v.size)} · ${v.uploader||''} · ${v.date||''}</div>
+        </div>
+        <a class="vid-play" href="/mtti-lms/assets/uploads/videos/${v.name}" target="_blank">▶ Play</a>
+      </div>`).join('');
+  }catch(e){
+    document.getElementById('vidList').innerHTML='<div style="text-align:center;padding:16px;color:#c62828;font-size:.78rem">❌ Could not load video list</div>';
+  }
+}
+
+function formatSize(b){
+  if(b>1073741824) return (b/1073741824).toFixed(1)+' GB';
+  if(b>1048576) return (b/1048576).toFixed(1)+' MB';
+  return (b/1024).toFixed(0)+' KB';
+}
+
+function toast(msg){const t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),3000);}
+</script>
+</body>
+</html>

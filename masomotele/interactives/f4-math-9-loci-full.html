@@ -1,0 +1,255 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Mathematics Form 4 | Loci</title>
+<style>
+:root{--pri:#0a5e2a;--pri-l:#0d7a38;--acc:#f5a623;--ok:#2e7d32;--no:#c62828;--bg:#f4f7f5;--txt:#1a1a1a;}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Segoe UI',system-ui,sans-serif;background:var(--bg);color:var(--txt);min-height:100vh;display:flex;flex-direction:column}
+#topbar{position:sticky;top:0;z-index:100;background:linear-gradient(135deg,var(--pri) 0%,var(--pri-l) 100%);color:#fff;padding:10px 16px;display:flex;align-items:center;gap:10px;box-shadow:0 2px 8px rgba(0,0,0,.25)}
+#topbar .sub{font-size:.7rem;opacity:.8;text-transform:uppercase;letter-spacing:1px}
+#topbar .ttl{font-size:.95rem;font-weight:700;flex:1}
+#slide-badge{background:var(--acc);color:#000;font-weight:700;font-size:.78rem;padding:3px 10px;border-radius:20px;white-space:nowrap}
+.slide{display:none;padding:16px 16px 80px;animation:fi .3s ease}
+.slide.active{display:block}
+@keyframes fi{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+.slide-title{font-size:1.2rem;font-weight:800;color:var(--pri);margin-bottom:14px;padding-bottom:8px;border-bottom:3px solid var(--acc)}
+.lo-box{background:#e8f5e9;border-left:5px solid var(--pri);border-radius:8px;padding:14px 16px;margin-bottom:12px}
+.lo-box h3{color:var(--pri);font-size:.95rem;margin-bottom:8px}
+.lo-box ol{padding-left:18px;font-size:.9rem;line-height:1.8}
+.inquiry{background:#fff8e1;border:1.5px solid var(--acc);border-radius:8px;padding:10px 14px;font-size:.88rem;color:#5d4037;margin-top:10px}
+.inquiry strong{color:#e65100}
+.teach-block{margin-bottom:18px}
+.teach-block h3{font-size:1rem;font-weight:700;color:var(--pri);margin-bottom:8px;padding-bottom:4px;border-bottom:2px solid var(--acc);display:inline-block}
+.teach-block p,.teach-block li{font-size:.9rem;line-height:1.7}
+.teach-block ul,.teach-block ol{padding-left:18px;margin-top:6px}
+.key-term{background:#fff8e1;border-left:4px solid var(--acc);border-radius:6px;padding:10px 14px;margin:10px 0;font-size:.88rem}
+.key-term strong{color:#e65100}
+.info-table{width:100%;border-collapse:collapse;margin:10px 0;font-size:.88rem}
+.info-table th{background:var(--pri);color:#fff;padding:8px 10px;text-align:left}
+.info-table td{padding:7px 10px;border-bottom:1px solid #e0e0e0}
+.info-table tr:nth-child(even) td{background:#f1f8e9}
+.example-box{background:#f1f8e9;border:1.5px solid var(--ok);border-radius:8px;padding:12px 14px;margin:10px 0;font-size:.88rem}
+.example-box strong{color:var(--ok);display:block;margin-bottom:6px}
+.formula-box{background:#e3f2fd;border:2px solid #1976d2;border-radius:10px;padding:14px;margin:12px 0;text-align:center}
+.formula-box .formula{font-size:1.1rem;font-weight:800;color:#1565c0;font-family:Georgia,serif;margin:6px 0}
+.warn-box{background:#fff3e0;border-left:4px solid #e65100;border-radius:6px;padding:10px 14px;margin:10px 0;font-size:.88rem;color:#5d4037}
+.quiz-section{margin-bottom:20px}
+.quiz-section h3{font-size:1rem;font-weight:700;color:var(--pri);margin-bottom:12px}
+.q-item{background:#fff;border:1.5px solid #c8e6c9;border-radius:10px;padding:14px;margin-bottom:12px}
+.q-item p{font-size:.9rem;font-weight:600;margin-bottom:10px}
+.fill-blank{border:none;border-bottom:2.5px dashed var(--pri);background:transparent;font-size:.9rem;padding:2px 6px;width:110px;outline:none;text-align:center}
+.fb-result{font-size:.82rem;font-weight:600;margin-top:6px;padding:4px 8px;border-radius:4px;display:inline-block}
+.fb-result.ok{background:#e8f5e9;color:var(--ok)}
+.fb-result.no{background:#ffebee;color:var(--no)}
+.sa-box{width:100%;border:1.5px solid #c8e6c9;border-radius:8px;padding:10px;font-size:.88rem;font-family:inherit;resize:vertical;min-height:80px;outline:none}
+.grade-btn{background:var(--pri);color:#fff;border:none;border-radius:8px;padding:8px 18px;font-size:.85rem;font-weight:700;cursor:pointer;margin-top:8px}
+.sa-feedback{font-size:.82rem;margin-top:8px;padding:10px;border-radius:8px;line-height:1.6;display:none}
+.sa-feedback.ok{background:#e8f5e9;border:1px solid #a5d6a7;color:#1b5e20}
+.sa-feedback.partial{background:#fff8e1;border:1px solid #ffe082;color:#5d4037}
+.sa-feedback.no{background:#ffebee;border:1px solid #ef9a9a;color:#b71c1c}
+.kw-found{color:var(--ok);font-weight:700}
+.kw-miss{color:var(--no);font-weight:700}
+.model-ans{margin-top:6px;padding-top:6px;border-top:1px solid #ccc;font-style:italic}
+#score-result{background:linear-gradient(135deg,var(--pri),var(--pri-l));color:#fff;border-radius:12px;padding:20px;text-align:center;margin-top:16px;display:none}
+#score-result .big{font-size:2rem;font-weight:900;margin:8px 0}
+.submit-btn{background:var(--acc);color:#000;border:none;border-radius:10px;padding:12px 32px;font-size:1rem;font-weight:800;cursor:pointer;margin-top:16px;width:100%}
+#navbar{position:fixed;bottom:0;left:0;right:0;background:#fff;border-top:1px solid #e0e0e0;padding:10px 16px;display:flex;align-items:center;justify-content:space-between;gap:8px;z-index:100;box-shadow:0 -2px 8px rgba(0,0,0,.1)}
+.nav-btn{background:var(--pri);color:#fff;border:none;border-radius:8px;padding:9px 22px;font-size:.88rem;font-weight:700;cursor:pointer}
+.nav-btn:disabled{background:#ccc;cursor:not-allowed}
+#dot-nav{display:flex;gap:6px;flex-wrap:wrap;justify-content:center;flex:1}
+.dot{width:10px;height:10px;border-radius:50%;background:#c8e6c9;cursor:pointer;transition:all .2s}
+.dot.active{background:var(--pri);transform:scale(1.3)}
+.dot.done{background:var(--acc)}
+</style>
+<script type="text/javascript">(function(c,l,a,r,i,t,y){c[a]=c[a]||function(){(c[a].q=c[a].q||[]).push(arguments)};t=l.createElement(r);t.async=1;t.src="https://www.clarity.ms/tag/"+i;y=l.getElementsByTagName(r)[0];y.parentNode.insertBefore(t,y);})(window,document,"clarity","script","wg31zlwbt9");</script>\n</head>
+<body>
+<div id="topbar">
+  <div><div class="sub">Mathematics · Form 4</div><div class="ttl">Loci</div></div>
+  <div id="slide-badge">Slide 1 / 10</div>
+</div>
+
+<div class="slide active" id="s1">
+  <div class="slide-title">📋 Learning Outcomes</div>
+  <div class="lo-box"><h3>By the end of this lesson, you should be able to:</h3>
+    <ol>
+      <li>Define the locus of a point</li>
+      <li>Describe and construct standard loci</li>
+      <li>Find the locus of points equidistant from two fixed points</li>
+      <li>Find the locus of points equidistant from two intersecting lines</li>
+      <li>Construct intersections of loci</li>
+      <li>Apply loci to solve real-life problems</li>
+      <li>Use loci to prove geometric properties</li>
+    </ol>
+  </div>
+  <div class="inquiry"><strong>🔍 Key Inquiry Question:</strong> How can we describe the path traced by a moving point that satisfies certain conditions?</div>
+</div>
+<div class="slide" id="s2">
+  <div class="slide-title">📍 Definition of Locus</div>
+  <div class="teach-block"><h3>What is a Locus?</h3>
+    <p>A <strong>locus</strong> (plural: loci) is the set of all points that satisfy a given condition or rule.</p>
+    <div class="key-term"><strong>Think of it as:</strong> the path traced by a point as it moves according to a fixed rule.</div>
+    <div class="example-box"><strong>Common Loci:</strong>
+      <table class="info-table">
+        <tr><th>Condition</th><th>Locus</th></tr>
+        <tr><td>Fixed distance r from point O</td><td>Circle, centre O, radius r</td></tr>
+        <tr><td>Equidistant from two points A and B</td><td>Perpendicular bisector of AB</td></tr>
+        <tr><td>Equidistant from two lines</td><td>Angle bisector</td></tr>
+        <tr><td>Fixed distance from a line</td><td>Two parallel lines</td></tr>
+      </table>
+    </div>
+  </div>
+</div>
+<div class="slide" id="s3">
+  <div class="slide-title">⭕ Locus as a Circle</div>
+  <div class="teach-block"><h3>Points at Fixed Distance from a Point</h3>
+    <p>The locus of all points at distance r from a fixed point O is a <strong>circle</strong> with centre O and radius r.</p>
+    <div class="example-box"><strong>Example 1:</strong>
+      <p>A dog is tied to a post with a 5m rope. The locus of the dog's maximum reach is a circle of radius 5m centred on the post.</p>
+    </div>
+    <div class="example-box"><strong>Example 2:</strong>
+      <p>Describe the locus of a point P that moves so that |OP| = 3 cm, where O is origin.</p>
+      <p>Locus: Circle, centre O(0,0), radius 3 cm. Equation: x² + y² = 9</p>
+    </div>
+  </div>
+  <div class="teach-block"><h3>Locus Between Two Radii</h3>
+    <p>Points within distance r from O but at distance ≥ r₁ → annulus (ring) between two circles.</p>
+  </div>
+</div>
+<div class="slide" id="s4">
+  <div class="slide-title">↔ Perpendicular Bisector Locus</div>
+  <div class="teach-block"><h3>Equidistant from Two Points</h3>
+    <p>The locus of all points equidistant from two fixed points A and B is the <strong>perpendicular bisector</strong> of AB.</p>
+    <div class="key-term"><strong>Construction:</strong> Open compass to more than half AB, draw arcs from A and B above and below. Join intersection points — this is the perpendicular bisector.</div>
+    <div class="example-box"><strong>Example:</strong>
+      <p>A(2,0) and B(8,0). Find equation of locus of points equidistant from A and B.</p>
+      <p>Midpoint = (5,0). AB is horizontal, so perp. bisector is vertical: <strong>x = 5</strong></p>
+    </div>
+    <div class="example-box"><strong>Real-life:</strong>
+      <p>A mobile phone tower is to be built equidistant from two towns. The ideal location lies on the perpendicular bisector of the line joining the two towns.</p>
+    </div>
+  </div>
+</div>
+<div class="slide" id="s5">
+  <div class="slide-title">📐 Angle Bisector Locus</div>
+  <div class="teach-block"><h3>Equidistant from Two Lines</h3>
+    <p>The locus of points equidistant from two intersecting lines is the <strong>angle bisector</strong> of the angle between the lines.</p>
+    <div class="key-term"><strong>Note:</strong> There are two angle bisectors (for the two angles formed) — they are perpendicular to each other.</div>
+    <div class="example-box"><strong>Construction:</strong>
+      <p>1. Mark equal distances along each line from intersection point.</p>
+      <p>2. Draw arcs from these points.</p>
+      <p>3. Join intersection of arcs to the vertex.</p>
+    </div>
+    <div class="example-box"><strong>Real-life application:</strong>
+      <p>Finding the location of a fire station equidistant from two roads uses the angle bisector locus.</p>
+    </div>
+  </div>
+</div>
+<div class="slide" id="s6">
+  <div class="slide-title">🔗 Intersection of Loci</div>
+  <div class="teach-block"><h3>Finding Points Satisfying Multiple Conditions</h3>
+    <p>When a point must satisfy two conditions simultaneously, find the intersection of both loci.</p>
+    <div class="example-box"><strong>Example:</strong>
+      <p>Find the locus of points that are:</p>
+      <p>(i) 4 cm from point A, AND</p>
+      <p>(ii) equidistant from two points B and C</p>
+      <p>Draw circle radius 4cm centred at A. Draw perpendicular bisector of BC. The intersection points satisfy both conditions.</p>
+    </div>
+    <div class="example-box"><strong>Example 2:</strong>
+      <p>Construct a point P such that PA = 3cm and PB = 5cm where AB = 6cm.</p>
+      <p>Draw circle radius 3cm at A and circle radius 5cm at B. Intersection gives P.</p>
+    </div>
+  </div>
+</div>
+<div class="slide" id="s7">
+  <div class="slide-title">📏 Loci and Inequalities</div>
+  <div class="teach-block"><h3>Regions Defined by Loci</h3>
+    <table class="info-table">
+      <tr><th>Condition</th><th>Locus/Region</th></tr>
+      <tr><td>PA = r</td><td>Circle, radius r</td></tr>
+      <tr><td>PA ≤ r</td><td>Interior of circle (disk)</td></tr>
+      <tr><td>PA ≥ r</td><td>Exterior of circle</td></tr>
+      <tr><td>PA < PB</td><td>Region closer to A (one side of perp. bisector)</td></tr>
+    </table>
+    <div class="example-box"><strong>Example:</strong>
+      <p>Shade the region where a point is within 3cm of A AND closer to A than to B.</p>
+      <p>Draw circle radius 3 at A. Draw perpendicular bisector of AB. Shade region inside circle on A's side of perp. bisector.</p>
+    </div>
+  </div>
+</div>
+<div class="slide" id="s8">
+  <div class="slide-title">💡 Real-Life Applications</div>
+  <div class="teach-block"><h3>Town Planning</h3>
+    <div class="example-box"><strong>Example:</strong>
+      <p>A hospital must be built within 10km of Town A and within 8km of Town B. The hospital must also be on the same side as the main road (which bisects angle between directions to two mountains).</p>
+      <p>Solution: Draw circles of radius 10km (A) and 8km (B). Draw angle bisector of roads. The valid region is the intersection of the two circles on the correct side of the bisector.</p>
+    </div>
+  </div>
+  <div class="teach-block"><h3>Navigation</h3>
+    <div class="example-box"><strong>Example:</strong>
+      <p>A ship must stay at least 2km from two rocky islands. The safe zone is outside circles of radius 2km centred on each island — the complement of the union of the two circles.</p>
+    </div>
+  </div>
+</div>
+<div class="slide" id="s9">
+  <div class="slide-title">✏️ Practice Problems</div>
+  <div class="teach-block"><h3>Problem 1</h3>
+    <p>Describe the locus of a point P such that angle APB = 90° where A and B are fixed points.</p>
+    <div class="example-box"><strong>Solution:</strong>
+      <p>By Thales' theorem, the locus is a circle with AB as diameter (excluding points A and B).</p>
+    </div>
+  </div>
+  <div class="teach-block"><h3>Problem 2</h3>
+    <p>A(0,0), B(6,0). Find the equation of the locus of points equidistant from A and B.</p>
+    <div class="example-box"><strong>Solution:</strong>
+      <p>PA = PB → √(x²+y²) = √((x−6)²+y²)</p>
+      <p>x² = x²−12x+36 → 12x = 36 → <strong>x = 3</strong> (vertical line)</p>
+    </div>
+  </div>
+</div>
+<div class="slide" id="s10">
+  <div class="slide-title">📝 Quiz — Loci</div>
+  <div class="quiz-section"><h3>Part A: Fill in the Blanks (5 marks)</h3>
+    <div class="q-item"><p>1. The path traced by a moving point satisfying a given condition is called a <input class="fill-blank" id="f1">.</p><div id="f1r" class="fb-result" style="display:none"></div></div>
+    <div class="q-item"><p>2. The locus of points at a fixed distance r from a fixed point is a <input class="fill-blank" id="f2">.</p><div id="f2r" class="fb-result" style="display:none"></div></div>
+    <div class="q-item"><p>3. The locus of points equidistant from two fixed points is the <input class="fill-blank" id="f3" style="width:180px">.</p><div id="f3r" class="fb-result" style="display:none"></div></div>
+    <div class="q-item"><p>4. The locus of points equidistant from two intersecting lines is the <input class="fill-blank" id="f4" style="width:160px">.</p><div id="f4r" class="fb-result" style="display:none"></div></div>
+    <div class="q-item"><p>5. Points on the perpendicular bisector of AB are <input class="fill-blank" id="f5" style="width:120px"> from A and B.</p><div id="f5r" class="fb-result" style="display:none"></div></div>
+  </div>
+  <div class="quiz-section"><h3>Part B: Short Answer (10 marks)</h3>
+    <div class="q-item"><p>6. (4 marks) A point P moves such that it is always 5cm from a fixed point O. (a) Describe the locus of P. (b) Write the equation of this locus if O is at the origin.</p>
+      <textarea class="sa-box" id="sa1" placeholder="Describe and give equation..."></textarea>
+      <button class="grade-btn" onclick="gradeAnswer('sa1','fb1',{keywords:['circle','radius 5','x²+y²=25','centre o','origin','equation'],required:3,marks:4,model:'(a) The locus is a circle with centre O and radius 5cm. (b) If O is at origin: x²+y²=25.'})">✓ Grade My Answer</button>
+      <div id="fb1" class="sa-feedback"></div></div>
+    <div class="q-item"><p>7. (3 marks) A(2,3) and B(8,3). Find the equation of the locus of points equidistant from A and B.</p>
+      <textarea class="sa-box" id="sa2" placeholder="Use distance formula..."></textarea>
+      <button class="grade-btn" onclick="gradeAnswer('sa2','fb2',{keywords:['x=5','perpendicular bisector','midpoint','equidistant','vertical'],required:3,marks:3,model:'PA=PB → (x-2)²+(y-3)²=(x-8)²+(y-3)². Expanding: x²-4x+4=x²-16x+64 → 12x=60 → x=5. Locus is x=5 (perpendicular bisector).'})">✓ Grade My Answer</button>
+      <div id="fb2" class="sa-feedback"></div></div>
+    <div class="q-item"><p>8. (3 marks) A goat is tied to a corner of a rectangular field (30m × 20m) with a 15m rope. Describe and calculate the area it can graze.</p>
+      <textarea class="sa-box" id="sa3" placeholder="Think about the shape of the grazing area..."></textarea>
+      <button class="grade-btn" onclick="gradeAnswer('sa3','fb3',{keywords:['quarter circle','90','¼','π','r=15','area','176.7','353.25'],required:3,marks:3,model:'The goat can graze a quarter circle of radius 15m (90° sector) at the corner. Area = ¼πr² = ¼×π×225 = 176.7 m².'})">✓ Grade My Answer</button>
+      <div id="fb3" class="sa-feedback"></div></div>
+  </div>
+  <button class="submit-btn" onclick="submitQuiz()">📊 Submit & See My Score</button>
+  <div id="score-result"></div>
+</div>
+<div id="navbar">
+  <button class="nav-btn" id="prev-btn" onclick="changeSlide(-1)" disabled>◀ Prev</button>
+  <div id="dot-nav"></div>
+  <button class="nav-btn" id="next-btn" onclick="changeSlide(1)">Next ▶</button>
+</div>
+<script>
+const TOTAL=10;let cur=1;const visited=new Set([1]);
+function buildDots(){const dn=document.getElementById('dot-nav');dn.innerHTML='';for(let i=1;i<=TOTAL;i++){const d=document.createElement('div');d.className='dot'+(i===cur?' active':visited.has(i)&&i!==cur?' done':'');d.onclick=(()=>{const n=i;return()=>goTo(n)})();dn.appendChild(d);}}
+function goTo(n){document.getElementById('s'+cur).classList.remove('active');cur=n;visited.add(n);document.getElementById('s'+n).classList.add('active');document.getElementById('slide-badge').textContent='Slide '+n+' / '+TOTAL;document.getElementById('prev-btn').disabled=(n===1);document.getElementById('next-btn').disabled=(n===TOTAL);buildDots();window.scrollTo(0,0);}
+function changeSlide(d){goTo(cur+d);}
+buildDots();
+const fillAnswers={f1:['locus'],f2:['circle'],f3:['perpendicular bisector'],f4:['angle bisector'],f5:['equidistant']};
+function gradeAnswer(saId,fbId,cfg){const txt=document.getElementById(saId).value.toLowerCase().trim();if(!txt){alert('Please write your answer first.');return;}const found=cfg.keywords.filter(k=>txt.includes(k.toLowerCase()));const missed=cfg.keywords.filter(k=>!txt.includes(k.toLowerCase())).slice(0,4);const hitRate=Math.min(1,found.length/cfg.required);const marks=Math.round(hitRate*cfg.marks);const fb=document.getElementById(fbId);fb.style.display='block';const cls=marks>=cfg.marks?'ok':marks>0?'partial':'no';fb.className='sa-feedback '+cls;fb.innerHTML=`<strong>Score: ${marks} / ${cfg.marks}</strong><br>✅ Found: <span class="kw-found">${found.length>0?found.join(', '):'none'}</span><br>❌ Missed: <span class="kw-miss">${missed.length>0?missed.join(', '):'none'}</span><div class="model-ans">📖 ${cfg.model}</div>`;}
+function submitQuiz(){let fillScore=0;Object.keys(fillAnswers).forEach(id=>{const val=(document.getElementById(id).value||'').toLowerCase().trim();const correct=fillAnswers[id].some(a=>val===a||val.includes(a));const res=document.getElementById(id+'r');res.style.display='inline-block';if(correct){res.className='fb-result ok';res.textContent='✓ Correct! (1 mark)';fillScore++;}else{res.className='fb-result no';res.textContent='✗ Expected: '+fillAnswers[id][0];}});let saTotal=0;['fb1','fb2','fb3'].forEach(id=>{const fb=document.getElementById(id);if(fb.style.display!=='none'){const m=fb.innerHTML.match(/Score:\s*(\d+)\s*\//);if(m)saTotal+=parseInt(m[1]);}});const total=fillScore+saTotal;const pct=Math.round((total/15)*100);const grade=pct>=80?'Excellent (A)':pct>=60?'Good (B)':pct>=50?'Average (C)':'Needs Improvement';const emoji=pct>=80?'🏆':pct>=60?'👍':pct>=50?'📚':'💪';const res=document.getElementById('score-result');res.style.display='block';res.innerHTML=`${emoji}<div class="big">${total}/15 (${pct}%)</div><strong>${grade}</strong><br><small>Fill: ${fillScore}/5 | SA: ${saTotal}/10</small>`;submitExamToMTTI(total,15,pct);res.scrollIntoView({behavior:'smooth'});}
+function submitExamToMTTI(score,total,percent){try{fetch('/wp-json/mtti/v1/exam-result',{method:'POST',headers:{'Content-Type':'application/json','X-WP-Nonce':window.mtti_nonce||''},body:JSON.stringify({lesson_id:'f4-math-9-loci',score,total,percent,timestamp:new Date().toISOString()})}).then(r=>r.json()).then(d=>{if(d&&d.success)console.log('[MTTI] Saved',d);}).catch(e=>console.log('[MTTI] Offline',e));}catch(e){console.log('[MTTI] Error',e);}}
+</script>
+</body>
+</html>

@@ -1,0 +1,389 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>F4 Math | Integration</title>
+<style>
+:root{--pri:#0a5e2a;--acc:#f5a623;--ok:#2e7d32;--no:#c62828;--bg:#f4f6f8;--card:#fff;--txt:#1a1a1a;}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:'Segoe UI',sans-serif;background:var(--bg);color:var(--txt);}
+#topbar{background:var(--pri);color:#fff;padding:10px 16px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:100;}
+#topbar .title{font-size:.95rem;font-weight:700;}
+#topbar .meta{font-size:.8rem;opacity:.85;}
+.slide{display:none;padding:16px;max-width:860px;margin:0 auto;}
+.slide.active{display:block;}
+.slide h2{color:var(--pri);font-size:1.2rem;margin-bottom:12px;border-left:4px solid var(--acc);padding-left:10px;}
+.card{background:var(--card);border-radius:10px;padding:16px;margin-bottom:14px;box-shadow:0 2px 6px rgba(0,0,0,.07);}
+.card h3{color:var(--pri);font-size:1rem;margin-bottom:8px;}
+.card p,.card li{font-size:.95rem;line-height:1.65;margin-bottom:6px;}
+.card ul,.card ol{padding-left:18px;}
+.highlight{background:#e8f5e9;border-left:4px solid var(--pri);padding:10px 14px;border-radius:6px;margin:10px 0;font-size:.9rem;}
+.formula{background:#fff8e1;border:1px solid var(--acc);border-radius:8px;padding:12px;margin:10px 0;font-size:.95rem;font-family:monospace;line-height:1.8;}
+.example-box{background:#f3e5f5;border-radius:8px;padding:14px;margin:10px 0;}
+.example-box strong{color:#6a1b9a;}
+.nav-row{display:flex;justify-content:space-between;align-items:center;padding:14px 0;margin-top:10px;}
+.btn{padding:10px 22px;border:none;border-radius:8px;cursor:pointer;font-size:.9rem;font-weight:600;transition:.2s;}
+.btn-pri{background:var(--pri);color:#fff;}.btn-pri:hover{opacity:.88;}
+.btn-acc{background:var(--acc);color:#fff;}.btn-acc:hover{opacity:.88;}
+.btn-gray{background:#ccc;color:#555;}
+.dots{display:flex;gap:6px;flex-wrap:wrap;justify-content:center;padding:8px;}
+.dot{width:10px;height:10px;border-radius:50%;background:#ccc;cursor:pointer;transition:.2s;}
+.dot.active{background:var(--pri);}.dot.done{background:var(--acc);}
+#progress-bar{height:4px;background:#e0e0e0;}#progress-fill{height:4px;background:var(--acc);transition:width .3s;}
+.outcome-item{display:flex;align-items:flex-start;gap:10px;margin-bottom:8px;}
+.outcome-item .icon{font-size:1.2rem;}
+input[type=text]{border:2px solid #ddd;border-radius:6px;padding:8px 10px;font-size:.9rem;width:100%;margin-top:4px;}
+input[type=text]:focus{outline:none;border-color:var(--pri);}
+.q-block{background:#fff;border-radius:10px;padding:14px;margin-bottom:12px;box-shadow:0 1px 4px rgba(0,0,0,.06);}
+.feedback{margin-top:6px;font-size:.85rem;padding:6px 10px;border-radius:6px;}
+.feedback.ok{background:#e8f5e9;color:var(--ok);}
+.feedback.no{background:#ffebee;color:var(--no);}
+#score-board{background:var(--pri);color:#fff;border-radius:14px;padding:24px;text-align:center;margin-top:16px;}
+#score-board h3{font-size:1.5rem;}#score-board p{font-size:1rem;opacity:.9;margin-top:6px;}
+.trap-box{background:#e3f2fd;border-radius:8px;padding:14px;margin:10px 0;border-left:4px solid #1976d2;}
+</style>
+<script type="text/javascript">(function(c,l,a,r,i,t,y){c[a]=c[a]||function(){(c[a].q=c[a].q||[]).push(arguments)};t=l.createElement(r);t.async=1;t.src="https://www.clarity.ms/tag/"+i;y=l.getElementsByTagName(r)[0];y.parentNode.insertBefore(t,y);})(window,document,"clarity","script","wg31zlwbt9");</script>\n</head>
+<body>
+<div id="topbar">
+  <div class="title">📐 F4 Mathematics — Integration</div>
+  <div class="meta" id="slide-label">Slide 1 / 10</div>
+</div>
+<div id="progress-bar"><div id="progress-fill" style="width:10%"></div></div>
+<div class="dots" id="dot-row"></div>
+
+<div class="slide active" id="s1">
+  <h2>📌 Learning Outcomes</h2>
+  <div class="card">
+    <h3>By the end of this lesson, you will be able to:</h3>
+    <div class="outcome-item"><span class="icon">🔄</span><p>Interpret integration as the reverse process of differentiation</p></div>
+    <div class="outcome-item"><span class="icon">📏</span><p>Integrate a polynomial using the power rule</p></div>
+    <div class="outcome-item"><span class="icon">∞</span><p>Distinguish between indefinite and definite integrals</p></div>
+    <div class="outcome-item"><span class="icon">📊</span><p>Calculate area under a curve using definite integration</p></div>
+    <div class="outcome-item"><span class="icon">🚗</span><p>Apply integration in kinematics (distance from velocity)</p></div>
+    <div class="outcome-item"><span class="icon">📐</span><p>Use the trapezium rule and mid-ordinate rule to approximate areas</p></div>
+  </div>
+  <div class="nav-row"><span></span><button class="btn btn-pri" onclick="go(2)">Start Lesson →</button></div>
+</div>
+
+<div class="slide" id="s2">
+  <h2>🔄 Integration as Reverse Differentiation</h2>
+  <div class="card">
+    <h3>The Concept</h3>
+    <div class="highlight">Integration is the <strong>reverse of differentiation</strong>. If differentiation gives the gradient function, integration finds the original function from its gradient.</div>
+    <div class="formula">
+      Differentiate: x² → 2x<br>
+      Integrate:   2x → x² + c
+    </div>
+    <p>The constant <strong>c</strong> (called the constant of integration) is added because when we differentiate a constant it becomes zero — so we can't know what constant was there originally.</p>
+  </div>
+  <div class="card">
+    <h3>The Integration Rule (Power Rule)</h3>
+    <div class="formula">
+      ∫xⁿ dx = xⁿ⁺¹/(n+1) + c    (n ≠ −1)<br><br>
+      ∫axⁿ dx = axⁿ⁺¹/(n+1) + c
+    </div>
+    <p>In words: <em>add 1 to the power, divide by the new power, add c</em></p>
+  </div>
+  <div class="nav-row"><button class="btn btn-gray" onclick="go(1)">← Back</button><button class="btn btn-pri" onclick="go(3)">Next →</button></div>
+</div>
+
+<div class="slide" id="s3">
+  <h2>📝 Integrating Polynomials</h2>
+  <div class="card">
+    <h3>Examples — Indefinite Integrals</h3>
+    <div class="example-box">
+      <strong>a) ∫2x⁵ dx</strong><br>
+      = 2x⁶/6 + c = x⁶/3 + c
+    </div>
+    <div class="example-box">
+      <strong>b) ∫(5x³ − 2x + 4) dx</strong><br>
+      = 5x⁴/4 − 2x²/2 + 4x + c<br>
+      = 5x⁴/4 − x² + 4x + c
+    </div>
+    <div class="example-box">
+      <strong>c) Find y if dy/dx = 3x² and y=5 when x=1</strong><br>
+      y = ∫3x² dx = x³ + c<br>
+      Substitute: 5 = 1 + c → c = 4<br>
+      Particular solution: <strong>y = x³ + 4</strong>
+    </div>
+    <div class="example-box">
+      <strong>d) Find y if dy/dx = 2x + 3 and passes through (0,1)</strong><br>
+      y = x² + 3x + c<br>
+      At (0,1): 1 = 0 + 0 + c → c = 1<br>
+      <strong>y = x² + 3x + 1</strong>
+    </div>
+  </div>
+  <div class="nav-row"><button class="btn btn-gray" onclick="go(2)">← Back</button><button class="btn btn-pri" onclick="go(4)">Next →</button></div>
+</div>
+
+<div class="slide" id="s4">
+  <h2>🔢 Definite Integrals</h2>
+  <div class="card">
+    <h3>What is a Definite Integral?</h3>
+    <p>A definite integral has upper and lower limits — it gives a specific numerical answer (no c).</p>
+    <div class="formula">
+      ∫ₐᵇ f(x) dx = [F(x)]ₐᵇ = F(b) − F(a)<br>
+      where F(x) is the integral of f(x)
+    </div>
+  </div>
+  <div class="card">
+    <h3>Examples</h3>
+    <div class="example-box">
+      <strong>Evaluate ∫₁³ (x² + 2) dx</strong><br><br>
+      = [x³/3 + 2x]₁³<br>
+      = (27/3 + 6) − (1/3 + 2)<br>
+      = (9 + 6) − (1/3 + 2)<br>
+      = 15 − 7⁄3<br>
+      = <strong>38/3 ≈ 12.67</strong>
+    </div>
+    <div class="example-box">
+      <strong>Evaluate ∫₀² (3x² − 4x) dx</strong><br><br>
+      = [x³ − 2x²]₀²<br>
+      = (8 − 8) − (0 − 0)<br>
+      = <strong>0</strong>
+    </div>
+  </div>
+  <div class="nav-row"><button class="btn btn-gray" onclick="go(3)">← Back</button><button class="btn btn-pri" onclick="go(5)">Next →</button></div>
+</div>
+
+<div class="slide" id="s5">
+  <h2>📊 Area Under a Curve</h2>
+  <div class="card">
+    <h3>Finding Area Using Integration</h3>
+    <div class="highlight">
+      The area bounded by the curve y = f(x), the x-axis, and the lines x = a and x = b is:<br>
+      <strong>Area = ∫ₐᵇ f(x) dx</strong>
+    </div>
+    <p>Note: Areas below the x-axis give negative values when integrated, so take the absolute value.</p>
+  </div>
+  <div class="card">
+    <h3>Worked Example</h3>
+    <div class="example-box">
+      <strong>Find the area bounded by y = x² + 1, the x-axis, x = 0 and x = 3</strong><br><br>
+      Area = ∫₀³ (x² + 1) dx<br>
+      = [x³/3 + x]₀³<br>
+      = (27/3 + 3) − 0<br>
+      = 9 + 3 = <strong>12 square units</strong>
+    </div>
+    <div class="example-box">
+      <strong>Area between y = 4 − x² and the x-axis (where y ≥ 0):</strong><br>
+      Curve crosses x-axis when x² = 4 → x = ±2<br>
+      Area = ∫₋₂² (4 − x²) dx = [4x − x³/3]₋₂²<br>
+      = (8 − 8/3) − (−8 + 8/3)<br>
+      = 16 − 16/3 = <strong>32/3 ≈ 10.67 sq units</strong>
+    </div>
+  </div>
+  <div class="nav-row"><button class="btn btn-gray" onclick="go(4)">← Back</button><button class="btn btn-pri" onclick="go(6)">Next →</button></div>
+</div>
+
+<div class="slide" id="s6">
+  <h2>🚗 Integration in Kinematics</h2>
+  <div class="card">
+    <h3>Reversing the Kinematics Formulas</h3>
+    <div class="formula">
+      s = ∫v dt    (integrate velocity to get displacement)<br>
+      v = ∫a dt    (integrate acceleration to get velocity)
+    </div>
+  </div>
+  <div class="card">
+    <h3>Worked Example</h3>
+    <div class="example-box">
+      <strong>A particle has velocity v = 3t² − 6t m/s. Find:</strong><br><br>
+      <strong>(a) Displacement after 4 seconds (starts from rest at origin):</strong><br>
+      s = ∫(3t² − 6t) dt = t³ − 3t² + c<br>
+      At t=0, s=0: 0 = 0 + c → c = 0<br>
+      At t=4: s = 64 − 48 = <strong>16 m</strong><br><br>
+      <strong>(b) Distance travelled between t=0 and t=4:</strong><br>
+      v=0 when 3t(t−2)=0 → t=0 or t=2<br>
+      s(2) = 8 − 12 = −4 m (moved 4 m in negative direction)<br>
+      Total distance = 4 + (4+16) = <strong>24 m</strong>
+    </div>
+  </div>
+  <div class="nav-row"><button class="btn btn-gray" onclick="go(5)">← Back</button><button class="btn btn-pri" onclick="go(7)">Next →</button></div>
+</div>
+
+<div class="slide" id="s7">
+  <h2>📐 Trapezium Rule & Mid-Ordinate Rule</h2>
+  <div class="card">
+    <h3>Trapezium Rule (Area Approximation)</h3>
+    <div class="trap-box">
+      <strong>Trapezium Rule:</strong><br>
+      Area ≈ h/2 [(y₀ + yₙ) + 2(y₁ + y₂ + ... + yₙ₋₁)]<br>
+      where h = uniform width of each strip
+    </div>
+    <div class="example-box">
+      <strong>Example:</strong> A car's velocity (m/s) is measured every second:<br>
+      t: 0, 1, 2, 3, 4, 5, 6<br>
+      v: 0, 12, 24, 35, 41, 45, 47<br><br>
+      Area (distance) ≈ 1/2[(0+47) + 2(12+24+35+41+45)]<br>
+      = 1/2[47 + 2(157)]<br>
+      = 1/2[47 + 314] = 1/2 × 361 = <strong>180.5 m</strong>
+    </div>
+  </div>
+  <div class="card">
+    <h3>Mid-Ordinate Rule</h3>
+    <div class="trap-box">
+      Area ≈ h × (sum of ordinates at midpoints of each strip)<br>
+      Use midpoints of intervals instead of edges
+    </div>
+  </div>
+  <div class="nav-row"><button class="btn btn-gray" onclick="go(6)">← Back</button><button class="btn btn-pri" onclick="go(8)">Next →</button></div>
+</div>
+
+<div class="slide" id="s8">
+  <h2>📋 Summary</h2>
+  <div class="card">
+    <div class="formula">
+      <strong>Power Rule:</strong> ∫xⁿ dx = xⁿ⁺¹/(n+1) + c<br><br>
+      <strong>Definite integral:</strong> ∫ₐᵇ f(x)dx = F(b) − F(a)<br><br>
+      <strong>Area under curve:</strong> A = ∫ₐᵇ f(x) dx<br><br>
+      <strong>Trapezium Rule:</strong><br>
+      A ≈ h/2[(y₀+yₙ) + 2(y₁+y₂+...+yₙ₋₁)]<br><br>
+      <strong>Kinematics:</strong> s = ∫v dt, v = ∫a dt
+    </div>
+  </div>
+  <div class="card">
+    <h3>Key Reminders</h3>
+    <ul>
+      <li>Always add +c for indefinite integrals</li>
+      <li>Use given conditions to find the value of c</li>
+      <li>Definite integrals: substitute upper limit minus lower limit</li>
+      <li>Area below x-axis gives negative value — take absolute value</li>
+    </ul>
+  </div>
+  <div class="nav-row"><button class="btn btn-gray" onclick="go(7)">← Back</button><button class="btn btn-pri" onclick="go(9)">Practice →</button></div>
+</div>
+
+<div class="slide" id="s9">
+  <h2>✏️ Practice Questions</h2>
+  <div class="card">
+    <div class="q-block">
+      <strong>1. Integrate: ∫(4x³ + 2x) dx</strong>
+      <input type="text" id="p1" placeholder="answer + c">
+      <div id="pf1"></div>
+    </div>
+    <div class="q-block">
+      <strong>2. Evaluate: ∫₀² x² dx</strong>
+      <input type="text" id="p2" placeholder="numerical answer">
+      <div id="pf2"></div>
+    </div>
+    <div class="q-block">
+      <strong>3. If v = 6t + 2, find displacement s from t=0 to t=3 (s=0 at t=0)</strong>
+      <input type="text" id="p3" placeholder="s = ?">
+      <div id="pf3"></div>
+    </div>
+    <button class="btn btn-acc" onclick="checkPractice()" style="margin-top:10px">Check Answers</button>
+  </div>
+  <div class="nav-row"><button class="btn btn-gray" onclick="go(8)">← Back</button><button class="btn btn-pri" onclick="go(10)">Take Quiz →</button></div>
+</div>
+
+<div class="slide" id="s10">
+  <h2>🎯 Quiz — Integration</h2>
+  <div id="quiz-area">
+    <div class="card">
+      <h3>Fill in the Blanks (1 mark each)</h3>
+      <div class="q-block"><strong>1.</strong> Integration is the _____ of differentiation.<input type="text" id="q1"></div>
+      <div class="q-block"><strong>2.</strong> ∫xⁿ dx = xⁿ⁺¹/(n+1) + _____ (for indefinite integrals).<input type="text" id="q2"></div>
+      <div class="q-block"><strong>3.</strong> The area under a curve between x=a and x=b = ∫_a^b _____ dx.<input type="text" id="q3"></div>
+      <div class="q-block"><strong>4.</strong> In kinematics, displacement s = ∫_____ dt.<input type="text" id="q4"></div>
+      <div class="q-block"><strong>5.</strong> ∫6x² dx = _____ + c.<input type="text" id="q5"></div>
+    </div>
+    <div class="card">
+      <h3>Short Answer (2 marks each)</h3>
+      <div class="q-block">
+        <strong>6.</strong> Integrate: ∫(3x² − 4x + 5) dx
+        <input type="text" id="q6"><div id="qf6"></div>
+      </div>
+      <div class="q-block">
+        <strong>7.</strong> Evaluate ∫₁⁴ (2x + 1) dx
+        <input type="text" id="q7"><div id="qf7"></div>
+      </div>
+      <div class="q-block">
+        <strong>8.</strong> A velocity v = 4t − 2. Find the displacement from t=1 to t=3.
+        <input type="text" id="q8"><div id="qf8"></div>
+      </div>
+    </div>
+    <button class="btn btn-acc" onclick="submitQuiz()" style="margin-top:10px;width:100%">Submit Quiz</button>
+  </div>
+  <div id="score-board" style="display:none">
+    <h3 id="score-txt"></h3><p id="grade-txt"></p><p id="cbc-comment"></p>
+  </div>
+  <div class="nav-row"><button class="btn btn-gray" onclick="go(9)">← Back</button></div>
+</div>
+
+<script>
+let current=1;const total=10;
+const dots=document.getElementById('dot-row');
+for(let i=1;i<=total;i++){const d=document.createElement('div');d.className='dot';d.id='dot'+i;d.onclick=()=>go(i);dots.appendChild(d);}
+function go(n){
+  document.querySelector('.slide.active').classList.remove('active');
+  document.getElementById('s'+n).classList.add('active');
+  current=n;
+  document.getElementById('slide-label').textContent=`Slide ${n} / ${total}`;
+  document.getElementById('progress-fill').style.width=(n/total*100)+'%';
+  for(let i=1;i<=total;i++){const d=document.getElementById('dot'+i);d.className='dot'+(i===n?' active':i<n?' done':'');}
+  window.scrollTo(0,0);
+}go(1);
+
+function checkPractice(){
+  const checks=[
+    {id:'p1',correct:'x4',hint:'x⁴ + x² + c'},
+    {id:'p2',correct:'8/3',hint:'[x³/3]₀² = 8/3 ≈ 2.67'},
+    {id:'p3',correct:'33',hint:'s=3t²+2t; at t=3: 27+6=33 m'}
+  ];
+  checks.forEach((c,i)=>{
+    const v=document.getElementById(c.id).value.replace(/\s/g,'');
+    const fb=document.getElementById('pf'+(i+1));
+    if(v.includes(c.correct)||v.includes(c.correct.replace(/[^0-9]/g,''))){
+      fb.innerHTML=`<div class="feedback ok">✅ Correct! Full: ${c.hint}</div>`;
+    } else {
+      fb.innerHTML=`<div class="feedback no">❌ Answer: ${c.hint}</div>`;
+    }
+  });
+}
+
+function submitQuiz(){
+  const fills=[
+    {id:'q1',answers:['reverse','inverse','opposite']},
+    {id:'q2',answers:['c']},
+    {id:'q3',answers:['f(x)','y']},
+    {id:'q4',answers:['v']},
+    {id:'q5',answers:['2x³','2x^3']}
+  ];
+  let score=0,tm=11;
+  fills.forEach(f=>{
+    const v=document.getElementById(f.id).value.trim().toLowerCase();
+    if(f.answers.some(a=>v.includes(a.toLowerCase()))){score++;}
+  });
+  const shorts=[
+    {id:'q6',keys:['x³','x3','−2x²','2x2'],model:'x³ − 2x² + 5x + c',marks:2},
+    {id:'q7',keys:['18','18.0'],model:'[x²+x]₁⁴=(16+4)−(1+1)=20−2=18',marks:2},
+    {id:'q8',keys:['12','12.0'],model:'s=∫(4t−2)dt=[2t²−2t]₁³=(18−6)−(2−2)=12 m',marks:2}
+  ];
+  shorts.forEach(s=>{
+    const v=document.getElementById(s.id).value.trim().toLowerCase();
+    const fb=document.getElementById(s.id.replace('q','qf'));
+    if(s.keys.some(k=>v.includes(k.toLowerCase()))){
+      score+=s.marks;
+      fb.innerHTML=`<div class="feedback ok">✅ +${s.marks} marks. Model: ${s.model}</div>`;
+    } else {
+      fb.innerHTML=`<div class="feedback no">❌ 0 marks. Model: ${s.model}</div>`;
+    }
+  });
+  const pct=Math.round(score/tm*100);
+  let g='',c='';
+  if(pct>=80){g='Exceeds Expectation (EE)';c='Excellent! Integration mastered — top of the class!';}
+  else if(pct>=60){g='Meets Expectation (ME)';c='Good work! Review definite integrals and area under curve.';}
+  else if(pct>=40){g='Approaches Expectation (AE)';c='Keep going. Focus on the basic power rule for integration.';}
+  else{g='Below Expectation (BE)';c='Revisit the lesson slides and practise with simple polynomials first.';}
+  document.getElementById('score-board').style.display='block';
+  document.getElementById('score-txt').textContent=`Score: ${score} / ${tm} (${pct}%)`;
+  document.getElementById('grade-txt').textContent=g;
+  document.getElementById('cbc-comment').textContent=c;
+  document.getElementById('quiz-area').style.display='none';
+  if(typeof submitExamToMTTI==='function') submitExamToMTTI(score,tm,pct);
+}
+</script>
+</body>
+</html>

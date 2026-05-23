@@ -1,0 +1,831 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>Weekly Interactive — Masomotele</title>
+<style>
+:root{
+  --pri:#0a5e2a;--pri-d:#064a1f;--pri-l:#e6f5ec;
+  --acc:#f5a623;--acc-d:#b8760a;--acc-l:#fff8e6;
+  --ink:#141f18;--dim:#4a5c50;--mid:#8fa897;
+  --sur:#f3f8f4;--bdr:#d6ead9;--wht:#fff;
+  --red:#c62828;--red-l:#ffeaea;
+  --grn:#2e7d32;--grn-l:#e8f5e9;
+  --amb:#f57c00;--amb-l:#fff3e0;
+  --rad:12px;--rad-sm:8px;
+  --sh:0 2px 12px rgba(0,0,0,.08);
+  --sh-lg:0 8px 32px rgba(0,0,0,.14);
+}
+*{margin:0;padding:0;box-sizing:border-box;}
+html{overflow-x:hidden;}
+body{font-family:'Segoe UI',system-ui,sans-serif;background:var(--sur);color:var(--ink);-webkit-font-smoothing:antialiased;min-height:100vh;}
+button{font-family:inherit;cursor:pointer;border:none;}
+input,textarea{font-family:inherit;}
+
+/* HEADER */
+.hdr{background:var(--pri-d);padding:0 16px;height:54px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:100;box-shadow:0 2px 10px rgba(0,0,0,.2);}
+.hdr-brand{display:flex;align-items:center;gap:10px;}
+.hdr-logo{width:32px;height:32px;border-radius:7px;background:white;display:flex;align-items:center;justify-content:center;font-weight:900;color:var(--pri);font-size:.75rem;flex-shrink:0;}
+.hdr-name{color:white;font-size:.88rem;font-weight:700;line-height:1.2;}
+.hdr-name small{display:block;font-size:.6rem;font-weight:400;opacity:.6;}
+.hdr-score{background:rgba(255,255,255,.12);border-radius:50px;padding:5px 14px;color:white;font-size:.75rem;font-weight:700;display:none;align-items:center;gap:5px;}
+.hdr-score b{color:var(--acc);}
+
+/* HERO */
+.hero{background:linear-gradient(135deg,var(--pri-d),var(--pri));padding:24px 16px 32px;text-align:center;position:relative;overflow:hidden;}
+.hero::after{display:none;}
+.hero-tag{display:inline-block;background:rgba(245,166,35,.18);border:1px solid rgba(245,166,35,.35);color:var(--acc);padding:3px 12px;border-radius:50px;font-size:.62rem;font-weight:700;text-transform:uppercase;letter-spacing:.07em;margin-bottom:10px;}
+.hero h1{font-size:clamp(1.1rem,4vw,1.5rem);font-weight:900;color:white;margin-bottom:5px;line-height:1.25;}
+.hero-sub{font-size:.78rem;color:rgba(255,255,255,.65);margin-bottom:18px;}
+.stage-pills{display:flex;justify-content:center;gap:8px;}
+.sp{display:flex;align-items:center;gap:5px;padding:5px 13px;border-radius:50px;font-size:.7rem;font-weight:700;background:rgba(255,255,255,.1);color:rgba(255,255,255,.55);transition:all .2s;}
+.sp .dot{width:6px;height:6px;border-radius:50%;background:currentColor;}
+.sp.active-basic{background:var(--grn-l);color:var(--grn);}
+.sp.active-medium{background:var(--amb-l);color:var(--amb);}
+.sp.active-hard{background:var(--red-l);color:var(--red);}
+.sp.done{background:var(--pri);color:white;}
+
+/* BODY */
+.body{max-width:660px;margin:0 auto;padding:16px 14px 80px;}
+
+/* START SCREEN */
+.start-card{background:white;border-radius:var(--rad);padding:22px;box-shadow:var(--sh);margin-bottom:12px;}
+.start-card h2{font-size:.98rem;font-weight:800;color:var(--pri-d);margin-bottom:7px;}
+.start-card p{font-size:.82rem;color:var(--dim);line-height:1.7;margin-bottom:14px;}
+.info-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:14px;}
+.info-box{background:var(--sur);border-radius:var(--rad-sm);padding:9px 12px;border:1px solid var(--bdr);}
+.info-box strong{display:block;font-size:.6rem;font-weight:700;text-transform:uppercase;letter-spacing:.05em;color:var(--mid);margin-bottom:2px;}
+.info-box span{font-size:.82rem;font-weight:600;color:var(--ink);}
+.stage-info{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:16px;}
+.si{border-radius:var(--rad-sm);padding:10px;text-align:center;}
+.si-b{background:var(--grn-l);} .si-m{background:var(--amb-l);} .si-h{background:var(--red-l);}
+.si-name{font-size:.68rem;font-weight:800;text-transform:uppercase;letter-spacing:.04em;margin-bottom:3px;}
+.si-b .si-name{color:var(--grn);} .si-m .si-name{color:var(--amb);} .si-h .si-name{color:var(--red);}
+.si-pts{font-size:1.1rem;font-weight:900;color:var(--ink);}
+.si-qs{font-size:.62rem;color:var(--dim);margin-top:1px;}
+.prev-row{display:flex;align-items:center;gap:9px;background:var(--pri-l);border:1px solid var(--bdr);border-radius:var(--rad-sm);padding:9px 13px;margin-bottom:12px;font-size:.77rem;color:var(--pri-d);display:none;}
+.prev-row b{font-weight:800;}
+.btn-start{display:block;width:100%;padding:14px;background:var(--pri);color:white;border-radius:50px;font-size:.93rem;font-weight:800;text-align:center;transition:all .18s;}
+.btn-start:active{background:var(--pri-d);transform:scale(.98);}
+
+/* QUIZ */
+.quiz-hd{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;gap:8px;}
+.stage-badge{display:inline-flex;padding:4px 12px;border-radius:50px;font-size:.67rem;font-weight:800;text-transform:uppercase;letter-spacing:.05em;}
+.sb-b{background:var(--grn-l);color:var(--grn);}
+.sb-m{background:var(--amb-l);color:var(--amb);}
+.sb-h{background:var(--red-l);color:var(--red);}
+.q-counter{font-size:.73rem;color:var(--dim);font-weight:600;}
+.prog-bar{height:4px;background:var(--bdr);border-radius:3px;overflow:hidden;margin-bottom:14px;}
+.prog-fill{height:100%;background:var(--pri);border-radius:3px;transition:width .3s ease;}
+.q-card{background:white;border-radius:var(--rad);padding:18px;box-shadow:var(--sh);margin-bottom:11px;}
+.q-type-tag{display:inline-block;font-size:.58rem;font-weight:800;text-transform:uppercase;letter-spacing:.06em;padding:2px 8px;border-radius:50px;background:var(--pri-l);color:var(--pri);margin-bottom:9px;}
+.q-text{font-size:.9rem;font-weight:700;color:var(--ink);line-height:1.55;margin-bottom:13px;}
+
+/* OPTIONS */
+.options{display:flex;flex-direction:column;gap:7px;}
+.opt{display:flex;align-items:center;gap:10px;padding:10px 13px;border-radius:var(--rad-sm);border:1.5px solid var(--bdr);background:var(--sur);cursor:pointer;font-size:.84rem;font-weight:600;color:var(--ink);transition:all .15s;}
+.opt-ltr{width:24px;height:24px;border-radius:6px;background:var(--bdr);display:flex;align-items:center;justify-content:center;font-size:.7rem;font-weight:800;color:var(--dim);flex-shrink:0;transition:all .15s;}
+.opt.sel{border-color:var(--pri);background:var(--pri-l);}
+.opt.sel .opt-ltr{background:var(--pri);color:white;}
+.opt.corr{border-color:var(--grn);background:var(--grn-l);color:var(--grn);}
+.opt.corr .opt-ltr{background:var(--grn);color:white;}
+.opt.wrong{border-color:var(--red);background:var(--red-l);color:var(--red);}
+.opt.wrong .opt-ltr{background:var(--red);color:white;}
+.opt.show-corr{border-color:var(--grn);background:var(--grn-l);color:var(--grn);}
+.opt.show-corr .opt-ltr{background:var(--grn);color:white;}
+
+/* TRUE FALSE */
+.tf-row{display:grid;grid-template-columns:1fr 1fr;gap:9px;}
+.tf-btn{padding:12px;border-radius:var(--rad-sm);border:1.5px solid var(--bdr);background:var(--sur);font-size:.86rem;font-weight:800;text-align:center;cursor:pointer;color:var(--dim);transition:all .15s;}
+.tf-btn.sel{border-color:var(--pri);background:var(--pri-l);color:var(--pri);}
+.tf-btn.corr{border-color:var(--grn);background:var(--grn-l);color:var(--grn);}
+.tf-btn.wrong{border-color:var(--red);background:var(--red-l);color:var(--red);}
+
+/* FILL */
+.fill-in{width:100%;padding:10px 13px;border:1.5px solid var(--bdr);border-radius:var(--rad-sm);font-size:.87rem;outline:none;background:var(--sur);color:var(--ink);transition:border .2s;}
+.fill-in:focus{border-color:var(--pri);background:white;}
+.fill-in.corr{border-color:var(--grn);background:var(--grn-l);}
+.fill-in.wrong{border-color:var(--red);background:var(--red-l);}
+
+/* SHORT ANSWER */
+.short-ta{width:100%;padding:10px 13px;border:1.5px solid var(--bdr);border-radius:var(--rad-sm);font-size:.84rem;outline:none;background:var(--sur);color:var(--ink);resize:vertical;min-height:88px;line-height:1.6;transition:border .2s;}
+.short-ta:focus{border-color:var(--pri);background:white;}
+.kw-wrap{margin-top:8px;}
+.kw-label{font-size:.68rem;font-weight:700;color:var(--dim);margin-bottom:4px;}
+.kw-tag{display:inline-block;padding:2px 8px;border-radius:50px;font-size:.63rem;font-weight:700;margin:2px;}
+.kw-found{background:var(--grn-l);color:var(--grn);}
+.kw-miss{background:var(--red-l);color:var(--red);}
+.override-box{margin-top:10px;padding:10px 12px;background:var(--acc-l);border:1px solid rgba(245,166,35,.3);border-radius:var(--rad-sm);}
+.ov-label{font-size:.67rem;font-weight:700;color:var(--acc-d);text-transform:uppercase;letter-spacing:.04em;margin-bottom:7px;}
+.ov-btns{display:flex;gap:7px;flex-wrap:wrap;}
+.ov-btn{padding:5px 13px;border-radius:50px;font-size:.7rem;font-weight:800;cursor:pointer;border:none;transition:all .15s;}
+.ov-full{background:var(--grn);color:white;}
+.ov-half{background:var(--amb);color:white;}
+.ov-zero{background:var(--red);color:white;}
+.ov-set{font-size:.7rem;font-weight:700;color:var(--acc-d);align-self:center;margin-left:4px;}
+
+/* EXPLANATION */
+.expl{margin-top:11px;padding:10px 13px;border-left:3px solid var(--pri);background:var(--pri-l);border-radius:0 var(--rad-sm) var(--rad-sm) 0;font-size:.76rem;line-height:1.65;color:var(--pri-d);display:none;}
+.expl.show{display:block;}
+.expl b{font-weight:800;}
+
+/* HINT */
+.hint-row{margin-top:9px;}
+.hint-btn{display:inline-flex;align-items:center;gap:5px;background:var(--acc-l);border:1px solid rgba(245,166,35,.3);color:var(--acc-d);padding:5px 12px;border-radius:50px;font-size:.68rem;font-weight:700;cursor:pointer;transition:all .15s;}
+.hint-txt{margin-top:7px;padding:8px 12px;background:var(--acc-l);border:1px solid rgba(245,166,35,.3);border-radius:var(--rad-sm);font-size:.74rem;color:var(--acc-d);line-height:1.6;display:none;}
+.hint-txt.show{display:block;}
+
+/* ACTIONS */
+.q-actions{display:flex;gap:9px;margin-top:12px;}
+.btn-sub{flex:1;padding:11px;background:var(--pri);color:white;border-radius:50px;font-size:.83rem;font-weight:800;transition:all .18s;}
+.btn-sub:disabled{opacity:.35;cursor:not-allowed;}
+.btn-nxt{flex:1;padding:11px;background:var(--acc);color:var(--pri-d);border-radius:50px;font-size:.83rem;font-weight:800;transition:all .18s;display:none;}
+.btn-nxt:active{background:var(--acc-d);color:white;}
+
+/* STAGE RESULT */
+.sr-card{background:white;border-radius:var(--rad);padding:24px;text-align:center;box-shadow:var(--sh);margin-bottom:12px;}
+.sr-ring{width:88px;height:88px;border-radius:50%;margin:0 auto 13px;display:flex;align-items:center;justify-content:center;flex-direction:column;border:4px solid;}
+.sr-ring.pass{border-color:var(--grn);background:var(--grn-l);}
+.sr-ring.fail{border-color:var(--red);background:var(--red-l);}
+.sr-pct{font-size:1.35rem;font-weight:900;line-height:1;}
+.sr-ring.pass .sr-pct{color:var(--grn);}
+.sr-ring.fail .sr-pct{color:var(--red);}
+.sr-pts{font-size:.6rem;font-weight:700;text-transform:uppercase;letter-spacing:.04em;opacity:.7;}
+.sr-title{font-size:.97rem;font-weight:800;margin-bottom:4px;}
+.sr-sub{font-size:.76rem;color:var(--dim);margin-bottom:16px;}
+.sr-btns{display:flex;flex-direction:column;gap:8px;}
+.btn-ns{padding:12px;background:var(--pri);color:white;border-radius:50px;font-size:.84rem;font-weight:800;cursor:pointer;transition:all .18s;}
+.btn-rt{padding:12px;background:var(--pri-l);color:var(--pri);border:1.5px solid var(--bdr);border-radius:50px;font-size:.84rem;font-weight:800;cursor:pointer;transition:all .18s;}
+.att-left{font-size:.68rem;color:var(--dim);text-align:center;margin-top:4px;}
+.btn-skip{padding:10px;background:transparent;color:var(--dim);border:1px solid var(--bdr);border-radius:50px;font-size:.76rem;font-weight:700;cursor:pointer;margin-top:2px;}
+
+/* FINAL RESULT */
+.fr-card{background:white;border-radius:var(--rad);padding:24px;box-shadow:var(--sh);margin-bottom:12px;}
+.fr-top{text-align:center;margin-bottom:18px;}
+.fr-ring-wrap{width:108px;height:108px;margin:0 auto 12px;position:relative;}
+.fr-ring-wrap svg{transform:rotate(-90deg);}
+.fr-inner{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;}
+.fr-pct{font-size:1.55rem;font-weight:900;color:var(--pri-d);line-height:1;}
+.fr-of{font-size:.62rem;color:var(--dim);font-weight:600;}
+.fr-name{font-size:.98rem;font-weight:800;margin-bottom:3px;}
+.fr-lesson{font-size:.76rem;color:var(--dim);margin-bottom:14px;}
+.sb-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:16px;}
+.sb-cell{border-radius:var(--rad-sm);padding:10px;text-align:center;}
+.sb-cell.b{background:var(--grn-l);} .sb-cell.m{background:var(--amb-l);} .sb-cell.h{background:var(--red-l);}
+.sb-num{font-size:1.1rem;font-weight:900;}
+.sb-cell.b .sb-num{color:var(--grn);} .sb-cell.m .sb-num{color:var(--amb);} .sb-cell.h .sb-num{color:var(--red);}
+.sb-lbl{font-size:.62rem;font-weight:700;text-transform:uppercase;letter-spacing:.03em;color:var(--dim);margin-top:1px;}
+.fr-btns{display:flex;flex-direction:column;gap:9px;}
+.btn-cert{padding:13px;background:var(--acc);color:var(--pri-d);border-radius:50px;font-size:.87rem;font-weight:800;cursor:pointer;text-align:center;}
+.btn-rev{padding:12px;background:var(--pri-l);color:var(--pri);border:1.5px solid var(--bdr);border-radius:50px;font-size:.84rem;font-weight:800;cursor:pointer;}
+.btn-bk{padding:12px;background:var(--sur);color:var(--dim);border:1.5px solid var(--bdr);border-radius:50px;font-size:.84rem;font-weight:800;cursor:pointer;}
+
+/* CERTIFICATE */
+#certOverlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.72);z-index:999;align-items:center;justify-content:center;padding:16px;}
+#certOverlay.show{display:flex;}
+.cert{background:white;border-radius:16px;padding:26px 22px;max-width:420px;width:100%;box-shadow:var(--sh-lg);text-align:center;position:relative;}
+.cert-x{position:absolute;top:11px;right:13px;background:var(--sur);border:none;border-radius:50%;width:28px;height:28px;font-size:.85rem;cursor:pointer;color:var(--dim);}
+.cert-logo{width:46px;height:46px;border-radius:10px;background:var(--pri);color:white;font-size:.68rem;font-weight:900;display:flex;align-items:center;justify-content:center;margin:0 auto 11px;}
+.cert-t{font-size:.6rem;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:var(--mid);margin-bottom:3px;}
+.cert-h{font-size:1.15rem;font-weight:900;color:var(--pri-d);margin-bottom:2px;}
+.cert-org{font-size:.72rem;color:var(--dim);margin-bottom:14px;}
+.cert-name{font-size:1.25rem;font-weight:900;color:var(--ink);margin-bottom:3px;}
+.cert-lesson{font-size:.78rem;color:var(--pri);font-weight:700;margin-bottom:12px;}
+.cert-row{display:flex;justify-content:center;gap:14px;margin-bottom:14px;}
+.cert-box{text-align:center;padding:9px 15px;border-radius:9px;background:var(--sur);border:1px solid var(--bdr);}
+.cert-box b{display:block;font-size:1.25rem;font-weight:900;color:var(--pri);}
+.cert-box span{font-size:.62rem;color:var(--dim);font-weight:600;}
+.cert-foot{font-size:.62rem;color:var(--mid);line-height:1.8;border-top:1px solid var(--bdr);padding-top:9px;}
+.btn-print{display:block;width:100%;padding:10px;background:var(--pri);color:white;border-radius:50px;font-size:.8rem;font-weight:800;cursor:pointer;margin-top:11px;border:none;}
+@media print{
+  body *{visibility:hidden;}
+  .cert,.cert *{visibility:visible;}
+  .cert{position:fixed;inset:0;margin:auto;border-radius:0;box-shadow:none;}
+  .cert-x,.btn-print{display:none;}
+}
+
+/* TOAST */
+#toast{position:fixed;bottom:20px;left:50%;transform:translateX(-50%);background:var(--ink);color:white;padding:8px 18px;border-radius:50px;font-size:.76rem;font-weight:700;display:none;z-index:300;white-space:nowrap;}
+#toast.on{display:block;}
+
+/* SCREENS */
+.screen{display:none;} .screen.on{display:block;}
+</style>
+<script type="text/javascript">(function(c,l,a,r,i,t,y){c[a]=c[a]||function(){(c[a].q=c[a].q||[]).push(arguments)};t=l.createElement(r);t.async=1;t.src="https://www.clarity.ms/tag/"+i;y=l.getElementsByTagName(r)[0];y.parentNode.insertBefore(t,y);})(window,document,"clarity","script","wg31zlwbt9");</script>\n</head>
+<body>
+
+<header class="hdr">
+  <div class="hdr-brand">
+    <div class="hdr-logo">M</div>
+    <div style="width:28px;height:28px;border-radius:6px;background:rgba(255,255,255,.15);display:flex;align-items:center;justify-content:center;font-size:.5rem;font-weight:900;color:white;text-align:center;line-height:1.1;">MTTI<br>EDO</div>
+    <div class="hdr-name">Masomotele<small>Join us after school · M.T.T.I Eldoret</small></div>
+  </div>
+  <div class="hdr-score" id="hdrScore">Score: <b id="hdrPts">0</b>/100</div>
+</header>
+
+<div class="hero">
+  <div class="hero-tag" id="heroTag">Weekly Interactive</div>
+  <h1 id="heroTitle">Loading…</h1>
+  <p class="hero-sub" id="heroSub"></p>
+  <div class="stage-pills">
+    <div class="sp" id="sp-basic"><div class="dot"></div>Basic</div>
+    <div class="sp" id="sp-medium"><div class="dot"></div>Medium</div>
+    <div class="sp" id="sp-hard"><div class="dot"></div>Hard</div>
+  </div>
+</div>
+
+<div class="body">
+
+  <!-- START -->
+  <div class="screen on" id="screenStart">
+    <div class="prev-row" id="prevRow">🏅 Previous best: <b id="prevTxt"></b></div>
+    <div class="start-card">
+      <h2 id="startTitle"></h2>
+      <p id="startDesc"></p>
+      <div class="info-grid">
+        <div class="info-box"><strong>Subject</strong><span id="iSubj">—</span></div>
+        <div class="info-box"><strong>Class</strong><span id="iClass">—</span></div>
+        <div class="info-box"><strong>Total Marks</strong><span>100</span></div>
+        <div class="info-box"><strong>Duration</strong><span id="iDur">—</span></div>
+      </div>
+      <div class="stage-info">
+        <div class="si si-b"><div class="si-name">Basic</div><div class="si-pts" id="siB">30</div><div class="si-qs" id="siBq">6 questions</div></div>
+        <div class="si si-m"><div class="si-name">Medium</div><div class="si-pts" id="siM">40</div><div class="si-qs" id="siMq">7 questions</div></div>
+        <div class="si si-h"><div class="si-name">Hard</div><div class="si-pts" id="siH">30</div><div class="si-qs" id="siHq">3 questions</div></div>
+      </div>
+      <button class="btn-start" onclick="startQuiz()">Begin Assessment →</button>
+    </div>
+  </div>
+
+  <!-- QUIZ -->
+  <div class="screen" id="screenQuiz">
+    <div class="quiz-hd">
+      <div>
+        <div class="stage-badge sb-b" id="stageBadge">Basic</div>
+        <div class="q-counter" id="qCount">Question 1 of 6</div>
+      </div>
+      <div style="font-size:.73rem;color:var(--dim);font-weight:600">Stage: <b id="stagePts">0</b> pts</div>
+    </div>
+    <div class="prog-bar"><div class="prog-fill" id="progFill"></div></div>
+    <div id="qWrap"></div>
+  </div>
+
+  <!-- STAGE RESULT -->
+  <div class="screen" id="screenSR"></div>
+
+  <!-- FINAL -->
+  <div class="screen" id="screenFinal"></div>
+
+</div>
+
+<!-- CERTIFICATE -->
+<div id="certOverlay">
+  <div class="cert">
+    <button class="cert-x" onclick="closeCert()">✕</button>
+    <div class="cert-logo">MTTI</div>
+    <div class="cert-t">Certificate of Achievement</div>
+    <div class="cert-h">Masomotele</div>
+    <div class="cert-org">M.T.T.I Eldoret · Free Learning Portal</div>
+    <div class="cert-name" id="cName">Student</div>
+    <div class="cert-lesson" id="cLesson"></div>
+    <div class="cert-row">
+      <div class="cert-box"><b id="cPct">0%</b><span>Score</span></div>
+      <div class="cert-box"><b id="cPts">0/100</b><span>Marks</span></div>
+      <div class="cert-box"><b id="cDate">—</b><span>Date</span></div>
+    </div>
+    <div class="cert-foot">
+      Masomotele Technical Training Institute · Sagaas Centre, 4th Floor, Eldoret<br>
+      masomoteletraining.co.ke · 0712 464 936 · Start Learning, Start Earning
+    </div>
+    <button class="btn-print" onclick="window.print()">🖨 Print Certificate</button>
+  </div>
+</div>
+
+<div id="toast"></div>
+
+<script>
+/* ══════════════════════════════════════════════════════════════
+   LESSON CONFIG
+   ══════════════════════════════════════════════════════════════
+   Fill this section for each new lesson. Engine is below — do not edit.
+
+   QUESTION TYPES:
+   "mcq"   → text, options[4], answer(0-3), explanation, hint(optional)
+   "tf"    → text, answer("true"|"false"), explanation, hint(optional)
+   "fill"  → text, answer(string), accept[array of acceptable strings], explanation, hint(optional)
+   "short" → text, keywords[array], minKeywords(int), maxPts(int), explanation, hint(optional)
+
+   MARKS: auto-distributed from stage totalPts unless you set pts on a question.
+   SHORT questions: set maxPts per question (they don't share the pool equally).
+   ══════════════════════════════════════════════════════════════ */
+
+const LESSON = {
+  id:          'f4-math-linear-programming',
+  title:       'Linear Programming',
+  subject:     'Mathematics',
+  classLevel:  'Form 4',
+  tag:         'Week 1 · Form 4 Maths',
+  description: 'Test your understanding of Linear Programming — forming inequalities, drawing feasible regions, and optimising objective functions.',
+  duration:    '20–30 minutes',
+
+  stages: {
+
+    basic: {
+      totalPts: 30,
+      maxAttempts: 0,        // 0 = unlimited
+      questions: [
+        {
+          type: 'mcq',
+          text: 'What is the feasible region in linear programming?',
+          options: [
+            'The area where no constraints are satisfied',
+            'The set of all points satisfying all constraints',
+            'The optimal solution point only',
+            'The line connecting two corner points'
+          ],
+          answer: 1,
+          explanation: 'The feasible region is the set of all points (x, y) that satisfy every constraint simultaneously. It is usually a polygon on the graph.',
+          hint: 'Think about the word "feasible" — it means possible or allowable.'
+        },
+        {
+          type: 'tf',
+          text: 'A linear inequality such as 2x + 3y ≤ 12 is represented as a straight line on a graph.',
+          answer: 'true',
+          explanation: 'The boundary of any linear inequality is a straight line. The inequality sign determines which side of the line is shaded.',
+          hint: 'Consider the boundary equation 2x + 3y = 12.'
+        },
+        {
+          type: 'mcq',
+          text: 'The objective function in linear programming is used to:',
+          options: [
+            'Define the constraints of the problem',
+            'Find the feasible region boundary',
+            'Maximise or minimise a quantity such as profit or cost',
+            'Determine the number of variables'
+          ],
+          answer: 2,
+          explanation: 'The objective function (e.g. P = 3x + 2y) is what we want to maximise or minimise — it represents profit, cost, output, etc.',
+          hint: 'The word "objective" means goal or aim.'
+        },
+        {
+          type: 'tf',
+          text: 'The optimal solution in linear programming always occurs at a corner (vertex) of the feasible region.',
+          answer: 'true',
+          explanation: 'This is a fundamental theorem. The maximum or minimum of the objective function always occurs at a vertex (corner point) of the feasible region.',
+          hint: 'This is always true when the feasible region is a polygon.'
+        },
+        {
+          type: 'mcq',
+          text: 'Which of these is a valid linear constraint?',
+          options: ['x² + y ≤ 10', '3x + 2y ≥ 6', 'xy ≤ 5', '√x + y ≤ 8'],
+          answer: 1,
+          explanation: 'A linear constraint must have variables with power 1 only. 3x + 2y ≥ 6 is linear. The others contain x², xy, or √x.',
+          hint: 'Linear means no powers, no roots, no products of variables.'
+        },
+        {
+          type: 'fill',
+          text: 'In the inequality 4x + y ≤ 20, the boundary line has equation 4x + y = ___.',
+          answer: '20',
+          accept: ['20', 'twenty'],
+          explanation: 'Replace the inequality sign with equals to get the boundary: 4x + y = 20.',
+          hint: 'Replace ≤ with = to find the boundary line.'
+        }
+      ]
+    },
+
+    medium: {
+      totalPts: 40,
+      maxAttempts: 2,
+      questions: [
+        {
+          type: 'mcq',
+          text: 'A farmer plants maize (x) and beans (y). He has 10 acres and 14 bags of fertiliser (maize: 2 bags/acre, beans: 1 bag/acre). Which set of constraints is correct?',
+          options: [
+            'x + y ≤ 10,  2x + y ≤ 14,  x ≥ 0,  y ≥ 0',
+            'x + y ≥ 10,  2x + y ≥ 14,  x ≥ 0,  y ≥ 0',
+            'x + y ≤ 14,  2x + y ≤ 10,  x ≥ 0,  y ≥ 0',
+            'x + y ≤ 10,  x + 2y ≤ 14,  x ≥ 0,  y ≥ 0'
+          ],
+          answer: 0,
+          explanation: 'Land: x + y ≤ 10. Fertiliser: maize uses 2x bags, beans 1y bag, total ≤ 14, so 2x + y ≤ 14. Non-negativity: x ≥ 0, y ≥ 0.',
+          hint: 'Write one constraint per limited resource: land and fertiliser.'
+        },
+        {
+          type: 'fill',
+          text: 'The lines x + y = 10 and 2x + y = 14 intersect at the point (___, ___). Enter as x,y.',
+          answer: '4,6',
+          accept: ['4,6', '4, 6', '(4,6)', '(4, 6)'],
+          explanation: 'Subtract equation 1 from equation 2: x = 4. Then 4 + y = 10, so y = 6. Intersection: (4, 6).',
+          hint: 'Subtract equation 1 from equation 2 to eliminate y.'
+        },
+        {
+          type: 'mcq',
+          text: 'Vertices of a feasible region are (0,0), (7,0), (4,6), (0,10). Objective function P = 5x + 4y. What is the maximum value of P?',
+          options: ['35', '40', '44', '50'],
+          answer: 2,
+          explanation: 'Test each vertex: P(0,0)=0, P(7,0)=35, P(4,6)=20+24=44, P(0,10)=40. Maximum is 44 at (4, 6).',
+          hint: 'Substitute each corner point into P = 5x + 4y and compare.'
+        },
+        {
+          type: 'tf',
+          text: 'If the objective function P = 3x + 3y, all points on an edge of the feasible region with the same gradient as the objective function give equal P values.',
+          answer: 'true',
+          explanation: 'When the objective function is parallel to a constraint boundary, every point on that edge gives the same optimal value.',
+          hint: 'Compare the gradients of P = 3x + 3y and a constraint line with the same slope.'
+        },
+        {
+          type: 'fill',
+          text: 'A constraint says production cannot exceed 50 units: x + y ≤ 50. In slope-intercept form the boundary is y = ___ − x.',
+          answer: '50',
+          accept: ['50', 'fifty'],
+          explanation: 'Rearrange x + y = 50: y = 50 − x. The slope is −1 and y-intercept is 50.',
+          hint: 'Make y the subject of x + y = 50.'
+        },
+        {
+          type: 'mcq',
+          text: 'What does it mean when the feasible region is empty?',
+          options: [
+            'The optimal solution is zero',
+            'The problem has infinite solutions',
+            'The problem is infeasible — no solution exists',
+            'We need to add more constraints'
+          ],
+          answer: 2,
+          explanation: 'An empty feasible region means the constraints contradict each other — no combination of x and y satisfies all of them. The problem is called infeasible.',
+          hint: 'Think: what if it is impossible to satisfy all constraints at once?'
+        },
+        {
+          type: 'fill',
+          text: 'We test all corner points of the feasible region to find the ___ value of the objective function.',
+          answer: 'optimal',
+          accept: ['optimal', 'optimum', 'maximum', 'minimum', 'max', 'min', 'best'],
+          explanation: 'The theorem of linear programming guarantees the optimal (maximum or minimum) value occurs at a vertex.',
+          hint: 'We are looking for the best — highest or lowest — value.'
+        }
+      ]
+    },
+
+    hard: {
+      totalPts: 30,
+      maxAttempts: 1,
+      questions: [
+        {
+          type: 'short',
+          text: 'A company makes chairs (x) and tables (y). Each chair needs 2 hours carpentry and 1 hour finishing. Each table needs 3 hours carpentry and 2 hours finishing. Available: 18 hours carpentry, 10 hours finishing. Profit: Ksh 800 per chair, Ksh 1200 per table. Write the TWO resource constraints and the objective function.',
+          keywords: ['2x+3y', '2x + 3y', '≤18', '≤ 18', 'x+2y', 'x + 2y', '≤10', '≤ 10', 'P=800', 'P = 800', '1200', 'maximise', 'maximize', 'P='],
+          minKeywords: 4,
+          maxPts: 10,
+          explanation: 'Carpentry: 2x + 3y ≤ 18. Finishing: x + 2y ≤ 10. Objective: Maximise P = 800x + 1200y. Also x ≥ 0, y ≥ 0.',
+          hint: 'Write one inequality per resource (carpentry hours, finishing hours), then write P for profit.'
+        },
+        {
+          type: 'short',
+          text: 'Explain in your own words why the optimal solution in linear programming always occurs at a vertex. Use the idea of the iso-profit line in your answer.',
+          keywords: ['iso-profit', 'parallel', 'objective', 'vertex', 'corner', 'boundary', 'slide', 'move', 'last', 'touch', 'edge'],
+          minKeywords: 3,
+          maxPts: 10,
+          explanation: 'The iso-profit line represents all combinations giving the same profit c. Sliding this line outward (increasing c), the last point it touches the feasible region is a corner (vertex). If parallel to an edge, the entire edge shares the maximum.',
+          hint: 'Imagine sliding the objective function line away from the origin — where does it last touch the feasible region?'
+        },
+        {
+          type: 'short',
+          text: 'Feasible region: x + y ≤ 8, x ≤ 5, y ≤ 6, x ≥ 0, y ≥ 0. Find ALL corner points and determine which maximises P = 4x + 3y. Show your working.',
+          keywords: ['(0,0)', '(5,0)', '(0,6)', '(5,3)', '(2,6)', '29', 'maximum', 'P=29', 'P = 29', '4(5)', '3(3)'],
+          minKeywords: 4,
+          maxPts: 10,
+          explanation: 'Vertices: (0,0), (5,0), (5,3), (2,6), (0,6). Testing P: P(5,3)=20+9=29 is maximum. P(2,6)=8+18=26, P(5,0)=20, P(0,6)=18.',
+          hint: 'Find intersections of each pair of boundary lines, list the vertices, then test each in P = 4x + 3y.'
+        }
+      ]
+    }
+  }
+};
+
+/* ══════════════════════════════════════════════════════════════
+   ENGINE — DO NOT EDIT BELOW
+   ══════════════════════════════════════════════════════════════ */
+const SL = ['basic','medium','hard'];
+const SN = {basic:'Basic',medium:'Medium',hard:'Hard'};
+
+let S = {
+  stage:'basic', qi:0,
+  pts:{basic:0,medium:0,hard:0},
+  attempts:{basic:0,medium:0,hard:0},
+  done:{basic:false,medium:false,hard:false},
+  ans:{}, hint:{}, ov:{},
+  fresh: true
+};
+
+function init(){
+  try{ const l=JSON.parse(localStorage.getItem('mtti_learner')||'{}'); if(l.name) LESSON.learnerName=l.name.split(' ')[0]; }catch(_){}
+  document.getElementById('heroTitle').textContent = LESSON.title;
+  document.getElementById('heroSub').textContent = LESSON.tag;
+  document.getElementById('heroTag').textContent = LESSON.tag;
+  document.getElementById('startTitle').textContent = LESSON.title;
+  document.getElementById('startDesc').textContent = LESSON.description;
+  document.getElementById('iSubj').textContent = LESSON.subject;
+  document.getElementById('iClass').textContent = LESSON.classLevel;
+  document.getElementById('iDur').textContent = LESSON.duration;
+  const b=LESSON.stages.basic, m=LESSON.stages.medium, h=LESSON.stages.hard;
+  document.getElementById('siB').textContent = b.totalPts;
+  document.getElementById('siM').textContent = m.totalPts;
+  document.getElementById('siH').textContent = h.totalPts;
+  document.getElementById('siBq').textContent = b.questions.length+' questions';
+  document.getElementById('siMq').textContent = m.questions.length+' questions';
+  document.getElementById('siHq').textContent = h.questions.length+' questions';
+  loadProg();
+  const best=getBest();
+  if(best){ const r=document.getElementById('prevRow'); r.style.display='flex'; document.getElementById('prevTxt').textContent=best.pts+'/100 ('+best.pct+'%)'; }
+  pills(); document.title=LESSON.title+' — Masomotele';
+}
+
+function saveProg(){ try{ localStorage.setItem('mtti_p_'+LESSON.id,JSON.stringify({S,ts:Date.now()})); }catch(_){} }
+function loadProg(){ try{ const r=localStorage.getItem('mtti_p_'+LESSON.id); if(!r)return; const d=JSON.parse(r); if(Date.now()-d.ts>86400000)return; S=d.S; S.fresh=false; }catch(_){} }
+function clearProg(){ try{ localStorage.removeItem('mtti_p_'+LESSON.id); }catch(_){} }
+function getBest(){ try{ return JSON.parse(localStorage.getItem('mtti_s_'+LESSON.id)||'null'); }catch(_){ return null; } }
+function saveBest(pts){ try{ const e=getBest(); if(!e||pts>e.pts){ const pct=Math.round(pts); localStorage.setItem('mtti_s_'+LESSON.id,JSON.stringify({pts,pct,date:new Date().toLocaleDateString('en-KE'),learner:LESSON.learnerName||''})); try{ let idx=JSON.parse(localStorage.getItem('mtti_scores_idx')||'{}'); idx[LESSON.id]={pts,pct}; localStorage.setItem('mtti_scores_idx',JSON.stringify(idx)); }catch(_){} } }catch(_){} }
+
+function qpts(stg,qi){ const q=LESSON.stages[stg].questions[qi]; if(q.pts)return q.pts; if(q.type==='short')return q.maxPts||10; return Math.round(LESSON.stages[stg].totalPts/LESSON.stages[stg].questions.length*10)/10; }
+function totalScore(){ return S.pts.basic+S.pts.medium+S.pts.hard; }
+
+function screen(id){ document.querySelectorAll('.screen').forEach(s=>s.classList.remove('on')); document.getElementById(id).classList.add('on'); window.scrollTo(0,0); }
+
+function pills(){
+  SL.forEach(s=>{
+    const el=document.getElementById('sp-'+s);
+    el.className='sp';
+    if(S.done[s]) el.classList.add('done');
+    else if(s===S.stage) el.classList.add('active-'+s);
+  });
+}
+
+function hdrScore(){ const el=document.getElementById('hdrScore'); el.style.display='inline-flex'; document.getElementById('hdrPts').textContent=Math.round(totalScore()); }
+
+function startQuiz(){
+  if(!S.fresh){
+    S.fresh=false;
+    if(S.done[S.stage]||S.qi>=LESSON.stages[S.stage].questions.length){ showSR(S.stage); return; }
+    screen('screenQuiz'); renderQ(); return;
+  }
+  S.stage='basic'; S.qi=0;
+  screen('screenQuiz'); renderQ(); pills();
+}
+
+function renderQ(){
+  const stg=S.stage, qi=S.qi;
+  const q=LESSON.stages[stg].questions[qi];
+  const pts=qpts(stg,qi);
+  const total=LESSON.stages[stg].questions.length;
+  const key=stg+'_'+qi;
+  const saved=S.ans[key];
+  const isAnswered=saved!==undefined;
+
+  document.getElementById('stageBadge').textContent=SN[stg];
+  document.getElementById('stageBadge').className='stage-badge sb-'+stg.charAt(0);
+  document.getElementById('qCount').textContent='Question '+(qi+1)+' of '+total;
+  document.getElementById('stagePts').textContent=Math.round(S.pts[stg]);
+  document.getElementById('progFill').style.width=(qi/total*100)+'%';
+
+  let h='<div class="q-card">';
+  h+='<div class="q-type-tag">'+q.type.toUpperCase()+' · '+pts+' marks</div>';
+  h+='<div class="q-text">'+q.text+'</div>';
+
+  if(q.type==='mcq'){
+    h+='<div class="options">';
+    ['A','B','C','D'].forEach((L,i)=>{
+      let cls='opt';
+      if(isAnswered){ if(i===q.answer)cls+=' corr'; else if(i===saved&&saved!==q.answer)cls+=' wrong'; }
+      else if(saved===i) cls+=' sel';
+      h+='<div class="'+cls+'" onclick="pickMCQ('+i+')">';
+      h+='<div class="opt-ltr">'+L+'</div>'+q.options[i]+'</div>';
+    });
+    h+='</div>';
+  }
+
+  if(q.type==='tf'){
+    h+='<div class="tf-row">';
+    ['true','false'].forEach(v=>{
+      let cls='tf-btn';
+      if(isAnswered){ if(v===q.answer)cls+=' corr'; else if(v===saved&&saved!==q.answer)cls+=' wrong'; }
+      else if(saved===v) cls+=' sel';
+      h+='<div class="'+cls+'" onclick="pickTF(\''+v+'\')">'+v.charAt(0).toUpperCase()+v.slice(1)+'</div>';
+    });
+    h+='</div>';
+  }
+
+  if(q.type==='fill'){
+    let cls='fill-in';
+    if(isAnswered){ const ok=(q.accept||[q.answer]).some(a=>a.toLowerCase().trim()===saved.toLowerCase().trim()); cls+=ok?' corr':' wrong'; }
+    h+='<input type="text" class="'+cls+'" id="fillIn" placeholder="Type your answer…" value="'+(saved||'')+'"'+(isAnswered?' readonly':'')+' onkeydown="if(event.key===\'Enter\')doSubmit()">';
+  }
+
+  if(q.type==='short'){
+    const ov=S.ov[key];
+    h+='<textarea class="short-ta" id="shortTA" placeholder="Write your answer here…"'+(isAnswered?' readonly':'')+'>'+( saved||'')+'</textarea>';
+    if(isAnswered){
+      h+='<div class="kw-wrap"><div class="kw-label">Keywords found:</div>';
+      q.keywords.forEach(kw=>{
+        const found=saved.toLowerCase().includes(kw.toLowerCase());
+        h+='<span class="kw-tag '+(found?'kw-found':'kw-miss')+'">'+kw+'</span>';
+      });
+      h+='</div>';
+      h+='<div class="override-box"><div class="ov-label">Teacher override</div><div class="ov-btns">';
+      h+='<button class="ov-btn ov-full" onclick="setOv(\''+key+'\','+pts+','+pts+')">Full ('+pts+')</button>';
+      h+='<button class="ov-btn ov-half" onclick="setOv(\''+key+'\','+Math.round(pts/2)+','+pts+')">Half ('+Math.round(pts/2)+')</button>';
+      h+='<button class="ov-btn ov-zero" onclick="setOv(\''+key+'\',0,'+pts+')">Zero</button>';
+      if(ov!==undefined) h+='<span class="ov-set">Set: '+ov+' pts</span>';
+      h+='</div></div>';
+    }
+  }
+
+  // Hint
+  if(q.hint&&!isAnswered){
+    const used=S.hint[key];
+    h+='<div class="hint-row">';
+    if(!used) h+='<button class="hint-btn" onclick="useHint(\''+key+'\')">💡 Hint (−2 marks)</button>';
+    h+='</div>';
+    h+='<div class="hint-txt'+(used?' show':'')+'" id="hintTxt">'+(used?'💡 '+q.hint:'')+'</div>';
+  }
+
+  // Explanation
+  if(isAnswered&&q.explanation) h+='<div class="expl show"><b>Explanation:</b> '+q.explanation+'</div>';
+
+  h+='</div>';// end q-card
+
+  // Buttons
+  h+='<div class="q-actions">';
+  if(!isAnswered){
+    h+='<button class="btn-sub" id="btnSub" onclick="doSubmit()">Submit Answer</button>';
+  } else {
+    const isLast=qi>=LESSON.stages[stg].questions.length-1;
+    h+='<button class="btn-nxt" id="btnNxt" style="display:inline-flex" onclick="'+(isLast?'finishStage()':'nextQ()')+'">'+( isLast?'Finish Stage →':'Next Question →')+'</button>';
+  }
+  h+='</div>';
+
+  document.getElementById('qWrap').innerHTML=h;
+  hdrScore(); saveProg();
+}
+
+function pickMCQ(i){ if(S.ans[S.stage+'_'+S.qi]!==undefined)return; document.querySelectorAll('.opt').forEach((o,j)=>{ o.classList.toggle('sel',j===i); }); document.getElementById('btnSub').dataset.sel=i; }
+function pickTF(v){ if(S.ans[S.stage+'_'+S.qi]!==undefined)return; document.querySelectorAll('.tf-btn').forEach(b=>b.classList.toggle('sel',b.textContent.toLowerCase()===v)); document.getElementById('btnSub').dataset.sel=v; }
+
+function useHint(key){
+  const parts=key.split('_'); const stg=parts[0]; const qi=parseInt(parts[1]);
+  const q=LESSON.stages[stg].questions[qi];
+  S.hint[key]=true; S.pts[stg]=Math.max(0,S.pts[stg]-2);
+  const ht=document.getElementById('hintTxt');
+  ht.textContent='💡 '+q.hint; ht.classList.add('show');
+  const hb=document.querySelector('.hint-btn'); if(hb)hb.remove();
+  hdrScore(); toast('Hint used — 2 marks deducted'); saveProg();
+}
+
+function doSubmit(){
+  const stg=S.stage, qi=S.qi;
+  const q=LESSON.stages[stg].questions[qi];
+  const key=stg+'_'+qi;
+  const pts=qpts(stg,qi);
+  let earned=0, val;
+
+  if(q.type==='mcq'){
+    const sel=parseInt(document.getElementById('btnSub').dataset.sel);
+    if(isNaN(sel)){ toast('Please select an answer.'); return; }
+    val=sel; earned=sel===q.answer?pts:0;
+  }
+  if(q.type==='tf'){
+    val=document.getElementById('btnSub').dataset.sel;
+    if(!val){ toast('Please select True or False.'); return; }
+    earned=val===q.answer?pts:0;
+  }
+  if(q.type==='fill'){
+    val=(document.getElementById('fillIn').value||'').trim();
+    if(!val){ toast('Please type your answer.'); return; }
+    earned=(q.accept||[q.answer]).some(a=>a.toLowerCase().trim()===val.toLowerCase().trim())?pts:0;
+  }
+  if(q.type==='short'){
+    val=(document.getElementById('shortTA').value||'').trim();
+    if(val.length<5){ toast('Please write a more complete answer.'); return; }
+    const found=q.keywords.filter(kw=>val.toLowerCase().includes(kw.toLowerCase())).length;
+    earned=Math.min(pts,Math.round(pts*Math.min(found/(q.minKeywords||q.keywords.length),1)*10)/10);
+  }
+
+  S.ans[key]=val;
+  S.pts[stg]=(S.pts[stg]||0)+earned;
+  saveProg(); renderQ();
+}
+
+function setOv(key,newPts,maxPts){
+  const stg=key.split('_')[0];
+  const old=S.ov[key];
+  if(old!==undefined) S.pts[stg]=Math.max(0,S.pts[stg]-old+newPts);
+  else S.pts[stg]=(S.pts[stg]||0)+newPts;
+  S.ov[key]=newPts;
+  hdrScore(); toast('Score set to '+newPts+' pts'); saveProg(); renderQ();
+}
+
+function nextQ(){ S.qi++; renderQ(); window.scrollTo(0,0); }
+function finishStage(){ S.done[S.stage]=true; S.attempts[S.stage]++; pills(); showSR(S.stage); saveProg(); }
+
+function showSR(stg){
+  const earned=Math.round(S.pts[stg]);
+  const total=LESSON.stages[stg].totalPts;
+  const pct=Math.round(earned/total*100);
+  const pass=pct>=50;
+  const maxAtt=stg==='basic'?0:(LESSON.stages[stg].maxAttempts||1);
+  const attLeft=maxAtt===0?99:maxAtt-S.attempts[stg];
+  const nxt=SL[SL.indexOf(stg)+1];
+
+  let h='<div class="sr-card">';
+  h+='<div class="sr-ring '+(pass?'pass':'fail')+'"><div class="sr-pct">'+pct+'%</div><div class="sr-pts">'+earned+'/'+total+' pts</div></div>';
+  h+='<div class="sr-title">'+SN[stg]+' Stage '+(pass?'Passed ✅':'— Try Again')+'</div>';
+  h+='<div class="sr-sub">'+(LESSON.learnerName?LESSON.learnerName+' · ':'')+LESSON.title+'</div>';
+  h+='<div class="sr-btns">';
+
+  if(pass&&nxt) h+='<button class="btn-ns" onclick="goStage(\''+nxt+'\')">Continue to '+SN[nxt]+' →</button>';
+
+  const canRetry=maxAtt===0||attLeft>0;
+  if(canRetry&&(!pass||!nxt)){
+    h+='<button class="btn-rt" onclick="retryStage(\''+stg+'\')">Retry '+SN[stg]+' ↺</button>';
+    if(maxAtt>0) h+='<div class="att-left">'+attLeft+' attempt'+(attLeft!==1?'s':'')+' left</div>';
+  }
+
+  if(!nxt) h+='<button class="btn-ns" onclick="showFinal()">View Final Results →</button>';
+  if(nxt) h+='<button class="btn-skip" onclick="showFinal()">Skip to Final Results</button>';
+
+  h+='</div></div>';
+  document.getElementById('screenSR').innerHTML=h;
+  screen('screenSR');
+}
+
+function goStage(stg){ S.stage=stg; S.qi=0; pills(); screen('screenQuiz'); renderQ(); }
+
+function retryStage(stg){
+  Object.keys(S.ans).forEach(k=>{ if(k.startsWith(stg+'_'))delete S.ans[k]; });
+  Object.keys(S.hint).forEach(k=>{ if(k.startsWith(stg+'_'))delete S.hint[k]; });
+  S.pts[stg]=0; S.done[stg]=false; S.qi=0;
+  pills(); screen('screenQuiz'); renderQ(); saveProg();
+}
+
+function showFinal(){
+  const tot=Math.round(totalScore());
+  const pct=Math.round(tot);
+  saveBest(tot); clearProg();
+
+  const circ=2*Math.PI*45;
+  const off=circ-(pct/100)*circ;
+  const col=pct>=70?'#2e7d32':pct>=50?'#f57c00':'#c62828';
+
+  let h='<div class="fr-card">';
+  h+='<div class="fr-top">';
+  h+='<div class="fr-ring-wrap">';
+  h+='<svg width="108" height="108" viewBox="0 0 108 108"><circle cx="54" cy="54" r="45" fill="none" stroke="var(--bdr)" stroke-width="8"/><circle cx="54" cy="54" r="45" fill="none" stroke="'+col+'" stroke-width="8" stroke-linecap="round" stroke-dasharray="'+circ+'" stroke-dashoffset="'+off+'" style="transition:stroke-dashoffset 1s ease"/></svg>';
+  h+='<div class="fr-inner"><div class="fr-pct">'+pct+'</div><div class="fr-of">/ 100</div></div>';
+  h+='</div>';
+  h+='<div class="fr-name">'+(LESSON.learnerName||'Well done!')+'</div>';
+  h+='<div class="fr-lesson">'+LESSON.title+' · '+LESSON.classLevel+'</div>';
+  h+='</div>';
+
+  h+='<div class="sb-grid">';
+  h+='<div class="sb-cell b"><div class="sb-num">'+Math.round(S.pts.basic)+'</div><div class="sb-lbl">Basic</div></div>';
+  h+='<div class="sb-cell m"><div class="sb-num">'+Math.round(S.pts.medium)+'</div><div class="sb-lbl">Medium</div></div>';
+  h+='<div class="sb-cell h"><div class="sb-num">'+Math.round(S.pts.hard)+'</div><div class="sb-lbl">Hard</div></div>';
+  h+='</div>';
+
+  h+='<div class="fr-btns">';
+  h+='<button class="btn-cert" onclick="showCert()">🎓 Get Certificate</button>';
+  h+='<button class="btn-rev" onclick="reviewAnss()">Review My Answers</button>';
+  h+='<button class="btn-bk" onclick="backStart()">↩ Try Again</button>';
+  h+='</div></div>';
+
+  document.getElementById('screenFinal').innerHTML=h;
+  screen('screenFinal'); pills();
+}
+
+function reviewAnss(){ S.stage='basic'; S.qi=0; screen('screenQuiz'); renderQ(); }
+
+function backStart(){
+  S={stage:'basic',qi:0,pts:{basic:0,medium:0,hard:0},attempts:{basic:0,medium:0,hard:0},done:{basic:false,medium:false,hard:false},ans:{},hint:{},ov:{},fresh:true};
+  pills();
+  document.getElementById('hdrScore').style.display='none';
+  screen('screenStart');
+  const best=getBest();
+  if(best){ const r=document.getElementById('prevRow'); r.style.display='flex'; document.getElementById('prevTxt').textContent=best.pts+'/100 ('+best.pct+'%)'; }
+}
+
+function showCert(){
+  const tot=Math.round(totalScore());
+  document.getElementById('cName').textContent=LESSON.learnerName||'Student';
+  document.getElementById('cLesson').textContent=LESSON.title+' · '+LESSON.classLevel;
+  document.getElementById('cPct').textContent=tot+'%';
+  document.getElementById('cPts').textContent=tot+'/100';
+  document.getElementById('cDate').textContent=new Date().toLocaleDateString('en-KE',{day:'numeric',month:'short',year:'numeric'});
+  document.getElementById('certOverlay').classList.add('show');
+}
+function closeCert(){ document.getElementById('certOverlay').classList.remove('show'); }
+
+function toast(msg){ const t=document.getElementById('toast'); t.textContent=msg; t.classList.add('on'); setTimeout(()=>t.classList.remove('on'),2500); }
+
+init();
+</script>
+</body>
+</html>

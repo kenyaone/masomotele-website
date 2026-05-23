@@ -1,0 +1,692 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Electrical Technology Gr.10 | 3.1 Generation, Transmission & Distribution</title>
+<style>
+:root{
+  --pri:#0a5e2a;--pri-l:#0d7a38;--acc:#f5a623;
+  --ok:#2e7d32;--no:#c62828;--bg:#f4f7f5;
+  --border:#d0e0d4;--txt:#1a2e1f;--warn-bg:#fff3e0;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Segoe UI',system-ui,sans-serif;background:var(--bg);color:var(--txt);min-height:100vh;display:flex;flex-direction:column}
+.top-bar{position:sticky;top:0;z-index:100;background:linear-gradient(135deg,var(--pri),var(--pri-l));color:#fff;padding:10px 16px;display:flex;align-items:center;gap:12px;box-shadow:0 2px 8px rgba(0,0,0,.25)}
+.top-bar .logo{font-weight:800;font-size:1rem;white-space:nowrap}
+.top-bar .title{font-size:.85rem;opacity:.9;flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.slide-badge{background:var(--acc);color:#000;font-weight:700;font-size:.8rem;padding:3px 10px;border-radius:20px;white-space:nowrap}
+.slides-wrap{flex:1;overflow:hidden}
+.slide{display:none;padding:16px;max-width:860px;margin:0 auto;animation:fadeIn .3s ease}
+.slide.active{display:block}
+@keyframes fadeIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+.slide-header{background:linear-gradient(135deg,var(--pri),var(--pri-l));color:#fff;padding:14px 18px;border-radius:10px;margin-bottom:16px}
+.slide-header h2{font-size:1.1rem;font-weight:700}
+.slide-header .strand{font-size:.78rem;opacity:.85;margin-top:3px}
+.lo-box{background:#fff;border-left:5px solid var(--acc);border-radius:8px;padding:14px 16px;margin-bottom:14px;box-shadow:0 1px 4px rgba(0,0,0,.06)}
+.lo-box h3{color:var(--pri);font-size:.95rem;margin-bottom:8px}
+.lo-box ol{padding-left:18px}
+.lo-box ol li{margin-bottom:5px;font-size:.88rem;line-height:1.5}
+.inquiry{margin-top:12px;background:var(--pri);color:#fff;border-radius:6px;padding:10px 14px;font-size:.85rem}
+.inquiry strong{display:block;margin-bottom:3px;color:var(--acc)}
+.teach-block{margin-bottom:18px}
+.teach-block h3{color:var(--pri);font-size:1rem;font-weight:700;padding-bottom:5px;border-bottom:2.5px solid var(--acc);margin-bottom:10px}
+.key-term{border-left:4px solid var(--acc);background:#fffbf0;padding:10px 14px;border-radius:0 6px 6px 0;margin:8px 0;font-size:.87rem}
+.key-term strong{color:var(--pri)}
+.info-table{width:100%;border-collapse:collapse;margin:10px 0;font-size:.84rem}
+.info-table th{background:var(--pri);color:#fff;padding:8px 10px;text-align:left}
+.info-table td{padding:7px 10px;border-bottom:1px solid var(--border)}
+.info-table tr:nth-child(even) td{background:#eef5f0}
+.example-box{background:#f0faf2;border:1.5px solid var(--ok);border-radius:8px;padding:12px 14px;margin:10px 0;font-size:.86rem}
+.example-box h4{color:var(--ok);margin-bottom:7px;font-size:.9rem}
+.warn-box{background:var(--warn-bg);border:1.5px solid #e65100;border-radius:8px;padding:11px 14px;margin:10px 0;font-size:.85rem}
+.warn-box h4{color:#e65100;margin-bottom:5px}
+.diagram-wrap{text-align:center;margin:14px 0;overflow-x:auto}
+.calc-box{background:#fff;border:1.5px solid var(--pri-l);border-radius:8px;padding:14px;margin:10px 0}
+.calc-box h4{color:var(--pri);margin-bottom:10px;font-size:.9rem}
+.practice-q{background:#fff;border-radius:8px;border:1px solid var(--border);padding:14px;margin-bottom:12px;box-shadow:0 1px 3px rgba(0,0,0,.05)}
+.practice-q .qnum{font-weight:700;color:var(--pri);font-size:.85rem;margin-bottom:5px}
+.fill-blank{border:none;border-bottom:2px dashed var(--pri);background:transparent;outline:none;font-size:.9rem;padding:2px 6px;min-width:110px;color:var(--txt)}
+.fill-blank.correct{border-bottom-color:var(--ok);background:#f0faf2;border-radius:4px}
+.fill-blank.wrong{border-bottom-color:var(--no);background:#fff0f0;border-radius:4px}
+.fb-feedback{font-size:.8rem;display:inline-block;margin-left:4px;font-weight:600}
+.sa-box{width:100%;min-height:80px;padding:8px 10px;border:1.5px solid var(--border);border-radius:6px;font-size:.86rem;font-family:inherit;resize:vertical}
+.grade-btn{background:var(--pri);color:#fff;border:none;padding:7px 18px;border-radius:6px;cursor:pointer;font-size:.84rem;margin-top:7px}
+.grade-btn:hover{background:var(--pri-l)}
+.sa-feedback{margin-top:8px;padding:10px;border-radius:6px;background:#f9f9f9;border:1px solid #ddd;font-size:.82rem;display:none}
+.kw-found{color:var(--ok);font-weight:600}
+.kw-missed{color:var(--no);font-weight:600}
+.model-ans{margin-top:6px;font-style:italic;color:#555}
+.check-btn{background:var(--ok);color:#fff;border:none;padding:8px 18px;border-radius:6px;cursor:pointer;font-size:.84rem;margin-top:8px}
+.check-btn:hover{background:#256427}
+.score-btn{display:block;margin:18px auto 0;background:var(--acc);color:#000;font-weight:700;border:none;padding:11px 32px;border-radius:8px;cursor:pointer;font-size:.95rem}
+.score-btn:hover{background:#e0951a}
+.next-lesson-box{margin-top:18px;text-align:center;display:none}.next-lesson-btn{display:inline-block;background:linear-gradient(135deg,var(--pri),var(--pri-l));color:#fff;font-weight:700;border:none;padding:14px 32px;border-radius:10px;cursor:pointer;font-size:.95rem;text-decoration:none;transition:all .3s;box-shadow:0 4px 15px rgba(10,94,42,.25)}.next-lesson-btn:hover{transform:translateY(-2px);box-shadow:0 8px 25px rgba(10,94,42,.35)}.next-lesson-sub{font-size:.78rem;color:#666;margin-top:8px}
+.total-result{margin-top:14px;text-align:center;font-size:1rem;font-weight:700;padding:12px;border-radius:8px;background:#fff;border:2px solid var(--pri)}
+.tag{display:inline-block;background:var(--pri);color:#fff;font-size:.72rem;padding:2px 8px;border-radius:10px;margin:2px}
+.calc-row{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin:6px 0;font-size:.87rem}
+.calc-row label{min-width:150px;font-weight:600;color:var(--pri)}
+.calc-row input{padding:6px 10px;border:1.5px solid var(--border);border-radius:6px;font-size:.87rem;width:110px}
+.calc-row select{padding:6px 10px;border:1.5px solid var(--border);border-radius:6px;font-size:.87rem}
+.calc-result{background:var(--pri);color:#fff;padding:10px 14px;border-radius:6px;margin-top:8px;font-size:.88rem;font-weight:600;display:none;white-space:pre-line}
+.calc-err{background:#fff0f0;color:var(--no);padding:8px 12px;border-radius:6px;margin-top:8px;font-size:.85rem;display:none}
+.grid-node{cursor:pointer;transition:all .2s}
+.grid-node:hover rect{fill:#0d7a38}
+.nav-bar{position:sticky;bottom:0;background:#fff;border-top:2px solid var(--border);padding:10px 16px;display:flex;align-items:center;justify-content:space-between;gap:10px;z-index:90}
+.nav-btn{background:var(--pri);color:#fff;border:none;padding:9px 22px;border-radius:8px;font-size:.88rem;cursor:pointer;font-weight:600}
+.nav-btn:disabled{background:#b0b0b0;cursor:not-allowed}
+.nav-btn:hover:not(:disabled){background:var(--pri-l)}
+.dots{display:flex;gap:6px;flex-wrap:wrap;justify-content:center;flex:1}
+.dot{width:9px;height:9px;border-radius:50%;background:#ccc;cursor:pointer;transition:background .2s}
+.dot.active{background:var(--pri)}
+@media(max-width:600px){
+  .top-bar .title{display:none}
+  .slide{padding:10px}
+  .info-table{font-size:.78rem}
+  .nav-btn{padding:8px 14px;font-size:.82rem}
+  .calc-row{flex-direction:column;align-items:flex-start}
+}
+</style>
+<script type="text/javascript">(function(c,l,a,r,i,t,y){c[a]=c[a]||function(){(c[a].q=c[a].q||[]).push(arguments)};t=l.createElement(r);t.async=1;t.src="https://www.clarity.ms/tag/"+i;y=l.getElementsByTagName(r)[0];y.parentNode.insertBefore(t,y);})(window,document,"clarity","script","wg31zlwbt9");</script>\n</head>
+<body>
+
+<div class="top-bar">
+  <div class="logo">M.T.T.I</div>
+  <div class="title">Electrical Technology Gr.10 · 3.1 Generation, Transmission & Distribution</div>
+  <div class="slide-badge" id="slideLabel">1 / 10</div>
+</div>
+
+<div class="slides-wrap">
+
+<!-- SLIDE 1: LEARNING OUTCOMES -->
+<div class="slide active" id="s1">
+  <div class="slide-header">
+    <h2>Learning Outcomes</h2>
+    <div class="strand">Strand 3.0 Electrical Installation · Sub-strand 3.1 · 14 Lessons</div>
+  </div>
+  <div class="lo-box">
+    <h3>By the end of this sub-strand, you should be able to:</h3>
+    <ol>
+      <li>Describe <strong>methods of generation</strong> of electrical energy.</li>
+      <li>Explain the <strong>functions of components</strong> in the electrical power transmission network.</li>
+      <li>Draw a <strong>3-phase 4-wire distribution circuit</strong> of a power line.</li>
+      <li><strong>Model an electric power grid</strong> network.</li>
+      <li>Appreciate the <strong>importance of a grid system</strong> in a country.</li>
+    </ol>
+    <div class="inquiry">
+      <strong>🔍 Key Inquiry Questions</strong>
+      How is electricity generated and transmitted to the consumer? &nbsp;|&nbsp; What is the importance of a power grid?
+    </div>
+  </div>
+  <div class="teach-block">
+    <h3>Topics Covered</h3>
+    <div style="display:flex;flex-wrap:wrap;gap:8px;margin-top:6px">
+      <span class="tag">Generation Methods</span>
+      <span class="tag">Power Stations</span>
+      <span class="tag">Step-Up Transformer</span>
+      <span class="tag">Transmission Lines</span>
+      <span class="tag">Step-Down Transformer</span>
+      <span class="tag">3-Phase System</span>
+      <span class="tag">Kenya Power Grid</span>
+    </div>
+  </div>
+</div>
+
+<!-- SLIDE 2: METHODS OF GENERATION -->
+<div class="slide" id="s2">
+  <div class="slide-header">
+    <h2>Methods of Generating Electricity</h2>
+    <div class="strand">Converting other forms of energy into electrical energy</div>
+  </div>
+  <div class="teach-block">
+    <h3>Key Definition</h3>
+    <div class="key-term"><strong>Electrical energy generation:</strong> The process of converting other forms of energy (kinetic, thermal, chemical, solar, nuclear) into electrical energy using generators or other devices.</div>
+  </div>
+  <div class="teach-block">
+    <h3>Generation Methods</h3>
+    <table class="info-table">
+      <tr><th>Method</th><th>Energy Source</th><th>How It Works</th><th>Kenya Example</th></tr>
+      <tr><td><strong>Hydroelectric</strong></td><td>Water (potential energy)</td><td>Falling water spins turbines connected to generators</td><td>Seven Forks (Masinga, Kindaruma, Gitaru, Kamburu, Kiambere)</td></tr>
+      <tr><td><strong>Geothermal</strong></td><td>Earth's heat</td><td>Steam from underground heats turbines</td><td>Olkaria (Hell's Gate) — ~850MW</td></tr>
+      <tr><td><strong>Wind</strong></td><td>Wind kinetic energy</td><td>Wind turns rotor blades connected to generator</td><td>Lake Turkana Wind Power — 310MW</td></tr>
+      <tr><td><strong>Solar PV</strong></td><td>Sunlight</td><td>Photovoltaic cells convert light directly to DC</td><td>Garissa Solar Plant — 55MW</td></tr>
+      <tr><td><strong>Thermal (fossil)</strong></td><td>Oil, gas, coal</td><td>Fuel burned to heat water → steam → turbine</td><td>Kipevu Oil Thermal Station</td></tr>
+      <tr><td><strong>Nuclear</strong></td><td>Nuclear fission</td><td>Heat from fission boils water → steam → turbine</td><td>Under consideration for Kenya</td></tr>
+      <tr><td><strong>Biomass</strong></td><td>Organic matter</td><td>Burning or digesting organic waste to generate heat/gas</td><td>Mumias Sugar cogeneration</td></tr>
+    </table>
+  </div>
+  <div class="example-box">
+    <h4>💡 Kenya's Energy Mix (2024)</h4>
+    <p>Kenya's electricity is predominantly <strong>renewable</strong>: Geothermal (~44%), Hydro (~27%), Wind (~13%), Solar (~3%), Thermal (~13%). Kenya targets 100% clean energy by 2030.</p>
+  </div>
+</div>
+
+<!-- SLIDE 3: THE POWER STATION -->
+<div class="slide" id="s3">
+  <div class="slide-header">
+    <h2>The Power Station</h2>
+    <div class="strand">Where electricity is generated</div>
+  </div>
+  <div class="teach-block">
+    <h3>Main Components of a Thermal Power Station</h3>
+    <table class="info-table">
+      <tr><th>Component</th><th>Function</th></tr>
+      <tr><td>Boiler/Furnace</td><td>Burns fuel to produce high-pressure steam</td></tr>
+      <tr><td>Steam turbine</td><td>High-pressure steam causes turbine blades to rotate at high speed</td></tr>
+      <tr><td>Alternator (AC generator)</td><td>Turbine shaft rotates coils in magnetic field — produces 3-phase AC voltage (typically 11kV–33kV)</td></tr>
+      <tr><td>Condenser</td><td>Cools exhaust steam back to water for reuse</td></tr>
+      <tr><td>Cooling tower</td><td>Removes waste heat from condenser water</td></tr>
+      <tr><td>Step-up transformer</td><td>Raises generator voltage (11kV) to transmission voltage (132kV–400kV)</td></tr>
+    </table>
+  </div>
+  <div class="teach-block">
+    <h3>Why Step Up Voltage for Transmission?</h3>
+    <div class="key-term"><strong>Power loss formula:</strong> P<sub>loss</sub> = I² × R. Transmission lines have resistance. If voltage is <em>stepped up</em>, current is <em>reduced</em> for the same power (P = V × I), so line losses (I²R) are dramatically reduced.</div>
+    <div class="example-box">
+      <h4>✏️ Why High Voltage Saves Energy</h4>
+      <p>Transmit 100MW over a line with resistance 10Ω:</p>
+      <p><strong>At 11kV:</strong> I = 100MW/11kV = 9,091A → P<sub>loss</sub> = 9091² × 10 = <strong>826MW lost!</strong> (impossible)</p>
+      <p><strong>At 220kV:</strong> I = 100MW/220kV = 455A → P<sub>loss</sub> = 455² × 10 = <strong>2.07MW lost</strong> (only 2%)</p>
+      <p>Higher voltage = much lower current = much less power wasted as heat in cables.</p>
+    </div>
+  </div>
+</div>
+
+<!-- SLIDE 4: TRANSMISSION NETWORK -->
+<div class="slide" id="s4">
+  <div class="slide-header">
+    <h2>Power Transmission Network</h2>
+    <div class="strand">Moving electricity from power station to city</div>
+  </div>
+  <div class="teach-block">
+    <h3>Components of the Transmission System</h3>
+    <div class="diagram-wrap">
+      <svg viewBox="0 0 700 130" xmlns="http://www.w3.org/2000/svg" style="font-family:'Segoe UI',sans-serif;max-width:700px">
+        <rect width="700" height="130" rx="8" fill="#f4f7f5"/>
+        <!-- Power station -->
+        <rect x="10" y="35" width="70" height="50" rx="5" fill="#0a5e2a"/>
+        <text x="45" y="57" text-anchor="middle" fill="#fff" font-size="8" font-weight="700">POWER</text>
+        <text x="45" y="68" text-anchor="middle" fill="#fff" font-size="8" font-weight="700">STATION</text>
+        <text x="45" y="98" text-anchor="middle" fill="#0a5e2a" font-size="8">11kV</text>
+        <!-- Step up TX -->
+        <rect x="100" y="40" width="50" height="40" rx="4" fill="#f5a623"/>
+        <text x="125" y="57" text-anchor="middle" fill="#000" font-size="7" font-weight="700">STEP-UP</text>
+        <text x="125" y="67" text-anchor="middle" fill="#000" font-size="7">TRANSF.</text>
+        <text x="125" y="98" text-anchor="middle" fill="#555" font-size="7">11kV→220kV</text>
+        <!-- Transmission line -->
+        <line x1="150" y1="60" x2="300" y2="60" stroke="#c62828" stroke-width="2.5"/>
+        <text x="225" y="50" text-anchor="middle" fill="#c62828" font-size="8" font-weight="700">TRANSMISSION LINE</text>
+        <text x="225" y="76" text-anchor="middle" fill="#555" font-size="7">220kV–400kV (high voltage)</text>
+        <!-- Towers -->
+        <line x1="200" y1="55" x2="200" y2="90" stroke="#888" stroke-width="1.5"/>
+        <line x1="190" y1="70" x2="210" y2="70" stroke="#888" stroke-width="1.5"/>
+        <line x1="250" y1="55" x2="250" y2="90" stroke="#888" stroke-width="1.5"/>
+        <line x1="240" y1="70" x2="260" y2="70" stroke="#888" stroke-width="1.5"/>
+        <!-- Grid substation -->
+        <rect x="300" y="40" width="60" height="40" rx="4" fill="#0a5e2a"/>
+        <text x="330" y="57" text-anchor="middle" fill="#fff" font-size="7" font-weight="700">GRID</text>
+        <text x="330" y="67" text-anchor="middle" fill="#fff" font-size="7">SUBSTATION</text>
+        <text x="330" y="98" text-anchor="middle" fill="#555" font-size="7">220kV→66kV</text>
+        <!-- Primary distribution -->
+        <line x1="360" y1="60" x2="450" y2="60" stroke="#0a5e2a" stroke-width="2"/>
+        <text x="405" y="50" text-anchor="middle" fill="#0a5e2a" font-size="7">PRIMARY DISTRIBUTION</text>
+        <text x="405" y="76" text-anchor="middle" fill="#555" font-size="7">66kV–33kV</text>
+        <!-- Zone substation -->
+        <rect x="450" y="40" width="60" height="40" rx="4" fill="#f5a623"/>
+        <text x="480" y="57" text-anchor="middle" fill="#000" font-size="7" font-weight="700">ZONE</text>
+        <text x="480" y="67" text-anchor="middle" fill="#000" font-size="7">SUBSTATION</text>
+        <text x="480" y="98" text-anchor="middle" fill="#555" font-size="7">33kV→11kV</text>
+        <!-- Secondary distribution -->
+        <line x1="510" y1="60" x2="575" y2="60" stroke="#0a5e2a" stroke-width="2"/>
+        <text x="542" y="50" text-anchor="middle" fill="#0a5e2a" font-size="7">SECONDARY</text>
+        <text x="542" y="76" text-anchor="middle" fill="#555" font-size="7">11kV</text>
+        <!-- Distribution TX -->
+        <rect x="575" y="40" width="55" height="40" rx="4" fill="#0d7a38"/>
+        <text x="602" y="54" text-anchor="middle" fill="#fff" font-size="7" font-weight="700">DIST.</text>
+        <text x="602" y="64" text-anchor="middle" fill="#fff" font-size="7">TRANSF.</text>
+        <text x="602" y="74" text-anchor="middle" fill="#fff" font-size="7">→240V</text>
+        <text x="602" y="98" text-anchor="middle" fill="#555" font-size="7">Consumer</text>
+        <!-- Arrows -->
+        <text x="82" y="64" fill="#555" font-size="11">→</text>
+        <text x="282" y="64" fill="#555" font-size="11">→</text>
+        <text x="432" y="64" fill="#555" font-size="11">→</text>
+        <text x="558" y="64" fill="#555" font-size="11">→</text>
+      </svg>
+    </div>
+    <table class="info-table">
+      <tr><th>Stage</th><th>Voltage</th><th>Component</th><th>Purpose</th></tr>
+      <tr><td>Generation</td><td>11kV – 33kV</td><td>Alternator</td><td>Produces 3-phase AC electricity</td></tr>
+      <tr><td>Transmission</td><td>132kV – 400kV</td><td>Step-up transformer + pylons</td><td>Long-distance with minimum losses</td></tr>
+      <tr><td>Grid substation</td><td>220kV → 66kV</td><td>Step-down transformer</td><td>Reduces voltage for primary distribution</td></tr>
+      <tr><td>Zone substation</td><td>66kV → 33kV → 11kV</td><td>Step-down transformers</td><td>Regional distribution to towns</td></tr>
+      <tr><td>Distribution</td><td>11kV → 240V/415V</td><td>Distribution transformer</td><td>Final supply to consumers</td></tr>
+    </table>
+  </div>
+</div>
+
+<!-- SLIDE 5: 3-PHASE SYSTEM -->
+<div class="slide" id="s5">
+  <div class="slide-header">
+    <h2>The 3-Phase 4-Wire System</h2>
+    <div class="strand">How electricity is distributed to consumers</div>
+  </div>
+  <div class="teach-block">
+    <h3>What is 3-Phase Supply?</h3>
+    <div class="key-term"><strong>3-phase supply:</strong> Three separate AC voltages of equal magnitude, each displaced 120° from the others. Generated by a 3-phase alternator with three sets of coils arranged 120° apart.</div>
+    <div class="key-term"><strong>3-phase 4-wire system:</strong> Three phase conductors (L1, L2, L3) plus one neutral conductor (N). This provides both single-phase (240V) and three-phase (415V) supply from the same system.</div>
+    <div class="diagram-wrap">
+      <svg viewBox="0 0 580 160" xmlns="http://www.w3.org/2000/svg" style="font-family:'Segoe UI',sans-serif;max-width:580px">
+        <rect width="580" height="160" rx="8" fill="#f4f7f5"/>
+        <!-- Transformer -->
+        <rect x="20" y="30" width="60" height="100" rx="5" fill="#0a5e2a"/>
+        <text x="50" y="78" text-anchor="middle" fill="#fff" font-size="9" font-weight="700">3-Phase</text>
+        <text x="50" y="90" text-anchor="middle" fill="#fff" font-size="9">Transf.</text>
+        <!-- Phase lines -->
+        <line x1="80" y1="45" x2="400" y2="45" stroke="#c62828" stroke-width="3"/>
+        <text x="240" y="38" text-anchor="middle" fill="#c62828" font-size="9" font-weight="700">L1 (Red) — 240V to N</text>
+        <line x1="80" y1="75" x2="400" y2="75" stroke="#0a5e2a" stroke-width="3"/>
+        <text x="240" y="68" text-anchor="middle" fill="#0a5e2a" font-size="9" font-weight="700">L2 (Yellow) — 240V to N</text>
+        <line x1="80" y1="105" x2="400" y2="105" stroke="#00008b" stroke-width="3"/>
+        <text x="240" y="98" text-anchor="middle" fill="#00008b" font-size="9" font-weight="700">L3 (Blue) — 240V to N</text>
+        <line x1="80" y1="130" x2="400" y2="130" stroke="#888" stroke-width="2" stroke-dasharray="5"/>
+        <text x="240" y="145" text-anchor="middle" fill="#555" font-size="9">N (Neutral) — 0V reference</text>
+        <!-- Voltage annotations -->
+        <line x1="420" y1="45" x2="420" y2="130" stroke="#555" stroke-width="1" stroke-dasharray="3"/>
+        <text x="480" y="92" text-anchor="middle" fill="#555" font-size="9">Phase-to-Phase</text>
+        <text x="480" y="103" text-anchor="middle" fill="#555" font-size="9" font-weight="700">= 415V</text>
+        <line x1="520" y1="45" x2="520" y2="130" stroke="#555" stroke-width="1" stroke-dasharray="3"/>
+        <text x="555" y="92" text-anchor="middle" fill="#555" font-size="8">Ph-N</text>
+        <text x="555" y="103" text-anchor="middle" fill="#555" font-size="8" font-weight="700">240V</text>
+      </svg>
+    </div>
+    <table class="info-table">
+      <tr><th>Connection</th><th>Voltage</th><th>Used For</th></tr>
+      <tr><td>Phase to Neutral (L-N)</td><td>240V AC</td><td>Homes, small offices — lighting, sockets</td></tr>
+      <tr><td>Phase to Phase (L-L)</td><td>415V AC</td><td>Industrial motors, large machines, 3-phase equipment</td></tr>
+      <tr><td>3-Phase 4-wire system</td><td>240V/415V</td><td>Distribution to mixed domestic/industrial areas</td></tr>
+    </table>
+  </div>
+  <div class="example-box">
+    <h4>✏️ Voltage Relationship</h4>
+    <p>Line voltage (VL) = √3 × Phase voltage (Vph)</p>
+    <p>415V = 1.732 × 240V ✓</p>
+    <p>This relationship is fundamental to all 3-phase calculations.</p>
+  </div>
+</div>
+
+<!-- SLIDE 6: KENYA POWER GRID -->
+<div class="slide" id="s6">
+  <div class="slide-header">
+    <h2>The Kenya National Power Grid</h2>
+    <div class="strand">How electricity reaches your home</div>
+  </div>
+  <div class="teach-block">
+    <h3>What is a Grid System?</h3>
+    <div class="key-term"><strong>National Grid:</strong> An interconnected network of power stations, transmission lines, and substations that distributes electricity across the country. In Kenya, it is managed by <strong>KPLC (Kenya Power and Lighting Company)</strong> and <strong>KETRACO (Kenya Electricity Transmission Company)</strong>.</div>
+  </div>
+  <div class="teach-block">
+    <h3>Kenya's Grid Voltage Levels</h3>
+    <table class="info-table">
+      <tr><th>Level</th><th>Voltage</th><th>Operator</th><th>Purpose</th></tr>
+      <tr><td>Generation</td><td>11kV</td><td>KenGen</td><td>Power produced at stations</td></tr>
+      <tr><td>Extra-high voltage transmission</td><td>400kV</td><td>KETRACO</td><td>Backbone grid — long distance</td></tr>
+      <tr><td>High voltage transmission</td><td>220kV / 132kV</td><td>KETRACO</td><td>Regional transmission</td></tr>
+      <tr><td>Primary distribution</td><td>66kV / 33kV</td><td>KPLC</td><td>To towns and zones</td></tr>
+      <tr><td>Secondary distribution</td><td>11kV</td><td>KPLC</td><td>Street-level distribution</td></tr>
+      <tr><td>Consumer supply</td><td>240V / 415V</td><td>KPLC</td><td>Homes and businesses</td></tr>
+    </table>
+  </div>
+  <div class="teach-block">
+    <h3>Importance of the Grid System</h3>
+    <div class="example-box">
+      <h4>💡 Why the Grid Matters for Kenya</h4>
+      <p>1. <strong>Reliability</strong> — If one power station goes offline, others can compensate. Grid prevents total blackouts.</p>
+      <p>2. <strong>Efficiency</strong> — Power can be routed from where it is surplus to where it is needed, reducing waste.</p>
+      <p>3. <strong>Economic development</strong> — Reliable electricity enables industry, hospitals, schools, and businesses to operate.</p>
+      <p>4. <strong>Last Mile Connectivity</strong> — The grid enables rural electrification to reach every Kenyan home.</p>
+      <p>5. <strong>Regional integration</strong> — Kenya exports power to Uganda, Tanzania, Ethiopia — East Africa Power Pool (EAPP).</p>
+      <p>6. <strong>Renewable integration</strong> — Grid balances variable solar and wind with steady hydro and geothermal.</p>
+    </div>
+  </div>
+</div>
+
+<!-- SLIDE 7: TRANSFORMERS IN THE GRID -->
+<div class="slide" id="s7">
+  <div class="slide-header">
+    <h2>Transformers in the Grid</h2>
+    <div class="strand">The key to efficient power transmission</div>
+  </div>
+  <div class="teach-block">
+    <h3>The Transformer</h3>
+    <div class="key-term"><strong>Transformer:</strong> An electromagnetic device that transfers electrical energy between two circuits through electromagnetic induction, while changing (stepping up or down) the voltage. Works on AC only.</div>
+    <div class="key-term"><strong>Turns ratio:</strong> N1/N2 = V1/V2 = I2/I1. The ratio of primary to secondary turns determines the voltage transformation. More turns on secondary = step-up. Fewer turns = step-down.</div>
+    <table class="info-table">
+      <tr><th>Transformer Type</th><th>Voltage Change</th><th>Turns Ratio</th><th>Where Used</th></tr>
+      <tr><td>Step-up</td><td>Increases voltage (decreases current)</td><td>N1 &lt; N2</td><td>Power station output → transmission</td></tr>
+      <tr><td>Step-down</td><td>Decreases voltage (increases current)</td><td>N1 &gt; N2</td><td>Substations, distribution transformers</td></tr>
+      <tr><td>Isolating</td><td>1:1 ratio (no change)</td><td>N1 = N2</td><td>Safety isolation in labs, workshops</td></tr>
+    </table>
+  </div>
+  <div class="teach-block">
+    <h3>Transformer Calculations</h3>
+    <div class="example-box">
+      <h4>✏️ Transformer Worked Examples</h4>
+      <p><strong>Example 1:</strong> A step-up transformer has 500 primary turns and 10,000 secondary turns. Primary voltage = 11kV. Find secondary voltage.</p>
+      <p>V2 = V1 × (N2/N1) = 11,000 × (10,000/500) = 11,000 × 20 = <strong>220,000V = 220kV</strong></p>
+      <p style="margin-top:8px"><strong>Example 2:</strong> A distribution transformer steps down 11kV to 240V. If primary current is 5A, find secondary current (assume ideal transformer).</p>
+      <p>I2 = I1 × (V1/V2) = 5 × (11,000/240) = 5 × 45.83 = <strong>229.2A</strong></p>
+    </div>
+  </div>
+  <div class="warn-box">
+    <h4>⚠️ High Voltage Safety</h4>
+    <p>Transmission line voltages (132kV–400kV) are <strong>instantly lethal</strong> even without direct contact. Electricity can arc through air over many metres at these voltages. Always observe exclusion zones around pylons and substations. Never fly kites, drones, or climb near power lines.</p>
+  </div>
+</div>
+
+<!-- SLIDE 8: INTERACTIVE -->
+<div class="slide" id="s8">
+  <div class="slide-header">
+    <h2>Interactive Activities</h2>
+    <div class="strand">Grid explorer & transformer calculator</div>
+  </div>
+
+  <div class="calc-box">
+    <h4>🔧 Tool 1: Transformer Calculator</h4>
+    <p style="font-size:.83rem;margin-bottom:8px">N1/N2 = V1/V2 = I2/I1</p>
+    <div class="calc-row"><label>Primary Turns N1</label><input type="number" id="tx_n1" placeholder="e.g. 500"></div>
+    <div class="calc-row"><label>Secondary Turns N2</label><input type="number" id="tx_n2" placeholder="e.g. 10000"></div>
+    <div class="calc-row"><label>Primary Voltage V1 (V)</label><input type="number" id="tx_v1" placeholder="e.g. 11000"></div>
+    <div class="calc-row"><label>Primary Current I1 (A)</label><input type="number" id="tx_i1" placeholder="e.g. 5"></div>
+    <button class="check-btn" onclick="calcTransformer()">⚡ Calculate</button>
+    <button class="check-btn" style="background:#888;margin-left:8px" onclick="clearTransformer()">↺ Clear</button>
+    <div class="calc-result" id="tx-result"></div>
+    <div class="calc-err" id="tx-err"></div>
+  </div>
+
+  <div class="calc-box" style="margin-top:14px">
+    <h4>🔧 Tool 2: Transmission Line Loss Calculator</h4>
+    <p style="font-size:.83rem;margin-bottom:8px">P<sub>loss</sub> = I² × R &nbsp;|&nbsp; I = P / V</p>
+    <div class="calc-row"><label>Power to transmit (MW)</label><input type="number" id="tl_p" placeholder="e.g. 100"></div>
+    <div class="calc-row"><label>Transmission voltage (kV)</label><input type="number" id="tl_v" placeholder="e.g. 220"></div>
+    <div class="calc-row"><label>Line resistance (Ω)</label><input type="number" id="tl_r" placeholder="e.g. 10"></div>
+    <button class="check-btn" onclick="calcLineLoss()">⚡ Calculate Loss</button>
+    <button class="check-btn" style="background:#888;margin-left:8px" onclick="clearLineLoss()">↺ Clear</button>
+    <div class="calc-result" id="tl-result"></div>
+    <div class="calc-err" id="tl-err"></div>
+  </div>
+
+  <div class="calc-box" style="margin-top:14px">
+    <h4>🔧 Tool 3: 3-Phase Voltage Calculator</h4>
+    <p style="font-size:.83rem;margin-bottom:8px">V<sub>line</sub> = √3 × V<sub>phase</sub></p>
+    <div class="calc-row"><label>Known voltage (V)</label><input type="number" id="ph_v" placeholder="e.g. 240"></div>
+    <div class="calc-row"><label>Type</label>
+      <select id="ph_type">
+        <option value="phase">Phase voltage → Line voltage</option>
+        <option value="line">Line voltage → Phase voltage</option>
+      </select>
+    </div>
+    <button class="check-btn" onclick="calcPhase()">⚡ Calculate</button>
+    <div class="calc-result" id="ph-result"></div>
+  </div>
+</div>
+
+<!-- SLIDE 9: PRACTICE -->
+<div class="slide" id="s9">
+  <div class="slide-header">
+    <h2>Practice Problems</h2>
+    <div class="strand">Generation, transmission and transformers</div>
+  </div>
+
+  <div class="practice-q">
+    <div class="qnum">Problem 1: Transformer Calculation</div>
+    <p style="font-size:.86rem">A step-up transformer at a power station has 200 primary turns and 4,000 secondary turns. The generator produces 11kV at 100A. Find: (a) secondary voltage, (b) secondary current, (c) power transmitted (assume ideal).</p>
+    <div class="example-box" style="margin-top:8px">
+      <h4>📌 Solution</h4>
+      <p>(a) V2 = V1 × N2/N1 = 11,000 × 4000/200 = 11,000 × 20 = <strong>220,000V = 220kV</strong></p>
+      <p>(b) I2 = I1 × N1/N2 = 100 × 200/4000 = 100 × 0.05 = <strong>5A</strong></p>
+      <p>(c) P = V1 × I1 = 11,000 × 100 = <strong>1.1MW</strong> (same on both sides for ideal transformer)</p>
+    </div>
+  </div>
+
+  <div class="practice-q">
+    <div class="qnum">Problem 2: Transmission Line Loss</div>
+    <p style="font-size:.86rem">50MW is transmitted over a line with resistance 8Ω at 132kV. Calculate: (a) line current, (b) power lost in the line, (c) efficiency of transmission.</p>
+    <div class="example-box" style="margin-top:8px">
+      <h4>📌 Solution</h4>
+      <p>(a) I = P/V = 50,000,000 / 132,000 = <strong>378.8A</strong></p>
+      <p>(b) P<sub>loss</sub> = I²R = 378.8² × 8 = 143,489 × 8 = <strong>1.148MW</strong></p>
+      <p>(c) η = (P − P<sub>loss</sub>) / P × 100 = (50 − 1.148) / 50 × 100 = <strong>97.7%</strong></p>
+    </div>
+  </div>
+
+  <div class="practice-q">
+    <div class="qnum">Problem 3: 3-Phase Voltages</div>
+    <p style="font-size:.86rem">A 3-phase 4-wire distribution system has a phase voltage of 240V. Calculate the line voltage and explain what load would use each voltage level.</p>
+    <div class="example-box" style="margin-top:8px">
+      <h4>📌 Solution</h4>
+      <p>V<sub>line</sub> = √3 × V<sub>phase</sub> = 1.732 × 240 = <strong>415.7V ≈ 415V</strong></p>
+      <p><strong>240V (phase-neutral):</strong> Domestic use — lighting, TVs, fridges, phone chargers.</p>
+      <p><strong>415V (line-line):</strong> Industrial motors, large air conditioners, 3-phase machinery.</p>
+    </div>
+  </div>
+
+  <div class="practice-q">
+    <div class="qnum">Problem 4: Grid Importance</div>
+    <p style="font-size:.86rem">Explain why Kenya's government has invested heavily in expanding the national power grid to rural areas under the Last Mile Connectivity programme.</p>
+    <div class="example-box" style="margin-top:8px">
+      <h4>📌 Answer</h4>
+      <p>• <strong>Economic development</strong> — Electricity enables small businesses, agro-processing, and cottage industries to operate, creating jobs and income.</p>
+      <p>• <strong>Education</strong> — Schools can use computers, projectors, and the internet for better learning outcomes.</p>
+      <p>• <strong>Healthcare</strong> — Rural health facilities can power medical equipment, refrigerate vaccines, and provide 24-hour services.</p>
+      <p>• <strong>Quality of life</strong> — Replaces kerosene lamps (which cause respiratory diseases and fires) with clean, safe lighting.</p>
+      <p>• <strong>Vision 2030</strong> — Universal electricity access is a key pillar of Kenya's development blueprint.</p>
+    </div>
+  </div>
+</div>
+
+<!-- SLIDE 10: QUIZ -->
+<div class="slide" id="s10">
+  <div class="slide-header">
+    <h2>End-of-Lesson Quiz</h2>
+    <div class="strand">Sub-strand 3.1 · Generation, Transmission & Distribution</div>
+  </div>
+  <p style="font-size:.83rem;color:#555;margin-bottom:14px">Part A: 5 fill-in-the-blank (5 marks) &nbsp;|&nbsp; Part B: 3 short answer (10 marks) &nbsp;|&nbsp; <strong>Total: 15 marks</strong></p>
+
+  <div class="practice-q">
+    <div class="qnum">Part A: Fill in the Blank (1 mark each)</div>
+    <div style="font-size:.87rem">
+      <p style="margin:10px 0">1. Kenya's largest source of electricity generation is <input class="fill-blank" id="f1" placeholder="..."> energy, produced at Olkaria. <span class="fb-feedback" id="ff1"></span></p>
+      <p style="margin:10px 0">2. Voltage is stepped up for transmission to reduce <input class="fill-blank" id="f2" placeholder="..."> losses in the line. <span class="fb-feedback" id="ff2"></span></p>
+      <p style="margin:10px 0">3. In a 3-phase 4-wire system, the voltage between any phase and neutral is <input class="fill-blank" id="f3" placeholder="..."> V. <span class="fb-feedback" id="ff3"></span></p>
+      <p style="margin:10px 0">4. The formula relating line and phase voltages in a 3-phase system is V<sub>L</sub> = <input class="fill-blank" id="f4" placeholder="..."> × V<sub>ph</sub>. <span class="fb-feedback" id="ff4"></span></p>
+      <p style="margin:10px 0">5. The company responsible for operating Kenya's national transmission grid is <input class="fill-blank" id="f5" placeholder="...">. <span class="fb-feedback" id="ff5"></span></p>
+    </div>
+    <button class="check-btn" onclick="checkFills()" style="margin-top:12px">✓ Check Part A</button>
+  </div>
+
+  <div class="practice-q" style="margin-top:12px">
+    <div class="qnum">Part B: Short Answer</div>
+
+    <div style="margin-bottom:14px">
+      <p style="font-size:.87rem"><strong>B1.</strong> Explain why electricity is transmitted at very high voltages (e.g. 220kV) rather than at the generator voltage (e.g. 11kV). Use the formula P<sub>loss</sub> = I²R in your answer. <em>(3 marks)</em></p>
+      <textarea class="sa-box" id="sa1" placeholder="Type your answer here..."></textarea>
+      <button class="grade-btn" onclick="gradeAnswer('sa1','fb1',{keywords:['high voltage','low current','power loss','i squared r','resistance','reduce','efficient','transmission','step up','transformer'],required:5,marks:3,model:'Electricity is transmitted at high voltage because P = VI means that for the same power, higher voltage results in lower current. Since power loss in the line = I²R, lower current dramatically reduces losses. For example, doubling the voltage halves the current, reducing line losses by 75%. This makes long-distance transmission economically viable.'})">✓ Grade My Answer</button>
+      <div class="sa-feedback" id="fb1"></div>
+    </div>
+
+    <div style="margin-bottom:14px">
+      <p style="font-size:.87rem"><strong>B2.</strong> A distribution transformer steps down 11kV to 415V for a small industrial estate. It has 2,200 primary turns. Calculate: (a) the number of secondary turns, (b) if primary current is 8A, find the secondary current. <em>(4 marks)</em></p>
+      <textarea class="sa-box" id="sa2" placeholder="Show your working..."></textarea>
+      <button class="grade-btn" onclick="gradeAnswer('sa2','fb2',{keywords:['83','83 turns','212','211','secondary','primary','turns ratio','11000','415','2200','current','voltage'],required:5,marks:4,model:'Turns ratio: N1/N2 = V1/V2. N2 = N1 × V2/V1 = 2200 × 415/11000 = 2200 × 0.03773 = 83 turns. Secondary current: I2 = I1 × V1/V2 = 8 × 11000/415 = 8 × 26.5 = 212A (or use I1N1=I2N2: I2 = 8×2200/83 = 212A).'})">✓ Grade My Answer</button>
+      <div class="sa-feedback" id="fb2"></div>
+    </div>
+
+    <div style="margin-bottom:14px">
+      <p style="font-size:.87rem"><strong>B3.</strong> State THREE methods of generating electricity used in Kenya and for each, name ONE specific power station and state the primary energy source used. <em>(3 marks)</em></p>
+      <textarea class="sa-box" id="sa3" placeholder="Type your answer here..."></textarea>
+      <button class="grade-btn" onclick="gradeAnswer('sa3','fb3',{keywords:['geothermal','olkaria','hydro','masinga','kindaruma','wind','turkana','solar','garissa','thermal','kipevu','steam','water','heat'],required:5,marks:3,model:'1. Geothermal — Olkaria (Hell\'s Gate), Naivasha — primary source: Earth\'s internal heat/steam. 2. Hydroelectric — Masinga/Kindaruma/Seven Forks on Tana River — primary source: potential energy of water. 3. Wind — Lake Turkana Wind Power (Loiyangalani) — primary source: kinetic energy of wind. Bonus: Solar — Garissa Solar Plant — primary source: solar radiation.'})">✓ Grade My Answer</button>
+      <div class="sa-feedback" id="fb3"></div>
+    </div>
+  </div>
+
+  <button class="score-btn" onclick="showTotalScore()">📊 View My Total Score</button>
+  <div class="total-result" id="totalResult" style="display:none"></div>
+  <div class="next-lesson-box" id="nextLessonBox">
+    <a href="elec-3.2-intake-point-equipment-full.html" class="next-lesson-btn">➡️ Next Lesson: 3.2 Equipment at the Intake Point</a>
+    <div class="next-lesson-sub">You've completed this lesson! Keep going 🎉</div>
+  </div>
+</div>
+
+</div><!-- end slides-wrap -->
+
+<div class="nav-bar">
+  <button class="nav-btn" id="prevBtn" onclick="goSlide(-1)" disabled>← Prev</button>
+  <div class="dots" id="dotsWrap"></div>
+  <button class="nav-btn" id="nextBtn" onclick="goSlide(1)">Next →</button>
+</div>
+
+<script>
+// ── NAVIGATION ────────────────────────────────────────────────
+const TOTAL=10; let cur=0;
+const dotsWrap=document.getElementById('dotsWrap');
+for(let i=0;i<TOTAL;i++){
+  const d=document.createElement('div');
+  d.className='dot'+(i===0?' active':'');
+  d.onclick=()=>showSlide(i);
+  dotsWrap.appendChild(d);
+}
+function showSlide(n){
+  document.querySelectorAll('.slide').forEach((s,i)=>s.classList.toggle('active',i===n));
+  document.querySelectorAll('.dot').forEach((d,i)=>d.classList.toggle('active',i===n));
+  document.getElementById('prevBtn').disabled=(n===0);
+  document.getElementById('nextBtn').disabled=(n===TOTAL-1);
+  document.getElementById('slideLabel').textContent=(n+1)+' / '+TOTAL;
+  cur=n; window.scrollTo(0,0);
+}
+function goSlide(d){showSlide(Math.max(0,Math.min(TOTAL-1,cur+d)))}
+
+// ── TRANSFORMER CALCULATOR ────────────────────────────────────
+function calcTransformer(){
+  const n1=parseFloat(document.getElementById('tx_n1').value);
+  const n2=parseFloat(document.getElementById('tx_n2').value);
+  const v1=parseFloat(document.getElementById('tx_v1').value);
+  const i1=parseFloat(document.getElementById('tx_i1').value);
+  const res=document.getElementById('tx-result');
+  const err=document.getElementById('tx-err');
+  res.style.display='none'; err.style.display='none';
+  if(isNaN(n1)||isNaN(n2)||isNaN(v1)){err.textContent='Enter N1, N2 and V1 at minimum.';err.style.display='block';return;}
+  const ratio=n2/n1;
+  const v2=v1*ratio;
+  let out=`Turns Ratio N2/N1 = ${n2}/${n1} = ${ratio.toFixed(4)}\nV2 = V1 × (N2/N1) = ${v1} × ${ratio.toFixed(4)} = ${v2.toFixed(1)} V`;
+  if(!isNaN(i1)){
+    const i2=i1/ratio;
+    const p=v1*i1/1000;
+    out+=`\nI2 = I1 × (N1/N2) = ${i1} × ${(1/ratio).toFixed(4)} = ${i2.toFixed(2)} A\nPower = V1×I1 = ${p.toFixed(3)} kW`;
+    out+=v2>v1?'\nType: STEP-UP transformer':'\nType: STEP-DOWN transformer';
+  }
+  res.textContent=out; res.style.display='block';
+}
+function clearTransformer(){
+  ['tx_n1','tx_n2','tx_v1','tx_i1'].forEach(id=>document.getElementById(id).value='');
+  document.getElementById('tx-result').style.display='none';
+  document.getElementById('tx-err').style.display='none';
+}
+
+// ── LINE LOSS CALCULATOR ──────────────────────────────────────
+function calcLineLoss(){
+  const p=parseFloat(document.getElementById('tl_p').value)*1e6;
+  const v=parseFloat(document.getElementById('tl_v').value)*1e3;
+  const r=parseFloat(document.getElementById('tl_r').value);
+  const res=document.getElementById('tl-result');
+  const err=document.getElementById('tl-err');
+  res.style.display='none'; err.style.display='none';
+  if(isNaN(p)||isNaN(v)||isNaN(r)){err.textContent='Enter all three values.';err.style.display='block';return;}
+  const i=p/v;
+  const ploss=i*i*r;
+  const eff=((p-ploss)/p*100);
+  res.textContent=`Current I = P/V = ${(p/1e6).toFixed(1)}MW / ${(v/1e3).toFixed(0)}kV = ${i.toFixed(2)} A\nLine loss = I²R = ${i.toFixed(2)}² × ${r} = ${(ploss/1e3).toFixed(2)} kW = ${(ploss/1e6).toFixed(3)} MW\nEfficiency = ${eff.toFixed(2)}%\nPower delivered = ${((p-ploss)/1e6).toFixed(3)} MW`;
+  res.style.display='block';
+}
+function clearLineLoss(){
+  ['tl_p','tl_v','tl_r'].forEach(id=>document.getElementById(id).value='');
+  document.getElementById('tl-result').style.display='none';
+  document.getElementById('tl-err').style.display='none';
+}
+
+// ── PHASE CALCULATOR ──────────────────────────────────────────
+function calcPhase(){
+  const v=parseFloat(document.getElementById('ph_v').value);
+  const type=document.getElementById('ph_type').value;
+  const res=document.getElementById('ph-result');
+  if(isNaN(v)){res.textContent='Enter a voltage value.';res.style.display='block';return;}
+  const sqrt3=Math.sqrt(3);
+  if(type==='phase'){
+    res.textContent=`Phase voltage = ${v} V\nLine voltage = √3 × ${v} = ${(sqrt3*v).toFixed(2)} V`;
+  } else {
+    res.textContent=`Line voltage = ${v} V\nPhase voltage = ${v} / √3 = ${(v/sqrt3).toFixed(2)} V`;
+  }
+  res.style.display='block';
+}
+
+// ── FILL BLANK ────────────────────────────────────────────────
+const fbAns={
+  f1:['geothermal'],
+  f2:['power','i squared r','line','transmission','heat'],
+  f3:['240'],
+  f4:['√3','root 3','1.732','sqrt3','√ 3'],
+  f5:['ketraco','kenya electricity transmission company']
+};
+let fillScore=0, saScores={};
+function checkFills(){
+  fillScore=0;
+  Object.entries(fbAns).forEach(([id,ans])=>{
+    const inp=document.getElementById(id);
+    const fb=document.getElementById('f'+id.slice(1));
+    const val=inp.value.trim().toLowerCase();
+    const ok=ans.some(a=>val===a||val.includes(a));
+    if(ok){fillScore++;inp.className='fill-blank correct';fb.textContent='✓ +1';fb.style.color='#2e7d32';}
+    else{inp.className='fill-blank wrong';fb.textContent='✗ ('+ans[0]+')';fb.style.color='#c62828';}
+    fb.style.display='inline';
+  });
+}
+function gradeAnswer(saId,fbId,cfg){
+  const ans=document.getElementById(saId).value.trim().toLowerCase();
+  const found=cfg.keywords.filter(k=>ans.includes(k.toLowerCase()));
+  const missed=cfg.keywords.filter(k=>!ans.includes(k.toLowerCase()));
+  const hitRate=Math.min(found.length/cfg.required,1.0);
+  const marks=Math.round(hitRate*cfg.marks);
+  saScores[saId]=marks;
+  const grade=marks>=cfg.marks?'🌟 Excellent!':marks>=cfg.marks*0.5?'👍 Good attempt':'📖 Needs improvement';
+  const fbEl=document.getElementById(fbId);
+  fbEl.style.display='block';
+  fbEl.innerHTML=`<strong>${grade} — ${marks}/${cfg.marks} marks</strong><br>
+  <span class="kw-found">✅ Keywords found: ${found.join(', ')||'none'}</span><br>
+  <span class="kw-missed">❌ Missed: ${missed.join(', ')||'none'}</span>
+  <div class="model-ans"><strong>Model Answer:</strong> ${cfg.model}</div>`;
+}
+function showTotalScore(){
+  const saTotal=Object.values(saScores).reduce((a,b)=>a+b,0);
+  const total=fillScore+saTotal;
+  const pct=Math.round(total/15*100);
+  const grade=pct>=80?'Exceeds Expectation 🎉':pct>=60?'Meets Expectation 👍':pct>=40?'Approaches Expectation 📖':'Below Expectation 💪';
+  const el=document.getElementById('totalResult');
+  el.style.display='block';
+  el.innerHTML=`<strong>Total Score: ${total} / 15 (${pct}%)</strong><br>
+  Part A: ${fillScore}/5 &nbsp;|&nbsp; Part B: ${saTotal}/10<br>
+  <span style="color:var(--pri);font-size:1.05rem">${grade}</span><br>
+  <span style="font-size:.8rem;color:#666;margin-top:4px;display:block">CBE Rubric — ${pct>=80?'Exceeds':pct>=60?'Meets':pct>=40?'Approaches':'Below'} Expectation</span>`;
+  submitExamToMTTI(total,15,pct);
+  document.getElementById('nextLessonBox').style.display='block';
+}
+function submitExamToMTTI(score,total,percent){
+  try{
+    fetch('/wp-json/mtti/v1/exam-result',{
+      method:'POST',
+      headers:{'Content-Type':'application/json','X-WP-Nonce':window.mtti_nonce||''},
+      body:JSON.stringify({lesson_id:'elec-3.1-generation-transmission-distribution',score,total,percent,timestamp:new Date().toISOString()})
+    }).then(r=>r.json()).then(d=>{if(d&&d.success)console.log('[MTTI] Result saved:',d);}).catch(e=>console.log('[MTTI] Offline:',e));
+  }catch(e){console.log('[MTTI] Error:',e);}
+}
+</script>
+</body>
+</html>

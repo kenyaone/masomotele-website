@@ -1,0 +1,1854 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>M.T.T.I Lead CRM - Google Sheets</title>
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #1E3A5F; --primary-light: #2a4a73; --accent: #2E7D32; --accent-light: #4CAF50;
+            --warning: #FF9800; --danger: #e53935; --whatsapp: #25D366; --google: #4285F4;
+            --bg: #f0f4f8; --card: #ffffff; --text: #1a1a2e; --text-muted: #64748b; --border: #e2e8f0;
+            --shadow: 0 4px 6px -1px rgba(0,0,0,0.1); --shadow-lg: 0 10px 15px -3px rgba(0,0,0,0.1);
+        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'DM Sans', sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; }
+        
+        /* Setup Screen */
+        .setup-screen { display: flex; align-items: center; justify-content: center; min-height: 100vh; padding: 2rem; }
+        .setup-card { background: white; border-radius: 20px; padding: 2.5rem; max-width: 600px; width: 100%; box-shadow: var(--shadow-lg); }
+        .setup-logo { text-align: center; margin-bottom: 2rem; }
+        .setup-logo-icon { width: 80px; height: 80px; background: linear-gradient(135deg, var(--primary), var(--primary-light));
+            border-radius: 20px; display: flex; align-items: center; justify-content: center;
+            font-size: 2rem; color: white; margin: 0 auto 1rem; }
+        .setup-title { font-size: 1.75rem; font-weight: 700; margin-bottom: 0.5rem; }
+        .setup-subtitle { color: var(--text-muted); }
+        .setup-steps { margin: 2rem 0; }
+        .setup-step { display: flex; gap: 1rem; margin-bottom: 1.5rem; padding: 1rem; background: var(--bg); border-radius: 12px; }
+        .step-number { width: 32px; height: 32px; background: var(--primary); color: white; border-radius: 50%;
+            display: flex; align-items: center; justify-content: center; font-weight: 700; flex-shrink: 0; }
+        .step-content h4 { margin-bottom: 0.25rem; }
+        .step-content p { font-size: 0.9rem; color: var(--text-muted); }
+        .step-content a { color: var(--google); }
+        .step-content code { background: #E8F0FE; padding: 2px 6px; border-radius: 4px; font-family: 'Space Mono', monospace; font-size: 0.85rem; }
+        
+        .form-group { margin-bottom: 1.25rem; }
+        .form-label { display: block; font-size: 0.85rem; font-weight: 600; margin-bottom: 0.5rem; }
+        .form-input { width: 100%; padding: 14px 16px; border: 2px solid var(--border); border-radius: 10px;
+            font-family: 'DM Sans', sans-serif; font-size: 1rem; transition: border-color 0.2s; }
+        .form-input:focus { outline: none; border-color: var(--google); }
+        .form-hint { font-size: 0.8rem; color: var(--text-muted); margin-top: 6px; }
+        
+        .btn { padding: 14px 28px; border-radius: 10px; border: none; font-family: 'DM Sans', sans-serif;
+            font-weight: 600; font-size: 1rem; cursor: pointer; transition: all 0.2s;
+            display: inline-flex; align-items: center; justify-content: center; gap: 10px; }
+        .btn-google { background: var(--google); color: white; width: 100%; }
+        .btn-google:hover { background: #3367D6; }
+        .btn-primary { background: var(--accent); color: white; }
+        .btn-primary:hover { background: var(--accent-light); }
+        .btn-outline { background: transparent; color: var(--primary); border: 2px solid var(--primary); }
+        .btn-outline:hover { background: var(--primary); color: white; }
+        .btn-sm { padding: 8px 16px; font-size: 0.9rem; }
+        .btn-danger { background: var(--danger); color: white; }
+        
+        .connected-badge { display: inline-flex; align-items: center; gap: 8px; background: #E8F5E9;
+            color: var(--accent); padding: 8px 16px; border-radius: 20px; font-weight: 600; margin-bottom: 1rem; }
+        
+        /* Main App */
+        .app-container { display: none; }
+        .app-container.active { display: block; }
+        
+        .header { background: linear-gradient(135deg, var(--primary) 0%, var(--primary-light) 100%);
+            color: white; padding: 1rem 2rem; display: flex; justify-content: space-between;
+            align-items: center; position: sticky; top: 0; z-index: 100; box-shadow: var(--shadow-lg); flex-wrap: wrap; gap: 12px; }
+        .logo { display: flex; align-items: center; gap: 12px; }
+        .logo-icon { width: 40px; height: 40px; background: var(--accent); border-radius: 10px;
+            display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 18px; }
+        .logo-text { font-weight: 700; font-size: 1.25rem; }
+        .logo-subtitle { font-size: 0.7rem; opacity: 0.8; display: flex; align-items: center; gap: 6px; }
+        .sync-dot { width: 8px; height: 8px; background: #4CAF50; border-radius: 50%; animation: pulse 2s infinite; }
+        @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.5; } }
+        
+        .header-actions { display: flex; gap: 12px; align-items: center; flex-wrap: wrap; }
+        .nav-tabs { display: flex; gap: 4px; background: rgba(255,255,255,0.1); padding: 4px; border-radius: 10px; }
+        .nav-tab { padding: 8px 16px; border: none; background: transparent; color: rgba(255,255,255,0.7);
+            font-family: 'DM Sans', sans-serif; font-weight: 600; font-size: 0.9rem; cursor: pointer;
+            border-radius: 8px; transition: all 0.2s ease; }
+        .nav-tab:hover { color: white; background: rgba(255,255,255,0.1); }
+        .nav-tab.active { background: white; color: var(--primary); }
+        .badge-count { background: var(--warning); color: white; padding: 2px 6px; border-radius: 10px; font-size: 0.7rem; margin-left: 4px; }
+        
+        .form-select { padding: 10px 14px; border: 1px solid rgba(255,255,255,0.3); border-radius: 8px;
+            font-family: 'DM Sans', sans-serif; font-size: 0.9rem; background: rgba(255,255,255,0.1);
+            color: white; cursor: pointer; }
+        .form-select option { color: var(--text); }
+        
+        .main { display: flex; min-height: calc(100vh - 72px); }
+        .sidebar { width: 280px; background: var(--card); border-right: 1px solid var(--border);
+            padding: 1.5rem; overflow-y: auto; flex-shrink: 0; }
+        .content { flex: 1; padding: 1.5rem; overflow-y: auto; }
+        
+        .stats-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 1.5rem; }
+        .stat-card { background: linear-gradient(135deg, var(--bg) 0%, white 100%); padding: 1rem;
+            border-radius: 12px; border: 1px solid var(--border); text-align: center; }
+        .stat-value { font-size: 1.75rem; font-weight: 700; color: var(--primary); font-family: 'Space Mono', monospace; }
+        .stat-label { font-size: 0.7rem; color: var(--text-muted); text-transform: uppercase; }
+        .stat-card.highlight { background: linear-gradient(135deg, var(--accent) 0%, var(--accent-light) 100%); }
+        .stat-card.highlight .stat-value, .stat-card.highlight .stat-label { color: white; }
+        .stat-card.warning { background: linear-gradient(135deg, var(--warning) 0%, #FFB74D 100%); }
+        .stat-card.warning .stat-value, .stat-card.warning .stat-label { color: white; }
+        
+        .sync-status { background: #E8F5E9; border: 1px solid #A5D6A7; border-radius: 10px; padding: 12px; margin-bottom: 1.5rem; text-align: center; }
+        .sync-status.syncing { background: #FFF8E1; border-color: #FFE082; }
+        .sync-status.error { background: #FFEBEE; border-color: #FFCDD2; }
+        .sync-text { font-size: 0.85rem; font-weight: 500; }
+        .sync-time { font-size: 0.75rem; color: var(--text-muted); }
+        
+        .filter-section { margin-bottom: 1.5rem; }
+        .filter-title { font-size: 0.75rem; text-transform: uppercase; letter-spacing: 1px;
+            color: var(--text-muted); margin-bottom: 0.75rem; font-weight: 600; }
+        .filter-btn { display: flex; width: 100%; padding: 10px 12px; margin-bottom: 4px; border: none;
+            background: transparent; text-align: left; border-radius: 8px; cursor: pointer;
+            font-family: 'DM Sans', sans-serif; font-size: 0.9rem; color: var(--text);
+            transition: all 0.15s ease; justify-content: space-between; align-items: center; }
+        .filter-btn:hover { background: var(--bg); }
+        .filter-btn.active { background: var(--primary); color: white; }
+        .filter-count { background: var(--bg); padding: 2px 8px; border-radius: 10px; font-size: 0.75rem; font-weight: 600; }
+        .filter-btn.active .filter-count { background: rgba(255,255,255,0.2); color: white; }
+        
+        .search-box { display: flex; align-items: center; background: var(--card); border: 1px solid var(--border);
+            border-radius: 10px; padding: 0 16px; flex: 1; max-width: 350px; }
+        .search-box input { border: none; padding: 12px; font-family: 'DM Sans', sans-serif;
+            font-size: 0.9rem; width: 100%; background: transparent; }
+        .search-box input:focus { outline: none; }
+        
+        .leads-grid { display: grid; gap: 1rem; }
+        .lead-card { background: var(--card); border-radius: 12px; padding: 1.25rem; border: 1px solid var(--border);
+            box-shadow: var(--shadow); transition: all 0.2s ease; cursor: pointer; }
+        .lead-card:hover { box-shadow: var(--shadow-lg); transform: translateY(-2px); }
+        .lead-card.pending { border-left: 4px solid var(--warning); }
+        .lead-card.verified { border-left: 4px solid var(--accent); }
+        .lead-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 0.75rem; }
+        .lead-name { font-weight: 600; font-size: 1.1rem; }
+        .lead-course { font-size: 0.85rem; color: var(--text-muted); }
+        .lead-stage { padding: 4px 12px; border-radius: 20px; font-size: 0.75rem; font-weight: 600; text-transform: uppercase; }
+        .stage-new { background: #E3F2FD; color: #1976D2; }
+        .stage-contacted { background: #FFF3E0; color: #F57C00; }
+        .stage-interested { background: #E8F5E9; color: #388E3C; }
+        .stage-enrolled { background: #E8F5E9; color: #1B5E20; }
+        .stage-lost { background: #FFEBEE; color: #C62828; }
+        .lead-info { display: flex; gap: 1rem; flex-wrap: wrap; font-size: 0.85rem; color: var(--text-muted); margin-bottom: 0.75rem; }
+        .lead-footer { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 8px; }
+        .lead-badges { display: flex; gap: 6px; flex-wrap: wrap; }
+        .badge { padding: 3px 8px; border-radius: 6px; font-size: 0.7rem; font-weight: 600; }
+        .badge-pending { background: #FFF3E0; color: #F57C00; }
+        .badge-verified { background: #E8F5E9; color: #388E3C; }
+        .lead-actions { display: flex; gap: 8px; }
+        .action-btn { width: 36px; height: 36px; border-radius: 8px; border: 1px solid var(--border);
+            background: white; cursor: pointer; display: flex; align-items: center; justify-content: center;
+            transition: all 0.15s ease; font-size: 1rem; }
+        .action-btn:hover { background: var(--primary); border-color: var(--primary); color: white; }
+        
+        /* Modal */
+        .modal-overlay { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.5);
+            display: flex; align-items: center; justify-content: center; z-index: 1000;
+            opacity: 0; visibility: hidden; transition: all 0.3s ease; padding: 1rem; }
+        .modal-overlay.active { opacity: 1; visibility: visible; }
+        .modal { background: var(--card); border-radius: 16px; width: 100%; max-width: 600px;
+            max-height: 90vh; overflow-y: auto; transform: translateY(20px); transition: transform 0.3s ease; }
+        .modal-overlay.active .modal { transform: translateY(0); }
+        .modal-header { padding: 1.25rem 1.5rem; border-bottom: 1px solid var(--border);
+            display: flex; justify-content: space-between; align-items: center; position: sticky; top: 0; background: white; z-index: 10; }
+        .modal-title { font-size: 1.25rem; font-weight: 700; }
+        .modal-close { width: 36px; height: 36px; border-radius: 8px; border: none; background: var(--bg);
+            cursor: pointer; font-size: 1.25rem; display: flex; align-items: center; justify-content: center; }
+        .modal-body { padding: 1.5rem; }
+        .modal-footer { padding: 1rem 1.5rem; border-top: 1px solid var(--border);
+            display: flex; justify-content: flex-end; gap: 12px; flex-wrap: wrap; }
+        
+        .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
+        
+        /* Proof Section */
+        .proof-section { background: #FFF8E1; border: 2px dashed #FFE082; border-radius: 12px; padding: 1.25rem; margin-bottom: 1rem; }
+        .proof-section.has-proof { background: #E8F5E9; border-color: #A5D6A7; border-style: solid; }
+        .proof-title { font-weight: 600; margin-bottom: 0.75rem; }
+        .proof-options { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 1rem; }
+        .proof-option { background: white; border: 2px solid var(--border); border-radius: 10px;
+            padding: 14px; cursor: pointer; text-align: center; transition: all 0.2s; }
+        .proof-option:hover { border-color: var(--primary); }
+        .proof-option.selected { border-color: var(--accent); background: #E8F5E9; }
+        .proof-option-icon { font-size: 1.5rem; margin-bottom: 4px; }
+        .proof-option-label { font-size: 0.9rem; font-weight: 500; }
+        
+        .upload-area { border: 2px dashed var(--border); border-radius: 10px; padding: 1.5rem;
+            text-align: center; cursor: pointer; transition: all 0.2s; }
+        .upload-area:hover { border-color: var(--primary); background: #F5F5F5; }
+        .upload-area.has-file { border-color: var(--accent); background: #E8F5E9; border-style: solid; }
+        .upload-preview { max-width: 100%; max-height: 200px; border-radius: 8px; margin-top: 1rem; }
+        
+        .call-duration-input { display: flex; gap: 8px; align-items: center; margin-top: 1rem; flex-wrap: wrap; }
+        .call-duration-input input { width: 70px; text-align: center; }
+        
+        /* Communication Log */
+        .comm-log { margin-top: 1.5rem; padding-top: 1.5rem; border-top: 1px solid var(--border); }
+        .comm-entry { display: flex; gap: 12px; padding: 12px; background: var(--bg); border-radius: 10px; margin-bottom: 10px; }
+        .comm-entry.pending { background: #FFF8E1; border: 1px dashed #FFE082; }
+        .comm-entry.verified { background: #E8F5E9; border: 1px solid #A5D6A7; }
+        .comm-entry.disputed { background: #FFEBEE; border: 1px solid #FFCDD2; }
+        .comm-icon { width: 40px; height: 40px; border-radius: 10px; display: flex; align-items: center;
+            justify-content: center; flex-shrink: 0; font-size: 1.25rem; background: white; }
+        .comm-content { flex: 1; min-width: 0; }
+        .comm-header { display: flex; justify-content: space-between; align-items: flex-start; flex-wrap: wrap; gap: 8px; }
+        .comm-type { font-weight: 600; font-size: 0.9rem; }
+        .comm-status { font-size: 0.7rem; padding: 3px 8px; border-radius: 4px; font-weight: 600; }
+        .comm-status.pending { background: #FFF3E0; color: #F57C00; }
+        .comm-status.verified { background: #E8F5E9; color: #388E3C; }
+        .comm-status.disputed { background: #FFEBEE; color: #C62828; }
+        .comm-text { font-size: 0.9rem; margin: 8px 0; }
+        .comm-meta { font-size: 0.8rem; color: var(--text-muted); }
+        .comm-message { background: white; padding: 10px; border-radius: 8px; margin: 8px 0; font-size: 0.85rem; border-left: 3px solid var(--accent); }
+        .comm-proof-img { max-width: 120px; max-height: 80px; border-radius: 6px; cursor: pointer; margin-top: 8px; }
+        
+        /* Image Preview */
+        .image-preview-overlay { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.9);
+            display: flex; align-items: center; justify-content: center; z-index: 2000;
+            opacity: 0; visibility: hidden; transition: all 0.3s ease; }
+        .image-preview-overlay.active { opacity: 1; visibility: visible; }
+        .image-preview-overlay img { max-width: 90%; max-height: 90%; border-radius: 8px; }
+        .image-preview-close { position: absolute; top: 20px; right: 20px; color: white; font-size: 2rem;
+            cursor: pointer; background: none; border: none; }
+        
+        /* Analytics */
+        .analytics-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 1rem; margin-bottom: 1.5rem; }
+        .analytics-card { background: var(--card); border-radius: 12px; padding: 1.25rem; box-shadow: var(--shadow); }
+        .analytics-card h3 { font-size: 0.75rem; text-transform: uppercase; color: var(--text-muted); margin-bottom: 0.5rem; }
+        .big-number { font-size: 2rem; font-weight: 700; color: var(--primary); font-family: 'Space Mono', monospace; }
+        
+        .perf-table { width: 100%; border-collapse: collapse; margin-top: 1rem; }
+        .perf-table th { text-align: left; padding: 12px; font-size: 0.75rem; text-transform: uppercase;
+            color: var(--text-muted); border-bottom: 2px solid var(--border); }
+        .perf-table td { padding: 12px; border-bottom: 1px solid var(--border); }
+        .perf-table tr:hover { background: var(--bg); }
+        
+        .toast { position: fixed; bottom: 20px; right: 20px; background: var(--primary); color: white;
+            padding: 16px 24px; border-radius: 10px; box-shadow: var(--shadow-lg);
+            transform: translateY(100px); opacity: 0; transition: all 0.3s ease; z-index: 1001; max-width: 90%; }
+        .toast.show { transform: translateY(0); opacity: 1; }
+        .toast.success { background: var(--accent); }
+        .toast.warning { background: var(--warning); }
+        .toast.error { background: var(--danger); }
+        
+        .loading-spinner { display: inline-block; width: 20px; height: 20px; border: 3px solid rgba(255,255,255,0.3);
+            border-radius: 50%; border-top-color: white; animation: spin 1s linear infinite; }
+        @keyframes spin { to { transform: rotate(360deg); } }
+        
+        @media (max-width: 768px) {
+            .sidebar { display: none; }
+            .form-row { grid-template-columns: 1fr; }
+            .proof-options { grid-template-columns: 1fr; }
+            .header { padding: 1rem; }
+            .main { flex-direction: column; }
+        }
+    </style>
+</head>
+<body>
+
+<!-- SETUP SCREEN -->
+<div class="setup-screen" id="setupScreen">
+    <div class="setup-card">
+        <div class="setup-logo">
+            <div class="setup-logo-icon">M</div>
+            <h1 class="setup-title">M.T.T.I Lead CRM</h1>
+            <p class="setup-subtitle">Connect to Google Sheets for cloud storage</p>
+        </div>
+
+        <div id="setupContent">
+            <div class="setup-steps">
+                <div class="setup-step">
+                    <div class="step-number">1</div>
+                    <div class="step-content">
+                        <h4>Create a Google Sheet</h4>
+                        <p>Go to <a href="https://sheets.google.com" target="_blank">sheets.google.com</a> and create a new spreadsheet. Name it "MTTI CRM".</p>
+                    </div>
+                </div>
+                <div class="setup-step">
+                    <div class="step-number">2</div>
+                    <div class="step-content">
+                        <h4>Set up the Sheet</h4>
+                        <p>Create 3 sheets (tabs) named exactly: <code>Leads</code>, <code>Communications</code>, <code>Staff</code></p>
+                    </div>
+                </div>
+                <div class="setup-step">
+                    <div class="step-number">3</div>
+                    <div class="step-content">
+                        <h4>Deploy Web App</h4>
+                        <p>Go to Extensions → Apps Script, paste the provided code, then Deploy → New deployment → Web app. Copy the URL.</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label class="form-label">Google Apps Script Web App URL</label>
+                <input type="url" class="form-input" id="webAppUrl" placeholder="https://script.google.com/macros/s/xxx/exec">
+                <p class="form-hint">This URL connects the CRM to your Google Sheet</p>
+            </div>
+
+            <button class="btn btn-google" onclick="connectToSheets()">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M19.5 3H4.5C3.12 3 2 4.12 2 5.5v13C2 19.88 3.12 21 4.5 21h15c1.38 0 2.5-1.12 2.5-2.5v-13C22 4.12 20.88 3 19.5 3zM4.5 5h15c.28 0 .5.22.5.5V8H4V5.5c0-.28.22-.5.5-.5zM4 10h4v4H4v-4zm0 6h4v3H4.5c-.28 0-.5-.22-.5-.5V16zm6 3v-3h4v3h-4zm6 0v-3h4v2.5c0 .28-.22.5-.5.5H16zm4-5h-4v-4h4v4zm-6-4v4h-4v-4h4z"/>
+                </svg>
+                Connect to Google Sheets
+            </button>
+
+            <div style="margin-top: 2rem; padding-top: 1.5rem; border-top: 1px solid var(--border);">
+                <p style="font-size: 0.9rem; color: var(--text-muted); margin-bottom: 1rem;">
+                    <strong>Need the Apps Script code?</strong> Click below to view:
+                </p>
+                <button class="btn btn-outline btn-sm" onclick="showAppsScriptCode()" style="width: 100%;">
+                    📋 View Apps Script Code
+                </button>
+            </div>
+
+            <div style="margin-top: 1.5rem; text-align: center;">
+                <button class="btn btn-sm" style="background: transparent; color: var(--text-muted);" onclick="useLocalStorage()">
+                    Skip → Use Local Storage Only
+                </button>
+            </div>
+            <div id="localRecovery" style="display:none; margin-top: 1rem; background: #E8F5E9; border: 1px solid #A5D6A7; border-radius: 10px; padding: 1rem; text-align: center;">
+                <p style="font-size:0.9rem;margin-bottom:0.75rem;">💾 <strong>Local data found!</strong></p>
+                <p style="font-size:0.85rem;color:var(--text-muted);margin-bottom:0.75rem;" id="localRecoveryInfo"></p>
+                <button class="btn btn-sm btn-primary" onclick="recoverLocalData()">🔄 Recover & Launch</button>
+            </div>
+            <script>
+                // Check for recoverable local data
+                try {
+                    const local = JSON.parse(localStorage.getItem('mtti_crm_local'));
+                    if (local && (local.leads?.length || local.staff?.length)) {
+                        document.getElementById('localRecovery').style.display = 'block';
+                        document.getElementById('localRecoveryInfo').textContent = 
+                            `${local.leads?.length || 0} leads, ${local.staff?.length || 0} staff members`;
+                    }
+                } catch(e) {}
+            </script>
+        </div>
+
+        <!-- Connected State -->
+        <div id="connectedContent" style="display: none;">
+            <div class="connected-badge">
+                <span class="sync-dot"></span>
+                Connected to Google Sheets
+            </div>
+            <p style="margin-bottom: 1.5rem; color: var(--text-muted);">Your data will sync automatically to your Google Sheet.</p>
+            <button class="btn btn-primary" onclick="launchApp()" style="width: 100%;">
+                🚀 Launch CRM
+            </button>
+            <button class="btn btn-outline btn-sm" onclick="disconnect()" style="width: 100%; margin-top: 1rem;">
+                Disconnect & Reset
+            </button>
+        </div>
+    </div>
+</div>
+
+<!-- APPS SCRIPT CODE MODAL -->
+<div class="modal-overlay" id="codeModal">
+    <div class="modal" style="max-width: 700px;">
+        <div class="modal-header">
+            <h2 class="modal-title">📋 Google Apps Script Setup</h2>
+            <button class="modal-close" onclick="closeCodeModal()">×</button>
+        </div>
+        <div class="modal-body">
+            <div class="setup-steps">
+                <div class="setup-step">
+                    <div class="step-number">1</div>
+                    <div class="step-content">
+                        <h4>Open Apps Script</h4>
+                        <p>In your Google Sheet, go to <strong>Extensions → Apps Script</strong></p>
+                    </div>
+                </div>
+                <div class="setup-step">
+                    <div class="step-number">2</div>
+                    <div class="step-content">
+                        <h4>Paste the Code</h4>
+                        <p>Delete any existing code, then paste the contents of the <strong>MTTI_CRM_AppScript.gs</strong> file (provided separately).</p>
+                    </div>
+                </div>
+                <div class="setup-step">
+                    <div class="step-number">3</div>
+                    <div class="step-content">
+                        <h4>Deploy as Web App</h4>
+                        <p><strong>Deploy → New Deployment → Web App</strong></p>
+                        <p>• Execute as: <code>Me</code></p>
+                        <p>• Who has access: <code>Anyone</code></p>
+                    </div>
+                </div>
+                <div class="setup-step">
+                    <div class="step-number">4</div>
+                    <div class="step-content">
+                        <h4>Copy the URL</h4>
+                        <p>Copy the <strong>Web App URL</strong> and paste it in the setup screen.</p>
+                    </div>
+                </div>
+            </div>
+            <div style="background:#FFF8E1;border:1px solid #FFE082;border-radius:10px;padding:1rem;margin-top:1rem;">
+                <strong>⚠️ Important:</strong> After any code changes, you must create a <strong>NEW deployment</strong> (not update existing) for changes to take effect.
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- MAIN APP -->
+<div class="app-container" id="appContainer">
+    <header class="header">
+        <div class="logo">
+            <div class="logo-icon">M</div>
+            <div>
+                <div class="logo-text">M.T.T.I CRM</div>
+                <div class="logo-subtitle">
+                    <span class="sync-dot" id="syncDot"></span>
+                    <span id="syncLabel">Synced with Google Sheets</span>
+                </div>
+            </div>
+        </div>
+        
+        <div class="nav-tabs">
+            <button class="nav-tab active" onclick="switchView('leads')">📋 Leads</button>
+            <button class="nav-tab" onclick="switchView('tasks')">✅ Verify <span class="badge-count" id="pendingBadge">0</span></button>
+            <button class="nav-tab" onclick="switchView('analytics')">📊 Analytics</button>
+            <button class="nav-tab" onclick="switchView('courses')">🎓 Courses</button>
+        </div>
+
+        <div class="header-actions">
+            <select class="form-select" id="currentStaff" onchange="setCurrentStaff()">
+                <option value="">👤 Select Staff...</option>
+            </select>
+            <button class="btn btn-primary" onclick="openLeadModal('add')">➕ Add Lead</button>
+            <div style="position:relative;">
+                <button class="btn btn-outline" style="border-color:rgba(255,255,255,0.3);color:white;padding:8px 12px;" onclick="toggleSettingsMenu()">⚙️</button>
+                <div id="settingsMenu" style="display:none;position:absolute;right:0;top:100%;margin-top:8px;background:white;border-radius:10px;box-shadow:var(--shadow-lg);padding:8px;min-width:200px;z-index:200;">
+                    <button class="filter-btn" onclick="exportData();toggleSettingsMenu();">📤 Export Data</button>
+                    <button class="filter-btn" onclick="importData();toggleSettingsMenu();">📥 Import Data</button>
+                    <button class="filter-btn" onclick="syncData();toggleSettingsMenu();" id="cloudSyncBtn">🔄 Sync to Cloud</button>
+                    <hr style="margin:6px 0;border:none;border-top:1px solid var(--border);">
+                    <button class="filter-btn" style="color:var(--danger);" onclick="if(confirm('Disconnect from Google Sheets?')){disconnect();}">🔌 Disconnect</button>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- LEADS VIEW -->
+    <div class="main" id="leadsView">
+        <aside class="sidebar">
+            <div class="sync-status" id="syncStatus">
+                <div class="sync-text">✅ Synced</div>
+                <div class="sync-time" id="syncTime">Just now</div>
+            </div>
+            
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-value" id="totalLeads">0</div>
+                    <div class="stat-label">Total</div>
+                </div>
+                <div class="stat-card highlight">
+                    <div class="stat-value" id="hotLeads">0</div>
+                    <div class="stat-label">Hot</div>
+                </div>
+                <div class="stat-card warning">
+                    <div class="stat-value" id="pendingVerify">0</div>
+                    <div class="stat-label">Pending</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value" id="enrolledCount">0</div>
+                    <div class="stat-label">Enrolled</div>
+                </div>
+            </div>
+
+            <button class="btn btn-outline btn-sm" style="width:100%;margin-bottom:1rem;" onclick="syncData()">
+                🔄 Sync Now
+            </button>
+
+            <div class="filter-section">
+                <div class="filter-title">Stage</div>
+                <button class="filter-btn active" data-filter="all">All <span class="filter-count" id="count-all">0</span></button>
+                <button class="filter-btn" data-filter="new">🆕 New <span class="filter-count" id="count-new">0</span></button>
+                <button class="filter-btn" data-filter="contacted">📞 Contacted <span class="filter-count" id="count-contacted">0</span></button>
+                <button class="filter-btn" data-filter="interested">⭐ Interested <span class="filter-count" id="count-interested">0</span></button>
+                <button class="filter-btn" data-filter="enrolled">✅ Enrolled <span class="filter-count" id="count-enrolled">0</span></button>
+            </div>
+        </aside>
+
+        <main class="content">
+            <div style="display:flex;gap:12px;margin-bottom:1.5rem;flex-wrap:wrap;">
+                <div class="search-box">
+                    <span>🔍</span>
+                    <input type="text" placeholder="Search leads..." id="searchInput" oninput="renderLeads()">
+                </div>
+            </div>
+            <div class="leads-grid" id="leadsContainer">
+                <div style="text-align:center;padding:3rem;color:var(--text-muted);">
+                    <div class="loading-spinner" style="border-color: var(--border); border-top-color: var(--primary);"></div>
+                    <p style="margin-top:1rem;">Loading leads...</p>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- TASKS VIEW -->
+    <div class="content" id="tasksView" style="display:none;">
+        <h2 style="margin-bottom:1rem;">✅ Verification Queue</h2>
+        <div class="analytics-grid">
+            <div class="analytics-card">
+                <h3>Pending</h3>
+                <div class="big-number" id="taskPending">0</div>
+            </div>
+            <div class="analytics-card">
+                <h3>Verified Today</h3>
+                <div class="big-number" id="taskVerified">0</div>
+            </div>
+            <div class="analytics-card">
+                <h3>Disputed</h3>
+                <div class="big-number" id="taskDisputed">0</div>
+            </div>
+        </div>
+        <div id="tasksContainer"></div>
+    </div>
+
+    <!-- ANALYTICS VIEW -->
+    <div class="content" id="analyticsView" style="display:none;">
+        <h2 style="margin-bottom:1.5rem;">📊 Staff Performance</h2>
+        <div class="analytics-grid">
+            <div class="analytics-card">
+                <h3>Total Comms</h3>
+                <div class="big-number" id="analyticsTotalComms">0</div>
+            </div>
+            <div class="analytics-card">
+                <h3>Verify Rate</h3>
+                <div class="big-number" id="analyticsVerifyRate">0%</div>
+            </div>
+            <div class="analytics-card">
+                <h3>With Proof</h3>
+                <div class="big-number" id="analyticsProofRate">0%</div>
+            </div>
+            <div class="analytics-card">
+                <h3>Conversion</h3>
+                <div class="big-number" id="analyticsConversion">0%</div>
+            </div>
+        </div>
+        <div class="analytics-card">
+            <h3>Staff Performance</h3>
+            <table class="perf-table">
+                <thead><tr><th>Staff</th><th>Calls</th><th>Messages</th><th>Verified</th><th>Disputed</th><th>Rate</th></tr></thead>
+                <tbody id="staffPerfTable"></tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- COURSES VIEW -->
+    <div class="content" id="coursesView" style="display:none;">
+        <h2 style="margin-bottom:1.5rem;">🎓 Course Management</h2>
+        <div style="display:flex;gap:12px;margin-bottom:1.5rem;flex-wrap:wrap;align-items:flex-end;">
+            <div class="form-group" style="margin:0;flex:1;min-width:200px;">
+                <label class="form-label">Course Name</label>
+                <input type="text" class="form-input" id="newCourseName" placeholder="e.g. Data Science">
+            </div>
+            <div class="form-group" style="margin:0;width:80px;">
+                <label class="form-label">Emoji</label>
+                <input type="text" class="form-input" id="newCourseEmoji" placeholder="📊" maxlength="4">
+            </div>
+            <button class="btn btn-primary" onclick="addCourse()">➕ Add Course</button>
+        </div>
+        <div class="analytics-card">
+            <h3 style="margin-bottom:1rem;">Active Courses (<span id="courseCount">0</span>)</h3>
+            <div id="coursesContainer"></div>
+        </div>
+    </div>
+</div>
+
+<!-- LEAD MODAL -->
+<div class="modal-overlay" id="leadModal">
+    <div class="modal">
+        <div class="modal-header">
+            <h2 class="modal-title" id="leadModalTitle">Add Lead</h2>
+            <button class="modal-close" onclick="closeLeadModal()">×</button>
+        </div>
+        <div class="modal-body">
+            <input type="hidden" id="leadId">
+            <div class="form-row">
+                <div class="form-group">
+                    <label class="form-label">Name *</label>
+                    <input type="text" class="form-input" id="leadName">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Phone *</label>
+                    <input type="tel" class="form-input" id="leadPhone" placeholder="07XX XXX XXX">
+                </div>
+            </div>
+            <div class="form-row">
+                <div class="form-group">
+                    <label class="form-label">Email</label>
+                    <input type="email" class="form-input" id="leadEmail" placeholder="email@example.com">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Location</label>
+                    <input type="text" class="form-input" id="leadLocation" placeholder="e.g. Eldoret, Pioneer">
+                </div>
+            </div>
+            <div class="form-row">
+                <div class="form-group">
+                    <label class="form-label">Course *</label>
+                    <select class="form-input" id="leadCourse" onchange="handleCourseSelect(this)">
+                        <option value="">-- Select Course --</option>
+                    </select>
+                    <datalist id="courseList"></datalist>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Source</label>
+                    <select class="form-input" id="leadSource" onchange="handleSourceSelect(this)">
+                        <option value="">-- Select Source --</option>
+                    </select>
+                    <datalist id="sourceList"></datalist>
+                </div>
+            </div>
+            <div class="form-row">
+                <div class="form-group">
+                    <label class="form-label">Stage</label>
+                    <select class="form-input" id="leadStage">
+                        <option value="new">🆕 New</option>
+                        <option value="contacted">📞 Contacted</option>
+                        <option value="interested">⭐ Interested</option>
+                        <option value="enrolled">✅ Enrolled</option>
+                        <option value="lost">❌ Lost</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Follow-up</label>
+                    <input type="date" class="form-input" id="leadFollowUp">
+                </div>
+            </div>
+            <div class="form-group">
+                <label class="form-label">Notes</label>
+                <textarea class="form-input" id="leadNotes" rows="2"></textarea>
+            </div>
+            
+            <div class="comm-log" id="commLogSection" style="display:none;">
+                <h3 style="margin-bottom:1rem;">📝 Communication History</h3>
+                <div id="commLogEntries"></div>
+                <button class="btn btn-outline" style="width:100%;margin-top:1rem;" onclick="openCommModal()">
+                    ➕ Log Call/Message
+                </button>
+            </div>
+        </div>
+        <div class="modal-footer">
+            <button class="btn btn-outline" onclick="closeLeadModal()">Cancel</button>
+            <button class="btn btn-primary" onclick="saveLead()">💾 Save</button>
+        </div>
+    </div>
+</div>
+
+<!-- COMM MODAL -->
+<div class="modal-overlay" id="commModal">
+    <div class="modal">
+        <div class="modal-header">
+            <h2 class="modal-title">📞 Log Communication</h2>
+            <button class="modal-close" onclick="closeCommModal()">×</button>
+        </div>
+        <div class="modal-body">
+            <div class="proof-options" style="grid-template-columns: repeat(3, 1fr);">
+                <div class="proof-option selected" data-type="call" onclick="selectCommType('call')">
+                    <div class="proof-option-icon">📞</div>
+                    <div class="proof-option-label">Phone Call</div>
+                </div>
+                <div class="proof-option" data-type="whatsapp" onclick="selectCommType('whatsapp')">
+                    <div class="proof-option-icon">💬</div>
+                    <div class="proof-option-label">WhatsApp</div>
+                </div>
+                <div class="proof-option" data-type="sms" onclick="selectCommType('sms')">
+                    <div class="proof-option-icon">📱</div>
+                    <div class="proof-option-label">SMS</div>
+                </div>
+                <div class="proof-option" data-type="facebook" onclick="selectCommType('facebook')">
+                    <div class="proof-option-icon">📘</div>
+                    <div class="proof-option-label">Facebook</div>
+                </div>
+                <div class="proof-option" data-type="instagram" onclick="selectCommType('instagram')">
+                    <div class="proof-option-icon">📸</div>
+                    <div class="proof-option-label">Instagram</div>
+                </div>
+                <div class="proof-option" data-type="tiktok" onclick="selectCommType('tiktok')">
+                    <div class="proof-option-icon">🎵</div>
+                    <div class="proof-option-label">TikTok</div>
+                </div>
+            </div>
+
+            <div class="proof-section" id="proofSection">
+                <div class="proof-title">📸 Proof of Communication</div>
+                
+                <div id="callProofSection">
+                    <div class="call-duration-input">
+                        <label>Duration:</label>
+                        <input type="number" class="form-input" id="callMinutes" placeholder="0" min="0">
+                        <span>min</span>
+                        <input type="number" class="form-input" id="callSeconds" placeholder="0" min="0" max="59">
+                        <span>sec</span>
+                    </div>
+                    <div class="upload-area" id="callUploadArea" onclick="document.getElementById('callScreenshot').click()">
+                        <div>📱 Upload call log screenshot</div>
+                        <input type="file" id="callScreenshot" accept="image/*" style="display:none" onchange="handleUpload('call')">
+                    </div>
+                    <img id="callPreview" class="upload-preview" style="display:none;">
+                </div>
+
+                <div id="whatsappProofSection" style="display:none;">
+                    <div class="form-group">
+                        <label class="form-label" id="messageLabel">Message Sent *</label>
+                        <textarea class="form-input" id="whatsappMessage" rows="3" placeholder="Paste your message..."></textarea>
+                    </div>
+                    <div class="upload-area" id="waUploadArea" onclick="document.getElementById('waScreenshot').click()">
+                        <div id="waUploadLabel">💬 Upload screenshot</div>
+                        <input type="file" id="waScreenshot" accept="image/*" style="display:none" onchange="handleUpload('whatsapp')">
+                    </div>
+                    <img id="waPreview" class="upload-preview" style="display:none;">
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label class="form-label">Summary *</label>
+                <textarea class="form-input" id="commSummary" rows="2" placeholder="What was discussed?"></textarea>
+            </div>
+            <div class="form-row">
+                <div class="form-group">
+                    <label class="form-label">Outcome</label>
+                    <select class="form-input" id="commOutcome">
+                        <option value="positive">✅ Positive</option>
+                        <option value="neutral">➖ Neutral</option>
+                        <option value="negative">❌ Negative</option>
+                        <option value="no-answer">📵 No Answer</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Follow-up</label>
+                    <input type="date" class="form-input" id="commFollowUp">
+                </div>
+            </div>
+        </div>
+        <div class="modal-footer">
+            <button class="btn btn-outline" onclick="closeCommModal()">Cancel</button>
+            <button class="btn btn-primary" onclick="saveComm()">📝 Submit</button>
+        </div>
+    </div>
+</div>
+
+<!-- VERIFY MODAL -->
+<div class="modal-overlay" id="verifyModal">
+    <div class="modal" style="max-width:550px;">
+        <div class="modal-header">
+            <h2 class="modal-title">✅ Verify Communication</h2>
+            <button class="modal-close" onclick="closeVerifyModal()">×</button>
+        </div>
+        <div class="modal-body" id="verifyContent"></div>
+        <div class="modal-footer">
+            <button class="btn btn-danger" onclick="disputeComm()">❌ Dispute</button>
+            <button class="btn btn-outline" onclick="closeVerifyModal()">Cancel</button>
+            <button class="btn btn-primary" onclick="approveComm()">✅ Verify</button>
+        </div>
+    </div>
+</div>
+
+<!-- IMAGE PREVIEW -->
+<div class="image-preview-overlay" id="imagePreview" onclick="closeImagePreview()">
+    <button class="image-preview-close">×</button>
+    <img id="previewImage" src="">
+</div>
+
+<div class="toast" id="toast"><span id="toastMsg"></span></div>
+
+<script>
+// ============ CONFIG ============
+const CONFIG_KEY = 'mtti_crm_config';
+const LOCAL_KEY = 'mtti_crm_local';
+
+let config = JSON.parse(localStorage.getItem(CONFIG_KEY)) || {};
+let webAppUrl = 'https://script.google.com/macros/s/AKfycbzrDSDDjXgcsLCQdnoRgIylj5eti74fnCuAYMoRq94E8NQMmdaCdCQ_ya_zyJYGGatniQ/exec';
+let useCloud = true;
+
+let leads = [];
+let staff = [];
+let currentStaffId = null;
+let editingLeadId = null;
+let currentCommType = 'call';
+let uploadedProof = null;
+let verifyingComm = null;
+let currentFilter = 'all';
+let lastSync = null;
+
+const COURSES_KEY = 'mtti_crm_courses';
+const SOURCES_KEY = 'mtti_crm_sources';
+
+const defaultCourses = { 
+    'German Language': '🇩🇪',
+    'Web Development': '💻',
+    'Graphic Design': '🎨',
+    'Digital Marketing': '📱',
+    'CCTV Installation': '📹',
+    'Computer Applications': '🖥️',
+    'Phone Repair': '📱',
+    'Video Editing': '🎬',
+    'Cybersecurity': '🔒',
+    'AI Fundamentals': '🤖',
+    'Data Entry': '⌨️',
+    'Microsoft Office': '📊',
+    'Accounting Packages': '📒',
+    'AutoCAD': '📐',
+    'Photography': '📷'
+};
+
+const defaultSources = [
+    'Walk-in', 'WhatsApp', 'Facebook', 'Instagram', 'TikTok', 'Twitter/X', 'YouTube',
+    'Referral', 'Website', 'Google Search', 'Phone Call', 'SMS',
+    'Flyer', 'Poster', 'Banner', 'Brochure',
+    'Radio', 'TV', 'Newspaper',
+    'School Visit', 'Church', 'Community Event', 'Career Fair', 'Exhibition',
+    'LinkedIn', 'Telegram', 'Email Campaign',
+    'Former Student', 'Parent/Guardian', 'Partner Organization',
+    'Road Show', 'Door-to-Door', 'Market/Shopping Center'
+];
+
+let courses = JSON.parse(localStorage.getItem(COURSES_KEY)) || { ...defaultCourses };
+let sources = JSON.parse(localStorage.getItem(SOURCES_KEY)) || [...defaultSources];
+
+function saveCourses() {
+    localStorage.setItem(COURSES_KEY, JSON.stringify(courses));
+    updateCourseDatalist();
+}
+
+function updateCourseDatalist() {
+    const sel = document.getElementById('leadCourse');
+    const currentVal = sel.value;
+    sel.innerHTML = '<option value="">-- Select Course --</option>' +
+        Object.entries(courses).map(([name, emoji]) => 
+            `<option value="${name}">${emoji} ${name}</option>`
+        ).join('') +
+        '<option value="__add_new__">➕ Add New Course...</option>';
+    sel.value = currentVal;
+}
+
+function handleCourseSelect(sel) {
+    if (sel.value === '__add_new__') {
+        const name = prompt('Enter new course name:');
+        if (name && name.trim()) {
+            const trimmed = name.trim();
+            const emoji = prompt('Emoji for this course (optional):', '📚') || '📚';
+            courses[trimmed] = emoji;
+            saveCourses();
+            updateCourseDatalist();
+            sel.value = trimmed;
+            showToast(`Course "${trimmed}" added!`, 'success');
+        } else {
+            sel.value = '';
+        }
+    }
+}
+
+function saveSources() {
+    localStorage.setItem(SOURCES_KEY, JSON.stringify(sources));
+    updateSourceDatalist();
+}
+
+function updateSourceDatalist() {
+    const sel = document.getElementById('leadSource');
+    const currentVal = sel.value;
+    sel.innerHTML = '<option value="">-- Select Source --</option>' +
+        sources.map(s => `<option value="${s}">${s}</option>`).join('') +
+        '<option value="__add_new__">➕ Add New Source...</option>';
+    sel.value = currentVal;
+}
+
+function handleSourceSelect(sel) {
+    if (sel.value === '__add_new__') {
+        const name = prompt('Enter new lead source:');
+        if (name && name.trim()) {
+            const trimmed = name.trim();
+            if (!sources.includes(trimmed)) {
+                sources.push(trimmed);
+                saveSources();
+            }
+            updateSourceDatalist();
+            sel.value = trimmed;
+            showToast(`Source "${trimmed}" added!`, 'success');
+        } else {
+            sel.value = '';
+        }
+    }
+}
+
+function getCourseName(course) {
+    if (courses[course]) return courses[course] + ' ' + course;
+    // Legacy support
+    const legacyMap = { 'german': '🇩🇪 German', 'web': '💻 Web Dev', 'graphics': '🎨 Graphics', 'digital': '📱 Digital', 'cctv': '📹 CCTV' };
+    return legacyMap[course] || course;
+}
+
+function addCourse() {
+    const name = document.getElementById('newCourseName').value.trim();
+    const emoji = document.getElementById('newCourseEmoji').value.trim() || '📚';
+    
+    if (!name) { showToast('Enter a course name', 'error'); return; }
+    if (courses[name]) { showToast('Course already exists!', 'error'); return; }
+    
+    courses[name] = emoji;
+    saveCourses();
+    document.getElementById('newCourseName').value = '';
+    document.getElementById('newCourseEmoji').value = '';
+    renderCourses();
+    showToast(`Course "${name}" added!`, 'success');
+}
+
+function removeCourse(name) {
+    // Check if any leads use this course
+    const leadsUsing = leads.filter(l => l.course === name).length;
+    if (leadsUsing > 0) {
+        if (!confirm(`${leadsUsing} lead(s) are enrolled in "${name}". Remove anyway? (Leads will keep the course name)`)) return;
+    }
+    delete courses[name];
+    saveCourses();
+    renderCourses();
+    showToast(`Course "${name}" removed`, 'warning');
+}
+
+function renderCourses() {
+    const container = document.getElementById('coursesContainer');
+    const courseList = Object.entries(courses);
+    document.getElementById('courseCount').textContent = courseList.length;
+    
+    if (!courseList.length) {
+        container.innerHTML = '<p style="text-align:center;color:var(--text-muted);padding:2rem;">No courses added yet</p>';
+        return;
+    }
+    
+    container.innerHTML = courseList.map(([name, emoji]) => {
+        const count = leads.filter(l => l.course === name).length;
+        return `
+        <div style="display:flex;justify-content:space-between;align-items:center;padding:12px;border-bottom:1px solid var(--border);">
+            <div>
+                <span style="font-size:1.2rem;margin-right:8px;">${emoji}</span>
+                <strong>${name}</strong>
+                <span style="color:var(--text-muted);font-size:0.85rem;margin-left:8px;">${count} lead${count !== 1 ? 's' : ''}</span>
+            </div>
+            <button class="btn btn-sm" style="background:var(--danger);color:white;padding:4px 12px;" onclick="removeCourse('${name.replace(/'/g, "\\'")}')">✕</button>
+        </div>`;
+    }).join('');
+}
+
+// ============ INIT ============
+document.addEventListener('DOMContentLoaded', () => {
+    // Auto-launch — hardcoded Google Sheets connection
+    document.getElementById('setupScreen').style.display = 'none';
+    document.getElementById('appContainer').classList.add('active');
+    initApp();
+});
+
+function showAppsScriptCode() {
+    document.getElementById('codeModal').classList.add('active');
+}
+
+function closeCodeModal() {
+    document.getElementById('codeModal').classList.remove('active');
+}
+
+function copyCode() {
+    showToast('Use the separate MTTI_CRM_AppScript.gs file', 'warning');
+}
+
+async function connectToSheets() {
+    const url = document.getElementById('webAppUrl').value.trim();
+    if (!url) {
+        showToast('Please enter the Web App URL', 'error');
+        return;
+    }
+
+    if (!url.startsWith('https://script.google.com/')) {
+        showToast('URL must start with https://script.google.com/', 'error');
+        return;
+    }
+
+    showToast('Connecting...', 'warning');
+    
+    try {
+        const data = await gasRequest(url, 'ping');
+        
+        if (data && data.success) {
+            config.webAppUrl = url;
+            config.useCloud = true;
+            config.useLocal = false;
+            localStorage.setItem(CONFIG_KEY, JSON.stringify(config));
+            webAppUrl = url;
+            useCloud = true;
+            
+            document.getElementById('setupContent').style.display = 'none';
+            document.getElementById('connectedContent').style.display = 'block';
+            showToast('Connected to Google Sheets!', 'success');
+        } else {
+            showToast('Connection failed: ' + (data?.error || 'No response from script'), 'error');
+        }
+    } catch (err) {
+        console.error('Connection error:', err);
+        showToast('Connection failed: ' + err.message, 'error');
+    }
+}
+
+function useLocalStorage() {
+    config.useLocal = true;
+    config.useCloud = false;
+    localStorage.setItem(CONFIG_KEY, JSON.stringify(config));
+    
+    document.getElementById('setupScreen').style.display = 'none';
+    document.getElementById('appContainer').classList.add('active');
+    document.getElementById('syncLabel').textContent = 'Local Storage Mode';
+    initApp();
+}
+
+function launchApp() {
+    document.getElementById('setupScreen').style.display = 'none';
+    document.getElementById('appContainer').classList.add('active');
+    initApp();
+}
+
+function disconnect() {
+    if (confirm('Disconnect from Google Sheets? Your local data will be kept.')) {
+        config.useCloud = false;
+        config.webAppUrl = '';
+        localStorage.setItem(CONFIG_KEY, JSON.stringify(config));
+        location.reload();
+    }
+}
+
+function recoverLocalData() {
+    config.useLocal = true;
+    config.useCloud = false;
+    localStorage.setItem(CONFIG_KEY, JSON.stringify(config));
+    
+    document.getElementById('setupScreen').style.display = 'none';
+    document.getElementById('appContainer').classList.add('active');
+    document.getElementById('syncLabel').textContent = 'Local Storage Mode (Recovered)';
+    initApp();
+}
+
+function exportData() {
+    const exportObj = {
+        exportDate: new Date().toISOString(),
+        leads: leads,
+        staff: staff,
+        courses: courses
+    };
+    const blob = new Blob([JSON.stringify(exportObj, null, 2)], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = 'MTTI_CRM_Backup_' + new Date().toISOString().split('T')[0] + '.json';
+    a.click();
+    URL.revokeObjectURL(url);
+    showToast('Data exported!', 'success');
+}
+
+function importData() {
+    const input = document.createElement('input');
+    input.type = 'file';
+    input.accept = '.json';
+    input.onchange = (e) => {
+        const file = e.target.files[0];
+        if (!file) return;
+        const reader = new FileReader();
+        reader.onload = (ev) => {
+            try {
+                const data = JSON.parse(ev.target.result);
+                if (!confirm(`Import ${data.leads?.length || 0} leads and ${data.staff?.length || 0} staff? This will REPLACE current data.`)) return;
+                if (data.leads) leads = data.leads;
+                if (data.staff) staff = data.staff;
+                if (data.courses) { courses = data.courses; saveCourses(); }
+                saveLocal();
+                renderStaffDropdown();
+                updateCourseDatalist();
+                renderLeads();
+                updateStats();
+                showToast(`Imported ${leads.length} leads!`, 'success');
+            } catch(err) {
+                showToast('Invalid backup file', 'error');
+            }
+        };
+        reader.readAsText(file);
+    };
+    input.click();
+}
+
+async function initApp() {
+    await loadData();
+    renderStaffDropdown();
+    updateCourseDatalist();
+    updateSourceDatalist();
+    renderLeads();
+    updateStats();
+    setupFilters();
+}
+
+// ============ DATA LAYER ============
+
+// Google Apps Script request with proper error diagnostics
+async function gasRequest(baseUrl, action, params = {}) {
+    // Build query string
+    let qs = 'action=' + encodeURIComponent(action);
+    for (const [key, value] of Object.entries(params)) {
+        const val = typeof value === 'object' ? JSON.stringify(value) : String(value);
+        qs += '&' + encodeURIComponent(key) + '=' + encodeURIComponent(val);
+    }
+    const url = baseUrl + '?' + qs;
+    
+    console.log('[CRM] Requesting:', action, url.substring(0, 80) + '...');
+    
+    const response = await fetch(url, {
+        method: 'GET',
+        redirect: 'follow'
+    });
+    
+    console.log('[CRM] Response status:', response.status, response.statusText);
+    
+    if (!response.ok) {
+        throw new Error('HTTP ' + response.status + ': ' + response.statusText);
+    }
+    
+    const text = await response.text();
+    console.log('[CRM] Response preview:', text.substring(0, 100));
+    
+    try {
+        return JSON.parse(text);
+    } catch(e) {
+        // If we get HTML back, the deployment is wrong
+        if (text.includes('<html') || text.includes('<!DOCTYPE')) {
+            throw new Error('Got HTML instead of JSON. Redeploy Apps Script: Deploy → New Deployment → Web App → Anyone.');
+        }
+        throw new Error('Invalid response: ' + text.substring(0, 100));
+    }
+}
+
+async function loadData() {
+    if (useCloud) {
+        await syncData();
+    } else {
+        const local = JSON.parse(localStorage.getItem(LOCAL_KEY)) || { leads: [], staff: getDefaultStaff() };
+        leads = local.leads || [];
+        staff = local.staff || getDefaultStaff();
+    }
+}
+
+async function syncData() {
+    updateSyncStatus('syncing');
+    
+    try {
+        // Try getAllData first (new script), fall back to separate calls (old script)
+        let syncedStaff, syncedLeads;
+        
+        try {
+            const data = await gasRequest(webAppUrl, 'getAllData');
+            if (data && !data.error && data.staff && data.leads) {
+                syncedStaff = data.staff;
+                syncedLeads = data.leads;
+            } else {
+                throw new Error('getAllData not available');
+            }
+        } catch(e) {
+            // Fall back to separate calls (works with original Apps Script)
+            console.log('getAllData not available, using separate calls...');
+            syncedStaff = await gasRequest(webAppUrl, 'getStaff');
+            syncedLeads = await gasRequest(webAppUrl, 'getLeads');
+        }
+        
+        staff = Array.isArray(syncedStaff) ? syncedStaff : [];
+        leads = Array.isArray(syncedLeads) ? syncedLeads : [];
+        
+        // Deduplicate leads by phone number (keep the one with most communications)
+        const seen = new Map();
+        leads.forEach(l => {
+            const phone = String(l.phone || '');
+            const key = phone ? phone.replace(/\D/g, '') : String(l.id);
+            const existing = seen.get(key);
+            if (!existing || (l.communications?.length || 0) > (existing.communications?.length || 0)) {
+                // Normalize phone to string while we're at it
+                l.phone = phone;
+                l.id = l.id !== undefined ? l.id : '';
+                seen.set(key, l);
+            }
+        });
+        const beforeCount = leads.length;
+        leads = Array.from(seen.values());
+        if (leads.length < beforeCount) {
+            console.log(`[CRM] Deduplicated: ${beforeCount} → ${leads.length} leads`);
+        }
+        
+        // Save to local as backup
+        saveLocal();
+        
+        lastSync = new Date();
+        updateSyncStatus('synced');
+        renderStaffDropdown();
+        renderLeads();
+        updateStats();
+        showToast(`Synced! ${leads.length} leads, ${staff.length} staff`, 'success');
+    } catch (err) {
+        console.error('Sync error:', err);
+        updateSyncStatus('error');
+        
+        // Fall back to local data
+        const local = JSON.parse(localStorage.getItem(LOCAL_KEY)) || { leads: [], staff: getDefaultStaff() };
+        leads = local.leads || [];
+        staff = local.staff || getDefaultStaff();
+        
+        // Show helpful error message
+        let errorMsg = err.message || 'Unknown error';
+        if (errorMsg.includes('Failed to fetch') || errorMsg.includes('NetworkError')) {
+            errorMsg = 'Network error — check internet connection. If using file://, try hosting on a local server or uploading to a web host.';
+        }
+        
+        if (leads.length || staff.length > 3) {
+            showToast('Offline — using cached data (' + leads.length + ' leads)', 'warning');
+        } else {
+            showToast('Sync failed: ' + errorMsg, 'error');
+        }
+    }
+}
+
+function updateSyncStatus(status) {
+    const el = document.getElementById('syncStatus');
+    const dot = document.getElementById('syncDot');
+    const time = document.getElementById('syncTime');
+    
+    el.className = 'sync-status ' + (status === 'syncing' ? 'syncing' : status === 'error' ? 'error' : '');
+    
+    if (status === 'syncing') {
+        el.innerHTML = '<div class="sync-text">🔄 Syncing...</div>';
+        dot.style.background = '#FF9800';
+    } else if (status === 'error') {
+        el.innerHTML = '<div class="sync-text">❌ Sync failed</div><div class="sync-time">Using local data</div><button class="btn btn-sm btn-outline" style="margin-top:8px;font-size:0.75rem;" onclick="syncData()">🔄 Retry</button>';
+        dot.style.background = '#e53935';
+    } else {
+        el.innerHTML = '<div class="sync-text">✅ Synced</div><div class="sync-time">Just now</div>';
+        dot.style.background = '#4CAF50';
+    }
+}
+
+function saveLocal() {
+    localStorage.setItem(LOCAL_KEY, JSON.stringify({ leads, staff }));
+}
+
+function getDefaultStaff() {
+    return [
+        { id: 1, name: 'Admin', role: 'Manager' },
+        { id: 2, name: 'Jane', role: 'Sales' },
+        { id: 3, name: 'Peter', role: 'Sales' }
+    ];
+}
+
+async function apiCall(action, params = {}) {
+    // Always save locally first as backup
+    saveLocal();
+    
+    if (!useCloud) {
+        return { success: true };
+    }
+    
+    try {
+        const result = await gasRequest(webAppUrl, action, params);
+        return result;
+    } catch (err) {
+        console.error('API error:', err);
+        showToast('Cloud save failed, saved locally', 'warning');
+        return { success: false, error: err.message };
+    }
+}
+
+// ============ STAFF ============
+function renderStaffDropdown() {
+    const sel = document.getElementById('currentStaff');
+    sel.innerHTML = '<option value="">👤 Select Staff...</option>' + 
+        staff.map(s => `<option value="${s.id}">${s.name} (${s.role})</option>`).join('');
+}
+
+function setCurrentStaff() {
+    currentStaffId = parseInt(document.getElementById('currentStaff').value) || null;
+    if (currentStaffId) {
+        const s = staff.find(x => x.id == currentStaffId);
+        showToast(`Logged in as ${s.name}`, 'success');
+    }
+}
+
+function getCurrentStaff() { return staff.find(s => s.id == currentStaffId); }
+function isManager() { const s = getCurrentStaff(); return s && s.role === 'Manager'; }
+
+// ============ LEADS ============
+function renderLeads() {
+    const container = document.getElementById('leadsContainer');
+    const search = document.getElementById('searchInput')?.value?.toLowerCase() || '';
+    
+    let filtered = leads.filter(l => {
+        if (currentFilter !== 'all' && l.stage !== currentFilter) return false;
+        if (search && !`${l.name} ${l.phone} ${l.course} ${l.location || ''} ${l.email || ''}`.toLowerCase().includes(search)) return false;
+        return true;
+    });
+
+    if (!filtered.length) {
+        container.innerHTML = '<div style="text-align:center;padding:3rem;color:var(--text-muted);">No leads found</div>';
+        return;
+    }
+
+    container.innerHTML = filtered.map(l => {
+        const pending = hasPending(l);
+        const verified = l.communications?.some(c => c.status === 'verified');
+        
+        return `
+        <div class="lead-card ${pending ? 'pending' : verified ? 'verified' : ''}" onclick="openLeadModal('edit', ${l.id})">
+            <div class="lead-header">
+                <div>
+                    <div class="lead-name">${l.name}</div>
+                    <div class="lead-course">${getCourseName(l.course)}</div>
+                </div>
+                <span class="lead-stage stage-${l.stage}">${l.stage}</span>
+            </div>
+            <div class="lead-info">
+                <span>📞 ${l.phone}</span>
+                ${l.location ? `<span>📍 ${l.location}</span>` : ''}
+                <span>📅 ${l.followUp || 'No follow-up'}</span>
+                <span>💬 ${l.communications?.length || 0}</span>
+            </div>
+            <div class="lead-footer">
+                <div class="lead-badges">
+                    ${pending ? '<span class="badge badge-pending">⏳ Pending</span>' : ''}
+                    ${verified ? '<span class="badge badge-verified">✅ Verified</span>' : ''}
+                </div>
+                <div class="lead-actions" onclick="event.stopPropagation()">
+                    <a href="tel:${l.phone}" class="action-btn" title="Call">📞</a>
+                    <button class="action-btn" onclick="quickWhatsApp(${l.id})" title="WhatsApp">💬</button>
+                    <button class="action-btn" onclick="quickSMS(${l.id})" title="SMS">📱</button>
+                </div>
+            </div>
+        </div>`;
+    }).join('');
+}
+
+function hasPending(lead) {
+    return lead.communications?.some(c => c.status === 'pending');
+}
+
+function updateStats() {
+    const total = leads.length;
+    const hot = leads.filter(l => l.stage === 'interested').length;
+    const enrolled = leads.filter(l => l.stage === 'enrolled').length;
+    
+    let pending = 0;
+    leads.forEach(l => { pending += (l.communications || []).filter(c => c.status === 'pending').length; });
+
+    document.getElementById('totalLeads').textContent = total;
+    document.getElementById('hotLeads').textContent = hot;
+    document.getElementById('pendingVerify').textContent = pending;
+    document.getElementById('enrolledCount').textContent = enrolled;
+    document.getElementById('pendingBadge').textContent = pending;
+
+    document.getElementById('count-all').textContent = total;
+    document.getElementById('count-new').textContent = leads.filter(l => l.stage === 'new').length;
+    document.getElementById('count-contacted').textContent = leads.filter(l => l.stage === 'contacted').length;
+    document.getElementById('count-interested').textContent = leads.filter(l => l.stage === 'interested').length;
+    document.getElementById('count-enrolled').textContent = enrolled;
+}
+
+function setupFilters() {
+    document.querySelectorAll('[data-filter]').forEach(btn => {
+        btn.addEventListener('click', () => {
+            document.querySelectorAll('[data-filter]').forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+            currentFilter = btn.dataset.filter;
+            renderLeads();
+        });
+    });
+}
+
+// ============ LEAD MODAL ============
+function openLeadModal(mode, id = null) {
+    if (mode === 'add') {
+        document.getElementById('leadModalTitle').textContent = 'Add Lead';
+        document.getElementById('leadId').value = '';
+        document.getElementById('leadName').value = '';
+        document.getElementById('leadPhone').value = '';
+        document.getElementById('leadEmail').value = '';
+        document.getElementById('leadLocation').value = '';
+        document.getElementById('leadCourse').value = '';
+        document.getElementById('leadSource').value = '';
+        document.getElementById('leadStage').value = 'new';
+        document.getElementById('leadFollowUp').value = '';
+        document.getElementById('leadNotes').value = '';
+        document.getElementById('commLogSection').style.display = 'none';
+        editingLeadId = null;
+    } else {
+        const lead = leads.find(l => l.id == id);
+        if (!lead) return;
+        editingLeadId = id;
+        document.getElementById('leadModalTitle').textContent = 'Edit Lead';
+        document.getElementById('leadId').value = lead.id;
+        document.getElementById('leadName').value = lead.name || '';
+        document.getElementById('leadPhone').value = lead.phone || '';
+        document.getElementById('leadEmail').value = lead.email || '';
+        document.getElementById('leadLocation').value = lead.location || '';
+        document.getElementById('leadCourse').value = lead.course || '';
+        document.getElementById('leadSource').value = lead.source || '';
+        document.getElementById('leadStage').value = lead.stage || 'new';
+        document.getElementById('leadFollowUp').value = lead.followUp || '';
+        document.getElementById('leadNotes').value = lead.notes || '';
+        document.getElementById('commLogSection').style.display = 'block';
+        renderCommLog(lead.communications || []);
+    }
+    document.getElementById('leadModal').classList.add('active');
+}
+
+function closeLeadModal() {
+    document.getElementById('leadModal').classList.remove('active');
+    editingLeadId = null;
+}
+
+async function saveLead() {
+    const id = document.getElementById('leadId').value;
+    const data = {
+        id: id ? Number(id) || id : Date.now(),
+        name: document.getElementById('leadName').value.trim(),
+        phone: document.getElementById('leadPhone').value.trim(),
+        email: document.getElementById('leadEmail').value.trim(),
+        location: document.getElementById('leadLocation').value.trim(),
+        course: document.getElementById('leadCourse').value.trim(),
+        source: document.getElementById('leadSource').value.trim(),
+        stage: document.getElementById('leadStage').value,
+        followUp: document.getElementById('leadFollowUp').value,
+        notes: document.getElementById('leadNotes').value.trim(),
+        createdAt: id ? leads.find(l => String(l.id) === String(id))?.createdAt : getToday()
+    };
+
+    if (!data.name || !data.phone || !data.course) {
+        showToast('Fill required fields', 'error');
+        return;
+    }
+
+    // Prevent duplicate leads by phone number
+    const cleanPhone = String(data.phone).replace(/\D/g, '');
+    const duplicate = leads.find(l => {
+        const lPhone = String(l.phone || '').replace(/\D/g, '');
+        return lPhone && lPhone === cleanPhone && String(l.id) !== String(data.id);
+    });
+    if (duplicate) {
+        showToast(`⚠️ "${duplicate.name}" already has this phone number!`, 'error');
+        return;
+    }
+
+    if (id) {
+        const idx = leads.findIndex(l => String(l.id) === String(id));
+        if (idx !== -1) {
+            data.communications = leads[idx].communications;
+            leads[idx] = data;
+        }
+    } else {
+        data.communications = [];
+        leads.push(data);
+    }
+
+    await apiCall('saveLead', { data });
+    saveLocal();
+    renderLeads();
+    updateStats();
+    closeLeadModal();
+    showToast('Lead saved!', 'success');
+}
+
+// ============ COMM LOG ============
+function renderCommLog(comms) {
+    const container = document.getElementById('commLogEntries');
+    if (!comms?.length) {
+        container.innerHTML = '<p style="text-align:center;color:var(--text-muted);padding:1rem;">No communications yet</p>';
+        return;
+    }
+
+    container.innerHTML = comms.map(c => {
+        const typeIcons = { call: '📞', whatsapp: '💬', sms: '📱', facebook: '📘', instagram: '📸', tiktok: '🎵' };
+        const typeLabels = { call: 'Call', whatsapp: 'WhatsApp', sms: 'SMS', facebook: 'Facebook', instagram: 'Instagram', tiktok: 'TikTok' };
+        const icon = typeIcons[c.type] || '📞';
+        const label = typeLabels[c.type] || c.type;
+        return `
+        <div class="comm-entry ${c.status}">
+            <div class="comm-icon">${icon}</div>
+            <div class="comm-content">
+                <div class="comm-header">
+                    <span class="comm-type">${label} ${c.callDuration ? '(' + c.callDuration + ')' : ''}</span>
+                    <span class="comm-status ${c.status}">${c.status === 'pending' ? '⏳' : c.status === 'verified' ? '✅' : '❌'} ${c.status}</span>
+                </div>
+                <div class="comm-text">${c.summary}</div>
+                ${c.messageSent ? `<div class="comm-message"><strong>Sent:</strong> ${c.messageSent}</div>` : ''}
+                <div class="comm-meta">${c.staffName} • ${c.date} • ${c.outcome}</div>
+                ${c.proofImage ? `<img src="${c.proofImage}" class="comm-proof-img" onclick="event.stopPropagation();showImagePreview('${c.proofImage}')">` : ''}
+                ${c.status === 'pending' && isManager() ? `<button class="btn btn-sm btn-outline" style="margin-top:8px;" onclick="event.stopPropagation();openVerifyModal(${editingLeadId}, ${c.id})">🔍 Review</button>` : ''}
+            </div>
+        </div>
+    `; }).join('');
+}
+
+function openCommModal() {
+    if (!currentStaffId) {
+        showToast('Select your name first!', 'error');
+        return;
+    }
+    currentCommType = 'call';
+    uploadedProof = null;
+    document.querySelectorAll('.proof-option').forEach(o => o.classList.remove('selected'));
+    document.querySelector('[data-type="call"]').classList.add('selected');
+    document.getElementById('callProofSection').style.display = 'block';
+    document.getElementById('whatsappProofSection').style.display = 'none';
+    document.getElementById('callMinutes').value = '';
+    document.getElementById('callSeconds').value = '';
+    document.getElementById('callPreview').style.display = 'none';
+    document.getElementById('waPreview').style.display = 'none';
+    document.getElementById('whatsappMessage').value = '';
+    document.getElementById('commSummary').value = '';
+    document.getElementById('commOutcome').value = 'positive';
+    document.getElementById('commFollowUp').value = '';
+    document.getElementById('callUploadArea').classList.remove('has-file');
+    document.getElementById('waUploadArea').classList.remove('has-file');
+    document.getElementById('commModal').classList.add('active');
+}
+
+function closeCommModal() {
+    document.getElementById('commModal').classList.remove('active');
+}
+
+function selectCommType(type) {
+    currentCommType = type;
+    document.querySelectorAll('.proof-option').forEach(o => o.classList.remove('selected'));
+    document.querySelector(`[data-type="${type}"]`).classList.add('selected');
+    document.getElementById('callProofSection').style.display = type === 'call' ? 'block' : 'none';
+    document.getElementById('whatsappProofSection').style.display = type !== 'call' ? 'block' : 'none';
+    
+    // Update labels based on platform
+    const platformLabels = {
+        whatsapp: { label: 'WhatsApp Message Sent *', placeholder: 'Paste your WhatsApp message...', upload: '💬 Upload WhatsApp screenshot' },
+        sms: { label: 'SMS Message Sent *', placeholder: 'Paste your SMS message...', upload: '📱 Upload SMS screenshot' },
+        facebook: { label: 'Facebook Message Sent *', placeholder: 'Paste your Facebook message or DM...', upload: '📘 Upload Facebook screenshot' },
+        instagram: { label: 'Instagram Message Sent *', placeholder: 'Paste your Instagram DM...', upload: '📸 Upload Instagram screenshot' },
+        tiktok: { label: 'TikTok Message Sent *', placeholder: 'Paste your TikTok message...', upload: '🎵 Upload TikTok screenshot' }
+    };
+    
+    if (platformLabels[type]) {
+        document.getElementById('messageLabel').textContent = platformLabels[type].label;
+        document.getElementById('whatsappMessage').placeholder = platformLabels[type].placeholder;
+        document.getElementById('waUploadLabel').textContent = platformLabels[type].upload;
+    }
+}
+
+function handleUpload(type) {
+    const input = document.getElementById(type === 'call' ? 'callScreenshot' : 'waScreenshot');
+    const preview = document.getElementById(type === 'call' ? 'callPreview' : 'waPreview');
+    const area = document.getElementById(type === 'call' ? 'callUploadArea' : 'waUploadArea');
+    
+    if (input.files && input.files[0]) {
+        const reader = new FileReader();
+        reader.onload = (e) => {
+            uploadedProof = e.target.result;
+            preview.src = uploadedProof;
+            preview.style.display = 'block';
+            area.classList.add('has-file');
+            showToast('Screenshot uploaded!', 'success');
+        };
+        reader.readAsDataURL(input.files[0]);
+    }
+}
+
+async function saveComm() {
+    const summary = document.getElementById('commSummary').value;
+    if (!summary) {
+        showToast('Add a summary', 'error');
+        return;
+    }
+
+    if (currentCommType === 'call') {
+        const mins = document.getElementById('callMinutes').value;
+        const secs = document.getElementById('callSeconds').value;
+        if (!mins && !secs) {
+            showToast('Enter call duration', 'error');
+            return;
+        }
+    } else {
+        const msg = document.getElementById('whatsappMessage').value;
+        if (!msg) {
+            showToast('Enter the message sent', 'error');
+            return;
+        }
+    }
+
+    const commTypeIcons = { call: '📞', whatsapp: '💬', sms: '📱', facebook: '📘', instagram: '📸', tiktok: '🎵' };
+    const staffMember = getCurrentStaff();
+    const comm = {
+        id: Date.now(),
+        leadId: editingLeadId,
+        type: currentCommType,
+        summary: summary,
+        messageSent: currentCommType !== 'call' ? document.getElementById('whatsappMessage').value : '',
+        outcome: document.getElementById('commOutcome').value,
+        callDuration: currentCommType === 'call' ? `${document.getElementById('callMinutes').value || 0}:${(document.getElementById('callSeconds').value || 0).toString().padStart(2, '0')}` : '',
+        proofImage: uploadedProof || '',
+        staffId: staffMember.id,
+        staffName: staffMember.name,
+        date: getToday(),
+        status: 'pending',
+        verifiedBy: '',
+        verifiedAt: ''
+    };
+
+    const lead = leads.find(l => l.id == editingLeadId);
+    if (!lead.communications) lead.communications = [];
+    lead.communications.unshift(comm);
+    if (lead.stage === 'new') lead.stage = 'contacted';
+    
+    const followUp = document.getElementById('commFollowUp').value;
+    if (followUp) lead.followUp = followUp;
+
+    await apiCall('saveComm', { data: comm });
+    await apiCall('saveLead', { data: lead });
+    saveLocal();
+    
+    renderCommLog(lead.communications);
+    renderLeads();
+    updateStats();
+    closeCommModal();
+    showToast('Logged! Pending verification.', 'warning');
+}
+
+// ============ VERIFICATION ============
+function openVerifyModal(leadId, commId) {
+    const lead = leads.find(l => l.id == leadId);
+    if (!lead) return;
+    const comm = lead.communications.find(c => c.id == commId);
+    if (!comm) return;
+
+    verifyingComm = { leadId, commId };
+
+    const typeIcons = { call: '📞', whatsapp: '💬', sms: '📱', facebook: '📘', instagram: '📸', tiktok: '🎵' };
+    const typeLabels = { call: 'Call', whatsapp: 'WhatsApp', sms: 'SMS', facebook: 'Facebook', instagram: 'Instagram', tiktok: 'TikTok' };
+
+    document.getElementById('verifyContent').innerHTML = `
+        <div style="background:var(--bg);padding:1rem;border-radius:8px;margin-bottom:1rem;">
+            <strong>${lead.name}</strong> (${lead.phone})
+        </div>
+        <div style="background:white;border:1px solid var(--border);border-radius:8px;padding:1rem;margin-bottom:1rem;">
+            <p><strong>${typeIcons[comm.type] || '📞'} ${typeLabels[comm.type] || comm.type}</strong> by ${comm.staffName}</p>
+            ${comm.callDuration ? `<p>Duration: ${comm.callDuration}</p>` : ''}
+            <p style="margin-top:8px;">${comm.summary}</p>
+        </div>
+        ${comm.messageSent ? `<div style="background:#E8F5E9;padding:1rem;border-radius:8px;margin-bottom:1rem;"><strong>Message:</strong><br>${comm.messageSent}</div>` : ''}
+        ${comm.proofImage ? `<div style="margin-bottom:1rem;"><strong>📸 Proof:</strong><br><img src="${comm.proofImage}" style="max-width:100%;max-height:250px;border-radius:8px;margin-top:8px;cursor:pointer;" onclick="showImagePreview('${comm.proofImage}')"></div>` : '<div style="background:#FFEBEE;padding:1rem;border-radius:8px;margin-bottom:1rem;">⚠️ No screenshot</div>'}
+    `;
+
+    document.getElementById('verifyModal').classList.add('active');
+}
+
+function closeVerifyModal() {
+    document.getElementById('verifyModal').classList.remove('active');
+    verifyingComm = null;
+}
+
+async function approveComm() {
+    if (!verifyingComm || !isManager()) return;
+    
+    const lead = leads.find(l => l.id == verifyingComm.leadId);
+    const comm = lead?.communications.find(c => c.id == verifyingComm.commId);
+    if (!comm) return;
+
+    comm.status = 'verified';
+    comm.verifiedBy = getCurrentStaff().name;
+    comm.verifiedAt = getToday();
+
+    await apiCall('updateCommStatus', { id: comm.id, status: 'verified', verifiedBy: comm.verifiedBy });
+    saveLocal();
+    
+    closeVerifyModal();
+    if (editingLeadId == verifyingComm.leadId) renderCommLog(lead.communications);
+    renderLeads();
+    updateStats();
+    renderTasksView();
+    showToast('Verified! ✅', 'success');
+}
+
+async function disputeComm() {
+    if (!verifyingComm || !isManager()) return;
+    if (!confirm('Dispute this communication?')) return;
+    
+    const lead = leads.find(l => l.id == verifyingComm.leadId);
+    const comm = lead?.communications.find(c => c.id == verifyingComm.commId);
+    if (!comm) return;
+
+    comm.status = 'disputed';
+    comm.verifiedBy = getCurrentStaff().name;
+    comm.verifiedAt = getToday();
+
+    await apiCall('updateCommStatus', { id: comm.id, status: 'disputed', verifiedBy: comm.verifiedBy });
+    saveLocal();
+    
+    closeVerifyModal();
+    if (editingLeadId == verifyingComm.leadId) renderCommLog(lead.communications);
+    renderLeads();
+    updateStats();
+    renderTasksView();
+    showToast('Disputed ❌', 'warning');
+}
+
+// ============ TASKS VIEW ============
+function renderTasksView() {
+    let allComms = [];
+    leads.forEach(l => {
+        (l.communications || []).forEach(c => {
+            allComms.push({ ...c, leadName: l.name, leadPhone: l.phone });
+        });
+    });
+
+    const pending = allComms.filter(c => c.status === 'pending');
+    const verifiedToday = allComms.filter(c => c.status === 'verified' && c.verifiedAt === getToday());
+    const disputed = allComms.filter(c => c.status === 'disputed');
+
+    document.getElementById('taskPending').textContent = pending.length;
+    document.getElementById('taskVerified').textContent = verifiedToday.length;
+    document.getElementById('taskDisputed').textContent = disputed.length;
+
+    const container = document.getElementById('tasksContainer');
+    if (!pending.length) {
+        container.innerHTML = '<div style="text-align:center;padding:3rem;color:var(--text-muted);">🎉 All verified!</div>';
+        return;
+    }
+
+    container.innerHTML = pending.map(c => {
+        const typeIcons = { call: '📞', whatsapp: '💬', sms: '📱', facebook: '📘', instagram: '📸', tiktok: '🎵' };
+        const typeLabels = { call: 'Call', whatsapp: 'WhatsApp', sms: 'SMS', facebook: 'Facebook', instagram: 'Instagram', tiktok: 'TikTok' };
+        return `
+        <div class="lead-card pending" style="margin-bottom:1rem;">
+            <div class="lead-header">
+                <div>
+                    <div class="lead-name">${c.leadName}</div>
+                    <div class="lead-course">${typeIcons[c.type] || '📞'} ${typeLabels[c.type] || c.type} by ${c.staffName}</div>
+                </div>
+                <span class="badge badge-pending">⏳ Pending</span>
+            </div>
+            <p style="margin:0.5rem 0;">${c.summary}</p>
+            <div style="font-size:0.85rem;color:var(--text-muted);">
+                ${c.proofImage ? '📸 Has proof' : '⚠️ No proof'} • ${c.date}
+            </div>
+            ${isManager() ? `<button class="btn btn-sm btn-primary" style="margin-top:0.75rem;" onclick="openVerifyModal(${c.leadId}, ${c.id})">🔍 Review</button>` : ''}
+        </div>
+    `; }).join('');
+}
+
+// ============ ANALYTICS ============
+function renderAnalytics() {
+    let totalComms = 0, verified = 0, withProof = 0;
+    const staffStats = {};
+    
+    staff.forEach(s => {
+        staffStats[s.id] = { name: s.name, calls: 0, messages: 0, verified: 0, disputed: 0 };
+    });
+
+    leads.forEach(l => {
+        (l.communications || []).forEach(c => {
+            totalComms++;
+            if (c.status === 'verified') verified++;
+            if (c.proofImage) withProof++;
+            
+            if (c.staffId && staffStats[c.staffId]) {
+                if (c.type === 'call') staffStats[c.staffId].calls++;
+                else staffStats[c.staffId].messages++;
+                if (c.status === 'verified') staffStats[c.staffId].verified++;
+                if (c.status === 'disputed') staffStats[c.staffId].disputed++;
+            }
+        });
+    });
+
+    const enrolled = leads.filter(l => l.stage === 'enrolled').length;
+
+    document.getElementById('analyticsTotalComms').textContent = totalComms;
+    document.getElementById('analyticsVerifyRate').textContent = totalComms ? Math.round((verified / totalComms) * 100) + '%' : '0%';
+    document.getElementById('analyticsProofRate').textContent = totalComms ? Math.round((withProof / totalComms) * 100) + '%' : '0%';
+    document.getElementById('analyticsConversion').textContent = leads.length ? Math.round((enrolled / leads.length) * 100) + '%' : '0%';
+
+    document.getElementById('staffPerfTable').innerHTML = Object.values(staffStats).map(s => {
+        const total = s.calls + s.messages;
+        const rate = total ? Math.round((s.verified / total) * 100) : 0;
+        return `<tr>
+            <td><strong>${s.name}</strong></td>
+            <td>${s.calls}</td>
+            <td>${s.messages}</td>
+            <td style="color:var(--accent);">${s.verified}</td>
+            <td style="color:var(--danger);">${s.disputed}</td>
+            <td><strong>${rate}%</strong></td>
+        </tr>`;
+    }).join('');
+}
+
+// ============ VIEW SWITCHING ============
+function switchView(view) {
+    document.querySelectorAll('.nav-tab').forEach(t => t.classList.remove('active'));
+    event.target.classList.add('active');
+
+    document.getElementById('leadsView').style.display = view === 'leads' ? 'flex' : 'none';
+    document.getElementById('tasksView').style.display = view === 'tasks' ? 'block' : 'none';
+    document.getElementById('analyticsView').style.display = view === 'analytics' ? 'block' : 'none';
+    document.getElementById('coursesView').style.display = view === 'courses' ? 'block' : 'none';
+
+    if (view === 'tasks') renderTasksView();
+    if (view === 'analytics') renderAnalytics();
+    if (view === 'courses') renderCourses();
+}
+
+// ============ UTILS ============
+function getToday() { return new Date().toISOString().split('T')[0]; }
+
+function quickWhatsApp(leadId) {
+    const lead = leads.find(l => l.id == leadId);
+    if (!lead) return;
+    let phone = String(lead.phone || '').replace(/\D/g, '');
+    phone = phone.startsWith('0') ? '254' + phone.slice(1) : phone;
+    window.open(`https://wa.me/${phone}`, '_blank');
+}
+
+function quickSMS(leadId) {
+    const lead = leads.find(l => l.id == leadId);
+    if (!lead) return;
+    window.open(`sms:${lead.phone}`, '_blank');
+}
+
+function showImagePreview(src) {
+    document.getElementById('previewImage').src = src;
+    document.getElementById('imagePreview').classList.add('active');
+}
+
+function closeImagePreview() {
+    document.getElementById('imagePreview').classList.remove('active');
+}
+
+function showToast(msg, type = 'success') {
+    const toast = document.getElementById('toast');
+    toast.className = 'toast show ' + type;
+    document.getElementById('toastMsg').textContent = msg;
+    setTimeout(() => toast.classList.remove('show'), 3000);
+}
+
+function toggleSettingsMenu() {
+    const menu = document.getElementById('settingsMenu');
+    menu.style.display = menu.style.display === 'none' ? 'block' : 'none';
+    if (!useCloud) document.getElementById('cloudSyncBtn').style.display = 'none';
+}
+
+// Close settings menu when clicking outside
+document.addEventListener('click', (e) => {
+    const menu = document.getElementById('settingsMenu');
+    if (menu && !e.target.closest('#settingsMenu') && !e.target.closest('[onclick*="toggleSettingsMenu"]')) {
+        menu.style.display = 'none';
+    }
+});
+</script>
+</body>
+</html>

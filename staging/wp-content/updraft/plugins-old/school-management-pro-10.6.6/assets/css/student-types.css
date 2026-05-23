@@ -1,0 +1,368 @@
+/*
+ * School Management Pro - Student Types CSS
+ * Modern, clean styling for student types management
+ */
+
+/* Page Layout */
+.wlsm-student-types-page {
+    background-color: #f8f9fa;
+    min-height: 100vh;
+    padding: 20px 0;
+}
+
+.wlsm-student-types-page .container-fluid {
+    max-width: 1200px;
+}
+
+/* Page Header */
+.wlsm-page-header {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    padding: 30px;
+    border-radius: 10px;
+    margin-bottom: 30px;
+    box-shadow: 0 4px 15px rgba(102, 126, 234, 0.2);
+}
+
+.page-title {
+    font-size: 1.75rem;
+    font-weight: 600;
+    margin: 0;
+}
+
+.page-subtitle {
+    font-size: 1rem;
+    opacity: 0.9;
+    margin-top: 5px;
+}
+
+/* Content Sections */
+.wlsm-content-section {
+    background: white;
+    border-radius: 10px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.08);
+    transition: box-shadow 0.3s ease;
+    margin-bottom: 20px;
+}
+
+.wlsm-content-section:hover {
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.12);
+}
+
+.section-header {
+    border-bottom: 1px solid #e9ecef;
+    padding-bottom: 15px;
+    margin-bottom: 25px;
+}
+
+.section-title {
+    font-size: 1.3rem;
+    font-weight: 600;
+    color: #2c3e50;
+    margin: 0;
+}
+
+.section-subtitle {
+    font-size: 0.95rem;
+    color: #6c757d;
+}
+
+/* Form Styling */
+.wlsm-student-type-form {
+    max-width: 100%;
+}
+
+.form-label {
+    font-weight: 500;
+    color: #495057;
+    margin-bottom: 8px;
+}
+
+.form-control-lg {
+    padding: 12px 16px;
+    font-size: 1.1rem;
+    border-radius: 8px;
+    border: 2px solid #e9ecef;
+    transition: all 0.3s ease;
+}
+
+.form-control-lg:focus {
+    border-color: #667eea;
+    box-shadow: 0 0 0 0.2rem rgba(102, 126, 234, 0.25);
+    transform: translateY(-1px);
+}
+
+.form-control-lg:hover {
+    border-color: #cbd3da;
+}
+
+/* Quick Suggestions */
+.quick-suggestions {
+    background: #f8f9fa;
+    padding: 20px;
+    border-radius: 8px;
+    border: 1px solid #e9ecef;
+}
+
+.suggestion-buttons .btn {
+    transition: all 0.3s ease;
+    border-radius: 20px;
+    font-size: 0.9rem;
+    padding: 8px 16px;
+}
+
+.suggestion-buttons .btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+}
+
+.quick-add-type:hover {
+    background-color: #17a2b8;
+    border-color: #17a2b8;
+    color: white;
+}
+
+/* Table Styling */
+.table {
+    border-radius: 8px;
+    overflow: hidden;
+    margin-bottom: 0;
+}
+
+.table thead th {
+    border-top: none;
+    font-weight: 600;
+    background-color: #f8f9fa;
+    color: #495057;
+    padding: 15px;
+}
+
+.table tbody td {
+    padding: 15px;
+    vertical-align: middle;
+    border-top: 1px solid #f1f3f4;
+}
+
+.table tbody tr:hover {
+    background-color: #f8f9fa;
+    transform: translateY(-1px);
+    transition: all 0.2s ease;
+}
+
+/* Action Buttons */
+.form-actions {
+    margin-top: 30px;
+    padding-top: 20px;
+    border-top: 1px solid #e9ecef;
+}
+
+.btn {
+    border-radius: 8px;
+    font-weight: 500;
+    padding: 10px 20px;
+    transition: all 0.3s ease;
+}
+
+.btn-lg {
+    padding: 12px 30px;
+    font-size: 1.1rem;
+}
+
+.btn-primary {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    border: none;
+    box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
+}
+
+.btn-primary:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(102, 126, 234, 0.4);
+}
+
+.btn-outline-secondary {
+    border-color: #6c757d;
+    color: #6c757d;
+}
+
+.btn-outline-secondary:hover {
+    background-color: #6c757d;
+    border-color: #6c757d;
+    transform: translateY(-1px);
+}
+
+/* Alert Messages */
+.wlsm-messages-container {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    z-index: 1050;
+    max-width: 400px;
+}
+
+.alert {
+    border: none;
+    border-radius: 8px;
+    padding: 15px 20px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.15);
+    animation: slideInRight 0.5s ease;
+}
+
+.alert-success {
+    background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+    color: white;
+}
+
+.alert-danger {
+    background: linear-gradient(135deg, #dc3545 0%, #fd7e14 100%);
+    color: white;
+}
+
+@keyframes slideInRight {
+    from {
+        transform: translateX(100%);
+        opacity: 0;
+    }
+    to {
+        transform: translateX(0);
+        opacity: 1;
+    }
+}
+
+/* Loading States */
+.btn.loading {
+    position: relative;
+    color: transparent;
+}
+
+.btn.loading::after {
+    content: "";
+    position: absolute;
+    width: 16px;
+    height: 16px;
+    top: 50%;
+    left: 50%;
+    margin-left: -8px;
+    margin-top: -8px;
+    border: 2px solid transparent;
+    border-top-color: currentColor;
+    border-radius: 50%;
+    animation: spin 1s ease infinite;
+}
+
+@keyframes spin {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(360deg); }
+}
+
+/* DataTable Customizations */
+#wlsm-class-student-type-table_wrapper {
+    padding: 0;
+}
+
+#wlsm-class-student-type-table_wrapper .dataTables_length,
+#wlsm-class-student-type-table_wrapper .dataTables_filter {
+    margin-bottom: 20px;
+}
+
+#wlsm-class-student-type-table_wrapper .dataTables_info,
+#wlsm-class-student-type-table_wrapper .dataTables_paginate {
+    margin-top: 20px;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .wlsm-page-header {
+        padding: 20px;
+        margin-bottom: 20px;
+    }
+    
+    .page-title {
+        font-size: 1.5rem;
+    }
+    
+    .wlsm-content-section {
+        margin-bottom: 15px;
+    }
+    
+    .form-control-lg {
+        font-size: 1rem;
+        padding: 10px 14px;
+    }
+    
+    .btn-lg {
+        padding: 10px 20px;
+        font-size: 1rem;
+    }
+    
+    .suggestion-buttons .btn {
+        font-size: 0.8rem;
+        padding: 6px 12px;
+        margin-bottom: 8px;
+    }
+    
+    .wlsm-messages-container {
+        position: relative;
+        top: auto;
+        right: auto;
+        max-width: 100%;
+        margin-top: 20px;
+    }
+}
+
+@media (max-width: 576px) {
+    .page-title {
+        font-size: 1.3rem;
+    }
+    
+    .section-title {
+        font-size: 1.1rem;
+    }
+    
+    .form-actions .row {
+        text-align: center;
+    }
+    
+    .form-actions .col,
+    .form-actions .col-auto {
+        margin-bottom: 10px;
+    }
+}
+
+/* Accessibility */
+.btn:focus,
+.form-control:focus {
+    outline: 2px solid #667eea;
+    outline-offset: 2px;
+}
+
+/* Dark mode support (if needed) */
+@media (prefers-color-scheme: dark) {
+    .wlsm-student-types-page {
+        background-color: #1a1a1a;
+        color: #e9ecef;
+    }
+    
+    .wlsm-content-section {
+        background: #2d3748;
+        border-color: #4a5568;
+    }
+    
+    .section-title {
+        color: #e9ecef;
+    }
+    
+    .form-control-lg {
+        background-color: #4a5568;
+        border-color: #718096;
+        color: #e9ecef;
+    }
+    
+    .table thead th {
+        background-color: #4a5568;
+        color: #e9ecef;
+    }
+    
+    .table tbody tr:hover {
+        background-color: #4a5568;
+    }
+}

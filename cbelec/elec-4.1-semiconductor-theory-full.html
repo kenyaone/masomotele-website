@@ -1,0 +1,714 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Electrical Technology Gr.10 | 4.1 Semiconductor Theory</title>
+<style>
+:root{
+  --pri:#0a5e2a;--pri-l:#0d7a38;--acc:#f5a623;
+  --ok:#2e7d32;--no:#c62828;--bg:#f4f7f5;
+  --border:#d0e0d4;--txt:#1a2e1f;--warn-bg:#fff3e0;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Segoe UI',system-ui,sans-serif;background:var(--bg);color:var(--txt);min-height:100vh;display:flex;flex-direction:column}
+.top-bar{position:sticky;top:0;z-index:100;background:linear-gradient(135deg,var(--pri),var(--pri-l));color:#fff;padding:10px 16px;display:flex;align-items:center;gap:12px;box-shadow:0 2px 8px rgba(0,0,0,.25)}
+.top-bar .logo{font-weight:800;font-size:1rem;white-space:nowrap}
+.top-bar .title{font-size:.85rem;opacity:.9;flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.slide-badge{background:var(--acc);color:#000;font-weight:700;font-size:.8rem;padding:3px 10px;border-radius:20px;white-space:nowrap}
+.slides-wrap{flex:1;overflow:hidden}
+.slide{display:none;padding:16px;max-width:860px;margin:0 auto;animation:fadeIn .3s ease}
+.slide.active{display:block}
+@keyframes fadeIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+.slide-header{background:linear-gradient(135deg,var(--pri),var(--pri-l));color:#fff;padding:14px 18px;border-radius:10px;margin-bottom:16px}
+.slide-header h2{font-size:1.1rem;font-weight:700}
+.slide-header .strand{font-size:.78rem;opacity:.85;margin-top:3px}
+.lo-box{background:#fff;border-left:5px solid var(--acc);border-radius:8px;padding:14px 16px;margin-bottom:14px;box-shadow:0 1px 4px rgba(0,0,0,.06)}
+.lo-box h3{color:var(--pri);font-size:.95rem;margin-bottom:8px}
+.lo-box ol{padding-left:18px}
+.lo-box ol li{margin-bottom:5px;font-size:.88rem;line-height:1.5}
+.inquiry{margin-top:12px;background:var(--pri);color:#fff;border-radius:6px;padding:10px 14px;font-size:.85rem}
+.inquiry strong{display:block;margin-bottom:3px;color:var(--acc)}
+.teach-block{margin-bottom:18px}
+.teach-block h3{color:var(--pri);font-size:1rem;font-weight:700;padding-bottom:5px;border-bottom:2.5px solid var(--acc);margin-bottom:10px}
+.key-term{border-left:4px solid var(--acc);background:#fffbf0;padding:10px 14px;border-radius:0 6px 6px 0;margin:8px 0;font-size:.87rem}
+.key-term strong{color:var(--pri)}
+.info-table{width:100%;border-collapse:collapse;margin:10px 0;font-size:.84rem}
+.info-table th{background:var(--pri);color:#fff;padding:8px 10px;text-align:left}
+.info-table td{padding:7px 10px;border-bottom:1px solid var(--border)}
+.info-table tr:nth-child(even) td{background:#eef5f0}
+.example-box{background:#f0faf2;border:1.5px solid var(--ok);border-radius:8px;padding:12px 14px;margin:10px 0;font-size:.86rem}
+.example-box h4{color:var(--ok);margin-bottom:7px;font-size:.9rem}
+.warn-box{background:var(--warn-bg);border:1.5px solid #e65100;border-radius:8px;padding:11px 14px;margin:10px 0;font-size:.85rem}
+.warn-box h4{color:#e65100;margin-bottom:5px}
+.diagram-wrap{text-align:center;margin:14px 0;overflow-x:auto}
+.calc-box{background:#fff;border:1.5px solid var(--pri-l);border-radius:8px;padding:14px;margin:10px 0}
+.calc-box h4{color:var(--pri);margin-bottom:10px;font-size:.9rem}
+.practice-q{background:#fff;border-radius:8px;border:1px solid var(--border);padding:14px;margin-bottom:12px;box-shadow:0 1px 3px rgba(0,0,0,.05)}
+.practice-q .qnum{font-weight:700;color:var(--pri);font-size:.85rem;margin-bottom:5px}
+.fill-blank{border:none;border-bottom:2px dashed var(--pri);background:transparent;outline:none;font-size:.9rem;padding:2px 6px;min-width:110px;color:var(--txt)}
+.fill-blank.correct{border-bottom-color:var(--ok);background:#f0faf2;border-radius:4px}
+.fill-blank.wrong{border-bottom-color:var(--no);background:#fff0f0;border-radius:4px}
+.fb-feedback{font-size:.8rem;display:inline-block;margin-left:4px;font-weight:600}
+.sa-box{width:100%;min-height:80px;padding:8px 10px;border:1.5px solid var(--border);border-radius:6px;font-size:.86rem;font-family:inherit;resize:vertical}
+.grade-btn{background:var(--pri);color:#fff;border:none;padding:7px 18px;border-radius:6px;cursor:pointer;font-size:.84rem;margin-top:7px}
+.grade-btn:hover{background:var(--pri-l)}
+.sa-feedback{margin-top:8px;padding:10px;border-radius:6px;background:#f9f9f9;border:1px solid #ddd;font-size:.82rem;display:none}
+.kw-found{color:var(--ok);font-weight:600}
+.kw-missed{color:var(--no);font-weight:600}
+.model-ans{margin-top:6px;font-style:italic;color:#555}
+.check-btn{background:var(--ok);color:#fff;border:none;padding:8px 18px;border-radius:6px;cursor:pointer;font-size:.84rem;margin-top:8px}
+.check-btn:hover{background:#256427}
+.score-btn{display:block;margin:18px auto 0;background:var(--acc);color:#000;font-weight:700;border:none;padding:11px 32px;border-radius:8px;cursor:pointer;font-size:.95rem}
+.score-btn:hover{background:#e0951a}
+.next-lesson-box{margin-top:18px;text-align:center;display:none}.next-lesson-btn{display:inline-block;background:linear-gradient(135deg,var(--pri),var(--pri-l));color:#fff;font-weight:700;border:none;padding:14px 32px;border-radius:10px;cursor:pointer;font-size:.95rem;text-decoration:none;transition:all .3s;box-shadow:0 4px 15px rgba(10,94,42,.25)}.next-lesson-btn:hover{transform:translateY(-2px);box-shadow:0 8px 25px rgba(10,94,42,.35)}.next-lesson-sub{font-size:.78rem;color:#666;margin-top:8px}
+.total-result{margin-top:14px;text-align:center;font-size:1rem;font-weight:700;padding:12px;border-radius:8px;background:#fff;border:2px solid var(--pri)}
+.tag{display:inline-block;background:var(--pri);color:#fff;font-size:.72rem;padding:2px 8px;border-radius:10px;margin:2px}
+/* Atom builder */
+.atom-btn{padding:7px 14px;border:2px solid var(--border);border-radius:6px;cursor:pointer;font-size:.84rem;font-weight:600;background:#fff;transition:all .2s;margin:4px}
+.atom-btn:hover{border-color:var(--pri);background:#eef5f0}
+.atom-btn.active{border-color:var(--pri);background:var(--pri);color:#fff}
+.atom-display{background:#f9f9f9;border:1px solid var(--border);border-radius:8px;padding:12px;margin-top:8px;font-size:.84rem;min-height:80px}
+.nav-bar{position:sticky;bottom:0;background:#fff;border-top:2px solid var(--border);padding:10px 16px;display:flex;align-items:center;justify-content:space-between;gap:10px;z-index:90}
+.nav-btn{background:var(--pri);color:#fff;border:none;padding:9px 22px;border-radius:8px;font-size:.88rem;cursor:pointer;font-weight:600}
+.nav-btn:disabled{background:#b0b0b0;cursor:not-allowed}
+.nav-btn:hover:not(:disabled){background:var(--pri-l)}
+.dots{display:flex;gap:6px;flex-wrap:wrap;justify-content:center;flex:1}
+.dot{width:9px;height:9px;border-radius:50%;background:#ccc;cursor:pointer;transition:background .2s}
+.dot.active{background:var(--pri)}
+@media(max-width:600px){
+  .top-bar .title{display:none}
+  .slide{padding:10px}
+  .info-table{font-size:.78rem}
+  .nav-btn{padding:8px 14px;font-size:.82rem}
+}
+</style>
+<script type="text/javascript">(function(c,l,a,r,i,t,y){c[a]=c[a]||function(){(c[a].q=c[a].q||[]).push(arguments)};t=l.createElement(r);t.async=1;t.src="https://www.clarity.ms/tag/"+i;y=l.getElementsByTagName(r)[0];y.parentNode.insertBefore(t,y);})(window,document,"clarity","script","wg31zlwbt9");</script>\n</head>
+<body>
+<div class="top-bar">
+  <div class="logo">M.T.T.I</div>
+  <div class="title">Electrical Technology Gr.10 · 4.1 Semiconductor Theory</div>
+  <div class="slide-badge" id="slideLabel">1 / 10</div>
+</div>
+<div class="slides-wrap">
+
+<!-- SLIDE 1: LEARNING OUTCOMES -->
+<div class="slide active" id="s1">
+  <div class="slide-header">
+    <h2>Learning Outcomes</h2>
+    <div class="strand">Strand 4.0 Electronics · Sub-strand 4.1 Semiconductor Theory · 15 Lessons</div>
+  </div>
+  <div class="lo-box">
+    <h3>By the end of this sub-strand, you should be able to:</h3>
+    <ol>
+      <li>Explain the <strong>characteristics of semiconductor materials</strong> — atomic structure, intrinsic and extrinsic.</li>
+      <li>Describe the <strong>doping process</strong> in semiconductors to form N-type and P-type materials.</li>
+      <li>Simulate <strong>covalent bonding</strong> in extrinsic semiconductors.</li>
+      <li>Illustrate the <strong>formation of a PN junction</strong> and depletion layer.</li>
+      <li>Appreciate the <strong>importance of electronic materials</strong> in electronic engineering.</li>
+    </ol>
+    <div class="inquiry">
+      <strong>🔍 Key Inquiry Questions</strong>
+      How does a semiconductor material conduct electricity? &nbsp;|&nbsp; How is doping in semiconductors achieved?
+    </div>
+  </div>
+  <div class="teach-block">
+    <h3>Topics Covered</h3>
+    <div style="display:flex;flex-wrap:wrap;gap:8px;margin-top:6px">
+      <span class="tag">Conductors / Insulators / Semiconductors</span>
+      <span class="tag">Atomic Structure</span>
+      <span class="tag">Covalent Bonding</span>
+      <span class="tag">Intrinsic Semiconductor</span>
+      <span class="tag">Doping</span>
+      <span class="tag">N-type / P-type</span>
+      <span class="tag">PN Junction</span>
+      <span class="tag">Depletion Layer</span>
+    </div>
+  </div>
+</div>
+
+<!-- SLIDE 2: CONDUCTORS, INSULATORS & SEMICONDUCTORS -->
+<div class="slide" id="s2">
+  <div class="slide-header">
+    <h2>Conductors, Insulators & Semiconductors</h2>
+    <div class="strand">Classification of materials by electrical conductivity</div>
+  </div>
+  <div class="teach-block">
+    <h3>The Three Classes of Materials</h3>
+    <div class="key-term"><strong>Conductor:</strong> A material that allows electric current to flow easily. Has many free electrons in its outer shell (valence band overlaps conduction band). Examples: copper, silver, aluminium, gold.</div>
+    <div class="key-term"><strong>Insulator:</strong> A material that strongly resists current flow. Valence electrons are tightly bound — a large energy gap (bandgap &gt;5eV) prevents electrons reaching the conduction band. Examples: rubber, glass, PVC, wood, ceramic.</div>
+    <div class="key-term"><strong>Semiconductor:</strong> A material with conductivity between a conductor and an insulator. Has a small energy gap (~1eV) that electrons can cross with thermal energy or doping. Examples: silicon (Si), germanium (Ge), gallium arsenide (GaAs).</div>
+    <div class="diagram-wrap">
+      <svg viewBox="0 0 580 110" xmlns="http://www.w3.org/2000/svg" style="font-family:'Segoe UI',sans-serif;max-width:580px">
+        <rect width="580" height="110" rx="8" fill="#f4f7f5"/>
+        <!-- Conductor -->
+        <rect x="20" y="20" width="150" height="70" rx="6" fill="#0a5e2a"/>
+        <text x="95" y="50" text-anchor="middle" fill="#fff" font-size="11" font-weight="700">CONDUCTOR</text>
+        <text x="95" y="65" text-anchor="middle" fill="#f5a623" font-size="9">Copper, Silver</text>
+        <text x="95" y="78" text-anchor="middle" fill="#ddd" font-size="8">Overlap — free electrons</text>
+        <text x="95" y="100" text-anchor="middle" fill="#555" font-size="8">Resistivity: ~10⁻⁸ Ω·m</text>
+        <!-- Semiconductor -->
+        <rect x="210" y="20" width="160" height="70" rx="6" fill="#f5a623"/>
+        <text x="290" y="50" text-anchor="middle" fill="#000" font-size="11" font-weight="700">SEMICONDUCTOR</text>
+        <text x="290" y="65" text-anchor="middle" fill="#333" font-size="9">Silicon, Germanium</text>
+        <text x="290" y="78" text-anchor="middle" fill="#333" font-size="8">Small gap ~1eV</text>
+        <text x="290" y="100" text-anchor="middle" fill="#555" font-size="8">Resistivity: 10⁻⁴–10³ Ω·m</text>
+        <!-- Insulator -->
+        <rect x="410" y="20" width="150" height="70" rx="6" fill="#c62828"/>
+        <text x="485" y="50" text-anchor="middle" fill="#fff" font-size="11" font-weight="700">INSULATOR</text>
+        <text x="485" y="65" text-anchor="middle" fill="#fdd" font-size="9">Glass, Rubber, PVC</text>
+        <text x="485" y="78" text-anchor="middle" fill="#fdd" font-size="8">Large gap &gt;5eV</text>
+        <text x="485" y="100" text-anchor="middle" fill="#555" font-size="8">Resistivity: ~10¹⁴ Ω·m</text>
+      </svg>
+    </div>
+  </div>
+  <div class="teach-block">
+    <h3>Why Semiconductors are Special</h3>
+    <table class="info-table">
+      <tr><th>Property</th><th>Semiconductor Behaviour</th></tr>
+      <tr><td>Temperature effect</td><td>Conductivity <em>increases</em> with temperature (opposite to metals)</td></tr>
+      <tr><td>Light effect</td><td>Light energy can free electrons — basis of solar cells and photodetectors</td></tr>
+      <tr><td>Doping effect</td><td>Adding impurities dramatically changes conductivity — basis of all electronic devices</td></tr>
+      <tr><td>Controllable</td><td>Can be made to conduct or insulate — basis of transistors and switches</td></tr>
+    </table>
+  </div>
+</div>
+
+<!-- SLIDE 3: ATOMIC STRUCTURE OF SILICON -->
+<div class="slide" id="s3">
+  <div class="slide-header">
+    <h2>Atomic Structure of Silicon</h2>
+    <div class="strand">Understanding the building block of electronics</div>
+  </div>
+  <div class="teach-block">
+    <h3>Silicon — The Most Important Semiconductor</h3>
+    <div class="key-term"><strong>Silicon (Si):</strong> Atomic number 14. Has 4 valence electrons in its outer shell. Most widely used semiconductor — forms the basis of 95%+ of all electronic devices including transistors, integrated circuits, and solar cells.</div>
+    <div class="key-term"><strong>Germanium (Ge):</strong> Atomic number 32. Also has 4 valence electrons. Used in early transistors; now mainly used in high-speed and infrared devices.</div>
+    <div class="diagram-wrap">
+      <svg viewBox="0 0 400 180" xmlns="http://www.w3.org/2000/svg" style="font-family:'Segoe UI',sans-serif;max-width:400px">
+        <rect width="400" height="180" rx="8" fill="#f4f7f5"/>
+        <!-- Nucleus -->
+        <circle cx="200" cy="90" r="22" fill="#0a5e2a"/>
+        <text x="200" y="87" text-anchor="middle" fill="#fff" font-size="10" font-weight="700">Si</text>
+        <text x="200" y="100" text-anchor="middle" fill="#f5a623" font-size="9">14p 14n</text>
+        <!-- Shell 1 (2 electrons) -->
+        <circle cx="200" cy="90" r="42" fill="none" stroke="#888" stroke-width="1" stroke-dasharray="3"/>
+        <circle cx="200" cy="48" r="6" fill="#c62828"/>
+        <circle cx="200" cy="132" r="6" fill="#c62828"/>
+        <text x="255" y="52" fill="#555" font-size="8">Shell 1: 2e⁻</text>
+        <!-- Shell 2 (8 electrons) -->
+        <circle cx="200" cy="90" r="70" fill="none" stroke="#888" stroke-width="1" stroke-dasharray="3"/>
+        <circle cx="200" cy="20" r="6" fill="#0a5e2a"/>
+        <circle cx="200" cy="160" r="6" fill="#0a5e2a"/>
+        <circle cx="130" cy="90" r="6" fill="#0a5e2a"/>
+        <circle cx="270" cy="90" r="6" fill="#0a5e2a"/>
+        <circle cx="150" cy="40" r="6" fill="#0a5e2a"/>
+        <circle cx="250" cy="40" r="6" fill="#0a5e2a"/>
+        <circle cx="150" cy="140" r="6" fill="#0a5e2a"/>
+        <circle cx="250" cy="140" r="6" fill="#0a5e2a"/>
+        <text x="280" y="25" fill="#555" font-size="8">Shell 2: 8e⁻</text>
+        <!-- Valence electrons (Shell 3 - 4 electrons) -->
+        <circle cx="200" cy="90" r="95" fill="none" stroke="#f5a623" stroke-width="2" stroke-dasharray="3"/>
+        <circle cx="200" cy="-5" r="8" fill="#f5a623"/>
+        <circle cx="295" cy="90" r="8" fill="#f5a623"/>
+        <circle cx="200" cy="185" r="8" fill="#f5a623"/>
+        <circle cx="105" cy="90" r="8" fill="#f5a623"/>
+        <text x="320" y="94" fill="#f5a623" font-size="9" font-weight="700">4 valence e⁻</text>
+        <text x="320" y="107" fill="#555" font-size="8">(outer shell)</text>
+      </svg>
+    </div>
+  </div>
+  <div class="teach-block">
+    <h3>Covalent Bonding in Silicon</h3>
+    <div class="key-term"><strong>Covalent bond:</strong> A chemical bond formed when two atoms share a pair of electrons. In silicon crystal, each atom shares its 4 valence electrons with 4 neighbouring atoms, forming a stable lattice with 8 electrons in each outer shell (octet rule).</div>
+    <div class="example-box">
+      <h4>💡 Silicon Crystal Structure</h4>
+      <p>In a pure silicon crystal: each Si atom is bonded to 4 others by covalent bonds. All valence electrons are shared — there are <strong>no free electrons</strong> at absolute zero temperature.</p>
+      <p style="margin-top:6px">At room temperature: thermal energy breaks a few bonds, freeing electrons and creating <strong>holes</strong> (positive vacancies). This gives pure silicon its limited conductivity.</p>
+    </div>
+  </div>
+</div>
+
+<!-- SLIDE 4: INTRINSIC SEMICONDUCTOR -->
+<div class="slide" id="s4">
+  <div class="slide-header">
+    <h2>Intrinsic Semiconductors</h2>
+    <div class="strand">Pure semiconductor behaviour</div>
+  </div>
+  <div class="teach-block">
+    <h3>What is an Intrinsic Semiconductor?</h3>
+    <div class="key-term"><strong>Intrinsic semiconductor:</strong> A pure semiconductor material with no impurity atoms added. Silicon or germanium in its chemically pure form. Conductivity depends entirely on temperature — the higher the temperature, the more electron-hole pairs are generated.</div>
+    <div class="key-term"><strong>Electron-hole pair:</strong> When thermal energy breaks a covalent bond, a free electron and a hole (positive vacancy) are created simultaneously. These are charge carriers — electrons move toward the positive terminal, holes toward the negative terminal.</div>
+    <div class="key-term"><strong>Hole:</strong> The absence of an electron in a covalent bond. It behaves like a positive charge carrier. Holes move in the opposite direction to electrons when voltage is applied.</div>
+  </div>
+  <div class="teach-block">
+    <h3>Conduction in Intrinsic Silicon</h3>
+    <table class="info-table">
+      <tr><th>Temperature</th><th>Electron-Hole Pairs</th><th>Conductivity</th></tr>
+      <tr><td>Absolute zero (0K / −273°C)</td><td>Zero — all bonds intact</td><td>Zero — perfect insulator</td></tr>
+      <tr><td>Room temperature (~300K)</td><td>Few — limited thermal energy</td><td>Very low — poor conductor</td></tr>
+      <tr><td>Elevated temperature</td><td>Many — more bonds broken</td><td>Increases — more carriers</td></tr>
+    </table>
+    <div class="example-box">
+      <h4>💡 Key Intrinsic Properties</h4>
+      <p>• Equal numbers of electrons and holes: n = p = n<sub>i</sub> (intrinsic carrier concentration)</p>
+      <p>• For silicon at 300K: n<sub>i</sub> ≈ 1.5 × 10¹⁰ carriers/cm³ (very few compared to copper's ~8.5 × 10²² e⁻/cm³)</p>
+      <p>• Pure silicon is too resistive for most electronic applications → <strong>doping</strong> is needed</p>
+    </div>
+  </div>
+</div>
+
+<!-- SLIDE 5: DOPING — N-TYPE -->
+<div class="slide" id="s5">
+  <div class="slide-header">
+    <h2>Doping — N-Type Semiconductor</h2>
+    <div class="strand">Adding donor impurities to increase free electrons</div>
+  </div>
+  <div class="teach-block">
+    <h3>What is Doping?</h3>
+    <div class="key-term"><strong>Doping:</strong> The deliberate addition of tiny amounts of impurity atoms (dopants) into a pure semiconductor to dramatically increase its conductivity and control the type of charge carriers. Typical doping level: 1 impurity atom per 10⁶–10⁸ silicon atoms.</div>
+  </div>
+  <div class="teach-block">
+    <h3>N-Type Semiconductor</h3>
+    <div class="key-term"><strong>N-type semiconductor:</strong> Formed by adding a <strong>pentavalent (5 valence electrons)</strong> donor impurity to silicon. The extra electron from the dopant becomes a free electron. Majority carriers = electrons; minority carriers = holes.</div>
+    <div class="key-term"><strong>Donor impurities (pentavalent):</strong> Phosphorus (P), Arsenic (As), Antimony (Sb). Each donor atom donates one free electron to the crystal lattice.</div>
+    <div class="diagram-wrap">
+      <svg viewBox="0 0 500 150" xmlns="http://www.w3.org/2000/svg" style="font-family:'Segoe UI',sans-serif;max-width:500px">
+        <rect width="500" height="150" rx="8" fill="#f4f7f5"/>
+        <!-- Silicon lattice -->
+        <text x="150" y="18" text-anchor="middle" fill="#0a5e2a" font-size="11" font-weight="700">N-type Silicon (doped with Phosphorus)</text>
+        <!-- Si atoms grid -->
+        <circle cx="60" cy="50" r="16" fill="#eef5f0" stroke="#0a5e2a" stroke-width="2"/>
+        <text x="60" y="54" text-anchor="middle" fill="#0a5e2a" font-size="10" font-weight="700">Si</text>
+        <circle cx="140" cy="50" r="16" fill="#eef5f0" stroke="#0a5e2a" stroke-width="2"/>
+        <text x="140" y="54" text-anchor="middle" fill="#0a5e2a" font-size="10" font-weight="700">Si</text>
+        <!-- Phosphorus atom -->
+        <circle cx="220" cy="50" r="18" fill="#fff3cd" stroke="#f5a623" stroke-width="2.5"/>
+        <text x="220" y="54" text-anchor="middle" fill="#c67000" font-size="10" font-weight="700">P</text>
+        <circle cx="248" cy="26" r="6" fill="#c62828"/>
+        <text x="260" y="22" fill="#c62828" font-size="8" font-weight="700">free e⁻</text>
+        <circle cx="300" cy="50" r="16" fill="#eef5f0" stroke="#0a5e2a" stroke-width="2"/>
+        <text x="300" y="54" text-anchor="middle" fill="#0a5e2a" font-size="10" font-weight="700">Si</text>
+        <!-- Bonds -->
+        <line x1="76" y1="50" x2="124" y2="50" stroke="#0a5e2a" stroke-width="2"/>
+        <line x1="156" y1="50" x2="202" y2="50" stroke="#0a5e2a" stroke-width="2"/>
+        <line x1="238" y1="50" x2="284" y2="50" stroke="#0a5e2a" stroke-width="2"/>
+        <!-- Bottom row -->
+        <circle cx="60" cy="110" r="16" fill="#eef5f0" stroke="#0a5e2a" stroke-width="2"/>
+        <text x="60" y="114" text-anchor="middle" fill="#0a5e2a" font-size="10" font-weight="700">Si</text>
+        <circle cx="140" cy="110" r="16" fill="#eef5f0" stroke="#0a5e2a" stroke-width="2"/>
+        <text x="140" y="114" text-anchor="middle" fill="#0a5e2a" font-size="10" font-weight="700">Si</text>
+        <circle cx="220" cy="110" r="16" fill="#eef5f0" stroke="#0a5e2a" stroke-width="2"/>
+        <text x="220" y="114" text-anchor="middle" fill="#0a5e2a" font-size="10" font-weight="700">Si</text>
+        <circle cx="300" cy="110" r="16" fill="#eef5f0" stroke="#0a5e2a" stroke-width="2"/>
+        <text x="300" y="114" text-anchor="middle" fill="#0a5e2a" font-size="10" font-weight="700">Si</text>
+        <line x1="76" y1="110" x2="124" y2="110" stroke="#0a5e2a" stroke-width="2"/>
+        <line x1="156" y1="110" x2="204" y2="110" stroke="#0a5e2a" stroke-width="2"/>
+        <line x1="236" y1="110" x2="284" y2="110" stroke="#0a5e2a" stroke-width="2"/>
+        <line x1="60" y1="66" x2="60" y2="94" stroke="#0a5e2a" stroke-width="2"/>
+        <line x1="140" y1="66" x2="140" y2="94" stroke="#0a5e2a" stroke-width="2"/>
+        <line x1="220" y1="68" x2="220" y2="94" stroke="#0a5e2a" stroke-width="2"/>
+        <line x1="300" y1="66" x2="300" y2="94" stroke="#0a5e2a" stroke-width="2"/>
+        <!-- Label -->
+        <text x="390" y="55" fill="#0a5e2a" font-size="10" font-weight="700">Phosphorus</text>
+        <text x="390" y="68" fill="#555" font-size="9">has 5 valence e⁻</text>
+        <text x="390" y="82" fill="#555" font-size="9">4 form bonds</text>
+        <text x="390" y="96" fill="#c62828" font-size="9" font-weight="700">1 is FREE → e⁻</text>
+        <text x="390" y="115" fill="#555" font-size="9">Majority: electrons</text>
+        <text x="390" y="128" fill="#555" font-size="9">Minority: holes</text>
+      </svg>
+    </div>
+  </div>
+</div>
+
+<!-- SLIDE 6: DOPING — P-TYPE -->
+<div class="slide" id="s6">
+  <div class="slide-header">
+    <h2>Doping — P-Type Semiconductor</h2>
+    <div class="strand">Adding acceptor impurities to increase holes</div>
+  </div>
+  <div class="teach-block">
+    <h3>P-Type Semiconductor</h3>
+    <div class="key-term"><strong>P-type semiconductor:</strong> Formed by adding a <strong>trivalent (3 valence electrons)</strong> acceptor impurity to silicon. A hole (missing electron) is created at each dopant atom. Majority carriers = holes; minority carriers = electrons.</div>
+    <div class="key-term"><strong>Acceptor impurities (trivalent):</strong> Boron (B), Aluminium (Al), Gallium (Ga), Indium (In). Each acceptor atom accepts an electron from a neighbouring bond, creating a hole.</div>
+    <div class="diagram-wrap">
+      <svg viewBox="0 0 500 150" xmlns="http://www.w3.org/2000/svg" style="font-family:'Segoe UI',sans-serif;max-width:500px">
+        <rect width="500" height="150" rx="8" fill="#f4f7f5"/>
+        <text x="150" y="18" text-anchor="middle" fill="#0a5e2a" font-size="11" font-weight="700">P-type Silicon (doped with Boron)</text>
+        <circle cx="60" cy="50" r="16" fill="#eef5f0" stroke="#0a5e2a" stroke-width="2"/>
+        <text x="60" y="54" text-anchor="middle" fill="#0a5e2a" font-size="10" font-weight="700">Si</text>
+        <circle cx="140" cy="50" r="16" fill="#eef5f0" stroke="#0a5e2a" stroke-width="2"/>
+        <text x="140" y="54" text-anchor="middle" fill="#0a5e2a" font-size="10" font-weight="700">Si</text>
+        <!-- Boron atom -->
+        <circle cx="220" cy="50" r="18" fill="#f0e8ff" stroke="#7b2d8b" stroke-width="2.5"/>
+        <text x="220" y="54" text-anchor="middle" fill="#7b2d8b" font-size="10" font-weight="700">B</text>
+        <!-- Hole symbol -->
+        <circle cx="248" cy="26" r="6" fill="none" stroke="#c62828" stroke-width="2"/>
+        <text x="260" y="22" fill="#c62828" font-size="8" font-weight="700">hole ⊕</text>
+        <circle cx="300" cy="50" r="16" fill="#eef5f0" stroke="#0a5e2a" stroke-width="2"/>
+        <text x="300" y="54" text-anchor="middle" fill="#0a5e2a" font-size="10" font-weight="700">Si</text>
+        <line x1="76" y1="50" x2="124" y2="50" stroke="#0a5e2a" stroke-width="2"/>
+        <line x1="156" y1="50" x2="202" y2="50" stroke="#0a5e2a" stroke-width="2"/>
+        <line x1="238" y1="50" x2="284" y2="50" stroke="#0a5e2a" stroke-width="2"/>
+        <circle cx="60" cy="110" r="16" fill="#eef5f0" stroke="#0a5e2a" stroke-width="2"/>
+        <text x="60" y="114" text-anchor="middle" fill="#0a5e2a" font-size="10" font-weight="700">Si</text>
+        <circle cx="140" cy="110" r="16" fill="#eef5f0" stroke="#0a5e2a" stroke-width="2"/>
+        <text x="140" y="114" text-anchor="middle" fill="#0a5e2a" font-size="10" font-weight="700">Si</text>
+        <circle cx="220" cy="110" r="16" fill="#eef5f0" stroke="#0a5e2a" stroke-width="2"/>
+        <text x="220" y="114" text-anchor="middle" fill="#0a5e2a" font-size="10" font-weight="700">Si</text>
+        <circle cx="300" cy="110" r="16" fill="#eef5f0" stroke="#0a5e2a" stroke-width="2"/>
+        <text x="300" y="114" text-anchor="middle" fill="#0a5e2a" font-size="10" font-weight="700">Si</text>
+        <line x1="76" y1="110" x2="124" y2="110" stroke="#0a5e2a" stroke-width="2"/>
+        <line x1="156" y1="110" x2="204" y2="110" stroke="#0a5e2a" stroke-width="2"/>
+        <line x1="236" y1="110" x2="284" y2="110" stroke="#0a5e2a" stroke-width="2"/>
+        <line x1="60" y1="66" x2="60" y2="94" stroke="#0a5e2a" stroke-width="2"/>
+        <line x1="140" y1="66" x2="140" y2="94" stroke="#0a5e2a" stroke-width="2"/>
+        <line x1="220" y1="68" x2="220" y2="94" stroke="#0a5e2a" stroke-width="2"/>
+        <line x1="300" y1="66" x2="300" y2="94" stroke="#0a5e2a" stroke-width="2"/>
+        <text x="390" y="55" fill="#7b2d8b" font-size="10" font-weight="700">Boron</text>
+        <text x="390" y="68" fill="#555" font-size="9">has 3 valence e⁻</text>
+        <text x="390" y="82" fill="#555" font-size="9">needs 4 for bonds</text>
+        <text x="390" y="96" fill="#c62828" font-size="9" font-weight="700">1 HOLE created ⊕</text>
+        <text x="390" y="115" fill="#555" font-size="9">Majority: holes</text>
+        <text x="390" y="128" fill="#555" font-size="9">Minority: electrons</text>
+      </svg>
+    </div>
+    <table class="info-table">
+      <tr><th>Property</th><th>N-type</th><th>P-type</th></tr>
+      <tr><td>Dopant valency</td><td>Pentavalent (5)</td><td>Trivalent (3)</td></tr>
+      <tr><td>Dopant examples</td><td>Phosphorus, Arsenic, Antimony</td><td>Boron, Aluminium, Gallium</td></tr>
+      <tr><td>Majority carriers</td><td>Electrons (−)</td><td>Holes (+)</td></tr>
+      <tr><td>Minority carriers</td><td>Holes (+)</td><td>Electrons (−)</td></tr>
+      <tr><td>Overall charge</td><td>Electrically neutral</td><td>Electrically neutral</td></tr>
+    </table>
+  </div>
+</div>
+
+<!-- SLIDE 7: PN JUNCTION -->
+<div class="slide" id="s7">
+  <div class="slide-header">
+    <h2>The PN Junction</h2>
+    <div class="strand">The heart of all semiconductor devices</div>
+  </div>
+  <div class="teach-block">
+    <h3>Formation of the PN Junction</h3>
+    <div class="key-term"><strong>PN junction:</strong> The boundary formed when P-type and N-type semiconductor materials are joined together. This junction is the fundamental building block of diodes, transistors, solar cells, and LEDs.</div>
+    <div class="teach-block">
+      <h3>The Depletion Layer</h3>
+      <div class="key-term"><strong>Depletion layer (depletion region):</strong> A thin region at the PN junction that is depleted of free charge carriers. It forms automatically when P and N materials are joined, as electrons from the N-side diffuse across and recombine with holes on the P-side.</div>
+    </div>
+    <div class="diagram-wrap">
+      <svg viewBox="0 0 580 150" xmlns="http://www.w3.org/2000/svg" style="font-family:'Segoe UI',sans-serif;max-width:580px">
+        <rect width="580" height="150" rx="8" fill="#f4f7f5"/>
+        <!-- P region -->
+        <rect x="20" y="30" width="220" height="80" rx="5" fill="#f0e8ff" stroke="#7b2d8b" stroke-width="2"/>
+        <text x="80" y="55" text-anchor="middle" fill="#7b2d8b" font-size="12" font-weight="800">P-type</text>
+        <text x="80" y="70" text-anchor="middle" fill="#7b2d8b" font-size="9">Majority: holes ⊕</text>
+        <!-- Holes in P -->
+        <circle cx="50" cy="85" r="7" fill="none" stroke="#7b2d8b" stroke-width="2"/>
+        <circle cx="80" cy="85" r="7" fill="none" stroke="#7b2d8b" stroke-width="2"/>
+        <circle cx="110" cy="85" r="7" fill="none" stroke="#7b2d8b" stroke-width="2"/>
+        <!-- N region -->
+        <rect x="340" y="30" width="220" height="80" rx="5" fill="#eef5f0" stroke="#0a5e2a" stroke-width="2"/>
+        <text x="450" y="55" text-anchor="middle" fill="#0a5e2a" font-size="12" font-weight="800">N-type</text>
+        <text x="450" y="70" text-anchor="middle" fill="#0a5e2a" font-size="9">Majority: electrons ⊖</text>
+        <!-- Electrons in N -->
+        <circle cx="390" cy="85" r="7" fill="#0a5e2a"/>
+        <circle cx="420" cy="85" r="7" fill="#0a5e2a"/>
+        <circle cx="450" cy="85" r="7" fill="#0a5e2a"/>
+        <!-- Depletion layer -->
+        <rect x="230" y="30" width="110" height="80" rx="0" fill="#ffe0b2" opacity=".8"/>
+        <text x="285" y="55" text-anchor="middle" fill="#e65100" font-size="9" font-weight="700">DEPLETION</text>
+        <text x="285" y="67" text-anchor="middle" fill="#e65100" font-size="9" font-weight="700">LAYER</text>
+        <text x="285" y="82" text-anchor="middle" fill="#555" font-size="8">No free carriers</text>
+        <!-- Built-in potential -->
+        <line x1="240" y1="120" x2="340" y2="120" stroke="#c62828" stroke-width="2"/>
+        <text x="290" y="135" text-anchor="middle" fill="#c62828" font-size="9" font-weight="700">Built-in potential ~0.7V (Si)</text>
+        <!-- Arrows showing diffusion -->
+        <text x="195" y="100" fill="#0a5e2a" font-size="12">→</text>
+        <text x="360" y="100" fill="#7b2d8b" font-size="12">←</text>
+      </svg>
+    </div>
+    <table class="info-table">
+      <tr><th>Feature</th><th>Detail</th></tr>
+      <tr><td>Built-in potential (barrier voltage)</td><td>~0.7V for silicon; ~0.3V for germanium</td></tr>
+      <tr><td>Width of depletion layer</td><td>Typically 0.5–1 µm at equilibrium</td></tr>
+      <tr><td>Electric field in depletion layer</td><td>Points from N to P (opposes further diffusion)</td></tr>
+      <tr><td>Charges in depletion layer</td><td>Positive ions on N-side; negative ions on P-side</td></tr>
+    </table>
+  </div>
+</div>
+
+<!-- SLIDE 8: INTERACTIVE -->
+<div class="slide" id="s8">
+  <div class="slide-header">
+    <h2>Interactive Activities</h2>
+    <div class="strand">Semiconductor explorer & doping identifier</div>
+  </div>
+
+  <div class="calc-box">
+    <h4>🔧 Activity 1: Semiconductor Material Explorer</h4>
+    <p style="font-size:.83rem;margin-bottom:8px">Click a material to explore its semiconductor properties:</p>
+    <div style="display:flex;flex-wrap:wrap">
+      <button class="atom-btn active" onclick="showMat(this,'si')">Silicon (Si)</button>
+      <button class="atom-btn" onclick="showMat(this,'ge')">Germanium (Ge)</button>
+      <button class="atom-btn" onclick="showMat(this,'gaas')">GaAs</button>
+      <button class="atom-btn" onclick="showMat(this,'cu')">Copper (Cu)</button>
+      <button class="atom-btn" onclick="showMat(this,'rubber')">Rubber</button>
+    </div>
+    <div class="atom-display" id="matDisplay">
+      <strong>Silicon (Si):</strong> Atomic number 14 | 4 valence electrons | Bandgap: 1.12 eV | Most common semiconductor — used in 95%+ of all chips, transistors, solar cells. Intrinsic carrier concentration: ~1.5×10¹⁰/cm³ at 300K. Melting point: 1414°C.
+    </div>
+  </div>
+
+  <div class="calc-box" style="margin-top:14px">
+    <h4>🔧 Activity 2: Dopant Identifier</h4>
+    <p style="font-size:.83rem;margin-bottom:8px">Select an impurity element — identify if it creates N-type or P-type silicon and why:</p>
+    <div style="display:flex;flex-wrap:wrap">
+      <button class="atom-btn" onclick="showDopant(this,'P')">Phosphorus (P)</button>
+      <button class="atom-btn" onclick="showDopant(this,'B')">Boron (B)</button>
+      <button class="atom-btn" onclick="showDopant(this,'As')">Arsenic (As)</button>
+      <button class="atom-btn" onclick="showDopant(this,'Al')">Aluminium (Al)</button>
+      <button class="atom-btn" onclick="showDopant(this,'Sb')">Antimony (Sb)</button>
+      <button class="atom-btn" onclick="showDopant(this,'Ga')">Gallium (Ga)</button>
+    </div>
+    <div class="atom-display" id="dopantDisplay">Select a dopant element above...</div>
+  </div>
+
+  <div class="calc-box" style="margin-top:14px">
+    <h4>🔧 Activity 3: PN Junction Bias Explorer</h4>
+    <p style="font-size:.83rem;margin-bottom:8px">Select the biasing condition to see what happens at the PN junction:</p>
+    <div style="display:flex;flex-wrap:wrap">
+      <button class="atom-btn" onclick="showBias(this,'none')">No Bias</button>
+      <button class="atom-btn" onclick="showBias(this,'forward')">Forward Bias</button>
+      <button class="atom-btn" onclick="showBias(this,'reverse')">Reverse Bias</button>
+    </div>
+    <div class="atom-display" id="biasDisplay">Select a bias condition...</div>
+  </div>
+</div>
+
+<!-- SLIDE 9: PRACTICE -->
+<div class="slide" id="s9">
+  <div class="slide-header">
+    <h2>Practice Activities</h2>
+    <div class="strand">Apply semiconductor theory</div>
+  </div>
+
+  <div class="practice-q">
+    <div class="qnum">Activity A: Classification</div>
+    <p style="font-size:.86rem">Classify each material and state whether it can be used as a semiconductor:</p>
+    <table class="info-table" style="margin-top:8px">
+      <tr><th>Material</th><th>Classification</th><th>Semiconductor?</th></tr>
+      <tr><td>Copper</td><td style="color:var(--ok)">Conductor</td><td style="color:var(--no)">No — too conductive</td></tr>
+      <tr><td>Silicon</td><td style="color:var(--ok)">Semiconductor</td><td style="color:var(--ok)">Yes — ideal bandgap</td></tr>
+      <tr><td>Glass</td><td style="color:var(--ok)">Insulator</td><td style="color:var(--no)">No — bandgap too large</td></tr>
+      <tr><td>Germanium</td><td style="color:var(--ok)">Semiconductor</td><td style="color:var(--ok)">Yes — used in early transistors</td></tr>
+      <tr><td>Rubber</td><td style="color:var(--ok)">Insulator</td><td style="color:var(--no)">No — insulator</td></tr>
+    </table>
+  </div>
+
+  <div class="practice-q">
+    <div class="qnum">Activity B: Doping Questions</div>
+    <ol style="font-size:.86rem;padding-left:18px;margin-top:6px">
+      <li style="margin-bottom:6px">Silicon is doped with arsenic. What type of semiconductor is formed and what are the majority carriers?<br>→ <span style="color:var(--ok);font-weight:600">N-type. Arsenic has 5 valence electrons (pentavalent). Majority carriers = electrons.</span></li>
+      <li style="margin-bottom:6px">Silicon is doped with boron. What type and majority carriers?<br>→ <span style="color:var(--ok);font-weight:600">P-type. Boron has 3 valence electrons (trivalent). Majority carriers = holes.</span></li>
+      <li>Why is an N-type semiconductor still electrically neutral even though it has extra electrons?<br>→ <span style="color:var(--ok);font-weight:600">The donor atoms (e.g. phosphorus) each contribute one free electron but also contribute one positive ion (the atom itself). The positive ion is fixed in the lattice, balancing the negative free electron. Total charge = zero.</span></li>
+    </ol>
+  </div>
+
+  <div class="practice-q">
+    <div class="qnum">Activity C: PN Junction</div>
+    <p style="font-size:.86rem">Explain what happens when P-type and N-type silicon are joined to form a PN junction. Include: diffusion, depletion layer, built-in potential.</p>
+    <div class="example-box" style="margin-top:8px">
+      <h4>📌 Model Answer</h4>
+      <p>When P and N materials are joined: <strong>electrons from the N-side diffuse</strong> across the junction toward the P-side (high concentration → low concentration). They recombine with holes on the P-side.</p>
+      <p style="margin-top:5px">This creates a <strong>depletion layer</strong> — a region devoid of free carriers. Positive ions remain on the N-side; negative ions on the P-side.</p>
+      <p style="margin-top:5px">The ion charges create an electric field and a <strong>built-in potential (~0.7V for silicon)</strong> that opposes further diffusion. Equilibrium is reached when the diffusion force equals the electric field force.</p>
+    </div>
+  </div>
+</div>
+
+<!-- SLIDE 10: QUIZ -->
+<div class="slide" id="s10">
+  <div class="slide-header">
+    <h2>End-of-Lesson Quiz</h2>
+    <div class="strand">Sub-strand 4.1 · Semiconductor Theory</div>
+  </div>
+  <p style="font-size:.83rem;color:#555;margin-bottom:14px">Part A: 5 fill-in-the-blank (5 marks) &nbsp;|&nbsp; Part B: 3 short answer (10 marks) &nbsp;|&nbsp; <strong>Total: 15 marks</strong></p>
+
+  <div class="practice-q">
+    <div class="qnum">Part A: Fill in the Blank (1 mark each)</div>
+    <div style="font-size:.87rem">
+      <p style="margin:10px 0">1. A semiconductor doped with a pentavalent impurity such as phosphorus is called a <input class="fill-blank" id="f1" placeholder="...">-type semiconductor. <span class="fb-feedback" id="ff1"></span></p>
+      <p style="margin:10px 0">2. In a P-type semiconductor, the majority charge carriers are <input class="fill-blank" id="f2" placeholder="...">. <span class="fb-feedback" id="ff2"></span></p>
+      <p style="margin:10px 0">3. The built-in potential barrier at a silicon PN junction is approximately <input class="fill-blank" id="f3" placeholder="..."> volts. <span class="fb-feedback" id="ff3"></span></p>
+      <p style="margin:10px 0">4. The process of adding impurity atoms to a pure semiconductor is called <input class="fill-blank" id="f4" placeholder="...">. <span class="fb-feedback" id="ff4"></span></p>
+      <p style="margin:10px 0">5. Silicon has <input class="fill-blank" id="f5" placeholder="..."> valence electrons in its outer shell. <span class="fb-feedback" id="ff5"></span></p>
+    </div>
+    <button class="check-btn" onclick="checkFills()" style="margin-top:12px">✓ Check Part A</button>
+  </div>
+
+  <div class="practice-q" style="margin-top:12px">
+    <div class="qnum">Part B: Short Answer</div>
+
+    <div style="margin-bottom:14px">
+      <p style="font-size:.87rem"><strong>B1.</strong> Explain the difference between an intrinsic and an extrinsic semiconductor. Why is doping necessary for practical electronic devices? <em>(3 marks)</em></p>
+      <textarea class="sa-box" id="sa1" placeholder="Type your answer here..."></textarea>
+      <button class="grade-btn" onclick="gradeAnswer('sa1','fb1',{keywords:['intrinsic','pure','extrinsic','doped','impurity','conductivity','temperature','control','practical','devices','carriers'],required:5,marks:3,model:'Intrinsic semiconductor: pure silicon with no impurities. Conductivity depends on temperature — very low at room temperature. Extrinsic semiconductor: silicon doped with impurity atoms (N-type with pentavalent donor; P-type with trivalent acceptor). Doping is necessary because pure silicon has too few carriers for practical use. Doping increases carrier concentration by millions of times, making controlled electronic devices possible.'})">✓ Grade My Answer</button>
+      <div class="sa-feedback" id="fb1"></div>
+    </div>
+
+    <div style="margin-bottom:14px">
+      <p style="font-size:.87rem"><strong>B2.</strong> Describe how N-type and P-type semiconductors are formed. For each type: name the dopant used, state its valency, and identify the majority and minority charge carriers. <em>(4 marks)</em></p>
+      <textarea class="sa-box" id="sa2" placeholder="Type your answer here..."></textarea>
+      <button class="grade-btn" onclick="gradeAnswer('sa2','fb2',{keywords:['n-type','pentavalent','5','phosphorus','arsenic','electrons','majority','holes','minority','p-type','trivalent','3','boron','aluminium'],required:6,marks:4,model:'N-type: formed by adding pentavalent (5 valence electrons) donor dopant such as phosphorus or arsenic. The extra electron becomes a free carrier. Majority carriers = electrons; minority carriers = holes. P-type: formed by adding trivalent (3 valence electrons) acceptor dopant such as boron or aluminium. A hole is created at each dopant site. Majority carriers = holes; minority carriers = electrons.'})">✓ Grade My Answer</button>
+      <div class="sa-feedback" id="fb2"></div>
+    </div>
+
+    <div style="margin-bottom:14px">
+      <p style="font-size:.87rem"><strong>B3.</strong> Describe the formation of the depletion layer at a PN junction. What is the built-in potential and what role does it play? <em>(3 marks)</em></p>
+      <textarea class="sa-box" id="sa3" placeholder="Type your answer here..."></textarea>
+      <button class="grade-btn" onclick="gradeAnswer('sa3','fb3',{keywords:['diffusion','electrons','holes','recombine','depletion','ions','electric field','built-in','0.7','barrier','equilibrium','junction'],required:5,marks:3,model:'When P and N materials are joined, electrons from N-side diffuse across to P-side and recombine with holes. This leaves positive donor ions on N-side and negative acceptor ions on P-side — forming the depletion layer (no free carriers). The ion charges create a built-in electric field (~0.7V for silicon) that opposes further diffusion. Equilibrium is reached when diffusion force = electric field force. The built-in potential acts as a barrier that must be overcome (forward biased) to allow current to flow.'})">✓ Grade My Answer</button>
+      <div class="sa-feedback" id="fb3"></div>
+    </div>
+  </div>
+
+  <button class="score-btn" onclick="showTotalScore()">📊 View My Total Score</button>
+  <div class="total-result" id="totalResult" style="display:none"></div>
+  <div class="next-lesson-box" id="nextLessonBox">
+    <a href="elec-4.2-semiconductor-diodes-full.html" class="next-lesson-btn">➡️ Next Lesson: 4.2 Semiconductor Diodes</a>
+    <div class="next-lesson-sub">You've completed this lesson! Keep going 🎉</div>
+  </div>
+</div>
+
+</div><!-- end slides-wrap -->
+
+<div class="nav-bar">
+  <button class="nav-btn" id="prevBtn" onclick="goSlide(-1)" disabled>← Prev</button>
+  <div class="dots" id="dotsWrap"></div>
+  <button class="nav-btn" id="nextBtn" onclick="goSlide(1)">Next →</button>
+</div>
+
+<script>
+// ── NAVIGATION ────────────────────────────────────────────────
+const TOTAL=10; let cur=0;
+const dotsWrap=document.getElementById('dotsWrap');
+for(let i=0;i<TOTAL;i++){
+  const d=document.createElement('div');
+  d.className='dot'+(i===0?' active':'');
+  d.onclick=()=>showSlide(i);
+  dotsWrap.appendChild(d);
+}
+function showSlide(n){
+  document.querySelectorAll('.slide').forEach((s,i)=>s.classList.toggle('active',i===n));
+  document.querySelectorAll('.dot').forEach((d,i)=>d.classList.toggle('active',i===n));
+  document.getElementById('prevBtn').disabled=(n===0);
+  document.getElementById('nextBtn').disabled=(n===TOTAL-1);
+  document.getElementById('slideLabel').textContent=(n+1)+' / '+TOTAL;
+  cur=n; window.scrollTo(0,0);
+}
+function goSlide(d){showSlide(Math.max(0,Math.min(TOTAL-1,cur+d)))}
+
+// ── MATERIAL EXPLORER ─────────────────────────────────────────
+const matData={
+  si:'<strong>Silicon (Si):</strong> Atomic number 14 | 4 valence electrons | Bandgap: 1.12 eV | Most common semiconductor — used in 95%+ of all chips, transistors, solar cells. Intrinsic carrier concentration: ~1.5×10¹⁰/cm³ at 300K. Melting point: 1414°C. Type: <span style="color:var(--ok)">Semiconductor ✓</span>',
+  ge:'<strong>Germanium (Ge):</strong> Atomic number 32 | 4 valence electrons | Bandgap: 0.67 eV | Used in early transistors (1947). Smaller bandgap means more intrinsic carriers than Si. Lower barrier voltage (~0.3V vs 0.7V for Si). Used today in infrared detectors and high-speed devices. Type: <span style="color:var(--ok)">Semiconductor ✓</span>',
+  gaas:'<strong>Gallium Arsenide (GaAs):</strong> Compound semiconductor (Group III-V) | Bandgap: 1.42 eV (direct) | Higher electron mobility than Si — used in high-frequency circuits (mobile phones, radar, satellites). Also used in LEDs and laser diodes because of direct bandgap. Type: <span style="color:var(--ok)">Semiconductor ✓</span>',
+  cu:'<strong>Copper (Cu):</strong> Atomic number 29 | 1 valence electron (easily freed) | Resistivity: ~1.7×10⁻⁸ Ω·m | Excellent conductor — used in electrical wiring. Bandgap: zero (conduction and valence bands overlap). Cannot be doped to control conductivity. Type: <span style="color:var(--no)">Conductor — NOT a semiconductor</span>',
+  rubber:'<strong>Rubber:</strong> Polymer insulator | Bandgap: very large (>5eV) | Resistivity: ~10¹³ Ω·m | Electrons cannot reach conduction band. Used as cable insulation and for PPE gloves. Cannot be made to conduct. Type: <span style="color:var(--no)">Insulator — NOT a semiconductor</span>'
+};
+function showMat(el,mat){
+  document.querySelectorAll('.calc-box:nth-child(1) .atom-btn').forEach(b=>b.classList.remove('active'));
+  el.classList.add('active');
+  document.getElementById('matDisplay').innerHTML=matData[mat];
+}
+
+// ── DOPANT IDENTIFIER ─────────────────────────────────────────
+const dopantData={
+  P:'<strong>Phosphorus (P) — Group V, Valency: 5</strong><br>Type formed: <span style="color:var(--ok);font-weight:700">N-type</span><br>Phosphorus has 5 valence electrons. When added to silicon, 4 electrons form covalent bonds with neighbouring Si atoms. The 5th electron has no bond to complete and becomes a <strong>free electron</strong> (donor). Majority carriers = electrons.',
+  B:'<strong>Boron (B) — Group III, Valency: 3</strong><br>Type formed: <span style="color:#7b2d8b;font-weight:700">P-type</span><br>Boron has only 3 valence electrons. When added to silicon, it forms 3 covalent bonds but needs 4. The missing electron position creates a <strong>hole</strong> (acceptor). Majority carriers = holes.',
+  As:'<strong>Arsenic (As) — Group V, Valency: 5</strong><br>Type formed: <span style="color:var(--ok);font-weight:700">N-type</span><br>Arsenic has 5 valence electrons — same group as phosphorus. Acts as a donor — gives one free electron per atom. Used when higher doping concentration stability is needed. Majority carriers = electrons.',
+  Al:'<strong>Aluminium (Al) — Group III, Valency: 3</strong><br>Type formed: <span style="color:#7b2d8b;font-weight:700">P-type</span><br>Aluminium has 3 valence electrons — same group as boron. Acts as acceptor — creates one hole per atom. Used in high-power devices. Majority carriers = holes.',
+  Sb:'<strong>Antimony (Sb) — Group V, Valency: 5</strong><br>Type formed: <span style="color:var(--ok);font-weight:700">N-type</span><br>Antimony is a pentavalent donor — gives one free electron. Used in specialized high-frequency N-type devices. Majority carriers = electrons.',
+  Ga:'<strong>Gallium (Ga) — Group III, Valency: 3</strong><br>Type formed: <span style="color:#7b2d8b;font-weight:700">P-type</span><br>Gallium is a trivalent acceptor — creates holes. Also used with arsenic to form GaAs compound semiconductor for LEDs and high-speed devices. Majority carriers = holes.'
+};
+function showDopant(el,dopant){
+  document.querySelectorAll('.calc-box:nth-child(2) .atom-btn').forEach(b=>b.classList.remove('active'));
+  el.classList.add('active');
+  document.getElementById('dopantDisplay').innerHTML=dopantData[dopant];
+}
+
+// ── BIAS EXPLORER ─────────────────────────────────────────────
+const biasData={
+  none:'<strong>No Bias (Equilibrium):</strong> No external voltage applied. The depletion layer exists at its natural width. A built-in potential (~0.7V for Si) opposes any further diffusion. No net current flows. The junction is in equilibrium — diffusion current equals drift current.',
+  forward:'<strong>Forward Bias:</strong> Positive terminal connected to P-side; negative to N-side. The external voltage opposes the built-in potential. When applied voltage > 0.7V (for Si), the depletion layer narrows and effectively disappears. <strong>Current flows freely</strong> — diode conducts. This is the "ON" state of a diode.',
+  reverse:'<strong>Reverse Bias:</strong> Positive terminal connected to N-side; negative to P-side. The external voltage adds to the built-in potential — depletion layer <strong>widens</strong>. No majority carriers can cross. <strong>Only a tiny leakage current</strong> (minority carriers) flows — practically zero. This is the "OFF" state of a diode. If reverse voltage is too high → breakdown (avalanche or Zener).'
+};
+function showBias(el,bias){
+  document.querySelectorAll('.calc-box:nth-child(3) .atom-btn').forEach(b=>b.classList.remove('active'));
+  el.classList.add('active');
+  document.getElementById('biasDisplay').innerHTML=biasData[bias];
+}
+
+// ── FILL BLANK ────────────────────────────────────────────────
+const fbAns={
+  f1:['n','n-type'],
+  f2:['holes','hole'],
+  f3:['0.7','0.7v','0.7 v'],
+  f4:['doping'],
+  f5:['4','four']
+};
+let fillScore=0, saScores={};
+function checkFills(){
+  fillScore=0;
+  Object.entries(fbAns).forEach(([id,ans])=>{
+    const inp=document.getElementById(id);
+    const fb=document.getElementById('f'+id.slice(1));
+    const val=inp.value.trim().toLowerCase();
+    const ok=ans.some(a=>val===a||val.includes(a));
+    if(ok){fillScore++;inp.className='fill-blank correct';fb.textContent='✓ +1';fb.style.color='#2e7d32';}
+    else{inp.className='fill-blank wrong';fb.textContent='✗ ('+ans[0]+')';fb.style.color='#c62828';}
+    fb.style.display='inline';
+  });
+}
+function gradeAnswer(saId,fbId,cfg){
+  const ans=document.getElementById(saId).value.trim().toLowerCase();
+  const found=cfg.keywords.filter(k=>ans.includes(k.toLowerCase()));
+  const missed=cfg.keywords.filter(k=>!ans.includes(k.toLowerCase()));
+  const hitRate=Math.min(found.length/cfg.required,1.0);
+  const marks=Math.round(hitRate*cfg.marks);
+  saScores[saId]=marks;
+  const grade=marks>=cfg.marks?'🌟 Excellent!':marks>=cfg.marks*0.5?'👍 Good attempt':'📖 Needs improvement';
+  const fbEl=document.getElementById(fbId);
+  fbEl.style.display='block';
+  fbEl.innerHTML=`<strong>${grade} — ${marks}/${cfg.marks} marks</strong><br>
+  <span class="kw-found">✅ Keywords found: ${found.join(', ')||'none'}</span><br>
+  <span class="kw-missed">❌ Missed: ${missed.join(', ')||'none'}</span>
+  <div class="model-ans"><strong>Model Answer:</strong> ${cfg.model}</div>`;
+}
+function showTotalScore(){
+  const saTotal=Object.values(saScores).reduce((a,b)=>a+b,0);
+  const total=fillScore+saTotal;
+  const pct=Math.round(total/15*100);
+  const grade=pct>=80?'Exceeds Expectation 🎉':pct>=60?'Meets Expectation 👍':pct>=40?'Approaches Expectation 📖':'Below Expectation 💪';
+  const el=document.getElementById('totalResult');
+  el.style.display='block';
+  el.innerHTML=`<strong>Total Score: ${total} / 15 (${pct}%)</strong><br>
+  Part A: ${fillScore}/5 &nbsp;|&nbsp; Part B: ${saTotal}/10<br>
+  <span style="color:var(--pri);font-size:1.05rem">${grade}</span><br>
+  <span style="font-size:.8rem;color:#666;margin-top:4px;display:block">CBE Rubric — ${pct>=80?'Exceeds':pct>=60?'Meets':pct>=40?'Approaches':'Below'} Expectation</span>`;
+  submitExamToMTTI(total,15,pct);
+  document.getElementById('nextLessonBox').style.display='block';
+}
+function submitExamToMTTI(score,total,percent){
+  try{
+    fetch('/wp-json/mtti/v1/exam-result',{
+      method:'POST',
+      headers:{'Content-Type':'application/json','X-WP-Nonce':window.mtti_nonce||''},
+      body:JSON.stringify({lesson_id:'elec-4.1-semiconductor-theory',score,total,percent,timestamp:new Date().toISOString()})
+    }).then(r=>r.json()).then(d=>{if(d&&d.success)console.log('[MTTI] Result saved:',d);}).catch(e=>console.log('[MTTI] Offline:',e));
+  }catch(e){console.log('[MTTI] Error:',e);}
+}
+</script>
+</body>
+</html>

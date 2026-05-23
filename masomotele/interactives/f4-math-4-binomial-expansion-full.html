@@ -1,0 +1,309 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Mathematics Form 4 | Binomial Expansion</title>
+<style>
+:root{--pri:#0a5e2a;--pri-l:#0d7a38;--acc:#f5a623;--ok:#2e7d32;--no:#c62828;--bg:#f4f7f5;--txt:#1a1a1a;--muted:#555;}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Segoe UI',system-ui,sans-serif;background:var(--bg);color:var(--txt);min-height:100vh;display:flex;flex-direction:column}
+#topbar{position:sticky;top:0;z-index:100;background:linear-gradient(135deg,var(--pri) 0%,var(--pri-l) 100%);color:#fff;padding:10px 16px;display:flex;align-items:center;gap:10px;box-shadow:0 2px 8px rgba(0,0,0,.25)}
+#topbar .sub{font-size:.7rem;opacity:.8;text-transform:uppercase;letter-spacing:1px}
+#topbar .ttl{font-size:.95rem;font-weight:700;flex:1}
+#slide-badge{background:var(--acc);color:#000;font-weight:700;font-size:.78rem;padding:3px 10px;border-radius:20px;white-space:nowrap}
+.slide{display:none;padding:16px 16px 80px;animation:fi .3s ease}
+.slide.active{display:block}
+@keyframes fi{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+.slide-title{font-size:1.2rem;font-weight:800;color:var(--pri);margin-bottom:14px;padding-bottom:8px;border-bottom:3px solid var(--acc)}
+.lo-box{background:#e8f5e9;border-left:5px solid var(--pri);border-radius:8px;padding:14px 16px;margin-bottom:12px}
+.lo-box h3{color:var(--pri);font-size:.95rem;margin-bottom:8px}
+.lo-box ol{padding-left:18px;font-size:.9rem;line-height:1.8}
+.inquiry{background:#fff8e1;border:1.5px solid var(--acc);border-radius:8px;padding:10px 14px;font-size:.88rem;color:#5d4037;margin-top:10px}
+.inquiry strong{color:#e65100}
+.teach-block{margin-bottom:18px}
+.teach-block h3{font-size:1rem;font-weight:700;color:var(--pri);margin-bottom:8px;padding-bottom:4px;border-bottom:2px solid var(--acc);display:inline-block}
+.teach-block p,.teach-block li{font-size:.9rem;line-height:1.7}
+.teach-block ul,.teach-block ol{padding-left:18px;margin-top:6px}
+.key-term{background:#fff8e1;border-left:4px solid var(--acc);border-radius:6px;padding:10px 14px;margin:10px 0;font-size:.88rem}
+.key-term strong{color:#e65100}
+.info-table{width:100%;border-collapse:collapse;margin:10px 0;font-size:.88rem}
+.info-table th{background:var(--pri);color:#fff;padding:8px 10px;text-align:left}
+.info-table td{padding:7px 10px;border-bottom:1px solid #e0e0e0;text-align:center}
+.info-table tr:nth-child(even) td{background:#f1f8e9}
+.example-box{background:#f1f8e9;border:1.5px solid var(--ok);border-radius:8px;padding:12px 14px;margin:10px 0;font-size:.88rem}
+.example-box strong{color:var(--ok);display:block;margin-bottom:6px}
+.formula-box{background:#e3f2fd;border:2px solid #1976d2;border-radius:10px;padding:14px;margin:12px 0;text-align:center}
+.formula-box .formula{font-size:1rem;font-weight:800;color:#1565c0;font-family:Georgia,serif;margin:6px 0}
+.pascal{display:flex;flex-direction:column;align-items:center;gap:4px;margin:10px 0}
+.pascal-row{display:flex;gap:8px}
+.pascal-row span{width:36px;height:36px;display:flex;align-items:center;justify-content:center;background:var(--pri);color:#fff;border-radius:6px;font-weight:700;font-size:.85rem}
+.warn-box{background:#fff3e0;border-left:4px solid #e65100;border-radius:6px;padding:10px 14px;margin:10px 0;font-size:.88rem;color:#5d4037}
+.quiz-section{margin-bottom:20px}
+.quiz-section h3{font-size:1rem;font-weight:700;color:var(--pri);margin-bottom:12px}
+.q-item{background:#fff;border:1.5px solid #c8e6c9;border-radius:10px;padding:14px;margin-bottom:12px}
+.q-item p{font-size:.9rem;font-weight:600;margin-bottom:10px}
+.fill-blank{border:none;border-bottom:2.5px dashed var(--pri);background:transparent;font-size:.9rem;padding:2px 6px;width:110px;outline:none;text-align:center}
+.fb-result{font-size:.82rem;font-weight:600;margin-top:6px;padding:4px 8px;border-radius:4px;display:inline-block}
+.fb-result.ok{background:#e8f5e9;color:var(--ok)}
+.fb-result.no{background:#ffebee;color:var(--no)}
+.sa-box{width:100%;border:1.5px solid #c8e6c9;border-radius:8px;padding:10px;font-size:.88rem;font-family:inherit;resize:vertical;min-height:80px;outline:none}
+.grade-btn{background:var(--pri);color:#fff;border:none;border-radius:8px;padding:8px 18px;font-size:.85rem;font-weight:700;cursor:pointer;margin-top:8px}
+.sa-feedback{font-size:.82rem;margin-top:8px;padding:10px;border-radius:8px;line-height:1.6;display:none}
+.sa-feedback.ok{background:#e8f5e9;border:1px solid #a5d6a7;color:#1b5e20}
+.sa-feedback.partial{background:#fff8e1;border:1px solid #ffe082;color:#5d4037}
+.sa-feedback.no{background:#ffebee;border:1px solid #ef9a9a;color:#b71c1c}
+.kw-found{color:var(--ok);font-weight:700}
+.kw-miss{color:var(--no);font-weight:700}
+.model-ans{margin-top:6px;padding-top:6px;border-top:1px solid #ccc;font-style:italic}
+#score-result{background:linear-gradient(135deg,var(--pri),var(--pri-l));color:#fff;border-radius:12px;padding:20px;text-align:center;margin-top:16px;display:none}
+#score-result .big{font-size:2rem;font-weight:900;margin:8px 0}
+.submit-btn{background:var(--acc);color:#000;border:none;border-radius:10px;padding:12px 32px;font-size:1rem;font-weight:800;cursor:pointer;margin-top:16px;width:100%}
+#navbar{position:fixed;bottom:0;left:0;right:0;background:#fff;border-top:1px solid #e0e0e0;padding:10px 16px;display:flex;align-items:center;justify-content:space-between;gap:8px;z-index:100;box-shadow:0 -2px 8px rgba(0,0,0,.1)}
+.nav-btn{background:var(--pri);color:#fff;border:none;border-radius:8px;padding:9px 22px;font-size:.88rem;font-weight:700;cursor:pointer}
+.nav-btn:disabled{background:#ccc;cursor:not-allowed}
+#dot-nav{display:flex;gap:6px;flex-wrap:wrap;justify-content:center;flex:1}
+.dot{width:10px;height:10px;border-radius:50%;background:#c8e6c9;cursor:pointer;transition:all .2s}
+.dot.active{background:var(--pri);transform:scale(1.3)}
+.dot.done{background:var(--acc)}
+</style>
+<script type="text/javascript">(function(c,l,a,r,i,t,y){c[a]=c[a]||function(){(c[a].q=c[a].q||[]).push(arguments)};t=l.createElement(r);t.async=1;t.src="https://www.clarity.ms/tag/"+i;y=l.getElementsByTagName(r)[0];y.parentNode.insertBefore(t,y);})(window,document,"clarity","script","wg31zlwbt9");</script>\n</head>
+<body>
+<div id="topbar">
+  <div><div class="sub">Mathematics · Form 4</div><div class="ttl">Binomial Expansion</div></div>
+  <div id="slide-badge">Slide 1 / 10</div>
+</div>
+
+<div class="slide active" id="s1">
+  <div class="slide-title">📋 Learning Outcomes</div>
+  <div class="lo-box"><h3>By the end of this lesson, you should be able to:</h3>
+    <ol>
+      <li>Expand binomial expressions using Pascal's Triangle</li>
+      <li>State and apply the Binomial Theorem</li>
+      <li>Find specific terms in a binomial expansion</li>
+      <li>Use binomial expansion to make approximations</li>
+      <li>Apply binomial expansion to real-life problems</li>
+      <li>Identify patterns in binomial coefficients</li>
+      <li>Use nCr notation to find coefficients</li>
+    </ol>
+  </div>
+  <div class="inquiry"><strong>🔍 Key Inquiry Question:</strong> How can we efficiently expand expressions like (1 + x)ⁿ without multiplying repeatedly?</div>
+</div>
+
+<div class="slide" id="s2">
+  <div class="slide-title">🔺 Pascal's Triangle</div>
+  <div class="teach-block"><h3>Building Pascal's Triangle</h3>
+    <p>Each number is the sum of the two numbers above it. The rows give the coefficients of binomial expansions.</p>
+    <div class="pascal">
+      <div class="pascal-row"><span>1</span></div>
+      <div class="pascal-row"><span>1</span><span>1</span></div>
+      <div class="pascal-row"><span>1</span><span>2</span><span>1</span></div>
+      <div class="pascal-row"><span>1</span><span>3</span><span>3</span><span>1</span></div>
+      <div class="pascal-row"><span>1</span><span>4</span><span>6</span><span>4</span><span>1</span></div>
+      <div class="pascal-row"><span>1</span><span>5</span><span>10</span><span>10</span><span>5</span><span>1</span></div>
+    </div>
+    <div class="key-term"><strong>Row n:</strong> gives coefficients for (a+b)ⁿ. Row 0 → (a+b)⁰, Row 4 → (a+b)⁴ coefficients are 1,4,6,4,1</div>
+  </div>
+  <div class="teach-block"><h3>Using Pascal's Triangle</h3>
+    <div class="example-box"><strong>Expand (a + b)⁴:</strong>
+      <p>Coefficients from row 4: 1, 4, 6, 4, 1</p>
+      <p>(a+b)⁴ = a⁴ + 4a³b + 6a²b² + 4ab³ + b⁴</p>
+    </div>
+  </div>
+</div>
+
+<div class="slide" id="s3">
+  <div class="slide-title">📐 Binomial Theorem</div>
+  <div class="teach-block"><h3>The Theorem</h3>
+    <div class="formula-box">
+      <div class="formula">(a + b)ⁿ = Σ ⁿCᵣ · aⁿ⁻ʳ · bʳ &nbsp; (r = 0 to n)</div>
+      <div class="formula" style="margin-top:8px">ⁿCᵣ = n! / (r!(n−r)!)</div>
+    </div>
+    <div class="key-term"><strong>nCr</strong> (read "n choose r") is the binomial coefficient — the number of ways to choose r items from n.</div>
+  </div>
+  <div class="teach-block"><h3>Computing nCr</h3>
+    <table class="info-table">
+      <tr><th>Expression</th><th>Calculation</th><th>Value</th></tr>
+      <tr><td>⁵C₀</td><td>5!/(0!5!)</td><td>1</td></tr>
+      <tr><td>⁵C₂</td><td>5!/(2!3!) = (5×4)/(2×1)</td><td>10</td></tr>
+      <tr><td>⁵C₃</td><td>5!/(3!2!)</td><td>10</td></tr>
+      <tr><td>⁶C₄</td><td>6!/(4!2!) = (6×5)/(2×1)</td><td>15</td></tr>
+    </table>
+    <div class="warn-box">⚠️ Note: ⁿCᵣ = ⁿCₙ₋ᵣ &nbsp;(symmetry property)</div>
+  </div>
+</div>
+
+<div class="slide" id="s4">
+  <div class="slide-title">✏️ Expanding Using Binomial Theorem</div>
+  <div class="teach-block"><h3>Worked Examples</h3>
+    <div class="example-box"><strong>Example 1: Expand (1 + x)⁵</strong>
+      <p>(1+x)⁵ = ⁵C₀(1)⁵ + ⁵C₁(1)⁴x + ⁵C₂(1)³x² + ⁵C₃(1)²x³ + ⁵C₄(1)x⁴ + ⁵C₅x⁵</p>
+      <p>= 1 + 5x + 10x² + 10x³ + 5x⁴ + x⁵</p>
+    </div>
+    <div class="example-box"><strong>Example 2: Expand (2 + 3x)⁴</strong>
+      <p>a=2, b=3x, n=4</p>
+      <p>= ⁴C₀(2)⁴ + ⁴C₁(2)³(3x) + ⁴C₂(2)²(3x)² + ⁴C₃(2)(3x)³ + ⁴C₄(3x)⁴</p>
+      <p>= 16 + 4(8)(3x) + 6(4)(9x²) + 4(2)(27x³) + 81x⁴</p>
+      <p>= <strong>16 + 96x + 216x² + 216x³ + 81x⁴</strong></p>
+    </div>
+    <div class="example-box"><strong>Example 3: Expand (x − 2)³</strong>
+      <p>a=x, b=−2, n=3</p>
+      <p>= x³ + 3x²(−2) + 3x(−2)² + (−2)³</p>
+      <p>= <strong>x³ − 6x² + 12x − 8</strong></p>
+    </div>
+  </div>
+</div>
+
+<div class="slide" id="s5">
+  <div class="slide-title">🎯 Finding a Specific Term</div>
+  <div class="teach-block"><h3>General Term Formula</h3>
+    <div class="formula-box"><div class="formula">Tᵣ₊₁ = ⁿCᵣ · aⁿ⁻ʳ · bʳ</div>
+      <p>The (r+1)th term in the expansion of (a+b)ⁿ</p></div>
+    <div class="example-box"><strong>Example 1: Find the 4th term of (2+x)⁶</strong>
+      <p>4th term → r = 3</p>
+      <p>T₄ = ⁶C₃ · (2)³ · x³ = 20 · 8 · x³ = <strong>160x³</strong></p>
+    </div>
+    <div class="example-box"><strong>Example 2: Find the term containing x⁴ in (1+2x)⁷</strong>
+      <p>Tᵣ₊₁ = ⁷Cᵣ(1)⁷⁻ʳ(2x)ʳ = ⁷Cᵣ · 2ʳ · xʳ</p>
+      <p>For x⁴: r = 4</p>
+      <p>T₅ = ⁷C₄ · 2⁴ · x⁴ = 35 · 16 · x⁴ = <strong>560x⁴</strong></p>
+    </div>
+  </div>
+</div>
+
+<div class="slide" id="s6">
+  <div class="slide-title">🔢 Approximations Using Binomial</div>
+  <div class="teach-block"><h3>Using Binomial for Approximations</h3>
+    <p>When x is small, higher powers of x are negligible. We can use the first few terms to approximate.</p>
+    <div class="example-box"><strong>Example 1: Approximate (1.02)⁶</strong>
+      <p>Write as (1 + 0.02)⁶</p>
+      <p>≈ 1 + 6(0.02) + 15(0.02)² + 20(0.02)³ ...</p>
+      <p>≈ 1 + 0.12 + 0.006 + 0.00016</p>
+      <p>≈ <strong>1.1262</strong> (actual: 1.1262)</p>
+    </div>
+    <div class="example-box"><strong>Example 2: Approximate (0.99)⁵</strong>
+      <p>Write as (1 − 0.01)⁵</p>
+      <p>≈ 1 + 5(−0.01) + 10(−0.01)²</p>
+      <p>≈ 1 − 0.05 + 0.001 = <strong>0.951</strong></p>
+    </div>
+    <div class="key-term"><strong>Rule of thumb:</strong> Keep terms up to x² or x³ for sufficient accuracy when |x| is small.</div>
+  </div>
+</div>
+
+<div class="slide" id="s7">
+  <div class="slide-title">📊 Patterns in Binomial Expansion</div>
+  <div class="teach-block"><h3>Key Observations</h3>
+    <table class="info-table">
+      <tr><th>Property</th><th>Description</th></tr>
+      <tr><td>Number of terms</td><td>(a+b)ⁿ has (n+1) terms</td></tr>
+      <tr><td>Powers of a</td><td>Decrease from n to 0</td></tr>
+      <tr><td>Powers of b</td><td>Increase from 0 to n</td></tr>
+      <tr><td>Sum of powers</td><td>Always equals n</td></tr>
+      <tr><td>Coefficients</td><td>Symmetric (palindrome)</td></tr>
+      <tr><td>Sum of coefficients</td><td>2ⁿ (set a=b=1)</td></tr>
+    </table>
+  </div>
+  <div class="teach-block"><h3>Verification</h3>
+    <div class="example-box"><strong>Sum of coefficients of (1+x)⁴:</strong>
+      <p>Coefficients: 1+4+6+4+1 = 16 = 2⁴ ✓</p>
+      <p>Number of terms: 5 = 4+1 ✓</p>
+    </div>
+  </div>
+</div>
+
+<div class="slide" id="s8">
+  <div class="slide-title">💡 Real-Life Applications</div>
+  <div class="teach-block"><h3>Probability (Binomial Distribution)</h3>
+    <div class="example-box"><strong>Example:</strong>
+      <p>A coin is tossed 4 times. What is the probability of getting exactly 2 heads?</p>
+      <p>P(2 heads) = ⁴C₂ × (0.5)² × (0.5)² = 6 × 0.25 × 0.25 = <strong>0.375</strong></p>
+    </div>
+  </div>
+  <div class="teach-block"><h3>Compound Interest Approximation</h3>
+    <div class="example-box"><strong>Example:</strong>
+      <p>Approximate (1.05)⁴ using binomial (rate = 5% for 4 years)</p>
+      <p>(1+0.05)⁴ ≈ 1 + 4(0.05) + 6(0.05)² + 4(0.05)³</p>
+      <p>≈ 1 + 0.2 + 0.015 + 0.0005 = <strong>1.2155</strong></p>
+      <p>Actual: 1.2155 ✓</p>
+    </div>
+  </div>
+  <div class="teach-block"><h3>Population Growth</h3>
+    <div class="example-box"><strong>Example:</strong>
+      <p>Population grows at 3% per year. Approximate population after 5 years if current is 1 million.</p>
+      <p>(1.03)⁵ ≈ 1 + 5(0.03) + 10(0.03)² = 1 + 0.15 + 0.009 = 1.159</p>
+      <p>Population ≈ <strong>1,159,000</strong></p>
+    </div>
+  </div>
+</div>
+
+<div class="slide" id="s9">
+  <div class="slide-title">✏️ Practice Problems</div>
+  <div class="teach-block"><h3>Problem 1</h3>
+    <p>Expand fully (2x − 1)⁴.</p>
+    <div class="example-box"><strong>Solution:</strong>
+      <p>a=2x, b=−1, n=4. Coefficients: 1,4,6,4,1</p>
+      <p>= (2x)⁴ + 4(2x)³(−1) + 6(2x)²(−1)² + 4(2x)(−1)³ + (−1)⁴</p>
+      <p>= 16x⁴ − 32x³ + 24x² − 8x + 1</p>
+    </div>
+  </div>
+  <div class="teach-block"><h3>Problem 2</h3>
+    <p>Find the coefficient of x³ in the expansion of (3 + 2x)⁵.</p>
+    <div class="example-box"><strong>Solution:</strong>
+      <p>T₄ = ⁵C₃(3)²(2x)³ = 10 × 9 × 8x³ = <strong>720x³</strong></p>
+      <p>Coefficient = 720</p>
+    </div>
+  </div>
+  <div class="teach-block"><h3>Problem 3</h3>
+    <p>Use binomial expansion to evaluate (1.01)⁵ to 4 decimal places.</p>
+    <div class="example-box"><strong>Solution:</strong>
+      <p>(1+0.01)⁵ ≈ 1+5(0.01)+10(0.01)²+10(0.01)³</p>
+      <p>= 1+0.05+0.001+0.00001 = <strong>1.0510</strong></p>
+    </div>
+  </div>
+</div>
+
+<div class="slide" id="s10">
+  <div class="slide-title">📝 Quiz — Binomial Expansion</div>
+  <div class="quiz-section"><h3>Part A: Fill in the Blanks (5 marks)</h3>
+    <div class="q-item"><p>1. The expansion of (a+b)ⁿ has <input class="fill-blank" id="f1" style="width:70px"> terms.</p><div id="f1r" class="fb-result" style="display:none"></div></div>
+    <div class="q-item"><p>2. ⁶C₂ = <input class="fill-blank" id="f2" style="width:50px">.</p><div id="f2r" class="fb-result" style="display:none"></div></div>
+    <div class="q-item"><p>3. The general term formula is Tᵣ₊₁ = ⁿCᵣ · <input class="fill-blank" id="f3">.</p><div id="f3r" class="fb-result" style="display:none"></div></div>
+    <div class="q-item"><p>4. The sum of all coefficients in (1+x)⁵ is <input class="fill-blank" id="f4" style="width:50px">.</p><div id="f4r" class="fb-result" style="display:none"></div></div>
+    <div class="q-item"><p>5. The 3rd row of Pascal's Triangle (for n=2) gives coefficients <input class="fill-blank" id="f5" style="width:120px">.</p><div id="f5r" class="fb-result" style="display:none"></div></div>
+  </div>
+  <div class="quiz-section"><h3>Part B: Short Answer (10 marks)</h3>
+    <div class="q-item"><p>6. (4 marks) Expand (1 + 2x)⁴ fully and find the term independent of x.</p>
+      <textarea class="sa-box" id="sa1" placeholder="Show all working..."></textarea>
+      <button class="grade-btn" onclick="gradeAnswer('sa1','fb1',{keywords:['1','8x','24x2','32x3','16x4','24','independent','constant'],required:4,marks:4,model:'(1+2x)⁴=⁴C₀+⁴C₁(2x)+⁴C₂(2x)²+⁴C₃(2x)³+⁴C₄(2x)⁴=1+8x+24x²+32x³+16x⁴. Independent term (x⁰) = 1.'})">✓ Grade My Answer</button>
+      <div id="fb1" class="sa-feedback"></div></div>
+    <div class="q-item"><p>7. (3 marks) Find the coefficient of x³ in the expansion of (2−x)⁶.</p>
+      <textarea class="sa-box" id="sa2" placeholder="Use general term formula..."></textarea>
+      <button class="grade-btn" onclick="gradeAnswer('sa2','fb2',{keywords:['-160','-160x3','6c3','20','8','coefficient','general'],required:3,marks:3,model:'T₄=⁶C₃(2)³(−x)³=20×8×(−x³)=−160x³. Coefficient of x³ = −160.'})">✓ Grade My Answer</button>
+      <div id="fb2" class="sa-feedback"></div></div>
+    <div class="q-item"><p>8. (3 marks) Use binomial expansion to evaluate (0.98)⁴ to 4 decimal places.</p>
+      <textarea class="sa-box" id="sa3" placeholder="Write 0.98 = 1 - 0.02..."></textarea>
+      <button class="grade-btn" onclick="gradeAnswer('sa3','fb3',{keywords:['0.9224','1-0.02','0.02','4','6','binomial','approximate'],required:3,marks:3,model:'(1-0.02)⁴≈1+4(-0.02)+6(-0.02)²+4(-0.02)³=1-0.08+0.0024-0.000032=0.9224.'})">✓ Grade My Answer</button>
+      <div id="fb3" class="sa-feedback"></div></div>
+  </div>
+  <button class="submit-btn" onclick="submitQuiz()">📊 Submit & See My Score</button>
+  <div id="score-result"></div>
+</div>
+
+<div id="navbar">
+  <button class="nav-btn" id="prev-btn" onclick="changeSlide(-1)" disabled>◀ Prev</button>
+  <div id="dot-nav"></div>
+  <button class="nav-btn" id="next-btn" onclick="changeSlide(1)">Next ▶</button>
+</div>
+<script>
+const TOTAL=10;let cur=1;const visited=new Set([1]);
+function buildDots(){const dn=document.getElementById('dot-nav');dn.innerHTML='';for(let i=1;i<=TOTAL;i++){const d=document.createElement('div');d.className='dot'+(i===cur?' active':visited.has(i)&&i!==cur?' done':'');d.onclick=(()=>{const n=i;return()=>goTo(n)})();dn.appendChild(d);}}
+function goTo(n){document.getElementById('s'+cur).classList.remove('active');cur=n;visited.add(n);document.getElementById('s'+n).classList.add('active');document.getElementById('slide-badge').textContent='Slide '+n+' / '+TOTAL;document.getElementById('prev-btn').disabled=(n===1);document.getElementById('next-btn').disabled=(n===TOTAL);buildDots();window.scrollTo(0,0);}
+function changeSlide(d){goTo(cur+d);}
+buildDots();
+const fillAnswers={f1:['n+1','(n+1)'],f2:['15'],f3:['aⁿ⁻ʳ · bʳ','a^(n-r) b^r'],f4:['32'],f5:['1, 2, 1','1,2,1']};
+function gradeAnswer(saId,fbId,cfg){const txt=document.getElementById(saId).value.toLowerCase().trim();if(!txt){alert('Please write your answer first.');return;}const found=cfg.keywords.filter(k=>txt.includes(k.toLowerCase()));const missed=cfg.keywords.filter(k=>!txt.includes(k.toLowerCase())).slice(0,4);const hitRate=Math.min(1,found.length/cfg.required);const marks=Math.round(hitRate*cfg.marks);const fb=document.getElementById(fbId);fb.style.display='block';const cls=marks>=cfg.marks?'ok':marks>0?'partial':'no';fb.className='sa-feedback '+cls;fb.innerHTML=`<strong>Score: ${marks} / ${cfg.marks}</strong><br>✅ Found: <span class="kw-found">${found.length>0?found.join(', '):'none'}</span><br>❌ Missed: <span class="kw-miss">${missed.length>0?missed.join(', '):'none'}</span><div class="model-ans">📖 ${cfg.model}</div>`;}
+function submitQuiz(){let fillScore=0;Object.keys(fillAnswers).forEach(id=>{const val=(document.getElementById(id).value||'').toLowerCase().trim();const correct=fillAnswers[id].some(a=>val===a||val.includes(a));const res=document.getElementById(id+'r');res.style.display='inline-block';if(correct){res.className='fb-result ok';res.textContent='✓ Correct! (1 mark)';fillScore++;}else{res.className='fb-result no';res.textContent='✗ Expected: '+fillAnswers[id][0];}});let saTotal=0;['fb1','fb2','fb3'].forEach(id=>{const fb=document.getElementById(id);if(fb.style.display!=='none'){const m=fb.innerHTML.match(/Score:\s*(\d+)\s*\//);if(m)saTotal+=parseInt(m[1]);}});const total=fillScore+saTotal;const pct=Math.round((total/15)*100);const grade=pct>=80?'Excellent (A)':pct>=60?'Good (B)':pct>=50?'Average (C)':'Needs Improvement';const emoji=pct>=80?'🏆':pct>=60?'👍':pct>=50?'📚':'💪';const res=document.getElementById('score-result');res.style.display='block';res.innerHTML=`${emoji}<div class="big">${total}/15 (${pct}%)</div><strong>${grade}</strong><br><small>Fill: ${fillScore}/5 | SA: ${saTotal}/10</small>`;submitExamToMTTI(total,15,pct);res.scrollIntoView({behavior:'smooth'});}
+function submitExamToMTTI(score,total,percent){try{fetch('/wp-json/mtti/v1/exam-result',{method:'POST',headers:{'Content-Type':'application/json','X-WP-Nonce':window.mtti_nonce||''},body:JSON.stringify({lesson_id:'f4-math-4-binomial-expansion',score,total,percent,timestamp:new Date().toISOString()})}).then(r=>r.json()).then(d=>{if(d&&d.success)console.log('[MTTI] Saved',d);}).catch(e=>console.log('[MTTI] Offline',e));}catch(e){console.log('[MTTI] Error',e);}}
+</script>
+</body>
+</html>

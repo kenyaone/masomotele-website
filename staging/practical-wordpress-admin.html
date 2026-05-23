@@ -1,0 +1,548 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WordPress Practical Exam - Admin Tasks | M.T.T.I</title>
+    <style>
+        :root{--c:#0073aa;--c2:#005a87;--bg:#1d2327;--card:#2c3338;--sidebar:#23282d;--success:#22c55e;--error:#ef4444;--wp-blue:#0073aa}
+        *{margin:0;padding:0;box-sizing:border-box}
+        body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;background:var(--bg);color:#c3c4c7;min-height:100vh}
+        
+        .start-screen{position:fixed;inset:0;background:var(--bg);display:flex;align-items:center;justify-content:center;z-index:200;padding:20px}
+        .start-card{background:var(--card);border:2px solid var(--c);border-radius:16px;padding:40px;max-width:550px;text-align:center}
+        .start-card .icon{font-size:4rem;margin-bottom:15px}
+        .start-card h1{color:#fff;font-size:1.8rem;margin-bottom:8px}
+        .start-card h2{color:var(--c);font-weight:400;margin-bottom:25px}
+        .brief{background:rgba(0,0,0,0.3);padding:20px;border-radius:12px;text-align:left;margin-bottom:20px}
+        .brief h3{color:var(--c);margin-bottom:10px}
+        .brief p{color:#c3c4c7;font-size:0.9rem;line-height:1.6}
+        .exam-info{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:20px}
+        .info-box{background:rgba(0,115,170,0.1);padding:15px;border-radius:10px}
+        .info-box span{display:block;color:var(--c);font-size:0.7rem;text-transform:uppercase}
+        .info-box b{color:#fff;font-size:1.3rem}
+        .name-input{width:100%;padding:14px;background:rgba(0,0,0,0.3);border:2px solid #3c434a;border-radius:8px;color:#fff;text-align:center;margin-bottom:15px}
+        .name-input:focus{outline:none;border-color:var(--c)}
+        .start-btn{width:100%;padding:14px;background:var(--c);color:#fff;border:none;border-radius:8px;font-weight:600;cursor:pointer}
+        .start-btn:disabled{opacity:0.5}
+        
+        .wp-admin{display:none;height:100vh}
+        .wp-header{background:#1d2327;height:32px;display:flex;align-items:center;padding:0 10px;border-bottom:1px solid #3c434a}
+        .wp-logo{color:#9ea3a8;font-size:0.8rem;display:flex;align-items:center;gap:8px}
+        .wp-logo svg{width:20px;height:20px;fill:#9ea3a8}
+        .wp-header-right{margin-left:auto;display:flex;align-items:center;gap:15px}
+        .timer{background:var(--c);color:#fff;padding:4px 12px;border-radius:3px;font-size:0.8rem;font-weight:600}
+        .timer.warn{background:var(--error)}
+        
+        .wp-body{display:flex;height:calc(100vh - 32px)}
+        .wp-sidebar{width:160px;background:var(--sidebar);padding:10px 0;overflow-y:auto}
+        .wp-menu-item{display:flex;align-items:center;gap:8px;padding:8px 12px;color:#9ea3a8;cursor:pointer;font-size:0.85rem;border-left:3px solid transparent}
+        .wp-menu-item:hover{background:#32373c;color:#fff}
+        .wp-menu-item.active{background:#32373c;color:#fff;border-left-color:var(--c)}
+        .wp-menu-item .dashicon{width:18px;text-align:center}
+        
+        .wp-content{flex:1;background:#f0f0f1;overflow-y:auto}
+        .wp-content-header{background:#fff;padding:15px 20px;border-bottom:1px solid #c3c4c7;display:flex;justify-content:space-between;align-items:center}
+        .wp-content-header h1{color:#1d2327;font-size:1.4rem;font-weight:400}
+        .task-indicator{background:var(--c);color:#fff;padding:5px 15px;border-radius:3px;font-size:0.85rem}
+        
+        .task-area{padding:20px}
+        .task-card{background:#fff;border:1px solid #c3c4c7;border-radius:4px;padding:20px;margin-bottom:20px}
+        .task-card h2{color:#1d2327;font-size:1.1rem;margin-bottom:10px;display:flex;align-items:center;gap:8px}
+        .task-card p{color:#646970;margin-bottom:15px;font-size:0.9rem}
+        
+        .form-group{margin-bottom:15px}
+        .form-group label{display:block;color:#1d2327;font-weight:600;margin-bottom:5px;font-size:0.9rem}
+        .form-group input,.form-group select,.form-group textarea{width:100%;padding:8px 10px;border:1px solid #8c8f94;border-radius:4px;font-size:0.9rem}
+        .form-group input:focus,.form-group select:focus{outline:none;border-color:var(--c);box-shadow:0 0 0 1px var(--c)}
+        .form-row{display:grid;grid-template-columns:1fr 1fr;gap:15px}
+        
+        .checkbox-list{display:flex;flex-wrap:wrap;gap:10px}
+        .checkbox-item{display:flex;align-items:center;gap:6px;background:#f0f0f1;padding:8px 12px;border-radius:4px;cursor:pointer;font-size:0.85rem}
+        .checkbox-item input{margin:0}
+        
+        .btn{padding:8px 16px;border:none;border-radius:4px;cursor:pointer;font-size:0.9rem;font-weight:500}
+        .btn-primary{background:var(--c);color:#fff}
+        .btn-primary:hover{background:var(--c2)}
+        .btn-secondary{background:#f0f0f1;color:#1d2327;border:1px solid #8c8f94}
+        
+        .feedback{padding:12px;margin-top:15px;border-radius:4px;display:none}
+        .feedback.show{display:block}
+        .feedback.success{background:#d4edda;border:1px solid #c3e6cb;color:#155724}
+        .feedback.error{background:#f8d7da;border:1px solid #f5c6cb;color:#721c24}
+        
+        .nav-buttons{display:flex;gap:10px;margin-top:20px;padding-top:20px;border-top:1px solid #c3c4c7}
+        .nav-buttons button{padding:10px 20px}
+        
+        .checklist{background:#f9f9f9;border:1px solid #ddd;border-radius:4px;padding:15px;margin-top:15px}
+        .checklist h4{color:#1d2327;font-size:0.9rem;margin-bottom:10px}
+        .check-item{display:flex;align-items:center;gap:8px;padding:5px 0;font-size:0.85rem;color:#646970}
+        .check-item.pass{color:var(--success)}
+        .check-item.pass::before{content:"✓";color:var(--success);font-weight:bold}
+        .check-item.fail::before{content:"○";color:#ccc}
+        
+        .score-box{background:var(--c);color:#fff;padding:15px;border-radius:4px;text-align:center;margin-top:15px}
+        .score-box .score{font-size:2rem;font-weight:700}
+        
+        .results-screen{position:fixed;inset:0;background:var(--bg);display:none;align-items:center;justify-content:center;z-index:200}
+        .results-card{background:var(--card);border:2px solid var(--c);border-radius:16px;padding:40px;max-width:450px;text-align:center}
+        .results-icon{font-size:4rem;margin-bottom:10px}
+        .results-status{font-size:1.8rem;font-weight:800;color:#fff}
+        .results-status.pass{color:var(--success)}
+        .results-status.fail{color:var(--error)}
+        .results-score{font-size:3rem;font-weight:800;color:var(--c);margin:10px 0}
+        .results-breakdown{margin:20px 0;text-align:left}
+        .result-item{display:flex;justify-content:space-between;padding:8px 12px;background:rgba(0,0,0,0.2);border-radius:4px;margin:5px 0;font-size:0.85rem}
+        .result-item.pass{border-left:3px solid var(--success)}
+        .result-item.fail{border-left:3px solid var(--error)}
+        .retry-btn{padding:12px 30px;background:var(--c);color:#fff;border:none;border-radius:8px;font-weight:600;cursor:pointer;margin-top:10px}
+    </style>
+</head>
+<body>
+    <div class="start-screen" id="startScreen">
+        <div class="start-card">
+            <div class="icon">🔧</div>
+            <h1>WordPress Practical Exam</h1>
+            <h2>Complete Real Admin Tasks</h2>
+            <div class="brief">
+                <h3>📋 Your Mission:</h3>
+                <p>You'll work in a simulated WordPress admin dashboard. Complete real tasks like creating posts, installing plugins, configuring settings, and managing content - just like a real WordPress administrator!</p>
+            </div>
+            <div class="exam-info">
+                <div class="info-box"><span>Tasks</span><b>5</b></div>
+                <div class="info-box"><span>Time</span><b>35 min</b></div>
+                <div class="info-box"><span>Pass</span><b>60%</b></div>
+            </div>
+            <input type="text" class="name-input" id="studentName" placeholder="Enter Your Full Name">
+            <button class="start-btn" id="startBtn" disabled>🚀 Enter WordPress Admin</button>
+        </div>
+    </div>
+
+    <div class="results-screen" id="resultsScreen">
+        <div class="results-card">
+            <div class="results-icon" id="resultsIcon">🏆</div>
+            <div class="results-status" id="resultsStatus">PASSED</div>
+            <div class="results-score" id="resultsScore">85%</div>
+            <div class="results-breakdown" id="resultsBreakdown"></div>
+            <button class="retry-btn" onclick="location.reload()">🔄 Try Again</button>
+        </div>
+    </div>
+
+    <div class="wp-admin" id="wpAdmin">
+        <div class="wp-header">
+            <div class="wp-logo">
+                <svg viewBox="0 0 24 24"><path d="M12 2C6.5 2 2 6.5 2 12s4.5 10 10 10 10-4.5 10-10S17.5 2 12 2zm0 18c-4.4 0-8-3.6-8-8s3.6-8 8-8 8 3.6 8 8-3.6 8-8 8z"/></svg>
+                M.T.T.I WordPress
+            </div>
+            <div class="wp-header-right">
+                <span id="taskProgress">Task 1/5</span>
+                <div class="timer" id="timer">35:00</div>
+            </div>
+        </div>
+        
+        <div class="wp-body">
+            <div class="wp-sidebar">
+                <div class="wp-menu-item active" data-menu="dashboard"><span class="dashicon">📊</span> Dashboard</div>
+                <div class="wp-menu-item" data-menu="posts"><span class="dashicon">📝</span> Posts</div>
+                <div class="wp-menu-item" data-menu="pages"><span class="dashicon">📄</span> Pages</div>
+                <div class="wp-menu-item" data-menu="media"><span class="dashicon">🖼️</span> Media</div>
+                <div class="wp-menu-item" data-menu="appearance"><span class="dashicon">🎨</span> Appearance</div>
+                <div class="wp-menu-item" data-menu="plugins"><span class="dashicon">🔌</span> Plugins</div>
+                <div class="wp-menu-item" data-menu="users"><span class="dashicon">👥</span> Users</div>
+                <div class="wp-menu-item" data-menu="settings"><span class="dashicon">⚙️</span> Settings</div>
+            </div>
+            
+            <div class="wp-content">
+                <div class="wp-content-header">
+                    <h1 id="pageTitle">Dashboard</h1>
+                    <span class="task-indicator" id="taskIndicator">Task 1: Initial Setup</span>
+                </div>
+                <div class="task-area" id="taskArea"></div>
+            </div>
+        </div>
+    </div>
+
+<script>
+const tasks = [
+    {
+        title: "Initial WordPress Setup",
+        menu: "settings",
+        pageTitle: "General Settings",
+        desc: "Configure the basic WordPress site settings for M.T.T.I.",
+        points: 20,
+        html: `
+            <div class="form-group">
+                <label>Site Title</label>
+                <input type="text" id="siteTitle" placeholder="Enter site title">
+            </div>
+            <div class="form-group">
+                <label>Tagline</label>
+                <input type="text" id="tagline" placeholder="Enter tagline">
+            </div>
+            <div class="form-row">
+                <div class="form-group">
+                    <label>WordPress Address (URL)</label>
+                    <input type="text" id="wpUrl" value="https://mtti.ac.ke" readonly style="background:#f0f0f1">
+                </div>
+                <div class="form-group">
+                    <label>Site Address (URL)</label>
+                    <input type="text" id="siteUrl" value="https://mtti.ac.ke" readonly style="background:#f0f0f1">
+                </div>
+            </div>
+            <div class="form-group">
+                <label>Administration Email Address</label>
+                <input type="email" id="adminEmail" placeholder="admin@example.com">
+            </div>
+            <div class="form-group">
+                <label>Timezone</label>
+                <select id="timezone">
+                    <option value="">Select timezone</option>
+                    <option value="UTC+0">UTC+0</option>
+                    <option value="Africa/Nairobi">Africa/Nairobi (UTC+3)</option>
+                    <option value="America/New_York">America/New_York</option>
+                </select>
+            </div>
+        `,
+        check: () => {
+            const title = document.getElementById('siteTitle').value.toLowerCase();
+            const tagline = document.getElementById('tagline').value;
+            const email = document.getElementById('adminEmail').value;
+            const tz = document.getElementById('timezone').value;
+            return [
+                { pass: title.includes('mtti') || title.includes('masomotele'), text: 'Site title includes M.T.T.I' },
+                { pass: tagline.length > 5, text: 'Tagline is set' },
+                { pass: email.includes('@') && email.includes('.'), text: 'Valid admin email' },
+                { pass: tz === 'Africa/Nairobi', text: 'Correct timezone (Nairobi)' }
+            ];
+        }
+    },
+    {
+        title: "Create a New Post",
+        menu: "posts",
+        pageTitle: "Add New Post",
+        desc: "Create a blog post announcing the new Web Development course.",
+        points: 20,
+        html: `
+            <div class="form-group">
+                <label>Post Title</label>
+                <input type="text" id="postTitle" placeholder="Enter post title">
+            </div>
+            <div class="form-group">
+                <label>Post Content</label>
+                <textarea id="postContent" rows="6" placeholder="Write your post content here..."></textarea>
+            </div>
+            <div class="form-row">
+                <div class="form-group">
+                    <label>Category</label>
+                    <select id="postCategory">
+                        <option value="">Select category</option>
+                        <option value="news">News</option>
+                        <option value="courses">Courses</option>
+                        <option value="events">Events</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Status</label>
+                    <select id="postStatus">
+                        <option value="draft">Draft</option>
+                        <option value="publish">Publish</option>
+                    </select>
+                </div>
+            </div>
+            <div class="form-group">
+                <label>Featured Image</label>
+                <button class="btn btn-secondary" onclick="document.getElementById('featuredSet').value='yes'">Set Featured Image</button>
+                <input type="hidden" id="featuredSet" value="no">
+                <span id="featuredStatus" style="margin-left:10px;color:#646970">No image selected</span>
+            </div>
+        `,
+        check: () => {
+            const title = document.getElementById('postTitle').value.toLowerCase();
+            const content = document.getElementById('postContent').value;
+            const cat = document.getElementById('postCategory').value;
+            const status = document.getElementById('postStatus').value;
+            const featured = document.getElementById('featuredSet').value;
+            return [
+                { pass: title.includes('web') && (title.includes('development') || title.includes('dev')), text: 'Title mentions Web Development' },
+                { pass: content.length > 50, text: 'Content has sufficient length' },
+                { pass: cat === 'courses' || cat === 'news', text: 'Appropriate category selected' },
+                { pass: status === 'publish', text: 'Post set to Publish' },
+                { pass: featured === 'yes', text: 'Featured image set' }
+            ];
+        }
+    },
+    {
+        title: "Install Security Plugins",
+        menu: "plugins",
+        pageTitle: "Add Plugins",
+        desc: "Select and 'install' the essential security plugins for the website.",
+        points: 20,
+        html: `
+            <p style="margin-bottom:15px;color:#646970">Select ALL plugins that should be installed for security:</p>
+            <div class="checkbox-list">
+                <label class="checkbox-item"><input type="checkbox" id="plug1"> Wordfence Security</label>
+                <label class="checkbox-item"><input type="checkbox" id="plug2"> Yoast SEO</label>
+                <label class="checkbox-item"><input type="checkbox" id="plug3"> UpdraftPlus Backup</label>
+                <label class="checkbox-item"><input type="checkbox" id="plug4"> WooCommerce</label>
+                <label class="checkbox-item"><input type="checkbox" id="plug5"> Sucuri Security</label>
+                <label class="checkbox-item"><input type="checkbox" id="plug6"> Limit Login Attempts</label>
+                <label class="checkbox-item"><input type="checkbox" id="plug7"> Contact Form 7</label>
+                <label class="checkbox-item"><input type="checkbox" id="plug8"> Elementor</label>
+            </div>
+            <div class="form-group" style="margin-top:20px">
+                <label>Where should plugins be downloaded from?</label>
+                <select id="pluginSource">
+                    <option value="">Select source</option>
+                    <option value="official">WordPress.org Repository</option>
+                    <option value="random">Random websites</option>
+                    <option value="nulled">Nulled/Cracked sites</option>
+                </select>
+            </div>
+        `,
+        check: () => {
+            const wordfence = document.getElementById('plug1').checked;
+            const backup = document.getElementById('plug3').checked;
+            const sucuri = document.getElementById('plug5').checked;
+            const limit = document.getElementById('plug6').checked;
+            const woo = document.getElementById('plug4').checked;
+            const source = document.getElementById('pluginSource').value;
+            return [
+                { pass: wordfence, text: 'Wordfence Security selected' },
+                { pass: backup, text: 'Backup plugin selected' },
+                { pass: sucuri || limit, text: 'Additional security plugin selected' },
+                { pass: !woo, text: 'Non-security plugins excluded' },
+                { pass: source === 'official', text: 'Official repository as source' }
+            ];
+        }
+    },
+    {
+        title: "Create Navigation Menu",
+        menu: "appearance",
+        pageTitle: "Menus",
+        desc: "Create a primary navigation menu with the correct pages.",
+        points: 20,
+        html: `
+            <div class="form-group">
+                <label>Menu Name</label>
+                <input type="text" id="menuName" placeholder="Enter menu name">
+            </div>
+            <div class="form-group">
+                <label>Select pages to add to menu (check all that apply):</label>
+                <div class="checkbox-list">
+                    <label class="checkbox-item"><input type="checkbox" id="page1"> Home</label>
+                    <label class="checkbox-item"><input type="checkbox" id="page2"> About Us</label>
+                    <label class="checkbox-item"><input type="checkbox" id="page3"> Courses</label>
+                    <label class="checkbox-item"><input type="checkbox" id="page4"> Contact</label>
+                    <label class="checkbox-item"><input type="checkbox" id="page5"> Privacy Policy</label>
+                    <label class="checkbox-item"><input type="checkbox" id="page6"> Sample Page</label>
+                </div>
+            </div>
+            <div class="form-group">
+                <label>Menu Location</label>
+                <select id="menuLocation">
+                    <option value="">Select location</option>
+                    <option value="primary">Primary Menu</option>
+                    <option value="footer">Footer Menu</option>
+                    <option value="none">None</option>
+                </select>
+            </div>
+        `,
+        check: () => {
+            const name = document.getElementById('menuName').value.toLowerCase();
+            const home = document.getElementById('page1').checked;
+            const about = document.getElementById('page2').checked;
+            const courses = document.getElementById('page3').checked;
+            const contact = document.getElementById('page4').checked;
+            const sample = document.getElementById('page6').checked;
+            const location = document.getElementById('menuLocation').value;
+            return [
+                { pass: name.length > 0, text: 'Menu name provided' },
+                { pass: home && about && courses && contact, text: 'Essential pages selected' },
+                { pass: !sample, text: 'Sample Page excluded' },
+                { pass: location === 'primary', text: 'Primary location selected' }
+            ];
+        }
+    },
+    {
+        title: "Add New User",
+        menu: "users",
+        pageTitle: "Add New User",
+        desc: "Create a new user account for a content editor with appropriate permissions.",
+        points: 20,
+        html: `
+            <div class="form-row">
+                <div class="form-group">
+                    <label>Username (required)</label>
+                    <input type="text" id="newUsername" placeholder="username">
+                </div>
+                <div class="form-group">
+                    <label>Email (required)</label>
+                    <input type="email" id="newEmail" placeholder="email@example.com">
+                </div>
+            </div>
+            <div class="form-row">
+                <div class="form-group">
+                    <label>First Name</label>
+                    <input type="text" id="firstName" placeholder="First name">
+                </div>
+                <div class="form-group">
+                    <label>Last Name</label>
+                    <input type="text" id="lastName" placeholder="Last name">
+                </div>
+            </div>
+            <div class="form-group">
+                <label>Role</label>
+                <select id="userRole">
+                    <option value="">Select role</option>
+                    <option value="subscriber">Subscriber</option>
+                    <option value="contributor">Contributor</option>
+                    <option value="author">Author</option>
+                    <option value="editor">Editor</option>
+                    <option value="administrator">Administrator</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label><input type="checkbox" id="sendNotification"> Send User Notification</label>
+            </div>
+        `,
+        check: () => {
+            const username = document.getElementById('newUsername').value;
+            const email = document.getElementById('newEmail').value;
+            const first = document.getElementById('firstName').value;
+            const last = document.getElementById('lastName').value;
+            const role = document.getElementById('userRole').value;
+            const notify = document.getElementById('sendNotification').checked;
+            return [
+                { pass: username.length >= 3 && !username.includes(' '), text: 'Valid username' },
+                { pass: email.includes('@') && email.includes('.'), text: 'Valid email address' },
+                { pass: first.length > 0 && last.length > 0, text: 'Full name provided' },
+                { pass: role === 'editor', text: 'Editor role selected (for content editor)' },
+                { pass: notify, text: 'Send notification checked' }
+            ];
+        }
+    }
+];
+
+let current = 0, timeLeft = 35 * 60, timer, scores = Array(tasks.length).fill(0);
+const $ = id => document.getElementById(id);
+
+$('studentName').oninput = e => $('startBtn').disabled = !e.target.value.trim();
+$('startBtn').onclick = startExam;
+
+// Handle featured image button
+document.addEventListener('click', e => {
+    if (e.target.textContent === 'Set Featured Image') {
+        document.getElementById('featuredSet').value = 'yes';
+        document.getElementById('featuredStatus').textContent = '✓ Image selected';
+        document.getElementById('featuredStatus').style.color = '#22c55e';
+    }
+});
+
+function startExam() {
+    $('startScreen').style.display = 'none';
+    $('wpAdmin').style.display = 'block';
+    renderTask();
+    timer = setInterval(tick, 1000);
+}
+
+function tick() {
+    timeLeft--;
+    $('timer').textContent = `${Math.floor(timeLeft/60)}:${(timeLeft%60).toString().padStart(2,'0')}`;
+    if (timeLeft <= 300) $('timer').classList.add('warn');
+    if (timeLeft <= 0) submitExam();
+}
+
+function renderTask() {
+    const t = tasks[current];
+    
+    // Update sidebar
+    document.querySelectorAll('.wp-menu-item').forEach(item => {
+        item.classList.toggle('active', item.dataset.menu === t.menu);
+    });
+    
+    $('pageTitle').textContent = t.pageTitle;
+    $('taskIndicator').textContent = `Task ${current + 1}: ${t.title}`;
+    $('taskProgress').textContent = `Task ${current + 1}/${tasks.length}`;
+    
+    $('taskArea').innerHTML = `
+        <div class="task-card">
+            <h2>📋 ${t.title}</h2>
+            <p>${t.desc}</p>
+            ${t.html}
+            <button class="btn btn-primary" onclick="checkTask()" style="margin-top:15px">Save Changes</button>
+            <div class="feedback" id="feedback"></div>
+        </div>
+        <div class="checklist" id="checklist">
+            <h4>Requirements:</h4>
+        </div>
+        <div class="score-box">
+            <p style="font-size:0.8rem;margin-bottom:5px">Total Score</p>
+            <div class="score" id="currentScore">${scores.reduce((a,b)=>a+b,0)}</div>
+            <p style="font-size:0.8rem">/100</p>
+        </div>
+        <div class="nav-buttons">
+            <button class="btn btn-secondary" id="prevBtn" onclick="prevTask()" ${current===0?'style="visibility:hidden"':''}>← Previous</button>
+            <button class="btn btn-primary" id="nextBtn" onclick="nextTask()">${current===tasks.length-1?'🏁 Finish Exam':'Next →'}</button>
+        </div>
+    `;
+    
+    checkTask();
+}
+
+function checkTask() {
+    const t = tasks[current];
+    const results = t.check();
+    const passed = results.filter(r => r.pass).length;
+    scores[current] = Math.round((passed / results.length) * t.points);
+    
+    $('checklist').innerHTML = '<h4>Requirements:</h4>' + results.map(r => 
+        `<div class="check-item ${r.pass?'pass':'fail'}">${r.text}</div>`
+    ).join('');
+    
+    $('currentScore').textContent = scores.reduce((a,b)=>a+b,0);
+    
+    const allPass = results.every(r => r.pass);
+    $('feedback').className = `feedback show ${allPass?'success':'error'}`;
+    $('feedback').innerHTML = allPass ? '✓ All requirements met!' : '⚠ Some requirements not met yet';
+}
+
+function prevTask() { if (current > 0) { current--; renderTask(); } }
+function nextTask() { if (current < tasks.length - 1) { current++; renderTask(); } else submitExam(); }
+
+function submitExam() {
+    clearInterval(timer);
+    const total = scores.reduce((a,b)=>a+b,0);
+    const pass = total >= 60;
+    
+    $('wpAdmin').style.display = 'none';
+    $('resultsScreen').style.display = 'flex';
+    $('resultsIcon').textContent = pass ? '🏆' : '📚';
+    $('resultsStatus').textContent = pass ? 'PASSED!' : 'KEEP PRACTICING';
+    $('resultsStatus').className = `results-status ${pass?'pass':'fail'}`;
+    $('resultsScore').textContent = `${total}%`;
+    $('resultsBreakdown').innerHTML = tasks.map((t,i) => 
+        `<div class="result-item ${scores[i]>=t.points*0.5?'pass':'fail'}"><span>${t.title}</span><span>${scores[i]}/${t.points}</span></div>`
+    ).join('');
+    
+    // Save results to MTTI system
+    if (typeof submitExamToMTTI === 'function') {
+        const questionResults = tasks.map((t, i) => ({
+            question: t.title,
+            correct: scores[i] >= t.points * 0.5
+        }));
+        
+        submitExamToMTTI(
+            document.title.split('|')[0].trim(),
+            total,
+            100,
+            questionResults,
+            0
+        ).then(result => {
+            if (result.success) console.log('✅ Results saved to MTTI:', result.data);
+            else console.error('❌ Failed to save results:', result.message);
+        });
+    }
+}
+</script>
+</body>
+</html>

@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CAT 6: CMS & WordPress | M.T.T.I</title>
+    <style>
+        :root{--c:#06b6d4;--c2:#0891b2;--bg:#0a1a1e;--card:#153035}
+        *{margin:0;padding:0;box-sizing:border-box}body{font-family:'Segoe UI',system-ui,sans-serif;background:linear-gradient(135deg,var(--bg),var(--card));color:#a5f3fc;min-height:100vh}
+        .screen{min-height:100vh;display:flex;align-items:center;justify-content:center;padding:20px}.card{background:var(--card);border:1px solid var(--c);border-radius:20px;padding:40px;max-width:650px;width:100%;text-align:center}
+        .badge{background:linear-gradient(135deg,var(--c),var(--c2));color:#fff;padding:8px 24px;border-radius:20px;font-size:0.85rem;font-weight:600;display:inline-block;margin-bottom:15px}
+        .icon{font-size:4rem;margin-bottom:15px}h1{font-size:1.8rem;color:var(--c);margin-bottom:8px}h2{font-size:1rem;color:#67e8f9;margin-bottom:25px;font-weight:400}
+        .topics{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:25px;text-align:left}.topic{background:rgba(6,182,212,0.1);border:1px solid rgba(6,182,212,0.3);padding:10px 12px;border-radius:8px;font-size:0.85rem;color:#67e8f9}
+        .info{display:grid;grid-template-columns:repeat(3,1fr);gap:15px;margin-bottom:25px}.info-box{background:rgba(6,182,212,0.1);padding:15px;border-radius:10px}.info-box span{display:block;color:#67e8f9;font-size:0.75rem;text-transform:uppercase}.info-box b{color:var(--c);font-size:1.4rem}
+        input[type=text]{width:100%;padding:15px;background:rgba(0,0,0,0.3);border:2px solid #164e63;border-radius:10px;color:#fff;font-size:1rem;text-align:center;margin-bottom:20px}input:focus{outline:none;border-color:var(--c)}
+        .btn{width:100%;padding:16px;font-size:1.1rem;font-weight:600;background:linear-gradient(135deg,var(--c),var(--c2));color:#fff;border:none;border-radius:12px;cursor:pointer}.btn:disabled{opacity:0.5;cursor:not-allowed}
+        .exam{display:none;padding:20px}.container{max-width:900px;margin:0 auto}
+        .header{background:var(--card);border:1px solid var(--c);border-radius:16px;padding:15px 20px;margin-bottom:20px;display:flex;justify-content:space-between;align-items:center;position:sticky;top:10px;z-index:100}
+        .header h1{font-size:1rem;color:var(--c)}.timer{background:linear-gradient(135deg,var(--c),var(--c2));padding:8px 20px;border-radius:20px;font-weight:600;font-size:0.95rem;color:#fff}.timer.warn{background:#ef4444;animation:pulse 1s infinite}@keyframes pulse{50%{opacity:0.7}}
+        .qcard{background:var(--card);border:1px solid #164e63;border-radius:16px;padding:25px;margin-bottom:20px}
+        .qnum{background:linear-gradient(135deg,var(--c),var(--c2));color:#fff;padding:5px 14px;border-radius:15px;font-size:0.8rem;font-weight:600;display:inline-block;margin-bottom:15px}
+        .scenario{background:rgba(6,182,212,0.1);border-left:4px solid var(--c);padding:12px 15px;border-radius:0 8px 8px 0;margin-bottom:15px;color:#67e8f9;font-size:0.9rem}
+        .qtext{font-size:1.1rem;margin-bottom:20px;line-height:1.5}
+        .opts{display:flex;flex-direction:column;gap:10px}.opt{background:rgba(0,0,0,0.2);border:2px solid #164e63;border-radius:10px;padding:14px 16px;cursor:pointer;display:flex;align-items:center;gap:12px;transition:all 0.2s}
+        .opt:hover{border-color:var(--c);background:rgba(6,182,212,0.1)}.opt.sel{border-color:var(--c);background:rgba(6,182,212,0.2)}.opt.correct{border-color:#22c55e;background:rgba(34,197,94,0.2)}.opt.wrong{border-color:#ef4444;background:rgba(239,68,68,0.2)}
+        .letter{width:32px;height:32px;border-radius:50%;background:rgba(6,182,212,0.2);display:flex;align-items:center;justify-content:center;font-weight:600;color:var(--c);flex-shrink:0}
+        .opt.sel .letter{background:var(--c);color:#fff}.opt.correct .letter{background:#22c55e;color:#fff}.opt.wrong .letter{background:#ef4444;color:#fff}
+        .nav{display:flex;gap:15px;margin-top:20px}.nav button{flex:1;padding:14px;border:none;border-radius:10px;font-size:1rem;font-weight:600;cursor:pointer}
+        .nav .sec{background:rgba(6,182,212,0.2);color:var(--c)}.nav .pri{background:linear-gradient(135deg,var(--c),var(--c2));color:#fff}.nav .sub{background:linear-gradient(135deg,#22c55e,#16a34a);color:#fff}
+        .results{display:none}.results .card{max-width:480px}.res-icon{font-size:5rem;margin-bottom:15px}.res-status{font-size:2rem;font-weight:800}.res-status.pass{color:#22c55e}.res-status.fail{color:#ef4444}
+        .res-score{font-size:4rem;font-weight:800;color:var(--c);margin:10px 0}.res-detail{color:#67e8f9;margin-bottom:25px}
+        .breakdown{display:grid;grid-template-columns:1fr 1fr;gap:15px;margin-bottom:25px}.breakdown div{background:rgba(6,182,212,0.1);padding:15px;border-radius:10px}.breakdown span{color:#67e8f9;font-size:0.8rem;display:block}.breakdown b{font-size:1.3rem}
+        .res-btns{display:flex;gap:15px}.res-btns button{flex:1;padding:14px;border:none;border-radius:10px;font-weight:600;cursor:pointer}.res-btns .rev{background:rgba(6,182,212,0.2);color:var(--c)}.res-btns .retry{background:linear-gradient(135deg,var(--c),var(--c2));color:#fff}
+        .explain{margin-top:15px;padding:12px;background:rgba(34,197,94,0.1);border-radius:8px;border-left:4px solid #22c55e;text-align:left}.explain b{color:#22c55e}.explain p{color:#67e8f9;margin-top:5px;font-size:0.9rem}
+    </style>
+</head>
+<body>
+    <div id="start" class="screen"><div class="card">
+        <div class="badge">📝 CAT 6</div><div class="icon">🔧</div>
+        <h1>CMS & WordPress</h1><h2>Masomotele Technical Training Institute - Web Design</h2>
+        <div class="topics"><div class="topic">📝 What is a CMS</div><div class="topic">📝 WordPress Dashboard</div><div class="topic">📝 Themes & Customization</div><div class="topic">📝 Plugins</div><div class="topic">📝 Posts vs Pages</div><div class="topic">📝 WordPress Security</div></div>
+        <div class="info"><div class="info-box"><span>Questions</span><b>10</b></div><div class="info-box"><span>Duration</span><b>20 min</b></div><div class="info-box"><span>Pass Mark</span><b>50%</b></div></div>
+        <input type="text" id="name" placeholder="Enter Your Full Name"><button class="btn" id="startBtn" disabled>Start Exam</button>
+    </div></div>
+    <div id="exam" class="exam"><div class="container">
+        <div class="header"><div style="display:flex;align-items:center;gap:10px"><span style="font-size:1.3rem">🔧</span><h1>CMS & WordPress</h1></div><div style="display:flex;align-items:center;gap:15px"><span id="prog">1/10</span><div class="timer" id="timer">20:00</div></div></div>
+        <div id="qbox"></div>
+        <div class="nav"><button class="sec" id="prev" onclick="prev()">← Previous</button><button class="pri" id="next" onclick="next()">Next →</button></div>
+    </div></div>
+    <div id="results" class="results screen"><div class="card">
+        <div class="res-icon" id="resIcon">🏆</div><div class="res-status" id="resStatus">PASSED</div><div class="res-score" id="resScore">80%</div><div class="res-detail" id="resDetail">8/10 correct</div>
+        <div class="breakdown"><div><span>Correct</span><b id="corr">8</b></div><div><span>Time Used</span><b id="time">15:30</b></div></div>
+        <div class="res-btns"><button class="rev" onclick="review()">📝 Review</button><button class="retry" onclick="location.reload()">🔄 Retry</button></div>
+    </div></div>
+<script>
+const Q=[
+    {q:"What does CMS stand for?",s:"A client asks why they should use WordPress.",o:["Computer Management System","Content Management System","Creative Media Software","Central Media Server"],a:1,e:"CMS = Content Management System - software for creating and managing website content without coding."},
+    {q:"What is the difference between WordPress.com and WordPress.org?",s:"You're advising a client on which WordPress to use.",o:["No difference",".com is hosted service, .org is self-hosted software",".org is paid, .com is free",".com is for blogs only"],a:1,e:"WordPress.com is hosted (limited); WordPress.org is self-hosted software (full control)."},
+    {q:"What are WordPress 'Plugins'?",s:"A client wants to add a contact form to their site.",o:["Website themes","Extensions that add features/functionality","Image files","User accounts"],a:1,e:"Plugins are add-ons that extend WordPress functionality (forms, SEO, security, etc.)."},
+    {q:"What is the difference between Posts and Pages in WordPress?",s:"You're organizing content for a business website.",o:["No difference","Posts are time-based (blog), Pages are static (About Us)","Posts are paid features","Pages are for images only"],a:1,e:"Posts are chronological blog entries; Pages are timeless static content like About or Contact."},
+    {q:"What does a WordPress Theme control?",s:"A client wants to change their website's appearance.",o:["Website security","Visual design and layout","Database storage","Email settings"],a:1,e:"Themes control the visual appearance, layout, and styling of a WordPress site."},
+    {q:"Where do you access WordPress administration?",s:"You need to log in to manage the website.",o:["example.com/login","example.com/wp-admin","example.com/dashboard","example.com/cms"],a:1,e:"/wp-admin is the default WordPress admin login URL (also /wp-login.php)."},
+    {q:"What is a WordPress 'Widget'?",s:"You want to add a search box to the sidebar.",o:["A plugin type","Small content blocks for sidebars/footers","Admin user role","Theme file"],a:1,e:"Widgets are small blocks of content placed in widget areas like sidebars and footers."},
+    {q:"Why should you keep WordPress updated?",s:"You notice an update notification in the dashboard.",o:["Updates slow down the site","Security patches and new features","Updates are optional cosmetic changes","Only update themes, not core"],a:1,e:"Updates fix security vulnerabilities and bugs, and add new features - critical for security."},
+    {q:"What is the WordPress Media Library?",s:"You need to add images to a blog post.",o:["Video player plugin","Central storage for images, videos, documents","Theme collection","Plugin store"],a:1,e:"Media Library stores and manages all uploaded files (images, videos, PDFs, etc.)."},
+    {q:"What is a 'Child Theme' in WordPress?",s:"You want to customize a theme without losing changes on updates.",o:["A smaller theme","Theme that inherits from parent theme safely","Theme for children's websites","Backup theme"],a:1,e:"Child themes inherit from parent themes, allowing safe customizations that survive updates."}
+];
+let cur=0,ans=Array(Q.length).fill(null),left=1200,tmr,start,reviewing=false;
+const $=id=>document.getElementById(id);
+$('name').oninput=e=>$('startBtn').disabled=!e.target.value.trim();
+$('startBtn').onclick=()=>{start=Date.now();$('start').style.display='none';$('exam').style.display='block';render();tmr=setInterval(tick,1000)};
+function tick(){left--;$('timer').textContent=`${Math.floor(left/60)}:${(left%60).toString().padStart(2,'0')}`;if(left<=300)$('timer').classList.add('warn');if(left<=0)end()}
+function render(){const q=Q[cur];$('prog').textContent=`${cur+1}/${Q.length}`;$('qbox').innerHTML=`<div class="qcard"><div class="qnum">Question ${cur+1}</div>${q.s?`<div class="scenario">📋 ${q.s}</div>`:''}<div class="qtext">${q.q}</div><div class="opts">${q.o.map((o,i)=>`<div class="opt ${ans[cur]===i?'sel':''} ${reviewing?(i===q.a?'correct':ans[cur]===i?'wrong':''):''}" onclick="${reviewing?'':`sel(${i})`}"><div class="letter">${'ABCD'[i]}</div><div>${o}</div></div>`).join('')}</div>${reviewing?`<div class="explain"><b>✓ Explanation:</b><p>${q.e}</p></div>`:''}</div>`;$('prev').style.visibility=cur===0?'hidden':'visible';$('next').textContent=cur===Q.length-1?(reviewing?'Finish':'Submit'):'Next →';$('next').className=`${cur===Q.length-1&&!reviewing?'sub':'pri'}`}
+function sel(i){if(!reviewing){ans[cur]=i;render()}}
+function prev(){if(cur>0){cur--;render()}}
+function next(){if(cur<Q.length-1){cur++;render()}else if(reviewing)location.reload();else end()}
+function end(){clearInterval(tmr);const c=ans.filter((a,i)=>a===Q[i].a).length,p=Math.round(c/Q.length*100),pass=p>=50,used=Math.floor((Date.now()-start)/1000);$('resIcon').textContent=pass?'🏆':'📚';$('resStatus').textContent=pass?'PASSED':'KEEP STUDYING';$('resStatus').className=`res-status ${pass?'pass':'fail'}`;$('resScore').textContent=p+'%';$('resDetail').textContent=`${c}/${Q.length} correct`;$('corr').textContent=c;$('time').textContent=`${Math.floor(used/60)}:${(used%60).toString().padStart(2,'0')}`;$('exam').style.display='none';$('results').style.display='flex'}
+function review(){reviewing=true;cur=0;$('results').style.display='none';$('exam').style.display='block';$('timer').textContent='Review';render()}
+</script>
+</body>
+</html>

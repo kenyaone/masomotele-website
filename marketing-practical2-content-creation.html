@@ -1,0 +1,476 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Content Creation & Strategy Practical | M.T.T.I</title>
+    <style>
+        :root{--c:#e4405f;--c2:#c13584;--bg:#1a0a10;--card:#2d1520;--success:#22c55e;--error:#ef4444}
+        *{margin:0;padding:0;box-sizing:border-box}
+        body{font-family:'Segoe UI',system-ui,sans-serif;background:var(--bg);color:#fce7f3;min-height:100vh}
+        
+        .header{background:var(--card);border-bottom:2px solid var(--c);padding:12px 20px;display:flex;justify-content:space-between;align-items:center;position:fixed;top:0;left:0;right:0;z-index:100}
+        .header h1{color:var(--c);font-size:1.1rem}
+        .timer{background:var(--c);color:#fff;padding:6px 16px;border-radius:20px;font-weight:600}
+        .timer.warn{background:var(--error)}
+        
+        .main-container{display:grid;grid-template-columns:300px 1fr 320px;height:100vh;padding-top:52px}
+        @media(max-width:1100px){.main-container{grid-template-columns:250px 1fr}}
+        
+        .task-panel{background:var(--card);border-right:1px solid #4a1530;padding:20px;overflow-y:auto}
+        .task-badge{background:var(--c);color:#fff;padding:4px 12px;border-radius:15px;font-size:0.75rem;font-weight:600}
+        .task-title{font-size:1.15rem;color:#fff;margin:12px 0 8px}
+        .task-desc{color:#f9a8d4;font-size:0.85rem;line-height:1.5;margin-bottom:15px}
+        
+        .brief-box{background:rgba(228,64,95,0.1);border-left:3px solid var(--c);padding:12px;border-radius:0 8px 8px 0;margin-bottom:15px}
+        .brief-box h4{color:var(--c);font-size:0.8rem;margin-bottom:6px}
+        .brief-box p{font-size:0.8rem;color:#fbcfe8}
+        
+        .checklist{background:rgba(0,0,0,0.3);border-radius:8px;padding:12px;margin-bottom:15px}
+        .checklist h4{color:var(--c);font-size:0.8rem;margin-bottom:8px}
+        .check-item{display:flex;align-items:center;gap:6px;padding:3px 0;font-size:0.75rem}
+        .check-item.pass{color:var(--success)}
+        .check-item::before{content:"○";color:#4a5568}
+        .check-item.pass::before{content:"✓";color:var(--success)}
+        
+        .score-box{background:var(--c);color:#fff;padding:10px;border-radius:8px;text-align:center;margin:12px 0}
+        .score-box .score{font-size:1.8rem;font-weight:700}
+        
+        .nav-btns{display:flex;gap:8px}
+        .nav-btns button{flex:1;padding:10px;border:none;border-radius:8px;font-weight:600;cursor:pointer;font-size:0.85rem}
+        .btn-prev{background:rgba(228,64,95,0.2);color:var(--c)}
+        .btn-next{background:var(--c);color:#fff}
+        
+        .editor-panel{background:#0f0a0c;padding:20px;overflow-y:auto}
+        .editor-title{color:var(--c);font-size:0.9rem;margin-bottom:15px}
+        
+        .post-composer{background:var(--card);border-radius:12px;padding:20px;margin-bottom:20px}
+        .composer-header{display:flex;align-items:center;gap:10px;margin-bottom:15px;padding-bottom:15px;border-bottom:1px solid #4a1530}
+        .avatar{width:40px;height:40px;background:var(--c);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:1.2rem}
+        .composer-meta{flex:1}
+        .composer-meta .name{font-weight:600;font-size:0.9rem}
+        .composer-meta .platform{font-size:0.75rem;color:#f9a8d4}
+        
+        .form-group{margin-bottom:15px}
+        .form-group label{display:block;color:#f9a8d4;font-size:0.8rem;margin-bottom:5px}
+        .form-group textarea,.form-group input,.form-group select{width:100%;padding:12px;background:rgba(0,0,0,0.3);border:1px solid #4a1530;border-radius:8px;color:#fff;font-size:0.9rem;resize:none}
+        .form-group textarea:focus,.form-group input:focus{outline:none;border-color:var(--c)}
+        .char-count{text-align:right;font-size:0.75rem;color:#f9a8d4;margin-top:4px}
+        .char-count.warn{color:#f59e0b}
+        .char-count.error{color:var(--error)}
+        
+        .media-selector{display:flex;gap:10px;flex-wrap:wrap}
+        .media-btn{background:rgba(0,0,0,0.3);border:1px dashed #4a1530;border-radius:8px;padding:15px;cursor:pointer;text-align:center;flex:1;min-width:80px}
+        .media-btn:hover{border-color:var(--c)}
+        .media-btn.selected{border-color:var(--c);border-style:solid;background:rgba(228,64,95,0.1)}
+        .media-btn .icon{font-size:1.5rem;margin-bottom:5px}
+        .media-btn .label{font-size:0.7rem;color:#f9a8d4}
+        
+        .hashtag-input{display:flex;flex-wrap:wrap;gap:6px;padding:10px;background:rgba(0,0,0,0.3);border:1px solid #4a1530;border-radius:8px;min-height:50px}
+        .hashtag{background:var(--c);color:#fff;padding:4px 10px;border-radius:15px;font-size:0.8rem;display:flex;align-items:center;gap:5px}
+        .hashtag .remove{cursor:pointer;opacity:0.7}
+        .hashtag-add{border:none;background:transparent;color:#f9a8d4;font-size:0.85rem;outline:none;min-width:100px}
+        
+        .cta-selector{display:flex;gap:8px;flex-wrap:wrap}
+        .cta-btn{background:rgba(0,0,0,0.3);border:1px solid #4a1530;padding:8px 12px;border-radius:6px;font-size:0.8rem;cursor:pointer}
+        .cta-btn:hover{border-color:var(--c)}
+        .cta-btn.selected{background:var(--c);color:#fff;border-color:var(--c)}
+        
+        .preview-panel{background:var(--card);border-left:1px solid #4a1530;padding:20px;overflow-y:auto}
+        @media(max-width:1100px){.preview-panel{display:none}}
+        .preview-title{color:var(--c);font-size:0.9rem;margin-bottom:15px}
+        
+        .phone-mockup{background:#000;border-radius:30px;padding:10px;max-width:280px;margin:0 auto}
+        .phone-screen{background:#fff;border-radius:20px;overflow:hidden}
+        .post-preview{padding:12px}
+        .preview-header{display:flex;align-items:center;gap:10px;margin-bottom:10px}
+        .preview-avatar{width:32px;height:32px;background:linear-gradient(45deg,#f09433,#e6683c,#dc2743,#cc2366,#bc1888);border-radius:50%}
+        .preview-name{font-weight:600;font-size:0.85rem;color:#000}
+        .preview-image{background:linear-gradient(135deg,#667eea,#764ba2);height:200px;margin:0 -12px;display:flex;align-items:center;justify-content:center;color:#fff;font-size:0.9rem}
+        .preview-actions{display:flex;gap:15px;padding:10px 0;font-size:1.2rem}
+        .preview-caption{font-size:0.85rem;color:#000;line-height:1.4}
+        .preview-caption .name{font-weight:600}
+        .preview-hashtags{color:#00376b;font-size:0.85rem}
+        
+        .content-tips{background:rgba(228,64,95,0.1);border-radius:8px;padding:12px;margin-top:15px}
+        .content-tips h4{color:var(--c);font-size:0.8rem;margin-bottom:8px}
+        .content-tips ul{margin-left:15px;font-size:0.75rem;color:#fbcfe8}
+        .content-tips li{margin:4px 0}
+        
+        .start-screen{position:fixed;inset:0;background:var(--bg);display:flex;align-items:center;justify-content:center;z-index:200}
+        .start-card{background:var(--card);border:2px solid var(--c);border-radius:20px;padding:40px;max-width:550px;text-align:center}
+        .start-card .icon{font-size:4rem;margin-bottom:15px}
+        .start-card h1{color:var(--c);font-size:1.8rem;margin-bottom:8px}
+        .start-card h2{color:#f9a8d4;font-weight:400;margin-bottom:25px}
+        .brief{background:rgba(0,0,0,0.3);padding:20px;border-radius:12px;text-align:left;margin-bottom:20px}
+        .brief h3{color:var(--c);margin-bottom:10px}
+        .brief p{color:#fce7f3;font-size:0.9rem;line-height:1.6}
+        .exam-info{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:20px}
+        .info-box{background:rgba(228,64,95,0.1);padding:15px;border-radius:10px}
+        .info-box span{display:block;color:#f9a8d4;font-size:0.7rem;text-transform:uppercase}
+        .info-box b{color:var(--c);font-size:1.3rem}
+        .name-input{width:100%;padding:14px;background:rgba(0,0,0,0.3);border:2px solid #4a1530;border-radius:10px;color:#fff;text-align:center;margin-bottom:15px}
+        .start-btn{width:100%;padding:14px;background:var(--c);color:#fff;border:none;border-radius:10px;font-weight:600;cursor:pointer}
+        .start-btn:disabled{opacity:0.5}
+        
+        .results-screen{position:fixed;inset:0;background:var(--bg);display:none;align-items:center;justify-content:center;z-index:200}
+        .results-card{background:var(--card);border:2px solid var(--c);border-radius:20px;padding:40px;max-width:450px;text-align:center}
+        .results-icon{font-size:4rem;margin-bottom:10px}
+        .results-status{font-size:1.8rem;font-weight:800}
+        .results-status.pass{color:var(--success)}
+        .results-status.fail{color:var(--error)}
+        .results-score{font-size:3rem;font-weight:800;color:var(--c);margin:10px 0}
+        .result-item{display:flex;justify-content:space-between;padding:8px 12px;background:rgba(0,0,0,0.2);border-radius:6px;margin:5px 0;font-size:0.85rem}
+        .result-item.pass{border-left:3px solid var(--success)}
+        .result-item.fail{border-left:3px solid var(--error)}
+        .retry-btn{padding:12px 30px;background:var(--c);color:#fff;border:none;border-radius:8px;font-weight:600;cursor:pointer;margin-top:15px}
+    </style>
+<meta name="description" content="Professional training courses at MTTI Eldoret. TVETA-accredited programs in IT, healthcare, and creative fields. Enroll today.">
+<script type="text/javascript">(function(c,l,a,r,i,t,y){c[a]=c[a]||function(){(c[a].q=c[a].q||[]).push(arguments)};t=l.createElement(r);t.async=1;t.src="https://www.clarity.ms/tag/"+i;y=l.getElementsByTagName(r)[0];y.parentNode.insertBefore(t,y);})(window,document,"clarity","script","wg31zlwbt9");</script>\n</head>
+<body>
+    <div class="start-screen" id="startScreen">
+        <div class="start-card">
+            <div class="icon">✍️</div>
+            <h1>Content Creation Practical</h1>
+            <h2>Create Engaging Social Media Posts</h2>
+            <div class="brief">
+                <h3>📋 Your Challenge:</h3>
+                <p>Write real social media posts for different brands and platforms. Craft compelling copy, select media types, add hashtags, and include calls-to-action. See your posts come to life in a phone preview!</p>
+            </div>
+            <div class="exam-info">
+                <div class="info-box"><span>Posts</span><b>5</b></div>
+                <div class="info-box"><span>Time</span><b>40 min</b></div>
+                <div class="info-box"><span>Pass</span><b>60%</b></div>
+            </div>
+            <input type="text" class="name-input" id="studentName" placeholder="Enter Your Full Name">
+            <button class="start-btn" id="startBtn" disabled>✍️ Start Creating Content</button>
+        </div>
+    </div>
+
+    <div class="results-screen" id="resultsScreen">
+        <div class="results-card">
+            <div class="results-icon" id="resultsIcon">🏆</div>
+            <div class="results-status" id="resultsStatus">PASSED</div>
+            <div class="results-score" id="resultsScore">85%</div>
+            <div id="resultsBreakdown"></div>
+            <button class="retry-btn" onclick="location.reload()">🔄 Try Again</button>
+        </div>
+    </div>
+
+    <div class="header" id="header" style="display:none">
+        <h1>✍️ Content Creation Practical</h1>
+        <div style="display:flex;align-items:center;gap:15px">
+            <span id="taskProgress">Post 1/5</span>
+            <div class="timer" id="timer">40:00</div>
+        </div>
+    </div>
+
+    <div class="main-container" id="mainContainer" style="display:none">
+        <div class="task-panel" id="taskPanel"></div>
+        <div class="editor-panel" id="editorPanel"></div>
+        <div class="preview-panel" id="previewPanel"></div>
+    </div>
+
+<script>
+const mediaTypes = [
+    { id: 'image', icon: '🖼️', label: 'Image' },
+    { id: 'carousel', icon: '🎠', label: 'Carousel' },
+    { id: 'video', icon: '🎬', label: 'Video' },
+    { id: 'reel', icon: '📱', label: 'Reel' },
+    { id: 'story', icon: '⭕', label: 'Story' }
+];
+
+const ctaOptions = ['Shop Now', 'Learn More', 'Sign Up', 'Book Now', 'Get Offer', 'Contact Us', 'Download', 'Watch Now'];
+
+const tasks = [
+    {
+        title: "Product Launch Post",
+        brand: "TechGadget Store",
+        platform: "Instagram",
+        brief: "Announce the launch of new wireless earbuds. Highlight: 40hr battery, noise cancellation, Ksh 4,999 price. Create excitement and drive sales.",
+        maxChars: 2200,
+        points: 20,
+        checks: [
+            { test: p => p.caption.length >= 50, text: 'Caption has substance (50+ chars)' },
+            { test: p => p.caption.length <= 2200, text: 'Within character limit' },
+            { test: p => /\d/.test(p.caption), text: 'Includes specific details (numbers)' },
+            { test: p => p.hashtags.length >= 3, text: 'At least 3 hashtags' },
+            { test: p => p.cta !== '', text: 'Call-to-action included' },
+            { test: p => p.mediaType !== '', text: 'Media type selected' }
+        ]
+    },
+    {
+        title: "Behind-the-Scenes Story",
+        brand: "Artisan Bakery",
+        platform: "Instagram Stories",
+        brief: "Show the morning baking process. Make it authentic and personal. Invite viewers to visit today for fresh bread. Keep it casual and warm.",
+        maxChars: 500,
+        points: 20,
+        checks: [
+            { test: p => p.caption.length >= 20, text: 'Story caption written' },
+            { test: p => p.caption.length <= 150, text: 'Concise for Stories format' },
+            { test: p => p.mediaType === 'video' || p.mediaType === 'story' || p.mediaType === 'reel', text: 'Video/Story format selected' },
+            { test: p => /today|now|fresh|morning/i.test(p.caption), text: 'Creates urgency' },
+            { test: p => p.cta !== '', text: 'Has call-to-action' }
+        ]
+    },
+    {
+        title: "Educational Carousel",
+        brand: "M.T.T.I Training",
+        platform: "Instagram/LinkedIn",
+        brief: "Create a carousel post: '5 Skills Every Digital Marketer Needs in 2024'. Educational, value-driven content to establish expertise and attract students.",
+        maxChars: 2200,
+        points: 20,
+        checks: [
+            { test: p => p.caption.length >= 100, text: 'Detailed educational caption' },
+            { test: p => p.mediaType === 'carousel', text: 'Carousel format selected' },
+            { test: p => p.hashtags.length >= 4, text: '4+ relevant hashtags' },
+            { test: p => /skill|learn|2024|digital|market/i.test(p.caption), text: 'Topic-relevant keywords' },
+            { test: p => p.cta === 'Learn More' || p.cta === 'Sign Up', text: 'Educational CTA' }
+        ]
+    },
+    {
+        title: "Sale Announcement",
+        brand: "Fashion Outlet",
+        platform: "Facebook",
+        brief: "Black Friday Sale: Up to 50% off everything! This weekend only. Create urgency, highlight the discount, drive store visits and online shopping.",
+        maxChars: 5000,
+        points: 20,
+        checks: [
+            { test: p => p.caption.length >= 50, text: 'Compelling sale copy' },
+            { test: p => /50%|discount|off|sale/i.test(p.caption), text: 'Highlights discount' },
+            { test: p => /weekend|today|limited|hurry|now/i.test(p.caption), text: 'Creates urgency' },
+            { test: p => p.hashtags.length >= 2, text: 'Relevant hashtags' },
+            { test: p => p.cta === 'Shop Now' || p.cta === 'Get Offer', text: 'Sales-focused CTA' },
+            { test: p => p.mediaType !== '', text: 'Visual media selected' }
+        ]
+    },
+    {
+        title: "Customer Testimonial",
+        brand: "Fitness Studio",
+        platform: "Instagram",
+        brief: "Share a member transformation story. Sarah lost 15kg in 6 months. Celebrate her success, inspire others, and subtly promote membership. Authentic and motivational.",
+        maxChars: 2200,
+        points: 20,
+        checks: [
+            { test: p => p.caption.length >= 80, text: 'Tells the transformation story' },
+            { test: p => /sarah|member|transform|journey|result/i.test(p.caption.toLowerCase()), text: 'Personal story element' },
+            { test: p => p.hashtags.length >= 3, text: 'Fitness hashtags included' },
+            { test: p => p.mediaType === 'image' || p.mediaType === 'carousel', text: 'Visual proof format' },
+            { test: p => !/buy|purchase|discount/i.test(p.caption), text: 'Not overly salesy' }
+        ]
+    }
+];
+
+let current = 0, timeLeft = 40 * 60, timer;
+let posts = tasks.map(() => ({
+    caption: '',
+    hashtags: [],
+    mediaType: '',
+    cta: ''
+}));
+let scores = Array(tasks.length).fill(0);
+let hashtagInput = '';
+
+const $ = id => document.getElementById(id);
+
+$('studentName').oninput = e => $('startBtn').disabled = !e.target.value.trim();
+$('startBtn').onclick = startExam;
+
+function startExam() {
+    $('startScreen').style.display = 'none';
+    $('header').style.display = 'flex';
+    $('mainContainer').style.display = 'grid';
+    renderTask();
+    timer = setInterval(tick, 1000);
+}
+
+function tick() {
+    timeLeft--;
+    $('timer').textContent = `${Math.floor(timeLeft/60)}:${(timeLeft%60).toString().padStart(2,'0')}`;
+    if (timeLeft <= 300) $('timer').classList.add('warn');
+    if (timeLeft <= 0) submitExam();
+}
+
+function renderTask() {
+    const t = tasks[current];
+    const p = posts[current];
+    $('taskProgress').textContent = `Post ${current + 1}/${tasks.length}`;
+    
+    // Task Panel
+    $('taskPanel').innerHTML = `
+        <span class="task-badge">${t.platform}</span>
+        <h2 class="task-title">${t.title}</h2>
+        <p class="task-desc">Create content for ${t.brand}</p>
+        
+        <div class="brief-box">
+            <h4>📋 Brief</h4>
+            <p>${t.brief}</p>
+        </div>
+        
+        <div class="checklist" id="checklist">
+            <h4>✅ Requirements</h4>
+        </div>
+        
+        <div class="score-box">
+            <div style="font-size:0.75rem">Score</div>
+            <div class="score" id="currentScore">${scores.reduce((a,b)=>a+b,0)}</div>
+            <div style="font-size:0.75rem">/100</div>
+        </div>
+        
+        <div class="nav-btns">
+            <button class="btn-prev" onclick="prevTask()" ${current===0?'style="visibility:hidden"':''}>←</button>
+            <button class="btn-next" onclick="nextTask()">${current===tasks.length-1?'🏁 Finish':'Next →'}</button>
+        </div>
+    `;
+    
+    // Editor Panel
+    $('editorPanel').innerHTML = `
+        <div class="editor-title">📝 Post Composer - ${t.brand}</div>
+        
+        <div class="post-composer">
+            <div class="composer-header">
+                <div class="avatar">🏢</div>
+                <div class="composer-meta">
+                    <div class="name">${t.brand}</div>
+                    <div class="platform">${t.platform}</div>
+                </div>
+            </div>
+            
+            <div class="form-group">
+                <label>Caption / Copy</label>
+                <textarea rows="5" placeholder="Write your engaging caption here..." oninput="updatePost('caption', this.value)">${p.caption}</textarea>
+                <div class="char-count ${p.caption.length > t.maxChars ? 'error' : p.caption.length > t.maxChars * 0.9 ? 'warn' : ''}">${p.caption.length}/${t.maxChars}</div>
+            </div>
+            
+            <div class="form-group">
+                <label>Media Type</label>
+                <div class="media-selector">
+                    ${mediaTypes.map(m => `
+                        <div class="media-btn ${p.mediaType === m.id ? 'selected' : ''}" onclick="updatePost('mediaType', '${m.id}')">
+                            <div class="icon">${m.icon}</div>
+                            <div class="label">${m.label}</div>
+                        </div>
+                    `).join('')}
+                </div>
+            </div>
+            
+            <div class="form-group">
+                <label>Hashtags</label>
+                <div class="hashtag-input">
+                    ${p.hashtags.map((h, i) => `
+                        <div class="hashtag">#${h} <span class="remove" onclick="removeHashtag(${i})">×</span></div>
+                    `).join('')}
+                    <input type="text" class="hashtag-add" placeholder="Type & press Enter" onkeydown="addHashtag(event)">
+                </div>
+            </div>
+            
+            <div class="form-group">
+                <label>Call-to-Action</label>
+                <div class="cta-selector">
+                    ${ctaOptions.map(c => `
+                        <div class="cta-btn ${p.cta === c ? 'selected' : ''}" onclick="updatePost('cta', '${c}')">${c}</div>
+                    `).join('')}
+                </div>
+            </div>
+        </div>
+        
+        <div class="content-tips">
+            <h4>💡 Content Tips</h4>
+            <ul>
+                <li>Start with a hook to grab attention</li>
+                <li>Use emojis to add personality 🎉</li>
+                <li>Include a clear call-to-action</li>
+                <li>Keep hashtags relevant to content</li>
+            </ul>
+        </div>
+    `;
+    
+    // Preview Panel
+    renderPreview();
+    checkRequirements();
+}
+
+function renderPreview() {
+    const t = tasks[current];
+    const p = posts[current];
+    
+    $('previewPanel').innerHTML = `
+        <div class="preview-title">📱 Live Preview</div>
+        <div class="phone-mockup">
+            <div class="phone-screen">
+                <div class="post-preview">
+                    <div class="preview-header">
+                        <div class="preview-avatar"></div>
+                        <div class="preview-name">${t.brand.toLowerCase().replace(/\s/g, '')}</div>
+                    </div>
+                    <div class="preview-image">
+                        ${p.mediaType ? `📷 ${p.mediaType.toUpperCase()}` : 'Select media type'}
+                    </div>
+                    <div class="preview-actions">❤️ 💬 ✈️ 🔖</div>
+                    <div class="preview-caption">
+                        <span class="name">${t.brand.toLowerCase().replace(/\s/g, '')}</span> ${p.caption || 'Your caption will appear here...'}
+                    </div>
+                    ${p.hashtags.length ? `<div class="preview-hashtags">${p.hashtags.map(h => '#' + h).join(' ')}</div>` : ''}
+                    ${p.cta ? `<div style="margin-top:10px"><button style="background:#0095f6;color:#fff;border:none;padding:8px 16px;border-radius:6px;font-size:0.8rem;width:100%">${p.cta}</button></div>` : ''}
+                </div>
+            </div>
+        </div>
+    `;
+}
+
+function updatePost(key, value) {
+    posts[current][key] = value;
+    renderTask();
+}
+
+function addHashtag(e) {
+    if (e.key === 'Enter' && e.target.value.trim()) {
+        const tag = e.target.value.trim().replace(/^#/, '').replace(/\s/g, '');
+        if (tag && !posts[current].hashtags.includes(tag)) {
+            posts[current].hashtags.push(tag);
+            renderTask();
+        }
+    }
+}
+
+function removeHashtag(index) {
+    posts[current].hashtags.splice(index, 1);
+    renderTask();
+}
+
+function checkRequirements() {
+    const t = tasks[current];
+    const p = posts[current];
+    const results = t.checks.map(c => ({ pass: c.test(p), text: c.text }));
+    const passed = results.filter(r => r.pass).length;
+    scores[current] = Math.round((passed / results.length) * t.points);
+    
+    $('checklist').innerHTML = '<h4>✅ Requirements</h4>' + results.map(r =>
+        `<div class="check-item ${r.pass?'pass':''}">${r.text}</div>`
+    ).join('');
+    $('currentScore').textContent = scores.reduce((a,b)=>a+b,0);
+}
+
+function prevTask() { if (current > 0) { current--; renderTask(); } }
+function nextTask() { if (current < tasks.length - 1) { current++; renderTask(); } else submitExam(); }
+
+function submitExam() {
+    clearInterval(timer);
+    const total = scores.reduce((a,b)=>a+b,0);
+    const pass = total >= 60;
+    
+    $('header').style.display = 'none';
+    $('mainContainer').style.display = 'none';
+    $('resultsScreen').style.display = 'flex';
+    $('resultsIcon').textContent = pass ? '🏆' : '📚';
+    $('resultsStatus').textContent = pass ? 'PASSED!' : 'KEEP PRACTICING';
+    $('resultsStatus').className = `results-status ${pass?'pass':'fail'}`;
+    $('resultsScore').textContent = `${total}%`;
+    $('resultsBreakdown').innerHTML = tasks.map((t,i) =>
+        `<div class="result-item ${scores[i]>=t.points*0.5?'pass':'fail'}"><span>${t.title}</span><span>${scores[i]}/${t.points}</span></div>`
+    ).join('');
+}
+</script>
+</body>
+</html>

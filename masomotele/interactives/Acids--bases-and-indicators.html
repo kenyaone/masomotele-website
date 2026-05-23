@@ -1,0 +1,1270 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Acids, Bases & Indicators Learning Game</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Arial', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 10px;
+            color: #333;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            overflow: hidden;
+            position: relative;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #e74c3c 0%, #c0392b 100%);
+            color: white;
+            padding: 20px;
+            text-align: center;
+            position: relative;
+        }
+
+        .header h1 {
+            font-size: 1.8rem;
+            margin-bottom: 10px;
+        }
+
+        .stats {
+            display: flex;
+            justify-content: space-around;
+            background: rgba(255,255,255,0.1);
+            padding: 15px;
+            border-radius: 10px;
+            margin-top: 10px;
+        }
+
+        .stat-item {
+            text-align: center;
+        }
+
+        .stat-value {
+            font-size: 1.5rem;
+            font-weight: bold;
+            display: block;
+        }
+
+        .stat-label {
+            font-size: 0.8rem;
+            opacity: 0.9;
+        }
+
+        .difficulty-selector {
+            padding: 20px;
+            text-align: center;
+            background: #f8f9fa;
+        }
+
+        .difficulty-buttons {
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+            flex-wrap: wrap;
+            margin-top: 15px;
+        }
+
+        .difficulty-btn {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 25px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: all 0.3s ease;
+            font-size: 1rem;
+        }
+
+        .difficulty-btn.easy { background: #28a745; color: white; }
+        .difficulty-btn.medium { background: #ffc107; color: black; }
+        .difficulty-btn.hard { background: #dc3545; color: white; }
+
+        .difficulty-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+        }
+
+        .difficulty-btn.active {
+            transform: scale(1.1);
+            box-shadow: 0 0 20px rgba(0,0,0,0.3);
+        }
+
+        .game-area {
+            padding: 30px;
+            display: none;
+        }
+
+        .question-container {
+            background: #f8f9fa;
+            padding: 25px;
+            border-radius: 15px;
+            margin-bottom: 20px;
+            border-left: 5px solid #e74c3c;
+        }
+
+        .question-number {
+            color: #6c757d;
+            font-size: 0.9rem;
+            margin-bottom: 10px;
+        }
+
+        .attempt-counter {
+            color: #007bff;
+            font-size: 0.9rem;
+            font-weight: 600;
+            margin-bottom: 10px;
+            padding: 5px 10px;
+            background: #e6f3ff;
+            border-radius: 5px;
+            display: inline-block;
+        }
+
+        .attempt-counter.warning {
+            color: #dc3545;
+            background: #f8d7da;
+        }
+
+        .question-text {
+            font-size: 1.2rem;
+            font-weight: 600;
+            line-height: 1.6;
+            margin-bottom: 20px;
+        }
+
+        .options {
+            display: grid;
+            gap: 15px;
+        }
+
+        .option {
+            padding: 15px;
+            border: 2px solid #dee2e6;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            background: white;
+            font-size: 1rem;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .option:hover {
+            border-color: #e74c3c;
+            background: #fff5f5;
+            transform: translateX(5px);
+        }
+
+        .option.selected {
+            border-color: #dc3545;
+            background: #f8d7da;
+        }
+
+        .option.correct {
+            border-color: #28a745;
+            background: #d4edda;
+            animation: correctPulse 0.6s ease;
+        }
+
+        .option.incorrect {
+            border-color: #dc3545;
+            background: #f8d7da;
+            animation: shake 0.5s ease;
+        }
+
+        .option.disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            pointer-events: none;
+        }
+
+        @keyframes correctPulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.03); }
+            100% { transform: scale(1); }
+        }
+
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-5px); }
+            75% { transform: translateX(5px); }
+        }
+
+        .controls {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+            flex-wrap: wrap;
+            margin-top: 25px;
+        }
+
+        .btn {
+            padding: 12px 25px;
+            border: none;
+            border-radius: 25px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: all 0.3s ease;
+            font-size: 1rem;
+        }
+
+        .btn-primary {
+            background: #007bff;
+            color: white;
+        }
+
+        .btn-warning {
+            background: #ffc107;
+            color: black;
+        }
+
+        .btn-success {
+            background: #28a745;
+            color: white;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+        }
+
+        .btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .hint-container {
+            background: #fff3cd;
+            border: 1px solid #ffeaa7;
+            padding: 15px;
+            border-radius: 10px;
+            margin: 15px 0;
+            display: none;
+        }
+
+        .hint-container.show {
+            display: block;
+            animation: slideDown 0.3s ease;
+        }
+
+        @keyframes slideDown {
+            from { opacity: 0; transform: translateY(-10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .congratulations {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: white;
+            padding: 30px;
+            border-radius: 20px;
+            text-align: center;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.3);
+            z-index: 1000;
+            display: none;
+        }
+
+        .congratulations.show {
+            display: block;
+            animation: celebrationPop 0.6s ease;
+        }
+
+        @keyframes celebrationPop {
+            0% { transform: translate(-50%, -50%) scale(0.5); opacity: 0; }
+            50% { transform: translate(-50%, -50%) scale(1.1); }
+            100% { transform: translate(-50%, -50%) scale(1); opacity: 1; }
+        }
+
+        .clap-emoji {
+            font-size: 3rem;
+            animation: clap 0.5s ease infinite;
+        }
+
+        @keyframes clap {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.2); }
+        }
+
+        .progress-bar {
+            background: #e9ecef;
+            border-radius: 10px;
+            height: 10px;
+            margin: 15px 0;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            background: linear-gradient(90deg, #e74c3c, #c0392b);
+            height: 100%;
+            transition: width 0.3s ease;
+            border-radius: 10px;
+        }
+
+        .results {
+            text-align: center;
+            padding: 30px;
+            display: none;
+        }
+
+        .results.show {
+            display: block;
+        }
+
+        .score-circle {
+            width: 150px;
+            height: 150px;
+            border-radius: 50%;
+            background: conic-gradient(#e74c3c 0deg, #e74c3c var(--percentage), #e9ecef var(--percentage));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 20px auto;
+            position: relative;
+        }
+
+        .score-circle::before {
+            content: '';
+            width: 120px;
+            height: 120px;
+            background: white;
+            border-radius: 50%;
+            position: absolute;
+        }
+
+        .score-text {
+            position: relative;
+            z-index: 1;
+            font-size: 1.5rem;
+            font-weight: bold;
+        }
+
+        .keyboard-hint {
+            text-align: center;
+            color: #6c757d;
+            font-size: 0.9rem;
+            margin-bottom: 15px;
+        }
+
+        .option::before {
+            content: attr(data-key);
+            position: absolute;
+            top: 5px;
+            right: 10px;
+            background: #6c757d;
+            color: white;
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.8rem;
+            font-weight: bold;
+        }
+
+        .overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0,0,0,0.5);
+            z-index: 999;
+            display: none;
+        }
+
+        .overlay.show {
+            display: block;
+        }
+
+        /* Mobile Responsiveness */
+        @media (max-width: 768px) {
+            .container {
+                margin: 5px;
+                border-radius: 15px;
+            }
+
+            .header h1 {
+                font-size: 1.4rem;
+            }
+
+            .stats {
+                flex-direction: column;
+                gap: 10px;
+            }
+
+            .difficulty-buttons {
+                flex-direction: column;
+                align-items: center;
+            }
+
+            .difficulty-btn {
+                width: 200px;
+            }
+
+            .game-area {
+                padding: 20px;
+            }
+
+            .question-text {
+                font-size: 1.1rem;
+            }
+
+            .option {
+                padding: 12px;
+                font-size: 0.95rem;
+            }
+
+            .controls {
+                flex-direction: column;
+                align-items: center;
+            }
+
+            .btn {
+                width: 200px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .header {
+                padding: 15px;
+            }
+
+            .header h1 {
+                font-size: 1.2rem;
+            }
+
+            .game-area {
+                padding: 15px;
+            }
+
+            .question-container {
+                padding: 20px;
+            }
+
+            .congratulations {
+                margin: 20px;
+                width: calc(100% - 40px);
+            }
+        }
+    </style>
+<script type="text/javascript">(function(c,l,a,r,i,t,y){c[a]=c[a]||function(){(c[a].q=c[a].q||[]).push(arguments)};t=l.createElement(r);t.async=1;t.src="https://www.clarity.ms/tag/"+i;y=l.getElementsByTagName(r)[0];y.parentNode.insertBefore(t,y);})(window,document,"clarity","script","wg31zlwbt9");</script>\n</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🧪 Acids, Bases & Indicators Quiz</h1>
+            <div class="stats">
+                <div class="stat-item">
+                    <span class="stat-value" id="currentScore">0</span>
+                    <span class="stat-label">Score</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-value" id="currentQuestion">0</span>
+                    <span class="stat-label">Question</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-value" id="totalQuestions">0</span>
+                    <span class="stat-label">Total</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-value" id="accuracy">0%</span>
+                    <span class="stat-label">Accuracy</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="difficulty-selector" id="difficultySelector">
+            <h2>Choose Your Difficulty Level</h2>
+            <p>Select a difficulty level to start your chemistry learning journey!</p>
+            <p><strong>🧪 Game Rules:</strong> You have 2 attempts per question. No points awarded after using hints or multiple attempts.</p>
+            <div class="difficulty-buttons">
+                <button class="difficulty-btn easy" onclick="startGame('easy')">
+                    🟢 Easy<br><small>Basic concepts (10 pts)</small>
+                </button>
+                <button class="difficulty-btn medium" onclick="startGame('medium')">
+                    🟡 Medium<br><small>Properties & reactions (15 pts)</small>
+                </button>
+                <button class="difficulty-btn hard" onclick="startGame('hard')">
+                    🔴 Hard<br><small>Advanced chemistry (20 pts)</small>
+                </button>
+            </div>
+        </div>
+
+        <div class="game-area" id="gameArea">
+            <div class="progress-bar">
+                <div class="progress-fill" id="progressFill"></div>
+            </div>
+            
+            <div class="question-container">
+                <div class="question-number" id="questionNumber"></div>
+                <div class="question-text" id="questionText"></div>
+                <div class="attempt-counter" id="attemptCounter">Attempts remaining: 2</div>
+                <div class="keyboard-hint">Use keys 1-4 to select answers on desktop</div>
+                <div class="options" id="optionsContainer"></div>
+                <div class="hint-container" id="hintContainer">
+                    <strong>💡 Hint:</strong>
+                    <div id="hintText"></div>
+                </div>
+            </div>
+
+            <div class="controls">
+                <button class="btn btn-warning" id="hintBtn" onclick="showHint()">💡 Get Hint</button>
+                <button class="btn btn-primary" id="nextBtn" onclick="nextQuestion()" disabled>Next Question ➡️</button>
+                <button class="btn btn-success" onclick="showResults()">📊 View Results</button>
+            </div>
+        </div>
+
+        <div class="results" id="results">
+            <h2>🎯 Quiz Results</h2>
+            <div class="score-circle" id="scoreCircle">
+                <div class="score-text" id="finalScore">0%</div>
+            </div>
+            <div id="resultsDetails"></div>
+            <div class="controls">
+                <button class="btn btn-primary" onclick="restartGame()">🔄 Play Again</button>
+                <button class="btn btn-success" onclick="changeDifficulty()">📊 Change Difficulty</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="overlay" id="overlay"></div>
+    <div class="congratulations" id="congratulations">
+        <div class="clap-emoji">👏</div>
+        <h3>Excellent!</h3>
+        <p>Correct Answer!</p>
+        <div id="pointsEarned"></div>
+    </div>
+
+    <script>
+        // Game State
+        let currentQuestionIndex = 0;
+        let currentDifficulty = '';
+        let score = 0;
+        let totalQuestions = 0;
+        let correctAnswers = 0;
+        let questionsAnswered = 0;
+        let currentQuestions = [];
+        let hasUsedHint = false;
+        let attemptCount = 0;
+        let selectedAnswer = null;
+
+        // Question Bank
+        const questionBank = {
+            easy: [
+                {
+                    question: "What causes the sour taste in foods like oranges and lemons?",
+                    options: ["Bases", "Acids", "Salts", "Neutral substances"],
+                    correct: 1,
+                    hint: "Think about what gives citrus fruits their characteristic taste - these substances have a pH less than 7.",
+                    points: 10
+                },
+                {
+                    question: "What causes the bitter taste in substances like antacid tablets?",
+                    options: ["Acids", "Bases", "Salts", "Water"],
+                    correct: 1,
+                    hint: "This is the opposite of what causes sour taste - these substances have a pH greater than 7.",
+                    points: 10
+                },
+                {
+                    question: "What are indicators used for?",
+                    options: ["To measure temperature", "To show different colors in acids or bases", "To weigh substances", "To mix chemicals"],
+                    correct: 1,
+                    hint: "These substances help identify whether something is acidic or basic by changing color.",
+                    points: 10
+                },
+                {
+                    question: "What color does litmus turn in an acid solution?",
+                    options: ["Blue", "Red", "Purple", "Green"],
+                    correct: 1,
+                    hint: "Remember: acids turn blue litmus to this warm color associated with stop signs.",
+                    points: 10
+                },
+                {
+                    question: "What color does litmus turn in a basic solution?",
+                    options: ["Red", "Blue", "Purple", "Yellow"],
+                    correct: 1,
+                    hint: "This is the color of the sky and opposite of what happens in acids.",
+                    points: 10
+                },
+                {
+                    question: "What color does litmus remain in a neutral solution?",
+                    options: ["Red", "Blue", "Purple", "Orange"],
+                    correct: 2,
+                    hint: "In neutral solutions, litmus stays its original color, which is neither red nor blue.",
+                    points: 10
+                },
+                {
+                    question: "Which pH value represents a neutral solution?",
+                    options: ["0", "3", "7", "14"],
+                    correct: 2,
+                    hint: "This number is right in the middle of the pH scale from 0 to 14.",
+                    points: 10
+                },
+                {
+                    question: "Which gas is produced when acids react with metals?",
+                    options: ["Oxygen", "Hydrogen", "Carbon dioxide", "Nitrogen"],
+                    correct: 1,
+                    hint: "This is the lightest gas and burns with a characteristic 'pop' sound when tested.",
+                    points: 10
+                },
+                {
+                    question: "What is the pH range for acids?",
+                    options: ["0 to 7", "7 to 14", "0 to 14", "Less than 7"],
+                    correct: 3,
+                    hint: "Acids have pH values below the neutral point of 7.",
+                    points: 10
+                },
+                {
+                    question: "What is the pH range for bases?",
+                    options: ["0 to 7", "Above 7", "7 to 14", "Exactly 7"],
+                    correct: 1,
+                    hint: "Bases have pH values higher than the neutral point of 7.",
+                    points: 10
+                },
+                {
+                    question: "Which indicator is colorless in acidic solutions?",
+                    options: ["Litmus", "Phenolphthalein", "Methyl orange", "Universal indicator"],
+                    correct: 1,
+                    hint: "This indicator only shows color in basic solutions, turning pink.",
+                    points: 10
+                },
+                {
+                    question: "What happens when acids and bases react together?",
+                    options: ["They explode", "They neutralize each other", "They become more acidic", "They become more basic"],
+                    correct: 1,
+                    hint: "This process produces salt and water, making the solution neither acidic nor basic.",
+                    points: 10
+                },
+                {
+                    question: "Which of these is an example of an acid found in food?",
+                    options: ["Soap", "Lemon juice", "Baking soda", "Toothpaste"],
+                    correct: 1,
+                    hint: "This citrus fruit juice is commonly used in cooking and has a characteristic sour taste.",
+                    points: 10
+                },
+                {
+                    question: "Which of these is an example of a base found at home?",
+                    options: ["Vinegar", "Orange juice", "Baking soda", "Lemon juice"],
+                    correct: 2,
+                    hint: "This white powder is used in baking and can neutralize stomach acid.",
+                    points: 10
+                },
+                {
+                    question: "What makes flower extracts unreliable as indicators?",
+                    options: ["They're too expensive", "Their composition changes with time", "They don't change color", "They only work in sunlight"],
+                    correct: 1,
+                    hint: "Natural plant materials decompose over time, causing their chemical composition to change unpredictably.",
+                    points: 10
+                }
+            ],
+            medium: [
+                {
+                    question: "What color does phenolphthalein turn in basic solutions?",
+                    options: ["Colorless", "Pink", "Red", "Blue"],
+                    correct: 1,
+                    hint: "This indicator turns from colorless to this feminine color in bases.",
+                    points: 15
+                },
+                {
+                    question: "What color does methyl orange turn in acidic solutions?",
+                    options: ["Yellow", "Pink", "Orange", "Red"],
+                    correct: 1,
+                    hint: "In acids, this indicator shows a bright feminine color, but turns yellow in bases.",
+                    points: 15
+                },
+                {
+                    question: "What gas is produced when acids react with carbonates?",
+                    options: ["Hydrogen", "Oxygen", "Carbon dioxide", "Nitrogen"],
+                    correct: 2,
+                    hint: "This gas turns lime water milky white and is the same gas we breathe out.",
+                    points: 15
+                },
+                {
+                    question: "Which acids are considered strong acids with pH 0-4?",
+                    options: ["Lemon juice and vinegar", "Sulfuric, hydrochloric, and nitric acid", "Carbonic acid only", "All acids are strong"],
+                    correct: 1,
+                    hint: "These are the three main mineral acids used in industry and laboratories.",
+                    points: 15
+                },
+                {
+                    question: "What is the test for hydrogen gas?",
+                    options: ["It turns lime water milky", "It burns with a pop sound", "It has a smell", "It turns litmus red"],
+                    correct: 1,
+                    hint: "When you bring a burning splint near this gas, it makes a distinctive sound.",
+                    points: 15
+                },
+                {
+                    question: "What is the test for carbon dioxide gas?",
+                    options: ["It burns with a pop", "It turns lime water milky", "It smells sweet", "It turns litmus blue"],
+                    correct: 1,
+                    hint: "This gas forms a white precipitate when bubbled through calcium hydroxide solution.",
+                    points: 15
+                },
+                {
+                    question: "What products are formed when acid reacts with a base?",
+                    options: ["Salt and hydrogen", "Salt and carbon dioxide", "Salt and water", "Only water"],
+                    correct: 2,
+                    hint: "This neutralization reaction produces two neutral substances - one ionic compound and one molecular compound.",
+                    points: 15
+                },
+                {
+                    question: "Which base is commonly used in soap making?",
+                    options: ["Calcium hydroxide", "Sodium hydroxide", "Magnesium hydroxide", "Ammonia"],
+                    correct: 1,
+                    hint: "This strong base is also known as caustic soda or lye.",
+                    points: 15
+                },
+                {
+                    question: "What happens to soil that becomes too acidic?",
+                    options: ["Plants grow better", "It becomes unsuitable for many plants", "Nothing changes", "It becomes more fertile"],
+                    correct: 1,
+                    hint: "Most plants prefer neutral to slightly acidic soil for optimal nutrient absorption.",
+                    points: 15
+                },
+                {
+                    question: "What causes acid rain?",
+                    options: ["Too much water vapor", "Industrial gases dissolving in rainwater", "Natural weather patterns", "Ocean water evaporation"],
+                    correct: 1,
+                    hint: "Pollution from factories and vehicles creates acidic compounds that dissolve in atmospheric moisture.",
+                    points: 15
+                },
+                {
+                    question: "What effect does acid rain have on buildings?",
+                    options: ["Makes them stronger", "Causes corrosion and damage", "Changes their color only", "No significant effect"],
+                    correct: 1,
+                    hint: "Acids can dissolve metals and stone materials, weakening structures over time.",
+                    points: 15
+                },
+                {
+                    question: "Which acid is commonly used in car batteries?",
+                    options: ["Hydrochloric acid", "Sulfuric acid", "Nitric acid", "Citric acid"],
+                    correct: 1,
+                    hint: "This strong acid is also used in making fertilizers and processing metals.",
+                    points: 15
+                },
+                {
+                    question: "What is the universal indicator used for?",
+                    options: ["Only testing acids", "Only testing bases", "Showing the strength of acids and bases", "Measuring temperature"],
+                    correct: 2,
+                    hint: "This special mixture of indicators shows different colors at different pH levels.",
+                    points: 15
+                },
+                {
+                    question: "Why is phenolphthalein used in acid-base titrations?",
+                    options: ["It's inexpensive", "It shows a sharp color change at the endpoint", "It's the only available indicator", "It works in all lighting"],
+                    correct: 1,
+                    hint: "This indicator provides a clear visual signal when neutralization is complete.",
+                    points: 15
+                },
+                {
+                    question: "What makes natural indicators less reliable than synthetic ones?",
+                    options: ["They're too colorful", "Their chemical composition changes over time", "They work too slowly", "They're too expensive"],
+                    correct: 1,
+                    hint: "Natural plant extracts decompose and their chemical properties change, affecting their reliability.",
+                    points: 15
+                }
+            ],
+            hard: [
+                {
+                    question: "When zinc reacts with hydrochloric acid, what are the complete products?",
+                    options: ["Zinc chloride and hydrogen", "Zinc oxide and water", "Zinc carbonate and oxygen", "Only hydrogen gas"],
+                    correct: 0,
+                    hint: "Metal + Acid → Metal salt + Hydrogen gas (Zn + HCl → ZnCl₂ + H₂)",
+                    points: 20
+                },
+                {
+                    question: "What happens when sodium carbonate reacts with hydrochloric acid?",
+                    options: ["Sodium chloride, water, and hydrogen", "Sodium chloride, water, and carbon dioxide", "Only sodium chloride", "Sodium oxide and water"],
+                    correct: 1,
+                    hint: "Acid + Carbonate → Salt + Water + Carbon dioxide (Na₂CO₃ + HCl → NaCl + H₂O + CO₂)",
+                    points: 20
+                },
+                {
+                    question: "Why are lead and copper unreactive with dilute acids?",
+                    options: ["They are too heavy", "They are below hydrogen in the reactivity series", "They are not metals", "They dissolve completely"],
+                    correct: 1,
+                    hint: "These metals cannot displace hydrogen from acids because they are less reactive than hydrogen.",
+                    points: 20
+                },
+                {
+                    question: "What is the complete neutralization reaction between sodium hydroxide and hydrochloric acid?",
+                    options: ["NaOH + HCl → NaCl + H₂O", "NaOH + HCl → NaCl + H₂", "NaOH + HCl → Na₂O + H₂O", "NaOH + HCl → NaH + ClO"],
+                    correct: 0,
+                    hint: "Base + Acid → Salt + Water (this is a neutralization reaction producing sodium chloride and water)",
+                    points: 20
+                },
+                {
+                    question: "Which pH range indicates weak acids?",
+                    options: ["0-4", "4-7", "7-10", "10-14"],
+                    correct: 1,
+                    hint: "These are acids but not as strong as the mineral acids with very low pH values.",
+                    points: 20
+                },
+                {
+                    question: "Which pH range indicates strong bases?",
+                    options: ["7-10", "10-14", "0-7", "4-10"],
+                    correct: 1,
+                    hint: "These bases have pH values at the high end of the scale, showing strong alkalinity.",
+                    points: 20
+                },
+                {
+                    question: "What is the main industrial use of nitric acid?",
+                    options: ["Making batteries", "Making fertilizers and explosives", "Cleaning metals only", "Making soap"],
+                    correct: 1,
+                    hint: "This acid is crucial for agriculture (nitrogen compounds) and defense industries (explosives).",
+                    points: 20
+                },
+                {
+                    question: "Why is calcium hydroxide used in agriculture?",
+                    options: ["To kill pests", "To neutralize acidic soil", "To add essential nutrients", "To retain soil moisture"],
+                    correct: 1,
+                    hint: "This base helps adjust soil pH to optimal levels for plant growth and nutrient absorption.",
+                    points: 20
+                },
+                {
+                    question: "What role does ammonia play in fertilizer production?",
+                    options: ["It's not used in fertilizers", "It provides nitrogen for plant growth", "It only acts as a base", "It prevents fertilizer spoilage"],
+                    correct: 1,
+                    hint: "This base is a key source of nitrogen, an essential plant nutrient for protein synthesis.",
+                    points: 20
+                },
+                {
+                    question: "Why can't simple indicators tell us the strength of acids or bases?",
+                    options: ["They are too expensive", "They only show if something is acidic or basic, not concentration", "They don't work properly", "They only work once"],
+                    correct: 1,
+                    hint: "These indicators show presence (acidic/basic) but not concentration or strength of the solution.",
+                    points: 20
+                },
+                {
+                    question: "What is the advantage of universal indicator over simple indicators?",
+                    options: ["It's cheaper to produce", "It shows different colors at different pH levels", "It works faster", "It lasts longer"],
+                    correct: 1,
+                    hint: "This indicator can distinguish between different strengths of acids and bases by showing various colors.",
+                    points: 20
+                },
+                {
+                    question: "How does acid rain affect human respiratory health?",
+                    options: ["Only affects buildings", "Causes respiratory disorders when pollutants are inhaled", "Makes breathing easier", "Has no health effects"],
+                    correct: 1,
+                    hint: "Breathing acidic gases and particles can damage the respiratory system and cause breathing problems.",
+                    points: 20
+                },
+                {
+                    question: "Why is sulfuric acid called the 'king of chemicals'?",
+                    options: ["It's the strongest acid", "It has numerous industrial applications", "It's the most expensive", "It's the safest to handle"],
+                    correct: 1,
+                    hint: "This acid is used in batteries, fertilizers, paints, detergents, metal processing, and many other industries.",
+                    points: 20
+                },
+                {
+                    question: "What happens to phenolphthalein at the neutralization endpoint?",
+                    options: ["It turns bright red", "It changes from pink to colorless", "It turns bright blue", "Nothing visible happens"],
+                    correct: 1,
+                    hint: "At the exact neutralization point, the solution becomes neutral and the indicator loses its basic color.",
+                    points: 20
+                },
+                {
+                    question: "Why must indicators be avoided when collecting pure salt from neutralization?",
+                    options: ["They are too expensive", "They would contaminate the pure salt product", "They don't work in salt solutions", "They are chemically dangerous"],
+                    correct: 1,
+                    hint: "To obtain pure salt crystals, no other chemicals should be added to contaminate the final product.",
+                    points: 20
+                }
+            ]
+        };
+
+        // Initialize game
+        function startGame(difficulty) {
+            currentDifficulty = difficulty;
+            currentQuestions = [...questionBank[difficulty]];
+            currentQuestionIndex = 0;
+            score = 0;
+            correctAnswers = 0;
+            questionsAnswered = 0;
+            totalQuestions = currentQuestions.length;
+
+            // Update UI
+            document.getElementById('difficultySelector').style.display = 'none';
+            document.getElementById('gameArea').style.display = 'block';
+            document.getElementById('totalQuestions').textContent = totalQuestions;
+
+            loadQuestion();
+            loadGameState();
+        }
+
+        function loadQuestion() {
+            if (currentQuestionIndex >= currentQuestions.length) {
+                showResults();
+                return;
+            }
+
+            const question = currentQuestions[currentQuestionIndex];
+            hasUsedHint = false;
+            attemptCount = 0;
+            selectedAnswer = null;
+
+            // Update question display
+            document.getElementById('questionNumber').textContent = `Question ${currentQuestionIndex + 1} of ${totalQuestions}`;
+            document.getElementById('questionText').textContent = question.question;
+            document.getElementById('currentQuestion').textContent = currentQuestionIndex + 1;
+
+            // Reset attempt counter
+            const attemptCounter = document.getElementById('attemptCounter');
+            attemptCounter.textContent = 'Attempts remaining: 2';
+            attemptCounter.className = 'attempt-counter';
+
+            // Update progress bar
+            const progress = ((currentQuestionIndex + 1) / totalQuestions) * 100;
+            document.getElementById('progressFill').style.width = progress + '%';
+
+            // Create options
+            const optionsContainer = document.getElementById('optionsContainer');
+            optionsContainer.innerHTML = '';
+
+            question.options.forEach((option, index) => {
+                const optionDiv = document.createElement('div');
+                optionDiv.className = 'option';
+                optionDiv.textContent = option;
+                optionDiv.setAttribute('data-key', index + 1);
+                optionDiv.onclick = () => selectAnswer(index);
+                optionsContainer.appendChild(optionDiv);
+            });
+
+            // Reset UI state
+            document.getElementById('hintContainer').classList.remove('show');
+            document.getElementById('hintBtn').disabled = false;
+            document.getElementById('nextBtn').disabled = true;
+
+            updateStats();
+        }
+
+        function selectAnswer(answerIndex) {
+            if (selectedAnswer !== null) return; // Prevent multiple selections
+
+            selectedAnswer = answerIndex;
+            attemptCount++;
+
+            const question = currentQuestions[currentQuestionIndex];
+            const options = document.querySelectorAll('.option');
+            const isCorrect = answerIndex === question.correct;
+
+            // Highlight selected answer
+            options[answerIndex].classList.add('selected');
+
+            setTimeout(() => {
+                if (isCorrect) {
+                    options[answerIndex].classList.add('correct');
+                    showCongratulations(question.points);
+                    
+                    // Award points only if no hint used and first attempt
+                    if (!hasUsedHint && attemptCount === 1) {
+                        score += question.points;
+                    }
+                    
+                    correctAnswers++;
+                    questionsAnswered++;
+                    document.getElementById('nextBtn').disabled = false;
+                } else {
+                    options[answerIndex].classList.add('incorrect');
+                    
+                    // Update attempt counter
+                    const attemptCounter = document.getElementById('attemptCounter');
+                    const remaining = 2 - attemptCount;
+                    attemptCounter.textContent = `Attempts remaining: ${remaining}`;
+                    if (remaining === 1) {
+                        attemptCounter.className = 'attempt-counter warning';
+                    }
+                    
+                    // Check if this is the second attempt
+                    if (attemptCount >= 2) {
+                        // Disable all options
+                        options.forEach(option => {
+                            option.classList.add('disabled');
+                        });
+                        
+                        // Show correct answer and move on
+                        setTimeout(() => {
+                            options[question.correct].classList.add('correct');
+                            options[question.correct].classList.remove('disabled'); // Keep correct answer visible
+                            questionsAnswered++;
+                            document.getElementById('nextBtn').disabled = false;
+                            
+                            // Show message about attempts exhausted
+                            showAttemptsExhausted();
+                        }, 1000);
+                    } else {
+                        // Reset for retry (first attempt failed)
+                        setTimeout(() => {
+                            selectedAnswer = null;
+                            options[answerIndex].classList.remove('selected', 'incorrect');
+                        }, 1000);
+                        
+                        if (attemptCount === 1) {
+                            questionsAnswered++;
+                        }
+                    }
+                }
+
+                updateStats();
+                saveGameState();
+            }, 500);
+        }
+
+        function showAttemptsExhausted() {
+            const congratsDiv = document.getElementById('congratulations');
+            const pointsDiv = document.getElementById('pointsEarned');
+            const overlay = document.getElementById('overlay');
+            
+            // Change the content for attempts exhausted
+            congratsDiv.querySelector('h3').textContent = 'Attempts Exhausted';
+            congratsDiv.querySelector('p').textContent = 'The correct answer is highlighted';
+            congratsDiv.querySelector('.clap-emoji').textContent = '📚';
+            pointsDiv.textContent = "No points earned - 2 attempts used";
+            
+            overlay.classList.add('show');
+            congratsDiv.classList.add('show');
+
+            setTimeout(() => {
+                overlay.classList.remove('show');
+                congratsDiv.classList.remove('show');
+                
+                // Reset congratulations content for next time
+                congratsDiv.querySelector('h3').textContent = 'Excellent!';
+                congratsDiv.querySelector('p').textContent = 'Correct Answer!';
+                congratsDiv.querySelector('.clap-emoji').textContent = '👏';
+            }, 2500);
+        }
+
+        function showCongratulations(points) {
+            const congratsDiv = document.getElementById('congratulations');
+            const pointsDiv = document.getElementById('pointsEarned');
+            const overlay = document.getElementById('overlay');
+            
+            if (!hasUsedHint && attemptCount === 1) {
+                pointsDiv.textContent = `+${points} points earned!`;
+            } else {
+                pointsDiv.textContent = "Correct! (No points - hint used or multiple attempts)";
+            }
+            
+            overlay.classList.add('show');
+            congratsDiv.classList.add('show');
+
+            // Play celebration sound (if supported)
+            try {
+                const audio = new Audio('data:audio/wav;base64,UklGRnoGAABXQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YQoGAACBhYqFbF1fdJivrJBhNjVgodDbq2EcBj+a2/LDciUFLIHO8tiJNwgZaLvt559NEAxQp+PwtmMcBjiR1/LMeSwFJHfH8N2QQAoUXrTp66hVFApGn+DyvmEhB');
+                audio.play().catch(() => {}); // Ignore errors
+            } catch (e) {}
+
+            setTimeout(() => {
+                overlay.classList.remove('show');
+                congratsDiv.classList.remove('show');
+            }, 2000);
+        }
+
+        function showHint() {
+            const question = currentQuestions[currentQuestionIndex];
+            document.getElementById('hintText').textContent = question.hint;
+            document.getElementById('hintContainer').classList.add('show');
+            document.getElementById('hintBtn').disabled = true;
+            hasUsedHint = true;
+        }
+
+        function nextQuestion() {
+            currentQuestionIndex++;
+            loadQuestion();
+        }
+
+        function updateStats() {
+            document.getElementById('currentScore').textContent = score;
+            
+            const accuracy = questionsAnswered > 0 ? Math.round((correctAnswers / questionsAnswered) * 100) : 0;
+            document.getElementById('accuracy').textContent = accuracy + '%';
+        }
+
+        function showResults() {
+            document.getElementById('gameArea').style.display = 'none';
+            document.getElementById('results').classList.add('show');
+
+            const accuracy = questionsAnswered > 0 ? Math.round((correctAnswers / questionsAnswered) * 100) : 0;
+            const maxPossibleScore = currentQuestions.reduce((sum, q) => sum + q.points, 0);
+            const scorePercentage = Math.round((score / maxPossibleScore) * 100);
+
+            // Update score circle
+            const scoreCircle = document.getElementById('scoreCircle');
+            scoreCircle.style.setProperty('--percentage', (scorePercentage * 3.6) + 'deg');
+            document.getElementById('finalScore').textContent = scorePercentage + '%';
+
+            // Generate results details
+            let performance = '';
+            if (scorePercentage >= 90) performance = '🧪 Chemistry Master!';
+            else if (scorePercentage >= 80) performance = '🎉 Excellent!';
+            else if (scorePercentage >= 70) performance = '👍 Good Job!';
+            else if (scorePercentage >= 60) performance = '🔬 Keep Learning!';
+            else performance = '💪 Keep Practicing!';
+
+            document.getElementById('resultsDetails').innerHTML = `
+                <h3>${performance}</h3>
+                <p><strong>Score:</strong> ${score} / ${maxPossibleScore} points</p>
+                <p><strong>Accuracy:</strong> ${correctAnswers} / ${totalQuestions} correct (${accuracy}%)</p>
+                <p><strong>Difficulty:</strong> ${currentDifficulty.charAt(0).toUpperCase() + currentDifficulty.slice(1)}</p>
+            `;
+
+            // Clear saved progress
+            clearGameState();
+        }
+
+        function restartGame() {
+            document.getElementById('results').classList.remove('show');
+            startGame(currentDifficulty);
+        }
+
+        function changeDifficulty() {
+            document.getElementById('results').classList.remove('show');
+            document.getElementById('gameArea').style.display = 'none';
+            document.getElementById('difficultySelector').style.display = 'block';
+        }
+
+        // Keyboard support
+        document.addEventListener('keydown', (e) => {
+            if (document.getElementById('gameArea').style.display === 'block') {
+                const key = parseInt(e.key);
+                if (key >= 1 && key <= 4) {
+                    e.preventDefault();
+                    selectAnswer(key - 1);
+                }
+                
+                if (e.key === 'h' || e.key === 'H') {
+                    e.preventDefault();
+                    if (!document.getElementById('hintBtn').disabled) {
+                        showHint();
+                    }
+                }
+                
+                if (e.key === 'Enter' || e.key === ' ') {
+                    e.preventDefault();
+                    if (!document.getElementById('nextBtn').disabled) {
+                        nextQuestion();
+                    }
+                }
+            }
+        });
+
+        // Save and load game state
+        function saveGameState() {
+            const gameState = {
+                currentQuestionIndex,
+                currentDifficulty,
+                score,
+                correctAnswers,
+                questionsAnswered,
+                attemptCount,
+                hasUsedHint,
+                timestamp: Date.now()
+            };
+            
+            try {
+                localStorage.setItem('acidsBasesIndicatorsGame', JSON.stringify(gameState));
+            } catch (e) {
+                console.log('Could not save game state');
+            }
+        }
+
+        function loadGameState() {
+            try {
+                const saved = localStorage.getItem('acidsBasesIndicatorsGame');
+                if (saved) {
+                    const gameState = JSON.parse(saved);
+                    // Only load if saved within last 24 hours
+                    if (Date.now() - gameState.timestamp < 24 * 60 * 60 * 1000) {
+                        if (gameState.currentDifficulty === currentDifficulty) {
+                            currentQuestionIndex = gameState.currentQuestionIndex;
+                            score = gameState.score;
+                            correctAnswers = gameState.correctAnswers;
+                            questionsAnswered = gameState.questionsAnswered;
+                            attemptCount = gameState.attemptCount || 0;
+                            hasUsedHint = gameState.hasUsedHint || false;
+                            
+                            // Update attempt counter display
+                            const attemptCounter = document.getElementById('attemptCounter');
+                            const remaining = 2 - attemptCount;
+                            attemptCounter.textContent = `Attempts remaining: ${remaining}`;
+                            if (remaining === 1) {
+                                attemptCounter.className = 'attempt-counter warning';
+                            }
+                            
+                            updateStats();
+                        }
+                    }
+                }
+            } catch (e) {
+                console.log('Could not load game state');
+            }
+        }
+
+        function clearGameState() {
+            try {
+                localStorage.removeItem('acidsBasesIndicatorsGame');
+            } catch (e) {
+                console.log('Could not clear game state');
+            }
+        }
+
+        // Prevent context menu on long press for mobile
+        document.addEventListener('contextmenu', (e) => {
+            if (e.target.classList.contains('option')) {
+                e.preventDefault();
+            }
+        });
+
+        // Touch support for mobile
+        let touchStartTime = 0;
+        document.addEventListener('touchstart', (e) => {
+            touchStartTime = Date.now();
+        });
+
+        document.addEventListener('touchend', (e) => {
+            const touchDuration = Date.now() - touchStartTime;
+            if (touchDuration < 500 && e.target.classList.contains('option')) {
+                // This is a tap, not a long press
+                const optionIndex = Array.from(e.target.parentNode.children).indexOf(e.target);
+                selectAnswer(optionIndex);
+            }
+        });
+
+        // Initialize game on load
+        document.addEventListener('DOMContentLoaded', () => {
+            // Check if there's a saved game state
+            try {
+                const saved = localStorage.getItem('acidsBasesIndicatorsGame');
+                if (saved) {
+                    const gameState = JSON.parse(saved);
+                    if (Date.now() - gameState.timestamp < 24 * 60 * 60 * 1000) {
+                        const continueBtn = document.createElement('button');
+                        continueBtn.className = 'difficulty-btn medium';
+                        continueBtn.innerHTML = '🔄 Continue Previous Game<br><small>Pick up where you left off</small>';
+                        continueBtn.onclick = () => startGame(gameState.currentDifficulty);
+                        document.querySelector('.difficulty-buttons').appendChild(continueBtn);
+                    }
+                }
+            } catch (e) {}
+        });
+    </script>
+</body>
+</html>

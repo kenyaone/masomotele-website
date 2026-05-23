@@ -1,0 +1,704 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Electrical Technology Gr.10 | 1.1 Introduction to Electrical Technology</title>
+<style>
+:root{
+  --pri:#0a5e2a;--pri-l:#0d7a38;--acc:#f5a623;
+  --ok:#2e7d32;--no:#c62828;--bg:#f4f7f5;
+  --card:#fff;--border:#d0e0d4;--txt:#1a2e1f;
+  --warn-bg:#fff3e0;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Segoe UI',system-ui,sans-serif;background:var(--bg);color:var(--txt);min-height:100vh;display:flex;flex-direction:column}
+
+/* TOP BAR */
+.top-bar{position:sticky;top:0;z-index:100;background:linear-gradient(135deg,var(--pri),var(--pri-l));color:#fff;padding:10px 16px;display:flex;align-items:center;gap:12px;box-shadow:0 2px 8px rgba(0,0,0,.25)}
+.top-bar .logo{font-weight:800;font-size:1rem;white-space:nowrap}
+.top-bar .title{font-size:.85rem;opacity:.9;flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.slide-badge{background:var(--acc);color:#000;font-weight:700;font-size:.8rem;padding:3px 10px;border-radius:20px;white-space:nowrap}
+
+/* SLIDES */
+.slides-wrap{flex:1;overflow:hidden}
+.slide{display:none;padding:16px;max-width:860px;margin:0 auto;animation:fadeIn .3s ease}
+.slide.active{display:block}
+@keyframes fadeIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+
+/* SLIDE HEADER */
+.slide-header{background:linear-gradient(135deg,var(--pri),var(--pri-l));color:#fff;padding:14px 18px;border-radius:10px;margin-bottom:16px}
+.slide-header h2{font-size:1.1rem;font-weight:700}
+.slide-header .strand{font-size:.78rem;opacity:.85;margin-top:3px}
+
+/* LO BOX */
+.lo-box{background:#fff;border-left:5px solid var(--acc);border-radius:8px;padding:14px 16px;margin-bottom:14px;box-shadow:0 1px 4px rgba(0,0,0,.06)}
+.lo-box h3{color:var(--pri);font-size:.95rem;margin-bottom:8px}
+.lo-box ol{padding-left:18px}
+.lo-box ol li{margin-bottom:5px;font-size:.88rem;line-height:1.5}
+.inquiry{margin-top:12px;background:var(--pri);color:#fff;border-radius:6px;padding:10px 14px;font-size:.85rem}
+.inquiry strong{display:block;margin-bottom:3px;color:var(--acc)}
+
+/* TEACH BLOCK */
+.teach-block{margin-bottom:18px}
+.teach-block h3{color:var(--pri);font-size:1rem;font-weight:700;padding-bottom:5px;border-bottom:2.5px solid var(--acc);margin-bottom:10px}
+
+/* KEY TERM */
+.key-term{border-left:4px solid var(--acc);background:#fffbf0;padding:10px 14px;border-radius:0 6px 6px 0;margin:8px 0;font-size:.87rem}
+.key-term strong{color:var(--pri)}
+
+/* INFO TABLE */
+.info-table{width:100%;border-collapse:collapse;margin:10px 0;font-size:.84rem}
+.info-table th{background:var(--pri);color:#fff;padding:8px 10px;text-align:left}
+.info-table td{padding:7px 10px;border-bottom:1px solid var(--border)}
+.info-table tr:nth-child(even) td{background:#eef5f0}
+
+/* EXAMPLE BOX */
+.example-box{background:#f0faf2;border:1.5px solid var(--ok);border-radius:8px;padding:12px 14px;margin:10px 0;font-size:.86rem}
+.example-box h4{color:var(--ok);margin-bottom:7px;font-size:.9rem}
+
+/* WARN BOX */
+.warn-box{background:var(--warn-bg);border:1.5px solid #e65100;border-radius:8px;padding:11px 14px;margin:10px 0;font-size:.85rem}
+.warn-box h4{color:#e65100;margin-bottom:5px}
+
+/* DIAGRAM WRAP */
+.diagram-wrap{text-align:center;margin:14px 0;overflow-x:auto}
+
+/* CALC BOX */
+.calc-box{background:#fff;border:1.5px solid var(--pri-l);border-radius:8px;padding:14px;margin:10px 0}
+.calc-box h4{color:var(--pri);margin-bottom:10px;font-size:.9rem}
+
+/* PRACTICE */
+.practice-q{background:#fff;border-radius:8px;border:1px solid var(--border);padding:14px;margin-bottom:12px;box-shadow:0 1px 3px rgba(0,0,0,.05)}
+.practice-q .qnum{font-weight:700;color:var(--pri);font-size:.85rem;margin-bottom:5px}
+
+/* QUIZ */
+.fill-blank{border:none;border-bottom:2px dashed var(--pri);background:transparent;outline:none;font-size:.9rem;padding:2px 6px;min-width:120px;color:var(--txt)}
+.fill-blank.correct{border-bottom-color:var(--ok);background:#f0faf2;border-radius:4px}
+.fill-blank.wrong{border-bottom-color:var(--no);background:#fff0f0;border-radius:4px}
+.fb-feedback{font-size:.8rem;display:inline-block;margin-left:4px;font-weight:600}
+.sa-box{width:100%;min-height:80px;padding:8px 10px;border:1.5px solid var(--border);border-radius:6px;font-size:.86rem;font-family:inherit;resize:vertical}
+.grade-btn{background:var(--pri);color:#fff;border:none;padding:7px 18px;border-radius:6px;cursor:pointer;font-size:.84rem;margin-top:7px}
+.grade-btn:hover{background:var(--pri-l)}
+.sa-feedback{margin-top:8px;padding:10px;border-radius:6px;background:#f9f9f9;border:1px solid #ddd;font-size:.82rem;display:none}
+.kw-found{color:var(--ok);font-weight:600}
+.kw-missed{color:var(--no);font-weight:600}
+.model-ans{margin-top:6px;font-style:italic;color:#555}
+.check-btn{background:var(--ok);color:#fff;border:none;padding:8px 18px;border-radius:6px;cursor:pointer;font-size:.84rem;margin-top:8px}
+.check-btn:hover{background:#256427}
+.score-btn{display:block;margin:18px auto 0;background:var(--acc);color:#000;font-weight:700;border:none;padding:11px 32px;border-radius:8px;cursor:pointer;font-size:.95rem}
+.score-btn:hover{background:#e0951a}
+.total-result{margin-top:14px;text-align:center;font-size:1rem;font-weight:700;padding:12px;border-radius:8px;background:#fff;border:2px solid var(--pri)}
+.next-lesson-box{margin-top:18px;text-align:center;display:none}.next-lesson-btn{display:inline-block;background:linear-gradient(135deg,var(--pri),var(--pri-l));color:#fff;font-weight:700;border:none;padding:14px 32px;border-radius:10px;cursor:pointer;font-size:.95rem;text-decoration:none;transition:all .3s;box-shadow:0 4px 15px rgba(10,94,42,.25)}.next-lesson-btn:hover{transform:translateY(-2px);box-shadow:0 8px 25px rgba(10,94,42,.35)}.next-lesson-sub{font-size:.78rem;color:#666;margin-top:8px}
+.tag{display:inline-block;background:var(--pri);color:#fff;font-size:.72rem;padding:2px 8px;border-radius:10px;margin:2px}
+
+/* PPE QUIZ */
+.ppe-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(130px,1fr));gap:10px;margin:10px 0}
+.ppe-card{background:#fff;border:2px solid var(--border);border-radius:8px;padding:10px;text-align:center;cursor:pointer;font-size:.82rem;transition:all .2s}
+.ppe-card:hover{border-color:var(--pri);background:#eef5f0}
+.ppe-card.selected{border-color:var(--ok);background:#f0faf2}
+.ppe-card .icon{font-size:1.8rem;display:block;margin-bottom:4px}
+
+/* CAREER MATCHER */
+.career-item{background:#fff;border:1.5px solid var(--border);border-radius:8px;padding:10px 14px;margin:6px 0;font-size:.85rem;display:flex;align-items:center;gap:10px}
+.career-item select{padding:4px 8px;border-radius:4px;border:1px solid var(--border);font-size:.83rem;flex:1}
+
+/* NAV BAR */
+.nav-bar{position:sticky;bottom:0;background:#fff;border-top:2px solid var(--border);padding:10px 16px;display:flex;align-items:center;justify-content:space-between;gap:10px;z-index:90}
+.nav-btn{background:var(--pri);color:#fff;border:none;padding:9px 22px;border-radius:8px;font-size:.88rem;cursor:pointer;font-weight:600}
+.nav-btn:disabled{background:#b0b0b0;cursor:not-allowed}
+.nav-btn:hover:not(:disabled){background:var(--pri-l)}
+.dots{display:flex;gap:6px;flex-wrap:wrap;justify-content:center;flex:1}
+.dot{width:9px;height:9px;border-radius:50%;background:#ccc;cursor:pointer;transition:background .2s}
+.dot.active{background:var(--pri)}
+
+@media(max-width:600px){
+  .top-bar .title{display:none}
+  .slide{padding:10px}
+  .info-table{font-size:.78rem}
+  .nav-btn{padding:8px 14px;font-size:.82rem}
+  .ppe-grid{grid-template-columns:repeat(3,1fr)}
+}
+</style>
+<script type="text/javascript">(function(c,l,a,r,i,t,y){c[a]=c[a]||function(){(c[a].q=c[a].q||[]).push(arguments)};t=l.createElement(r);t.async=1;t.src="https://www.clarity.ms/tag/"+i;y=l.getElementsByTagName(r)[0];y.parentNode.insertBefore(t,y);})(window,document,"clarity","script","wg31zlwbt9");</script>\n</head>
+<body>
+
+<div class="top-bar">
+  <div class="logo">M.T.T.I</div>
+  <div class="title">Electrical Technology Gr.10 · 1.1 Introduction to Electrical Technology</div>
+  <div class="slide-badge" id="slideLabel">1 / 10</div>
+</div>
+
+<div class="slides-wrap">
+
+<!-- ===== SLIDE 1: LEARNING OUTCOMES ===== -->
+<div class="slide active" id="s1">
+  <div class="slide-header">
+    <h2>Learning Outcomes</h2>
+    <div class="strand">Strand 1.0 Fundamentals of Electrical Technology · Sub-strand 1.1 · 10 Lessons</div>
+  </div>
+  <div class="lo-box">
+    <h3>By the end of this sub-strand, you should be able to:</h3>
+    <ol>
+      <li>Explain the <strong>importance of electrical technology</strong> in society.</li>
+      <li>Identify <strong>career opportunities</strong> in the electrical technology field.</li>
+      <li>Apply <strong>safety regulations</strong> while carrying out electrical tasks.</li>
+      <li>Explain the roles of <strong>stakeholders</strong> in application of electrical safety.</li>
+      <li>Embrace electrical technology as a <strong>viable career</strong> in society.</li>
+    </ol>
+    <div class="inquiry">
+      <strong>🔍 Key Inquiry Questions</strong>
+      Why is the study of electrical technology important in society?
+      &nbsp;|&nbsp; How is electricity utilised in various applications?
+    </div>
+  </div>
+  <div class="teach-block">
+    <h3>What We Cover</h3>
+    <div style="display:flex;flex-wrap:wrap;gap:8px;margin-top:6px">
+      <span class="tag">Uses of Electricity</span>
+      <span class="tag">Career Opportunities</span>
+      <span class="tag">Safety Rules & Regulations</span>
+      <span class="tag">PPE</span>
+      <span class="tag">Stakeholder Roles</span>
+    </div>
+    <p style="margin-top:10px;font-size:.87rem;line-height:1.6">Electrical technology is at the heart of modern civilization. From lighting homes to powering hospitals, industries and transportation, electricity touches every part of our lives. This sub-strand introduces you to the field, the opportunities it offers, and the critical safety practices that must always be observed.</p>
+  </div>
+</div>
+
+<!-- ===== SLIDE 2: IMPORTANCE OF ELECTRICAL TECHNOLOGY ===== -->
+<div class="slide" id="s2">
+  <div class="slide-header">
+    <h2>Importance of Electrical Technology in Society</h2>
+    <div class="strand">Why electricity matters</div>
+  </div>
+  <div class="teach-block">
+    <h3>What is Electrical Technology?</h3>
+    <div class="key-term"><strong>Electrical Technology:</strong> The branch of technology that deals with the practical application of electricity — including generation, distribution, installation, and maintenance of electrical systems and equipment.</div>
+    <div class="key-term"><strong>Electricity:</strong> A form of energy resulting from the movement of charged particles (electrons), used as a source of power for lighting, heating, motors, and electronics.</div>
+  </div>
+  <div class="teach-block">
+    <h3>Applications of Electricity in Society</h3>
+    <table class="info-table">
+      <tr><th>Sector</th><th>Application</th><th>Example</th></tr>
+      <tr><td>Domestic</td><td>Lighting, heating, cooking</td><td>LED bulbs, electric cookers, water heaters</td></tr>
+      <tr><td>Healthcare</td><td>Medical equipment</td><td>X-ray machines, ICU monitors, MRI scanners</td></tr>
+      <tr><td>Industry</td><td>Motors, automation</td><td>Factory machines, conveyor belts, welding</td></tr>
+      <tr><td>Transport</td><td>Electric vehicles, signals</td><td>Electric trains, traffic lights, EVs</td></tr>
+      <tr><td>Agriculture</td><td>Irrigation, cold storage</td><td>Water pumps, refrigerated storage</td></tr>
+      <tr><td>Communication</td><td>ICT infrastructure</td><td>Internet servers, mobile networks, TV</td></tr>
+      <tr><td>Education</td><td>Digital learning</td><td>Computers, projectors, LMS servers</td></tr>
+    </table>
+  </div>
+  <div class="example-box">
+    <h4>💡 Kenya Context</h4>
+    <p>Kenya's <strong>Vision 2030</strong> and <strong>Sessional Paper No. 1 of 2019</strong> prioritise STEM education. Electrical technology is key to achieving the <strong>Last Mile Connectivity</strong> programme, which aims to connect every home in Kenya to the national grid. The <strong>Kenya Power</strong> network currently serves millions of consumers across the country.</p>
+  </div>
+</div>
+
+<!-- ===== SLIDE 3: CAREER OPPORTUNITIES ===== -->
+<div class="slide" id="s3">
+  <div class="slide-header">
+    <h2>Career Opportunities in Electrical Technology</h2>
+    <div class="strand">Your future in the electrical field</div>
+  </div>
+  <div class="teach-block">
+    <h3>Entry-Level Careers (After Training)</h3>
+    <table class="info-table">
+      <tr><th>Career</th><th>Description</th><th>Where They Work</th></tr>
+      <tr><td>Electrical Wireman</td><td>Installs wiring in buildings</td><td>Construction sites, homes, offices</td></tr>
+      <tr><td>Electrical Fitter</td><td>Assembles & maintains electrical equipment</td><td>Factories, power plants</td></tr>
+      <tr><td>Solar Technician</td><td>Installs & maintains solar PV systems</td><td>Rural areas, homes, farms</td></tr>
+      <tr><td>Electrician</td><td>Repairs and maintains electrical systems</td><td>Homes, schools, hospitals</td></tr>
+      <tr><td>Electronics Technician</td><td>Repairs electronic devices</td><td>Repair shops, service centres</td></tr>
+    </table>
+  </div>
+  <div class="teach-block">
+    <h3>Advanced Careers (After College/University)</h3>
+    <table class="info-table">
+      <tr><th>Career</th><th>Qualification Path</th></tr>
+      <tr><td>Electrical Engineer</td><td>Diploma/Degree in Electrical Engineering</td></tr>
+      <tr><td>Mechatronics Engineer</td><td>Degree in Mechatronics</td></tr>
+      <tr><td>Telecommunications Engineer</td><td>Degree in Telecommunications</td></tr>
+      <tr><td>Power Engineer</td><td>Degree in Power Engineering</td></tr>
+      <tr><td>Industrial Electronics Engineer</td><td>Degree in Industrial Electronics</td></tr>
+      <tr><td>Communication Electronics Engineer</td><td>Degree in Communication Electronics</td></tr>
+    </table>
+  </div>
+  <div class="example-box">
+    <h4>📌 Career Pathway from Senior School</h4>
+    <p style="line-height:1.8">
+      <strong>Grade 10–12 Electrical Technology</strong> → 
+      <strong>TVET College</strong> (Artisan/Craft Certificate) → 
+      <strong>Middle-level College</strong> (Diploma) → 
+      <strong>University</strong> (Degree in Engineering)
+    </p>
+  </div>
+</div>
+
+<!-- ===== SLIDE 4: SAFETY REGULATIONS ===== -->
+<div class="slide" id="s4">
+  <div class="slide-header">
+    <h2>Safety Rules and Regulations</h2>
+    <div class="strand">Your life depends on following safety rules</div>
+  </div>
+  <div class="teach-block">
+    <h3>Why Safety Matters in Electrical Work</h3>
+    <div class="key-term"><strong>Electrical hazard:</strong> Any condition that exposes a person to risk of electric shock, electrocution, arc flash, arc blast, fire, or explosion from electrical equipment.</div>
+    <div class="key-term"><strong>Safety regulation:</strong> A rule or standard designed to protect workers and the public from injury or death when working with electricity.</div>
+  </div>
+  <div class="warn-box">
+    <h4>⚠️ Electricity is DEADLY — Always follow safety rules</h4>
+    <p>Electricity can cause: <strong>electric shock, severe burns, cardiac arrest, fire, and death</strong>. Even low voltages (50V AC) can be fatal under certain conditions. Never take shortcuts with electrical safety.</p>
+  </div>
+  <div class="teach-block">
+    <h3>Key Safety Rules in an Electrical Workplace</h3>
+    <table class="info-table">
+      <tr><th>#</th><th>Rule</th><th>Why It Matters</th></tr>
+      <tr><td>1</td><td>Always isolate (switch off) before working</td><td>Prevents shock from live conductors</td></tr>
+      <tr><td>2</td><td>Use correct PPE at all times</td><td>Protects body from shock, burns, falling objects</td></tr>
+      <tr><td>3</td><td>Never work alone on live equipment</td><td>Partner can assist in emergencies</td></tr>
+      <tr><td>4</td><td>Store tools properly after use</td><td>Prevents accidents and tool damage</td></tr>
+      <tr><td>5</td><td>Keep work area clean and dry</td><td>Water conducts electricity — danger of shock</td></tr>
+      <tr><td>6</td><td>Use insulated tools only</td><td>Insulation prevents current flowing through you</td></tr>
+      <tr><td>7</td><td>Label and lock out/tag out circuits</td><td>Prevents accidental energising</td></tr>
+      <tr><td>8</td><td>Check equipment before use</td><td>Damaged insulation = shock risk</td></tr>
+    </table>
+  </div>
+</div>
+
+<!-- ===== SLIDE 5: PPE ===== -->
+<div class="slide" id="s5">
+  <div class="slide-header">
+    <h2>Personal Protective Equipment (PPE)</h2>
+    <div class="strand">What you wear can save your life</div>
+  </div>
+  <div class="teach-block">
+    <h3>PPE for Electrical Work</h3>
+    <div class="key-term"><strong>PPE (Personal Protective Equipment):</strong> Specialised clothing or equipment worn by workers to protect against health and safety hazards in the workplace.</div>
+    <table class="info-table">
+      <tr><th>PPE Item</th><th>Protects Against</th><th>When Used</th></tr>
+      <tr><td>Insulated gloves</td><td>Electric shock</td><td>All electrical work</td></tr>
+      <tr><td>Safety helmet/hard hat</td><td>Falling objects, head injury</td><td>Construction sites, overhead work</td></tr>
+      <tr><td>Safety boots (steel toe)</td><td>Crushing, electric shock</td><td>All electrical sites</td></tr>
+      <tr><td>Safety goggles/glasses</td><td>Arc flash, flying debris</td><td>Switching operations, drilling</td></tr>
+      <tr><td>Flame-resistant (FR) clothing</td><td>Arc flash burns</td><td>High-voltage work</td></tr>
+      <tr><td>Face shield</td><td>Arc flash, splashes</td><td>Battery work, high-voltage</td></tr>
+      <tr><td>Ear protection</td><td>Noise-induced hearing loss</td><td>Generator rooms, noisy equipment</td></tr>
+      <tr><td>High-visibility vest</td><td>Being struck by vehicles</td><td>Outdoor/roadside electrical work</td></tr>
+    </table>
+  </div>
+  <div class="diagram-wrap">
+    <svg viewBox="0 0 580 180" xmlns="http://www.w3.org/2000/svg" style="font-family:'Segoe UI',sans-serif;max-width:580px">
+      <rect width="580" height="180" rx="10" fill="#f4f7f5"/>
+      <!-- Person silhouette -->
+      <circle cx="290" cy="35" r="18" fill="#0a5e2a"/>
+      <rect x="272" y="55" width="36" height="55" rx="4" fill="#0a5e2a"/>
+      <rect x="258" y="58" width="14" height="40" rx="4" fill="#0a5e2a"/>
+      <rect x="308" y="58" width="14" height="40" rx="4" fill="#0a5e2a"/>
+      <rect x="272" y="110" width="16" height="45" rx="4" fill="#0a5e2a"/>
+      <rect x="292" y="110" width="16" height="45" rx="4" fill="#0a5e2a"/>
+      <!-- Labels -->
+      <line x1="200" y1="25" x2="272" y2="25" stroke="#f5a623" stroke-width="1.5" stroke-dasharray="4"/>
+      <text x="50" y="22" fill="#0a5e2a" font-size="10" font-weight="700">Hard Hat</text>
+      <text x="50" y="33" fill="#555" font-size="9">Head protection</text>
+
+      <line x1="200" y1="65" x2="258" y2="65" stroke="#f5a623" stroke-width="1.5" stroke-dasharray="4"/>
+      <text x="50" y="62" fill="#0a5e2a" font-size="10" font-weight="700">Insulated Gloves</text>
+      <text x="50" y="73" fill="#555" font-size="9">Shock protection</text>
+
+      <line x1="200" y1="90" x2="272" y2="82" stroke="#f5a623" stroke-width="1.5" stroke-dasharray="4"/>
+      <text x="50" y="87" fill="#0a5e2a" font-size="10" font-weight="700">FR Clothing</text>
+      <text x="50" y="98" fill="#555" font-size="9">Arc flash burns</text>
+
+      <line x1="380" y1="25" x2="308" y2="25" stroke="#f5a623" stroke-width="1.5" stroke-dasharray="4"/>
+      <text x="385" y="22" fill="#0a5e2a" font-size="10" font-weight="700">Safety Goggles</text>
+      <text x="385" y="33" fill="#555" font-size="9">Eye protection</text>
+
+      <line x1="380" y1="65" x2="322" y2="65" stroke="#f5a623" stroke-width="1.5" stroke-dasharray="4"/>
+      <text x="385" y="62" fill="#0a5e2a" font-size="10" font-weight="700">Hi-Vis Vest</text>
+      <text x="385" y="73" fill="#555" font-size="9">Visibility</text>
+
+      <line x1="380" y1="145" x2="308" y2="145" stroke="#f5a623" stroke-width="1.5" stroke-dasharray="4"/>
+      <text x="385" y="142" fill="#0a5e2a" font-size="10" font-weight="700">Safety Boots</text>
+      <text x="385" y="153" fill="#555" font-size="9">Foot protection</text>
+
+      <text x="290" y="175" text-anchor="middle" fill="#0a5e2a" font-size="9" font-style="italic">Proper PPE is mandatory on all electrical worksites</text>
+    </svg>
+  </div>
+</div>
+
+<!-- ===== SLIDE 6: STAKEHOLDER ROLES ===== -->
+<div class="slide" id="s6">
+  <div class="slide-header">
+    <h2>Roles of Stakeholders in Electrical Safety</h2>
+    <div class="strand">Who is responsible for keeping workers safe?</div>
+  </div>
+  <div class="teach-block">
+    <h3>Key Stakeholders and Their Responsibilities</h3>
+    <div class="key-term"><strong>Stakeholder:</strong> Any person or organisation with an interest or responsibility in ensuring electrical safety in the workplace.</div>
+    <table class="info-table">
+      <tr><th>Stakeholder</th><th>Role in Electrical Safety</th></tr>
+      <tr><td><strong>Workers / Electricians</strong></td><td>Follow all safety rules; use PPE; report hazards; attend safety training; care for tools and equipment</td></tr>
+      <tr><td><strong>Employers / Contractors</strong></td><td>Provide PPE and safe tools; conduct safety training; ensure safe working conditions; enforce regulations</td></tr>
+      <tr><td><strong>Government (EPRA)</strong></td><td>Set and enforce electrical safety regulations; license electricians; inspect workplaces; prosecute violators</td></tr>
+      <tr><td><strong>Kenya Power (KPLC)</strong></td><td>Maintain the national grid safely; respond to electrical emergencies; educate consumers</td></tr>
+      <tr><td><strong>ERC / Energy Regulators</strong></td><td>Regulate energy sector; set standards for equipment; approve installations</td></tr>
+      <tr><td><strong>Consumers / Public</strong></td><td>Use electrical appliances safely; report faults; avoid illegal connections; engage certified electricians</td></tr>
+    </table>
+  </div>
+  <div class="example-box">
+    <h4>📌 Key Regulatory Bodies in Kenya</h4>
+    <p>• <strong>EPRA</strong> — Energy and Petroleum Regulatory Authority (regulates electrical installations)</p>
+    <p>• <strong>KPLC</strong> — Kenya Power and Lighting Company (supplies electricity)</p>
+    <p>• <strong>KEBS</strong> — Kenya Bureau of Standards (sets standards for electrical equipment)</p>
+    <p>• <strong>ERC</strong> — Energy Regulatory Commission (oversees energy sector policy)</p>
+  </div>
+  <div class="warn-box">
+    <h4>⚠️ Illegal Connections</h4>
+    <p>Connecting to the power supply without authorisation is <strong>illegal, dangerous, and punishable by law</strong> in Kenya. Always engage a licensed electrician and obtain permits from KPLC/EPRA before any installation work.</p>
+  </div>
+</div>
+
+<!-- ===== SLIDE 7: ELECTRICAL TOOLS & EQUIPMENT ===== -->
+<div class="slide" id="s7">
+  <div class="slide-header">
+    <h2>Tools Used in Electrical Technology</h2>
+    <div class="strand">Know your tools — and how to use them safely</div>
+  </div>
+  <div class="teach-block">
+    <h3>Common Electrical Hand Tools</h3>
+    <table class="info-table">
+      <tr><th>Tool</th><th>Use</th><th>Safety Note</th></tr>
+      <tr><td>Screwdrivers (insulated)</td><td>Tightening/loosening screws in fittings</td><td>Must be properly insulated; check before use</td></tr>
+      <tr><td>Combination pliers</td><td>Gripping, bending, cutting wires</td><td>Use insulated handles only</td></tr>
+      <tr><td>Wire stripper</td><td>Removing insulation from cables</td><td>Do not nick the conductor</td></tr>
+      <tr><td>Hacksaw</td><td>Cutting conduits and metal channels</td><td>Use correct blade; secure workpiece</td></tr>
+      <tr><td>Electrician's knife</td><td>Cutting cable sheath</td><td>Cut away from body; keep blade sharp</td></tr>
+      <tr><td>Crimping tool</td><td>Joining cable terminals</td><td>Use correct size terminal for cable</td></tr>
+      <tr><td>Voltage tester / pen</td><td>Checking if circuit is live</td><td>Always test before touching conductors</td></tr>
+      <tr><td>Multimeter</td><td>Measuring voltage, current, resistance</td><td>Set correct range before measuring</td></tr>
+    </table>
+  </div>
+  <div class="teach-block">
+    <h3>Proper Tool Storage</h3>
+    <div class="key-term"><strong>Tool care rule:</strong> Clean tools after use, store in a dry toolbox or panel, inspect insulation before each use, and replace damaged tools immediately. Never use a damaged insulated tool — replace it.</div>
+  </div>
+  <div class="example-box">
+    <h4>✏️ Tool Storage Best Practice</h4>
+    <p>• Store tools in a <strong>clean, dry toolbox</strong> or wall-mounted panel.</p>
+    <p>• Keep cutting tools (knives, hacksaws) with blade guards or in sheaths.</p>
+    <p>• <strong>Label or colour-code</strong> insulated tools for easy identification.</p>
+    <p>• <strong>Inspect before use</strong> — check for cracked handles, damaged insulation, bent shafts.</p>
+  </div>
+</div>
+
+<!-- ===== SLIDE 8: INTERACTIVE — PPE CHECKER & CAREER MATCHER ===== -->
+<div class="slide" id="s8">
+  <div class="slide-header">
+    <h2>Interactive Activities</h2>
+    <div class="strand">PPE Scenario Checker & Career Matcher</div>
+  </div>
+
+  <div class="calc-box">
+    <h4>🔧 Activity 1: PPE Scenario Checker</h4>
+    <p style="font-size:.83rem;margin-bottom:12px">Read each electrical task. Select ALL the PPE items that should be worn. Then click Check.</p>
+
+    <div style="font-size:.86rem;margin-bottom:8px"><strong>Task:</strong> Installing a light fitting in a domestic house (power OFF at the board)</div>
+    <div class="ppe-grid" id="ppeGrid">
+      <div class="ppe-card" onclick="togglePPE(this,'gloves')" data-item="gloves"><span class="icon">🧤</span>Insulated Gloves</div>
+      <div class="ppe-card" onclick="togglePPE(this,'boots')" data-item="boots"><span class="icon">👢</span>Safety Boots</div>
+      <div class="ppe-card" onclick="togglePPE(this,'helmet')" data-item="helmet"><span class="icon">⛑️</span>Hard Hat</div>
+      <div class="ppe-card" onclick="togglePPE(this,'goggles')" data-item="goggles"><span class="icon">🥽</span>Safety Goggles</div>
+      <div class="ppe-card" onclick="togglePPE(this,'fr')" data-item="fr"><span class="icon">🦺</span>FR Clothing</div>
+      <div class="ppe-card" onclick="togglePPE(this,'vis')" data-item="vis"><span class="icon">🦺</span>Hi-Vis Vest</div>
+    </div>
+    <button class="check-btn" onclick="checkPPE()">✓ Check My PPE Selection</button>
+    <div id="ppe-result" style="margin-top:8px;font-size:.83rem"></div>
+  </div>
+
+  <div class="calc-box" style="margin-top:14px">
+    <h4>🔧 Activity 2: Career Matcher</h4>
+    <p style="font-size:.83rem;margin-bottom:10px">Match each job description to the correct career. Select from the dropdown.</p>
+    <div class="career-item">
+      <span style="flex:2;font-size:.83rem">Installs wiring systems in new buildings and homes</span>
+      <select id="c1">
+        <option value="">-- Select --</option>
+        <option>Electrical Wireman</option>
+        <option>Power Engineer</option>
+        <option>Solar Technician</option>
+        <option>Electronics Technician</option>
+      </select>
+    </div>
+    <div class="career-item">
+      <span style="flex:2;font-size:.83rem">Installs and maintains solar panel systems on rooftops</span>
+      <select id="c2">
+        <option value="">-- Select --</option>
+        <option>Electrical Wireman</option>
+        <option>Power Engineer</option>
+        <option>Solar Technician</option>
+        <option>Electronics Technician</option>
+      </select>
+    </div>
+    <div class="career-item">
+      <span style="flex:2;font-size:.83rem">Repairs smartphones, TVs and radios at a service centre</span>
+      <select id="c3">
+        <option value="">-- Select --</option>
+        <option>Electrical Wireman</option>
+        <option>Power Engineer</option>
+        <option>Solar Technician</option>
+        <option>Electronics Technician</option>
+      </select>
+    </div>
+    <div class="career-item">
+      <span style="flex:2;font-size:.83rem">Designs and manages large-scale electricity generation systems</span>
+      <select id="c4">
+        <option value="">-- Select --</option>
+        <option>Electrical Wireman</option>
+        <option>Power Engineer</option>
+        <option>Solar Technician</option>
+        <option>Electronics Technician</option>
+      </select>
+    </div>
+    <button class="check-btn" onclick="checkCareers()" style="margin-top:10px">✓ Check Answers</button>
+    <div id="career-result" style="margin-top:8px;font-size:.83rem"></div>
+  </div>
+</div>
+
+<!-- ===== SLIDE 9: PRACTICE ===== -->
+<div class="slide" id="s9">
+  <div class="slide-header">
+    <h2>Practice Activities</h2>
+    <div class="strand">Apply what you have learned</div>
+  </div>
+
+  <div class="practice-q">
+    <div class="qnum">Activity A: Uses of Electricity</div>
+    <p style="font-size:.86rem">List TWO uses of electricity in each of the following sectors:</p>
+    <table class="info-table" style="margin-top:8px">
+      <tr><th>Sector</th><th>Use 1</th><th>Use 2</th></tr>
+      <tr><td>Healthcare</td><td style="color:var(--ok)">X-ray machines</td><td style="color:var(--ok)">ICU monitors</td></tr>
+      <tr><td>Agriculture</td><td style="color:var(--ok)">Water pumps</td><td style="color:var(--ok)">Cold storage</td></tr>
+      <tr><td>Transport</td><td style="color:var(--ok)">Traffic lights</td><td style="color:var(--ok)">Electric trains</td></tr>
+      <tr><td>Education</td><td style="color:var(--ok)">Computers</td><td style="color:var(--ok)">Projectors</td></tr>
+    </table>
+  </div>
+
+  <div class="practice-q">
+    <div class="qnum">Activity B: Safety Rules — True or False</div>
+    <ol style="font-size:.86rem;padding-left:18px;margin-top:6px">
+      <li style="margin-bottom:6px">You can work on live equipment alone if you are experienced. → <span style="color:var(--no);font-weight:700">FALSE</span> — Never work alone on live equipment.</li>
+      <li style="margin-bottom:6px">Water on the floor of an electrical workshop is harmless. → <span style="color:var(--no);font-weight:700">FALSE</span> — Water conducts electricity; always keep area dry.</li>
+      <li style="margin-bottom:6px">Insulated gloves must be worn when working on electrical circuits. → <span style="color:var(--ok);font-weight:700">TRUE</span></li>
+      <li>Tools should be inspected for damage before each use. → <span style="color:var(--ok);font-weight:700">TRUE</span></li>
+    </ol>
+  </div>
+
+  <div class="practice-q">
+    <div class="qnum">Activity C: Stakeholder Roles</div>
+    <p style="font-size:.86rem">State ONE specific responsibility for each stakeholder:</p>
+    <ol style="font-size:.86rem;padding-left:18px;margin-top:6px">
+      <li style="margin-bottom:5px"><strong>Worker:</strong> <span style="color:var(--ok)">Must wear appropriate PPE at all times on site.</span></li>
+      <li style="margin-bottom:5px"><strong>Employer:</strong> <span style="color:var(--ok)">Must provide PPE and conduct safety training for workers.</span></li>
+      <li><strong>Government (EPRA):</strong> <span style="color:var(--ok)">Sets and enforces electrical safety regulations and licenses electricians.</span></li>
+    </ol>
+  </div>
+
+  <div class="practice-q">
+    <div class="qnum">Activity D: Career Path Planning</div>
+    <p style="font-size:.86rem;line-height:1.6">Omondi wants to become an electrical engineer. Describe his career pathway starting from Grade 10 Electrical Technology.</p>
+    <div class="example-box" style="margin-top:8px">
+      <h4>📌 Model Answer</h4>
+      <p style="font-size:.85rem;line-height:1.7">Omondi should complete <strong>Grade 10–12 Electrical Technology</strong> at senior school. He can then join a <strong>TVET college</strong> to earn an Artisan or Craft Certificate in Electrical Installation. After gaining work experience, he can pursue a <strong>Diploma in Electrical Engineering</strong> at a middle-level college such as Kenya Technical Trainers College (KTTC). Finally, he can upgrade to a <strong>Degree in Electrical Engineering</strong> at a university such as UoN, JKUAT, or Moi University, qualifying him as a fully registered Electrical Engineer.</p>
+    </div>
+  </div>
+</div>
+
+<!-- ===== SLIDE 10: QUIZ ===== -->
+<div class="slide" id="s10">
+  <div class="slide-header">
+    <h2>End-of-Lesson Quiz</h2>
+    <div class="strand">Sub-strand 1.1 · Introduction to Electrical Technology</div>
+  </div>
+  <p style="font-size:.83rem;color:#555;margin-bottom:14px">Part A: 5 fill-in-the-blank (5 marks) &nbsp;|&nbsp; Part B: 3 short answer (10 marks) &nbsp;|&nbsp; <strong>Total: 15 marks</strong></p>
+
+  <!-- PART A -->
+  <div class="practice-q">
+    <div class="qnum">Part A: Fill in the Blank (1 mark each)</div>
+    <div style="font-size:.87rem">
+
+      <p style="margin:10px 0">1. The government agency responsible for regulating electrical installations and licensing electricians in Kenya is called <input class="fill-blank" id="f1" placeholder="...">. <span class="fb-feedback" id="ff1"></span></p>
+
+      <p style="margin:10px 0">2. The type of clothing that protects an electrician from arc flash burns is called <input class="fill-blank" id="f2" placeholder="..."> clothing. <span class="fb-feedback" id="ff2"></span></p>
+
+      <p style="margin:10px 0">3. Before starting any electrical work, the circuit must first be <input class="fill-blank" id="f3" placeholder="..."> (switched off). <span class="fb-feedback" id="ff3"></span></p>
+
+      <p style="margin:10px 0">4. An electrician who installs wiring systems in buildings is called an electrical <input class="fill-blank" id="f4" placeholder="...">. <span class="fb-feedback" id="ff4"></span></p>
+
+      <p style="margin:10px 0">5. The full meaning of PPE is <input class="fill-blank" id="f5" placeholder="..." style="min-width:200px">. <span class="fb-feedback" id="ff5"></span></p>
+    </div>
+    <button class="check-btn" onclick="checkFills()" style="margin-top:12px">✓ Check Part A</button>
+  </div>
+
+  <!-- PART B -->
+  <div class="practice-q" style="margin-top:12px">
+    <div class="qnum">Part B: Short Answer</div>
+
+    <div style="margin-bottom:14px">
+      <p style="font-size:.87rem"><strong>B1.</strong> Explain THREE reasons why electrical technology is important in Kenya's society today. <em>(3 marks)</em></p>
+      <textarea class="sa-box" id="sa1" placeholder="Type your answer here..."></textarea>
+      <button class="grade-btn" onclick="gradeAnswer('sa1','fb1',{keywords:['lighting','heating','industry','hospital','transport','communication','agriculture','economy','vision 2030','employment','grid','power'],required:4,marks:3,model:'Electrical technology is important because: (1) It powers homes and businesses with lighting and heating. (2) It drives industrial machines that create employment and economic growth. (3) It supports healthcare through medical equipment. (4) It enables communication through ICT infrastructure. (5) It supports Kenya Vision 2030 development goals.'})">✓ Grade My Answer</button>
+      <div class="sa-feedback" id="fb1"></div>
+    </div>
+
+    <div style="margin-bottom:14px">
+      <p style="font-size:.87rem"><strong>B2.</strong> State FOUR safety rules that must be observed when carrying out electrical tasks in a workplace. <em>(4 marks)</em></p>
+      <textarea class="sa-box" id="sa2" placeholder="Type your answer here..."></textarea>
+      <button class="grade-btn" onclick="gradeAnswer('sa2','fb2',{keywords:['isolate','switch off','ppe','gloves','boots','insulated','dry','alone','label','tag out','inspect','test','clean'],required:5,marks:4,model:'Safety rules include: (1) Always isolate/switch off the circuit before working. (2) Wear appropriate PPE including insulated gloves and safety boots. (3) Never work alone on live equipment. (4) Keep the work area clean and dry. (5) Use only insulated tools. (6) Inspect and test tools before use. (7) Label and lock out circuits when working on them.'})">✓ Grade My Answer</button>
+      <div class="sa-feedback" id="fb2"></div>
+    </div>
+
+    <div style="margin-bottom:14px">
+      <p style="font-size:.87rem"><strong>B3.</strong> Describe the role of the <em>employer</em> and the role of the <em>worker</em> in ensuring electrical safety at a workplace. <em>(3 marks)</em></p>
+      <textarea class="sa-box" id="sa3" placeholder="Type your answer here..."></textarea>
+      <button class="grade-btn" onclick="gradeAnswer('sa3','fb3',{keywords:['employer','provide','ppe','training','safe','worker','follow','wear','report','rules','regulations','tools','conditions'],required:5,marks:3,model:'Employer: Must provide appropriate PPE to all workers, conduct regular safety training, ensure safe working conditions, enforce safety regulations, and provide safe tools and equipment. Worker: Must follow all safety rules, wear PPE at all times, report hazards to supervisors, attend safety training, and take care of tools and equipment provided.'})">✓ Grade My Answer</button>
+      <div class="sa-feedback" id="fb3"></div>
+    </div>
+  </div>
+
+  <button class="score-btn" onclick="showTotalScore()">📊 View My Total Score</button>
+  <div class="total-result" id="totalResult" style="display:none"></div>
+  <div class="next-lesson-box" id="nextLessonBox">
+    <a href="elec-1.2-dc-circuits-full.html" class="next-lesson-btn">➡️ Next Lesson: 1.2 D.C. Electric Circuits</a>
+    <div class="next-lesson-sub">You've completed this lesson! Keep going 🎉</div>
+  </div>
+</div>
+
+</div><!-- end slides-wrap -->
+
+<!-- NAV BAR -->
+<div class="nav-bar">
+  <button class="nav-btn" id="prevBtn" onclick="goSlide(-1)" disabled>← Prev</button>
+  <div class="dots" id="dotsWrap"></div>
+  <button class="nav-btn" id="nextBtn" onclick="goSlide(1)">Next →</button>
+</div>
+
+<script>
+// ── NAVIGATION ────────────────────────────────────────────────
+const TOTAL=10; let cur=0;
+const dotsWrap=document.getElementById('dotsWrap');
+for(let i=0;i<TOTAL;i++){
+  const d=document.createElement('div');
+  d.className='dot'+(i===0?' active':'');
+  d.onclick=()=>showSlide(i);
+  dotsWrap.appendChild(d);
+}
+function showSlide(n){
+  document.querySelectorAll('.slide').forEach((s,i)=>s.classList.toggle('active',i===n));
+  document.querySelectorAll('.dot').forEach((d,i)=>d.classList.toggle('active',i===n));
+  document.getElementById('prevBtn').disabled=(n===0);
+  document.getElementById('nextBtn').disabled=(n===TOTAL-1);
+  document.getElementById('slideLabel').textContent=(n+1)+' / '+TOTAL;
+  cur=n; window.scrollTo(0,0);
+}
+function goSlide(d){showSlide(Math.max(0,Math.min(TOTAL-1,cur+d)))}
+
+// ── PPE CHECKER ───────────────────────────────────────────────
+// For domestic light fitting (power OFF): gloves + boots are correct; goggles optional
+const PPE_CORRECT=['gloves','boots'];
+let selectedPPE=[];
+function togglePPE(el,item){
+  el.classList.toggle('selected');
+  if(selectedPPE.includes(item)) selectedPPE=selectedPPE.filter(x=>x!==item);
+  else selectedPPE.push(item);
+}
+function checkPPE(){
+  const el=document.getElementById('ppe-result');
+  const correct=PPE_CORRECT.every(p=>selectedPPE.includes(p));
+  const noExtras=['fr','vis'].every(p=>!selectedPPE.includes(p));
+  if(correct&&noExtras){
+    el.innerHTML='<span style="color:#2e7d32">✅ Correct! For indoor domestic work with power OFF, insulated gloves and safety boots are the minimum required PPE. Well done!</span>';
+  } else if(correct){
+    el.innerHTML='<span style="color:#e65100">⚠️ You selected the correct minimum PPE but also included unnecessary items (FR clothing / Hi-Vis vest are not needed for indoor domestic work with power off).</span>';
+  } else {
+    el.innerHTML='<span style="color:#c62828">❌ Not quite. Minimum PPE for this task: Insulated Gloves + Safety Boots. Remember — always isolate first, then wear appropriate PPE.</span>';
+  }
+}
+
+// ── CAREER MATCHER ────────────────────────────────────────────
+const CAREER_ANS={c1:'Electrical Wireman',c2:'Solar Technician',c3:'Electronics Technician',c4:'Power Engineer'};
+function checkCareers(){
+  let score=0,html='';
+  Object.entries(CAREER_ANS).forEach(([id,ans])=>{
+    const val=document.getElementById(id).value;
+    if(val===ans){score++;html+=`<span style="color:var(--ok)">Q${id.slice(1)}: ✅ ${ans}</span><br>`;}
+    else{html+=`<span style="color:var(--no)">Q${id.slice(1)}: ❌ "${val||'—'}" — Correct: ${ans}</span><br>`;}
+  });
+  document.getElementById('career-result').innerHTML=`<strong>${score}/4</strong><br>${html}`;
+}
+
+// ── FILL BLANK GRADING ────────────────────────────────────────
+const fbAns={
+  f1:['epra','energy and petroleum regulatory authority'],
+  f2:['flame resistant','flame-resistant','fr','fire resistant'],
+  f3:['isolated','switched off','isolate','de-energised','deenergised'],
+  f4:['wireman','wire man'],
+  f5:['personal protective equipment']
+};
+let fillScore=0, saScores={};
+
+function checkFills(){
+  fillScore=0;
+  Object.entries(fbAns).forEach(([id,ans])=>{
+    const inp=document.getElementById(id);
+    const fb=document.getElementById('f'+id.slice(1));
+    const val=inp.value.trim().toLowerCase();
+    const ok=ans.some(a=>val===a||val.includes(a));
+    if(ok){fillScore++;inp.className='fill-blank correct';fb.textContent='✓ +1';fb.style.color='#2e7d32';}
+    else{inp.className='fill-blank wrong';fb.textContent='✗ ('+ans[0]+')';fb.style.color='#c62828';}
+    fb.style.display='inline';
+  });
+}
+
+function gradeAnswer(saId,fbId,cfg){
+  const ans=document.getElementById(saId).value.trim().toLowerCase();
+  const found=cfg.keywords.filter(k=>ans.includes(k.toLowerCase()));
+  const missed=cfg.keywords.filter(k=>!ans.includes(k.toLowerCase()));
+  const hitRate=Math.min(found.length/cfg.required,1.0);
+  const marks=Math.round(hitRate*cfg.marks);
+  saScores[saId]=marks;
+  const grade=marks>=cfg.marks?'🌟 Excellent!':marks>=cfg.marks*0.5?'👍 Good attempt':'📖 Needs improvement';
+  const fbEl=document.getElementById(fbId);
+  fbEl.style.display='block';
+  fbEl.innerHTML=`<strong>${grade} — ${marks}/${cfg.marks} marks</strong><br>
+  <span class="kw-found">✅ Keywords found: ${found.join(', ')||'none'}</span><br>
+  <span class="kw-missed">❌ Missed keywords: ${missed.join(', ')||'none'}</span>
+  <div class="model-ans"><strong>Model Answer:</strong> ${cfg.model}</div>`;
+}
+
+function showTotalScore(){
+  const saTotal=Object.values(saScores).reduce((a,b)=>a+b,0);
+  const total=fillScore+saTotal;
+  const pct=Math.round(total/15*100);
+  const grade=pct>=80?'Exceeds Expectation 🎉':pct>=60?'Meets Expectation 👍':pct>=40?'Approaches Expectation 📖':'Below Expectation 💪';
+  const el=document.getElementById('totalResult');
+  el.style.display='block';
+  el.innerHTML=`<strong>Total Score: ${total} / 15 (${pct}%)</strong><br>
+  Part A: ${fillScore}/5 &nbsp;|&nbsp; Part B: ${saTotal}/10<br>
+  <span style="color:var(--pri);font-size:1.05rem">${grade}</span><br>
+  <span style="font-size:.8rem;color:#666;margin-top:4px;display:block">CBC Rubric — ${pct>=80?'Exceeds':pct>=60?'Meets':pct>=40?'Approaches':'Below'} Expectation</span>`;
+  submitExamToMTTI(total,15,pct);
+  document.getElementById('nextLessonBox').style.display='block';
+}
+
+function submitExamToMTTI(score,total,percent){
+  try{
+    fetch('/wp-json/mtti/v1/exam-result',{
+      method:'POST',
+      headers:{'Content-Type':'application/json','X-WP-Nonce':window.mtti_nonce||''},
+      body:JSON.stringify({lesson_id:'elec-1.1-intro-electrical-tech',score,total,percent,timestamp:new Date().toISOString()})
+    }).then(r=>r.json()).then(d=>{if(d&&d.success)console.log('[MTTI] Result saved:',d);}).catch(e=>console.log('[MTTI] Offline:',e));
+  }catch(e){console.log('[MTTI] Error:',e);}
+}
+</script>
+</body>
+</html>

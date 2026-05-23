@@ -1,0 +1,475 @@
+<?php
+if (!defined('ABSPATH')) {
+    exit;
+}
+/**
+ * @phpcs:disable WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedVariableFound
+ */
+
+?>
+
+<!--Footer Start-->
+<div class="b2s-footer">
+    <div class="pull-left hidden-xs <?php echo isset($noLegend) ? 'hide' : ''; ?>">
+        <?php if (!B2S_System::isblockedArea('B2S_MENU_FOOTER', B2S_PLUGIN_ADMIN)) { ?>
+            <small> © <?php echo esc_html(wp_date('Y', null,  new DateTimeZone(date_default_timezone_get()))); ?> <a target="_blank" href="https://www.adenion.de" rel="nofollow">Adenion GmbH</a> | <a target="_blank" href="<?php echo esc_url(B2S_Tools::getSupportLink('privacy_policy')); ?>" rel="nofollow"><?php esc_html_e("Privacy Policy", "blog2social") ?></a> | <a target="_blank" href="<?php echo esc_url(B2S_Tools::getSupportLink('term')); ?>" rel="nofollow"><?php esc_html_e("Terms", "blog2social") ?></a> | <?php esc_html_e("We never store your data from your social media profiles", "blog2social") ?></small>
+        <?php } ?>
+    </div>
+    <div class="pull-right hidden-xs <?php echo isset($noLegend) || isset($noLegendCalender) ? 'hide' : ''; ?>">
+        <?php if (sanitize_text_field(wp_unslash(isset($_GET['page'])?$_GET['page']:"")) != 'blog2social-video') { ?>
+            <small>
+                <img class="img-width-9" src="<?php echo esc_url(plugins_url('/assets/images/b2s/video-icon.png', B2S_PLUGIN_FILE)); ?>" alt="video">  <?php esc_html_e('Video', 'blog2social') ?> 
+                <img class="img-width-9" src="<?php echo esc_url(plugins_url('/assets/images/b2s/post-icon.png', B2S_PLUGIN_FILE)); ?>" alt="beitrag">  <?php esc_html_e('Post', 'blog2social') ?> 
+                <img class="img-width-9" src="<?php echo esc_url(plugins_url('/assets/images/b2s/job-icon.png', B2S_PLUGIN_FILE)); ?>" alt="job"> <?php esc_html_e('Job', 'blog2social') ?>
+                <img class="img-width-9" src="<?php echo esc_url(plugins_url('/assets/images/b2s/event-icon.png', B2S_PLUGIN_FILE)); ?>" alt="event"> <?php esc_html_e('Event', 'blog2social') ?>
+                <img class="img-width-9" src="<?php echo esc_url(plugins_url('/assets/images/b2s/product-icon.png', B2S_PLUGIN_FILE)); ?>" alt="product"> <?php esc_html_e('Product', 'blog2social') ?>
+            </small>
+        <?php } ?>
+    </div>
+</div>
+<!--Footer Ende-->
+<?php if (sanitize_text_field(wp_unslash(isset($_GET['page'])? $_GET['page'] : "")) != 'blog2social-calendar') { ?>
+
+    <?php
+        $modalNames= array("b2sPreFeatureAutoPosterModal", "b2sPreFeatureReshareModal", "b2sProFeatureUserAppsModal", "b2sPreFeatureEditAndDeleteModal", "b2sPreFeatureScheduleModal", "b2sPreFeatureBestTimesModal", "b2sBestTimesInfoModal", "b2sInfoMetaTagModal");
+        include (B2S_PLUGIN_DIR . 'views/b2s/partials/general-modal.php');
+
+    ?>
+
+    <div class="modal fade" id="b2sInfoFormatModal" tabindex="-1" role="dialog" aria-labelledby="b2sInfoFormatModal" aria-hidden="true" data-backdrop="false"  style="display:none;">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="b2s-modal-close close" data-modal-name="#b2sInfoFormatModal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                    <h4 class="modal-title"><?php esc_html_e('Select a custom post format for your social media posts (PREMIUM feature)', 'blog2social') ?></h4>
+                </div>
+                <div class="modal-body">        
+                    <div class="row">
+                        <div class="col-md-12">
+                            <b><?php esc_html_e('Define your preferred post format for sharing your social media content on Twitter, LinkedIn, or Facebook.', 'blog2social') ?></b>
+                            <div class="clearfix"></div>
+                            <div class="col-md-6">
+                                <br>
+                                <b>1) <?php esc_html_e('Link Post', 'blog2social') ?></b><br>
+                                <?php esc_html_e('A link post will display the title of the original post, the link address, the first one or two lines of the article, and the original image linked to the post. Clicking the image will direct the user to the linked website.', 'blog2social'); ?>
+                            </div>
+                            <div class="col-md-6">
+                                <br>
+                                <b>2) <?php esc_html_e('Image Post', 'blog2social') ?></b><br>
+                                <?php esc_html_e('An image post will display the cover image of the linked website or post and add it to the library of the selected social media networks. Blog2Social will automatically include a link to the website in the text field of the social media post. You can customize the link for each network.', 'blog2social') . "<br><br>" . esc_html_e('Selecting an individual post format for your social media posts is only one of Blog2Social Premium features. Here are some more things you can do with Blog2Social Premium:', 'blog2social'); ?>
+                                <br>
+                                <span class="glyphicon glyphicon-ok glyphicon-success"></span> <?php esc_html_e('Select frames or crop, flip and rotate images', 'blog2social') ?><br>
+                                <span class="glyphicon glyphicon-ok glyphicon-success"></span> <?php esc_html_e('Create your own custom social media post templates', 'blog2social') ?><br>
+                                <span class="glyphicon glyphicon-ok glyphicon-success"></span> <?php esc_html_e('Auto-post new and updated blog posts', 'blog2social') ?><br>
+                                <span class="glyphicon glyphicon-ok glyphicon-success"></span> <?php esc_html_e('Create and share social media posts from any other content', 'blog2social') ?><br>
+                                <span class="glyphicon glyphicon-ok glyphicon-success"></span> <?php esc_html_e('Auto-schedule your posts with the Best Time Manager', 'blog2social') ?><br>
+                                <span class="glyphicon glyphicon-ok glyphicon-success"></span> <?php esc_html_e('Publish and share videos to your social media networks', 'blog2social') ?><br>
+                                <span class="glyphicon glyphicon-ok glyphicon-success"></span> <?php esc_html_e('and many more!', 'blog2social') ?><br>
+
+                            </div>
+                        </div>
+                    </div>
+                    <br>
+                    <div class="row">
+                        <?php if (B2S_PLUGIN_USER_VERSION == 0) {
+                            ?>
+                            <div class="col-md-12"> 
+
+                                <a target="_blank" href="<?php echo esc_url(B2S_Tools::getSupportLink('upgrade_version')); ?>" class="btn btn-success center-block"><?php esc_html_e('Upgrade to SMART or above ', 'blog2social') ?></a>
+                                <br>
+                                <center> <?php echo wp_kses(sprintf(
+                                    // translators: %s is a link
+                                    __('or <a target="_blank" href="%s">start with free 30-days-trial of Blog2Social Premium</a> (no payment information needed)', 'blog2social'), esc_url('https://service.blog2social.com/trial')),
+                                    array(
+                                        'a' => array(
+                                            'href' => array(),
+                                            'target' => array()
+                                            )
+                                        )
+                                    );
+                                    ?> </center>
+                            </div>
+                        <?php } ?>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade" id="b2sTrailFeedbackModal" tabindex="-1" role="dialog" aria-labelledby="b2sTrailFeedbackModal" aria-hidden="true" data-backdrop="false"  style="display:none;">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="b2s-modal-close close" data-modal-name="#b2sTrailFeedbackModal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                    <h4 class="modal-title"><?php esc_html_e('Did you miss something?', 'blog2social') ?></h4>
+                </div>
+                <div class="modal-body">
+                    <?php esc_html_e('Help us make Blog2Social even better!', 'blog2social') ?>
+                    <textarea id="b2s-trial_message" class="form-control"></textarea>
+                </div>
+                <div class="modal-footer">
+                    <button class="btn btn-primary b2s-send-trail-feedback"><?php esc_html_e('submit', 'blog2social') ?></button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade" id="b2sInfoPostRelayModal" tabindex="-1" role="dialog" aria-labelledby="b2sInfoPostRelayModal" aria-hidden="true" data-backdrop="false"  style="display:none;">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="b2s-modal-close close" data-modal-name="#b2sInfoPostRelayModal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                    <h4 class="modal-title"><?php esc_html_e('Why Retweets?', 'blog2social') ?></h4>
+                </div>
+                <div class="modal-body">
+                    <?php esc_html_e('Retweets are the recommended way to reshare the same Tweets across Twitter accounts in accordance with Twitter new rules. You can now schedule multiple Retweets for an original Tweet that you are planning right from your WordPress.', 'blog2social') ?>
+                    <br>
+                    <br>
+                    <?php esc_html_e('If Retweets are enabled, every Original-Tweet you schedule in this step will be retweeted by the selected Twitter accounts. If, for example, 3 Original-Tweets are scheduled, every single Tweet will trigger a Retweet for the selected Twitter accounts.', 'blog2social') ?>
+                    <br>
+                    <br>
+                    <?php if (B2S_PLUGIN_USER_VERSION == 0) { ?>
+                        <h4><?php esc_html_e('Would you like to retweet?', 'blog2social'); ?></h4>
+                        <?php esc_html_e('With Blog2Social Premium you can:', 'blog2social') ?>
+                        <br>
+                        <br>
+                        <span class="glyphicon glyphicon-ok glyphicon-success"></span> <?php esc_html_e('Post on pages and groups', 'blog2social') ?><br>
+                        <span class="glyphicon glyphicon-ok glyphicon-success"></span> <?php esc_html_e('Share on multiple profiles, pages and groups', 'blog2social') ?><br>
+                        <span class="glyphicon glyphicon-ok glyphicon-success"></span> <?php esc_html_e('Auto-post and auto-schedule new and updated blog posts', 'blog2social') ?><br>
+                        <span class="glyphicon glyphicon-ok glyphicon-success"></span> <?php esc_html_e('Schedule your posts at the best times on each network', 'blog2social') ?><br>  
+                        <span class="glyphicon glyphicon-ok glyphicon-success"></span> <?php esc_html_e('Best Time Manager: use predefined best time scheduler to auto-schedule your social media posts', 'blog2social') ?><br>  
+                        <span class="glyphicon glyphicon-ok glyphicon-success"></span> <?php esc_html_e('Schedule your post for one time, multiple times or recurrently', 'blog2social') ?><br>
+                        <span class="glyphicon glyphicon-ok glyphicon-success"></span> <?php esc_html_e('Schedule and re-share old posts', 'blog2social') ?><br>
+                        <span class="glyphicon glyphicon-ok glyphicon-success"></span> <?php esc_html_e('Select link format or image format for your posts', 'blog2social') ?><br>
+                        <span class="glyphicon glyphicon-ok glyphicon-success"></span> <?php esc_html_e('Select individual images per post', 'blog2social') ?><br>
+                        <span class="glyphicon glyphicon-ok glyphicon-success"></span> <?php esc_html_e('Reporting & calendar: keep track of your published and scheduled social media posts', 'blog2social') ?><br>
+                        <br>
+                        <a target="_blank" href="<?php echo esc_url(B2S_Tools::getSupportLink('upgrade_version')); ?>" class="btn btn-success center-block"><?php esc_html_e('Upgrade to SMART and above', 'blog2social') ?></a>
+                        <br>
+                        <center> <?php echo wp_kses(sprintf(
+                            // translators: %s is a link
+                            __('or <a target="_blank" href="%s">start with free 30-days-trial of Blog2Social Premium</a> (no payment information needed)', 'blog2social'), esc_url('https://service.blog2social.com/trial')),
+                            array(
+                                'a' => array(
+                                    'href' => array(),
+                                    'target' => array())
+                                )
+                            ); ?>
+                             </center>
+                    <?php } ?>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade" id="b2sInfoContentTwitterModal" tabindex="-1" role="dialog" aria-labelledby="b2sInfoContentTwitterModal" aria-hidden="true" data-backdrop="false">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="b2s-modal-close close" data-modal-name="#b2sInfoContentTwitterModal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                    <h4 class="modal-title"><?php esc_html_e('Define Twitter post content', 'blog2social') ?></h4>
+                </div>
+                <div class="modal-body">
+                    <?php esc_html_e('Select the content that will be automatically pre-filled in your Twitter posts. If you have ticked the box "include WordPress tags as hashtags in my post", hashtags are automatically added in the drop-down menu.', 'blog2social') ?>
+                    <br>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade" id="b2sInfoAutoPosterMModal" tabindex="-1" role="dialog" aria-labelledby="b2sInfoAutoPosterMModal" aria-hidden="true" data-backdrop="false"  style="display:none;">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                    <h4 class="modal-title"><?php esc_html_e('Blog2Social: Social Media Auto-Posting', 'blog2social') ?></h4>
+                </div>
+                <div class="modal-body">
+                    <p><?php
+                        esc_html_e('Share your blog posts with the Auto Poster: Your blog posts will be shared automatically on your social media channels as soon as you publish or update a new post. You can also choose to autopost scheduled blog posts as soon as they are published.', 'blog2social');
+                        echo ' ' . wp_kses(sprintf(
+                            // translators: %s is a link
+                            __('<a target="_blank" href="%s">Learn how to set up auto posting for your blog posts</a>', 'blog2social'), esc_url(B2S_Tools::getSupportLink('auto_poster_m'))),
+                            array(
+                                'a' => array(
+                                    'href' => array(),
+                                    'target' => array())
+                                )
+                            );
+
+                        if (B2S_PLUGIN_USER_VERSION == 0) {
+                            ?>
+                            <br>
+                        <hr>               
+                        <h4><?php esc_html_e('You want to auto-post your blog post?', 'blog2social'); ?></h4>
+                        <?php esc_html_e('With Blog2Social Premium you can:', 'blog2social') ?>
+                        <br>
+                        <br>
+                        <span class="glyphicon glyphicon-ok glyphicon-success"></span> <?php esc_html_e('Post on pages and groups', 'blog2social') ?><br>
+                        <span class="glyphicon glyphicon-ok glyphicon-success"></span> <?php esc_html_e('Share on multiple profiles, pages and groups', 'blog2social') ?><br>
+                        <span class="glyphicon glyphicon-ok glyphicon-success"></span> <?php esc_html_e('Auto-post and auto-schedule new and updated blog posts', 'blog2social') ?><br>
+                        <span class="glyphicon glyphicon-ok glyphicon-success"></span> <?php esc_html_e('Schedule your posts at the best times on each network', 'blog2social') ?><br>  
+                        <span class="glyphicon glyphicon-ok glyphicon-success"></span> <?php esc_html_e('Best Time Manager: use predefined best time scheduler to auto-schedule your social media posts', 'blog2social') ?><br>  
+                        <span class="glyphicon glyphicon-ok glyphicon-success"></span> <?php esc_html_e('Schedule your post for one time, multiple times or recurrently', 'blog2social') ?><br>
+                        <span class="glyphicon glyphicon-ok glyphicon-success"></span> <?php esc_html_e('Schedule and re-share old posts', 'blog2social') ?><br>
+                        <span class="glyphicon glyphicon-ok glyphicon-success"></span> <?php esc_html_e('Select link format or image format for your posts', 'blog2social') ?><br>
+                        <span class="glyphicon glyphicon-ok glyphicon-success"></span> <?php esc_html_e('Select individual images per post', 'blog2social') ?><br>
+                        <span class="glyphicon glyphicon-ok glyphicon-success"></span> <?php esc_html_e('Reporting & calendar: keep track of your published and scheduled social media posts', 'blog2social') ?><br>
+                        <br>
+                        <a target="_blank" href="<?php echo esc_url(B2S_Tools::getSupportLink('upgrade_version')); ?>" class="btn btn-success center-block"><?php esc_html_e('Upgrade to SMART and above', 'blog2social') ?></a>
+                        <br>
+                        <center> <?php echo wp_kses(sprintf(
+                            // translators: %s is a link
+                            __('or <a target="_blank" href="%s">start with free 30-days-trial of Blog2Social Premium</a> (no payment information needed)', 'blog2social'), esc_url('https://service.blog2social.com/trial')),
+                            array(
+                                'a' => array(
+                                    'href' => array(),
+                                    'target' => array()
+                                    )
+                                )
+                            );
+                            ?> </center>
+                    <?php } ?>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade" id="b2sInfoAutoPosterAModal" tabindex="-1" role="dialog" aria-labelledby="b2sInfoAutoPosterAModal" aria-hidden="true" data-backdrop="false"  style="display:none;">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                    <h4 class="modal-title"><?php esc_html_e('Blog2Social: Social Media Auto-Posting', 'blog2social') ?></h4>
+                </div>
+                <div class="modal-body">
+                    <p><?php
+                        esc_html_e('Share imported posts with the Auto Poster: Posts that you import via RSS feeds and plugins can be shared automatically on your social media channels.', 'blog2social');
+                        echo ' ' . wp_kses(sprintf(
+                            // translators: %s is a link
+                            __('<a target="_blank" href="%s">Learn how to set up auto posting for imported posts</a>', 'blog2social'), esc_url(B2S_Tools::getSupportLink('auto_poster_a'))),
+                            array(
+                                'a' => array(
+                                    'href' => array(),
+                                    'target' => array()
+                                    )
+                                )
+                            );
+
+                        if (B2S_PLUGIN_USER_VERSION == 0) {
+                            ?>
+                        <hr>               
+                        <h4><?php esc_html_e('You want to auto-post your blog post?', 'blog2social'); ?></h4>
+                        <?php esc_html_e('With Blog2Social Premium you can:', 'blog2social') ?>
+                        <br>
+                        <br>
+                        <span class="glyphicon glyphicon-ok glyphicon-success"></span> <?php esc_html_e('Post on pages and groups', 'blog2social') ?><br>
+                        <span class="glyphicon glyphicon-ok glyphicon-success"></span> <?php esc_html_e('Share on multiple profiles, pages and groups', 'blog2social') ?><br>
+                        <span class="glyphicon glyphicon-ok glyphicon-success"></span> <?php esc_html_e('Auto-post and auto-schedule new and updated blog posts', 'blog2social') ?><br>
+                        <span class="glyphicon glyphicon-ok glyphicon-success"></span> <?php esc_html_e('Schedule your posts at the best times on each network', 'blog2social') ?><br>  
+                        <span class="glyphicon glyphicon-ok glyphicon-success"></span> <?php esc_html_e('Best Time Manager: use predefined best time scheduler to auto-schedule your social media posts', 'blog2social') ?><br>  
+                        <span class="glyphicon glyphicon-ok glyphicon-success"></span> <?php esc_html_e('Schedule your post for one time, multiple times or recurrently', 'blog2social') ?><br>
+                        <span class="glyphicon glyphicon-ok glyphicon-success"></span> <?php esc_html_e('Schedule and re-share old posts', 'blog2social') ?><br>
+                        <span class="glyphicon glyphicon-ok glyphicon-success"></span> <?php esc_html_e('Select link format or image format for your posts', 'blog2social') ?><br>
+                        <span class="glyphicon glyphicon-ok glyphicon-success"></span> <?php esc_html_e('Select individual images per post', 'blog2social') ?><br>
+                        <span class="glyphicon glyphicon-ok glyphicon-success"></span> <?php esc_html_e('Reporting & calendar: keep track of your published and scheduled social media posts', 'blog2social') ?><br>
+                        <br>
+                        <a target="_blank" href="<?php echo esc_url(B2S_Tools::getSupportLink('upgrade_version')); ?>" class="btn btn-success center-block"><?php esc_html_e('Upgrade to SMART and above', 'blog2social') ?></a>
+                        <br>
+                        <center> <?php echo wp_kses(sprintf(
+                            // translators: %s is a link
+                            __('or <a target="_blank" href="%s">start with free 30-days-trial of Blog2Social Premium</a> (no payment information needed)', 'blog2social'), esc_url('https://service.blog2social.com/trial')),
+                            array(
+                                'a' => array(
+                                    'href' => array(),
+                                    'target' => array()
+                                    )
+                                )
+                            );
+                            ?> </center>
+                    <?php } ?>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade" id="b2sInfoAssignAutoPost" tabindex="-1" role="dialog" aria-labelledby="b2sInfoAssignAutoPost" aria-hidden="true" data-backdrop="false"  style="display:none;">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="b2s-modal-close close" data-modal-name="#b2sInfoAssignAutoPost" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                    <h4 class="modal-title"><?php esc_html_e('Transfer Auto-Poster settings to other users (Business):', 'blog2social') ?></h4>
+                </div>
+                <div class="modal-body">
+                    <?php esc_html_e('With Blog2Social you can transfer the Auto-Poster settings as a WordPress-administrator to other users if they have activated the same Blog2Social-Business license. This way, you can also assign social media accounts to other users, so they can auto-post without setting up these connections in each user account. Within these settings, you can also decide whether newly published or updated content from other users should be automatically shared. Users with an assigned Auto-Poster setting and an assigned social-media-network group will then share content automatically how you selected the content to be shared automatically.', 'blog2social') ?>
+                    <br>
+                    <?php echo wp_kses(sprintf(
+                        // translators: %s is a link
+                        __('You will get more information on how to assign the Auto-Poster settings in the <a target="_blank" href="%s">Auto-Poster guide</a>.', 'blog2social'), esc_url(B2S_Tools::getSupportLink('auto_post_assign'))),
+                        array(
+                            'a' => array(
+                                'href' => array(),
+                                'target' => array()
+                                )
+                            )
+                        );
+                    ?>
+                    <br>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+    <div class="modal fade" id="b2sInfoRePosterModal" tabindex="-1" role="dialog" aria-labelledby="b2sInfoRePosterModal" aria-hidden="true" data-backdrop="false"  style="display:none;">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                    <h4 class="modal-title"><?php esc_html_e('Blog2Social: Re-Share Posts', 'blog2social') ?></h4>
+                </div>
+                <div class="modal-body">
+                    <p><?php
+                        esc_html_e('Keep your social media feed updated automatically with your best content and save valuable time by reviving your evergreen content regularly. Automate your resharing process with Blog2Social, so you can use your time to create new content and interact with your community.', 'blog2social');
+                        echo ' ' . wp_kses(sprintf(
+                            // translators: %s is a link
+                            __('<a target="_blank" href="%s">More information</a>', 'blog2social'), esc_url(B2S_Tools::getSupportLink('re_post'))),
+                            array(
+                                'a' => array(
+                                    'href' => array(),
+                                    'target' => array()
+                                    )
+                                )
+                            );
+
+                        if (B2S_PLUGIN_USER_VERSION == 0) {
+                            ?>
+                            <br>
+                        <hr>               
+                        <h4><?php esc_html_e('You want to auto-post your blog post?', 'blog2social'); ?></h4>
+                        <?php esc_html_e('With Blog2Social Premium you can:', 'blog2social') ?>
+                        <br>
+                        <br>
+                        <span class="glyphicon glyphicon-ok glyphicon-success"></span> <?php esc_html_e('Post on pages and groups', 'blog2social') ?><br>
+                        <span class="glyphicon glyphicon-ok glyphicon-success"></span> <?php esc_html_e('Share on multiple profiles, pages and groups', 'blog2social') ?><br>
+                        <span class="glyphicon glyphicon-ok glyphicon-success"></span> <?php esc_html_e('Auto-post and auto-schedule new and updated blog posts', 'blog2social') ?><br>
+                        <span class="glyphicon glyphicon-ok glyphicon-success"></span> <?php esc_html_e('Schedule your posts at the best times on each network', 'blog2social') ?><br>  
+                        <span class="glyphicon glyphicon-ok glyphicon-success"></span> <?php esc_html_e('Best Time Manager: use predefined best time scheduler to auto-schedule your social media posts', 'blog2social') ?><br>  
+                        <span class="glyphicon glyphicon-ok glyphicon-success"></span> <?php esc_html_e('Schedule your post for one time, multiple times or recurrently', 'blog2social') ?><br>
+                        <span class="glyphicon glyphicon-ok glyphicon-success"></span> <?php esc_html_e('Schedule and re-share old posts', 'blog2social') ?><br>
+                        <span class="glyphicon glyphicon-ok glyphicon-success"></span> <?php esc_html_e('Select link format or image format for your posts', 'blog2social') ?><br>
+                        <span class="glyphicon glyphicon-ok glyphicon-success"></span> <?php esc_html_e('Select individual images per post', 'blog2social') ?><br>
+                        <span class="glyphicon glyphicon-ok glyphicon-success"></span> <?php esc_html_e('Reporting & calendar: keep track of your published and scheduled social media posts', 'blog2social') ?><br>
+                        <br>
+                        <a target="_blank" href="<?php echo esc_url(B2S_Tools::getSupportLink('upgrade_version')); ?>" class="btn btn-success center-block"><?php esc_html_e('Upgrade to SMART and above', 'blog2social') ?></a>
+                        <br>
+                        <center> <?php echo wp_kses(sprintf(
+                            // translators: %s is a link
+                            __('or <a target="_blank" href="%s">start with free 30-days-trial of Blog2Social Premium</a> (no payment information needed)', 'blog2social'), esc_url('https://service.blog2social.com/trial')),
+                            array(
+                                'a' => array(
+                                    'href' => array(),
+                                    'target' => array()
+                                    )
+                                )
+                            );
+                            ?> </center>
+                    <?php } ?>
+                </div>
+            </div>
+        </div>
+    </div>
+
+<?php } ?>
+
+
+<div class="modal fade" id="b2sInfoTwitterThreads" tabindex="-1" role="dialog" aria-labelledby="b2sInfoTwitterThreads" aria-hidden="true" data-backdrop="false"  style="display:none;">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="b2s-modal-close close" data-modal-name="#b2sInfoTwitterThreads" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                <h4 class="modal-title"><?php esc_html_e('X Threads', 'blog2social') ?></h4>
+            </div>
+            <div class="modal-body">
+                <?php esc_html_e('Use X threads to share messages that deserve more than just 280 characters! Your copy will be shared in multiple connected tweets, each one with 280 characters, appearing underneath each other - like a thread.', 'blog2social') ?>
+                <br>
+                <br>
+                <?php esc_html_e('Tip: To define threaded posts as the default setting for your tweets, activate this function in your post templates for Twitter.', 'blog2social') ?>
+                <br>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="modal fade" id="b2s-info-change-meta-tag-modal" tabindex="-1" role="dialog" aria-labelledby="b2s-info-change-meta-tag-modal" aria-hidden="true" data-backdrop="false" style="display:none; z-index: 1070;">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="b2s-modal-close close" data-modal-name="#b2s-info-change-meta-tag-modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                <h4 class="modal-title">
+                    <?php esc_html_e('Change image, title and description for your post on this network', 'blog2social'); ?>
+                </h4>
+            </div>
+            <div class="modal-body">
+                <div class="isLinkPost meta-text" style="display:none;">
+                    <?php esc_html_e('You are currently sharing this post as image post. Changes to title and description Meta Tag parameters will only be supported for link post formats. Please change your post format to link post to make individual changes to the title and description for your post preview.', 'blog2social'); ?>
+                </div>
+                <div class="isOgMetaChecked meta-text" style="display:none;">
+                    <?php echo wp_kses(sprintf(
+                        // translators: %s is a link
+                        __('Your changes will have no effect on your social media posts on Facebook, if you have manually unchecked the Meta Tag options for Facebook in your Blog2Social <a target="_blank" href="%s">settings</a>', 'blog2social'), esc_url('admin.php?page=blog2social-settings')),
+                        array('a' => 
+                            array('target' => array(), 
+                            'href' => array())
+                            )
+                        );
+                    ?>
+                </div>
+                <div class="isCardMetaChecked meta-text"  style="display:none;">
+                    <?php echo wp_kses(
+                        // translators: %s is a link
+                        sprintf(__('Your changes will have no effect on your social media posts on Twitter, if you have manually unchecked the Meta Tag options for Twitter in your Blog2Social <a target="_blank" href="%s">settings</a>', 'blog2social'), esc_url('admin.php?page=blog2social-settings')),
+                        array('a' => 
+                            array('target' => array(), 
+                            'href' => array())
+                            )
+                        );
+                    ?>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="b2s-changelog-modal" tabindex="-1" role="dialog" aria-labelledby="b2s-changelog-modal" aria-hidden="true" data-backdrop="false" style="display:none;">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-body">
+                <div class="b2s-changelog-header">
+                    <span class="b2s-text-bold"><?php esc_html_e('Update news', 'blog2social'); ?></span>
+                    <button type="button" class="b2s-modal-close close" data-modal-name="#b2s-changelog-modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                </div>
+                <?php echo wp_kses(B2S_Changelog::getChangelogContent(),
+                    array(
+                        'a' => array(
+                            'target' => array(), 
+                            'href' => array()
+                        ),
+                        'div' => array(
+                            'class' => array()
+                        ),
+                        'p' => array(
+                            'class' => array()
+                        ),
+                        'br'=> array(),
+                        'ul' => array(
+                            'class' => array()
+                        ),
+                        'li' => array(
+                            'class' => array()
+                        )
+                    )
+                ); ?>
+            </div>
+        </div>
+    </div>
+</div>

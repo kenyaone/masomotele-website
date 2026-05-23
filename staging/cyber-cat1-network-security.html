@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CAT 1: Network Security Fundamentals | M.T.T.I</title>
+    <style>
+        :root{--c:#3b82f6;--c2:#1d4ed8;--bg:#0c1222;--card:#1a2744}
+        *{margin:0;padding:0;box-sizing:border-box}body{font-family:'Segoe UI',system-ui,sans-serif;background:linear-gradient(135deg,var(--bg),var(--card));color:#e2e8f0;min-height:100vh}
+        .screen{min-height:100vh;display:flex;align-items:center;justify-content:center;padding:20px}.card{background:var(--card);border:1px solid var(--c);border-radius:20px;padding:40px;max-width:650px;width:100%;text-align:center}
+        .badge{background:linear-gradient(135deg,var(--c),var(--c2));color:#fff;padding:8px 24px;border-radius:20px;font-size:0.85rem;font-weight:600;display:inline-block;margin-bottom:15px}
+        .icon{font-size:4rem;margin-bottom:15px}h1{font-size:1.8rem;color:var(--c);margin-bottom:8px}h2{font-size:1rem;color:#94a3b8;margin-bottom:25px;font-weight:400}
+        .topics{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:25px;text-align:left}.topic{background:rgba(59,130,246,0.1);border:1px solid rgba(59,130,246,0.3);padding:10px 12px;border-radius:8px;font-size:0.85rem;color:#94a3b8}
+        .info{display:grid;grid-template-columns:repeat(3,1fr);gap:15px;margin-bottom:25px}.info-box{background:rgba(59,130,246,0.1);padding:15px;border-radius:10px}.info-box span{display:block;color:#94a3b8;font-size:0.75rem;text-transform:uppercase}.info-box b{color:var(--c);font-size:1.4rem}
+        input[type=text]{width:100%;padding:15px;background:rgba(0,0,0,0.3);border:2px solid #2d4a6f;border-radius:10px;color:#fff;font-size:1rem;text-align:center;margin-bottom:20px}input:focus{outline:none;border-color:var(--c)}
+        .btn{width:100%;padding:16px;font-size:1.1rem;font-weight:600;background:linear-gradient(135deg,var(--c),var(--c2));color:#fff;border:none;border-radius:12px;cursor:pointer}.btn:disabled{opacity:0.5;cursor:not-allowed}
+        .exam{display:none;padding:20px}.container{max-width:900px;margin:0 auto}
+        .header{background:var(--card);border:1px solid var(--c);border-radius:16px;padding:15px 20px;margin-bottom:20px;display:flex;justify-content:space-between;align-items:center;position:sticky;top:10px;z-index:100}
+        .header h1{font-size:1rem;color:var(--c)}.timer{background:linear-gradient(135deg,var(--c),var(--c2));padding:8px 20px;border-radius:20px;font-weight:600;font-size:0.95rem}.timer.warn{background:#ef4444;animation:pulse 1s infinite}@keyframes pulse{50%{opacity:0.7}}
+        .qcard{background:var(--card);border:1px solid #2d4a6f;border-radius:16px;padding:25px;margin-bottom:20px}
+        .qnum{background:linear-gradient(135deg,var(--c),var(--c2));color:#fff;padding:5px 14px;border-radius:15px;font-size:0.8rem;font-weight:600;display:inline-block;margin-bottom:15px}
+        .scenario{background:rgba(59,130,246,0.1);border-left:4px solid var(--c);padding:12px 15px;border-radius:0 8px 8px 0;margin-bottom:15px;color:#94a3b8;font-size:0.9rem}
+        .qtext{font-size:1.1rem;margin-bottom:20px;line-height:1.5}
+        .opts{display:flex;flex-direction:column;gap:10px}.opt{background:rgba(0,0,0,0.2);border:2px solid #2d4a6f;border-radius:10px;padding:14px 16px;cursor:pointer;display:flex;align-items:center;gap:12px;transition:all 0.2s}
+        .opt:hover{border-color:var(--c);background:rgba(59,130,246,0.1)}.opt.sel{border-color:var(--c);background:rgba(59,130,246,0.2)}.opt.correct{border-color:#22c55e;background:rgba(34,197,94,0.2)}.opt.wrong{border-color:#ef4444;background:rgba(239,68,68,0.2)}
+        .letter{width:32px;height:32px;border-radius:50%;background:rgba(59,130,246,0.2);display:flex;align-items:center;justify-content:center;font-weight:600;color:var(--c);flex-shrink:0}
+        .opt.sel .letter{background:var(--c);color:#fff}.opt.correct .letter{background:#22c55e;color:#fff}.opt.wrong .letter{background:#ef4444;color:#fff}
+        .nav{display:flex;gap:15px;margin-top:20px}.nav button{flex:1;padding:14px;border:none;border-radius:10px;font-size:1rem;font-weight:600;cursor:pointer}
+        .nav .sec{background:rgba(59,130,246,0.2);color:var(--c)}.nav .pri{background:linear-gradient(135deg,var(--c),var(--c2));color:#fff}.nav .sub{background:linear-gradient(135deg,#22c55e,#16a34a);color:#fff}
+        .results{display:none}.results .card{max-width:480px}.res-icon{font-size:5rem;margin-bottom:15px}.res-status{font-size:2rem;font-weight:800}.res-status.pass{color:#22c55e}.res-status.fail{color:#ef4444}
+        .res-score{font-size:4rem;font-weight:800;color:var(--c);margin:10px 0}.res-detail{color:#94a3b8;margin-bottom:25px}
+        .breakdown{display:grid;grid-template-columns:1fr 1fr;gap:15px;margin-bottom:25px}.breakdown div{background:rgba(59,130,246,0.1);padding:15px;border-radius:10px}.breakdown span{color:#94a3b8;font-size:0.8rem;display:block}.breakdown b{font-size:1.3rem}
+        .res-btns{display:flex;gap:15px}.res-btns button{flex:1;padding:14px;border:none;border-radius:10px;font-weight:600;cursor:pointer}.res-btns .rev{background:rgba(59,130,246,0.2);color:var(--c)}.res-btns .retry{background:linear-gradient(135deg,var(--c),var(--c2));color:#fff}
+        .explain{margin-top:15px;padding:12px;background:rgba(34,197,94,0.1);border-radius:8px;border-left:4px solid #22c55e;text-align:left}.explain b{color:#22c55e}.explain p{color:#94a3b8;margin-top:5px;font-size:0.9rem}
+    </style>
+</head>
+<body>
+    <div id="start" class="screen"><div class="card">
+        <div class="badge">🛡️ CAT 1</div><div class="icon">🌐</div>
+        <h1>Network Security Fundamentals</h1><h2>Masomotele Technical Training Institute</h2>
+        <div class="topics"><div class="topic">🔒 OSI & TCP/IP Models</div><div class="topic">🔒 IP Addressing</div><div class="topic">🔒 Network Protocols</div><div class="topic">🔒 Ports & Services</div><div class="topic">🔒 Network Devices</div><div class="topic">🔒 Network Segmentation</div></div>
+        <div class="info"><div class="info-box"><span>Questions</span><b>10</b></div><div class="info-box"><span>Duration</span><b>20 min</b></div><div class="info-box"><span>Pass Mark</span><b>50%</b></div></div>
+        <input type="text" id="name" placeholder="Enter Your Full Name"><button class="btn" id="startBtn" disabled>Start Exam</button>
+    </div></div>
+    <div id="exam" class="exam"><div class="container">
+        <div class="header"><div style="display:flex;align-items:center;gap:10px"><span style="font-size:1.3rem">🌐</span><h1>Network Security Fundamentals</h1></div><div style="display:flex;align-items:center;gap:15px"><span id="prog">1/10</span><div class="timer" id="timer">20:00</div></div></div>
+        <div id="qbox"></div>
+        <div class="nav"><button class="sec" id="prev" onclick="prev()">← Previous</button><button class="pri" id="next" onclick="next()">Next →</button></div>
+    </div></div>
+    <div id="results" class="results screen"><div class="card">
+        <div class="res-icon" id="resIcon">🏆</div><div class="res-status" id="resStatus">PASSED</div><div class="res-score" id="resScore">80%</div><div class="res-detail" id="resDetail">8/10 correct</div>
+        <div class="breakdown"><div><span>Correct</span><b id="corr">8</b></div><div><span>Time Used</span><b id="time">15:30</b></div></div>
+        <div class="res-btns"><button class="rev" onclick="review()">📝 Review</button><button class="retry" onclick="location.reload()">🔄 Retry</button></div>
+    </div></div>
+<script>
+const Q=[
+    {q:"Which OSI layer handles IP addressing and routing?",s:"You're tracing how data travels between different networks.",o:["Data Link (Layer 2)","Network (Layer 3)","Transport (Layer 4)","Session (Layer 5)"],a:1,e:"Network Layer (Layer 3) handles logical addressing (IP) and routing."},
+    {q:"What port does HTTPS use?",s:"A user sees a padlock icon when visiting a banking website.",o:["80","443","22","21"],a:1,e:"HTTPS uses port 443 for encrypted web traffic. HTTP uses port 80."},
+    {q:"Which protocol provides secure remote shell access?",s:"An admin needs to securely manage a Linux server remotely.",o:["Telnet","FTP","SSH","HTTP"],a:2,e:"SSH (port 22) encrypts all traffic. Telnet (port 23) sends data in plain text."},
+    {q:"What is the subnet mask for /24?",s:"You're configuring a network for a small office with about 200 devices.",o:["255.0.0.0","255.255.0.0","255.255.255.0","255.255.255.128"],a:2,e:"/24 = 24 network bits = 255.255.255.0, providing 254 usable host addresses."},
+    {q:"Which device operates at Layer 3 and routes between networks?",s:"M.T.T.I needs to connect and isolate student and admin networks.",o:["Hub","Switch","Router","Repeater"],a:2,e:"Routers operate at Layer 3, making decisions based on IP addresses."},
+    {q:"What does NAT do?",s:"30 office computers share one public IP for internet access.",o:["Encrypts traffic","Translates private to public IPs","Filters malware","Speeds up connections"],a:1,e:"NAT allows multiple private IPs to share one public IP for internet access."},
+    {q:"Which IP range is private (RFC 1918)?",s:"You're setting up an internal network not directly reachable from internet.",o:["8.8.8.0/24","192.168.0.0/16","200.100.0.0/16","172.32.0.0/12"],a:1,e:"Private ranges: 10.0.0.0/8, 172.16.0.0/12, 192.168.0.0/16."},
+    {q:"What is a DMZ?",s:"The company wants public web servers separated from internal systems.",o:["Firewall type","Buffer zone for public-facing servers","Encryption method","Backup location"],a:1,e:"DMZ hosts public services in a protected zone between internet and internal network."},
+    {q:"Which protocol automatically assigns IP addresses?",s:"New devices get IP addresses automatically when connecting.",o:["DNS","DHCP","ARP","SNMP"],a:1,e:"DHCP dynamically assigns IP addresses, subnet masks, and gateway info."},
+    {q:"What does a VLAN provide?",s:"IT wants to separate departments logically without new hardware.",o:["Faster internet","Logical network segmentation","Wireless access","Data encryption"],a:1,e:"VLANs create logical segments on the same physical infrastructure."}
+];
+let cur=0,ans=Array(Q.length).fill(null),left=1200,tmr,start,reviewing=false;
+const $=id=>document.getElementById(id);
+$('name').oninput=e=>$('startBtn').disabled=!e.target.value.trim();
+$('startBtn').onclick=()=>{start=Date.now();$('start').style.display='none';$('exam').style.display='block';render();tmr=setInterval(tick,1000)};
+function tick(){left--;$('timer').textContent=`${Math.floor(left/60)}:${(left%60).toString().padStart(2,'0')}`;if(left<=300)$('timer').classList.add('warn');if(left<=0)end()}
+function render(){const q=Q[cur];$('prog').textContent=`${cur+1}/${Q.length}`;$('qbox').innerHTML=`<div class="qcard"><div class="qnum">Question ${cur+1}</div>${q.s?`<div class="scenario">📋 ${q.s}</div>`:''}<div class="qtext">${q.q}</div><div class="opts">${q.o.map((o,i)=>`<div class="opt ${ans[cur]===i?'sel':''} ${reviewing?(i===q.a?'correct':ans[cur]===i?'wrong':''):''}" onclick="${reviewing?'':`sel(${i})`}"><div class="letter">${'ABCD'[i]}</div><div>${o}</div></div>`).join('')}</div>${reviewing?`<div class="explain"><b>✓ Explanation:</b><p>${q.e}</p></div>`:''}</div>`;$('prev').style.visibility=cur===0?'hidden':'visible';$('next').textContent=cur===Q.length-1?(reviewing?'Finish':'Submit'):'Next →';$('next').className=`${cur===Q.length-1&&!reviewing?'sub':'pri'}`}
+function sel(i){if(!reviewing){ans[cur]=i;render()}}
+function prev(){if(cur>0){cur--;render()}}
+function next(){if(cur<Q.length-1){cur++;render()}else if(reviewing)location.reload();else end()}
+function end(){clearInterval(tmr);const c=ans.filter((a,i)=>a===Q[i].a).length,p=Math.round(c/Q.length*100),pass=p>=50,used=Math.floor((Date.now()-start)/1000);$('resIcon').textContent=pass?'🏆':'📚';$('resStatus').textContent=pass?'PASSED':'KEEP STUDYING';$('resStatus').className=`res-status ${pass?'pass':'fail'}`;$('resScore').textContent=p+'%';$('resDetail').textContent=`${c}/${Q.length} correct`;$('corr').textContent=c;$('time').textContent=`${Math.floor(used/60)}:${(used%60).toString().padStart(2,'0')}`;$('exam').style.display='none';$('results').style.display='flex'}
+function review(){reviewing=true;cur=0;$('results').style.display='none';$('exam').style.display='block';$('timer').textContent='Review';render()}
+</script>
+</body>
+</html>

@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CAT 4: JavaScript Basics | M.T.T.I</title>
+    <style>
+        :root{--c:#eab308;--c2:#ca8a04;--bg:#1a1a0a;--card:#2d2d15}
+        *{margin:0;padding:0;box-sizing:border-box}body{font-family:'Segoe UI',system-ui,sans-serif;background:linear-gradient(135deg,var(--bg),var(--card));color:#fef9c3;min-height:100vh}
+        .screen{min-height:100vh;display:flex;align-items:center;justify-content:center;padding:20px}.card{background:var(--card);border:1px solid var(--c);border-radius:20px;padding:40px;max-width:650px;width:100%;text-align:center}
+        .badge{background:linear-gradient(135deg,var(--c),var(--c2));color:#000;padding:8px 24px;border-radius:20px;font-size:0.85rem;font-weight:600;display:inline-block;margin-bottom:15px}
+        .icon{font-size:4rem;margin-bottom:15px}h1{font-size:1.8rem;color:var(--c);margin-bottom:8px}h2{font-size:1rem;color:#fde047;margin-bottom:25px;font-weight:400}
+        .topics{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:25px;text-align:left}.topic{background:rgba(234,179,8,0.1);border:1px solid rgba(234,179,8,0.3);padding:10px 12px;border-radius:8px;font-size:0.85rem;color:#fde047}
+        .info{display:grid;grid-template-columns:repeat(3,1fr);gap:15px;margin-bottom:25px}.info-box{background:rgba(234,179,8,0.1);padding:15px;border-radius:10px}.info-box span{display:block;color:#fde047;font-size:0.75rem;text-transform:uppercase}.info-box b{color:var(--c);font-size:1.4rem}
+        input[type=text]{width:100%;padding:15px;background:rgba(0,0,0,0.3);border:2px solid #4a4a20;border-radius:10px;color:#fff;font-size:1rem;text-align:center;margin-bottom:20px}input:focus{outline:none;border-color:var(--c)}
+        .btn{width:100%;padding:16px;font-size:1.1rem;font-weight:600;background:linear-gradient(135deg,var(--c),var(--c2));color:#000;border:none;border-radius:12px;cursor:pointer}.btn:disabled{opacity:0.5;cursor:not-allowed}
+        .exam{display:none;padding:20px}.container{max-width:900px;margin:0 auto}
+        .header{background:var(--card);border:1px solid var(--c);border-radius:16px;padding:15px 20px;margin-bottom:20px;display:flex;justify-content:space-between;align-items:center;position:sticky;top:10px;z-index:100}
+        .header h1{font-size:1rem;color:var(--c)}.timer{background:linear-gradient(135deg,var(--c),var(--c2));padding:8px 20px;border-radius:20px;font-weight:600;font-size:0.95rem;color:#000}.timer.warn{background:#ef4444;color:#fff;animation:pulse 1s infinite}@keyframes pulse{50%{opacity:0.7}}
+        .qcard{background:var(--card);border:1px solid #4a4a20;border-radius:16px;padding:25px;margin-bottom:20px}
+        .qnum{background:linear-gradient(135deg,var(--c),var(--c2));color:#000;padding:5px 14px;border-radius:15px;font-size:0.8rem;font-weight:600;display:inline-block;margin-bottom:15px}
+        .scenario{background:rgba(234,179,8,0.1);border-left:4px solid var(--c);padding:12px 15px;border-radius:0 8px 8px 0;margin-bottom:15px;color:#fde047;font-size:0.9rem}
+        .qtext{font-size:1.1rem;margin-bottom:20px;line-height:1.5}
+        .opts{display:flex;flex-direction:column;gap:10px}.opt{background:rgba(0,0,0,0.2);border:2px solid #4a4a20;border-radius:10px;padding:14px 16px;cursor:pointer;display:flex;align-items:center;gap:12px;transition:all 0.2s}
+        .opt:hover{border-color:var(--c);background:rgba(234,179,8,0.1)}.opt.sel{border-color:var(--c);background:rgba(234,179,8,0.2)}.opt.correct{border-color:#22c55e;background:rgba(34,197,94,0.2)}.opt.wrong{border-color:#ef4444;background:rgba(239,68,68,0.2)}
+        .letter{width:32px;height:32px;border-radius:50%;background:rgba(234,179,8,0.2);display:flex;align-items:center;justify-content:center;font-weight:600;color:var(--c);flex-shrink:0}
+        .opt.sel .letter{background:var(--c);color:#000}.opt.correct .letter{background:#22c55e;color:#fff}.opt.wrong .letter{background:#ef4444;color:#fff}
+        .nav{display:flex;gap:15px;margin-top:20px}.nav button{flex:1;padding:14px;border:none;border-radius:10px;font-size:1rem;font-weight:600;cursor:pointer}
+        .nav .sec{background:rgba(234,179,8,0.2);color:var(--c)}.nav .pri{background:linear-gradient(135deg,var(--c),var(--c2));color:#000}.nav .sub{background:linear-gradient(135deg,#22c55e,#16a34a);color:#fff}
+        .results{display:none}.results .card{max-width:480px}.res-icon{font-size:5rem;margin-bottom:15px}.res-status{font-size:2rem;font-weight:800}.res-status.pass{color:#22c55e}.res-status.fail{color:#ef4444}
+        .res-score{font-size:4rem;font-weight:800;color:var(--c);margin:10px 0}.res-detail{color:#fde047;margin-bottom:25px}
+        .breakdown{display:grid;grid-template-columns:1fr 1fr;gap:15px;margin-bottom:25px}.breakdown div{background:rgba(234,179,8,0.1);padding:15px;border-radius:10px}.breakdown span{color:#fde047;font-size:0.8rem;display:block}.breakdown b{font-size:1.3rem}
+        .res-btns{display:flex;gap:15px}.res-btns button{flex:1;padding:14px;border:none;border-radius:10px;font-weight:600;cursor:pointer}.res-btns .rev{background:rgba(234,179,8,0.2);color:var(--c)}.res-btns .retry{background:linear-gradient(135deg,var(--c),var(--c2));color:#000}
+        .explain{margin-top:15px;padding:12px;background:rgba(34,197,94,0.1);border-radius:8px;border-left:4px solid #22c55e;text-align:left}.explain b{color:#22c55e}.explain p{color:#fde047;margin-top:5px;font-size:0.9rem}
+        code{background:rgba(0,0,0,0.3);padding:2px 6px;border-radius:4px;font-family:monospace;color:#facc15}
+    </style>
+<meta name="description" content="Professional training courses at MTTI Eldoret. TVETA-accredited programs in IT, healthcare, and creative fields. Enroll today.">
+<script type="text/javascript">(function(c,l,a,r,i,t,y){c[a]=c[a]||function(){(c[a].q=c[a].q||[]).push(arguments)};t=l.createElement(r);t.async=1;t.src="https://www.clarity.ms/tag/"+i;y=l.getElementsByTagName(r)[0];y.parentNode.insertBefore(t,y);})(window,document,"clarity","script","wg31zlwbt9");</script>\n</head>
+<body>
+    <div id="start" class="screen"><div class="card">
+        <div class="badge">⚡ CAT 4</div><div class="icon">{ }</div>
+        <h1>JavaScript Basics</h1><h2>Masomotele Technical Training Institute - Web Design</h2>
+        <div class="topics"><div class="topic">⚡ Variables & Data Types</div><div class="topic">⚡ Functions</div><div class="topic">⚡ DOM Manipulation</div><div class="topic">⚡ Events</div><div class="topic">⚡ Conditionals & Loops</div><div class="topic">⚡ Arrays & Objects</div></div>
+        <div class="info"><div class="info-box"><span>Questions</span><b>10</b></div><div class="info-box"><span>Duration</span><b>20 min</b></div><div class="info-box"><span>Pass Mark</span><b>50%</b></div></div>
+        <input type="text" id="name" placeholder="Enter Your Full Name"><button class="btn" id="startBtn" disabled>Start Exam</button>
+    </div></div>
+    <div id="exam" class="exam"><div class="container">
+        <div class="header"><div style="display:flex;align-items:center;gap:10px"><span style="font-size:1.3rem">{ }</span><h1>JavaScript Basics</h1></div><div style="display:flex;align-items:center;gap:15px"><span id="prog">1/10</span><div class="timer" id="timer">20:00</div></div></div>
+        <div id="qbox"></div>
+        <div class="nav"><button class="sec" id="prev" onclick="prev()">← Previous</button><button class="pri" id="next" onclick="next()">Next →</button></div>
+    </div></div>
+    <div id="results" class="results screen"><div class="card">
+        <div class="res-icon" id="resIcon">🏆</div><div class="res-status" id="resStatus">PASSED</div><div class="res-score" id="resScore">80%</div><div class="res-detail" id="resDetail">8/10 correct</div>
+        <div class="breakdown"><div><span>Correct</span><b id="corr">8</b></div><div><span>Time Used</span><b id="time">15:30</b></div></div>
+        <div class="res-btns"><button class="rev" onclick="review()">📝 Review</button><button class="retry" onclick="location.reload()">🔄 Retry</button></div>
+    </div></div>
+<script>
+const Q=[
+    {q:"Which keyword declares a variable that can be reassigned?",s:"You need a variable whose value will change.",o:["<code>const</code>","<code>let</code>","<code>final</code>","<code>static</code>"],a:1,e:"let declares a variable that can be reassigned; const cannot be reassigned."},
+    {q:"How do you write a single-line comment in JavaScript?",s:"You want to add a note in your code.",o:["<code>&lt;!-- comment --&gt;</code>","<code>/* comment */</code>","<code>// comment</code>","<code># comment</code>"],a:2,e:"// is for single-line comments; /* */ is for multi-line comments."},
+    {q:"What does DOM stand for?",s:"You need to modify webpage elements with JavaScript.",o:["Document Object Model","Data Output Method","Digital Ordinance Module","Display Object Manager"],a:0,e:"DOM = Document Object Model, representing the page structure for JavaScript interaction."},
+    {q:"Which method selects an element by its ID?",s:"You want to target a specific element with id='btn'.",o:["<code>getElement('btn')</code>","<code>querySelector('#btn')</code>","<code>findById('btn')</code>","Both B and <code>getElementById('btn')</code>"],a:3,e:"getElementById('btn') or querySelector('#btn') both select by ID."},
+    {q:"What event fires when a user clicks a button?",s:"You want to run code when a button is clicked.",o:["<code>onhover</code>","<code>onclick</code>","<code>onpress</code>","<code>ontouch</code>"],a:1,e:"onclick event fires when an element is clicked; also addEventListener('click')."},
+    {q:"What is the output of: <code>typeof []</code>?",s:"You're checking the type of an array.",o:["<code>'array'</code>","<code>'object'</code>","<code>'list'</code>","<code>'undefined'</code>"],a:1,e:"Arrays are objects in JavaScript, so typeof [] returns 'object'."},
+    {q:"Which method adds an item to the END of an array?",s:"You want to add a new item to your list.",o:["<code>unshift()</code>","<code>push()</code>","<code>pop()</code>","<code>shift()</code>"],a:1,e:"push() adds to end; unshift() adds to start. pop() removes from end."},
+    {q:"What will <code>console.log(2 + '2')</code> output?",s:"You're debugging code with mixed types.",o:["<code>4</code>","<code>22</code>","<code>'22'</code>","Error"],a:2,e:"JavaScript converts number to string and concatenates: '2' + '2' = '22'."},
+    {q:"How do you create a function in JavaScript?",s:"You need to define reusable code.",o:["<code>function myFunc() {}</code>","<code>def myFunc() {}</code>","<code>create myFunc() {}</code>","<code>func myFunc() {}</code>"],a:0,e:"function keyword declares functions; arrow functions: const myFunc = () => {}"},
+    {q:"What does <code>===</code> check in JavaScript?",s:"You're comparing two values.",o:["Value only","Type only","Value AND type (strict equality)","Assignment"],a:2,e:"=== checks both value and type; == only checks value with type coercion."}
+];
+let cur=0,ans=Array(Q.length).fill(null),left=1200,tmr,start,reviewing=false;
+const $=id=>document.getElementById(id);
+$('name').oninput=e=>$('startBtn').disabled=!e.target.value.trim();
+$('startBtn').onclick=()=>{start=Date.now();$('start').style.display='none';$('exam').style.display='block';render();tmr=setInterval(tick,1000)};
+function tick(){left--;$('timer').textContent=`${Math.floor(left/60)}:${(left%60).toString().padStart(2,'0')}`;if(left<=300)$('timer').classList.add('warn');if(left<=0)end()}
+function render(){const q=Q[cur];$('prog').textContent=`${cur+1}/${Q.length}`;$('qbox').innerHTML=`<div class="qcard"><div class="qnum">Question ${cur+1}</div>${q.s?`<div class="scenario">📋 ${q.s}</div>`:''}<div class="qtext">${q.q}</div><div class="opts">${q.o.map((o,i)=>`<div class="opt ${ans[cur]===i?'sel':''} ${reviewing?(i===q.a?'correct':ans[cur]===i?'wrong':''):''}" onclick="${reviewing?'':`sel(${i})`}"><div class="letter">${'ABCD'[i]}</div><div>${o}</div></div>`).join('')}</div>${reviewing?`<div class="explain"><b>✓ Explanation:</b><p>${q.e}</p></div>`:''}</div>`;$('prev').style.visibility=cur===0?'hidden':'visible';$('next').textContent=cur===Q.length-1?(reviewing?'Finish':'Submit'):'Next →';$('next').className=`${cur===Q.length-1&&!reviewing?'sub':'pri'}`}
+function sel(i){if(!reviewing){ans[cur]=i;render()}}
+function prev(){if(cur>0){cur--;render()}}
+function next(){if(cur<Q.length-1){cur++;render()}else if(reviewing)location.reload();else end()}
+function end(){clearInterval(tmr);const c=ans.filter((a,i)=>a===Q[i].a).length,p=Math.round(c/Q.length*100),pass=p>=50,used=Math.floor((Date.now()-start)/1000);$('resIcon').textContent=pass?'🏆':'📚';$('resStatus').textContent=pass?'PASSED':'KEEP STUDYING';$('resStatus').className=`res-status ${pass?'pass':'fail'}`;$('resScore').textContent=p+'%';$('resDetail').textContent=`${c}/${Q.length} correct`;$('corr').textContent=c;$('time').textContent=`${Math.floor(used/60)}:${(used%60).toString().padStart(2,'0')}`;$('exam').style.display='none';$('results').style.display='flex'}
+function review(){reviewing=true;cur=0;$('results').style.display='none';$('exam').style.display='block';$('timer').textContent='Review';render()}
+</script>
+</body>
+</html>

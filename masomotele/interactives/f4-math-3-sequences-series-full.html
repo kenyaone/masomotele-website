@@ -1,0 +1,296 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Mathematics Form 4 | Sequences and Series</title>
+<style>
+:root{--pri:#0a5e2a;--pri-l:#0d7a38;--acc:#f5a623;--ok:#2e7d32;--no:#c62828;--bg:#f4f7f5;--card:#fff;--txt:#1a1a1a;--muted:#555;}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Segoe UI',system-ui,sans-serif;background:var(--bg);color:var(--txt);min-height:100vh;display:flex;flex-direction:column}
+#topbar{position:sticky;top:0;z-index:100;background:linear-gradient(135deg,var(--pri) 0%,var(--pri-l) 100%);color:#fff;padding:10px 16px;display:flex;align-items:center;gap:10px;box-shadow:0 2px 8px rgba(0,0,0,.25)}
+#topbar .sub{font-size:.7rem;opacity:.8;text-transform:uppercase;letter-spacing:1px}
+#topbar .ttl{font-size:.95rem;font-weight:700;flex:1}
+#slide-badge{background:var(--acc);color:#000;font-weight:700;font-size:.78rem;padding:3px 10px;border-radius:20px;white-space:nowrap}
+.slide{display:none;padding:16px 16px 80px;animation:fi .3s ease}
+.slide.active{display:block}
+@keyframes fi{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+.slide-title{font-size:1.2rem;font-weight:800;color:var(--pri);margin-bottom:14px;padding-bottom:8px;border-bottom:3px solid var(--acc)}
+.lo-box{background:#e8f5e9;border-left:5px solid var(--pri);border-radius:8px;padding:14px 16px;margin-bottom:12px}
+.lo-box h3{color:var(--pri);font-size:.95rem;margin-bottom:8px}
+.lo-box ol{padding-left:18px;font-size:.9rem;line-height:1.8}
+.inquiry{background:#fff8e1;border:1.5px solid var(--acc);border-radius:8px;padding:10px 14px;font-size:.88rem;color:#5d4037;margin-top:10px}
+.inquiry strong{color:#e65100}
+.teach-block{margin-bottom:18px}
+.teach-block h3{font-size:1rem;font-weight:700;color:var(--pri);margin-bottom:8px;padding-bottom:4px;border-bottom:2px solid var(--acc);display:inline-block}
+.teach-block p,.teach-block li{font-size:.9rem;line-height:1.7}
+.teach-block ul,.teach-block ol{padding-left:18px;margin-top:6px}
+.key-term{background:#fff8e1;border-left:4px solid var(--acc);border-radius:6px;padding:10px 14px;margin:10px 0;font-size:.88rem}
+.key-term strong{color:#e65100}
+.info-table{width:100%;border-collapse:collapse;margin:10px 0;font-size:.88rem}
+.info-table th{background:var(--pri);color:#fff;padding:8px 10px;text-align:left}
+.info-table td{padding:7px 10px;border-bottom:1px solid #e0e0e0}
+.info-table tr:nth-child(even) td{background:#f1f8e9}
+.example-box{background:#f1f8e9;border:1.5px solid var(--ok);border-radius:8px;padding:12px 14px;margin:10px 0;font-size:.88rem}
+.example-box strong{color:var(--ok);display:block;margin-bottom:6px}
+.formula-box{background:#e3f2fd;border:2px solid #1976d2;border-radius:10px;padding:14px;margin:12px 0;text-align:center}
+.formula-box .formula{font-size:1.1rem;font-weight:800;color:#1565c0;font-family:Georgia,serif;margin:6px 0}
+.warn-box{background:#fff3e0;border-left:4px solid #e65100;border-radius:6px;padding:10px 14px;margin:10px 0;font-size:.88rem;color:#5d4037}
+.quiz-section{margin-bottom:20px}
+.quiz-section h3{font-size:1rem;font-weight:700;color:var(--pri);margin-bottom:12px}
+.q-item{background:#fff;border:1.5px solid #c8e6c9;border-radius:10px;padding:14px;margin-bottom:12px}
+.q-item p{font-size:.9rem;font-weight:600;margin-bottom:10px}
+.fill-blank{border:none;border-bottom:2.5px dashed var(--pri);background:transparent;font-size:.9rem;padding:2px 6px;width:110px;outline:none;text-align:center}
+.fb-result{font-size:.82rem;font-weight:600;margin-top:6px;padding:4px 8px;border-radius:4px;display:inline-block}
+.fb-result.ok{background:#e8f5e9;color:var(--ok)}
+.fb-result.no{background:#ffebee;color:var(--no)}
+.sa-box{width:100%;border:1.5px solid #c8e6c9;border-radius:8px;padding:10px;font-size:.88rem;font-family:inherit;resize:vertical;min-height:80px;outline:none}
+.grade-btn{background:var(--pri);color:#fff;border:none;border-radius:8px;padding:8px 18px;font-size:.85rem;font-weight:700;cursor:pointer;margin-top:8px}
+.sa-feedback{font-size:.82rem;margin-top:8px;padding:10px;border-radius:8px;line-height:1.6;display:none}
+.sa-feedback.ok{background:#e8f5e9;border:1px solid #a5d6a7;color:#1b5e20}
+.sa-feedback.partial{background:#fff8e1;border:1px solid #ffe082;color:#5d4037}
+.sa-feedback.no{background:#ffebee;border:1px solid #ef9a9a;color:#b71c1c}
+.kw-found{color:var(--ok);font-weight:700}
+.kw-miss{color:var(--no);font-weight:700}
+.model-ans{margin-top:6px;padding-top:6px;border-top:1px solid #ccc;font-style:italic}
+#score-result{background:linear-gradient(135deg,var(--pri),var(--pri-l));color:#fff;border-radius:12px;padding:20px;text-align:center;margin-top:16px;display:none}
+#score-result .big{font-size:2rem;font-weight:900;margin:8px 0}
+.submit-btn{background:var(--acc);color:#000;border:none;border-radius:10px;padding:12px 32px;font-size:1rem;font-weight:800;cursor:pointer;margin-top:16px;width:100%}
+#navbar{position:fixed;bottom:0;left:0;right:0;background:#fff;border-top:1px solid #e0e0e0;padding:10px 16px;display:flex;align-items:center;justify-content:space-between;gap:8px;z-index:100;box-shadow:0 -2px 8px rgba(0,0,0,.1)}
+.nav-btn{background:var(--pri);color:#fff;border:none;border-radius:8px;padding:9px 22px;font-size:.88rem;font-weight:700;cursor:pointer}
+.nav-btn:disabled{background:#ccc;cursor:not-allowed}
+#dot-nav{display:flex;gap:6px;flex-wrap:wrap;justify-content:center;flex:1}
+.dot{width:10px;height:10px;border-radius:50%;background:#c8e6c9;cursor:pointer;transition:all .2s}
+.dot.active{background:var(--pri);transform:scale(1.3)}
+.dot.done{background:var(--acc)}
+</style>
+<script type="text/javascript">(function(c,l,a,r,i,t,y){c[a]=c[a]||function(){(c[a].q=c[a].q||[]).push(arguments)};t=l.createElement(r);t.async=1;t.src="https://www.clarity.ms/tag/"+i;y=l.getElementsByTagName(r)[0];y.parentNode.insertBefore(t,y);})(window,document,"clarity","script","wg31zlwbt9");</script>\n</head>
+<body>
+<div id="topbar">
+  <div><div class="sub">Mathematics · Form 4</div><div class="ttl">Sequences and Series</div></div>
+  <div id="slide-badge">Slide 1 / 10</div>
+</div>
+
+<div class="slide active" id="s1">
+  <div class="slide-title">📋 Learning Outcomes</div>
+  <div class="lo-box"><h3>By the end of this lesson, you should be able to:</h3>
+    <ol>
+      <li>Identify and describe arithmetic and geometric sequences</li>
+      <li>Find the nth term of arithmetic and geometric sequences</li>
+      <li>Calculate the sum of arithmetic and geometric series</li>
+      <li>Find the sum to infinity of a geometric series</li>
+      <li>Apply sequences and series to real-life problems</li>
+      <li>Identify convergent and divergent series</li>
+      <li>Use sequences to solve financial problems</li>
+    </ol>
+  </div>
+  <div class="inquiry"><strong>🔍 Key Inquiry Question:</strong> How do patterns in numbers help us predict future values and solve financial problems?</div>
+</div>
+
+<div class="slide" id="s2">
+  <div class="slide-title">🔢 Arithmetic Sequences</div>
+  <div class="teach-block"><h3>Definition</h3>
+    <p>An <strong>arithmetic sequence</strong> is a sequence where each term is obtained by adding a fixed number (common difference d) to the previous term.</p>
+    <div class="key-term"><strong>Examples:</strong> 2, 5, 8, 11, 14, ... (d = 3) &nbsp;|&nbsp; 20, 15, 10, 5, ... (d = −5)</div>
+  </div>
+  <div class="teach-block"><h3>nth Term Formula</h3>
+    <div class="formula-box"><div class="formula">Tₙ = a + (n−1)d</div>
+      <p>a = first term, d = common difference, n = term number</p></div>
+    <div class="example-box"><strong>Example 1:</strong>
+      <p>Find the 15th term of 3, 7, 11, 15, ...</p>
+      <p>a = 3, d = 4, n = 15</p>
+      <p>T₁₅ = 3 + (15−1)×4 = 3 + 56 = <strong>59</strong></p>
+    </div>
+    <div class="example-box"><strong>Example 2:</strong>
+      <p>Which term of 5, 8, 11, ... is 50?</p>
+      <p>50 = 5 + (n−1)×3 → 45 = 3(n−1) → n−1 = 15 → n = <strong>16</strong></p>
+    </div>
+  </div>
+</div>
+
+<div class="slide" id="s3">
+  <div class="slide-title">➕ Arithmetic Series (Sum)</div>
+  <div class="teach-block"><h3>Sum Formula</h3>
+    <div class="formula-box"><div class="formula">Sₙ = n/2 [2a + (n−1)d] &nbsp;or&nbsp; Sₙ = n/2 (a + l)</div>
+      <p>where l = last term = a + (n−1)d</p></div>
+    <div class="example-box"><strong>Example 1:</strong>
+      <p>Find the sum of the first 20 terms of 4, 7, 10, 13, ...</p>
+      <p>a = 4, d = 3, n = 20</p>
+      <p>S₂₀ = 20/2 [2(4) + (20−1)(3)] = 10[8 + 57] = 10 × 65 = <strong>650</strong></p>
+    </div>
+    <div class="example-box"><strong>Example 2 — Real life:</strong>
+      <p>A worker earns Ksh 8,000 in January and gets a Ksh 500 raise each month. Total earnings in 12 months?</p>
+      <p>a = 8000, d = 500, n = 12</p>
+      <p>S₁₂ = 12/2[2(8000) + 11(500)] = 6[16000 + 5500] = 6 × 21500 = <strong>Ksh 129,000</strong></p>
+    </div>
+  </div>
+</div>
+
+<div class="slide" id="s4">
+  <div class="slide-title">📐 Geometric Sequences</div>
+  <div class="teach-block"><h3>Definition</h3>
+    <p>A <strong>geometric sequence</strong> has a constant ratio r between consecutive terms.</p>
+    <div class="key-term"><strong>Common ratio:</strong> r = T₂/T₁ = T₃/T₂ (any term divided by previous term)</div>
+    <div class="key-term"><strong>Examples:</strong> 2, 6, 18, 54, ... (r = 3) &nbsp;|&nbsp; 64, 32, 16, 8, ... (r = 0.5)</div>
+  </div>
+  <div class="teach-block"><h3>nth Term Formula</h3>
+    <div class="formula-box"><div class="formula">Tₙ = arⁿ⁻¹</div>
+      <p>a = first term, r = common ratio, n = term number</p></div>
+    <div class="example-box"><strong>Example 1:</strong>
+      <p>Find the 6th term of 3, 6, 12, 24, ...</p>
+      <p>a = 3, r = 2, n = 6</p>
+      <p>T₆ = 3 × 2⁵ = 3 × 32 = <strong>96</strong></p>
+    </div>
+    <div class="example-box"><strong>Example 2:</strong>
+      <p>In a GP, T₂ = 6 and T₅ = 48. Find a and r.</p>
+      <p>ar = 6 ... (i) &nbsp;&nbsp; ar⁴ = 48 ... (ii)</p>
+      <p>(ii)÷(i): r³ = 8 → r = 2 → a = 3</p>
+    </div>
+  </div>
+</div>
+
+<div class="slide" id="s5">
+  <div class="slide-title">✖️ Geometric Series (Sum)</div>
+  <div class="teach-block"><h3>Sum Formula</h3>
+    <div class="formula-box"><div class="formula">Sₙ = a(rⁿ − 1)/(r − 1) &nbsp;when r ≠ 1, r > 1</div><div class="formula">Sₙ = a(1 − rⁿ)/(1 − r) &nbsp;when r < 1</div></div>
+    <div class="example-box"><strong>Example 1:</strong>
+      <p>Find the sum of first 8 terms of 2, 6, 18, ...</p>
+      <p>a = 2, r = 3, n = 8</p>
+      <p>S₈ = 2(3⁸ − 1)/(3−1) = 2(6561−1)/2 = <strong>6560</strong></p>
+    </div>
+    <div class="example-box"><strong>Example 2 — Population growth:</strong>
+      <p>A town has 5,000 people. Population grows by 10% per year. Total population over 5 years?</p>
+      <p>a = 5000, r = 1.1, n = 5</p>
+      <p>S₅ = 5000(1.1⁵−1)/(1.1−1) = 5000(0.6105)/0.1 = <strong>30,526</strong></p>
+    </div>
+  </div>
+</div>
+
+<div class="slide" id="s6">
+  <div class="slide-title">∞ Sum to Infinity</div>
+  <div class="teach-block"><h3>Convergent Geometric Series</h3>
+    <p>When |r| < 1, a geometric series converges (approaches a finite sum as n → ∞).</p>
+    <div class="formula-box"><div class="formula">S∞ = a / (1 − r) &nbsp;&nbsp;where |r| < 1</div></div>
+    <div class="warn-box">⚠️ If |r| ≥ 1, the series diverges (no sum to infinity).</div>
+    <div class="example-box"><strong>Example 1:</strong>
+      <p>Find S∞ of 16, 8, 4, 2, ...</p>
+      <p>a = 16, r = 0.5</p>
+      <p>S∞ = 16/(1−0.5) = 16/0.5 = <strong>32</strong></p>
+    </div>
+    <div class="example-box"><strong>Example 2 — Recurring decimals:</strong>
+      <p>Express 0.333... as a fraction using GP.</p>
+      <p>0.333... = 0.3 + 0.03 + 0.003 + ... → a = 0.3, r = 0.1</p>
+      <p>S∞ = 0.3/(1−0.1) = 0.3/0.9 = <strong>1/3</strong></p>
+    </div>
+  </div>
+</div>
+
+<div class="slide" id="s7">
+  <div class="slide-title">📊 Comparison Table</div>
+  <div class="teach-block"><h3>AP vs GP Summary</h3>
+    <table class="info-table">
+      <tr><th>Feature</th><th>Arithmetic (AP)</th><th>Geometric (GP)</th></tr>
+      <tr><td>Pattern</td><td>Add common difference d</td><td>Multiply by common ratio r</td></tr>
+      <tr><td>nth term</td><td>a + (n−1)d</td><td>arⁿ⁻¹</td></tr>
+      <tr><td>Sum Sₙ</td><td>n/2[2a+(n−1)d]</td><td>a(rⁿ−1)/(r−1)</td></tr>
+      <tr><td>Sum to ∞</td><td>Does not exist</td><td>a/(1−r) if |r|&lt;1</td></tr>
+      <tr><td>Test</td><td>T₂−T₁ = T₃−T₂</td><td>T₂/T₁ = T₃/T₂</td></tr>
+    </table>
+  </div>
+  <div class="teach-block"><h3>Identifying the Type</h3>
+    <div class="example-box"><strong>Is 5, 10, 20, 40 an AP or GP?</strong>
+      <p>Differences: 5, 10, 20 — NOT constant → not AP</p>
+      <p>Ratios: 10/5=2, 20/10=2, 40/20=2 — constant → <strong>GP, r=2</strong></p>
+    </div>
+  </div>
+</div>
+
+<div class="slide" id="s8">
+  <div class="slide-title">💰 Real-Life Applications</div>
+  <div class="teach-block"><h3>Compound Interest (GP)</h3>
+    <div class="example-box"><strong>Example:</strong>
+      <p>Ksh 10,000 invested at 12% compound interest per year. Amount after 5 years?</p>
+      <p>a = 10,000, r = 1.12, n = 5</p>
+      <p>T₅ = 10,000 × 1.12⁴ = 10,000 × 1.5735 = <strong>Ksh 15,735</strong></p>
+    </div>
+  </div>
+  <div class="teach-block"><h3>Salary Increments (AP)</h3>
+    <div class="example-box"><strong>Example:</strong>
+      <p>Starting salary Ksh 30,000, annual increment Ksh 2,000. Salary in 10th year?</p>
+      <p>T₁₀ = 30,000 + (10−1)×2,000 = 30,000 + 18,000 = <strong>Ksh 48,000</strong></p>
+    </div>
+  </div>
+  <div class="teach-block"><h3>Bouncing Ball (GP)</h3>
+    <div class="example-box"><strong>Example:</strong>
+      <p>A ball dropped from 10 m bounces to 60% of previous height. Total distance travelled?</p>
+      <p>First drop: 10 m. Each bounce up then down: 10×0.6 + 10×0.6 = 2×10×0.6</p>
+      <p>Total = 10 + 2×[10×0.6/(1−0.6)] = 10 + 2×15 = <strong>40 m</strong></p>
+    </div>
+  </div>
+</div>
+
+<div class="slide" id="s9">
+  <div class="slide-title">✏️ Practice Problems</div>
+  <div class="teach-block"><h3>Problem 1</h3>
+    <p>The 5th term of an AP is 21 and the 10th term is 41. Find a, d, and S₁₅.</p>
+    <div class="example-box"><strong>Solution:</strong>
+      <p>T₅ = a + 4d = 21 ... (i) &nbsp;&nbsp; T₁₀ = a + 9d = 41 ... (ii)</p>
+      <p>(ii)−(i): 5d = 20 → d = 4, a = 5</p>
+      <p>S₁₅ = 15/2[2(5)+14(4)] = 15/2[10+56] = 15/2×66 = <strong>495</strong></p>
+    </div>
+  </div>
+  <div class="teach-block"><h3>Problem 2</h3>
+    <p>A GP has first term 3 and sum to infinity 12. Find r and the 4th term.</p>
+    <div class="example-box"><strong>Solution:</strong>
+      <p>S∞ = a/(1−r) → 12 = 3/(1−r) → 1−r = 0.25 → r = 0.75</p>
+      <p>T₄ = 3 × (0.75)³ = 3 × 0.4219 = <strong>1.266</strong></p>
+    </div>
+  </div>
+</div>
+
+<div class="slide" id="s10">
+  <div class="slide-title">📝 Quiz — Sequences and Series</div>
+  <div class="quiz-section"><h3>Part A: Fill in the Blanks (5 marks)</h3>
+    <div class="q-item"><p>1. The nth term of an AP is Tₙ = <input class="fill-blank" id="f1">.</p><div id="f1r" class="fb-result" style="display:none"></div></div>
+    <div class="q-item"><p>2. For a GP, the common ratio r = <input class="fill-blank" id="f2">.</p><div id="f2r" class="fb-result" style="display:none"></div></div>
+    <div class="q-item"><p>3. The sum to infinity of a GP exists only when |r| <input class="fill-blank" id="f3" style="width:60px">.</p><div id="f3r" class="fb-result" style="display:none"></div></div>
+    <div class="q-item"><p>4. The 8th term of 2, 5, 8, 11, ... is <input class="fill-blank" id="f4" style="width:60px">.</p><div id="f4r" class="fb-result" style="display:none"></div></div>
+    <div class="q-item"><p>5. S∞ = a/(1−r) applies to a <input class="fill-blank" id="f5"> series.</p><div id="f5r" class="fb-result" style="display:none"></div></div>
+  </div>
+  <div class="quiz-section"><h3>Part B: Short Answer (10 marks)</h3>
+    <div class="q-item"><p>6. (4 marks) The 3rd term of a GP is 12 and the 6th term is 96. Find a, r, and S₆.</p>
+      <textarea class="sa-box" id="sa1" placeholder="Show working..."></textarea>
+      <button class="grade-btn" onclick="gradeAnswer('sa1','fb1',{keywords:['2','r=2','3','a=3','189','s6=189','geometric','ratio','term'],required:4,marks:4,model:'T3=ar²=12, T6=ar⁵=96. Dividing: r³=8 → r=2. ar²=12 → a×4=12 → a=3. S6=3(2⁶−1)/(2−1)=3×63=189.'})">✓ Grade My Answer</button>
+      <div id="fb1" class="sa-feedback"></div></div>
+    <div class="q-item"><p>7. (3 marks) An AP has a=7, d=3. Find n if Sₙ = 255.</p>
+      <textarea class="sa-box" id="sa2" placeholder="Show working..."></textarea>
+      <button class="grade-btn" onclick="gradeAnswer('sa2','fb2',{keywords:['10','n=10','255','arithmetic','formula','quadratic'],required:3,marks:3,model:'Sn=n/2[2(7)+(n-1)3]=255 → n/2[14+3n-3]=255 → n(3n+11)/2=255 → 3n²+11n=510 → 3n²+11n-510=0 → (3n+51)(n-10)=0 → n=10.'})">✓ Grade My Answer</button>
+      <div id="fb2" class="sa-feedback"></div></div>
+    <div class="q-item"><p>8. (3 marks) Express 0.272727... as a fraction using GP sum to infinity.</p>
+      <textarea class="sa-box" id="sa3" placeholder="Show working..."></textarea>
+      <button class="grade-btn" onclick="gradeAnswer('sa3','fb3',{keywords:['0.27','0.01','r=0.01','3/11','27/99','fraction','geometric','infinity'],required:3,marks:3,model:'0.272727=0.27+0.0027+... a=0.27, r=0.01. S∞=0.27/(1-0.01)=0.27/0.99=27/99=3/11.'})">✓ Grade My Answer</button>
+      <div id="fb3" class="sa-feedback"></div></div>
+  </div>
+  <button class="submit-btn" onclick="submitQuiz()">📊 Submit & See My Score</button>
+  <div id="score-result"></div>
+</div>
+
+<div id="navbar">
+  <button class="nav-btn" id="prev-btn" onclick="changeSlide(-1)" disabled>◀ Prev</button>
+  <div id="dot-nav"></div>
+  <button class="nav-btn" id="next-btn" onclick="changeSlide(1)">Next ▶</button>
+</div>
+
+<script>
+const TOTAL=10;let cur=1;const visited=new Set([1]);
+function buildDots(){const dn=document.getElementById('dot-nav');dn.innerHTML='';for(let i=1;i<=TOTAL;i++){const d=document.createElement('div');d.className='dot'+(i===cur?' active':visited.has(i)&&i!==cur?' done':'');d.onclick=(()=>{const n=i;return()=>goTo(n)})();dn.appendChild(d);}}
+function goTo(n){document.getElementById('s'+cur).classList.remove('active');cur=n;visited.add(n);document.getElementById('s'+n).classList.add('active');document.getElementById('slide-badge').textContent='Slide '+n+' / '+TOTAL;document.getElementById('prev-btn').disabled=(n===1);document.getElementById('next-btn').disabled=(n===TOTAL);buildDots();window.scrollTo(0,0);}
+function changeSlide(d){goTo(cur+d);}
+buildDots();
+const fillAnswers={f1:['a + (n-1)d','a+(n-1)d'],f2:['t2/t1','t₂/t₁'],f3:['< 1','<1'],f4:['23'],f5:['geometric']};
+function gradeAnswer(saId,fbId,cfg){const txt=document.getElementById(saId).value.toLowerCase().trim();if(!txt){alert('Please write your answer first.');return;}const found=cfg.keywords.filter(k=>txt.includes(k.toLowerCase()));const missed=cfg.keywords.filter(k=>!txt.includes(k.toLowerCase())).slice(0,4);const hitRate=Math.min(1,found.length/cfg.required);const marks=Math.round(hitRate*cfg.marks);const fb=document.getElementById(fbId);fb.style.display='block';const cls=marks>=cfg.marks?'ok':marks>0?'partial':'no';fb.className='sa-feedback '+cls;fb.innerHTML=`<strong>Score: ${marks} / ${cfg.marks}</strong><br>✅ Found: <span class="kw-found">${found.length>0?found.join(', '):'none'}</span><br>❌ Missed: <span class="kw-miss">${missed.length>0?missed.join(', '):'none'}</span><div class="model-ans">📖 ${cfg.model}</div>`;}
+function submitQuiz(){let fillScore=0;Object.keys(fillAnswers).forEach(id=>{const val=(document.getElementById(id).value||'').toLowerCase().trim();const correct=fillAnswers[id].some(a=>val===a||val.includes(a));const res=document.getElementById(id+'r');res.style.display='inline-block';if(correct){res.className='fb-result ok';res.textContent='✓ Correct! (1 mark)';fillScore++;}else{res.className='fb-result no';res.textContent='✗ Expected: '+fillAnswers[id][0];}});let saTotal=0;['fb1','fb2','fb3'].forEach(id=>{const fb=document.getElementById(id);if(fb.style.display!=='none'){const m=fb.innerHTML.match(/Score:\s*(\d+)\s*\//);if(m)saTotal+=parseInt(m[1]);}});const total=fillScore+saTotal;const pct=Math.round((total/15)*100);const grade=pct>=80?'Excellent (A)':pct>=60?'Good (B)':pct>=50?'Average (C)':'Needs Improvement';const emoji=pct>=80?'🏆':pct>=60?'👍':pct>=50?'📚':'💪';const res=document.getElementById('score-result');res.style.display='block';res.innerHTML=`${emoji}<div class="big">${total}/15 (${pct}%)</div><strong>${grade}</strong><br><small>Fill-in-Blanks: ${fillScore}/5 | Short Answer: ${saTotal}/10</small>`;submitExamToMTTI(total,15,pct);res.scrollIntoView({behavior:'smooth'});}
+function submitExamToMTTI(score,total,percent){try{fetch('/wp-json/mtti/v1/exam-result',{method:'POST',headers:{'Content-Type':'application/json','X-WP-Nonce':window.mtti_nonce||''},body:JSON.stringify({lesson_id:'f4-math-3-sequences-series',score,total,percent,timestamp:new Date().toISOString()})}).then(r=>r.json()).then(d=>{if(d&&d.success)console.log('[MTTI] Saved',d);}).catch(e=>console.log('[MTTI] Offline',e));}catch(e){console.log('[MTTI] Error',e);}}
+</script>
+</body>
+</html>

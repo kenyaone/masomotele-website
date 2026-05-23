@@ -1,0 +1,274 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Mathematics Form 4 | Statistics (2)</title>
+<style>
+:root{--pri:#0a5e2a;--pri-l:#0d7a38;--acc:#f5a623;--ok:#2e7d32;--no:#c62828;--bg:#f4f7f5;--txt:#1a1a1a;}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Segoe UI',system-ui,sans-serif;background:var(--bg);color:var(--txt);min-height:100vh;display:flex;flex-direction:column}
+#topbar{position:sticky;top:0;z-index:100;background:linear-gradient(135deg,var(--pri) 0%,var(--pri-l) 100%);color:#fff;padding:10px 16px;display:flex;align-items:center;gap:10px;box-shadow:0 2px 8px rgba(0,0,0,.25)}
+#topbar .sub{font-size:.7rem;opacity:.8;text-transform:uppercase;letter-spacing:1px}
+#topbar .ttl{font-size:.95rem;font-weight:700;flex:1}
+#slide-badge{background:var(--acc);color:#000;font-weight:700;font-size:.78rem;padding:3px 10px;border-radius:20px;white-space:nowrap}
+.slide{display:none;padding:16px 16px 80px;animation:fi .3s ease}
+.slide.active{display:block}
+@keyframes fi{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+.slide-title{font-size:1.2rem;font-weight:800;color:var(--pri);margin-bottom:14px;padding-bottom:8px;border-bottom:3px solid var(--acc)}
+.lo-box{background:#e8f5e9;border-left:5px solid var(--pri);border-radius:8px;padding:14px 16px;margin-bottom:12px}
+.lo-box h3{color:var(--pri);font-size:.95rem;margin-bottom:8px}
+.lo-box ol{padding-left:18px;font-size:.9rem;line-height:1.8}
+.inquiry{background:#fff8e1;border:1.5px solid var(--acc);border-radius:8px;padding:10px 14px;font-size:.88rem;color:#5d4037;margin-top:10px}
+.inquiry strong{color:#e65100}
+.teach-block{margin-bottom:18px}
+.teach-block h3{font-size:1rem;font-weight:700;color:var(--pri);margin-bottom:8px;padding-bottom:4px;border-bottom:2px solid var(--acc);display:inline-block}
+.teach-block p,.teach-block li{font-size:.9rem;line-height:1.7}
+.teach-block ul,.teach-block ol{padding-left:18px;margin-top:6px}
+.key-term{background:#fff8e1;border-left:4px solid var(--acc);border-radius:6px;padding:10px 14px;margin:10px 0;font-size:.88rem}
+.key-term strong{color:#e65100}
+.info-table{width:100%;border-collapse:collapse;margin:10px 0;font-size:.88rem}
+.info-table th{background:var(--pri);color:#fff;padding:8px 10px;text-align:left}
+.info-table td{padding:7px 10px;border-bottom:1px solid #e0e0e0}
+.info-table tr:nth-child(even) td{background:#f1f8e9}
+.example-box{background:#f1f8e9;border:1.5px solid var(--ok);border-radius:8px;padding:12px 14px;margin:10px 0;font-size:.88rem}
+.example-box strong{color:var(--ok);display:block;margin-bottom:6px}
+.formula-box{background:#e3f2fd;border:2px solid #1976d2;border-radius:10px;padding:14px;margin:12px 0;text-align:center}
+.formula-box .formula{font-size:1.1rem;font-weight:800;color:#1565c0;font-family:Georgia,serif;margin:6px 0}
+.warn-box{background:#fff3e0;border-left:4px solid #e65100;border-radius:6px;padding:10px 14px;margin:10px 0;font-size:.88rem;color:#5d4037}
+.quiz-section{margin-bottom:20px}
+.quiz-section h3{font-size:1rem;font-weight:700;color:var(--pri);margin-bottom:12px}
+.q-item{background:#fff;border:1.5px solid #c8e6c9;border-radius:10px;padding:14px;margin-bottom:12px}
+.q-item p{font-size:.9rem;font-weight:600;margin-bottom:10px}
+.fill-blank{border:none;border-bottom:2.5px dashed var(--pri);background:transparent;font-size:.9rem;padding:2px 6px;width:110px;outline:none;text-align:center}
+.fb-result{font-size:.82rem;font-weight:600;margin-top:6px;padding:4px 8px;border-radius:4px;display:inline-block}
+.fb-result.ok{background:#e8f5e9;color:var(--ok)}
+.fb-result.no{background:#ffebee;color:var(--no)}
+.sa-box{width:100%;border:1.5px solid #c8e6c9;border-radius:8px;padding:10px;font-size:.88rem;font-family:inherit;resize:vertical;min-height:80px;outline:none}
+.grade-btn{background:var(--pri);color:#fff;border:none;border-radius:8px;padding:8px 18px;font-size:.85rem;font-weight:700;cursor:pointer;margin-top:8px}
+.sa-feedback{font-size:.82rem;margin-top:8px;padding:10px;border-radius:8px;line-height:1.6;display:none}
+.sa-feedback.ok{background:#e8f5e9;border:1px solid #a5d6a7;color:#1b5e20}
+.sa-feedback.partial{background:#fff8e1;border:1px solid #ffe082;color:#5d4037}
+.sa-feedback.no{background:#ffebee;border:1px solid #ef9a9a;color:#b71c1c}
+.kw-found{color:var(--ok);font-weight:700}
+.kw-miss{color:var(--no);font-weight:700}
+.model-ans{margin-top:6px;padding-top:6px;border-top:1px solid #ccc;font-style:italic}
+#score-result{background:linear-gradient(135deg,var(--pri),var(--pri-l));color:#fff;border-radius:12px;padding:20px;text-align:center;margin-top:16px;display:none}
+#score-result .big{font-size:2rem;font-weight:900;margin:8px 0}
+.submit-btn{background:var(--acc);color:#000;border:none;border-radius:10px;padding:12px 32px;font-size:1rem;font-weight:800;cursor:pointer;margin-top:16px;width:100%}
+#navbar{position:fixed;bottom:0;left:0;right:0;background:#fff;border-top:1px solid #e0e0e0;padding:10px 16px;display:flex;align-items:center;justify-content:space-between;gap:8px;z-index:100;box-shadow:0 -2px 8px rgba(0,0,0,.1)}
+.nav-btn{background:var(--pri);color:#fff;border:none;border-radius:8px;padding:9px 22px;font-size:.88rem;font-weight:700;cursor:pointer}
+.nav-btn:disabled{background:#ccc;cursor:not-allowed}
+#dot-nav{display:flex;gap:6px;flex-wrap:wrap;justify-content:center;flex:1}
+.dot{width:10px;height:10px;border-radius:50%;background:#c8e6c9;cursor:pointer;transition:all .2s}
+.dot.active{background:var(--pri);transform:scale(1.3)}
+.dot.done{background:var(--acc)}
+</style>
+<script type="text/javascript">(function(c,l,a,r,i,t,y){c[a]=c[a]||function(){(c[a].q=c[a].q||[]).push(arguments)};t=l.createElement(r);t.async=1;t.src="https://www.clarity.ms/tag/"+i;y=l.getElementsByTagName(r)[0];y.parentNode.insertBefore(t,y);})(window,document,"clarity","script","wg31zlwbt9");</script>\n</head>
+<body>
+<div id="topbar">
+  <div><div class="sub">Mathematics · Form 4</div><div class="ttl">Statistics (2)</div></div>
+  <div id="slide-badge">Slide 1 / 10</div>
+</div>
+
+<div class="slide active" id="s1">
+  <div class="slide-title">📋 Learning Outcomes</div>
+  <div class="lo-box"><h3>By the end of this lesson, you should be able to:</h3>
+    <ol>
+      <li>Calculate measures of central tendency for grouped data</li>
+      <li>Calculate the standard deviation and variance</li>
+      <li>Interpret standard deviation in context</li>
+      <li>Draw and interpret histograms and frequency polygons</li>
+      <li>Calculate quartiles and interquartile range</li>
+      <li>Draw and interpret cumulative frequency curves (ogives)</li>
+      <li>Apply statistics to real-life data analysis</li>
+    </ol>
+  </div>
+  <div class="inquiry"><strong>🔍 Key Inquiry Question:</strong> How do we summarise and compare large sets of data meaningfully?</div>
+</div>
+<div class="slide" id="s2">
+  <div class="slide-title">📊 Mean, Median, Mode for Grouped Data</div>
+  <div class="teach-block"><h3>Mean from Grouped Data</h3>
+    <div class="formula-box"><div class="formula">x̄ = Σfx / Σf</div><p>where x = midpoint of class, f = frequency</p></div>
+    <div class="example-box"><strong>Example:</strong>
+      <table class="info-table">
+        <tr><th>Class</th><th>f</th><th>Midpoint x</th><th>fx</th></tr>
+        <tr><td>10-19</td><td>5</td><td>14.5</td><td>72.5</td></tr>
+        <tr><td>20-29</td><td>8</td><td>24.5</td><td>196</td></tr>
+        <tr><td>30-39</td><td>7</td><td>34.5</td><td>241.5</td></tr>
+      </table>
+      <p>Mean = (72.5+196+241.5)/(5+8+7) = 510/20 = <strong>25.5</strong></p>
+    </div>
+  </div>
+  <div class="teach-block"><h3>Modal Class</h3>
+    <p>The class with the highest frequency. In the example above: modal class = <strong>20-29</strong></p>
+  </div>
+</div>
+<div class="slide" id="s3">
+  <div class="slide-title">📏 Standard Deviation</div>
+  <div class="teach-block"><h3>Standard Deviation Formula</h3>
+    <div class="formula-box">
+      <div class="formula">σ = √[Σf(x−x̄)² / Σf]</div>
+      <div class="formula" style="margin-top:6px">Or: σ = √[Σfx²/Σf − (x̄)²]</div>
+    </div>
+    <div class="key-term"><strong>Standard deviation</strong> measures how spread out the data is from the mean. Small σ = data clustered near mean. Large σ = data widely spread.</div>
+    <div class="example-box"><strong>Example (ungrouped):</strong>
+      <p>Data: 2, 4, 4, 4, 5, 5, 7, 9. Mean = 5</p>
+      <p>Deviations²: 9,1,1,1,0,0,4,16. Sum = 32</p>
+      <p>σ = √(32/8) = √4 = <strong>2</strong></p>
+    </div>
+  </div>
+  <div class="teach-block"><h3>Variance</h3>
+    <div class="formula-box"><div class="formula">Variance = σ² = Σf(x−x̄)² / Σf</div></div>
+  </div>
+</div>
+<div class="slide" id="s4">
+  <div class="slide-title">📈 Quartiles and IQR</div>
+  <div class="teach-block"><h3>Quartiles</h3>
+    <p>Divide ordered data into four equal parts.</p>
+    <table class="info-table">
+      <tr><th>Quartile</th><th>Position</th><th>Meaning</th></tr>
+      <tr><td>Q1 (Lower)</td><td>¼ of way</td><td>25th percentile</td></tr>
+      <tr><td>Q2 (Median)</td><td>½ of way</td><td>50th percentile</td></tr>
+      <tr><td>Q3 (Upper)</td><td>¾ of way</td><td>75th percentile</td></tr>
+    </table>
+    <div class="formula-box"><div class="formula">IQR = Q3 − Q1</div><p>Interquartile Range — measures spread of middle 50% of data</p></div>
+    <div class="example-box"><strong>Example:</strong>
+      <p>Data: 3, 5, 7, 9, 11, 13, 15, 17, 19. n=9</p>
+      <p>Q1 = 2nd+3rd avg = (5+7)/2? No — Q1 position = (9+1)/4 = 2.5 → Q1 = (5+7)/2 = 6</p>
+      <p>Q3 position = 3(9+1)/4 = 7.5 → Q3 = (15+17)/2 = 16</p>
+      <p>IQR = 16−6 = <strong>10</strong></p>
+    </div>
+  </div>
+</div>
+<div class="slide" id="s5">
+  <div class="slide-title">📉 Cumulative Frequency (Ogive)</div>
+  <div class="teach-block"><h3>Building a Cumulative Frequency Table</h3>
+    <div class="example-box">
+      <table class="info-table">
+        <tr><th>Class</th><th>Freq</th><th>Cum. Freq</th></tr>
+        <tr><td>0-9</td><td>4</td><td>4</td></tr>
+        <tr><td>10-19</td><td>8</td><td>12</td></tr>
+        <tr><td>20-29</td><td>12</td><td>24</td></tr>
+        <tr><td>30-39</td><td>6</td><td>30</td></tr>
+      </table>
+    </div>
+  </div>
+  <div class="teach-block"><h3>Reading from Ogive</h3>
+    <ul>
+      <li>Median → read off at cumulative frequency = n/2</li>
+      <li>Q1 → read off at n/4</li>
+      <li>Q3 → read off at 3n/4</li>
+      <li>Percentiles → read off at required percentage of n</li>
+    </ul>
+  </div>
+</div>
+<div class="slide" id="s6">
+  <div class="slide-title">📊 Histograms and Frequency Polygons</div>
+  <div class="teach-block"><h3>Histograms</h3>
+    <p>Used for continuous grouped data. The area of each bar represents frequency.</p>
+    <div class="key-term"><strong>Frequency Density = Frequency / Class Width</strong> (for unequal class widths)</div>
+  </div>
+  <div class="teach-block"><h3>Frequency Polygon</h3>
+    <p>Formed by joining the midpoints of the tops of histogram bars.</p>
+    <div class="example-box"><strong>Uses of frequency polygon:</strong>
+      <ul>
+        <li>Compare two distributions on the same graph</li>
+        <li>Show the shape of distribution (symmetric, skewed)</li>
+        <li>Identify modal class visually</li>
+      </ul>
+    </div>
+  </div>
+</div>
+<div class="slide" id="s7">
+  <div class="slide-title">🔢 Comparing Distributions</div>
+  <div class="teach-block"><h3>Using Mean and SD to Compare</h3>
+    <div class="example-box"><strong>Example:</strong>
+      <p>Class A: mean = 65, σ = 5</p>
+      <p>Class B: mean = 65, σ = 15</p>
+      <p>Both classes have same average but Class B has more variation — scores more spread out. Class A performed more consistently.</p>
+    </div>
+    <div class="example-box"><strong>Coefficient of Variation (CV):</strong>
+      <p>CV = (σ/x̄) × 100% — compares variability between datasets with different means</p>
+      <p>Lower CV → more consistent data</p>
+    </div>
+  </div>
+</div>
+<div class="slide" id="s8">
+  <div class="slide-title">💡 Real-Life Applications</div>
+  <div class="teach-block"><h3>Quality Control</h3>
+    <div class="example-box"><strong>Example:</strong>
+      <p>A factory produces bolts. Target diameter = 10mm, σ = 0.1mm. A bolt is acceptable if within 2σ of mean (9.8mm to 10.2mm). This uses the concept of standard deviation in manufacturing.</p>
+    </div>
+  </div>
+  <div class="teach-block"><h3>Finance — Risk Analysis</h3>
+    <div class="example-box"><strong>Example:</strong>
+      <p>Investment A: mean return 12%, σ = 2%</p>
+      <p>Investment B: mean return 12%, σ = 8%</p>
+      <p>Investment A is less risky (lower standard deviation = less variability in returns).</p>
+    </div>
+  </div>
+</div>
+<div class="slide" id="s9">
+  <div class="slide-title">✏️ Practice Problems</div>
+  <div class="teach-block"><h3>Problem 1</h3>
+    <p>Calculate mean and standard deviation of: 5, 8, 10, 12, 15.</p>
+    <div class="example-box"><strong>Solution:</strong>
+      <p>Mean = 50/5 = 10</p>
+      <p>Deviations: −5,−2,0,2,5. Squared: 25,4,0,4,25. Sum = 58</p>
+      <p>σ = √(58/5) = √11.6 ≈ <strong>3.41</strong></p>
+    </div>
+  </div>
+  <div class="teach-block"><h3>Problem 2</h3>
+    <p>Find Q1, Q3, IQR for: 12, 15, 18, 20, 22, 25, 28, 30, 35.</p>
+    <div class="example-box"><strong>Solution:</strong>
+      <p>n=9. Q1 = average of 2nd and 3rd = (15+18)/2 = 16.5</p>
+      <p>Q3 = average of 7th and 8th = (28+30)/2 = 29</p>
+      <p>IQR = 29−16.5 = <strong>12.5</strong></p>
+    </div>
+  </div>
+</div>
+<div class="slide" id="s10">
+  <div class="slide-title">📝 Quiz — Statistics (2)</div>
+  <div class="quiz-section"><h3>Part A: Fill in the Blanks (5 marks)</h3>
+    <div class="q-item"><p>1. The sum of all values divided by the number of values gives the <input class="fill-blank" id="f1">.</p><div id="f1r" class="fb-result" style="display:none"></div></div>
+    <div class="q-item"><p>2. The middle value in ordered data is the <input class="fill-blank" id="f2">.</p><div id="f2r" class="fb-result" style="display:none"></div></div>
+    <div class="q-item"><p>3. The most frequently occurring value is the <input class="fill-blank" id="f3">.</p><div id="f3r" class="fb-result" style="display:none"></div></div>
+    <div class="q-item"><p>4. The square root of variance is called <input class="fill-blank" id="f4">.</p><div id="f4r" class="fb-result" style="display:none"></div></div>
+    <div class="q-item"><p>5. σ² is the symbol for <input class="fill-blank" id="f5">.</p><div id="f5r" class="fb-result" style="display:none"></div></div>
+  </div>
+  <div class="quiz-section"><h3>Part B: Short Answer (10 marks)</h3>
+    <div class="q-item"><p>6. (4 marks) Calculate the mean and standard deviation of the grouped data: 10-19 (f=3), 20-29 (f=7), 30-39 (f=5), 40-49 (f=5).</p>
+      <textarea class="sa-box" id="sa1" placeholder="Use midpoints and frequency table..."></textarea>
+      <button class="grade-btn" onclick="gradeAnswer('sa1','fb1',{keywords:['midpoint','14.5','24.5','34.5','44.5','mean','29.5','standard deviation','fx'],required:4,marks:4,model:'Midpoints:14.5,24.5,34.5,44.5. Σf=20. Σfx=43.5+171.5+172.5+222.5=610. Mean=610/20=30.5. σ=√[Σfx²/Σf-mean²]≈10.5.'})">✓ Grade My Answer</button>
+      <div id="fb1" class="sa-feedback"></div></div>
+    <div class="q-item"><p>7. (3 marks) Data: 4, 7, 9, 12, 14, 16, 19, 21. Find Q1, Q3, and IQR.</p>
+      <textarea class="sa-box" id="sa2" placeholder="Show working..."></textarea>
+      <button class="grade-btn" onclick="gradeAnswer('sa2','fb2',{keywords:['8','17.5','9.5','q1','q3','iqr','quartile'],required:3,marks:3,model:'n=8. Q1=average of 2nd and 3rd=(7+9)/2=8. Q3=average of 6th and 7th=(16+19)/2=17.5. IQR=17.5-8=9.5.'})">✓ Grade My Answer</button>
+      <div id="fb2" class="sa-feedback"></div></div>
+    <div class="q-item"><p>8. (3 marks) Two factories A and B produce rods. Factory A: mean length=50cm, σ=0.5cm. Factory B: mean=50cm, σ=2cm. Which factory is more consistent and why?</p>
+      <textarea class="sa-box" id="sa3" placeholder="Compare using standard deviation..."></textarea>
+      <button class="grade-btn" onclick="gradeAnswer('sa3','fb3',{keywords:['factory a','consistent','smaller','standard deviation','0.5','variation','spread'],required:3,marks:3,model:'Factory A is more consistent because it has a smaller standard deviation (0.5cm vs 2cm). Smaller σ means the lengths are less spread out and closer to the mean, indicating more uniform production.'})">✓ Grade My Answer</button>
+      <div id="fb3" class="sa-feedback"></div></div>
+  </div>
+  <button class="submit-btn" onclick="submitQuiz()">📊 Submit & See My Score</button>
+  <div id="score-result"></div>
+</div>
+<div id="navbar">
+  <button class="nav-btn" id="prev-btn" onclick="changeSlide(-1)" disabled>◀ Prev</button>
+  <div id="dot-nav"></div>
+  <button class="nav-btn" id="next-btn" onclick="changeSlide(1)">Next ▶</button>
+</div>
+<script>
+const TOTAL=10;let cur=1;const visited=new Set([1]);
+function buildDots(){const dn=document.getElementById('dot-nav');dn.innerHTML='';for(let i=1;i<=TOTAL;i++){const d=document.createElement('div');d.className='dot'+(i===cur?' active':visited.has(i)&&i!==cur?' done':'');d.onclick=(()=>{const n=i;return()=>goTo(n)})();dn.appendChild(d);}}
+function goTo(n){document.getElementById('s'+cur).classList.remove('active');cur=n;visited.add(n);document.getElementById('s'+n).classList.add('active');document.getElementById('slide-badge').textContent='Slide '+n+' / '+TOTAL;document.getElementById('prev-btn').disabled=(n===1);document.getElementById('next-btn').disabled=(n===TOTAL);buildDots();window.scrollTo(0,0);}
+function changeSlide(d){goTo(cur+d);}
+buildDots();
+const fillAnswers={f1:['mean'],f2:['median'],f3:['mode'],f4:['standard deviation'],f5:['variance']};
+function gradeAnswer(saId,fbId,cfg){const txt=document.getElementById(saId).value.toLowerCase().trim();if(!txt){alert('Please write your answer first.');return;}const found=cfg.keywords.filter(k=>txt.includes(k.toLowerCase()));const missed=cfg.keywords.filter(k=>!txt.includes(k.toLowerCase())).slice(0,4);const hitRate=Math.min(1,found.length/cfg.required);const marks=Math.round(hitRate*cfg.marks);const fb=document.getElementById(fbId);fb.style.display='block';const cls=marks>=cfg.marks?'ok':marks>0?'partial':'no';fb.className='sa-feedback '+cls;fb.innerHTML=`<strong>Score: ${marks} / ${cfg.marks}</strong><br>✅ Found: <span class="kw-found">${found.length>0?found.join(', '):'none'}</span><br>❌ Missed: <span class="kw-miss">${missed.length>0?missed.join(', '):'none'}</span><div class="model-ans">📖 ${cfg.model}</div>`;}
+function submitQuiz(){let fillScore=0;Object.keys(fillAnswers).forEach(id=>{const val=(document.getElementById(id).value||'').toLowerCase().trim();const correct=fillAnswers[id].some(a=>val===a||val.includes(a));const res=document.getElementById(id+'r');res.style.display='inline-block';if(correct){res.className='fb-result ok';res.textContent='✓ Correct! (1 mark)';fillScore++;}else{res.className='fb-result no';res.textContent='✗ Expected: '+fillAnswers[id][0];}});let saTotal=0;['fb1','fb2','fb3'].forEach(id=>{const fb=document.getElementById(id);if(fb.style.display!=='none'){const m=fb.innerHTML.match(/Score:\s*(\d+)\s*\//);if(m)saTotal+=parseInt(m[1]);}});const total=fillScore+saTotal;const pct=Math.round((total/15)*100);const grade=pct>=80?'Excellent (A)':pct>=60?'Good (B)':pct>=50?'Average (C)':'Needs Improvement';const emoji=pct>=80?'🏆':pct>=60?'👍':pct>=50?'📚':'💪';const res=document.getElementById('score-result');res.style.display='block';res.innerHTML=`${emoji}<div class="big">${total}/15 (${pct}%)</div><strong>${grade}</strong><br><small>Fill: ${fillScore}/5 | SA: ${saTotal}/10</small>`;submitExamToMTTI(total,15,pct);res.scrollIntoView({behavior:'smooth'});}
+function submitExamToMTTI(score,total,percent){try{fetch('/wp-json/mtti/v1/exam-result',{method:'POST',headers:{'Content-Type':'application/json','X-WP-Nonce':window.mtti_nonce||''},body:JSON.stringify({lesson_id:'f4-math-8-statistics-2',score,total,percent,timestamp:new Date().toISOString()})}).then(r=>r.json()).then(d=>{if(d&&d.success)console.log('[MTTI] Saved',d);}).catch(e=>console.log('[MTTI] Offline',e));}catch(e){console.log('[MTTI] Error',e);}}
+</script>
+</body>
+</html>

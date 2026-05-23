@@ -1,0 +1,127 @@
+# Enforce HTTPS
+RewriteEngine On
+RewriteCond %{HTTPS} off
+RewriteRule ^(.*)$ https://%{HTTP_HOST}%{REQUEST_URI} [L,R=301]
+
+# Redirect WWW to non-WWW
+RewriteCond %{HTTP_HOST} ^www\.masomoteletraining\.co\.ke [NC]
+RewriteRule ^(.*)$ https://staging.masomoteletraining.co.ke/$1 [L,R=301]
+
+# 404 Fixes
+Redirect 301 /faq/ https://staging.masomoteletraining.co.ke/#faq
+Redirect 301 /checkout/ https://staging.masomoteletraining.co.ke/#contact
+Redirect 301 /shop/ https://staging.masomoteletraining.co.ke/#courses
+
+# Allow direct access to special folders
+RewriteRule ^cbelec/ - [L]
+RewriteRule ^cbe/ - [L]
+RewriteRule ^exams/exams/.*\.html$ - [L]
+RewriteRule ^exams/ - [L]
+
+# NCBA Webhook bypass
+RewriteRule ^wp-content/plugins/mtti-fixed-v6/ncba-webhook\.php$ - [L]
+
+# Block compromised paths
+RewriteRule ^(arg|22)(/.*)?$ - [F,L]
+
+# Cache control for HTML files
+<FilesMatch "\.html$">
+    Header set Cache-Control "no-cache, no-store, must-revalidate"
+    Order Allow,Deny
+    Allow from all
+</FilesMatch>
+
+# Homepage directory index
+DirectoryIndex index.html index.php
+
+# BEGIN WordPress
+<IfModule mod_rewrite.c>
+RewriteEngine On
+RewriteRule .* - [E=HTTP_AUTHORIZATION:%{HTTP:Authorization}]
+RewriteBase /
+RewriteRule ^index\.php$ - [L]
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteRule . /index.php [L]
+</IfModule>
+# END WordPress
+
+# Disable directory browsing
+Options -Indexes
+
+# Protect sensitive files
+<FilesMatch "^\.">
+    Order allow,deny
+    Deny from all
+</FilesMatch>
+
+<Files wp-config.php>
+    Order allow,deny
+    Deny from all
+</Files>
+
+<Files xmlrpc.php>
+    Order allow,deny
+    Deny from all
+</Files>
+
+<Files .htaccess>
+    Order allow,deny
+    Deny from all
+</Files>
+
+# Prevent PHP execution in uploads
+<Directory "/wp-content/uploads/">
+    <FilesMatch "\.php$">
+        Order allow,deny
+        Deny from all
+    </FilesMatch>
+</Directory>
+
+# Prevent PHP execution in wp-includes
+<Directory "/wp-includes/">
+    <FilesMatch "\.php$">
+        Order allow,deny
+        Deny from all
+    </FilesMatch>
+</Directory>
+
+# BEGIN LiteSpeed
+<IfModule Litespeed>
+    SetEnv noabort 1
+</IfModule>
+# END LiteSpeed
+
+# BEGIN cPanel-generated php ini directives, do not edit
+<IfModule php8_module>
+   php_flag display_errors Off
+   php_value max_execution_time 300
+   php_value max_input_time 60
+   php_value max_input_vars 1000
+   php_value memory_limit 128M
+   php_value post_max_size 128M
+   php_value session.gc_maxlifetime 1440
+   php_value session.save_path "/var/cpanel/php/sessions/ea-php83"
+   php_value upload_max_filesize 128M
+   php_flag zlib.output_compression Off
+</IfModule>
+<IfModule lsapi_module>
+   php_flag display_errors Off
+   php_value max_execution_time 300
+   php_value max_input_time 60
+   php_value max_input_vars 1000
+   php_value memory_limit 128M
+   php_value post_max_size 128M
+   php_value session.gc_maxlifetime 1440
+   php_value session.save_path "/var/cpanel/php/sessions/ea-php83"
+   php_value upload_max_filesize 128M
+   php_flag zlib.output_compression Off
+</IfModule>
+# END cPanel-generated php ini directives, do not edit
+
+# php -- BEGIN cPanel-generated handler, do not edit
+# Set the “ea-php83” package as the default “PHP” programming language.
+<IfModule mime_module>
+  AddHandler application/x-httpd-ea-php83 .php .php8 .phtml
+</IfModule>
+# php -- END cPanel-generated handler, do not edit

@@ -1,0 +1,370 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="theme-color" content="#1e3a5f">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <title>MTTI Student Portal</title>
+    <link rel="manifest" href="manifest.json">
+    <link rel="apple-touch-icon" href="icon-192.png">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        :root { --primary: #1e3a5f; --primary-light: #2d5a8a; --secondary: #f4a825; --success: #28a745; --danger: #dc3545; --warning: #ffc107; --light: #f8f9fa; --dark: #343a40; --gray: #6c757d; }
+        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: var(--light); min-height: 100vh; padding-bottom: 80px; }
+        
+        .install-banner { background: linear-gradient(135deg, var(--secondary), #e6951d); color: var(--dark); padding: 12px 15px; display: flex; justify-content: space-between; align-items: center; font-size: 14px; font-weight: 500; }
+        .install-banner.hidden { display: none; }
+        .install-btn { background: var(--primary); color: white; border: none; padding: 8px 16px; border-radius: 20px; font-weight: 600; cursor: pointer; }
+        .install-close { background: none; border: none; font-size: 20px; cursor: pointer; padding: 0 10px; opacity: 0.7; }
+        
+        .header { background: linear-gradient(135deg, var(--primary), var(--primary-light)); color: white; padding: 15px 20px; position: sticky; top: 0; z-index: 100; box-shadow: 0 2px 10px rgba(0,0,0,0.2); }
+        .header h1 { font-size: 18px; font-weight: 600; }
+        .header-sub { font-size: 12px; opacity: 0.9; margin-top: 2px; }
+        .header-user { display: flex; justify-content: space-between; align-items: center; }
+        .logout-btn { background: rgba(255,255,255,0.2); border: none; color: white; padding: 8px 15px; border-radius: 20px; font-size: 12px; cursor: pointer; }
+        
+        .login-container { min-height: 100vh; display: flex; flex-direction: column; justify-content: center; align-items: center; background: linear-gradient(135deg, var(--primary), var(--primary-light)); padding: 20px; }
+        .login-logo { width: 100px; height: 100px; background: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin-bottom: 20px; font-size: 36px; color: var(--primary); font-weight: bold; }
+        .login-title { color: white; font-size: 24px; margin-bottom: 5px; text-align: center; }
+        .login-subtitle { color: rgba(255,255,255,0.8); font-size: 14px; margin-bottom: 30px; }
+        .login-form { width: 100%; max-width: 350px; background: white; padding: 30px; border-radius: 15px; box-shadow: 0 10px 30px rgba(0,0,0,0.2); }
+        .form-group { margin-bottom: 20px; }
+        .form-group label { display: block; margin-bottom: 8px; font-weight: 500; color: var(--dark); font-size: 14px; }
+        .form-group input { width: 100%; padding: 12px 15px; border: 2px solid #e0e0e0; border-radius: 10px; font-size: 16px; }
+        .form-group input:focus { outline: none; border-color: var(--primary); }
+        .login-btn { width: 100%; padding: 14px; background: var(--primary); color: white; border: none; border-radius: 10px; font-size: 16px; font-weight: 600; cursor: pointer; }
+        .login-btn:disabled { background: var(--gray); cursor: not-allowed; }
+        .error-msg { background: #fee; color: var(--danger); padding: 10px 15px; border-radius: 8px; margin-bottom: 15px; font-size: 14px; display: none; }
+        
+        .main-content { padding: 15px; }
+        .screen { display: none; }
+        .screen.active { display: block; }
+        .card { background: white; border-radius: 12px; padding: 20px; margin-bottom: 15px; box-shadow: 0 2px 8px rgba(0,0,0,0.08); }
+        .card-title { font-size: 16px; font-weight: 600; color: var(--dark); margin-bottom: 15px; display: flex; align-items: center; gap: 8px; }
+        
+        .stats-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; margin-bottom: 15px; }
+        .stat-card { background: white; border-radius: 12px; padding: 15px; text-align: center; box-shadow: 0 2px 8px rgba(0,0,0,0.08); }
+        .stat-value { font-size: 28px; font-weight: 700; color: var(--primary); }
+        .stat-label { font-size: 12px; color: var(--gray); margin-top: 5px; }
+        .stat-card.success .stat-value { color: var(--success); }
+        .stat-card.danger .stat-value { color: var(--danger); }
+        
+        .result-item { display: flex; justify-content: space-between; align-items: center; padding: 15px; border-bottom: 1px solid #eee; }
+        .result-item:last-child { border-bottom: none; }
+        .result-info h4 { font-size: 14px; color: var(--dark); margin-bottom: 4px; }
+        .result-info span { font-size: 12px; color: var(--gray); }
+        .result-score { text-align: right; }
+        .result-percentage { font-size: 20px; font-weight: 700; }
+        .result-grade { font-size: 12px; padding: 3px 10px; border-radius: 12px; display: inline-block; margin-top: 4px; }
+        .grade-a { background: #d4edda; color: #155724; }
+        .grade-b { background: #cce5ff; color: #004085; }
+        .grade-c { background: #fff3cd; color: #856404; }
+        .grade-d, .grade-e { background: #f8d7da; color: #721c24; }
+        .result-rank { font-size: 11px; color: var(--gray); margin-top: 2px; }
+        
+        .balance-card { background: linear-gradient(135deg, var(--primary), var(--primary-light)); color: white; border-radius: 12px; padding: 20px; margin-bottom: 15px; }
+        .balance-label { font-size: 12px; opacity: 0.9; }
+        .balance-amount { font-size: 32px; font-weight: 700; margin: 5px 0; }
+        .balance-details { display: flex; justify-content: space-between; margin-top: 15px; padding-top: 15px; border-top: 1px solid rgba(255,255,255,0.2); font-size: 13px; }
+        
+        .payment-item { display: flex; justify-content: space-between; align-items: center; padding: 15px; border-bottom: 1px solid #eee; }
+        .payment-info h4 { font-size: 14px; color: var(--dark); }
+        .payment-info span { font-size: 12px; color: var(--gray); }
+        .payment-amount { font-size: 16px; font-weight: 600; color: var(--success); }
+        
+        .profile-header { text-align: center; padding: 30px 20px; background: linear-gradient(135deg, var(--primary), var(--primary-light)); color: white; margin: -15px -15px 15px -15px; border-radius: 0 0 20px 20px; }
+        .profile-avatar { width: 80px; height: 80px; background: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 15px; font-size: 32px; color: var(--primary); }
+        .profile-name { font-size: 20px; font-weight: 600; }
+        .profile-admission { opacity: 0.9; font-size: 14px; margin-top: 5px; }
+        .info-row { display: flex; justify-content: space-between; padding: 12px 0; border-bottom: 1px solid #eee; }
+        .info-label { color: var(--gray); font-size: 14px; }
+        .info-value { font-weight: 500; font-size: 14px; text-align: right; max-width: 60%; }
+        .transcript-btn, .action-btn { display: block; width: 100%; padding: 15px; background: var(--secondary); color: var(--dark); text-align: center; border: none; border-radius: 10px; font-size: 16px; font-weight: 600; cursor: pointer; margin-top: 15px; }
+        .action-btn.outline { background: white; border: 2px solid var(--primary); color: var(--primary); }
+        
+        .bottom-nav { position: fixed; bottom: 0; left: 0; right: 0; background: white; display: flex; justify-content: space-around; padding: 8px 0 12px; box-shadow: 0 -2px 10px rgba(0,0,0,0.1); z-index: 100; }
+        .nav-item { display: flex; flex-direction: column; align-items: center; padding: 5px 10px; color: var(--gray); font-size: 10px; cursor: pointer; }
+        .nav-item.active { color: var(--primary); }
+        .nav-icon { font-size: 22px; margin-bottom: 3px; }
+        
+        .loading { text-align: center; padding: 40px; color: var(--gray); }
+        .spinner { width: 40px; height: 40px; border: 3px solid #eee; border-top-color: var(--primary); border-radius: 50%; animation: spin 1s linear infinite; margin: 0 auto 15px; }
+        @keyframes spin { to { transform: rotate(360deg); } }
+        .empty-state { text-align: center; padding: 40px 20px; color: var(--gray); }
+        .empty-icon { font-size: 48px; margin-bottom: 15px; }
+        
+        .modal-overlay { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.5); display: flex; align-items: center; justify-content: center; z-index: 1000; padding: 20px; }
+        .modal-overlay.hidden { display: none; }
+        .modal { background: white; border-radius: 15px; max-width: 400px; width: 100%; max-height: 80vh; overflow-y: auto; }
+        .modal-header { padding: 20px; border-bottom: 1px solid #eee; display: flex; justify-content: space-between; align-items: center; }
+        .modal-header h2 { font-size: 18px; }
+        .modal-close { background: none; border: none; font-size: 24px; cursor: pointer; }
+        .modal-body { padding: 20px; }
+        .install-step { display: flex; gap: 15px; margin-bottom: 20px; align-items: flex-start; }
+        .step-num { width: 30px; height: 30px; background: var(--primary); color: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: bold; flex-shrink: 0; }
+        .step-text { font-size: 14px; line-height: 1.5; }
+        .step-text strong { display: block; margin-bottom: 5px; }
+        
+        .transcript-container { display: none; }
+        @media print { body * { visibility: hidden; } .transcript-container, .transcript-container * { visibility: visible; } .transcript-container { position: absolute; left: 0; top: 0; width: 100%; display: block !important; } }
+        .transcript { max-width: 800px; margin: 0 auto; padding: 30px; background: white; font-family: 'Times New Roman', serif; }
+        .transcript-header { text-align: center; border-bottom: 2px solid var(--primary); padding-bottom: 20px; margin-bottom: 20px; }
+        .transcript-table { width: 100%; border-collapse: collapse; margin: 20px 0; }
+        .transcript-table th, .transcript-table td { border: 1px solid #ddd; padding: 10px; text-align: left; }
+        .transcript-table th { background: var(--primary); color: white; }
+        .hidden { display: none !important; }
+    </style>
+</head>
+<body>
+    <div class="install-banner hidden" id="installBanner">
+        <span>📲 Install app for quick access</span>
+        <div>
+            <button class="install-btn" id="installBtn">Install</button>
+            <button class="install-close" id="installClose">×</button>
+        </div>
+    </div>
+    
+    <div id="loginScreen" class="login-container">
+        <div class="login-logo">M</div>
+        <h1 class="login-title">MTTI Student Portal</h1>
+        <p class="login-subtitle">Start Learning, Start Earning</p>
+        <form class="login-form" id="loginForm">
+            <div class="error-msg" id="loginError"></div>
+            <div class="form-group">
+                <label>Admission Number</label>
+                <input type="text" id="admissionInput" placeholder="e.g., MTTI/2025/0001" required>
+            </div>
+            <div class="form-group">
+                <label>Password</label>
+                <input type="password" id="passwordInput" placeholder="Your password" required>
+            </div>
+            <button type="submit" class="login-btn" id="loginBtn">Login</button>
+            <p style="text-align: center; margin-top: 15px; font-size: 12px; color: #666;">Use your ID number or phone as password</p>
+        </form>
+    </div>
+    
+    <div id="mainApp" class="hidden">
+        <div class="header">
+            <div class="header-user">
+                <div>
+                    <h1 id="headerName">Student Portal</h1>
+                    <div class="header-sub" id="headerAdmission">MTTI</div>
+                </div>
+                <button class="logout-btn" onclick="logout()">Logout</button>
+            </div>
+        </div>
+        
+        <div class="main-content">
+            <div id="dashboardScreen" class="screen active">
+                <div class="stats-grid">
+                    <div class="stat-card"><div class="stat-value" id="avgScore">--</div><div class="stat-label">Average Score</div></div>
+                    <div class="stat-card"><div class="stat-value" id="totalExams">--</div><div class="stat-label">Total Exams</div></div>
+                    <div class="stat-card success"><div class="stat-value" id="passedExams">--</div><div class="stat-label">Passed</div></div>
+                    <div class="stat-card danger"><div class="stat-value" id="failedExams">--</div><div class="stat-label">Failed</div></div>
+                </div>
+                <div class="card">
+                    <div class="card-title">📊 Recent Results</div>
+                    <div id="recentResults"><div class="loading"><div class="spinner"></div>Loading...</div></div>
+                </div>
+            </div>
+            
+            <div id="resultsScreen" class="screen">
+                <div class="card">
+                    <div class="card-title">📝 All Exam Results</div>
+                    <div id="allResults"><div class="loading"><div class="spinner"></div>Loading...</div></div>
+                </div>
+            </div>
+            
+            <div id="paymentsScreen" class="screen">
+                <div class="balance-card">
+                    <div class="balance-label">Fee Balance</div>
+                    <div class="balance-amount" id="feeBalance">KES 0</div>
+                    <div class="balance-details">
+                        <div><div>Course Fee</div><div id="courseFee">KES 0</div></div>
+                        <div><div>Total Paid</div><div id="totalPaid">KES 0</div></div>
+                    </div>
+                </div>
+                <div class="card">
+                    <div class="card-title">💳 Payment History</div>
+                    <div id="paymentsList"><div class="loading"><div class="spinner"></div>Loading...</div></div>
+                </div>
+            </div>
+            
+            <div id="profileScreen" class="screen">
+                <div class="profile-header">
+                    <div class="profile-avatar">👤</div>
+                    <div class="profile-name" id="profileName">Student Name</div>
+                    <div class="profile-admission" id="profileAdmission">Admission Number</div>
+                </div>
+                <div class="card">
+                    <div class="card-title">📋 Student Information</div>
+                    <div id="profileInfo"></div>
+                </div>
+                <button class="transcript-btn" onclick="generateTranscript()">📄 View / Print Transcript</button>
+                <button class="action-btn outline" onclick="showInstallGuide()">📲 How to Install This App</button>
+            </div>
+        </div>
+        
+        <nav class="bottom-nav">
+            <div class="nav-item active" onclick="showScreen('dashboard', this)"><span class="nav-icon">🏠</span>Home</div>
+            <div class="nav-item" onclick="showScreen('results', this)"><span class="nav-icon">📊</span>Results</div>
+            <div class="nav-item" onclick="showScreen('payments', this)"><span class="nav-icon">💳</span>Payments</div>
+            <div class="nav-item" onclick="showScreen('profile', this)"><span class="nav-icon">👤</span>Profile</div>
+        </nav>
+    </div>
+    
+    <div class="modal-overlay hidden" id="installModal">
+        <div class="modal">
+            <div class="modal-header"><h2>📲 Install MTTI App</h2><button class="modal-close" onclick="hideInstallGuide()">×</button></div>
+            <div class="modal-body" id="installInstructions"></div>
+        </div>
+    </div>
+    
+    <div class="transcript-container" id="transcriptContainer"><div class="transcript" id="transcriptContent"></div></div>
+    
+    <script>
+        const API_BASE = '/wp-json/mtti-mis/v1';
+        let studentData = null, resultsData = [], paymentsData = null, deferredPrompt = null;
+        
+        window.addEventListener('beforeinstallprompt', (e) => { e.preventDefault(); deferredPrompt = e; document.getElementById('installBanner').classList.remove('hidden'); });
+        
+        document.getElementById('installBtn').addEventListener('click', async () => {
+            if (deferredPrompt) { deferredPrompt.prompt(); const { outcome } = await deferredPrompt.userChoice; if (outcome === 'accepted') document.getElementById('installBanner').classList.add('hidden'); deferredPrompt = null; }
+            else showInstallGuide();
+        });
+        
+        document.getElementById('installClose').addEventListener('click', () => { document.getElementById('installBanner').classList.add('hidden'); localStorage.setItem('install_dismissed', '1'); });
+        
+        document.addEventListener('DOMContentLoaded', () => {
+            if (!localStorage.getItem('install_dismissed') && !window.matchMedia('(display-mode: standalone)').matches) setTimeout(() => document.getElementById('installBanner').classList.remove('hidden'), 2000);
+            const saved = localStorage.getItem('mtti_session');
+            if (saved) { try { const s = JSON.parse(saved); if (s.student && s.admission) { studentData = s.student; studentData.admission_number = s.admission; showMainApp(); loadDashboard(); } } catch (e) { localStorage.removeItem('mtti_session'); } }
+        });
+        
+        document.getElementById('loginForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const admission = document.getElementById('admissionInput').value.trim(), password = document.getElementById('passwordInput').value;
+            if (!admission || !password) { showLoginError('Please enter both admission number and password'); return; }
+            const loginBtn = document.getElementById('loginBtn'); loginBtn.disabled = true; loginBtn.textContent = 'Logging in...'; hideLoginError();
+            try {
+                const res = await fetch(`${API_BASE}/student-login`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ admission_number: admission, password: password }) });
+                const data = await res.json(); console.log('Login:', data);
+                if (data.success) { studentData = data.student || data; studentData.admission_number = studentData.admission_number || admission; localStorage.setItem('mtti_session', JSON.stringify({ student: studentData, admission: admission })); showMainApp(); loadDashboard(); }
+                else showLoginError(data.message || 'Login failed. Check your credentials.');
+            } catch (err) { console.error(err); showLoginError('Connection error. Please try again.'); }
+            finally { loginBtn.disabled = false; loginBtn.textContent = 'Login'; }
+        });
+        
+        function showLoginError(msg) { const el = document.getElementById('loginError'); el.textContent = msg; el.style.display = 'block'; }
+        function hideLoginError() { document.getElementById('loginError').style.display = 'none'; }
+        function showMainApp() { document.getElementById('loginScreen').classList.add('hidden'); document.getElementById('mainApp').classList.remove('hidden'); document.getElementById('headerName').textContent = studentData.name || studentData.full_name || studentData.student_name || 'Student'; document.getElementById('headerAdmission').textContent = studentData.admission_number || ''; }
+        function logout() { localStorage.removeItem('mtti_session'); studentData = null; resultsData = []; paymentsData = null; document.getElementById('mainApp').classList.add('hidden'); document.getElementById('loginScreen').classList.remove('hidden'); document.getElementById('admissionInput').value = ''; document.getElementById('passwordInput').value = ''; }
+        function showScreen(name, el) { document.querySelectorAll('.screen').forEach(s => s.classList.remove('active')); document.getElementById(name + 'Screen').classList.add('active'); document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active')); if (el) el.classList.add('active'); if (name === 'results' && resultsData.length > 0) renderResults(resultsData, 'allResults'); if (name === 'payments') loadPayments(); if (name === 'profile') loadProfile(); }
+        
+        async function loadDashboard() {
+            const admission = studentData.admission_number;
+            try {
+                const res = await fetch(`${API_BASE}/student-dashboard/${encodeURIComponent(admission)}`);
+                const data = await res.json(); console.log('Dashboard:', data);
+                if (data.success && data.stats) {
+                    document.getElementById('avgScore').textContent = data.stats.average_score + '%';
+                    document.getElementById('totalExams').textContent = data.stats.total_exams;
+                    document.getElementById('passedExams').textContent = data.stats.passed;
+                    document.getElementById('failedExams').textContent = data.stats.failed;
+                    if (data.results && data.results.length > 0) { resultsData = data.results; renderResults(data.results.slice(0, 5), 'recentResults'); }
+                    else document.getElementById('recentResults').innerHTML = '<div class="empty-state"><div class="empty-icon">📊</div>No exam results yet</div>';
+                    if (data.student) studentData = {...studentData, ...data.student};
+                    return;
+                }
+            } catch (e) { console.log('Dashboard not available, trying basic results'); }
+            
+            try {
+                const res = await fetch(`${API_BASE}/student-results/${encodeURIComponent(admission)}`);
+                const data = await res.json(); console.log('Results:', data);
+                let results = [];
+                if (Array.isArray(data)) results = data;
+                else if (data.success && Array.isArray(data.results)) results = data.results;
+                else if (data.data && Array.isArray(data.data)) results = data.data;
+                resultsData = results;
+                if (results.length > 0) {
+                    let sumPct = 0, passed = 0;
+                    results.forEach(r => { const max = parseFloat(r.max_score) || 100, score = parseFloat(r.score) || 0, pct = r.percentage ? parseFloat(r.percentage) : (score / max * 100); sumPct += pct; if (pct >= 50) passed++; });
+                    document.getElementById('avgScore').textContent = (sumPct / results.length).toFixed(1) + '%';
+                    document.getElementById('totalExams').textContent = results.length;
+                    document.getElementById('passedExams').textContent = passed;
+                    document.getElementById('failedExams').textContent = results.length - passed;
+                    renderResults(results.slice(0, 5), 'recentResults');
+                } else showEmptyResults();
+            } catch (err) { console.error(err); showEmptyResults(); }
+        }
+        
+        function showEmptyResults() { document.getElementById('recentResults').innerHTML = '<div class="empty-state"><div class="empty-icon">📊</div>No exam results yet<br><small style="color:#999">Results will appear here after you take exams</small></div>'; document.getElementById('avgScore').textContent = '--'; document.getElementById('totalExams').textContent = '0'; document.getElementById('passedExams').textContent = '0'; document.getElementById('failedExams').textContent = '0'; }
+        
+        function renderResults(results, containerId) {
+            if (!results || results.length === 0) { document.getElementById(containerId).innerHTML = '<div class="empty-state"><div class="empty-icon">📊</div>No results available</div>'; return; }
+            document.getElementById(containerId).innerHTML = results.map(r => {
+                const max = parseFloat(r.max_score) || 100, score = parseFloat(r.score) || 0, pct = r.percentage ? parseFloat(r.percentage) : (score / max * 100), grade = r.grade || getGrade(pct), gradeClass = 'grade-' + grade.charAt(0).toLowerCase(), medal = r.rank === 1 ? '🥇' : r.rank === 2 ? '🥈' : r.rank === 3 ? '🥉' : '';
+                return `<div class="result-item"><div class="result-info"><h4>${r.exam_name || r.unit_name || r.name || 'Exam'}</h4><span>${formatDate(r.exam_date || r.date)} · ${score}/${max}</span></div><div class="result-score"><div class="result-percentage" style="color: ${pct >= 50 ? 'var(--success)' : 'var(--danger)'}">${pct.toFixed(1)}%</div><div class="result-grade ${gradeClass}">${grade}</div>${r.rank ? `<div class="result-rank">${medal} Rank: ${r.rank}/${r.total_students || '?'}</div>` : ''}</div></div>`;
+            }).join('');
+        }
+        
+        async function loadPayments() {
+            if (paymentsData) { renderPayments(); return; }
+            document.getElementById('paymentsList').innerHTML = '<div class="loading"><div class="spinner"></div>Loading...</div>';
+            try {
+                const res = await fetch(`${API_BASE}/student-payments/${encodeURIComponent(studentData.admission_number)}`);
+                const data = await res.json(); console.log('Payments:', data);
+                if (data.success) { paymentsData = data; renderPayments(); }
+                else showNoPayments('Payment data not available');
+            } catch (err) { console.error(err); showNoPayments('Payment API not installed yet'); }
+        }
+        
+        function renderPayments() {
+            document.getElementById('feeBalance').textContent = 'KES ' + formatNumber(paymentsData.summary?.balance || 0);
+            document.getElementById('courseFee').textContent = 'KES ' + formatNumber(paymentsData.summary?.course_fee || 0);
+            document.getElementById('totalPaid').textContent = 'KES ' + formatNumber(paymentsData.summary?.total_paid || 0);
+            if (paymentsData.payments && paymentsData.payments.length > 0) document.getElementById('paymentsList').innerHTML = paymentsData.payments.map(p => `<div class="payment-item"><div class="payment-info"><h4>${p.receipt_no || 'Payment'}</h4><span>${formatDate(p.date)} · ${p.method || 'Cash'}</span></div><div class="payment-amount">KES ${formatNumber(p.amount)}</div></div>`).join('');
+            else document.getElementById('paymentsList').innerHTML = '<div class="empty-state"><div class="empty-icon">💳</div>No payments recorded yet</div>';
+        }
+        
+        function showNoPayments(msg) { document.getElementById('paymentsList').innerHTML = `<div class="empty-state"><div class="empty-icon">💳</div>${msg}<br><small style="color:#999;margin-top:10px;display:block">Contact admin for fee details</small></div>`; }
+        
+        function loadProfile() {
+            document.getElementById('profileName').textContent = studentData.name || studentData.full_name || studentData.student_name || 'Student';
+            document.getElementById('profileAdmission').textContent = studentData.admission_number || '';
+            document.getElementById('profileInfo').innerHTML = `<div class="info-row"><span class="info-label">Full Name</span><span class="info-value">${studentData.name || studentData.full_name || studentData.student_name || 'N/A'}</span></div><div class="info-row"><span class="info-label">Admission No.</span><span class="info-value">${studentData.admission_number || 'N/A'}</span></div><div class="info-row"><span class="info-label">Course</span><span class="info-value">${studentData.course_name || studentData.course || 'N/A'}</span></div><div class="info-row"><span class="info-label">Email</span><span class="info-value">${studentData.email || studentData.user_email || 'N/A'}</span></div><div class="info-row"><span class="info-label">Phone</span><span class="info-value">${studentData.phone || 'N/A'}</span></div><div class="info-row"><span class="info-label">Status</span><span class="info-value" style="color: var(--success);">${studentData.status || 'Active'}</span></div>`;
+        }
+        
+        function showInstallGuide() {
+            const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent), isAndroid = /Android/.test(navigator.userAgent);
+            let html = '';
+            if (isIOS) html = `<div class="install-step"><div class="step-num">1</div><div class="step-text"><strong>Tap the Share button</strong>Look for the share icon (square with arrow) at the bottom of Safari</div></div><div class="install-step"><div class="step-num">2</div><div class="step-text"><strong>Scroll down and tap "Add to Home Screen"</strong>This option has a + icon</div></div><div class="install-step"><div class="step-num">3</div><div class="step-text"><strong>Tap "Add"</strong>The app will appear on your home screen</div></div>`;
+            else if (isAndroid) html = `<div class="install-step"><div class="step-num">1</div><div class="step-text"><strong>Tap the menu (⋮)</strong>Look for 3 dots at the top right of Chrome</div></div><div class="install-step"><div class="step-num">2</div><div class="step-text"><strong>Tap "Add to Home screen"</strong>Or "Install app" if available</div></div><div class="install-step"><div class="step-num">3</div><div class="step-text"><strong>Tap "Add"</strong>The MTTI app will appear on your home screen</div></div>`;
+            else html = `<div class="install-step"><div class="step-num">1</div><div class="step-text"><strong>On Android Chrome:</strong>Tap menu (⋮) → "Add to Home screen"</div></div><div class="install-step"><div class="step-num">2</div><div class="step-text"><strong>On iPhone Safari:</strong>Tap Share → "Add to Home Screen"</div></div>`;
+            html += `<div style="margin-top: 20px; padding: 15px; background: #e8f4fd; border-radius: 10px; font-size: 13px;"><strong>✅ Benefits of installing:</strong><br>• Quick access from home screen<br>• Works offline for viewing results<br>• Feels like a native app<br>• No app store needed</div>`;
+            document.getElementById('installInstructions').innerHTML = html;
+            document.getElementById('installModal').classList.remove('hidden');
+        }
+        
+        function hideInstallGuide() { document.getElementById('installModal').classList.add('hidden'); }
+        
+        function generateTranscript() {
+            if (resultsData.length === 0) { alert('No results available for transcript'); return; }
+            let totalPct = 0, passed = 0;
+            resultsData.forEach(r => { const max = parseFloat(r.max_score) || 100, score = parseFloat(r.score) || 0, pct = r.percentage ? parseFloat(r.percentage) : (score / max * 100); totalPct += pct; if (pct >= 50) passed++; });
+            const avg = (totalPct / resultsData.length).toFixed(1);
+            document.getElementById('transcriptContent').innerHTML = `<div class="transcript-header"><h1 style="color: #1e3a5f; font-size: 24px;">🎓 MASOMOTELE TECHNICAL TRAINING INSTITUTE</h1><p>Sagaas Center, 4th Floor, Eldoret, Kenya</p><p><em>"Start Learning, Start Earning"</em></p><h2 style="margin-top: 20px;">ACADEMIC TRANSCRIPT</h2></div><div style="margin-bottom: 20px;"><p><strong>Student Name:</strong> ${studentData.name || studentData.full_name || studentData.student_name || 'N/A'}</p><p><strong>Admission Number:</strong> ${studentData.admission_number || 'N/A'}</p><p><strong>Course:</strong> ${studentData.course_name || studentData.course || 'N/A'}</p><p><strong>Date Generated:</strong> ${new Date().toLocaleDateString()}</p></div><table class="transcript-table"><thead><tr><th>Exam / Unit</th><th>Date</th><th>Score</th><th>%</th><th>Grade</th><th>Status</th></tr></thead><tbody>${resultsData.map(r => { const max = parseFloat(r.max_score) || 100, score = parseFloat(r.score) || 0, pct = r.percentage ? parseFloat(r.percentage) : (score / max * 100); return `<tr><td>${r.exam_name || r.unit_name || r.name || 'Exam'}</td><td>${formatDate(r.exam_date || r.date)}</td><td>${score}/${max}</td><td>${pct.toFixed(1)}%</td><td>${r.grade || getGrade(pct)}</td><td style="color: ${pct >= 50 ? 'green' : 'red'}">${pct >= 50 ? 'PASS' : 'FAIL'}</td></tr>`; }).join('')}</tbody></table><div style="margin-top: 30px; padding: 20px; background: #f5f5f5; border-radius: 8px;"><h3>Summary</h3><p><strong>Total Exams:</strong> ${resultsData.length} | <strong>Passed:</strong> ${passed} | <strong>Failed:</strong> ${resultsData.length - passed} | <strong>Average:</strong> ${avg}% | <strong>Grade:</strong> ${getGrade(parseFloat(avg))}</p></div><div style="margin-top: 50px; display: flex; justify-content: space-between;"><div style="text-align: center; width: 200px;"><div style="border-top: 1px solid #000; padding-top: 5px; margin-top: 50px;">Student Signature</div></div><div style="text-align: center; width: 200px;"><div style="border-top: 1px solid #000; padding-top: 5px; margin-top: 50px;">Principal's Signature</div></div></div>`;
+            document.getElementById('transcriptContainer').style.display = 'block'; window.print(); setTimeout(() => document.getElementById('transcriptContainer').style.display = 'none', 1000);
+        }
+        
+        function getGrade(pct) { if (pct >= 80) return 'A'; if (pct >= 70) return 'B+'; if (pct >= 60) return 'B'; if (pct >= 50) return 'C'; if (pct >= 40) return 'D'; return 'E'; }
+        function formatDate(d) { if (!d) return 'N/A'; try { return new Date(d).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' }); } catch { return d; } }
+        function formatNumber(n) { return Number(n || 0).toLocaleString(); }
+        
+        if ('serviceWorker' in navigator) navigator.serviceWorker.register('sw.js').catch(e => console.log('SW:', e));
+        document.getElementById('installModal').addEventListener('click', (e) => { if (e.target.classList.contains('modal-overlay')) hideInstallGuide(); });
+    </script>
+</body>
+</html>

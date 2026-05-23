@@ -1,0 +1,978 @@
+<!DOCTYPE html><!-- IELTS PREP v4.2 - MTTI SAGAAS - CHECK THIS IN VIEW SOURCE -->
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>IELTS Adaptive Prep — MTTI Sagaas</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;1,400&family=DM+Sans:wght@300;400;500;600&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root{--ink:#0f1117;--paper:#faf8f3;--cream:#f0ece0;--green:#1a6b3a;--gl:#2d8f52;--gp:#e8f5ed;--gold:#c9922a;--gol:#f0c96a;--red:#c0392b;--blue:#1a4a7a;--muted:#6b6860;--border:#d8d3c8;--r:12px}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'DM Sans',sans-serif;background:var(--paper);color:var(--ink);min-height:100vh;overflow-x:hidden}
+
+/* SPLASH */
+#splash{position:fixed;inset:0;background:var(--ink);display:flex;flex-direction:column;align-items:center;justify-content:center;z-index:1000;transition:opacity .6s}
+#splash.hide{opacity:0;pointer-events:none}
+.slogo{font-family:'Playfair Display',serif;font-size:clamp(2rem,6vw,3.5rem);color:var(--paper);text-align:center;line-height:1.1}
+.slogo span{color:var(--gol)}
+.ssub{color:#888;font-size:.9rem;margin-top:.5rem;letter-spacing:.15em;text-transform:uppercase}
+.sbar{width:200px;height:3px;background:#222;border-radius:2px;margin-top:2rem;overflow:hidden}
+.sbar-fill{height:100%;background:linear-gradient(90deg,var(--gol),var(--gl));border-radius:2px;animation:ld 1.8s ease forwards}
+@keyframes ld{from{width:0}to{width:100%}}
+
+/* APP */
+#app{display:none;flex-direction:column;min-height:100vh}
+#app.on{display:flex}
+nav{background:var(--ink);padding:.75rem 1.5rem;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:100}
+.nbrand{font-family:'Playfair Display',serif;color:var(--paper);font-size:1.1rem}
+.nbrand span{color:var(--gol)}
+.bbadge{background:var(--gold);color:var(--ink);font-weight:700;padding:.2rem .6rem;border-radius:4px;font-size:.85rem;font-family:'DM Mono',monospace}
+main{flex:1;padding:1.5rem;max-width:860px;margin:0 auto;width:100%}
+.screen{display:none}
+.screen.active{display:block}
+
+/* BUTTONS */
+.btn{display:inline-flex;align-items:center;gap:.5rem;padding:.75rem 1.5rem;border-radius:8px;font-family:'DM Sans',sans-serif;font-weight:600;font-size:.9rem;cursor:pointer;border:none;transition:all .2s}
+.btn-g{background:var(--green);color:#fff}.btn-g:hover{background:var(--gl)}
+.btn-gold{background:var(--gold);color:#fff}
+.btn-o{background:transparent;border:2px solid var(--border);color:var(--ink)}.btn-o:hover{border-color:var(--green);color:var(--green)}
+.btn-sm{padding:.5rem 1rem;font-size:.82rem}
+.btn:disabled{opacity:.5;cursor:not-allowed}
+
+/* HOME */
+.hero{text-align:center;padding:2rem 0 1.5rem}
+.hero h1{font-family:'Playfair Display',serif;font-size:clamp(1.8rem,5vw,2.8rem);line-height:1.2;margin-bottom:.75rem}
+.hero h1 em{font-style:italic;color:var(--gold)}
+.hero p{color:var(--muted);max-width:500px;margin:0 auto 1.5rem;line-height:1.6}
+.sgrid{display:grid;grid-template-columns:repeat(2,1fr);gap:1rem;margin-bottom:1.5rem}
+@media(min-width:600px){.sgrid{grid-template-columns:repeat(4,1fr)}}
+.scard{background:#fff;border:2px solid var(--border);border-radius:var(--r);padding:1.2rem 1rem;text-align:center;cursor:pointer;transition:all .2s}
+.scard:hover{border-color:var(--green);background:var(--gp)}
+.scard-icon{font-size:1.8rem;margin-bottom:.5rem}
+.scard-name{font-weight:600;font-size:.85rem}
+.scard-prog{font-size:.75rem;color:var(--muted);margin-top:.25rem}
+.pbar{height:4px;background:var(--cream);border-radius:2px;margin-top:.5rem;overflow:hidden}
+.pfill{height:100%;background:var(--green);border-radius:2px;transition:width .5s}
+
+/* DIAGNOSTIC */
+.dhead{background:linear-gradient(135deg,var(--ink),#1a2a1a);color:#fff;border-radius:var(--r);padding:1.5rem;margin-bottom:1.5rem}
+.dhead h2{font-family:'Playfair Display',serif;font-size:1.5rem;margin-bottom:.3rem}
+.dhead p{color:#aaa;font-size:.85rem}
+.qctr{font-family:'DM Mono',monospace;font-size:.8rem;color:var(--gol);margin-top:.5rem}
+.qcard{background:#fff;border:1px solid var(--border);border-radius:var(--r);padding:1.5rem;margin-bottom:1rem;box-shadow:0 2px 8px rgba(0,0,0,.06)}
+.qtag{display:inline-block;padding:.2rem .7rem;border-radius:20px;font-size:.72rem;font-weight:600;text-transform:uppercase;letter-spacing:.08em;margin-bottom:.75rem}
+.tl{background:#e8f0f8;color:var(--blue)}
+.tr{background:#fef3e2;color:var(--gold)}
+.tw{background:var(--gp);color:var(--green)}
+.ts{background:#fde8e8;color:var(--red)}
+.qtext{font-size:1rem;line-height:1.6;margin-bottom:1rem;font-weight:500}
+
+/* OPTIONS — the critical fix */
+.opt{display:block;width:100%;padding:.85rem 1rem;border:2px solid var(--border);border-radius:8px;cursor:pointer;font-size:.9rem;text-align:left;background:#fff;font-family:'DM Sans',sans-serif;margin-bottom:.5rem;transition:border-color .15s,background .15s}
+.opt:hover:not([disabled]){border-color:var(--green);background:var(--gp)}
+.opt[disabled]{cursor:default;pointer-events:none}
+.opt.right{border-color:#27ae60!important;background:#eafaf1!important;font-weight:600;color:#1a5c35!important}
+.opt.wrong{border-color:var(--red)!important;background:#fdecea!important;color:var(--red)!important}
+
+/* FEEDBACK BOX — hidden by default, shown by class */
+.fb{margin-top:.85rem;padding:.9rem 1rem;border-radius:8px;font-size:.86rem;line-height:1.6;display:none}
+.fb.ok{display:block;background:var(--gp);border:2px solid #27ae60}
+.fb.bad{display:block;background:#fdecea;border:2px solid var(--red)}
+
+/* RESULT */
+.rcard{background:linear-gradient(135deg,var(--ink),#0a2a15);color:#fff;border-radius:var(--r);padding:2rem;text-align:center;margin-bottom:1.5rem}
+.rband{font-family:'Playfair Display',serif;font-size:4rem;color:var(--gol);line-height:1}
+.rlabel{font-size:.85rem;color:#aaa;margin-top:.3rem;letter-spacing:.1em;text-transform:uppercase}
+.rdesc{margin-top:1rem;color:#ccc;font-size:.9rem;max-width:400px;margin-left:auto;margin-right:auto;line-height:1.5}
+.sbdown{display:grid;grid-template-columns:repeat(2,1fr);gap:.75rem;margin-bottom:1.5rem}
+@media(min-width:500px){.sbdown{grid-template-columns:repeat(4,1fr)}}
+.sbitem{background:#fff;border:1px solid var(--border);border-radius:var(--r);padding:1rem;text-align:center}
+.sbscore{font-family:'DM Mono',monospace;font-size:1.5rem;font-weight:700;color:var(--green)}
+.sbname{font-size:.75rem;color:var(--muted);margin-top:.2rem}
+.wbox{background:#fff;border:1px solid var(--border);border-radius:var(--r);padding:1.25rem;margin-bottom:1rem}
+.wbox h3{font-size:.9rem;font-weight:600;margin-bottom:.75rem}
+.wrow{display:flex;align-items:center;gap:.75rem;margin-bottom:.6rem}
+.wlabel{width:80px;font-size:.8rem;color:var(--muted)}
+.wbw{flex:1;height:8px;background:var(--cream);border-radius:4px;overflow:hidden}
+.wbf{height:100%;border-radius:4px}
+.wpct{font-size:.75rem;font-family:'DM Mono',monospace;width:35px;text-align:right}
+
+/* OBJECTIVES SLIDE */
+.obj-slide{background:linear-gradient(135deg,#fff,var(--gp));border:2px solid var(--green);border-radius:var(--r);padding:1.75rem;margin-bottom:1.5rem}
+.obj-slide h2{font-family:'Playfair Display',serif;font-size:1.4rem;color:var(--green);margin-bottom:1rem}
+.obj-list{list-style:none;display:flex;flex-direction:column;gap:.6rem}
+.obj-list li{display:flex;align-items:flex-start;gap:.6rem;font-size:.9rem;line-height:1.5}
+.obj-list li::before{content:'🎯';flex-shrink:0}
+.obj-meta{display:flex;gap:.75rem;margin-top:1.25rem;flex-wrap:wrap}
+.obj-chip{background:var(--green);color:#fff;padding:.3rem .8rem;border-radius:20px;font-size:.75rem;font-weight:600}
+
+/* MODULES */
+.mlist{display:flex;flex-direction:column;gap:1rem}
+.mitem{background:#fff;border:1px solid var(--border);border-radius:var(--r);overflow:hidden}
+.mhead{padding:1.2rem 1.5rem;display:flex;align-items:center;gap:1rem;cursor:pointer;transition:background .2s}
+.mhead:hover{background:var(--cream)}
+.micon{font-size:1.5rem;width:40px;text-align:center}
+.minfo{flex:1}
+.mtitle{font-weight:600;font-size:1rem}
+.msub{font-size:.8rem;color:var(--muted);margin-top:.1rem}
+.mstatus{font-size:.75rem;padding:.25rem .75rem;border-radius:20px;font-weight:600;background:var(--gp);color:var(--green)}
+.mcontent{display:none;padding:0 1.5rem 1.5rem;border-top:1px solid var(--border)}
+.mcontent.open{display:block}
+.lgrid{display:grid;gap:.5rem;margin-top:1rem}
+.litem{display:flex;align-items:center;gap:.75rem;padding:.7rem 1rem;border:1px solid var(--border);border-radius:8px;cursor:pointer;transition:all .2s;background:#fafafa}
+.litem:hover{border-color:var(--green);background:var(--gp)}
+.lnum{font-family:'DM Mono',monospace;font-size:.75rem;color:var(--muted);width:20px}
+.ltitle{flex:1;font-size:.88rem;font-weight:500}
+.ltag{font-size:.7rem;padding:.15rem .5rem;border-radius:4px;background:var(--cream);color:var(--muted)}
+
+/* PRACTICE */
+.phead{display:flex;align-items:center;gap:1rem;margin-bottom:1.5rem;flex-wrap:wrap}
+.tbadge{font-family:'DM Mono',monospace;background:var(--ink);color:var(--gol);padding:.4rem .9rem;border-radius:6px;font-size:.9rem}
+.aipanel{background:#f0f8ff;border:1px solid #d0d8f0;border-radius:var(--r);padding:1.25rem;margin-top:1rem}
+.aihead{font-weight:600;font-size:.85rem;color:var(--blue);margin-bottom:.75rem}
+.thinking{display:flex;align-items:center;gap:.5rem;color:var(--muted);font-size:.85rem}
+.dp{display:flex;gap:4px}
+.dp span{width:6px;height:6px;background:var(--green);border-radius:50%;animation:pu 1.2s ease infinite}
+.dp span:nth-child(2){animation-delay:.2s}.dp span:nth-child(3){animation-delay:.4s}
+@keyframes pu{0%,80%,100%{transform:scale(.6);opacity:.4}40%{transform:scale(1);opacity:1}}
+.wprompt{background:var(--gp);border-left:4px solid var(--green);border-radius:0 var(--r) var(--r) 0;padding:1.25rem;margin-bottom:1rem;font-size:.9rem;line-height:1.6}
+.wprompt strong{display:block;margin-bottom:.5rem;color:var(--green);font-size:.8rem;text-transform:uppercase;letter-spacing:.08em}
+.wc{font-size:.78rem;color:var(--muted);text-align:right;margin-top:.3rem;font-family:'DM Mono',monospace}
+.cgrid{display:grid;grid-template-columns:repeat(2,1fr);gap:.5rem;margin-top:.75rem}
+.cchip{padding:.6rem;border-radius:8px;text-align:center;font-size:.75rem;background:#f0f8f0;border:1px solid #c0e0c8}
+.cchip .cs{font-family:'DM Mono',monospace;font-size:1.2rem;font-weight:700;display:block;color:var(--green)}
+.sptopic{font-size:1.05rem;font-weight:600;margin-bottom:.75rem;line-height:1.4}
+.sppart{font-size:.75rem;text-transform:uppercase;letter-spacing:.1em;color:var(--red);font-weight:600;margin-bottom:.5rem}
+.spcues li{font-size:.85rem;color:var(--muted);margin-bottom:.3rem;margin-left:1.2rem}
+.model-answer{background:linear-gradient(135deg,#f8fff8,#fff);border:2px solid #27ae60;border-radius:var(--r);padding:1.25rem;margin-top:1rem}
+.model-answer h4{color:var(--green);font-size:.85rem;text-transform:uppercase;letter-spacing:.08em;margin-bottom:.75rem}
+.model-answer p{font-size:.88rem;line-height:1.8;font-style:italic;color:var(--ink)}
+
+/* VOCAB */
+.vcard{background:#fff;border:2px solid var(--border);border-radius:var(--r);padding:2rem 1.5rem;text-align:center;cursor:pointer;min-height:200px;display:flex;flex-direction:column;align-items:center;justify-content:center;position:relative;transition:border-color .2s}
+.vcard:hover{border-color:var(--green)}
+.vword{font-family:'Playfair Display',serif;font-size:2rem;margin-bottom:.5rem;transition:font-size .3s}
+.vtype{font-size:.75rem;color:var(--muted);text-transform:uppercase;letter-spacing:.1em;margin-bottom:.75rem}
+.vdef{font-size:.9rem;line-height:1.6;color:var(--muted);display:none;max-width:400px}
+.vcard.flipped .vdef{display:block}
+.vcard.flipped .vword{font-size:1.2rem;color:var(--muted)}
+.vhint{position:absolute;bottom:.75rem;right:1rem;font-size:.72rem;color:#bbb}
+.vex{font-size:.82rem;font-style:italic;color:var(--blue);margin-top:.5rem;display:none}
+.vcard.flipped .vex{display:block}
+
+/* DASH */
+.dgrid{display:grid;grid-template-columns:1fr 1fr;gap:1rem;margin-bottom:1.5rem}
+@media(min-width:600px){.dgrid{grid-template-columns:repeat(4,1fr)}}
+.dstat{background:#fff;border:1px solid var(--border);border-radius:var(--r);padding:1.2rem;text-align:center}
+.dnum{font-family:'DM Mono',monospace;font-size:1.8rem;font-weight:700;color:var(--green)}
+.dlabel{font-size:.75rem;color:var(--muted);margin-top:.2rem}
+
+/* TABS */
+.tabs{display:flex;background:var(--cream);border-radius:10px;padding:3px;margin-bottom:1.5rem;overflow-x:auto;gap:0}
+.tab{padding:.55rem 1rem;border-radius:7px;font-size:.82rem;font-weight:500;cursor:pointer;border:none;background:transparent;color:var(--muted);transition:all .2s;white-space:nowrap;font-family:'DM Sans',sans-serif}
+.tab.active{background:#fff;color:var(--ink);font-weight:600;box-shadow:0 1px 4px rgba(0,0,0,.08)}
+
+/* MISC */
+.backbtn{display:inline-flex;align-items:center;gap:.4rem;color:var(--muted);font-size:.85rem;cursor:pointer;margin-bottom:1rem;padding:.4rem 0;background:none;border:none;font-family:'DM Sans',sans-serif}
+.backbtn:hover{color:var(--green)}
+.passage{background:#fff;border:1px solid var(--border);border-radius:var(--r);padding:1.25rem;margin-bottom:1rem;max-height:280px;overflow-y:auto;font-size:.88rem;line-height:1.8}
+.qinput{width:100%;padding:.75rem;border:2px solid var(--border);border-radius:8px;font-family:'DM Sans',sans-serif;font-size:.9rem;resize:vertical}
+.qinput:focus{outline:none;border-color:var(--green)}
+.toast{position:fixed;bottom:1.5rem;left:50%;transform:translateX(-50%) translateY(100px);background:var(--ink);color:#fff;padding:.75rem 1.5rem;border-radius:8px;font-size:.88rem;z-index:999;transition:transform .3s}
+.toast.show{transform:translateX(-50%) translateY(0)}
+.bnav{background:#fff;border-top:1px solid var(--border);display:flex;position:sticky;bottom:0;z-index:100}
+.bni{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:.7rem .5rem;cursor:pointer;border:none;background:transparent;color:var(--muted);font-size:.7rem;gap:.2rem;transition:color .2s;font-family:'DM Sans',sans-serif}
+.bni.active,.bni:hover{color:var(--green)}
+.bni-icon{font-size:1.2rem}
+::-webkit-scrollbar{width:5px;height:5px}
+::-webkit-scrollbar-track{background:var(--cream)}
+::-webkit-scrollbar-thumb{background:var(--border);border-radius:3px}
+</style>
+<script type="text/javascript">(function(c,l,a,r,i,t,y){c[a]=c[a]||function(){(c[a].q=c[a].q||[]).push(arguments)};t=l.createElement(r);t.async=1;t.src="https://www.clarity.ms/tag/"+i;y=l.getElementsByTagName(r)[0];y.parentNode.insertBefore(t,y);})(window,document,"clarity","script","wg31zlwbt9");</script>\n</head>
+<body>
+
+<div id="splash">
+  <div class="slogo">IELTS<span>Prep</span><br><small style="font-size:.4em;letter-spacing:.2em;color:#666;font-family:'DM Sans',sans-serif">POWERED BY MTTI SAGAAS</small></div>
+  <div class="ssub">Adaptive AI Learning</div>
+  <div class="sbar"><div class="sbar-fill"></div></div>
+</div>
+
+<div id="app">
+  <nav>
+    <div class="nbrand">IELTS<span>Prep</span></div>
+    <div style="display:flex;align-items:center;gap:.5rem;color:#aaa;font-size:.8rem">Band: <span class="bbadge" id="navBand">—</span></div>
+  </nav>
+
+  <main>
+    <!-- HOME -->
+    <div class="screen active" id="sHome">
+      <div class="hero">
+        <h1>Master IELTS<br><em>At Your Own Pace</em></h1>
+        <p>Adaptive AI preparation that learns your weak areas and focuses practice where it matters most.</p>
+        <button class="btn btn-gold" onclick="startDiag()">🎯 Take Diagnostic Test</button>
+        &nbsp;
+        <button class="btn btn-o" onclick="go('sMods')">Browse Modules</button>
+      </div>
+      <div class="sgrid">
+        <div class="scard" onclick="go('sMods')"><div class="scard-icon">🎧</div><div class="scard-name">Listening</div><div class="scard-prog" id="ph-l">Not started</div><div class="pbar"><div class="pfill" id="pb-l" style="width:0%"></div></div></div>
+        <div class="scard" onclick="go('sMods')"><div class="scard-icon">📖</div><div class="scard-name">Reading</div><div class="scard-prog" id="ph-r">Not started</div><div class="pbar"><div class="pfill" id="pb-r" style="width:0%"></div></div></div>
+        <div class="scard" onclick="go('sMods')"><div class="scard-icon">✍️</div><div class="scard-name">Writing</div><div class="scard-prog" id="ph-w">Not started</div><div class="pbar"><div class="pfill" id="pb-w" style="width:0%"></div></div></div>
+        <div class="scard" onclick="go('sMods')"><div class="scard-icon">🗣️</div><div class="scard-name">Speaking</div><div class="scard-prog" id="ph-s">Not started</div><div class="pbar"><div class="pfill" id="pb-s" style="width:0%"></div></div></div>
+      </div>
+    </div>
+
+    <!-- DIAGNOSTIC -->
+    <div class="screen" id="sDiag">
+      <div class="dhead">
+        <h2>Diagnostic Assessment</h2>
+        <p>20 questions across all 4 skills — about 15 minutes</p>
+        <div class="qctr" id="qCtr">Question 1 of 20</div>
+      </div>
+      <div id="diagContent"></div>
+      <div style="display:flex;gap:.75rem;margin-top:.5rem;flex-wrap:wrap">
+        <button class="btn btn-g" id="diagBtn" onclick="diagNext()" disabled>Next →</button>
+        <button class="btn btn-o btn-sm" onclick="go('sHome')">← Exit</button>
+      </div>
+    </div>
+
+    <!-- RESULT -->
+    <div class="screen" id="sResult">
+      <div class="rcard">
+        <div class="rlabel">Estimated Band</div>
+        <div class="rband" id="rBand">—</div>
+        <div class="rdesc" id="rDesc"></div>
+      </div>
+      <div class="sbdown" id="sBDown"></div>
+      <div class="wbox"><h3>🎯 Focus Areas</h3><div id="wAreas"></div></div>
+      <div style="display:flex;gap:.75rem;flex-wrap:wrap">
+        <button class="btn btn-g" onclick="go('sMods')">📚 Start Learning →</button>
+        <button class="btn btn-o" onclick="startDiag()">Retake Diagnostic</button>
+      </div>
+    </div>
+
+    <!-- MODULES -->
+    <div class="screen" id="sMods">
+      <div class="tabs">
+        <button class="tab active" onclick="setTab('all',this)">All Skills</button>
+        <button class="tab" onclick="setTab('listening',this)">🎧 Listening</button>
+        <button class="tab" onclick="setTab('reading',this)">📖 Reading</button>
+        <button class="tab" onclick="setTab('writing',this)">✍️ Writing</button>
+        <button class="tab" onclick="setTab('speaking',this)">🗣️ Speaking</button>
+      </div>
+      <div class="mlist" id="modList"></div>
+    </div>
+
+    <!-- PRACTICE -->
+    <div class="screen" id="sPrac">
+      <button class="backbtn" onclick="go('sMods')">← Back to Modules</button>
+      <div class="phead">
+        <div><h2 id="pracTitle" style="font-family:'Playfair Display',serif;font-size:1.3rem"></h2><div id="pracSub" style="font-size:.82rem;color:var(--muted);margin-top:.2rem"></div></div>
+        <div class="tbadge" id="timer">⏱ 00:00</div>
+      </div>
+      <div id="pracContent"></div>
+    </div>
+
+    <!-- VOCAB -->
+    <div class="screen" id="sVocab">
+      <button class="backbtn" onclick="go('sMods')">← Back</button>
+      <h2 style="font-family:'Playfair Display',serif;margin-bottom:1rem">Academic Vocabulary</h2>
+      <div class="tabs" id="vtabs">
+        <button class="tab active" onclick="setVT('environment',this)">Environment</button>
+        <button class="tab" onclick="setVT('technology',this)">Technology</button>
+        <button class="tab" onclick="setVT('health',this)">Health</button>
+        <button class="tab" onclick="setVT('education',this)">Education</button>
+        <button class="tab" onclick="setVT('society',this)">Society</button>
+      </div>
+      <div id="vocabContent"></div>
+    </div>
+
+    <!-- DASH -->
+    <div class="screen" id="sDash">
+      <h2 style="font-family:'Playfair Display',serif;margin-bottom:1.25rem">Your Progress</h2>
+      <div class="dgrid">
+        <div class="dstat"><div class="dnum" id="dS">0</div><div class="dlabel">Sessions</div></div>
+        <div class="dstat"><div class="dnum" id="dB">—</div><div class="dlabel">Current Band</div></div>
+        <div class="dstat"><div class="dnum" id="dSt">0</div><div class="dlabel">Day Streak 🔥</div></div>
+        <div class="dstat"><div class="dnum" id="dQ">0</div><div class="dlabel">Questions Done</div></div>
+      </div>
+      <div class="wbox"><h3>📊 Skill Accuracy</h3><div id="dAcc"></div></div>
+      <div class="wbox" id="dImpBox"><h3>🎯 Areas of Improvement</h3><div id="dImp"></div></div>
+      <div class="wbox" id="dRetBox"><h3>🔄 Diagnostic Retake History</h3><div id="dRet"></div></div>
+      <div class="wbox"><h3>💡 Today's Recommendation</h3><div id="dRec" style="font-size:.88rem;color:var(--muted);line-height:1.6"></div></div>
+    </div>
+  </main>
+
+  <div class="bnav">
+    <button class="bni active" onclick="nav('sHome',this)"><div class="bni-icon">🏠</div>Home</button>
+    <button class="bni" onclick="nav('sMods',this)"><div class="bni-icon">📚</div>Modules</button>
+    <button class="bni" onclick="nav('sVocab',this)"><div class="bni-icon">📝</div>Vocab</button>
+    <button class="bni" onclick="nav('sDash',this)"><div class="bni-icon">📊</div>Progress</button>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+// ── STATE ──────────────────────────────────────────────────────────────────
+var ST = JSON.parse(localStorage.getItem('ielts_v3')||'null') || {
+  band:null, acc:{l:50,r:50,w:50,s:50},
+  sessions:0, streak:0, lastDate:null, qDone:0, diagDone:false,
+  retakeHistory:[], improvements:{l:[],r:[],w:[],s:[]}
+};
+if(!ST.retakeHistory) ST.retakeHistory=[];
+if(!ST.improvements) ST.improvements={l:[],r:[],w:[],s:[]};
+function save(){ localStorage.setItem('ielts_v3',JSON.stringify(ST)); }
+
+// ── BOOT ──────────────────────────────────────────────────────────────────
+setTimeout(function(){
+  document.getElementById('splash').classList.add('hide');
+  document.getElementById('app').classList.add('on');
+  refreshHome();
+  renderVocab('environment'); // pre-load vocab
+},2000);
+
+function refreshHome(){
+  document.getElementById('navBand').textContent = ST.band ? ST.band.toFixed(1) : '—';
+  var map = {l:'listening',r:'reading',w:'writing',s:'speaking'};
+  Object.keys(map).forEach(function(k){
+    var acc = ST.acc[k];
+    document.getElementById('ph-'+k).textContent = ST.diagDone ? 'Band ~'+(acc/12.5+4).toFixed(1) : 'Not started';
+    document.getElementById('pb-'+k).style.width = ST.diagDone ? acc+'%' : '0%';
+  });
+}
+
+// ── NAVIGATION ────────────────────────────────────────────────────────────
+function go(id){
+  document.querySelectorAll('.screen').forEach(function(s){s.classList.remove('active');});
+  document.getElementById(id).classList.add('active');
+  if(id==='sDash') renderDash();
+  if(id==='sMods') renderMods('all');
+  if(id==='sVocab') renderVocab(vT);
+}
+function nav(id,el){
+  document.querySelectorAll('.bni').forEach(function(b){b.classList.remove('active');});
+  el.classList.add('active');
+  go(id);
+}
+
+// ── DIAGNOSTIC DATA ───────────────────────────────────────────────────────
+var QS = [
+  {sk:'l',tp:'mcq',tx:'You hear: "The meeting has been postponed to next Thursday." What happened to the meeting?',op:['Cancelled permanently','Moved to a later date','Moved to an earlier date','Held as planned'],an:1,ex:'Postponed means moved to a later time — not cancelled or moved earlier.'},
+  {sk:'l',tp:'mcq',tx:'A student asks: "Could you possibly explain that again?" What is the student doing?',op:['Complaining','Requesting clarification','Offering help','Giving instructions'],an:1,ex:'"Could you possibly..." is a polite way of asking someone to re-explain something.'},
+  {sk:'l',tp:'fill',tx:'Complete: "The library opens at 8am and closes at ___" — the speaker said "ten in the evening".',an:'10pm',ex:'Ten in the evening = 10pm. Always write times in short form in IELTS.'},
+  {sk:'l',tp:'mcq',tx:'Which word signals contrast? "The results were promising; _____, more research is needed."',op:['furthermore','however','therefore','similarly'],an:1,ex:'"However" signals a contrast between two ideas — the results were good BUT more work is needed.'},
+  {sk:'l',tp:'mcq',tx:'A professor says "This will definitely be on the exam." What does "definitely" mean?',op:['Possibly','Never','Certainly','Sometimes'],an:2,ex:'"Definitely" means with absolute certainty — there is no doubt.'},
+  {sk:'r',tp:'mcq',tx:'"Despite the economic downturn, the company maintained its market share." This tells us:',op:['The company struggled','The company succeeded despite difficulty','The economy improved','The company lost customers'],an:1,ex:'"Despite" shows something happened contrary to expectation — the company succeeded even when things were bad.'},
+  {sk:'r',tp:'mcq',tx:'The word "ubiquitous" in "Smartphones have become ubiquitous" most likely means:',op:['Expensive','Dangerous','Present everywhere','Unreliable'],an:2,ex:'"Ubiquitous" means found or appearing everywhere — it\'s a key academic vocabulary word.'},
+  {sk:'r',tp:'mcq',tx:'Which text structure does "Firstly... Secondly... Finally..." indicate?',op:['Cause and effect','Comparison','Sequential/list','Problem-solution'],an:2,ex:'"Firstly, Secondly, Finally" signal items presented in order — a sequential or list structure.'},
+  {sk:'r',tp:'mcq',tx:'"The study was conducted with 500 participants over 12 months." This sentence provides:',op:['An opinion','Methodological details','A conclusion','A hypothesis'],an:1,ex:'Participants and duration describe how the study was done — this is methodology, not opinion or conclusion.'},
+  {sk:'r',tp:'mcq',tx:'"Critics argue that... proponents counter that..." The writer is:',op:['Giving personal opinion','Describing a debate','Explaining a process','Summarising results'],an:1,ex:'"Critics argue" vs "proponents counter" = two opposing viewpoints being presented — a debate structure.'},
+  {sk:'w',tp:'mcq',tx:'In IELTS Writing Task 2, the MOST important requirement is:',op:['Using complex vocabulary only','Addressing all parts of the question','Writing more than 400 words','Using bullet points'],an:1,ex:'Task Achievement means fully addressing all parts of the question — this carries the most weight in scoring.'},
+  {sk:'w',tp:'mcq',tx:'Which sentence is most appropriate for academic writing?',op:['I think pollution is really bad','Pollution poses significant environmental challenges','Pollution is super horrible','We all know pollution causes problems'],an:1,ex:'Academic writing requires formal, precise language. Only option B is formal and specific.'},
+  {sk:'w',tp:'mcq',tx:'Task 1 Academic asks you to describe a graph. You should:',op:['Give your opinion on the data','Describe every single data point','Summarise key trends and notable features','Explain why the trends occurred'],an:2,ex:'Task 1 = identify and summarise the main features and trends. Do not give opinions or list every number.'},
+  {sk:'w',tp:'mcq',tx:'Which linking word shows a reason?',op:['However','Furthermore','Because','Nevertheless'],an:2,ex:'"Because" introduces a cause or reason. "However" = contrast, "Furthermore" = addition, "Nevertheless" = concession.'},
+  {sk:'w',tp:'mcq',tx:'Coherence in writing refers to:',op:['Using long sentences','Ideas flowing logically and connecting clearly','Using academic vocabulary','Writing many paragraphs'],an:1,ex:'Coherence = logical flow and clear connections between ideas throughout the text.'},
+  {sk:'s',tp:'mcq',tx:'In IELTS Speaking Part 2, you have ___ minute(s) to prepare before speaking.',op:['30 seconds','1 minute','2 minutes','3 minutes'],an:1,ex:'Part 2 gives exactly 1 minute to prepare notes before you speak for 1–2 minutes.'},
+  {sk:'s',tp:'mcq',tx:'Best response to "Do you like cooking?" in Part 1?',op:['"Yes."','"I quite enjoy cooking, especially trying new recipes on weekends."','"Cooking is a very important life skill."','"I cannot answer that question."'],an:1,ex:'A natural, extended answer with specific personal detail shows real communicative ability — avoid one-word answers.'},
+  {sk:'s',tp:'mcq',tx:'What does the IELTS examiner assess in Speaking?',op:['Grammar only','Accent and pronunciation only','Fluency, vocabulary, grammar, and pronunciation','Speed of speech only'],an:2,ex:'All four criteria are assessed equally: Fluency & Coherence, Lexical Resource, Grammatical Range, Pronunciation.'},
+  {sk:'s',tp:'mcq',tx:'If you do not understand the examiner\'s question, you should:',op:['Stay silent','Make something up','Politely ask for clarification','Say "I don\'t know" immediately'],an:2,ex:'Asking for clarification politely is acceptable and actually demonstrates good communication competence.'},
+  {sk:'s',tp:'mcq',tx:'Which phrase best demonstrates spoken fluency?',op:['"Um... I think... maybe yes"','"Well, that\'s an interesting point. I\'d say that..."','"I must now answer your question formally."','"Yes. No. Maybe."'],an:1,ex:'Starting with "Well..." and elaborating thoughtfully shows natural, confident spoken fluency patterns.'}
+];
+
+// ── DIAGNOSTIC ENGINE ─────────────────────────────────────────────────────
+var dIdx=0, dAnss=[], dShown=false;
+
+function startDiag(){
+  dIdx=0; dAnss=[]; dShown=false;
+  go('sDiag');
+  showQ();
+}
+
+function showQ(){
+  dShown=false;
+  var q=QS[dIdx];
+  document.getElementById('qCtr').textContent='Question '+(dIdx+1)+' of '+QS.length;
+  var btn=document.getElementById('diagBtn');
+  btn.disabled=true;
+  btn.textContent='Next →';
+
+  var h='<div class="qcard">'
+    +'<span class="qtag t'+q.sk+'">'+{l:'Listening',r:'Reading',w:'Writing',s:'Speaking'}[q.sk]+'</span>'
+    +'<div class="qtext">'+q.tx+'</div>';
+
+  if(q.tp==='mcq'){
+    for(var i=0;i<q.op.length;i++){
+      h+='<button class="opt" id="op'+i+'" onclick="pick('+i+')">'+q.op[i]+'</button>';
+    }
+  } else {
+    h+='<input class="qinput" id="fillAns" placeholder="Type your answer here..." style="height:48px" oninput="document.getElementById(\'diagBtn\').disabled=(this.value.trim()===\'\')"/>';
+  }
+  h+='<div id="fb" style="display:none;margin-top:.85rem;padding:.9rem 1rem;border-radius:8px;font-size:.86rem;line-height:1.6;border:2px solid #27ae60"></div></div>';
+  document.getElementById('diagContent').innerHTML=h;
+}
+
+function pick(i){
+  if(dShown) return;
+  dShown=true;
+  dAnss[dIdx]=i;
+  var q=QS[dIdx];
+
+  // Apply colour via BOTH class AND inline style
+  var cb=document.getElementById('op'+q.an);
+  if(cb){cb.classList.add('right');cb.style.borderColor='#27ae60';cb.style.background='#eafaf1';cb.style.color='#1a5c35';cb.style.fontWeight='600';}
+  if(i!==q.an){var wb=document.getElementById('op'+i);if(wb){wb.classList.add('wrong');wb.style.borderColor='#c0392b';wb.style.background='#fdecea';wb.style.color='#c0392b';}}
+
+  // Disable all options after colouring
+  for(var j=0;j<q.op.length;j++){
+    var b=document.getElementById('op'+j);
+    if(b){b.disabled=true;b.style.cursor='default';}
+  }
+
+  var ok=(i===q.an);
+  var fb=document.getElementById('fb');
+  fb.style.display='block';
+  fb.style.background=ok?'#eafaf1':'#fdecea';
+  fb.style.borderColor=ok?'#27ae60':'#c0392b';
+  fb.innerHTML=(ok
+    ?'<strong style="color:#1a5c35">&#10003; Correct!</strong>'
+    :'<strong style="color:#c0392b">&#10007; Wrong. Correct answer: '+q.op[q.an]+'</strong>')
+    +'<br><span style="color:#6b6860;font-size:.82rem">'+q.ex+'</span>';
+
+  document.getElementById('diagBtn').disabled=false;
+}
+
+function diagNext(){
+  var q=QS[dIdx];
+  if(q.tp==='fill'){
+    if(!dShown){
+      // First click: grade and show feedback
+      var val=document.getElementById('fillAns').value.trim().toLowerCase();
+      dAnss[dIdx]=val;
+      document.getElementById('fillAns').disabled=true;
+      var c=q.an.toLowerCase();
+      var ok=(val===c||val.replace(/[^a-z0-9]/g,'').indexOf(c.replace(/[^a-z0-9]/g,''))>=0);
+      var fb=document.getElementById('fb');
+      fb.style.display='block';
+      fb.style.background=ok?'#eafaf1':'#fdecea';
+      fb.style.borderColor=ok?'#27ae60':'#c0392b';
+      fb.innerHTML=(ok
+        ?'<strong style="color:#1a5c35">&#10003; Correct!</strong>'
+        :'<strong style="color:#c0392b">&#10007; Wrong. Correct answer: <u>'+q.an+'</u></strong>')
+        +'<br><span style="color:#6b6860;font-size:.82rem">'+q.ex+'</span>';
+      dShown=true;
+      document.getElementById('diagBtn').textContent='Continue →';
+      return;
+    }
+  } else {
+    if(!dShown) return;
+  }
+  // Advance
+  dIdx++;
+  if(dIdx<QS.length){ showQ(); } else { calcBand(); }
+}
+
+function calcBand(){
+  var sc={l:0,r:0,w:0,s:0}, ct={l:0,r:0,w:0,s:0};
+  for(var i=0;i<QS.length;i++){
+    var q=QS[i]; ct[q.sk]++;
+    var a=dAnss[i];
+    if(q.tp==='mcq'&&a===q.an) sc[q.sk]++;
+    else if(q.tp==='fill'&&typeof a==='string'){
+      var c=q.an.toLowerCase();
+      if(a===c||a.replace(/[^a-z0-9]/g,'').indexOf(c.replace(/[^a-z0-9]/g,''))>=0) sc[q.sk]++;
+    }
+  }
+  var bands={}, tot=0;
+  var nm={l:'Listening',r:'Reading',w:'Writing',s:'Speaking'};
+  var ic={l:'🎧',r:'📖',w:'✍️',s:'🗣️'};
+  Object.keys(sc).forEach(function(k){
+    var pct=sc[k]/ct[k];
+    bands[k]=parseFloat((4+pct*4).toFixed(1));
+    ST.acc[k]=Math.round(pct*100);
+    tot+=bands[k];
+  });
+  var overall=parseFloat((tot/4).toFixed(1));
+  // Save retake history entry
+  var retakeEntry = {
+    date: new Date().toLocaleDateString('en-GB',{day:'numeric',month:'short',year:'numeric'}),
+    band: overall,
+    acc: {l:ST.acc.l, r:ST.acc.r, w:ST.acc.w, s:ST.acc.s}
+  };
+  ST.band=overall; ST.diagDone=true; ST.sessions++;
+  ST.retakeHistory.push(retakeEntry);
+  // Generate improvement notes per skill
+  var nm2={l:'Listening',r:'Reading',w:'Writing',s:'Speaking'};
+  var tips={
+    l:['Focus on identifying specific numbers, dates and names','Practise following long academic monologues','Use note-taking symbols to capture key points faster'],
+    r:['Practise skimming passages in under 2 minutes','Study True/False/Not Given question strategies','Expand academic vocabulary using the AWL word list'],
+    w:['Write at least one essay per day for AI feedback','Study Band 7 model essays for structure patterns','Focus on linking words and paragraph organisation'],
+    s:['Give longer, more detailed answers — avoid one-word replies','Use specific personal examples in every answer','Record yourself and listen back for fluency patterns']
+  };
+  Object.keys(ST.acc).forEach(function(k){
+    if(ST.acc[k]<60){
+      ST.improvements[k] = tips[k];
+    } else if(ST.acc[k]<80){
+      ST.improvements[k] = [tips[k][0]];
+    } else {
+      ST.improvements[k] = [];
+    }
+  });
+  save(); refreshHome();
+
+  document.getElementById('rBand').textContent=overall.toFixed(1);
+  var ds={4:'Foundation level. Build core grammar, vocabulary and comprehension skills.',5:'Modest user. Basic competency but struggles with complex language.',6:'Competent user. Generally effective with some inaccuracies.',7:'Good user. Operational command with occasional inaccuracies.',8:'Very good user. Fully operational with rare errors.'};
+  document.getElementById('rDesc').textContent=ds[Math.round(overall)]||ds[6];
+
+  var bd='';
+  Object.keys(bands).forEach(function(k){
+    bd+='<div class="sbitem"><div class="sbscore">'+bands[k].toFixed(1)+'</div><div class="sbname">'+ic[k]+' '+nm[k]+'</div></div>';
+  });
+  document.getElementById('sBDown').innerHTML=bd;
+
+  var sorted=Object.entries(ST.acc).sort(function(a,b){return a[1]-b[1];});
+  var wa='';
+  sorted.forEach(function(p){
+    var col=p[1]<40?'var(--red)':p[1]<65?'var(--gold)':'var(--green)';
+    wa+='<div class="wrow"><div class="wlabel">'+nm[p[0]]+'</div><div class="wbw"><div class="wbf" style="width:'+p[1]+'%;background:'+col+'"></div></div><div class="wpct">'+p[1]+'%</div></div>';
+  });
+  document.getElementById('wAreas').innerHTML=wa;
+  go('sResult');
+}
+
+// ── MODULES DATA ──────────────────────────────────────────────────────────
+var MODS=[
+  {id:'l1',sk:'listening',title:'Listening: Everyday Conversations',sub:'Part 1 — Social & transactional dialogues',
+    obj:['Identify specific information in short conversations','Understand numbers, dates, times and spelling','Complete forms and tables from listening'],
+    lessons:[{t:'Numbers, Dates & Times',type:'Practice'},{t:'Spelling & Personal Info',type:'Practice'},{t:'Form Filling Exercises',type:'Practice'},{t:'Map & Diagram Labelling',type:'Practice'}]},
+  {id:'l2',sk:'listening',title:'Listening: Monologues & Lectures',sub:'Parts 3 & 4 — Academic contexts',
+    obj:['Follow academic monologues and lectures','Identify speaker opinions and attitudes','Complete notes and summaries accurately'],
+    lessons:[{t:'Identifying Main Ideas',type:'Practice'},{t:'Following Complex Arguments',type:'Practice'},{t:'Note Completion',type:'Practice'}]},
+  {id:'r1',sk:'reading',title:'Reading: Skimming & Scanning',sub:'Speed and targeted reading techniques',
+    obj:['Skim a passage for general meaning in under 2 minutes','Scan for specific facts, names and figures','Answer True/False/Not Given questions accurately'],
+    lessons:[{t:'Finding Key Information Fast',type:'Practice'},{t:'True / False / Not Given',type:'Practice'},{t:'Matching Headings',type:'Practice'},{t:'Multiple Choice Strategies',type:'Practice'}]},
+  {id:'r2',sk:'reading',title:'Reading: Academic Texts',sub:'Complex passages and inference skills',
+    obj:['Understand complex academic vocabulary in context','Infer meaning from tone and structure','Complete summaries and matching tasks'],
+    lessons:[{t:'Understanding Academic Vocabulary',type:'Practice'},{t:'Inferring Meaning from Context',type:'Practice'},{t:'Summary Completion',type:'Practice'}]},
+  {id:'w1',sk:'writing',title:'Writing Task 1: Data Description',sub:'Graphs, charts, maps, and diagrams',
+    obj:['Identify and describe key trends in data','Use appropriate language for increases and decreases','Write a well-structured 150+ word report'],
+    lessons:[{t:'Describing Trends (Line Graphs)',type:'AI Feedback'},{t:'Comparing Data (Bar/Pie Charts)',type:'AI Feedback'},{t:'Process Diagrams',type:'AI Feedback'},{t:'Map Changes',type:'AI Feedback'}]},
+  {id:'w2',sk:'writing',title:'Writing Task 2: Academic Essays',sub:'Argument, discussion, and problem essays',
+    obj:['Structure a clear argument with introduction, body and conclusion','Use linking words for coherence','Achieve a minimum of 250 words with relevant ideas'],
+    lessons:[{t:'Opinion Essays (Agree/Disagree)',type:'AI Feedback'},{t:'Discussion Essays (Both Sides)',type:'AI Feedback'},{t:'Problem & Solution Essays',type:'AI Feedback'},{t:'Advantages & Disadvantages',type:'AI Feedback'}]},
+  {id:'s1',sk:'speaking',title:'Speaking Part 1: Introduction',sub:'Personal questions and familiar topics',
+    obj:['Give extended answers to personal questions','Use a range of tenses naturally','Avoid one-word or very short responses'],
+    lessons:[{t:'Talking About Yourself',type:'Speaking'},{t:'Hometown & Family',type:'Speaking'},{t:'Work, Study & Routine',type:'Speaking'}]},
+  {id:'s2',sk:'speaking',title:'Speaking Part 2: Long Turn',sub:'2-minute prepared monologue',
+    obj:['Speak for 1–2 minutes on a given topic','Use the cue card to structure your talk','Include specific details and personal examples'],
+    lessons:[{t:'Describing People & Places',type:'Speaking'},{t:'Events & Experiences',type:'Speaking'},{t:'Objects & Media',type:'Speaking'}]},
+  {id:'s3',sk:'speaking',title:'Speaking Part 3: Discussion',sub:'Abstract and extended discussion',
+    obj:['Express and justify opinions on abstract topics','Speculate and hypothesise using appropriate language','Compare different viewpoints confidently'],
+    lessons:[{t:'Expressing & Justifying Opinions',type:'Speaking'},{t:'Speculating About the Future',type:'Speaking'},{t:'Comparing & Contrasting',type:'Speaking'}]}
+];
+var IC={listening:'🎧',reading:'📖',writing:'✍️',speaking:'🗣️'};
+
+function setTab(tab,el){
+  document.querySelectorAll('#sMods .tab').forEach(function(t){t.classList.remove('active');});
+  el.classList.add('active');
+  renderMods(tab);
+}
+function renderMods(tab){
+  var list=tab==='all'?MODS:MODS.filter(function(m){return m.sk===tab;});
+  var h='';
+  list.forEach(function(m){
+    h+='<div class="mitem"><div class="mhead" onclick="toggleM(\'mc'+m.id+'\')">'
+      +'<div class="micon">'+IC[m.sk]+'</div>'
+      +'<div class="minfo"><div class="mtitle">'+m.title+'</div><div class="msub">'+m.sub+'</div></div>'
+      +'<div class="mstatus">Active</div></div>'
+      +'<div class="mcontent" id="mc'+m.id+'"><div class="lgrid">';
+    m.lessons.forEach(function(l,i){
+      h+='<div class="litem" onclick="openLesson(\''+m.id+'\','+i+')">'
+        +'<div class="lnum">'+(i+1)+'</div>'
+        +'<div class="ltitle">'+l.t+'</div>'
+        +'<div class="ltag">'+l.type+'</div></div>';
+    });
+    h+='</div></div></div>';
+  });
+  document.getElementById('modList').innerHTML=h;
+}
+function toggleM(id){ document.getElementById(id).classList.toggle('open'); }
+function openLesson(mid,li){
+  var m=MODS.find(function(x){return x.id===mid;});
+  var l=m.lessons[li];
+  if(l.type==='AI Feedback') openWriting(m,l);
+  else if(l.type==='Speaking') openSpeaking(m,l);
+  else openReading(m,l);
+}
+
+// ── OBJECTIVES SLIDE ──────────────────────────────────────────────────────
+function objSlide(m,l,nextFn){
+  document.getElementById('pracTitle').textContent=l.t;
+  document.getElementById('pracSub').textContent=m.sub;
+  go('sPrac');
+  var dur = l.type==='AI Feedback'?'30 min':l.type==='Speaking'?'15 min':'20 min';
+  var h='<div style="background:linear-gradient(135deg,#e8f5ed,#fff);border:2px solid #1a6b3a;border-radius:12px;padding:1.5rem;margin-bottom:1rem">'
+    +'<h2 style="font-size:1.3rem;color:#1a6b3a;margin-bottom:1rem;font-family:Playfair Display,serif">Learning Objectives</h2>'
+    +'<ul style="list-style:none;display:flex;flex-direction:column;gap:.6rem">'
+    +m.obj.map(function(o){return '<li style="font-size:.9rem;line-height:1.5;padding-left:1.5rem;position:relative"><span style="position:absolute;left:0">&#127919;</span>'+o+'</li>';}).join('')
+    +'</ul>'
+    +'<div style="display:flex;gap:.5rem;margin-top:1rem;flex-wrap:wrap">'
+    +'<span style="background:#1a6b3a;color:#fff;padding:.3rem .8rem;border-radius:20px;font-size:.75rem;font-weight:600">'+IC[m.sk]+' '+m.sk.charAt(0).toUpperCase()+m.sk.slice(1)+'</span>'
+    +'<span style="background:#1a6b3a;color:#fff;padding:.3rem .8rem;border-radius:20px;font-size:.75rem;font-weight:600">&#9201; '+dur+'</span>'
+    +'<span style="background:#1a6b3a;color:#fff;padding:.3rem .8rem;border-radius:20px;font-size:.75rem;font-weight:600">'+l.type+'</span>'
+    +'</div></div>'
+    +'<button id="objStartBtn" style="background:#1a6b3a;color:#fff;padding:.75rem 1.5rem;border-radius:8px;border:none;font-size:.9rem;font-weight:600;cursor:pointer;font-family:DM Sans,sans-serif;margin-top:.5rem">Start Lesson &#8594;</button>';
+  document.getElementById('pracContent').innerHTML=h;
+  document.getElementById('pracContent').querySelector('button').onclick=function(){
+    if(nextFn==='doReading') doReading();
+    else if(nextFn==='doWriting') doWriting();
+    else if(nextFn==='doSpeaking') doSpeaking();
+  };
+}
+
+// ── READING PRACTICE ──────────────────────────────────────────────────────
+var PASS={
+  title:'The Impact of Urbanisation',
+  body:'Urbanisation — the movement of people from rural to urban areas — has been one of the defining trends of the modern era. According to UN data, more than half of the world\'s population now lives in cities, a figure projected to reach 68% by 2050.\n\nThis rapid urban growth brings both opportunities and challenges. Cities offer greater access to employment, education, and healthcare. However, they also face significant pressures including housing shortages, traffic congestion, and pollution.\n\nDeveloping nations such as Kenya, Nigeria, and Ethiopia are seeing dramatic urban expansion, often outpacing governments\' ability to provide adequate services.',
+  qs:[
+    {tx:'What percentage of people will live in cities by 2050?',op:['50%','55%','68%','75%'],an:2,ex:'The passage states the figure is "projected to reach 68% by 2050".'},
+    {tx:'Which countries are mentioned as experiencing rapid urbanisation?',op:['China, India, Brazil','Kenya, Nigeria, Ethiopia','USA, UK, France','Egypt, Morocco, Tunisia'],an:1,ex:'The passage specifically names Kenya, Nigeria, and Ethiopia.'},
+    {tx:'The word "projected" most likely means:',op:['Measured in the past','Currently happening','Estimated for the future','Unexpected'],an:2,ex:'"Projected" means forecast or estimated for a future point in time.'}
+  ]
+};
+
+function openReading(m,l){
+  objSlide(m,l,'doReading');
+  startTimer();
+}
+function doReading(){
+  var h='<div class="passage"><h4 style="font-family:Playfair Display,serif;margin-bottom:.75rem">'+PASS.title+'</h4><p style="white-space:pre-line">'+PASS.body+'</p></div>';
+  PASS.qs.forEach(function(q,qi){
+    h+='<div class="qcard"><span class="qtag tr">Reading</span><div class="qtext">'+q.tx+'</div>';
+    q.op.forEach(function(o,oi){
+      h+='<button class="opt" id="rq'+qi+'_'+oi+'" onclick="chkR('+qi+','+oi+','+q.an+')">'+o+'</button>';
+    });
+    h+='<div class="fb" id="rfb'+qi+'"></div></div>';
+  });
+  h+='<button class="btn btn-g" style="margin-top:.5rem" onclick="go(\'sMods\')">✓ Complete Lesson</button>';
+  document.getElementById('pracContent').innerHTML=h;
+}
+function chkR(qi,sel,cor){
+  // Apply colour via BOTH class AND inline style for maximum reliability
+  var correctBtn = document.getElementById('rq'+qi+'_'+cor);
+  if(correctBtn){
+    correctBtn.classList.add('right');
+    correctBtn.style.borderColor='#27ae60';
+    correctBtn.style.background='#eafaf1';
+    correctBtn.style.color='#1a5c35';
+    correctBtn.style.fontWeight='600';
+  }
+  if(sel!==cor){
+    var wrongBtn = document.getElementById('rq'+qi+'_'+sel);
+    if(wrongBtn){
+      wrongBtn.classList.add('wrong');
+      wrongBtn.style.borderColor='#c0392b';
+      wrongBtn.style.background='#fdecea';
+      wrongBtn.style.color='#c0392b';
+    }
+  }
+  // Disable all after colouring
+  for(var i=0;i<4;i++){
+    var b=document.getElementById('rq'+qi+'_'+i);
+    if(b){b.disabled=true;b.style.cursor='default';}
+  }
+  var ok=(sel===cor), q=PASS.qs[qi], fb=document.getElementById('rfb'+qi);
+  fb.className='fb '+(ok?'ok':'bad');
+  fb.innerHTML=(ok
+    ?'<strong>✅ Correct!</strong>'
+    :'<strong>❌ Wrong. Correct answer: <u>'+q.op[cor]+'</u></strong>')
+    +'<br><span style="color:var(--muted);font-size:.82rem">'+q.ex+'</span>';
+  ST.qDone++; save();
+}
+
+// ── WRITING PRACTICE ──────────────────────────────────────────────────────
+var WP=[
+  {task:'Task 2',prompt:'Some people believe technology has made our lives more complicated. Others think it has simplified our lives.\n\nDiscuss both views and give your own opinion.\n\nWrite at least 250 words.',min:250},
+  {task:'Task 2',prompt:'In many countries, young people are leaving rural areas to live and work in cities. What are the advantages and disadvantages of this trend?\n\nWrite at least 250 words.',min:250},
+  {task:'Task 1',prompt:'The graph shows the percentage of households in three countries that owned at least one car between 1985 and 2015.\n\nSummarise the main features and make comparisons where relevant.\n\nWrite at least 150 words.',min:150}
+];
+var curW=null;
+function openWriting(m,l){ startTimer(); curW=WP[Math.floor(Math.random()*WP.length)]; objSlide(m,l,'doWriting'); }
+function doWriting(){
+  var wp=curW;
+  document.getElementById('pracContent').innerHTML=
+    '<div class="wprompt"><strong>'+wp.task+'</strong>'+wp.prompt.replace(/\n/g,'<br>')+'</div>'
+    +'<textarea class="qinput" id="wAns" rows="10" placeholder="Write your response here..." oninput="updWC(this,'+wp.min+')"></textarea>'
+    +'<div class="wc" id="wc">0 / '+wp.min+' words minimum</div><br>'
+    +'<div style="display:flex;gap:.75rem;flex-wrap:wrap;margin-top:.5rem">'
+    +'<button class="btn btn-g" onclick="subW('+wp.min+')">🤖 Get AI Feedback</button>'
+    +'<button class="btn btn-o btn-sm" onclick="go(\'sMods\')">← Back</button></div>'
+    +'<div id="wFb"></div>';
+}
+function updWC(ta,min){
+  var w=ta.value.trim().split(/\s+/).filter(function(x){return x.length>0;}).length;
+  var el=document.getElementById('wc');
+  el.textContent=w+' / '+min+' words minimum';
+  el.style.color=w>=min?'var(--green)':'var(--muted)';
+}
+async function subW(min){
+  var text=document.getElementById('wAns').value.trim();
+  if(text.split(/\s+/).filter(function(x){return x.length>0;}).length<50){showToast('Please write more before submitting');return;}
+  var fb=document.getElementById('wFb');
+  fb.innerHTML='<div class="aipanel"><div class="aihead">🤖 AI Examiner Scoring...</div><div class="thinking"><div class="dp"><span></span><span></span><span></span></div>&nbsp;Analysing Task Achievement, Coherence, Vocabulary, Grammar...</div></div>';
+  try{
+    var r=await fetch('/ielts/api-proxy.php',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({model:'claude-haiku-4-5-20251001',max_tokens:1200,messages:[{role:'user',content:'You are an expert IELTS examiner. Score this writing response:\n\n"'+text+'"\n\nRespond in JSON only (no markdown):\n{"overall_band":6.0,"task_achievement":{"band":6.0,"comment":"one sentence"},"coherence_cohesion":{"band":6.0,"comment":"one sentence"},"lexical_resource":{"band":6.0,"comment":"one sentence"},"grammatical_range":{"band":6.0,"comment":"one sentence"},"strengths":["s1","s2"],"improvements":["i1","i2"],"model_sentence":"A Band 7+ improved version of one weak sentence from the response"}'}]})});
+    var d=await r.json();
+    var res=JSON.parse(d.content[0].text.replace(/```json|```/g,'').trim());
+    var cn={task_achievement:'Task Achievement',coherence_cohesion:'Coherence & Cohesion',lexical_resource:'Lexical Resource',grammatical_range:'Grammatical Range'};
+    fb.innerHTML='<div class="aipanel"><div class="aihead">🤖 AI Examiner Feedback</div>'
+      +'<div style="text-align:center;margin-bottom:1rem"><div style="font-family:Playfair Display,serif;font-size:2.5rem;color:var(--green)">'+res.overall_band.toFixed(1)+'</div><div style="font-size:.75rem;color:var(--muted);text-transform:uppercase;letter-spacing:.1em">Overall Band Score</div></div>'
+      +'<div class="cgrid">'+['task_achievement','coherence_cohesion','lexical_resource','grammatical_range'].map(function(c){return '<div class="cchip"><span class="cs">'+res[c].band.toFixed(1)+'</span><span style="font-size:.7rem;color:var(--muted)">'+cn[c]+'</span><div style="font-size:.7rem;margin-top:.3rem;line-height:1.3">'+res[c].comment+'</div></div>';}).join('')+'</div>'
+      +'<div style="margin-top:1rem;font-size:.85rem">'
+      +'<strong style="color:var(--green)">✅ Strengths:</strong><ul style="margin-top:.3rem;padding-left:1.2rem;line-height:1.8">'+res.strengths.map(function(s){return '<li>'+s+'</li>';}).join('')+'</ul>'
+      +'<strong style="color:var(--red);display:block;margin-top:.75rem">🎯 To Improve:</strong><ul style="margin-top:.3rem;padding-left:1.2rem;line-height:1.8">'+res.improvements.map(function(s){return '<li>'+s+'</li>';}).join('')+'</ul>'
+      +'<div style="margin-top:.75rem;background:var(--gp);border-radius:8px;padding:.75rem;font-size:.82rem"><strong>💡 Model Sentence (Band 7+):</strong><br><em>'+res.model_sentence+'</em></div>'
+      +'</div></div>';
+    ST.qDone++; save();
+  }catch(e){fb.innerHTML='<div class="aipanel"><p style="color:var(--red);font-size:.85rem">⚠️ AI feedback unavailable. Check api-proxy.php is uploaded correctly.</p></div>';}
+}
+
+// ── SPEAKING PRACTICE ─────────────────────────────────────────────────────
+var SPDATA=[
+  {part:'Part 1',topic:'Tell me about your hometown. What do you like most about it?',
+   cues:['Describe the location and size','Mention what the place is known for','Say what you personally enjoy about it'],
+   model:'I\'m from Eldoret, which is a mid-sized city in western Kenya known mainly for its long-distance runners. What I appreciate most about it is the relatively cool climate and the strong sense of community — people tend to know their neighbours, which you don\'t always find in larger cities. The infrastructure has improved considerably over recent years, so there are more amenities now, though traffic congestion is becoming more of an issue.'},
+  {part:'Part 2',topic:'Describe a person who has had a significant influence on your life.',
+   cues:['Who this person is and how you know them','What qualities or characteristics they have','What specific things they have done for you','Why their influence has been so important'],
+   model:'I\'d like to talk about my secondary school teacher, Mr. Otieno, who taught Mathematics. What set him apart was his genuine belief that every student was capable of understanding the subject — he never wrote anyone off. He would stay after school voluntarily to help struggling students, myself included. His influence was significant because he showed me that with the right guidance and persistence, subjects that seem impossibly difficult become manageable. That lesson has extended well beyond Mathematics into how I approach challenges in my professional life.'},
+  {part:'Part 3',topic:'Do you think social media has had a positive or negative effect on society overall?',
+   cues:['State your overall position clearly','Give two or three specific reasons or examples','Acknowledge the opposing viewpoint briefly','Conclude by restating your position'],
+   model:'On balance, I would argue that social media has had more negative than positive effects on society, though the picture is undeniably complex. The most concerning impact is on mental health — research consistently shows correlations between heavy social media use and increased anxiety, particularly among younger users. Additionally, the spread of misinformation has become genuinely destabilising for democratic processes. That said, I acknowledge it has connected communities and provided platforms for marginalised voices that previously had no outlet. Nevertheless, I believe the structural incentives of these platforms — prioritising engagement over accuracy — make the negative effects difficult to mitigate without significant regulatory intervention.'}
+];
+var curSP=null, curTopic='';
+function openSpeaking(m,l){ startTimer(); curSP=SPDATA[Math.floor(Math.random()*SPDATA.length)]; curTopic=curSP.topic; objSlide(m,l,'doSpeaking'); }
+function doSpeaking(){
+  var t=curSP;
+  document.getElementById('pracContent').innerHTML=
+    '<div style="background:#fff5f5;border:1px solid #f0d0d0;border-radius:var(--r);padding:1.5rem;margin-bottom:1rem">'
+    +'<div class="sppart">'+t.part+'</div>'
+    +'<div class="sptopic">'+t.topic+'</div>'
+    +'<ul class="spcues">'+t.cues.map(function(c){return '<li>'+c+'</li>';}).join('')+'</ul></div>'
+    +'<div style="background:#fff;border:1px solid var(--border);border-radius:var(--r);padding:1.25rem;margin-bottom:1rem">'
+    +'<strong style="font-size:.88rem;display:block;margin-bottom:.75rem">✍️ Step 1 — Write your response below:</strong>'
+    +'<textarea class="qinput" id="spAns" rows="6" placeholder="Write what you would say in the IELTS exam..."></textarea>'
+    +'<button class="btn btn-g btn-sm" onclick="subSP()" style="margin-top:.75rem">🤖 Get AI Feedback + Model Answer</button></div>'
+    +'<div id="spFb"></div>';
+}
+async function subSP(){
+  var text=document.getElementById('spAns').value.trim();
+  if(text.length<30){showToast('Please write a longer response');return;}
+  var fb=document.getElementById('spFb');
+  fb.innerHTML='<div class="aipanel"><div class="aihead">🤖 Evaluating your response...</div><div class="thinking"><div class="dp"><span></span><span></span><span></span></div>&nbsp;Analysing fluency, vocabulary, grammar, pronunciation tips...</div></div>';
+  try{
+    var r=await fetch('/ielts/api-proxy.php',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({model:'claude-haiku-4-5-20251001',max_tokens:900,messages:[{role:'user',content:'You are an IELTS Speaking examiner. The question was:\n"'+curTopic+'"\n\nThe student\'s response:\n"'+text+'"\n\nRespond in JSON only (no markdown):\n{"band":6.0,"fluency_coherence":"one sentence assessment","lexical_resource":"one sentence assessment","grammar":"one sentence assessment","pronunciation_note":"one practical pronunciation tip","key_weakness":"the single most important thing to improve","key_strength":"the best thing about this response","improved_phrase":"take the weakest sentence and rewrite it at Band 7 level"}'}]})});
+    var d=await r.json();
+    var res=JSON.parse(d.content[0].text.replace(/```json|```/g,'').trim());
+    fb.innerHTML='<div class="aipanel"><div class="aihead">🤖 Speaking Feedback</div>'
+      +'<div style="text-align:center;margin-bottom:1rem">'
+      +'<div style="font-family:Playfair Display,serif;font-size:2.5rem;color:var(--green)">'+res.band.toFixed(1)+'</div>'
+      +'<div style="font-size:.75rem;color:var(--muted);text-transform:uppercase;letter-spacing:.1em">Estimated Band Score</div></div>'
+      +'<div style="font-size:.85rem;line-height:1.9">'
+      +'<div>🔄 <strong>Fluency & Coherence:</strong> '+res.fluency_coherence+'</div>'
+      +'<div>📚 <strong>Lexical Resource:</strong> '+res.lexical_resource+'</div>'
+      +'<div>📐 <strong>Grammar:</strong> '+res.grammar+'</div>'
+      +'<div>🎤 <strong>Pronunciation tip:</strong> '+res.pronunciation_note+'</div>'
+      +'<div style="background:var(--gp);border-radius:8px;padding:.75rem;margin-top:.75rem">✅ <strong>Key Strength:</strong> '+res.key_strength+'</div>'
+      +'<div style="background:#fdecea;border-radius:8px;padding:.75rem;margin-top:.5rem">🎯 <strong>Key Weakness:</strong> '+res.key_weakness+'</div>'
+      +'<div style="background:#fff3e0;border-radius:8px;padding:.75rem;margin-top:.5rem">💬 <strong>Improved Phrase (Band 7):</strong><br><em>'+res.improved_phrase+'</em></div>'
+      +'</div></div>'
+      // Model answer section
+      +'<div class="model-answer">'
+      +'<h4>🏆 Band 7+ Model Answer — Compare Yours</h4>'
+      +'<p>'+curSP.model+'</p>'
+      +'<div style="margin-top:1rem;font-size:.8rem;color:var(--muted)">📌 Notice: Extended ideas, specific examples, varied vocabulary, and natural connectors like "That said", "Additionally", "Nevertheless".</div>'
+      +'</div>';
+    ST.qDone++; save();
+  }catch(e){fb.innerHTML='<div class="aipanel"><p style="color:var(--red);font-size:.85rem">⚠️ AI feedback unavailable. Check api-proxy.php.</p></div>';}
+}
+
+// ── VOCABULARY ────────────────────────────────────────────────────────────
+var VOCAB={
+  environment:[
+    {w:'Biodiversity',t:'noun',d:'The variety of plant and animal life in a particular habitat or on Earth.',e:'Deforestation threatens biodiversity by destroying the habitats of thousands of species.'},
+    {w:'Sustainability',t:'noun',d:'Using resources in a way that meets present needs without compromising future generations.',e:'The company adopted sustainability measures, reducing its carbon emissions by 40%.'},
+    {w:'Mitigation',t:'noun',d:'Action taken to reduce the severity or impact of something, e.g. climate change.',e:'Carbon capture is one mitigation strategy being explored by governments worldwide.'},
+    {w:'Deforestation',t:'noun',d:'Large-scale clearing or removal of trees and forests.',e:'Deforestation in the Amazon has accelerated in recent decades due to agricultural expansion.'},
+    {w:'Emissions',t:'noun',d:'Gases or substances released into the atmosphere, especially from burning fuels.',e:'Transport accounts for nearly a quarter of global greenhouse gas emissions.'},
+    {w:'Renewable',t:'adjective',d:'Naturally replenished and therefore sustainable as an energy source.',e:'Solar and wind power are renewable energy sources that produce no direct emissions.'}
+  ],
+  technology:[
+    {w:'Algorithm',t:'noun',d:'A set of rules or instructions followed in calculations or computer problem-solving.',e:'The platform uses a recommendation algorithm to personalise content for each user.'},
+    {w:'Automation',t:'noun',d:'The use of technology or machines to perform tasks previously done by humans.',e:'Automation has transformed manufacturing, increasing output while reducing labour costs.'},
+    {w:'Proliferation',t:'noun',d:'A rapid increase in the number or spread of something.',e:'The proliferation of smartphones has fundamentally changed how people access information.'},
+    {w:'Innovation',t:'noun',d:'The process of creating and introducing new ideas, products, or methods.',e:'Technological innovation in the medical sector has extended average life expectancy significantly.'},
+    {w:'Obsolete',t:'adjective',d:'No longer produced, used, or relevant; out of date.',e:'Within a decade, cassette tapes became obsolete as digital formats took over.'},
+    {w:'Surveillance',t:'noun',d:'Close monitoring or observation, especially of people or digital activity.',e:'Critics argue that government surveillance programmes violate citizens\' right to privacy.'}
+  ],
+  health:[
+    {w:'Prevalence',t:'noun',d:'The proportion of a population found to have a condition at a given time.',e:'The prevalence of obesity has doubled in many countries over the past thirty years.'},
+    {w:'Sedentary',t:'adjective',d:'Characterised by much sitting and little physical exercise.',e:'Sedentary lifestyles, driven by desk jobs and screen time, contribute to cardiovascular disease.'},
+    {w:'Mortality',t:'noun',d:'The death rate in a particular population or from a particular cause.',e:'Infant mortality rates have fallen dramatically in countries with improved healthcare access.'},
+    {w:'Epidemic',t:'noun',d:'A widespread occurrence of an infectious disease in a community at a particular time.',e:'The 2009 swine flu epidemic spread to over 70 countries within months of its emergence.'},
+    {w:'Holistic',t:'adjective',d:'Addressing the whole person — physical, mental, and social wellbeing.',e:'A holistic approach to healthcare considers lifestyle, mental health, and social factors alongside physical symptoms.'},
+    {w:'Malnutrition',t:'noun',d:'Lack of proper nutrition from insufficient food or an unbalanced diet.',e:'Malnutrition affects over 800 million people globally, stunting physical and cognitive development.'}
+  ],
+  education:[
+    {w:'Curriculum',t:'noun',d:'The subjects and content comprising a course of study in a school or college.',e:'The government reformed the national curriculum to place greater emphasis on digital literacy.'},
+    {w:'Pedagogy',t:'noun',d:'The method, practice, and theory of teaching.',e:'Modern pedagogy increasingly incorporates collaborative learning and problem-solving activities.'},
+    {w:'Literacy',t:'noun',d:'The ability to read and write; also used broadly for competence in a specific area.',e:'Financial literacy programmes help young people manage money and avoid debt.'},
+    {w:'Equity',t:'noun',d:'Fairness and equal access to opportunities regardless of background.',e:'Educational equity requires not just equal resources but targeted support for disadvantaged students.'},
+    {w:'Cognition',t:'noun',d:'The mental processes involved in gaining knowledge and understanding.',e:'Sleep deprivation significantly impairs cognition, affecting memory, attention, and decision-making.'},
+    {w:'Vocational',t:'adjective',d:'Relating to practical skills training for a specific occupation or trade.',e:'Vocational qualifications provide a direct pathway into skilled trades such as engineering and healthcare.'}
+  ],
+  society:[
+    {w:'Urbanisation',t:'noun',d:'The process by which increasing numbers of people move to live in towns and cities.',e:'Rapid urbanisation has placed enormous pressure on infrastructure in developing nations.'},
+    {w:'Inequality',t:'noun',d:'The unequal distribution of resources, opportunities, or treatment among people.',e:'Income inequality has widened in many countries as wages for low-skilled work have stagnated.'},
+    {w:'Globalisation',t:'noun',d:'The process by which businesses, cultures, and economies develop international influence.',e:'Globalisation has created both new markets and new vulnerabilities, as seen during supply chain disruptions.'},
+    {w:'Demographics',t:'noun',d:'Statistical data relating to the characteristics of a population.',e:'Shifting demographics, including ageing populations, will place increasing strain on pension systems.'},
+    {w:'Marginalised',t:'adjective',d:'Treated as insignificant or excluded from the mainstream of society.',e:'Marginalised communities often have less access to quality healthcare and legal representation.'},
+    {w:'Assimilation',t:'noun',d:'The process of adopting the culture, language, and customs of a dominant social group.',e:'Debates about immigration often centre on the degree to which assimilation should be expected or encouraged.'}
+  ]
+};
+var vT='environment', vI=0;
+
+function setVT(topic,el){
+  vT=topic; vI=0;
+  document.querySelectorAll('#vtabs .tab').forEach(function(t){t.classList.remove('active');});
+  el.classList.add('active');
+  renderVocab(topic);
+}
+function renderVocab(topic){
+  vT=topic||vT;
+  var words=VOCAB[vT]||VOCAB.environment;
+  var w=words[vI];
+  document.getElementById('vocabContent').innerHTML=
+    '<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:.75rem">'
+    +'<span style="font-size:.82rem;color:var(--muted)">Card '+(vI+1)+' of '+words.length+' — tap to reveal definition</span>'
+    +'<div style="display:flex;gap:.5rem"><button class="btn btn-o btn-sm" onclick="prevV()">←</button><button class="btn btn-o btn-sm" onclick="nextV()">→</button></div></div>'
+    +'<div class="vcard" id="vcard" onclick="this.classList.toggle(\'flipped\')">'
+    +'<div class="vword">'+w.w+'</div>'
+    +'<div class="vtype">'+w.t+'</div>'
+    +'<div class="vdef">'+w.d+'</div>'
+    +'<div class="vex">📌 '+w.e+'</div>'
+    +'<div class="vhint">tap to flip</div></div>'
+    +'<div style="margin-top:1rem;background:#fff;border:1px solid var(--border);border-radius:var(--r);padding:1rem">'
+    +'<strong style="font-size:.82rem;color:var(--muted)">IELTS Topic: '+vT.charAt(0).toUpperCase()+vT.slice(1)+'</strong>'
+    +'<div style="display:flex;gap:.5rem;flex-wrap:wrap;margin-top:.75rem">'
+    +words.map(function(x,i){
+      return '<div onclick="jumpV('+i+')" style="width:32px;height:32px;border-radius:50%;border:2px solid '+(i===vI?'var(--green)':'var(--border)')+';background:'+(i===vI?'var(--green)':'#fff')+';cursor:pointer;font-size:.75rem;display:flex;align-items:center;justify-content:center;font-weight:600;color:'+(i===vI?'#fff':'var(--muted)')+';">'+(i+1)+'</div>';
+    }).join('')+'</div></div>';
+}
+function nextV(){ var w=VOCAB[vT]; vI=(vI+1)%w.length; renderVocab(); }
+function prevV(){ var w=VOCAB[vT]; vI=(vI-1+w.length)%w.length; renderVocab(); }
+function jumpV(i){ vI=i; renderVocab(); }
+
+// ── TIMER ─────────────────────────────────────────────────────────────────
+var tInt=null, tSec=0;
+function startTimer(){
+  clearInterval(tInt); tSec=0;
+  tInt=setInterval(function(){
+    tSec++;
+    var m=String(Math.floor(tSec/60)).padStart(2,'0');
+    var s=String(tSec%60).padStart(2,'0');
+    var el=document.getElementById('timer');
+    if(el) el.textContent='⏱ '+m+':'+s;
+  },1000);
+}
+
+// ── DASHBOARD ─────────────────────────────────────────────────────────────
+function renderDash(){
+  document.getElementById('dS').textContent=ST.sessions;
+  document.getElementById('dB').textContent=ST.band?ST.band.toFixed(1):'—';
+  document.getElementById('dSt').textContent=ST.streak;
+  document.getElementById('dQ').textContent=ST.qDone;
+  var nm={l:'Listening',r:'Reading',w:'Writing',s:'Speaking'};
+  var ic={l:'🎧',r:'📖',w:'✍️',s:'🗣️'};
+  var h='';
+  Object.entries(ST.acc).forEach(function(p){
+    var col=p[1]<40?'var(--red)':p[1]<65?'var(--gold)':'var(--green)';
+    h+='<div class="wrow"><div class="wlabel">'+ic[p[0]]+' '+nm[p[0]]+'</div><div class="wbw"><div class="wbf" style="width:'+p[1]+'%;background:'+col+'"></div></div><div class="wpct">'+p[1]+'%</div></div>';
+  });
+  document.getElementById('dAcc').innerHTML=h;
+  var wk=Object.entries(ST.acc).sort(function(a,b){return a[1]-b[1];})[0];
+  var recs={l:'Listen to BBC 6-Minute English daily. Practise note-taking while listening.',r:'Read one academic article daily. Skim for main idea first, then read in detail.',w:'Write one Task 2 essay and submit for AI feedback. Focus on paragraph structure.',s:'Write out a 2-minute Part 2 response and compare it to the model answer.'};
+  document.getElementById('dRec').innerHTML='<strong>Weakest skill: '+nm[wk[0]]+' ('+wk[1]+'% accuracy)</strong><br><br>'+recs[wk[0]];
+
+  // Areas of Improvement per skill
+  var hasImp=false, impH='';
+  Object.keys(ST.improvements).forEach(function(k){
+    var tips=ST.improvements[k];
+    if(tips&&tips.length>0){
+      hasImp=true;
+      impH+='<div style="margin-bottom:1rem">'
+        +'<div style="font-weight:600;font-size:.85rem;margin-bottom:.4rem">'+ic[k]+' '+nm[k]+'</div>'
+        +'<ul style="padding-left:1.2rem;display:flex;flex-direction:column;gap:.3rem">'
+        +tips.map(function(t){return '<li style="font-size:.84rem;color:var(--muted);line-height:1.5">'+t+'</li>';}).join('')
+        +'</ul></div>';
+    }
+  });
+  if(!hasImp) impH='<p style="font-size:.85rem;color:var(--muted)">Complete the diagnostic test to see personalised improvement areas.</p>';
+  document.getElementById('dImp').innerHTML=impH;
+
+  // Retake History
+  var retH='';
+  if(!ST.retakeHistory||ST.retakeHistory.length===0){
+    retH='<p style="font-size:.85rem;color:var(--muted)">No diagnostic attempts yet. Take the diagnostic test to start tracking your progress.</p>';
+  } else {
+    retH='<div style="overflow-x:auto"><table style="width:100%;border-collapse:collapse;font-size:.84rem">'
+      +'<thead><tr style="background:var(--cream)">'
+      +'<th style="padding:.6rem .75rem;text-align:left;font-weight:600">Attempt</th>'
+      +'<th style="padding:.6rem .75rem;text-align:left;font-weight:600">Date</th>'
+      +'<th style="padding:.6rem .75rem;text-align:center;font-weight:600">Band</th>'
+      +'<th style="padding:.6rem .75rem;text-align:center;font-weight:600">🎧</th>'
+      +'<th style="padding:.6rem .75rem;text-align:center;font-weight:600">📖</th>'
+      +'<th style="padding:.6rem .75rem;text-align:center;font-weight:600">✍️</th>'
+      +'<th style="padding:.6rem .75rem;text-align:center;font-weight:600">🗣️</th>'
+      +'<th style="padding:.6rem .75rem;text-align:center;font-weight:600">Change</th>'
+      +'</tr></thead><tbody>';
+    ST.retakeHistory.forEach(function(entry,idx){
+      var prev=idx>0?ST.retakeHistory[idx-1].band:null;
+      var diff=prev!==null?(entry.band-prev):null;
+      var diffStr=diff===null?'—':(diff>0?'<span style="color:var(--green)">+'+diff.toFixed(1)+'</span>':diff<0?'<span style="color:var(--red)">'+diff.toFixed(1)+'</span>':'<span style="color:var(--muted)">0.0</span>');
+      var bandCol=entry.band>=7?'var(--green)':entry.band>=5.5?'var(--gold)':'var(--red)';
+      var bg=idx%2===0?'#fff':'var(--paper)';
+      retH+='<tr style="background:'+bg+';border-bottom:1px solid var(--border)">'
+        +'<td style="padding:.6rem .75rem;font-family:monospace">#'+(idx+1)+'</td>'
+        +'<td style="padding:.6rem .75rem;color:var(--muted)">'+entry.date+'</td>'
+        +'<td style="padding:.6rem .75rem;text-align:center;font-family:monospace;font-weight:700;color:'+bandCol+'">'+entry.band.toFixed(1)+'</td>'
+        +'<td style="padding:.6rem .75rem;text-align:center;color:var(--muted)">'+entry.acc.l+'%</td>'
+        +'<td style="padding:.6rem .75rem;text-align:center;color:var(--muted)">'+entry.acc.r+'%</td>'
+        +'<td style="padding:.6rem .75rem;text-align:center;color:var(--muted)">'+entry.acc.w+'%</td>'
+        +'<td style="padding:.6rem .75rem;text-align:center;color:var(--muted)">'+entry.acc.s+'%</td>'
+        +'<td style="padding:.6rem .75rem;text-align:center">'+diffStr+'</td>'
+        +'</tr>';
+    });
+    retH+='</tbody></table></div>';
+    // Add next retake recommendation
+    var lastDate=new Date(ST.retakeHistory[ST.retakeHistory.length-1].date);
+    var nextDate=new Date(Date.now()+14*86400000);
+    retH+='<div style="margin-top:.75rem;padding:.75rem 1rem;background:var(--gp);border-radius:8px;font-size:.83rem;color:var(--green)">'
+      +'<strong>📅 Recommended next retake:</strong> '+nextDate.toLocaleDateString('en-GB',{day:'numeric',month:'short',year:'numeric'})
+      +' — after 2 weeks of consistent practice</div>';
+  }
+  document.getElementById('dRet').innerHTML=retH;
+}
+
+// ── TOAST ─────────────────────────────────────────────────────────────────
+function showToast(msg){ var t=document.getElementById('toast'); t.textContent=msg; t.classList.add('show'); setTimeout(function(){t.classList.remove('show');},2500); }
+
+// ── STREAK ────────────────────────────────────────────────────────────────
+(function(){
+  var today=new Date().toDateString();
+  if(ST.lastDate!==today){
+    ST.streak=ST.lastDate===new Date(Date.now()-86400000).toDateString()?ST.streak+1:1;
+    ST.lastDate=today; save();
+  }
+})();
+</script>
+</body>
+</html>

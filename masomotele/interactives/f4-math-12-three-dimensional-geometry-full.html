@@ -1,0 +1,369 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>F4 Math | Three Dimensional Geometry</title>
+<style>
+:root{--pri:#0a5e2a;--acc:#f5a623;--ok:#2e7d32;--no:#c62828;--bg:#f4f6f8;--card:#fff;--txt:#1a1a1a;}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:'Segoe UI',sans-serif;background:var(--bg);color:var(--txt);}
+#topbar{background:var(--pri);color:#fff;padding:10px 16px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:100;}
+#topbar .title{font-size:.95rem;font-weight:700;}
+#topbar .meta{font-size:.8rem;opacity:.85;}
+.slide{display:none;padding:16px;max-width:860px;margin:0 auto;}
+.slide.active{display:block;}
+.slide h2{color:var(--pri);font-size:1.2rem;margin-bottom:12px;border-left:4px solid var(--acc);padding-left:10px;}
+.card{background:var(--card);border-radius:10px;padding:16px;margin-bottom:14px;box-shadow:0 2px 6px rgba(0,0,0,.07);}
+.card h3{color:var(--pri);font-size:1rem;margin-bottom:8px;}
+.card p,.card li{font-size:.95rem;line-height:1.65;margin-bottom:6px;}
+.card ul{padding-left:18px;}
+.highlight{background:#e8f5e9;border-left:4px solid var(--pri);padding:10px 14px;border-radius:6px;margin:10px 0;font-size:.9rem;}
+.formula{background:#fff8e1;border:1px solid var(--acc);border-radius:8px;padding:12px;margin:10px 0;font-size:.95rem;font-family:monospace;}
+.example-box{background:#f3e5f5;border-radius:8px;padding:14px;margin:10px 0;}
+.example-box strong{color:#6a1b9a;}
+.solids-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:10px;margin:10px 0;}
+.solid-card{background:#e8f5e9;border-radius:8px;padding:12px;text-align:center;font-size:.85rem;}
+.solid-card .emoji{font-size:2rem;display:block;margin-bottom:4px;}
+.solid-card strong{color:var(--pri);}
+.nav-row{display:flex;justify-content:space-between;align-items:center;padding:14px 0;margin-top:10px;}
+.btn{padding:10px 22px;border:none;border-radius:8px;cursor:pointer;font-size:.9rem;font-weight:600;transition:.2s;}
+.btn-pri{background:var(--pri);color:#fff;}.btn-pri:hover{opacity:.88;}
+.btn-acc{background:var(--acc);color:#fff;}.btn-acc:hover{opacity:.88;}
+.btn-gray{background:#ccc;color:#555;}
+.dots{display:flex;gap:6px;flex-wrap:wrap;justify-content:center;padding:8px;}
+.dot{width:10px;height:10px;border-radius:50%;background:#ccc;cursor:pointer;transition:.2s;}
+.dot.active{background:var(--pri);}.dot.done{background:var(--acc);}
+#progress-bar{height:4px;background:#e0e0e0;}#progress-fill{height:4px;background:var(--acc);transition:width .3s;}
+.outcome-item{display:flex;align-items:flex-start;gap:10px;margin-bottom:8px;}
+.outcome-item .icon{font-size:1.2rem;}
+input[type=text]{border:2px solid #ddd;border-radius:6px;padding:8px 10px;font-size:.9rem;width:100%;margin-top:4px;}
+input[type=text]:focus{outline:none;border-color:var(--pri);}
+.q-block{background:#fff;border-radius:10px;padding:14px;margin-bottom:12px;box-shadow:0 1px 4px rgba(0,0,0,.06);}
+.q-block label{font-size:.9rem;color:#555;display:block;margin-bottom:4px;}
+.feedback{margin-top:6px;font-size:.85rem;padding:6px 10px;border-radius:6px;}
+.feedback.ok{background:#e8f5e9;color:var(--ok);}
+.feedback.no{background:#ffebee;color:var(--no);}
+.found-tag{background:#c8e6c9;color:#1b5e20;padding:2px 7px;border-radius:10px;font-size:.8rem;margin:2px;}
+.miss-tag{background:#ffcdd2;color:#b71c1c;padding:2px 7px;border-radius:10px;font-size:.8rem;margin:2px;}
+#score-board{background:var(--pri);color:#fff;border-radius:14px;padding:24px;text-align:center;margin-top:16px;}
+#score-board h3{font-size:1.5rem;}#score-board p{font-size:1rem;opacity:.9;margin-top:6px;}
+</style>
+<script type="text/javascript">(function(c,l,a,r,i,t,y){c[a]=c[a]||function(){(c[a].q=c[a].q||[]).push(arguments)};t=l.createElement(r);t.async=1;t.src="https://www.clarity.ms/tag/"+i;y=l.getElementsByTagName(r)[0];y.parentNode.insertBefore(t,y);})(window,document,"clarity","script","wg31zlwbt9");</script>\n</head>
+<body>
+<div id="topbar">
+  <div class="title">📐 F4 Mathematics — Three Dimensional Geometry</div>
+  <div class="meta" id="slide-label">Slide 1 / 10</div>
+</div>
+<div id="progress-bar"><div id="progress-fill" style="width:10%"></div></div>
+<div class="dots" id="dot-row"></div>
+
+<div class="slide active" id="s1">
+  <h2>📌 Learning Outcomes</h2>
+  <div class="card">
+    <h3>By the end of this lesson, you will be able to:</h3>
+    <div class="outcome-item"><span class="icon">🏗️</span><p>State the geometric properties of common 3D solids</p></div>
+    <div class="outcome-item"><span class="icon">📐</span><p>Identify projection of a line onto a plane and skew lines</p></div>
+    <div class="outcome-item"><span class="icon">📏</span><p>Calculate the length between two points in 3D geometry</p></div>
+    <div class="outcome-item"><span class="icon">🔺</span><p>Calculate the angle between two lines</p></div>
+    <div class="outcome-item"><span class="icon">📋</span><p>Calculate the angle between a line and a plane</p></div>
+    <div class="outcome-item"><span class="icon">🔶</span><p>Calculate the angle between two planes</p></div>
+  </div>
+  <div class="nav-row"><span></span><button class="btn btn-pri" onclick="go(2)">Start Lesson →</button></div>
+</div>
+
+<div class="slide" id="s2">
+  <h2>🏗️ Properties of Common Solids</h2>
+  <div class="card">
+    <h3>Dimensions</h3>
+    <ul>
+      <li><strong>1D:</strong> Length only (a line)</li>
+      <li><strong>2D:</strong> Area but no volume (a flat shape)</li>
+      <li><strong>3D:</strong> Has vertices (points), edges (lines) and faces (planes)</li>
+    </ul>
+  </div>
+  <div class="solids-grid">
+    <div class="solid-card"><span class="emoji">📦</span><strong>Rectangular Prism</strong><br>6 faces, 8 vertices, 12 edges</div>
+    <div class="solid-card"><span class="emoji">🔺</span><strong>Triangular Prism</strong><br>5 faces, 6 vertices, 9 edges</div>
+    <div class="solid-card"><span class="emoji">🔔</span><strong>Cone</strong><br>2 faces, 1 edge, 1 vertex</div>
+    <div class="solid-card"><span class="emoji">⬛</span><strong>Cube</strong><br>6 faces, 8 vertices, 12 edges</div>
+    <div class="solid-card"><span class="emoji">🥫</span><strong>Cylinder</strong><br>3 faces, 2 edges, 0 vertices</div>
+    <div class="solid-card"><span class="emoji">🔷</span><strong>Rect. Pyramid</strong><br>5 faces, 5 vertices, 8 edges</div>
+    <div class="solid-card"><span class="emoji">🌐</span><strong>Sphere</strong><br>1 curved face, 0 edges, 0 vertices</div>
+  </div>
+  <div class="nav-row"><button class="btn btn-gray" onclick="go(1)">← Back</button><button class="btn btn-pri" onclick="go(3)">Next →</button></div>
+</div>
+
+<div class="slide" id="s3">
+  <h2>↔️ Skew Lines & Projections</h2>
+  <div class="card">
+    <h3>Skew Lines</h3>
+    <div class="highlight">
+      <strong>Skew lines</strong> are lines that are NOT parallel and do NOT intersect — they exist in different planes. For example, the top-front edge of a cuboid and the bottom-right edge are skew lines.
+    </div>
+    <p>Skew lines cannot be in the same flat plane.</p>
+  </div>
+  <div class="card">
+    <h3>Projection of a Line onto a Plane</h3>
+    <p>The projection of a line onto a plane is like the "shadow" the line casts on the plane when light shines perpendicular to the plane.</p>
+    <div class="highlight">
+      To find the projection: drop perpendiculars from both ends of the line to the plane. The line joining the feet of these perpendiculars is the projection.
+    </div>
+    <div class="example-box">
+      <strong>Example:</strong> In a cuboid ABCDEFGH, the projection of diagonal AG onto the base ABCD is the diagonal AC.
+    </div>
+  </div>
+  <div class="nav-row"><button class="btn btn-gray" onclick="go(2)">← Back</button><button class="btn btn-pri" onclick="go(4)">Next →</button></div>
+</div>
+
+<div class="slide" id="s4">
+  <h2>📏 Length in 3D Geometry</h2>
+  <div class="card">
+    <h3>Distance Between Two Points in 3D</h3>
+    <p>For two points A(x₁, y₁, z₁) and B(x₂, y₂, z₂):</p>
+    <div class="formula">AB = √[(x₂-x₁)² + (y₂-y₁)² + (z₂-z₁)²]</div>
+    <p>This is an extension of Pythagoras' theorem into 3 dimensions.</p>
+  </div>
+  <div class="card">
+    <h3>Space Diagonal of a Cuboid</h3>
+    <p>For a cuboid with length l, width w, height h:</p>
+    <div class="formula">Space diagonal = √(l² + w² + h²)</div>
+    <div class="example-box">
+      <strong>Example:</strong> A cuboid is 3 cm × 4 cm × 5 cm. Find the length of the space diagonal.<br>
+      d = √(3² + 4² + 5²) = √(9 + 16 + 25) = √50 = <strong>5√2 ≈ 7.07 cm</strong>
+    </div>
+  </div>
+  <div class="card">
+    <h3>Face Diagonal</h3>
+    <div class="formula">Face diagonal (base) = √(l² + w²)</div>
+    <div class="example-box">
+      <strong>Example (continued):</strong> Face diagonal of base = √(3² + 4²) = √25 = <strong>5 cm</strong>
+    </div>
+  </div>
+  <div class="nav-row"><button class="btn btn-gray" onclick="go(3)">← Back</button><button class="btn btn-pri" onclick="go(5)">Next →</button></div>
+</div>
+
+<div class="slide" id="s5">
+  <h2>📐 Angle Between a Line and a Plane</h2>
+  <div class="card">
+    <h3>Definition</h3>
+    <div class="highlight">
+      The angle between a line and a plane is the angle between the line and its <strong>projection</strong> onto the plane. It is the smallest angle between the line and any line in the plane.
+    </div>
+    <p>Steps to find this angle:</p>
+    <ol style="padding-left:18px;line-height:2">
+      <li>Identify the foot of the perpendicular from a point on the line to the plane</li>
+      <li>The projection is the line joining this foot to the point where the line meets the plane</li>
+      <li>Use trigonometry: tan θ = height ÷ projection length</li>
+    </ol>
+  </div>
+  <div class="card">
+    <h3>Worked Example</h3>
+    <div class="example-box">
+      A pole PQ stands vertically at corner Q of a rectangular floor. Q is 10 m from corner A, and the pole is 4 m tall. Find the angle PA makes with the floor.<br><br>
+      tan θ = opposite/adjacent = 4/10 = 0.4<br>
+      θ = tan⁻¹(0.4) = <strong>21.8°</strong>
+    </div>
+  </div>
+  <div class="nav-row"><button class="btn btn-gray" onclick="go(4)">← Back</button><button class="btn btn-pri" onclick="go(6)">Next →</button></div>
+</div>
+
+<div class="slide" id="s6">
+  <h2>🔶 Angle Between Two Planes</h2>
+  <div class="card">
+    <h3>Definition</h3>
+    <div class="highlight">
+      Any two planes either are parallel or intersect in a straight line. The <strong>dihedral angle</strong> between two planes is measured by drawing a line on each plane perpendicular to the line of intersection at the same point, then measuring the angle between these two lines.
+    </div>
+  </div>
+  <div class="card">
+    <h3>Worked Example — Tetrahedron</h3>
+    <div class="example-box">
+      PQRS is a regular tetrahedron of side 4 cm. M is the midpoint of RS.<br><br>
+      <strong>Step 1:</strong> Find PM (in triangle PRS, equilateral with side 4):<br>
+      PM² = 4² – 2² = 16 – 4 = 12 → PM = 2√3 cm<br><br>
+      <strong>Step 2:</strong> Find QM (triangle QRS is also equilateral):<br>
+      QM = 2√3 cm → triangle PMQ is isosceles ✓<br><br>
+      <strong>Step 3:</strong> Angle PMQ = angle between planes PSR and QRS<br>
+      In triangle PMQ: PM = QM = 2√3, PQ = 4<br>
+      cos(PMQ) = (PM² + QM² – PQ²) / (2·PM·QM)<br>
+      = (12 + 12 – 16) / (2·12) = 8/24 = 1/3<br>
+      Angle PMQ = cos⁻¹(1/3) ≈ <strong>70.5°</strong>
+    </div>
+  </div>
+  <div class="nav-row"><button class="btn btn-gray" onclick="go(5)">← Back</button><button class="btn btn-pri" onclick="go(7)">Next →</button></div>
+</div>
+
+<div class="slide" id="s7">
+  <h2>🏠 Real-Life Example: Cuboid</h2>
+  <div class="card">
+    <h3>Full Cuboid Analysis</h3>
+    <div class="example-box">
+      A room is 6 m long, 4 m wide, and 3 m tall. A rope runs from corner A at the base to corner G diagonally opposite at the top.<br><br>
+      <strong>a) Length of rope AG:</strong><br>
+      AG = √(6² + 4² + 3²) = √(36+16+9) = √61 ≈ <strong>7.81 m</strong><br><br>
+      <strong>b) Projection of AG onto base = AC:</strong><br>
+      AC = √(6² + 4²) = √52 ≈ 7.21 m<br><br>
+      <strong>c) Angle AG makes with base floor:</strong><br>
+      sin θ = 3/7.81 → θ = sin⁻¹(0.384) ≈ <strong>22.6°</strong>
+    </div>
+  </div>
+  <div class="card">
+    <h3>Kenyan Context 🇰🇪</h3>
+    <p>These calculations are used in construction of buildings, bridges, and structures like the Nairobi Expressway pillars, roofing trusses, and telecommunications towers in Kenya.</p>
+  </div>
+  <div class="nav-row"><button class="btn btn-gray" onclick="go(6)">← Back</button><button class="btn btn-pri" onclick="go(8)">Next →</button></div>
+</div>
+
+<div class="slide" id="s8">
+  <h2>📋 Summary</h2>
+  <div class="card">
+    <div class="formula">
+      <strong>Distance in 3D:</strong> d = √(Δx² + Δy² + Δz²)<br><br>
+      <strong>Space diagonal of cuboid:</strong> d = √(l² + w² + h²)<br><br>
+      <strong>Angle: line to plane:</strong> tan θ = height / projection<br><br>
+      <strong>Angle between planes:</strong> Use perpendiculars to line of intersection + cosine rule
+    </div>
+  </div>
+  <div class="card">
+    <h3>Key Concepts to Remember</h3>
+    <ul>
+      <li>Skew lines: not parallel, don't intersect, in different planes</li>
+      <li>Projection = "shadow" of line onto plane</li>
+      <li>Always draw a diagram for 3D problems</li>
+      <li>Identify right-angled triangles within the 3D shape</li>
+    </ul>
+  </div>
+  <div class="nav-row"><button class="btn btn-gray" onclick="go(7)">← Back</button><button class="btn btn-pri" onclick="go(9)">Practice →</button></div>
+</div>
+
+<div class="slide" id="s9">
+  <h2>✏️ Practice Questions</h2>
+  <div class="card">
+    <div class="q-block">
+      <strong>1. How many edges does a rectangular prism have?</strong>
+      <input type="text" id="p1" placeholder="number">
+      <div id="pf1"></div>
+    </div>
+    <div class="q-block">
+      <strong>2. A cuboid is 5m × 3m × 4m. Find the space diagonal (1 dp).</strong>
+      <input type="text" id="p2" placeholder="cm">
+      <div id="pf2"></div>
+    </div>
+    <div class="q-block">
+      <strong>3. What is the term for lines that are not parallel and do not intersect?</strong>
+      <input type="text" id="p3" placeholder="answer">
+      <div id="pf3"></div>
+    </div>
+    <button class="btn btn-acc" onclick="checkPractice()" style="margin-top:10px">Check Answers</button>
+  </div>
+  <div class="nav-row"><button class="btn btn-gray" onclick="go(8)">← Back</button><button class="btn btn-pri" onclick="go(10)">Take Quiz →</button></div>
+</div>
+
+<div class="slide" id="s10">
+  <h2>🎯 Quiz — 3D Geometry</h2>
+  <div id="quiz-area">
+    <div class="card">
+      <h3>Fill in the Blanks (1 mark each)</h3>
+      <div class="q-block"><strong>1.</strong> A cuboid has _____ edges.<input type="text" id="q1"></div>
+      <div class="q-block"><strong>2.</strong> Lines in different planes that don't meet and aren't parallel are called _____ lines.<input type="text" id="q2"></div>
+      <div class="q-block"><strong>3.</strong> The projection of a line onto a plane is the _____ of the line on the plane.<input type="text" id="q3"></div>
+      <div class="q-block"><strong>4.</strong> The angle between a line and a plane uses: tan θ = _____ ÷ projection length.<input type="text" id="q4"></div>
+      <div class="q-block"><strong>5.</strong> The space diagonal of a cuboid l×w×h = √(l² + w² + _____²).<input type="text" id="q5"></div>
+    </div>
+    <div class="card">
+      <h3>Short Answer (2 marks each)</h3>
+      <div class="q-block">
+        <strong>6.</strong> A cuboid is 8cm × 6cm × 5cm. Find the length of the space diagonal (1 dp).
+        <input type="text" id="q6"><div id="qf6"></div>
+      </div>
+      <div class="q-block">
+        <strong>7.</strong> A vertical mast 12m tall stands at corner B of a rectangular field. Corner A is 9m from B. Find the angle the wire from A to top of mast makes with the ground (1 dp).
+        <input type="text" id="q7"><div id="qf7"></div>
+      </div>
+      <div class="q-block">
+        <strong>8.</strong> State TWO examples of 3D solids and give the number of faces for each.
+        <input type="text" id="q8"><div id="qf8"></div>
+      </div>
+    </div>
+    <button class="btn btn-acc" onclick="submitQuiz()" style="margin-top:10px;width:100%">Submit Quiz</button>
+  </div>
+  <div id="score-board" style="display:none">
+    <h3 id="score-txt"></h3><p id="grade-txt"></p><p id="cbc-comment"></p>
+  </div>
+  <div class="nav-row"><button class="btn btn-gray" onclick="go(9)">← Back</button></div>
+</div>
+
+<script>
+let current=1;const total=10;
+const dots=document.getElementById('dot-row');
+for(let i=1;i<=total;i++){const d=document.createElement('div');d.className='dot';d.id='dot'+i;d.onclick=()=>go(i);dots.appendChild(d);}
+function go(n){
+  document.querySelector('.slide.active').classList.remove('active');
+  document.getElementById('s'+n).classList.add('active');
+  current=n;
+  document.getElementById('slide-label').textContent=`Slide ${n} / ${total}`;
+  document.getElementById('progress-fill').style.width=(n/total*100)+'%';
+  for(let i=1;i<=total;i++){const d=document.getElementById('dot'+i);d.className='dot'+(i===n?' active':i<n?' done':'');}
+  window.scrollTo(0,0);
+}go(1);
+
+function checkPractice(){
+  const ans=[
+    {id:'p1',correct:'12',hint:'A rectangular prism (cuboid) has 12 edges'},
+    {id:'p2',correct:'7.1',hint:'√(25+9+16)=√50≈7.1 m'},
+    {id:'p3',correct:'skew',hint:'Lines that are not parallel and do not intersect are called skew lines'}
+  ];
+  ans.forEach((a,i)=>{
+    const v=document.getElementById(a.id).value.trim();
+    const fb=document.getElementById('pf'+(i+1));
+    if(v.toLowerCase().includes(a.correct.toLowerCase())){fb.innerHTML=`<div class="feedback ok">✅ Correct!</div>`;}
+    else{fb.innerHTML=`<div class="feedback no">❌ Hint: ${a.hint}</div>`;}
+  });
+}
+
+function submitQuiz(){
+  const fills=[
+    {id:'q1',answers:['12']},
+    {id:'q2',answers:['skew']},
+    {id:'q3',answers:['shadow','projection']},
+    {id:'q4',answers:['height']},
+    {id:'q5',answers:['h']}
+  ];
+  let score=0,tm=11;
+  fills.forEach(f=>{
+    const v=document.getElementById(f.id).value.trim().toLowerCase();
+    if(f.answers.some(a=>v.includes(a))){score++;}
+  });
+  const shorts=[
+    {id:'q6',keys:['11.2','11.18'],model:'√(64+36+25)=√125≈11.2 cm',marks:2},
+    {id:'q7',keys:['53.1','53','53.13'],model:'tan θ=12/9=1.333; θ=tan⁻¹(1.333)≈53.1°',marks:2},
+    {id:'q8',keys:['cube','prism','pyramid','cylinder','cone','sphere','6','5','1','2'],model:'E.g. Cube (6 faces), Cone (2 faces)',marks:2}
+  ];
+  shorts.forEach(s=>{
+    const v=document.getElementById(s.id).value.trim();
+    const res=v.toLowerCase();
+    const fb=document.getElementById(s.id.replace('q','qf'));
+    if(s.keys.some(k=>res.includes(k.toLowerCase()))){
+      score+=s.marks;
+      fb.innerHTML=`<div class="feedback ok">✅ +${s.marks} marks. Model: ${s.model}</div>`;
+    } else {
+      fb.innerHTML=`<div class="feedback no">❌ 0 marks. Model: ${s.model}</div>`;
+    }
+  });
+  const pct=Math.round(score/tm*100);
+  let g='',c='';
+  if(pct>=80){g='Exceeds Expectation (EE)';c='Excellent mastery of 3D geometry!';}
+  else if(pct>=60){g='Meets Expectation (ME)';c='Good work! Review the angle calculations.';}
+  else if(pct>=40){g='Approaches Expectation (AE)';c='Practise identifying right triangles in 3D shapes.';}
+  else{g='Below Expectation (BE)';c='Revisit the lesson. Draw diagrams for every problem.';}
+  document.getElementById('score-board').style.display='block';
+  document.getElementById('score-txt').textContent=`Score: ${score} / ${tm} (${pct}%)`;
+  document.getElementById('grade-txt').textContent=g;
+  document.getElementById('cbc-comment').textContent=c;
+  document.getElementById('quiz-area').style.display='none';
+  if(typeof submitExamToMTTI==='function') submitExamToMTTI(score,tm,pct);
+}
+</script>
+</body>
+</html>

@@ -1,0 +1,610 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>F4 Biology | Genetics &amp; Inheritance</title>
+<style>
+:root{--pri:#0a5e2a;--acc:#f5a623;--ok:#2e7d32;--no:#c62828;--bg:#f4f6f4;--card:#fff;--txt:#1a2e1a;--sub:#4a6a4a;--dna1:#e53935;--dna2:#1e88e5;}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:'Segoe UI',sans-serif;background:var(--bg);color:var(--txt);min-height:100vh;}
+#topbar{position:sticky;top:0;z-index:100;background:var(--pri);color:#fff;display:flex;align-items:center;justify-content:space-between;padding:10px 18px;gap:10px;box-shadow:0 2px 8px #0005;}
+#topbar .meta{font-size:.75rem;opacity:.8;}
+#topbar .title{font-weight:700;font-size:.95rem;text-align:center;flex:1;}
+#slide-counter{font-size:.78rem;background:#ffffff28;padding:3px 10px;border-radius:20px;}
+#dots{display:flex;gap:6px;justify-content:center;padding:10px 0 4px;flex-wrap:wrap;}
+.dot{width:11px;height:11px;border-radius:50%;background:#ccc;cursor:pointer;transition:.2s;}
+.dot.active{background:var(--pri);}
+.dot.done{background:var(--acc);}
+#slides-wrap{max-width:820px;margin:0 auto;padding:12px 14px 80px;}
+.slide{display:none;animation:fadeIn .35s ease;}
+.slide.active{display:block;}
+@keyframes fadeIn{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:translateY(0)}}
+.slide-title{background:linear-gradient(135deg,var(--pri),#1a8a40);color:#fff;padding:14px 18px;border-radius:12px 12px 0 0;font-size:1.1rem;font-weight:700;}
+.slide-body{background:var(--card);border-radius:0 0 12px 12px;padding:18px;box-shadow:0 2px 12px #0001;}
+.info-card{background:#f0f7f0;border-left:4px solid var(--pri);border-radius:8px;padding:13px 15px;margin:12px 0;}
+.warn-card{background:#fff8e1;border-left:4px solid var(--acc);border-radius:8px;padding:13px 15px;margin:12px 0;}
+.def-box{background:var(--pri);color:#fff;border-radius:10px;padding:13px 16px;margin:12px 0;font-size:.95rem;}
+h3{color:var(--pri);margin:14px 0 7px;font-size:1rem;}
+h4{color:var(--sub);margin:10px 0 5px;font-size:.93rem;}
+p,li{font-size:.93rem;line-height:1.6;margin-bottom:7px;}
+ul,ol{padding-left:20px;margin-bottom:8px;}
+table{width:100%;border-collapse:collapse;margin:12px 0;font-size:.86rem;}
+th{background:var(--pri);color:#fff;padding:8px 10px;text-align:left;}
+td{padding:7px 10px;border-bottom:1px solid #e0e8e0;}
+tr:nth-child(even) td{background:#f5faf5;}
+.two-col{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin:12px 0;}
+@media(max-width:560px){.two-col{grid-template-columns:1fr;}}
+.col-card{background:#f9fbf9;border:1px solid #d0e8d0;border-radius:10px;padding:13px;}
+.col-card h4{color:var(--pri);margin-top:0;}
+#nav{position:fixed;bottom:0;left:0;right:0;background:#fff;border-top:2px solid #e0e8e0;display:flex;justify-content:center;align-items:center;gap:14px;padding:10px 16px;z-index:99;}
+.btn{padding:10px 22px;border:none;border-radius:8px;font-size:.9rem;font-weight:600;cursor:pointer;transition:.2s;}
+.btn-pri{background:var(--pri);color:#fff;}
+.btn-pri:hover{background:#0d7a36;}
+.btn-sec{background:#e8f0e8;color:var(--pri);}
+.btn-sec:hover{background:#d0e4d0;}
+.btn-acc{background:var(--acc);color:#fff;}
+.q-block{background:#f9fbf9;border:1px solid #d0e8d0;border-radius:10px;padding:15px;margin:14px 0;}
+.q-block p{font-weight:600;margin-bottom:8px;}
+.fill-input{width:100%;padding:9px 12px;border:2px solid #cde;border-radius:7px;font-size:.92rem;margin-top:5px;}
+.fill-input:focus{outline:none;border-color:var(--pri);}
+textarea.fill-input{resize:vertical;min-height:70px;}
+.feedback{margin-top:8px;padding:8px 12px;border-radius:7px;font-size:.87rem;display:none;}
+.feedback.correct{background:#e8f5e9;border:1px solid #a5d6a7;color:var(--ok);display:block;}
+.feedback.wrong{background:#fce8e8;border:1px solid #ef9a9a;color:var(--no);display:block;}
+.tag{display:inline-block;padding:2px 8px;border-radius:12px;font-size:.78rem;margin:2px;}
+.tag.found{background:#c8e6c9;color:#1b5e20;}
+.tag.missed{background:#ffcdd2;color:#b71c1c;}
+.rubric{background:#fff3e0;border-radius:8px;padding:12px;margin-top:10px;font-size:.85rem;}
+.rubric strong{color:#e65100;}
+#score-board{background:linear-gradient(135deg,var(--pri),#1a8a40);color:#fff;border-radius:14px;padding:22px;text-align:center;margin-top:14px;}
+#score-board .big{font-size:2.5rem;font-weight:800;}
+.practice-q{background:#f0f7ff;border:1px solid #bbdefb;border-radius:9px;padding:14px;margin:12px 0;}
+.practice-q p{font-weight:600;color:#1565c0;}
+.reveal-btn{margin-top:8px;background:#1565c0;color:#fff;border:none;padding:7px 16px;border-radius:6px;cursor:pointer;font-size:.85rem;}
+.answer-reveal{display:none;margin-top:10px;background:#e3f2fd;border-radius:7px;padding:10px;font-size:.87rem;}
+.outcome-list li{margin:6px 0;padding:6px 10px;background:#f0f7f0;border-radius:6px;border-left:3px solid var(--acc);}
+/* PUNNETT SQUARE */
+.punnett{display:inline-grid;grid-template-columns:40px repeat(2,70px);grid-template-rows:40px repeat(2,60px);gap:2px;margin:14px auto;font-size:.88rem;font-weight:600;}
+.punnett .header{background:var(--pri);color:#fff;display:flex;align-items:center;justify-content:center;border-radius:5px;}
+.punnett .cell{background:#e8f5e9;border:2px solid #a5d6a7;border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:.95rem;}
+.punnett .corner{background:transparent;}
+.p-wrap{text-align:center;}
+/* GLOSSARY GRID */
+.gloss-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:12px 0;}
+@media(max-width:560px){.gloss-grid{grid-template-columns:1fr;}}
+.gloss-card{background:#f9fbf9;border:1px solid #d0e8d0;border-radius:8px;padding:11px 13px;}
+.gloss-card .term{font-weight:700;color:var(--pri);font-size:.9rem;}
+.gloss-card .def{font-size:.83rem;color:#444;margin-top:3px;line-height:1.5;}
+/* DNA HELIX SVG BAND */
+.dna-banner{width:100%;overflow:hidden;height:36px;margin:10px 0;}
+/* CROSS DIAGRAM */
+.cross-box{background:#fff8e1;border:2px solid var(--acc);border-radius:10px;padding:14px;margin:12px 0;text-align:center;}
+.cross-row{display:flex;justify-content:center;align-items:center;gap:10px;margin:6px 0;flex-wrap:wrap;}
+.cross-label{font-size:.85rem;color:#555;}
+.cross-allele{background:var(--pri);color:#fff;padding:5px 14px;border-radius:20px;font-weight:700;font-size:.9rem;}
+.cross-arrow{font-size:1.1rem;color:var(--acc);}
+/* RATIO BOX */
+.ratio-bar{display:flex;gap:4px;margin:10px 0;height:32px;border-radius:8px;overflow:hidden;}
+.ratio-seg{display:flex;align-items:center;justify-content:center;font-size:.78rem;font-weight:700;color:#fff;}
+</style>
+<script type="text/javascript">(function(c,l,a,r,i,t,y){c[a]=c[a]||function(){(c[a].q=c[a].q||[]).push(arguments)};t=l.createElement(r);t.async=1;t.src="https://www.clarity.ms/tag/"+i;y=l.getElementsByTagName(r)[0];y.parentNode.insertBefore(t,y);})(window,document,"clarity","script","wg31zlwbt9");</script>\n</head>
+<body>
+
+<div id="topbar">
+  <div class="meta">F4 Biology</div>
+  <div class="title">🧬 Genetics &amp; Inheritance</div>
+  <div id="slide-counter">1 / 10</div>
+</div>
+
+<div id="dots"></div>
+<div id="slides-wrap">
+
+<!-- SLIDE 1: LEARNING OUTCOMES -->
+<div class="slide active" id="s1">
+  <div class="slide-title">🎯 Learning Outcomes</div>
+  <div class="slide-body">
+    <div class="info-card">By the end of this lesson, you should be able to:</div>
+    <ul class="outcome-list">
+      <li>Define genetics, heredity, gene, allele, chromosome and DNA</li>
+      <li>Explain key genetic terms: genotype, phenotype, dominant, recessive, homozygous, heterozygous</li>
+      <li>Apply Mendel's First Law (Law of Segregation) using Punnett squares</li>
+      <li>Distinguish between complete dominance and co-dominance with examples</li>
+      <li>Explain ABO blood groups, Rh factor and sex determination</li>
+      <li>Describe sex linkage — colour blindness and haemophilia</li>
+      <li>Define mutation and explain chromosomal and gene mutations</li>
+      <li>State practical applications of genetics</li>
+    </ul>
+    <div class="warn-card">📚 <strong>Source:</strong> Form IV Biology Notes — Topic 1: Genetics &amp; Inheritance</div>
+  </div>
+</div>
+
+<!-- SLIDE 2: KEY DEFINITIONS -->
+<div class="slide" id="s2">
+  <div class="slide-title">📖 Key Definitions in Genetics</div>
+  <div class="slide-body">
+    <div class="def-box">🧬 <strong>Genetics:</strong> The study of heredity (inheritance) and variation — how characteristics are passed from parents to offspring.</div>
+
+    <div class="gloss-grid">
+      <div class="gloss-card"><div class="term">Heredity</div><div class="def">Transmission of traits from parents to offspring; resemblance among related individuals</div></div>
+      <div class="gloss-card"><div class="term">Trait / Character</div><div class="def">A characteristic of an organism e.g. eye colour, height, blood group</div></div>
+      <div class="gloss-card"><div class="term">Gene</div><div class="def">Unit of inheritance; hereditary factor at a fixed point (locus) on a chromosome that transmits traits</div></div>
+      <div class="gloss-card"><div class="term">Allele</div><div class="def">Alternative forms of genes controlling a particular characteristic at a specific locus</div></div>
+      <div class="gloss-card"><div class="term">Chromosome</div><div class="def">Threadlike structures in cell nuclei; carry genes (DNA + histone proteins); two types: autosomes and sex chromosomes</div></div>
+      <div class="gloss-card"><div class="term">DNA</div><div class="def">Deoxyribonucleic acid — double helix molecule making up chromosomes; contains genes; 4 bases: A-T, G-C pairs</div></div>
+      <div class="gloss-card"><div class="term">Genotype</div><div class="def">The genetic constitution/makeup of an individual (e.g. TT, Tt, tt)</div></div>
+      <div class="gloss-card"><div class="term">Phenotype</div><div class="def">The observable characteristic of an individual (what you can see)</div></div>
+      <div class="gloss-card"><div class="term">Dominant gene</div><div class="def">Expressed in the phenotype when homozygous OR heterozygous</div></div>
+      <div class="gloss-card"><div class="term">Recessive gene</div><div class="def">Only expressed in the homozygous state (e.g. tt)</div></div>
+      <div class="gloss-card"><div class="term">Homozygous</div><div class="def">Two identical alleles at a locus (e.g. LL or ll)</div></div>
+      <div class="gloss-card"><div class="term">Heterozygous</div><div class="def">Two different alleles at a locus (e.g. Ll)</div></div>
+    </div>
+
+    <div class="info-card">🔑 <strong>F1</strong> = First filial generation (first offspring from a cross). <strong>F2</strong> = Second generation (offspring from F1 × F1).</div>
+  </div>
+</div>
+
+<!-- SLIDE 3: MENDEL'S FIRST LAW & MONOHYBRID -->
+<div class="slide" id="s3">
+  <div class="slide-title">⚖️ Mendel's First Law &amp; Monohybrid Inheritance</div>
+  <div class="slide-body">
+    <div class="def-box">⚖️ <strong>Mendel's First Law (Law of Segregation):</strong> Only one character from a contrasting pair can be carried in a gamete. Genes are transmitted individually without alteration — hence only one character can be inherited per gamete.</div>
+
+    <div class="def-box" style="background:#1565c0;">🔬 <strong>Monohybrid Inheritance:</strong> The study of inheritance of ONE character at a time (e.g. wing size in Drosophila).</div>
+
+    <h3>Example — Wing Size in Drosophila (Fruit Fly)</h3>
+    <p>L = long wings (dominant); l = short wings (recessive)</p>
+
+    <div class="cross-box">
+      <div class="cross-row"><span class="cross-label">Parent phenotype:</span> <span class="cross-allele">Long wings</span> <span class="cross-arrow">×</span> <span class="cross-allele">Short wings</span></div>
+      <div class="cross-row"><span class="cross-label">Parent genotype:</span> <span class="cross-allele">LL</span> <span class="cross-arrow">×</span> <span class="cross-allele">ll</span></div>
+      <div class="cross-row"><span class="cross-label">Gametes:</span> <span class="cross-allele">L</span> <span class="cross-arrow">and</span> <span class="cross-allele">l</span></div>
+      <p style="margin:8px 0;font-size:.85rem;color:#555;">F1 Generation (Punnett Square):</p>
+      <div class="p-wrap">
+        <div class="punnett">
+          <div class="corner"></div><div class="header">L</div><div class="header">L</div>
+          <div class="header">l</div><div class="cell">Ll</div><div class="cell">Ll</div>
+          <div class="header">l</div><div class="cell">Ll</div><div class="cell">Ll</div>
+        </div>
+      </div>
+      <p style="font-size:.87rem;margin-top:6px;"><strong>F1 phenotype:</strong> All long wings (Ll) — heterozygous</p>
+    </div>
+
+    <h3>F1 × F1 → F2 Generation</h3>
+    <div class="cross-box">
+      <div class="p-wrap">
+        <div class="punnett">
+          <div class="corner"></div><div class="header">L</div><div class="header">l</div>
+          <div class="header">L</div><div class="cell">LL</div><div class="cell">Ll</div>
+          <div class="header">l</div><div class="cell">Ll</div><div class="cell" style="background:#fce8e8;border-color:#ef9a9a;">ll</div>
+        </div>
+      </div>
+      <div class="ratio-bar" style="margin-top:10px;">
+        <div class="ratio-seg" style="flex:3;background:var(--pri);">3 Long wings</div>
+        <div class="ratio-seg" style="flex:1;background:var(--no);">1 Short</div>
+      </div>
+      <p style="font-size:.85rem;"><strong>Phenotypic ratio: 3 long : 1 short</strong> | Genotypic ratio: 1 LL : 2 Ll : 1 ll</p>
+    </div>
+    <div class="info-card">🔑 <strong>Complete dominance:</strong> Only one dominant character is expressed in the heterozygous state; the recessive is masked.</div>
+  </div>
+</div>
+
+<!-- SLIDE 4: CO-DOMINANCE & TEST CROSS -->
+<div class="slide" id="s4">
+  <div class="slide-title">🌸 Co-dominance &amp; Test Cross</div>
+  <div class="slide-body">
+    <div class="def-box">🌸 <strong>Co-dominance:</strong> Neither allele is dominant — both are expressed in the heterozygous state. Neither gene masks the other.</div>
+
+    <h3>Example — Flower Colour</h3>
+    <p>R = red flowers; W = white flowers (neither dominant)</p>
+
+    <div class="cross-box">
+      <div class="cross-row"><span class="cross-allele" style="background:#c62828;">Red (RR)</span><span class="cross-arrow">×</span><span class="cross-allele" style="background:#555;">White (WW)</span></div>
+      <div class="p-wrap" style="margin-top:8px;">
+        <div class="punnett">
+          <div class="corner"></div><div class="header">R</div><div class="header">R</div>
+          <div class="header">W</div><div class="cell">RW</div><div class="cell">RW</div>
+          <div class="header">W</div><div class="cell">RW</div><div class="cell">RW</div>
+        </div>
+      </div>
+      <p style="font-size:.87rem;margin-top:6px;"><strong>F1:</strong> All RW = PINK flowers (intermediate — both expressed)</p>
+    </div>
+
+    <h3>F1 (RW) × F1 (RW) → F2</h3>
+    <div class="cross-box">
+      <div class="p-wrap">
+        <div class="punnett">
+          <div class="corner"></div><div class="header">R</div><div class="header">W</div>
+          <div class="header">R</div><div class="cell" style="background:#ffcdd2;">RR</div><div class="cell" style="background:#e8f5e9;">RW</div>
+          <div class="header">W</div><div class="cell" style="background:#e8f5e9;">RW</div><div class="cell" style="background:#e3f2fd;">WW</div>
+        </div>
+      </div>
+      <div class="ratio-bar" style="margin-top:10px;">
+        <div class="ratio-seg" style="flex:1;background:#c62828;">1 Red</div>
+        <div class="ratio-seg" style="flex:2;background:#e91e8c;">2 Pink</div>
+        <div class="ratio-seg" style="flex:1;background:#555;">1 White</div>
+      </div>
+      <p style="font-size:.85rem;"><strong>Phenotypic ratio: 1 Red : 2 Pink : 1 White | Genotypic ratio: 1:2:1</strong></p>
+    </div>
+
+    <h3>Test Cross</h3>
+    <div class="def-box" style="background:#1565c0;">🔬 <strong>Test Cross:</strong> A cross between an individual of unknown genotype (showing dominant character) with a <em>homozygous recessive</em> individual — to determine the unknown genotype.</div>
+    <div class="two-col">
+      <div class="col-card"><h4>If result is all dominant phenotype</h4><p>→ Unknown was <strong>homozygous dominant (LL)</strong></p></div>
+      <div class="col-card"><h4>If result is 1 dominant : 1 recessive</h4><p>→ Unknown was <strong>heterozygous (Ll)</strong></p></div>
+    </div>
+  </div>
+</div>
+
+<!-- SLIDE 5: BLOOD GROUPS & SEX DETERMINATION -->
+<div class="slide" id="s5">
+  <div class="slide-title">🩸 Blood Groups, Rh Factor &amp; Sex Determination</div>
+  <div class="slide-body">
+
+    <h3>ABO Blood Groups — Multiple Alleles</h3>
+    <div class="info-card">Three alleles: I<sup>A</sup>, I<sup>B</sup>, and i. Only TWO can be present at a time. I<sup>A</sup> and I<sup>B</sup> are co-dominant; i is recessive to both.</div>
+    <table>
+      <tr><th>Blood Group</th><th>Possible Genotypes</th><th>Antigens</th></tr>
+      <tr><td>A</td><td>I<sup>A</sup>I<sup>A</sup> or I<sup>A</sup>i</td><td>A antigen</td></tr>
+      <tr><td>B</td><td>I<sup>B</sup>I<sup>B</sup> or I<sup>B</sup>i</td><td>B antigen</td></tr>
+      <tr><td>AB</td><td>I<sup>A</sup>I<sup>B</sup></td><td>A and B (co-dominant)</td></tr>
+      <tr><td>O</td><td>ii</td><td>No antigen (recessive)</td></tr>
+    </table>
+
+    <h3>Rh Factor</h3>
+    <div class="two-col">
+      <div class="col-card"><h4>Rh Positive (Rh+)</h4><p>Has Rh antigen. Due to dominant gene (RR or Rr). Majority of people.</p></div>
+      <div class="col-card"><h4>Rh Negative (Rh–)</h4><p>No Rh antigen. Due to recessive gene (rr). Less common.</p></div>
+    </div>
+
+    <h3>Sex Determination in Humans</h3>
+    <div class="info-card">Humans have two sex chromosomes: <strong>X</strong> and <strong>Y</strong>.<br>
+    Females: XX (all ova carry X)<br>
+    Males: XY (50% of sperms carry X; 50% carry Y)
+    </div>
+    <div class="cross-box">
+      <div class="cross-row"><span class="cross-allele">Father (XY)</span><span class="cross-arrow">×</span><span class="cross-allele">Mother (XX)</span></div>
+      <div class="p-wrap" style="margin-top:8px;">
+        <div class="punnett">
+          <div class="corner"></div><div class="header">X</div><div class="header">Y</div>
+          <div class="header">X</div><div class="cell" style="background:#fce4ec;">XX ♀</div><div class="cell" style="background:#e3f2fd;">XY ♂</div>
+          <div class="header">X</div><div class="cell" style="background:#fce4ec;">XX ♀</div><div class="cell" style="background:#e3f2fd;">XY ♂</div>
+        </div>
+      </div>
+      <p style="font-size:.87rem;margin-top:6px;"><strong>Ratio: 1 female (XX) : 1 male (XY) — 50% chance of each sex</strong></p>
+      <p style="font-size:.83rem;color:#555;">X sperm + ovum = girl (XX) | Y sperm + ovum = boy (XY)</p>
+    </div>
+  </div>
+</div>
+
+<!-- SLIDE 6: SEX LINKAGE -->
+<div class="slide" id="s6">
+  <div class="slide-title">🔗 Sex Linkage &amp; Sex-Linked Traits</div>
+  <div class="slide-body">
+    <div class="def-box">🔗 <strong>Sex Linkage:</strong> Genes located on sex chromosomes, transmitted along with genes determining sex. <strong>Linkage:</strong> Genes occurring together on a chromosome and passed to offspring without separation.</div>
+
+    <h3>Sex-Linked Traits in Humans</h3>
+    <div class="two-col">
+      <div class="col-card"><h4>X-Linked traits</h4><ul><li>Colour blindness</li><li>Haemophilia</li></ul></div>
+      <div class="col-card"><h4>Y-Linked traits</h4><ul><li>Hairy ear pinna</li><li>Baldness</li></ul></div>
+    </div>
+    <div class="info-card">⚠️ Males (XY) have only ONE X chromosome — so a recessive X-linked gene will always be expressed in males (no second X to mask it).</div>
+
+    <h3>Colour Blindness — X-Linked Recessive</h3>
+    <p>X<sup>C</sup> = normal vision (dominant); X<sup>c</sup> = colour blind (recessive)</p>
+    <div class="cross-box">
+      <div class="cross-row"><span class="cross-allele">Normal man (X<sup>C</sup>Y)</span><span class="cross-arrow">×</span><span class="cross-allele">Carrier woman (X<sup>C</sup>X<sup>c</sup>)</span></div>
+      <div class="p-wrap" style="margin-top:8px;">
+        <div class="punnett">
+          <div class="corner"></div><div class="header">X<sup>C</sup></div><div class="header">Y</div>
+          <div class="header">X<sup>C</sup></div><div class="cell">X<sup>C</sup>X<sup>C</sup> ♀ Normal</div><div class="cell">X<sup>C</sup>Y ♂ Normal</div>
+          <div class="header">X<sup>c</sup></div><div class="cell" style="background:#fff8e1;">X<sup>C</sup>X<sup>c</sup> ♀ Carrier</div><div class="cell" style="background:#fce8e8;">X<sup>c</sup>Y ♂ Colour blind</div>
+        </div>
+      </div>
+      <p style="font-size:.85rem;margin-top:8px;"><strong>Result:</strong> 25% normal female | 25% carrier female | 25% normal male | 25% colour blind male</p>
+    </div>
+
+    <h3>Haemophilia — X-Linked Recessive</h3>
+    <p>X<sup>H</sup> = normal clotting; X<sup>h</sup> = haemophilia</p>
+    <div class="info-card">Normal parents (X<sup>H</sup>Y × X<sup>H</sup>X<sup>h</sup>) can produce haemophilic sons — the mother is a carrier. Daughters cannot be haemophilic unless father is haemophilic AND mother is carrier.</div>
+  </div>
+</div>
+
+<!-- SLIDE 7: VARIATION & MUTATION -->
+<div class="slide" id="s7">
+  <div class="slide-title">🔄 Variation &amp; Mutation</div>
+  <div class="slide-body">
+    <div class="def-box">🔄 <strong>Variation:</strong> Sequence of differences occurring among individuals of the same species.</div>
+
+    <h3>Types of Variation</h3>
+    <div class="two-col">
+      <div class="col-card">
+        <h4>Continuous Variation</h4>
+        <ul>
+          <li>Differences NOT clear-cut</li>
+          <li>Show intermediates</li>
+          <li>Quantitative</li>
+          <li>e.g. height, weight, skin colour, intelligence</li>
+        </ul>
+      </div>
+      <div class="col-card">
+        <h4>Discontinuous Variation</h4>
+        <ul>
+          <li>Differences ARE clear-cut</li>
+          <li>No intermediates</li>
+          <li>Qualitative</li>
+          <li>e.g. blood group, tongue rolling, fingerprints</li>
+        </ul>
+      </div>
+    </div>
+
+    <h3>Causes of Variation</h3>
+    <ul>
+      <li>Random assortment of genes during meiosis</li>
+      <li>Crossing over between homologous chromosomes</li>
+      <li>Fertilization (random combination of gametes)</li>
+      <li>Mutation (change in DNA)</li>
+      <li>Environmental conditions</li>
+    </ul>
+
+    <div class="def-box">💥 <strong>Mutation:</strong> A sudden change in the structure of DNA at a particular locus/chromosome/gene.</div>
+
+    <h3>Causes of Mutation (Mutagenic Agents)</h3>
+    <table>
+      <tr><th>Type</th><th>Agent</th><th>Effect</th></tr>
+      <tr><td>Radiation</td><td>X-rays</td><td>Gene/chromosome alteration</td></tr>
+      <tr><td>Radiation</td><td>UV rays</td><td>Structural distortion of DNA</td></tr>
+      <tr><td>Chemical</td><td>Colchicine</td><td>Prevents spindle formation</td></tr>
+      <tr><td>Chemical</td><td>Mustard gas</td><td>Chromosomal aberrations</td></tr>
+      <tr><td>Chemical</td><td>Nitrous acid</td><td>Adenine deaminated → behaves like guanine</td></tr>
+    </table>
+
+    <h3>Characteristics of Mutations</h3>
+    <ul><li>Arise suddenly and unpredictably</li><li>Random in nature</li><li>Generally rare</li><li>May breed true</li><li>Some desirable; some lethal</li></ul>
+  </div>
+</div>
+
+<!-- SLIDE 8: CHROMOSOMAL & GENE MUTATIONS -->
+<div class="slide" id="s8">
+  <div class="slide-title">🧬 Types of Mutations</div>
+  <div class="slide-body">
+
+    <h3>A. Chromosomal Mutations</h3>
+    <div class="def-box">Change in the nature, structure or <em>number</em> of chromosomes.</div>
+    <table>
+      <tr><th>Type</th><th>How it occurs</th></tr>
+      <tr><td>Duplication</td><td>A section of chromosome is repeated — genes are duplicated</td></tr>
+      <tr><td>Deletion</td><td>A portion of chromosome breaks off — alters number and sequence of genes</td></tr>
+      <tr><td>Inversion</td><td>Chromatid breaks at 2 places; middle piece rejoins in inverted position</td></tr>
+      <tr><td>Translocation</td><td>A section of chromatid breaks off and attaches to another chromosome</td></tr>
+      <tr><td>Non-disjunction</td><td>Failure of homologous chromosomes to separate during meiosis</td></tr>
+      <tr><td>Polyploidy</td><td>Chromosome number doubles or triples — beneficial in plants (↑ yield, disease resistance)</td></tr>
+    </table>
+
+    <h3>B. Gene Mutations</h3>
+    <div class="def-box">Alteration in the structure of a <em>gene</em> (change in DNA base sequence).</div>
+    <table>
+      <tr><th>Type</th><th>What happens</th></tr>
+      <tr><td>Deletion</td><td>Some bases/nucleotides of a gene are removed</td></tr>
+      <tr><td>Insertion</td><td>Addition of a base between two existing bases</td></tr>
+      <tr><td>Inversion</td><td>Order of some bases is reversed</td></tr>
+      <tr><td>Substitution</td><td>A portion of gene is replaced by a new portion</td></tr>
+    </table>
+
+    <h3>Disorders Caused by Gene Mutation</h3>
+    <div class="two-col">
+      <div class="col-card"><ul><li>Albinism</li><li>Sickle cell anaemia</li><li>Achondroplasia (dwarfism)</li></ul></div>
+      <div class="col-card"><ul><li>Haemophilia</li><li>Colour blindness</li><li>Phenylketonuria (PKU)</li></ul></div>
+    </div>
+  </div>
+</div>
+
+<!-- SLIDE 9: PRACTICE -->
+<div class="slide" id="s9">
+  <div class="slide-title">✏️ Practice Questions</div>
+  <div class="slide-body">
+
+    <div class="practice-q">
+      <p>1. Distinguish between genotype and phenotype. Give an example of each.</p>
+      <button class="reveal-btn" onclick="reveal(this)">Show Answer</button>
+      <div class="answer-reveal"><strong>Genotype:</strong> The genetic constitution of an organism (e.g. Ll — heterozygous for wing size).<br><strong>Phenotype:</strong> The observable characteristic (e.g. Long wings — because L is dominant).</div>
+    </div>
+
+    <div class="practice-q">
+      <p>2. In cattle, the gene for red coat (R) is co-dominant with the gene for white coat (W). What phenotype would a heterozygous (RW) cow have? What would be the F2 ratio if two RW cattle were crossed?</p>
+      <button class="reveal-btn" onclick="reveal(this)">Show Answer</button>
+      <div class="answer-reveal">RW cattle would be <strong>roan</strong> (mixture of red and white hairs) — both genes expressed.<br>F2: RR (red) : RW (roan) : WW (white) = <strong>1 Red : 2 Roan : 1 White</strong> (phenotypic ratio).</div>
+    </div>
+
+    <div class="practice-q">
+      <p>3. A carrier woman (X<sup>C</sup>X<sup>c</sup>) marries a colour blind man (X<sup>c</sup>Y). What proportion of their sons will be colour blind?</p>
+      <button class="reveal-btn" onclick="reveal(this)">Show Answer</button>
+      <div class="answer-reveal">Punnett square:<br>
+      Mother gametes: X<sup>C</sup> and X<sup>c</sup> | Father gametes: X<sup>c</sup> and Y<br>
+      Offspring: X<sup>C</sup>X<sup>c</sup> (carrier ♀), X<sup>c</sup>X<sup>c</sup> (colour blind ♀), X<sup>C</sup>Y (normal ♂), X<sup>c</sup>Y (colour blind ♂)<br>
+      <strong>50% of sons will be colour blind.</strong></div>
+    </div>
+
+    <div class="practice-q">
+      <p>4. Explain why only mutations in gametes (sex cells) influence evolution.</p>
+      <button class="reveal-btn" onclick="reveal(this)">Show Answer</button>
+      <div class="answer-reveal">Only gametes are passed on to form the next generation (offspring). Mutations in somatic/body cells affect only that individual and cannot be inherited. Gamete mutations are transmitted to offspring, changing the gene pool of the population.</div>
+    </div>
+
+    <div class="practice-q">
+      <p>5. State THREE practical applications of genetics.</p>
+      <button class="reveal-btn" onclick="reveal(this)">Show Answer</button>
+      <div class="answer-reveal">
+        1. <strong>Breeding programmes</strong> — producing high-yielding, disease-resistant crops and livestock<br>
+        2. <strong>Genetic engineering</strong> — manipulation of genes to produce desired characteristics<br>
+        3. <strong>Genetic counselling</strong> — reducing harmful traits (albinism, colour blindness) in populations<br>
+        4. <strong>Law</strong> — paternity determination using blood groups
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- SLIDE 10: QUIZ -->
+<div class="slide" id="s10">
+  <div class="slide-title">📝 Quiz — Genetics &amp; Inheritance</div>
+  <div class="slide-body">
+
+    <div class="q-block">
+      <p>Q1. A gene that is only expressed in the homozygous state is called a ____________ gene.</p>
+      <input class="fill-input" id="q1" placeholder="Type your answer..."/>
+      <div class="feedback" id="f1"></div>
+    </div>
+
+    <div class="q-block">
+      <p>Q2. In the F2 generation of a monohybrid cross showing complete dominance, the phenotypic ratio is ____________.</p>
+      <input class="fill-input" id="q2" placeholder="e.g. 3:1"/>
+      <div class="feedback" id="f2"></div>
+    </div>
+
+    <div class="q-block">
+      <p>Q3. Name the FOUR bases found in a DNA molecule.</p>
+      <input class="fill-input" id="q3" placeholder="List all four..."/>
+      <div class="feedback" id="f3"></div>
+    </div>
+
+    <div class="q-block">
+      <p>Q4. In ABO blood groups, genes I<sup>A</sup> and I<sup>B</sup> are ____________ to each other, while gene i is ____________ to both.</p>
+      <input class="fill-input" id="q4" placeholder="Type both answers..."/>
+      <div class="feedback" id="f4"></div>
+    </div>
+
+    <div class="q-block">
+      <p>Q5. State TWO differences between continuous and discontinuous variation.</p>
+      <input class="fill-input" id="q5" placeholder="Type your answer..."/>
+      <div class="feedback" id="f5"></div>
+    </div>
+
+    <div class="q-block">
+      <p>Q6 (Short Answer): Explain why males are more commonly affected by X-linked recessive disorders like colour blindness than females.</p>
+      <textarea class="fill-input" id="q6" placeholder="Write your explanation..."></textarea>
+      <div class="feedback" id="f6"></div>
+    </div>
+
+    <div class="q-block">
+      <p>Q7 (Short Answer): A tall pea plant (T = tall dominant, t = short recessive) of unknown genotype was test-crossed with a short plant. Half the offspring were tall and half were short. Determine the genotype of the unknown parent and explain your reasoning.</p>
+      <textarea class="fill-input" id="q7" placeholder="Write your answer..."></textarea>
+      <div class="feedback" id="f7"></div>
+    </div>
+
+    <button class="btn btn-acc" onclick="submitExam()" style="width:100%;margin-top:10px;padding:13px;font-size:1rem;">✅ Submit Quiz</button>
+    <div id="score-area"></div>
+  </div>
+</div>
+
+</div><!-- end slides-wrap -->
+
+<div id="nav">
+  <button class="btn btn-sec" id="prevBtn" onclick="changeSlide(-1)" disabled>◀ Prev</button>
+  <button class="btn btn-pri" id="nextBtn" onclick="changeSlide(1)">Next ▶</button>
+</div>
+
+<script>
+const TOTAL=10;
+let current=1;
+
+function buildDots(){
+  const c=document.getElementById('dots');
+  for(let i=1;i<=TOTAL;i++){
+    const d=document.createElement('div');
+    d.className='dot'+(i===1?' active':'');
+    d.onclick=()=>goTo(i);
+    d.id='dot'+i;
+    c.appendChild(d);
+  }
+}
+
+function goTo(n){
+  document.querySelector('.slide.active').classList.remove('active');
+  document.getElementById('s'+n).classList.add('active');
+  document.getElementById('dot'+current).classList.remove('active');
+  if(current<n) document.getElementById('dot'+current).classList.add('done');
+  current=n;
+  document.getElementById('dot'+current).classList.add('active');
+  document.getElementById('slide-counter').textContent=current+' / '+TOTAL;
+  document.getElementById('prevBtn').disabled=current===1;
+  document.getElementById('nextBtn').disabled=current===TOTAL;
+  window.scrollTo(0,0);
+}
+
+function changeSlide(d){goTo(Math.min(Math.max(1,current+d),TOTAL));}
+
+function reveal(btn){
+  const ans=btn.nextElementSibling;
+  ans.style.display=ans.style.display==='block'?'none':'block';
+  btn.textContent=ans.style.display==='block'?'Hide Answer':'Show Answer';
+}
+
+const ANSWERS={
+  q1:{kw:['recessive'],pts:2},
+  q2:{kw:['3:1','3 :1','3 to 1'],pts:2},
+  q3:{kw:['adenine','guanine','thymine','cytosine'],pts:4,need:4},
+  q4:{kw:['co-dominant','codominant','recessive'],pts:2,need:2},
+  q5:{kw:['intermediates','clear cut','quantitative','qualitative','continuous','discontinuous'],pts:2,need:2},
+};
+
+function checkFill(id,fb,data){
+  const val=document.getElementById(id).value.trim().toLowerCase();
+  if(!val){document.getElementById(fb).className='feedback wrong';document.getElementById(fb).textContent='Please write an answer.';return 0;}
+  const found=data.kw.filter(k=>val.includes(k.toLowerCase()));
+  const need=data.need||1;
+  const got=Math.min(found.length>=need?data.pts:Math.floor((found.length/need)*data.pts),data.pts);
+  const tags=data.kw.map(k=>`<span class="tag ${val.includes(k.toLowerCase())?'found':'missed'}">${k}</span>`).join('');
+  document.getElementById(fb).innerHTML=`Keywords: ${tags}`;
+  document.getElementById(fb).className='feedback '+(found.length>=need?'correct':'wrong');
+  return got;
+}
+
+function scoreShort(id,fb,kw,pts,rubric){
+  const val=document.getElementById(id).value.trim().toLowerCase();
+  if(!val){document.getElementById(fb).className='feedback wrong';document.getElementById(fb).innerHTML='Please write an answer.';return 0;}
+  const found=kw.filter(k=>val.includes(k.toLowerCase()));
+  const tags=kw.map(k=>`<span class="tag ${val.includes(k.toLowerCase())?'found':'missed'}">${k}</span>`).join('');
+  const score=Math.min(Math.round((found.length/kw.length)*pts),pts);
+  document.getElementById(fb).innerHTML=`Keywords found: ${tags}<div class="rubric"><strong>Model Answer:</strong> ${rubric}</div>`;
+  document.getElementById(fb).className='feedback '+(score>=Math.ceil(pts/2)?'correct':'wrong');
+  return score;
+}
+
+function submitExam(){
+  let total=0,max=0;
+  total+=checkFill('q1','f1',ANSWERS.q1); max+=ANSWERS.q1.pts;
+  total+=checkFill('q2','f2',ANSWERS.q2); max+=ANSWERS.q2.pts;
+  total+=checkFill('q3','f3',ANSWERS.q3); max+=ANSWERS.q3.pts;
+  total+=checkFill('q4','f4',ANSWERS.q4); max+=ANSWERS.q4.pts;
+  total+=checkFill('q5','f5',ANSWERS.q5); max+=ANSWERS.q5.pts;
+
+  total+=scoreShort('q6','f6',
+    ['one x','only one','xy','x chromosome','no second','recessive','expressed','masked','females','two x','carrier','heterozygous'],
+    3,
+    'Males have only ONE X chromosome (XY). If they inherit a recessive allele on their X, there is no second X to mask/override it — so the recessive trait is always expressed. Females (XX) have two X chromosomes, so a recessive allele on one X is masked by the dominant allele on the other X (making her a carrier, not affected).'
+  ); max+=3;
+
+  total+=scoreShort('q7','f7',
+    ['heterozygous','tt','tt','tt','1:1','50%','half','test cross','short','unknown','genotype'],
+    4,
+    'The unknown parent is HETEROZYGOUS (Tt). Reasoning: A test cross is with tt (homozygous recessive). If the unknown were TT (homozygous dominant), ALL offspring would be tall (Tt). Since half were tall and half short, the ratio is 1:1, which only occurs when Tt × tt → 50% Tt (tall) and 50% tt (short).'
+  ); max+=4;
+
+  const pct=Math.round((total/max)*100);
+  const grade=pct>=80?'Excellent! 🏆':pct>=60?'Good Work! 👍':pct>=40?'Keep Practising 📚':'Review the lesson 🔄';
+
+  document.getElementById('score-area').innerHTML=`
+    <div id="score-board">
+      <div class="big">${total}/${max}</div>
+      <div style="font-size:1.3rem;font-weight:700;margin:6px 0">${pct}%</div>
+      <div style="font-size:1rem;opacity:.9">${grade}</div>
+      <div style="font-size:.8rem;opacity:.75;margin-top:8px">CBC Rubric: 80–100% = Exceeding | 60–79% = Meeting | 40–59% = Approaching | Below 40% = Below</div>
+    </div>`;
+
+  if(typeof submitExamToMTTI==='function') submitExamToMTTI(total,max,pct);
+}
+
+buildDots();
+</script>
+</body>
+</html>

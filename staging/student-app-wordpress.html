@@ -1,0 +1,1087 @@
+<style>
+html,body{height:100%;margin:0;overflow-y:auto;-webkit-overflow-scrolling:touch}
+.mtti-app{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;max-width:500px;margin:0 auto;padding:15px;background:linear-gradient(135deg,#1a5d1a 0%,#2e7d32 100%);min-height:100vh;box-sizing:border-box;overflow-y:auto}
+.mtti-app *{box-sizing:border-box}
+.mtti-refresh-btn{position:fixed;bottom:80px;right:20px;width:50px;height:50px;border-radius:50%;background:#fff;border:none;box-shadow:0 4px 15px rgba(0,0,0,0.3);cursor:pointer;font-size:20px;display:none;align-items:center;justify-content:center;z-index:100}
+.mtti-refresh-btn:active{transform:scale(0.95)}
+.mtti-refresh-btn.spinning{animation:spin 1s linear infinite}
+.mtti-header{text-align:center;padding:25px 15px;color:#fff}
+.mtti-logo{width:70px;height:70px;background:#fff;border-radius:50%;margin:0 auto 12px;display:flex;align-items:center;justify-content:center;font-size:28px;font-weight:bold;color:#2e7d32}
+.mtti-header h1{font-size:20px;margin:0 0 5px}
+.mtti-header p{font-size:12px;opacity:0.9;margin:0}
+.mtti-card{background:#fff;border-radius:16px;padding:20px;margin-bottom:15px;box-shadow:0 4px 15px rgba(0,0,0,0.1)}
+.mtti-card h2{font-size:16px;color:#333;margin:0 0 15px;display:flex;align-items:center;gap:8px}
+.mtti-input-group{margin-bottom:15px}
+.mtti-input-group label{display:block;font-size:13px;color:#666;margin-bottom:6px;font-weight:500}
+.mtti-input-group input,.mtti-input-group textarea{width:100%;padding:14px;border:2px solid #e0e0e0;border-radius:10px;font-size:16px;font-family:inherit}
+.mtti-input-group input:focus,.mtti-input-group textarea:focus{outline:none;border-color:#2e7d32}
+.mtti-btn{width:100%;padding:14px;background:linear-gradient(135deg,#2e7d32,#1a5d1a);color:#fff;border:none;border-radius:10px;font-size:15px;font-weight:600;cursor:pointer}
+.mtti-btn:disabled{opacity:0.6}
+.mtti-btn-secondary{background:#f5f5f5;color:#333}
+.mtti-btn-small{padding:10px 16px;font-size:12px;border-radius:8px;width:auto}
+.mtti-btn-outline{background:#fff;border:2px solid #2e7d32;color:#2e7d32}
+.mtti-btn-blue{background:#1976D2;color:#fff;border:none}
+.mtti-error{background:#ffebee;color:#c62828;padding:12px;border-radius:10px;margin-bottom:15px;font-size:13px;display:none}
+.mtti-hidden{display:none!important}
+.mtti-loading{text-align:center;padding:30px}
+.mtti-spinner{width:36px;height:36px;border:4px solid #e0e0e0;border-top-color:#2e7d32;border-radius:50%;animation:spin 1s linear infinite;margin:0 auto 12px}
+@keyframes spin{to{transform:rotate(360deg)}}
+.mtti-footer{text-align:center;padding:15px;color:rgba(255,255,255,0.8);font-size:11px}
+
+.mtti-tabs{display:flex;gap:6px;margin-bottom:15px}
+.mtti-tab{flex:1;padding:10px 6px;background:rgba(255,255,255,0.2);color:#fff;border:none;border-radius:10px;font-size:12px;font-weight:600;cursor:pointer}
+.mtti-tab.active{background:#fff;color:#2e7d32}
+.mtti-tab-content{display:none}
+.mtti-tab-content.active{display:block}
+
+.mtti-stats{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:15px}
+.mtti-stat{background:linear-gradient(135deg,#e8f5e9,#c8e6c9);padding:12px 6px;border-radius:10px;text-align:center}
+.mtti-stat .number{font-size:20px;font-weight:700;color:#2e7d32}
+.mtti-stat .label{font-size:10px;color:#666;margin-top:2px}
+
+.mtti-result{background:#f8f9fa;border-radius:10px;padding:12px;margin-bottom:10px;border-left:4px solid #2e7d32}
+.mtti-result.failed{border-left-color:#f44336;background:#fff5f5}
+.mtti-result-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px}
+.mtti-result-title{font-weight:600;color:#333;font-size:14px}
+.mtti-result-grade{background:#2e7d32;color:#fff;padding:3px 10px;border-radius:15px;font-weight:700;font-size:13px}
+.mtti-result.failed .mtti-result-grade{background:#f44336}
+.mtti-result-details{display:flex;gap:12px;font-size:12px;color:#666;flex-wrap:wrap}
+
+.mtti-fee-box{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:15px}
+.mtti-fee-item{background:#f8f9fa;padding:15px 10px;border-radius:10px;text-align:center}
+.mtti-fee-item .label{font-size:10px;color:#666;text-transform:uppercase}
+.mtti-fee-item .value{font-size:18px;font-weight:700;margin-top:4px}
+.mtti-fee-item.balance{grid-column:1/-1;background:linear-gradient(135deg,#fff3e0,#ffe0b2)}
+.mtti-fee-item.balance .value{color:#e65100;font-size:22px}
+.mtti-fee-item.balance.clear{background:linear-gradient(135deg,#e8f5e9,#c8e6c9)}
+.mtti-fee-item.balance.clear .value{color:#2e7d32}
+.mtti-fee-item.balance.overpaid{background:linear-gradient(135deg,#e3f2fd,#bbdefb)}
+.mtti-fee-item.balance.overpaid .value{color:#1976D2}
+
+.mtti-table-wrap{overflow-x:auto;margin:0 -20px;padding:0 20px}
+.mtti-table{width:100%;border-collapse:collapse;font-size:12px;min-width:420px}
+.mtti-table th{background:#2e7d32;color:#fff;padding:10px 6px;text-align:left;font-weight:600;white-space:nowrap}
+.mtti-table td{padding:10px 6px;border-bottom:1px solid #eee;vertical-align:middle}
+.mtti-table tr:nth-child(even){background:#f9f9f9}
+.mtti-table .amt{color:#2e7d32;font-weight:600}
+.mtti-table .bal{color:#e65100;font-weight:600}
+.mtti-table .bal.clear{color:#2e7d32}
+.mtti-receipt-btns{display:flex;gap:4px}
+.mtti-receipt-btns button{border:none;padding:6px 10px;border-radius:6px;cursor:pointer;font-size:11px;font-weight:600}
+.mtti-receipt-btns .print-btn{background:#2e7d32;color:#fff}
+.mtti-receipt-btns .download-btn{background:#1976D2;color:#fff}
+
+.mtti-paybill{background:linear-gradient(135deg,#e8f5e9,#c8e6c9);border-radius:10px;padding:15px;text-align:center;margin-top:15px}
+.mtti-paybill h3{color:#1a5d1a;margin:0 0 10px;font-size:14px}
+.mtti-paybill-row{display:flex;justify-content:center;gap:25px}
+.mtti-paybill-item .label{font-size:10px;color:#666}
+.mtti-paybill-item .value{font-size:20px;font-weight:700;color:#1a5d1a}
+
+.mtti-actions{display:flex;gap:10px;margin-top:15px;flex-wrap:wrap}
+.mtti-actions .mtti-btn{flex:1;min-width:120px;display:flex;align-items:center;justify-content:center;gap:6px}
+
+.mtti-no-data{text-align:center;color:#666;padding:25px;font-size:13px}
+
+.mtti-toast{position:fixed;bottom:30px;left:50%;transform:translateX(-50%);background:#333;color:#fff;padding:14px 28px;border-radius:30px;font-size:14px;z-index:9998;opacity:0;transition:opacity 0.3s;pointer-events:none}
+.mtti-toast.show{opacity:1}
+
+.mtti-modal-overlay{position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,0.6);z-index:9999;display:none;align-items:center;justify-content:center;padding:20px}
+.mtti-modal-overlay.show{display:flex}
+.mtti-modal{background:#fff;border-radius:16px;width:100%;max-width:400px;overflow:hidden;box-shadow:0 10px 40px rgba(0,0,0,0.3);max-height:90vh;overflow-y:auto}
+.mtti-modal-header{display:flex;justify-content:space-between;align-items:center;padding:20px;background:#2e7d32;color:#fff}
+.mtti-modal-header h3{margin:0;font-size:18px}
+.mtti-modal-close{background:none;border:none;color:#fff;font-size:28px;cursor:pointer;line-height:1}
+.mtti-modal-body{padding:20px}
+.mtti-modal-body .mtti-input-group{margin-bottom:15px}
+.mtti-modal-body .mtti-btn{margin-top:10px}
+.mtti-success{background:#e8f5e9;color:#2e7d32;padding:12px;border-radius:10px;margin-bottom:15px;font-size:13px;display:none}
+
+/* Assignment specific styles */
+.mtti-assignment-stats{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:15px}
+.mtti-assignment-stat{padding:12px 6px;border-radius:10px;text-align:center}
+.mtti-assignment-stat .number{font-size:20px;font-weight:700}
+.mtti-assignment-stat .label{font-size:9px;color:#666;margin-top:2px}
+.stat-pending{background:linear-gradient(135deg,#fff3e0,#ffe0b2)}
+.stat-pending .number{color:#ef6c00}
+.stat-submitted{background:linear-gradient(135deg,#e3f2fd,#bbdefb)}
+.stat-submitted .number{color:#1976d2}
+.stat-graded{background:linear-gradient(135deg,#e8f5e9,#c8e6c9)}
+.stat-graded .number{color:#2e7d32}
+.stat-overdue{background:linear-gradient(135deg,#ffebee,#ffcdd2)}
+.stat-overdue .number{color:#c62828}
+
+.mtti-assignment{background:#f8f9fa;border-radius:12px;padding:15px;margin-bottom:12px;border-left:4px solid #2e7d32}
+.mtti-assignment.pending{border-left-color:#ff9800}
+.mtti-assignment.submitted{border-left-color:#1976d2;background:#f5f9ff}
+.mtti-assignment.graded{border-left-color:#2e7d32;background:#f5fff5}
+.mtti-assignment.overdue{border-left-color:#d32f2f;background:#fff5f5}
+.mtti-assignment-title{font-weight:600;color:#333;font-size:14px;margin-bottom:6px}
+.mtti-assignment-due{font-size:12px;color:#666;margin-bottom:8px;display:flex;align-items:center;gap:5px}
+.mtti-assignment-due.overdue{color:#d32f2f;font-weight:600}
+.mtti-assignment-status{display:inline-block;padding:4px 10px;border-radius:15px;font-size:11px;font-weight:600}
+.status-pending{background:#fff3e0;color:#ef6c00}
+.status-submitted{background:#e3f2fd;color:#1976d2}
+.status-graded{background:#e8f5e9;color:#2e7d32}
+.status-overdue{background:#ffebee;color:#c62828}
+.mtti-assignment-marks{font-size:13px;margin-top:8px;padding:8px 12px;background:#e8f5e9;border-radius:8px;color:#2e7d32;font-weight:600}
+.mtti-assignment-feedback{font-size:12px;margin-top:8px;padding:10px 12px;background:#f5f5f5;border-radius:8px;color:#666;font-style:italic;border-left:3px solid #2e7d32}
+.mtti-assignment-actions{margin-top:10px;display:flex;gap:8px}
+.mtti-assignment-actions button{padding:8px 14px;border-radius:8px;font-size:12px;font-weight:600;cursor:pointer;border:none}
+.mtti-assignment-actions .view-btn{background:#f5f5f5;color:#333}
+.mtti-assignment-actions .submit-btn{background:#2e7d32;color:#fff}
+</style>
+
+<div class="mtti-app" id="mttiApp">
+  <!-- LOGIN -->
+  <div id="loginScreen">
+    <div class="mtti-header">
+      <div class="mtti-logo">M</div>
+      <h1>MTTI Student Portal</h1>
+      <p>Masomotele Technical Training Institute</p>
+    </div>
+    
+    <div class="mtti-card">
+      <h2>🔐 Student Login</h2>
+      <div class="mtti-error" id="loginError"></div>
+      <div class="mtti-input-group">
+        <label>Admission Number</label>
+        <input type="text" id="admissionInput" placeholder="e.g., COA/2025/0001">
+      </div>
+      <div class="mtti-input-group" id="passwordGroup" style="display:none">
+        <label>Password</label>
+        <input type="password" id="passwordInput" placeholder="Enter your password">
+      </div>
+      <button class="mtti-btn" onclick="mttiLogin()">View My Portal</button>
+    </div>
+    
+    <div class="mtti-footer">"Start Learning, Start Earning" | © 2026 Masomotele Technical Training Institute</div>
+  </div>
+
+  <!-- LOADING -->
+  <div id="loadingScreen" class="mtti-hidden">
+    <div class="mtti-header">
+      <div class="mtti-logo">M</div>
+      <h1>MTTI Student Portal</h1>
+    </div>
+    <div class="mtti-card">
+      <div class="mtti-loading"><div class="mtti-spinner"></div><p>Loading your portal...</p></div>
+    </div>
+  </div>
+
+  <!-- PORTAL -->
+  <div id="portalScreen" class="mtti-hidden">
+    <div class="mtti-header" style="padding:15px">
+      <h1 style="font-size:18px">👋 <span id="studentName">Student</span></h1>
+      <p id="studentCourse">Course</p>
+      <p style="opacity:0.7;margin-top:3px;font-size:11px" id="studentAdm">ADM</p>
+    </div>
+
+    <div class="mtti-tabs">
+      <button class="mtti-tab active" onclick="showTab('results')">📊 Results</button>
+      <button class="mtti-tab" onclick="showTab('assignments')">📝 Tasks</button>
+      <button class="mtti-tab" onclick="showTab('payments')">💰 Fees</button>
+    </div>
+
+    <!-- RESULTS TAB -->
+    <div id="resultsTab" class="mtti-tab-content active">
+      <div class="mtti-card">
+        <div class="mtti-stats">
+          <div class="mtti-stat"><div class="number" id="avgScore">0%</div><div class="label">Average</div></div>
+          <div class="mtti-stat"><div class="number" id="totalExams">0</div><div class="label">Exams</div></div>
+          <div class="mtti-stat"><div class="number" id="passedExams" style="color:#2e7d32">0</div><div class="label">Passed</div></div>
+          <div class="mtti-stat"><div class="number" id="failedExams" style="color:#f44336">0</div><div class="label">Failed</div></div>
+        </div>
+      </div>
+      <div class="mtti-card">
+        <h2>📊 Exam Results</h2>
+        <div id="resultsList"></div>
+        <div class="mtti-actions">
+          <button class="mtti-btn mtti-btn-small mtti-btn-outline" onclick="printTranscript()">🖨️ Print</button>
+          <button class="mtti-btn mtti-btn-small mtti-btn-blue" onclick="downloadTranscript()">📥 Download PDF</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- ASSIGNMENTS TAB -->
+    <div id="assignmentsTab" class="mtti-tab-content">
+      <div class="mtti-card">
+        <div class="mtti-assignment-stats">
+          <div class="mtti-assignment-stat stat-pending"><div class="number" id="pendingCount">0</div><div class="label">Pending</div></div>
+          <div class="mtti-assignment-stat stat-submitted"><div class="number" id="submittedCount">0</div><div class="label">Submitted</div></div>
+          <div class="mtti-assignment-stat stat-graded"><div class="number" id="gradedCount">0</div><div class="label">Graded</div></div>
+          <div class="mtti-assignment-stat stat-overdue"><div class="number" id="overdueCount">0</div><div class="label">Overdue</div></div>
+        </div>
+      </div>
+      <div class="mtti-card">
+        <h2>📝 My Assignments</h2>
+        <div id="assignmentsList"></div>
+      </div>
+    </div>
+
+    <!-- PAYMENTS TAB -->
+    <div id="paymentsTab" class="mtti-tab-content">
+      <div class="mtti-card">
+        <h2>💰 Fee Summary</h2>
+        <div class="mtti-fee-box">
+          <div class="mtti-fee-item"><div class="label">Total Fee</div><div class="value" id="totalFee" style="color:#333">0</div></div>
+          <div class="mtti-fee-item"><div class="label">Paid</div><div class="value" id="totalPaid" style="color:#2e7d32">0</div></div>
+          <div class="mtti-fee-item balance" id="balanceBox"><div class="label" id="balanceLabel">Balance Due</div><div class="value" id="feeBalance">0</div></div>
+        </div>
+        <div class="mtti-paybill" id="paybillBox">
+          <h3>📱 Pay via M-Pesa</h3>
+          <div class="mtti-paybill-row">
+            <div class="mtti-paybill-item"><div class="label">Paybill</div><div class="value">880100</div></div>
+            <div class="mtti-paybill-item"><div class="label">Account</div><div class="value">219391</div></div>
+          </div>
+        </div>
+      </div>
+      <div class="mtti-card">
+        <h2>📋 Payment History</h2>
+        <div id="paymentsContent"></div>
+        <div class="mtti-actions">
+          <button class="mtti-btn mtti-btn-small mtti-btn-outline" onclick="printStatement()">🖨️ Print Statement</button>
+          <button class="mtti-btn mtti-btn-small mtti-btn-blue" onclick="downloadStatement()">📥 Download PDF</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="mtti-card">
+      <button class="mtti-btn mtti-btn-secondary" onclick="mttiLogout()">← Logout</button>
+      <button class="mtti-btn mtti-btn-outline" style="margin-top:10px" onclick="showPasswordModal()">🔑 Change Password</button>
+    </div>
+    <div class="mtti-footer">"Start Learning, Start Earning" | © 2026 Masomotele Technical Training Institute</div>
+  </div>
+</div>
+
+<!-- Floating Refresh Button -->
+<button class="mtti-refresh-btn" id="refreshBtn" onclick="refreshData()" title="Refresh">🔄</button>
+
+<!-- Password Change Modal -->
+<div class="mtti-modal-overlay" id="passwordModal">
+  <div class="mtti-modal">
+    <div class="mtti-modal-header">
+      <h3>🔑 Change Password</h3>
+      <button class="mtti-modal-close" onclick="closePasswordModal()">×</button>
+    </div>
+    <div class="mtti-modal-body">
+      <div class="mtti-error" id="passwordError"></div>
+      <div class="mtti-success" id="passwordSuccess"></div>
+      <div class="mtti-input-group" id="currentPwdGroup">
+        <label>Current Password</label>
+        <input type="password" id="currentPassword" placeholder="Enter current password">
+      </div>
+      <div class="mtti-input-group">
+        <label>New Password</label>
+        <input type="password" id="newPassword" placeholder="Enter new password (min 4 characters)">
+      </div>
+      <div class="mtti-input-group">
+        <label>Confirm New Password</label>
+        <input type="password" id="confirmPassword" placeholder="Confirm new password">
+      </div>
+      <button class="mtti-btn" onclick="changePassword()">Update Password</button>
+    </div>
+  </div>
+</div>
+
+<!-- Assignment View Modal -->
+<div class="mtti-modal-overlay" id="assignmentModal">
+  <div class="mtti-modal">
+    <div class="mtti-modal-header">
+      <h3>📝 Assignment Details</h3>
+      <button class="mtti-modal-close" onclick="closeAssignmentModal()">×</button>
+    </div>
+    <div class="mtti-modal-body" id="assignmentModalBody">
+      <!-- Content will be loaded dynamically -->
+    </div>
+  </div>
+</div>
+
+<div class="mtti-toast" id="toast"></div>
+
+<script>
+const API = 'https://masomoteletraining.co.ke/wp-json/mtti-mis/v1';
+let student = null, stats = null, results = [], payments = [], feeSummary = null, assignments = [], assignmentSummary = null;
+let hasPassword = false;
+let currentAdmission = '';
+
+function showTab(tab) {
+  document.querySelectorAll('.mtti-tab').forEach((t,i) => {
+    t.classList.remove('active');
+    if ((tab==='results' && i===0) || (tab==='assignments' && i===1) || (tab==='payments' && i===2)) {
+      t.classList.add('active');
+    }
+  });
+  document.getElementById('resultsTab').classList.toggle('active', tab==='results');
+  document.getElementById('assignmentsTab').classList.toggle('active', tab==='assignments');
+  document.getElementById('paymentsTab').classList.toggle('active', tab==='payments');
+  
+  if (tab === 'payments') loadPayments();
+  if (tab === 'assignments') loadAssignments();
+}
+
+async function mttiLogin() {
+  const adm = document.getElementById('admissionInput').value.trim().toUpperCase();
+  const pwd = document.getElementById('passwordInput').value;
+  const err = document.getElementById('loginError');
+  err.style.display = 'none';
+  
+  if (!adm) { err.textContent = 'Please enter your admission number'; err.style.display = 'block'; return; }
+  
+  document.getElementById('loginScreen').classList.add('mtti-hidden');
+  document.getElementById('loadingScreen').classList.remove('mtti-hidden');
+  
+  try {
+    // First try login with password check
+    const loginRes = await fetch(API + '/student-login', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ admission: adm, password: pwd })
+    });
+    const loginData = await loginRes.json();
+    
+    // If password is required but not provided, show password field
+    if (!loginData.success && loginData.requires_password) {
+      document.getElementById('loadingScreen').classList.add('mtti-hidden');
+      document.getElementById('loginScreen').classList.remove('mtti-hidden');
+      document.getElementById('passwordGroup').style.display = 'block';
+      err.textContent = loginData.message;
+      err.style.display = 'block';
+      document.getElementById('passwordInput').focus();
+      return;
+    }
+    
+    if (!loginData.success) {
+      throw new Error(loginData.message || 'Login failed');
+    }
+    
+    hasPassword = loginData.has_password;
+    currentAdmission = adm;
+    
+    // Now fetch full dashboard data
+    const res = await fetch(API + '/student-dashboard?admission=' + encodeURIComponent(adm));
+    const data = await res.json();
+    if (data.success && data.student) {
+      student = data.student;
+      stats = data.stats;
+      results = data.results || [];
+      localStorage.setItem('mtti_adm', adm);
+      if (pwd) localStorage.setItem('mtti_pwd', btoa(pwd));
+      renderPortal();
+    } else throw new Error(data.message || 'Student not found');
+  } catch (e) {
+    document.getElementById('loadingScreen').classList.add('mtti-hidden');
+    document.getElementById('loginScreen').classList.remove('mtti-hidden');
+    err.textContent = e.message; err.style.display = 'block';
+  }
+}
+
+// ========== ASSIGNMENTS FUNCTIONS ==========
+async function loadAssignments() {
+  if (!currentAdmission) return;
+  
+  const container = document.getElementById('assignmentsList');
+  container.innerHTML = '<div class="mtti-loading"><div class="mtti-spinner"></div><p>Loading assignments...</p></div>';
+  
+  try {
+    const res = await fetch(API + '/student-assignments?admission=' + encodeURIComponent(currentAdmission));
+    const data = await res.json();
+    
+    if (data.success) {
+      assignments = data.assignments || [];
+      assignmentSummary = data.summary;
+      renderAssignments();
+    } else {
+      container.innerHTML = '<div class="mtti-no-data">Failed to load assignments</div>';
+    }
+  } catch (e) {
+    container.innerHTML = '<div class="mtti-no-data">Error loading assignments</div>';
+  }
+}
+
+function renderAssignments() {
+  // Update stats
+  document.getElementById('pendingCount').textContent = assignmentSummary?.pending || 0;
+  document.getElementById('submittedCount').textContent = assignmentSummary?.submitted || 0;
+  document.getElementById('gradedCount').textContent = assignmentSummary?.graded || 0;
+  document.getElementById('overdueCount').textContent = assignmentSummary?.overdue || 0;
+  
+  const container = document.getElementById('assignmentsList');
+  
+  if (!assignments || assignments.length === 0) {
+    container.innerHTML = '<div class="mtti-no-data">📝 No assignments yet.<br><span style="font-size:12px;color:#999">Assignments will appear here when your instructor posts them.</span></div>';
+    return;
+  }
+  
+  let html = '';
+  assignments.forEach(a => {
+    const statusClass = a.status;
+    const statusText = a.status.charAt(0).toUpperCase() + a.status.slice(1);
+    const courseBadge = a.course_name ? `<span style="background:#e3f2fd;color:#1976d2;padding:2px 8px;border-radius:10px;font-size:10px;display:inline-block;margin-bottom:5px">${a.course_name}</span>` : '';
+    
+    html += `
+      <div class="mtti-assignment ${statusClass}">
+        ${courseBadge}
+        <div class="mtti-assignment-title">${escapeHtml(a.title)}</div>
+        <div class="mtti-assignment-due ${a.is_overdue ? 'overdue' : ''}">
+          📅 Due: ${a.due_date_formatted}
+        </div>
+        <span class="mtti-assignment-status status-${a.status}">${statusText}</span>
+        ${a.marks_obtained !== null ? `<div class="mtti-assignment-marks">✅ Score: ${a.marks_obtained}/${a.total_marks}</div>` : ''}
+        ${a.feedback ? `<div class="mtti-assignment-feedback">💬 "${escapeHtml(a.feedback)}"</div>` : ''}
+        <div class="mtti-assignment-actions">
+          <button class="view-btn" onclick="viewAssignment(${a.id})">📄 View Details</button>
+          ${!a.is_submitted && !a.is_overdue ? `<button class="submit-btn" onclick="openSubmitModal(${a.id}, '${escapeHtml(a.title)}')">✍️ Submit</button>` : ''}
+        </div>
+      </div>
+    `;
+  });
+  
+  container.innerHTML = html;
+}
+
+function viewAssignment(id) {
+  const a = assignments.find(x => x.id === id);
+  if (!a) return;
+  
+  const statusText = a.status.charAt(0).toUpperCase() + a.status.slice(1);
+  const courseBadge = a.course_name ? `<span style="background:#e3f2fd;color:#1976d2;padding:3px 10px;border-radius:10px;font-size:11px;margin-left:10px">${a.course_name}</span>` : '';
+  
+  let html = `
+    <h3 style="margin:0 0 15px;color:#333">${escapeHtml(a.title)}${courseBadge}</h3>
+    <div style="background:#f8f9fa;padding:12px;border-radius:10px;margin-bottom:15px">
+      <p style="margin:5px 0;font-size:13px"><strong>📅 Due Date:</strong> ${a.due_date_formatted}</p>
+      <p style="margin:5px 0;font-size:13px"><strong>📊 Total Marks:</strong> ${a.total_marks}</p>
+      <p style="margin:5px 0;font-size:13px"><strong>📌 Status:</strong> <span class="mtti-assignment-status status-${a.status}">${statusText}</span></p>
+    </div>
+  `;
+  
+  if (a.description) {
+    html += `
+      <div style="margin-bottom:15px">
+        <strong style="font-size:13px;color:#666">📝 Instructions:</strong>
+        <div style="background:#f5f5f5;padding:12px;border-radius:10px;margin-top:8px;font-size:13px;line-height:1.6">${escapeHtml(a.description)}</div>
+      </div>
+    `;
+  }
+  
+  if (a.file_url) {
+    html += `<a href="${a.file_url}" target="_blank" style="display:inline-flex;align-items:center;gap:6px;padding:10px 15px;background:#e3f2fd;color:#1976d2;border-radius:8px;text-decoration:none;font-size:13px;margin-bottom:15px">📎 Download Attachment</a>`;
+  }
+  
+  if (a.is_submitted) {
+    html += `
+      <div style="background:#e8f5e9;padding:12px;border-radius:10px;margin-bottom:15px">
+        <p style="margin:0 0 5px;font-size:13px;color:#2e7d32"><strong>✅ Submitted:</strong> ${a.submitted_at_formatted}</p>
+        ${a.submission_text ? `<p style="margin:8px 0 0;font-size:12px;color:#666"><strong>Your answer:</strong> ${escapeHtml(a.submission_text).substring(0, 200)}${a.submission_text.length > 200 ? '...' : ''}</p>` : ''}
+        ${a.submission_file ? `<a href="${a.submission_file}" target="_blank" style="display:inline-flex;align-items:center;gap:6px;padding:8px 12px;background:#fff;color:#2e7d32;border-radius:6px;text-decoration:none;font-size:12px;margin-top:8px;border:1px solid #2e7d32">📄 View Your Uploaded File</a>` : ''}
+      </div>
+    `;
+  }
+  
+  if (a.marks_obtained !== null) {
+    html += `
+      <div style="background:#e8f5e9;padding:15px;border-radius:10px;text-align:center;margin-bottom:15px">
+        <div style="font-size:28px;font-weight:700;color:#2e7d32">${a.marks_obtained}/${a.total_marks}</div>
+        <div style="font-size:12px;color:#666">Your Score</div>
+      </div>
+    `;
+  }
+  
+  if (a.feedback) {
+    html += `
+      <div style="margin-bottom:15px">
+        <strong style="font-size:13px;color:#666">💬 Instructor Feedback:</strong>
+        <div style="background:#f5f5f5;padding:12px;border-radius:10px;margin-top:8px;font-size:13px;font-style:italic;border-left:3px solid #2e7d32">${escapeHtml(a.feedback)}</div>
+      </div>
+    `;
+  }
+  
+  if (!a.is_submitted && !a.is_overdue) {
+    html += `<button class="mtti-btn" onclick="openSubmitModal(${a.id}, '${escapeHtml(a.title)}');closeAssignmentModal();">✍️ Submit Assignment</button>`;
+  }
+  
+  document.getElementById('assignmentModalBody').innerHTML = html;
+  document.getElementById('assignmentModal').classList.add('show');
+}
+
+function closeAssignmentModal() {
+  document.getElementById('assignmentModal').classList.remove('show');
+}
+
+function openSubmitModal(id, title) {
+  const html = `
+    <h3 style="margin:0 0 15px;color:#333">Submit: ${escapeHtml(title)}</h3>
+    <div class="mtti-error" id="submitError" style="display:none"></div>
+    <div class="mtti-success" id="submitSuccess" style="display:none"></div>
+    
+    <div class="mtti-input-group">
+      <label>📎 Upload File (PDF, Word, Excel, Images, etc.)</label>
+      <input type="file" id="submissionFile" accept=".pdf,.doc,.docx,.xls,.xlsx,.ppt,.pptx,.jpg,.jpeg,.png,.gif,.txt,.zip,.rar" style="padding:10px;border:2px dashed #ccc;border-radius:10px;background:#f9f9f9;cursor:pointer">
+      <div id="fileInfo" style="margin-top:8px;font-size:12px;color:#666;display:none">
+        <span id="fileName"></span>
+        <button onclick="clearFile()" style="margin-left:10px;background:#f44336;color:white;border:none;padding:4px 8px;border-radius:5px;font-size:11px;cursor:pointer">✕ Remove</button>
+      </div>
+      <div id="uploadProgress" style="display:none;margin-top:8px">
+        <div style="background:#e0e0e0;border-radius:5px;height:8px;overflow:hidden">
+          <div id="progressBar" style="background:#2e7d32;height:100%;width:0%;transition:width 0.3s"></div>
+        </div>
+        <span style="font-size:11px;color:#666">Uploading...</span>
+      </div>
+    </div>
+    
+    <div style="text-align:center;color:#666;margin:10px 0;font-size:12px">— OR —</div>
+    
+    <div class="mtti-input-group">
+      <label>✍️ Type Your Answer</label>
+      <textarea id="submissionText" rows="5" placeholder="Type your answer or describe your work here..."></textarea>
+    </div>
+    
+    <input type="hidden" id="uploadedFileUrl" value="">
+    <button class="mtti-btn" id="submitBtn" onclick="submitAssignment(${id})">📤 Submit Assignment</button>
+    <p style="font-size:11px;color:#999;margin-top:10px;text-align:center">⚠️ You can only submit once. Upload a file and/or type your answer.</p>
+  `;
+  
+  document.getElementById('assignmentModalBody').innerHTML = html;
+  document.getElementById('assignmentModal').classList.add('show');
+  
+  // Add file change listener
+  document.getElementById('submissionFile').addEventListener('change', handleFileSelect);
+}
+
+function clearFile() {
+  document.getElementById('submissionFile').value = '';
+  document.getElementById('uploadedFileUrl').value = '';
+  document.getElementById('fileInfo').style.display = 'none';
+}
+
+async function handleFileSelect(e) {
+  const file = e.target.files[0];
+  if (!file) return;
+  
+  const maxSize = 10 * 1024 * 1024; // 10MB
+  if (file.size > maxSize) {
+    showToast('❌ File too large. Max 10MB');
+    e.target.value = '';
+    return;
+  }
+  
+  // Show file info
+  document.getElementById('fileName').textContent = '📄 ' + file.name + ' (' + (file.size / 1024 / 1024).toFixed(2) + ' MB)';
+  document.getElementById('fileInfo').style.display = 'block';
+  document.getElementById('uploadProgress').style.display = 'block';
+  document.getElementById('submitBtn').disabled = true;
+  
+  // Upload file
+  const formData = new FormData();
+  formData.append('file', file);
+  formData.append('admission', currentAdmission);
+  formData.append('assignment_id', document.getElementById('submitBtn').onclick.toString().match(/submitAssignment\((\d+)\)/)[1]);
+  
+  try {
+    const xhr = new XMLHttpRequest();
+    xhr.open('POST', API + '/upload-assignment-file', true);
+    
+    xhr.upload.onprogress = function(e) {
+      if (e.lengthComputable) {
+        const pct = (e.loaded / e.total) * 100;
+        document.getElementById('progressBar').style.width = pct + '%';
+      }
+    };
+    
+    xhr.onload = function() {
+      document.getElementById('uploadProgress').style.display = 'none';
+      document.getElementById('submitBtn').disabled = false;
+      
+      if (xhr.status === 200) {
+        const data = JSON.parse(xhr.responseText);
+        if (data.success) {
+          document.getElementById('uploadedFileUrl').value = data.file_url;
+          document.getElementById('fileName').textContent = '✅ ' + file.name + ' (Uploaded)';
+          showToast('✅ File uploaded!');
+        } else {
+          showToast('❌ ' + (data.message || 'Upload failed'));
+          clearFile();
+        }
+      } else {
+        showToast('❌ Upload failed');
+        clearFile();
+      }
+    };
+    
+    xhr.onerror = function() {
+      document.getElementById('uploadProgress').style.display = 'none';
+      document.getElementById('submitBtn').disabled = false;
+      showToast('❌ Upload failed');
+      clearFile();
+    };
+    
+    xhr.send(formData);
+  } catch (err) {
+    document.getElementById('uploadProgress').style.display = 'none';
+    document.getElementById('submitBtn').disabled = false;
+    showToast('❌ Upload error');
+    clearFile();
+  }
+}
+
+async function submitAssignment(id) {
+  const text = document.getElementById('submissionText').value.trim();
+  const fileUrl = document.getElementById('uploadedFileUrl').value;
+  const err = document.getElementById('submitError');
+  const success = document.getElementById('submitSuccess');
+  
+  err.style.display = 'none';
+  success.style.display = 'none';
+  
+  if (!text && !fileUrl) {
+    err.textContent = 'Please upload a file or enter your answer';
+    err.style.display = 'block';
+    return;
+  }
+  
+  document.getElementById('submitBtn').disabled = true;
+  document.getElementById('submitBtn').textContent = '⏳ Submitting...';
+  
+  try {
+    const res = await fetch(API + '/submit-assignment', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        admission: currentAdmission,
+        assignment_id: id,
+        text: text,
+        file_url: fileUrl
+      })
+    });
+    
+    const data = await res.json();
+    
+    if (data.success) {
+      success.textContent = '✅ Assignment submitted successfully!';
+      success.style.display = 'block';
+      showToast('✅ Assignment submitted!');
+      
+      setTimeout(() => {
+        closeAssignmentModal();
+        loadAssignments(); // Refresh list
+      }, 1500);
+    } else {
+      err.textContent = data.message || 'Failed to submit';
+      err.style.display = 'block';
+      document.getElementById('submitBtn').disabled = false;
+      document.getElementById('submitBtn').textContent = '📤 Submit Assignment';
+    }
+  } catch (e) {
+    err.textContent = 'Error submitting assignment. Please try again.';
+    err.style.display = 'block';
+    document.getElementById('submitBtn').disabled = false;
+    document.getElementById('submitBtn').textContent = '📤 Submit Assignment';
+  }
+}
+
+function escapeHtml(text) {
+  if (!text) return '';
+  const div = document.createElement('div');
+  div.textContent = text;
+  return div.innerHTML;
+}
+
+// Password Modal Functions
+function showPasswordModal() {
+  document.getElementById('passwordError').style.display = 'none';
+  document.getElementById('passwordSuccess').style.display = 'none';
+  document.getElementById('currentPassword').value = '';
+  document.getElementById('newPassword').value = '';
+  document.getElementById('confirmPassword').value = '';
+  document.getElementById('currentPwdGroup').style.display = hasPassword ? 'block' : 'none';
+  document.getElementById('passwordModal').classList.add('show');
+}
+
+function closePasswordModal() {
+  document.getElementById('passwordModal').classList.remove('show');
+}
+
+async function changePassword() {
+  const currentPwd = document.getElementById('currentPassword').value;
+  const newPwd = document.getElementById('newPassword').value;
+  const confirmPwd = document.getElementById('confirmPassword').value;
+  const err = document.getElementById('passwordError');
+  const success = document.getElementById('passwordSuccess');
+  
+  err.style.display = 'none';
+  success.style.display = 'none';
+  
+  if (hasPassword && !currentPwd) {
+    err.textContent = 'Please enter your current password';
+    err.style.display = 'block';
+    return;
+  }
+  
+  if (!newPwd || newPwd.length < 4) {
+    err.textContent = 'New password must be at least 4 characters';
+    err.style.display = 'block';
+    return;
+  }
+  
+  if (newPwd !== confirmPwd) {
+    err.textContent = 'Passwords do not match';
+    err.style.display = 'block';
+    return;
+  }
+  
+  try {
+    const res = await fetch(API + '/change-password', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        admission: currentAdmission,
+        current_password: currentPwd,
+        new_password: newPwd
+      })
+    });
+    
+    const data = await res.json();
+    
+    if (data.success) {
+      success.textContent = data.message;
+      success.style.display = 'block';
+      hasPassword = true;
+      localStorage.setItem('mtti_pwd', btoa(newPwd));
+      showToast('✅ Password updated!');
+      setTimeout(() => closePasswordModal(), 2000);
+    } else {
+      err.textContent = data.message;
+      err.style.display = 'block';
+    }
+  } catch (e) {
+    err.textContent = 'Error changing password. Please try again.';
+    err.style.display = 'block';
+  }
+}
+
+function renderPortal() {
+  document.getElementById('loadingScreen').classList.add('mtti-hidden');
+  document.getElementById('portalScreen').classList.remove('mtti-hidden');
+  document.getElementById('refreshBtn').style.display = 'flex';
+  document.getElementById('studentName').textContent = student.name || 'Student';
+  document.getElementById('studentCourse').textContent = student.course_name || 'N/A';
+  document.getElementById('studentAdm').textContent = student.admission_number;
+  
+  document.getElementById('avgScore').textContent = (stats.average_score || 0).toFixed(1) + '%';
+  document.getElementById('totalExams').textContent = stats.total_exams || 0;
+  document.getElementById('passedExams').textContent = stats.passed || 0;
+  document.getElementById('failedExams').textContent = stats.failed || 0;
+  
+  renderResults();
+}
+
+function renderResults() {
+  const container = document.getElementById('resultsList');
+  if (!results || results.length === 0) {
+    container.innerHTML = '<div class="mtti-no-data">No exam results yet</div>';
+    return;
+  }
+  let html = '';
+  results.forEach(r => {
+    const passed = r.passed || r.percentage >= 50;
+    const courseBadge = r.course_name ? `<span style="background:#e3f2fd;color:#1976d2;padding:2px 8px;border-radius:10px;font-size:10px;margin-left:8px">${r.course_name}</span>` : '';
+    html += `<div class="mtti-result ${passed ? '' : 'failed'}">
+      <div class="mtti-result-header">
+        <span class="mtti-result-title">${r.exam_name || 'Exam'}${courseBadge}</span>
+        <span class="mtti-result-grade">${r.grade || '-'}</span>
+      </div>
+      <div class="mtti-result-details">
+        <span>📊 ${r.score}/${r.max_score} (${(r.percentage||0).toFixed(1)}%)</span>
+        <span>🏆 Rank: ${r.rank||'-'}/${r.total_students||'-'}</span>
+        <span>📅 ${fmtDate(r.exam_date)}</span>
+      </div>
+    </div>`;
+  });
+  container.innerHTML = html;
+}
+
+async function loadPayments() {
+  if (!currentAdmission || feeSummary) return;
+  const container = document.getElementById('paymentsContent');
+  container.innerHTML = '<div class="mtti-loading"><div class="mtti-spinner"></div><p>Loading payments...</p></div>';
+  try {
+    const res = await fetch(API + '/student-payments?admission=' + encodeURIComponent(currentAdmission));
+    const data = await res.json();
+    if (data.success) {
+      payments = data.payments || [];
+      feeSummary = data.fee_summary;
+      renderPayments();
+    } else container.innerHTML = '<div class="mtti-no-data">Failed to load payments</div>';
+  } catch (e) { container.innerHTML = '<div class="mtti-no-data">Error loading payments</div>'; }
+}
+
+function renderPayments() {
+  const totalFee = feeSummary?.total_fee || 0;
+  const totalPaid = feeSummary?.total_paid || 0;
+  const balance = feeSummary?.balance || 0;
+  const overpaid = feeSummary?.overpaid || 0;
+  
+  document.getElementById('totalFee').textContent = 'KES ' + fmt(totalFee);
+  document.getElementById('totalPaid').textContent = 'KES ' + fmt(totalPaid);
+  
+  const balanceBox = document.getElementById('balanceBox');
+  const balanceLabel = document.getElementById('balanceLabel');
+  const feeBalance = document.getElementById('feeBalance');
+  const paybillBox = document.getElementById('paybillBox');
+  
+  balanceBox.className = 'mtti-fee-item balance';
+  if (overpaid > 0) {
+    balanceBox.classList.add('overpaid');
+    balanceLabel.textContent = 'Credit Balance';
+    feeBalance.textContent = 'KES ' + fmt(overpaid);
+    paybillBox.style.display = 'none';
+  } else if (balance === 0) {
+    balanceBox.classList.add('clear');
+    balanceLabel.textContent = 'Balance';
+    feeBalance.textContent = '✅ CLEARED';
+    paybillBox.style.display = 'none';
+  } else {
+    balanceLabel.textContent = 'Balance Due';
+    feeBalance.textContent = 'KES ' + fmt(balance);
+    paybillBox.style.display = 'block';
+  }
+  
+  const container = document.getElementById('paymentsContent');
+  if (!payments || payments.length === 0) {
+    container.innerHTML = '<div class="mtti-no-data">No payment records yet</div>';
+    return;
+  }
+  
+  let runningBal = totalFee;
+  let rows = '';
+  const sortedPayments = [...payments].sort((a,b) => new Date(a.date) - new Date(b.date));
+  sortedPayments.forEach(p => {
+    runningBal -= p.amount;
+    const balText = runningBal <= 0 ? (runningBal < 0 ? 'Credit: ' + fmt(Math.abs(runningBal)) : 'Cleared') : fmt(runningBal);
+    const balClass = runningBal <= 0 ? 'clear' : '';
+    rows += `<tr>
+      <td>${fmtDate(p.date)}</td>
+      <td>${p.reference || '-'}</td>
+      <td>${p.method || 'Cash'}</td>
+      <td class="amt">${fmt(p.amount)}</td>
+      <td class="bal ${balClass}">${balText}</td>
+      <td><div class="mtti-receipt-btns"><button class="print-btn" onclick="printReceipt(${p.id})">🖨️</button></div></td>
+    </tr>`;
+  });
+  
+  container.innerHTML = `<div class="mtti-table-wrap"><table class="mtti-table">
+    <thead><tr><th>Date</th><th>Reference</th><th>Method</th><th>Amount</th><th>Balance</th><th></th></tr></thead>
+    <tbody>${rows}</tbody></table></div>`;
+}
+
+function fmt(n) { return Number(n||0).toLocaleString('en-KE'); }
+function fmtDate(d) { if(!d)return'-'; try{return new Date(d).toLocaleDateString('en-GB',{day:'numeric',month:'short',year:'numeric'});}catch(e){return d;} }
+function showToast(msg) { const t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),3000); }
+function openPrintWindow(html) { const w=window.open('','_blank','width=800,height=600');if(w){w.document.write(html);w.document.close();} }
+
+// RECEIPT
+function printReceipt(paymentId) {
+  const p = payments.find(x => x.id === paymentId);
+  if (!p) return;
+  
+  const html = `<!DOCTYPE html><html><head><meta charset="UTF-8"><title>Receipt</title>
+<style>*{margin:0;padding:0;box-sizing:border-box}body{font-family:Arial,sans-serif;padding:20px;font-size:12px}
+.c{max-width:400px;margin:0 auto;border:2px solid #2e7d32;padding:20px}
+.hdr{text-align:center;border-bottom:2px solid #2e7d32;padding-bottom:15px;margin-bottom:15px}
+.hdr h1{color:#2e7d32;font-size:16px}.hdr p{font-size:10px;color:#666}
+.ttl{text-align:center;background:#2e7d32;color:#fff;padding:8px;margin-bottom:15px;font-weight:bold}
+table{width:100%}td{padding:8px 5px;border-bottom:1px solid #eee}
+.lbl{color:#666;width:40%}.val{font-weight:bold}
+.amt{font-size:20px;color:#2e7d32;text-align:center;padding:15px;background:#e8f5e9;margin:15px 0}
+.ftr{text-align:center;margin-top:15px;font-size:9px;color:#999}
+</style></head><body><div class="c">
+<div class="hdr"><h1>MASOMOTELE TECHNICAL TRAINING INSTITUTE</h1><p>Sagaas Center, Eldoret | Tel: 0712464936</p><p style="color:#ff9800;font-style:italic">"Start Learning, Start Earning"</p></div>
+<div class="ttl">PAYMENT RECEIPT</div>
+<table>
+<tr><td class="lbl">Receipt No:</td><td class="val">${p.reference || 'RCP-' + p.id}</td></tr>
+<tr><td class="lbl">Date:</td><td class="val">${fmtDate(p.date)}</td></tr>
+<tr><td class="lbl">Student:</td><td class="val">${student.name}</td></tr>
+<tr><td class="lbl">Adm No:</td><td class="val">${student.admission_number}</td></tr>
+<tr><td class="lbl">Course:</td><td class="val">${student.course_name}</td></tr>
+<tr><td class="lbl">Payment Method:</td><td class="val">${p.method || 'Cash'}</td></tr>
+</table>
+<div class="amt">KES ${fmt(p.amount)}</div>
+<div class="ftr">Thank you for your payment!<br>Generated: ${new Date().toLocaleString('en-GB')}</div>
+</div></body></html>`;
+  
+  showToast('🖨️ Opening receipt...');
+  openPrintWindow(html);
+}
+
+// STATEMENT
+function getStatementHTML() {
+  const totalFee = feeSummary?.total_fee || 0;
+  const totalPaid = feeSummary?.total_paid || 0;
+  const balance = feeSummary?.balance || 0;
+  const overpaid = feeSummary?.overpaid || 0;
+  
+  let balanceDisplay, balanceColor;
+  if (overpaid > 0) { balanceDisplay = 'Credit: KES ' + fmt(overpaid); balanceColor = '#1976D2'; }
+  else if (balance === 0) { balanceDisplay = 'CLEARED'; balanceColor = '#2e7d32'; }
+  else { balanceDisplay = 'KES ' + fmt(balance); balanceColor = '#e65100'; }
+  
+  let runningBal = totalFee;
+  const sortedPayments = [...payments].sort((a,b) => new Date(a.date) - new Date(b.date));
+  const rows = sortedPayments.map(p => {
+    runningBal -= p.amount;
+    const balText = runningBal <= 0 ? (runningBal < 0 ? 'Credit: ' + fmt(Math.abs(runningBal)) : 'Cleared') : fmt(runningBal);
+    const balCol = runningBal <= 0 ? '#2e7d32' : '#e65100';
+    return `<tr><td>${fmtDate(p.date)}</td><td>${p.reference||'-'}</td><td>${p.method||'Cash'}</td>
+    <td style="text-align:right;color:#2e7d32;font-weight:bold">KES ${fmt(p.amount)}</td>
+    <td style="text-align:right;color:${balCol}">${balText}</td></tr>`;
+  }).join('');
+  
+  return `<!DOCTYPE html><html><head><meta charset="UTF-8"><title>Fee Statement</title>
+<style>*{margin:0;padding:0;box-sizing:border-box}body{font-family:Arial,sans-serif;padding:20px;font-size:12px}
+.c{max-width:700px;margin:0 auto}
+.hdr{text-align:center;border-bottom:3px solid #2e7d32;padding-bottom:12px;margin-bottom:20px}
+.hdr h1{color:#2e7d32;font-size:20px}.hdr p{color:#666;font-size:11px;margin:3px 0}.motto{color:#ff9800;font-style:italic}
+.ttl{text-align:center;background:#2e7d32;color:#fff;padding:10px;margin-bottom:20px;font-weight:bold}
+.info{display:flex;justify-content:space-between;margin-bottom:15px;padding:10px;background:#f5f5f5;border-radius:5px}
+.sum td{padding:10px;border:1px solid #ddd}.sum .t{background:#f5f5f5}.sum .p{background:#e8f5e9}
+.sum .b{background:#fff3e0}.sum .b .v{color:${balanceColor};font-size:16px;font-weight:bold}
+table{width:100%;border-collapse:collapse}th{background:#2e7d32;color:#fff;padding:8px;text-align:left;font-size:11px}
+td{padding:8px;border:1px solid #ddd;font-size:11px}tr:nth-child(even){background:#f9f9f9}
+.sig{display:flex;justify-content:space-between;margin-top:40px}.sig div{width:130px;text-align:center;border-top:1px solid #333;padding-top:5px;font-size:10px}
+.ftr{text-align:center;margin-top:25px;color:#999;font-size:9px}
+</style></head><body><div class="c">
+<div class="hdr"><h1>MASOMOTELE TECHNICAL TRAINING INSTITUTE</h1><p>Sagaas Center, Eldoret | Tel: 0712464936</p><p class="motto">"Start Learning, Start Earning"</p></div>
+<div class="ttl">FEE STATEMENT</div>
+<div class="info"><div><strong>Student:</strong> ${student.name}<br><strong>Adm No:</strong> ${student.admission_number}</div>
+<div style="text-align:right"><strong>Date:</strong> ${new Date().toLocaleDateString('en-GB')}<br><strong>Course:</strong> ${student.course_name}</div></div>
+<table class="sum"><tr class="t"><td><strong>Total Fee:</strong></td><td style="text-align:right">KES ${fmt(totalFee)}</td></tr>
+<tr class="p"><td><strong>Total Paid:</strong></td><td style="text-align:right;color:#2e7d32">KES ${fmt(totalPaid)}</td></tr>
+<tr class="b"><td><strong>Outstanding:</strong></td><td class="v" style="text-align:right">${balanceDisplay}</td></tr></table>
+<h3 style="color:#2e7d32;margin:20px 0 10px;font-size:13px">Payment History</h3>
+<table><thead><tr><th>Date</th><th>Reference</th><th>Method</th><th style="text-align:right">Amount</th><th style="text-align:right">Balance</th></tr></thead>
+<tbody>${rows||'<tr><td colspan="5" style="text-align:center;padding:15px">No payments</td></tr>'}</tbody></table>
+<div class="sig"><div>Accountant</div><div>Principal</div></div>
+<div class="ftr">Generated: ${new Date().toLocaleString('en-GB')}</div>
+</div></body></html>`;
+}
+
+function printStatement() { if(!feeSummary){showToast('Loading...');return;} showToast('🖨️ Opening statement...'); openPrintWindow(getStatementHTML()); }
+function downloadStatement() { if(!feeSummary){showToast('Loading...');return;} showToast('📥 Choose "Save as PDF" to download'); openPrintWindow(getStatementHTML()); }
+
+// TRANSCRIPT
+function getTranscriptHTML() {
+  const rows = results.map((r,i) => {
+    const pass = r.passed || r.percentage >= 50;
+    return `<tr style="background:${i%2===0?'#fff':'#f9f9f9'}">
+    <td>${r.exam_name||'Exam'}</td><td style="text-align:center">${fmtDate(r.exam_date)}</td>
+    <td style="text-align:center">${r.score}/${r.max_score}</td><td style="text-align:center">${(r.percentage||0).toFixed(1)}%</td>
+    <td style="text-align:center;font-weight:bold;color:${pass?'#2e7d32':'#f44336'}">${r.grade||'-'}</td>
+    <td style="text-align:center">${r.rank||'-'}/${r.total_students||'-'}</td>
+    <td style="text-align:center;font-weight:bold;color:${pass?'#2e7d32':'#f44336'}">${pass?'PASS':'FAIL'}</td></tr>`;
+  }).join('');
+  return `<!DOCTYPE html><html><head><meta charset="UTF-8"><title>Transcript</title>
+<style>*{margin:0;padding:0;box-sizing:border-box}body{font-family:Arial,sans-serif;padding:20px;font-size:12px}
+.c{max-width:750px;margin:0 auto}
+.hdr{text-align:center;border-bottom:3px solid #2e7d32;padding-bottom:12px;margin-bottom:20px}
+.hdr h1{color:#2e7d32;font-size:20px}.hdr p{color:#666;font-size:11px;margin:3px 0}.motto{color:#ff9800;font-style:italic}
+.ttl{text-align:center;background:#2e7d32;color:#fff;padding:10px;margin-bottom:20px;font-weight:bold}
+.info{display:flex;justify-content:space-between;margin-bottom:15px;padding:10px;background:#f5f5f5;border-radius:5px}
+.stats{display:flex;gap:12px;margin-bottom:20px}.stat{flex:1;padding:12px;border-radius:6px;text-align:center}
+.stat .n{font-size:22px;font-weight:bold}.stat .l{font-size:10px;color:#666}
+table{width:100%;border-collapse:collapse}th{background:#2e7d32;color:#fff;padding:8px;text-align:left;font-size:10px}
+td{padding:8px;border:1px solid #ddd;font-size:10px}
+.grade{margin-top:12px;padding:10px;background:#f5f5f5;border-radius:5px;font-size:10px}
+.sig{display:flex;justify-content:space-between;margin-top:40px}.sig div{width:130px;text-align:center;border-top:1px solid #333;padding-top:5px;font-size:10px}
+.ftr{text-align:center;margin-top:25px;color:#999;font-size:9px}
+@media print{.stat{-webkit-print-color-adjust:exact;print-color-adjust:exact}}
+</style></head><body><div class="c">
+<div class="hdr"><h1>MASOMOTELE TECHNICAL TRAINING INSTITUTE</h1><p>Sagaas Center, Eldoret | TVETA Accredited</p><p class="motto">"Start Learning, Start Earning"</p></div>
+<div class="ttl">ACADEMIC TRANSCRIPT</div>
+<div class="info"><div><strong>Student:</strong> ${student.name}<br><strong>Adm No:</strong> ${student.admission_number}</div>
+<div style="text-align:right"><strong>Date:</strong> ${new Date().toLocaleDateString('en-GB')}<br><strong>Course:</strong> ${student.course_name}</div></div>
+<div class="stats">
+<div class="stat" style="background:#e8f5e9"><div class="n" style="color:#2e7d32">${(stats.average_score||0).toFixed(1)}%</div><div class="l">Average</div></div>
+<div class="stat" style="background:#e3f2fd"><div class="n" style="color:#1976d2">${stats.total_exams||0}</div><div class="l">Exams</div></div>
+<div class="stat" style="background:#e8f5e9"><div class="n" style="color:#2e7d32">${stats.passed||0}</div><div class="l">Passed</div></div>
+<div class="stat" style="background:#ffebee"><div class="n" style="color:#f44336">${stats.failed||0}</div><div class="l">Failed</div></div></div>
+<table><thead><tr><th>Exam/Unit</th><th style="text-align:center">Date</th><th style="text-align:center">Score</th><th style="text-align:center">%</th><th style="text-align:center">Grade</th><th style="text-align:center">Rank</th><th style="text-align:center">Status</th></tr></thead>
+<tbody>${rows||'<tr><td colspan="7" style="text-align:center;padding:15px">No results</td></tr>'}</tbody></table>
+<div class="grade"><strong>Grading:</strong> A (80-100%) Distinction | B (60-79%) Credit | C (50-59%) Pass | D/E (<50%) Fail</div>
+<div class="sig"><div>Registrar</div><div>Principal</div></div>
+<div class="ftr">This is a computer-generated transcript.<br>Generated: ${new Date().toLocaleString('en-GB')}</div>
+</div></body></html>`;
+}
+
+function printTranscript() { if(!student){return;} showToast('🖨️ Opening transcript...'); openPrintWindow(getTranscriptHTML()); }
+function downloadTranscript() { if(!student){return;} showToast('📥 Choose "Save as PDF" to download'); openPrintWindow(getTranscriptHTML()); }
+
+function mttiLogout() {
+  localStorage.removeItem('mtti_adm');
+  localStorage.removeItem('mtti_pwd');
+  student = stats = results = payments = feeSummary = assignments = assignmentSummary = null;
+  hasPassword = false;
+  currentAdmission = '';
+  document.getElementById('portalScreen').classList.add('mtti-hidden');
+  document.getElementById('loginScreen').classList.remove('mtti-hidden');
+  document.getElementById('admissionInput').value = '';
+  document.getElementById('passwordInput').value = '';
+  document.getElementById('passwordGroup').style.display = 'none';
+  document.getElementById('refreshBtn').style.display = 'none';
+}
+
+async function refreshData() {
+  const btn = document.getElementById('refreshBtn');
+  btn.classList.add('spinning');
+  btn.disabled = true;
+  
+  try {
+    // Reset cached data to force reload
+    feeSummary = null;
+    assignments = null;
+    assignmentSummary = null;
+    
+    // Reload dashboard data
+    const res = await fetch(API + '/student-dashboard?admission=' + encodeURIComponent(currentAdmission));
+    const data = await res.json();
+    
+    if (data.success) {
+      student = data.student;
+      stats = data.stats;
+      results = data.results || [];
+      renderPortal();
+      
+      // Reload current tab data
+      const activeTab = document.querySelector('.mtti-tab.active');
+      if (activeTab) {
+        const tabId = activeTab.getAttribute('onclick').match(/switchTab\('(\w+)'\)/);
+        if (tabId && tabId[1] === 'payments') {
+          await loadPayments();
+        } else if (tabId && tabId[1] === 'assignments') {
+          await loadAssignments();
+        }
+      }
+      
+      showToast('✅ Refreshed!');
+    }
+  } catch (e) {
+    showToast('❌ Refresh failed');
+  }
+  
+  btn.classList.remove('spinning');
+  btn.disabled = false;
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+  const saved = localStorage.getItem('mtti_adm');
+  const savedPwd = localStorage.getItem('mtti_pwd');
+  if (saved) { 
+    document.getElementById('admissionInput').value = saved;
+    if (savedPwd) {
+      document.getElementById('passwordInput').value = atob(savedPwd);
+    }
+    mttiLogin(); 
+  }
+  document.getElementById('admissionInput').addEventListener('keypress', e => { if (e.key === 'Enter') mttiLogin(); });
+  document.getElementById('passwordInput').addEventListener('keypress', e => { if (e.key === 'Enter') mttiLogin(); });
+});
+</script>

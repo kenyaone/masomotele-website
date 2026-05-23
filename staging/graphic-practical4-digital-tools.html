@@ -1,0 +1,516 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Digital Tools Practical - Canva Style | M.T.T.I</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&family=Playfair+Display:wght@700&display=swap" rel="stylesheet">
+    <style>
+        :root{--c:#00c4cc;--c2:#7c3aed;--bg:#0b0e11;--card:#1a1d23;--toolbar:#252830;--success:#22c55e;--error:#ef4444}
+        *{margin:0;padding:0;box-sizing:border-box}
+        body{font-family:'Segoe UI',system-ui,sans-serif;background:var(--bg);color:#e2e8f0;min-height:100vh;overflow:hidden}
+        
+        .app-container{display:grid;grid-template-columns:70px 260px 1fr;grid-template-rows:52px 1fr;height:100vh}
+        
+        .top-bar{grid-column:1/-1;background:var(--card);border-bottom:1px solid #2d3748;padding:0 20px;display:flex;align-items:center;justify-content:space-between}
+        .logo{color:var(--c);font-weight:700;font-size:1.2rem;display:flex;align-items:center;gap:8px}
+        .top-center{display:flex;align-items:center;gap:15px}
+        .task-pill{background:var(--c);color:#000;padding:5px 15px;border-radius:20px;font-size:0.8rem;font-weight:600}
+        .timer{background:#2d3748;padding:6px 16px;border-radius:20px;font-weight:600}
+        .timer.warn{background:var(--error);color:#fff}
+        .progress-mini{display:flex;align-items:center;gap:8px;font-size:0.85rem}
+        .progress-dots{display:flex;gap:4px}
+        .progress-dot{width:8px;height:8px;border-radius:50%;background:#2d3748}
+        .progress-dot.done{background:var(--success)}
+        .progress-dot.current{background:var(--c)}
+        
+        .side-tools{background:var(--toolbar);border-right:1px solid #2d3748;display:flex;flex-direction:column;align-items:center;padding:15px 0;gap:5px}
+        .tool-btn{width:50px;height:50px;border:none;background:transparent;color:#94a3b8;border-radius:10px;cursor:pointer;display:flex;flex-direction:column;align-items:center;justify-content:center;font-size:0.65rem;gap:3px}
+        .tool-btn:hover{background:#2d3748;color:#fff}
+        .tool-btn.active{background:var(--c);color:#000}
+        .tool-btn span{font-size:1.2rem}
+        
+        .side-panel{background:var(--card);border-right:1px solid #2d3748;overflow-y:auto;padding:15px}
+        .panel-title{color:var(--c);font-size:0.85rem;font-weight:600;margin-bottom:15px}
+        .panel-section{margin-bottom:20px}
+        .panel-label{color:#94a3b8;font-size:0.75rem;margin-bottom:8px;text-transform:uppercase}
+        
+        .template-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+        .template-item{aspect-ratio:1;background:#2d3748;border-radius:8px;cursor:pointer;overflow:hidden;border:2px solid transparent;transition:all 0.2s}
+        .template-item:hover{border-color:var(--c)}
+        .template-item.selected{border-color:var(--c)}
+        .template-item img{width:100%;height:100%;object-fit:cover}
+        
+        .shape-grid{display:flex;flex-wrap:wrap;gap:8px}
+        .shape-btn{width:40px;height:40px;border:1px solid #2d3748;background:transparent;border-radius:6px;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:1.2rem;color:#94a3b8}
+        .shape-btn:hover{background:#2d3748;color:var(--c)}
+        
+        .color-grid{display:flex;flex-wrap:wrap;gap:6px}
+        .color-swatch{width:30px;height:30px;border-radius:6px;cursor:pointer;border:2px solid transparent}
+        .color-swatch:hover,.color-swatch.selected{border-color:#fff}
+        
+        .slider-control{margin-bottom:12px}
+        .slider-control label{display:flex;justify-content:space-between;font-size:0.8rem;color:#94a3b8;margin-bottom:5px}
+        .slider-control input[type=range]{width:100%;-webkit-appearance:none;height:6px;background:#2d3748;border-radius:3px}
+        .slider-control input::-webkit-slider-thumb{-webkit-appearance:none;width:14px;height:14px;background:var(--c);border-radius:50%;cursor:pointer}
+        
+        .canvas-area{background:#1a1d23;display:flex;align-items:center;justify-content:center;padding:30px;overflow:auto}
+        .design-canvas{background:#fff;box-shadow:0 20px 60px rgba(0,0,0,0.4);position:relative;transition:all 0.3s}
+        
+        .canvas-element{position:absolute;cursor:move;user-select:none}
+        .canvas-element.selected{outline:2px solid var(--c);outline-offset:2px}
+        .canvas-element.text{cursor:text}
+        
+        .task-overlay{position:fixed;bottom:20px;right:20px;background:var(--card);border:1px solid #2d3748;border-radius:12px;padding:15px;width:280px;box-shadow:0 10px 40px rgba(0,0,0,0.3)}
+        .task-overlay h4{color:var(--c);margin-bottom:10px;font-size:0.9rem}
+        .task-overlay p{color:#94a3b8;font-size:0.8rem;margin-bottom:10px;line-height:1.5}
+        .checklist-mini{background:#2d3748;border-radius:8px;padding:10px}
+        .check-mini{display:flex;align-items:center;gap:6px;font-size:0.75rem;padding:3px 0}
+        .check-mini.pass{color:var(--success)}
+        .check-mini::before{content:"○";color:#4a5568}
+        .check-mini.pass::before{content:"✓";color:var(--success)}
+        .task-nav-btns{display:flex;gap:8px;margin-top:12px}
+        .task-nav-btns button{flex:1;padding:8px;border:none;border-radius:6px;font-weight:600;cursor:pointer;font-size:0.8rem}
+        .btn-prev-mini{background:#2d3748;color:#94a3b8}
+        .btn-next-mini{background:var(--c);color:#000}
+        
+        .score-pill{background:linear-gradient(135deg,var(--c),var(--c2));padding:8px 15px;border-radius:8px;text-align:center;margin-bottom:12px}
+        .score-pill .num{font-size:1.5rem;font-weight:700}
+        .score-pill .label{font-size:0.7rem;opacity:0.8}
+        
+        .start-screen{position:fixed;inset:0;background:var(--bg);display:flex;align-items:center;justify-content:center;z-index:200}
+        .start-card{background:var(--card);border:2px solid var(--c);border-radius:20px;padding:40px;max-width:550px;text-align:center}
+        .start-card .icon{font-size:4rem;margin-bottom:15px}
+        .start-card h1{background:linear-gradient(135deg,var(--c),var(--c2));-webkit-background-clip:text;-webkit-text-fill-color:transparent;font-size:1.8rem;margin-bottom:8px}
+        .start-card h2{color:#94a3b8;font-weight:400;margin-bottom:25px}
+        .brief{background:#1a1d23;padding:20px;border-radius:12px;text-align:left;margin-bottom:20px}
+        .brief h3{color:var(--c);margin-bottom:10px}
+        .brief p{color:#e2e8f0;font-size:0.9rem;line-height:1.6}
+        .exam-info{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:20px}
+        .info-box{background:#1a1d23;padding:15px;border-radius:10px}
+        .info-box span{display:block;color:#94a3b8;font-size:0.7rem;text-transform:uppercase}
+        .info-box b{color:var(--c);font-size:1.3rem}
+        .name-input{width:100%;padding:14px;background:#1a1d23;border:2px solid #2d3748;border-radius:10px;color:#fff;text-align:center;margin-bottom:15px}
+        .start-btn{width:100%;padding:14px;background:linear-gradient(135deg,var(--c),var(--c2));color:#fff;border:none;border-radius:10px;font-weight:600;cursor:pointer}
+        .start-btn:disabled{opacity:0.5}
+        
+        .results-screen{position:fixed;inset:0;background:var(--bg);display:none;align-items:center;justify-content:center;z-index:200}
+        .results-card{background:var(--card);border:2px solid var(--c);border-radius:20px;padding:40px;max-width:450px;text-align:center}
+        .results-icon{font-size:4rem;margin-bottom:10px}
+        .results-status{font-size:1.8rem;font-weight:800}
+        .results-status.pass{color:var(--success)}
+        .results-status.fail{color:var(--error)}
+        .results-score{font-size:3rem;font-weight:800;background:linear-gradient(135deg,var(--c),var(--c2));-webkit-background-clip:text;-webkit-text-fill-color:transparent;margin:10px 0}
+        .result-item{display:flex;justify-content:space-between;padding:8px 12px;background:#1a1d23;border-radius:6px;margin:5px 0;font-size:0.85rem}
+        .result-item.pass{border-left:3px solid var(--success)}
+        .result-item.fail{border-left:3px solid var(--error)}
+        .retry-btn{padding:12px 30px;background:linear-gradient(135deg,var(--c),var(--c2));color:#fff;border:none;border-radius:8px;font-weight:600;cursor:pointer;margin-top:15px}
+    </style>
+</head>
+<body>
+    <div class="start-screen" id="startScreen">
+        <div class="start-card">
+            <div class="icon">✨</div>
+            <h1>Digital Design Tools Practical</h1>
+            <h2>Create Designs Like a Pro</h2>
+            <div class="brief">
+                <h3>📋 Your Challenge:</h3>
+                <p>Use this Canva-style design editor to create professional graphics. Add text, shapes, change colors, and arrange elements to build stunning designs!</p>
+            </div>
+            <div class="exam-info">
+                <div class="info-box"><span>Projects</span><b>5</b></div>
+                <div class="info-box"><span>Time</span><b>45 min</b></div>
+                <div class="info-box"><span>Pass</span><b>60%</b></div>
+            </div>
+            <input type="text" class="name-input" id="studentName" placeholder="Enter Your Full Name">
+            <button class="start-btn" id="startBtn" disabled>✨ Start Creating</button>
+        </div>
+    </div>
+
+    <div class="results-screen" id="resultsScreen">
+        <div class="results-card">
+            <div class="results-icon" id="resultsIcon">🏆</div>
+            <div class="results-status" id="resultsStatus">PASSED</div>
+            <div class="results-score" id="resultsScore">85%</div>
+            <div id="resultsBreakdown"></div>
+            <button class="retry-btn" onclick="location.reload()">🔄 Try Again</button>
+        </div>
+    </div>
+
+    <div class="app-container" id="appContainer" style="display:none">
+        <div class="top-bar">
+            <div class="logo">🎨 Design Studio</div>
+            <div class="top-center">
+                <span class="task-pill" id="taskPill">Task 1: Social Media Post</span>
+                <div class="progress-mini">
+                    <div class="progress-dots" id="progressDots"></div>
+                </div>
+            </div>
+            <div class="timer" id="timer">45:00</div>
+        </div>
+        
+        <div class="side-tools">
+            <button class="tool-btn active" data-tool="select" onclick="setTool('select')"><span>👆</span>Select</button>
+            <button class="tool-btn" data-tool="text" onclick="addText()"><span>T</span>Text</button>
+            <button class="tool-btn" data-tool="shape" onclick="setTool('shape')"><span>◼</span>Shape</button>
+            <button class="tool-btn" data-tool="image" onclick="setTool('image')"><span>🖼️</span>Image</button>
+        </div>
+        
+        <div class="side-panel" id="sidePanel"></div>
+        
+        <div class="canvas-area">
+            <div class="design-canvas" id="designCanvas"></div>
+        </div>
+        
+        <div class="task-overlay" id="taskOverlay"></div>
+    </div>
+
+<script>
+const colors = ['#ef4444','#f97316','#eab308','#22c55e','#06b6d4','#3b82f6','#8b5cf6','#ec4899','#000000','#ffffff','#64748b','#1e293b'];
+
+const tasks = [
+    {
+        title: "Social Media Post",
+        desc: "Create an Instagram post (1080x1080) with a headline, colored background, and call-to-action text.",
+        canvasSize: { w: 350, h: 350 },
+        points: 20,
+        checks: [
+            { test: s => s.elements.some(e => e.type === 'text' && e.fontSize >= 28), text: 'Large headline text (28px+)' },
+            { test: s => s.bgColor !== '#ffffff', text: 'Custom background color' },
+            { test: s => s.elements.filter(e => e.type === 'text').length >= 2, text: 'At least 2 text elements' },
+            { test: s => s.elements.some(e => e.type === 'shape'), text: 'Include a shape element' }
+        ]
+    },
+    {
+        title: "YouTube Thumbnail",
+        desc: "Design an eye-catching YouTube thumbnail (1280x720) with bold text and high contrast colors.",
+        canvasSize: { w: 450, h: 253 },
+        points: 20,
+        checks: [
+            { test: s => s.elements.some(e => e.type === 'text' && e.fontSize >= 36), text: 'Bold title text (36px+)' },
+            { test: s => s.elements.some(e => e.type === 'shape' && e.bgColor), text: 'Colored shape/banner' },
+            { test: s => s.bgColor !== '#ffffff' || s.elements.some(e => e.type === 'rect' && e.w > 300), text: 'Visual background' },
+            { test: s => s.elements.filter(e => e.type === 'text').length >= 1, text: 'Has title text' }
+        ]
+    },
+    {
+        title: "Story/Reel Cover",
+        desc: "Create a vertical story cover (1080x1920 ratio) with centered text and decorative elements.",
+        canvasSize: { w: 225, h: 400 },
+        points: 20,
+        checks: [
+            { test: s => s.elements.some(e => e.type === 'text'), text: 'Has text content' },
+            { test: s => s.elements.filter(e => e.type === 'shape').length >= 2, text: 'Multiple decorative shapes' },
+            { test: s => s.bgColor !== '#ffffff', text: 'Custom background' },
+            { test: s => s.elements.some(e => e.type === 'text' && e.y > 150 && e.y < 300), text: 'Text positioned centrally' }
+        ]
+    },
+    {
+        title: "Event Banner",
+        desc: "Design a Facebook event banner (1200x628) with event title, date, and styled text.",
+        canvasSize: { w: 450, h: 235 },
+        points: 20,
+        checks: [
+            { test: s => s.elements.some(e => e.type === 'text' && e.fontSize >= 30), text: 'Large event title' },
+            { test: s => s.elements.filter(e => e.type === 'text').length >= 3, text: 'Title, date & details (3+ texts)' },
+            { test: s => s.elements.some(e => e.type === 'shape'), text: 'Decorative element' },
+            { test: s => s.bgColor !== '#ffffff', text: 'Themed background color' }
+        ]
+    },
+    {
+        title: "Quote Graphic",
+        desc: "Create an inspirational quote graphic with large quote text, author name, and decorative elements.",
+        canvasSize: { w: 350, h: 350 },
+        points: 20,
+        checks: [
+            { test: s => s.elements.some(e => e.type === 'text' && e.fontSize >= 24 && e.content.length > 10), text: 'Quote text (24px+)' },
+            { test: s => s.elements.filter(e => e.type === 'text').length >= 2, text: 'Quote + author name' },
+            { test: s => s.elements.some(e => e.type === 'text' && e.fontSize < 20), text: 'Smaller attribution text' },
+            { test: s => s.elements.some(e => e.type === 'shape') || s.bgColor !== '#ffffff', text: 'Visual styling applied' }
+        ]
+    }
+];
+
+let current = 0, timeLeft = 45 * 60, timer;
+let state = { bgColor: '#ffffff', elements: [] };
+let selectedEl = null;
+let nextId = 1;
+let scores = Array(tasks.length).fill(0);
+let savedStates = tasks.map(() => ({ bgColor: '#ffffff', elements: [] }));
+
+const $ = id => document.getElementById(id);
+
+$('studentName').oninput = e => $('startBtn').disabled = !e.target.value.trim();
+$('startBtn').onclick = startExam;
+
+function startExam() {
+    $('startScreen').style.display = 'none';
+    $('appContainer').style.display = 'grid';
+    renderTask();
+    timer = setInterval(tick, 1000);
+}
+
+function tick() {
+    timeLeft--;
+    $('timer').textContent = `${Math.floor(timeLeft/60)}:${(timeLeft%60).toString().padStart(2,'0')}`;
+    if (timeLeft <= 300) $('timer').classList.add('warn');
+    if (timeLeft <= 0) submitExam();
+}
+
+function renderTask() {
+    const t = tasks[current];
+    state = savedStates[current];
+    selectedEl = null;
+    
+    $('taskPill').textContent = `Task ${current + 1}: ${t.title}`;
+    $('progressDots').innerHTML = tasks.map((_, i) => 
+        `<div class="progress-dot ${i < current ? 'done' : ''} ${i === current ? 'current' : ''}"></div>`
+    ).join('');
+    
+    const canvas = $('designCanvas');
+    canvas.style.width = t.canvasSize.w + 'px';
+    canvas.style.height = t.canvasSize.h + 'px';
+    
+    renderSidePanel();
+    renderCanvas();
+    renderTaskOverlay();
+}
+
+function renderSidePanel() {
+    $('sidePanel').innerHTML = `
+        <div class="panel-section">
+            <div class="panel-title">🎨 Background</div>
+            <div class="color-grid">
+                ${colors.map(c => `<div class="color-swatch ${state.bgColor === c ? 'selected' : ''}" style="background:${c}" onclick="setBgColor('${c}')"></div>`).join('')}
+            </div>
+        </div>
+        
+        <div class="panel-section">
+            <div class="panel-title">➕ Add Elements</div>
+            <button class="tool-btn" style="width:100%;height:auto;padding:10px;flex-direction:row;gap:10px;justify-content:flex-start" onclick="addText()">
+                <span style="font-size:1.5rem">T</span> Add Text
+            </button>
+            <div style="display:flex;gap:8px;margin-top:8px">
+                <button class="shape-btn" onclick="addShape('rect')">▬</button>
+                <button class="shape-btn" onclick="addShape('circle')">●</button>
+                <button class="shape-btn" onclick="addShape('triangle')">▲</button>
+            </div>
+        </div>
+        
+        ${selectedEl !== null ? `
+        <div class="panel-section">
+            <div class="panel-title">🎛️ Selected Element</div>
+            ${renderElementControls()}
+        </div>
+        ` : ''}
+    `;
+}
+
+function renderElementControls() {
+    const el = state.elements.find(e => e.id === selectedEl);
+    if (!el) return '';
+    
+    if (el.type === 'text') {
+        return `
+            <div class="slider-control">
+                <label><span>Content</span></label>
+                <input type="text" value="${el.content}" onchange="updateEl('content', this.value)" style="width:100%;padding:8px;background:#2d3748;border:1px solid #4a5568;border-radius:6px;color:#fff">
+            </div>
+            <div class="slider-control">
+                <label><span>Font Size</span><span>${el.fontSize}px</span></label>
+                <input type="range" min="12" max="72" value="${el.fontSize}" onchange="updateEl('fontSize', +this.value)">
+            </div>
+            <div class="panel-label">Text Color</div>
+            <div class="color-grid">
+                ${colors.map(c => `<div class="color-swatch ${el.color === c ? 'selected' : ''}" style="background:${c}" onclick="updateEl('color', '${c}')"></div>`).join('')}
+            </div>
+            <button onclick="deleteSelected()" style="width:100%;margin-top:15px;padding:8px;background:#ef4444;color:#fff;border:none;border-radius:6px;cursor:pointer">🗑️ Delete</button>
+        `;
+    } else {
+        return `
+            <div class="slider-control">
+                <label><span>Size</span><span>${el.w}px</span></label>
+                <input type="range" min="20" max="200" value="${el.w}" onchange="updateEl('w', +this.value); updateEl('h', +this.value)">
+            </div>
+            <div class="panel-label">Shape Color</div>
+            <div class="color-grid">
+                ${colors.map(c => `<div class="color-swatch ${el.bgColor === c ? 'selected' : ''}" style="background:${c}" onclick="updateEl('bgColor', '${c}')"></div>`).join('')}
+            </div>
+            <button onclick="deleteSelected()" style="width:100%;margin-top:15px;padding:8px;background:#ef4444;color:#fff;border:none;border-radius:6px;cursor:pointer">🗑️ Delete</button>
+        `;
+    }
+}
+
+function renderCanvas() {
+    const canvas = $('designCanvas');
+    canvas.style.background = state.bgColor;
+    
+    canvas.innerHTML = state.elements.map(el => {
+        const selected = el.id === selectedEl ? 'selected' : '';
+        if (el.type === 'text') {
+            return `<div class="canvas-element text ${selected}" data-id="${el.id}" style="left:${el.x}px;top:${el.y}px;font-size:${el.fontSize}px;color:${el.color};font-weight:600;font-family:Poppins,sans-serif;white-space:nowrap">${el.content}</div>`;
+        } else if (el.shape === 'rect') {
+            return `<div class="canvas-element ${selected}" data-id="${el.id}" style="left:${el.x}px;top:${el.y}px;width:${el.w}px;height:${el.h}px;background:${el.bgColor};border-radius:4px"></div>`;
+        } else if (el.shape === 'circle') {
+            return `<div class="canvas-element ${selected}" data-id="${el.id}" style="left:${el.x}px;top:${el.y}px;width:${el.w}px;height:${el.h}px;background:${el.bgColor};border-radius:50%"></div>`;
+        } else if (el.shape === 'triangle') {
+            return `<div class="canvas-element ${selected}" data-id="${el.id}" style="left:${el.x}px;top:${el.y}px;width:0;height:0;border-left:${el.w/2}px solid transparent;border-right:${el.w/2}px solid transparent;border-bottom:${el.h}px solid ${el.bgColor}"></div>`;
+        }
+    }).join('');
+    
+    canvas.querySelectorAll('.canvas-element').forEach(el => {
+        el.addEventListener('mousedown', startDrag);
+    });
+    
+    canvas.addEventListener('click', (e) => {
+        if (e.target === canvas) {
+            selectedEl = null;
+            renderSidePanel();
+            renderCanvas();
+        }
+    });
+}
+
+function renderTaskOverlay() {
+    const t = tasks[current];
+    const results = t.checks.map(c => ({ pass: c.test(state), text: c.text }));
+    const passed = results.filter(r => r.pass).length;
+    scores[current] = Math.round((passed / results.length) * t.points);
+    
+    $('taskOverlay').innerHTML = `
+        <div class="score-pill">
+            <div class="num">${scores.reduce((a,b)=>a+b,0)}/100</div>
+            <div class="label">Total Score</div>
+        </div>
+        <h4>📋 ${t.title}</h4>
+        <p>${t.desc}</p>
+        <div class="checklist-mini">
+            ${results.map(r => `<div class="check-mini ${r.pass?'pass':''}">${r.text}</div>`).join('')}
+        </div>
+        <div class="task-nav-btns">
+            <button class="btn-prev-mini" onclick="prevTask()" ${current===0?'disabled':''}>← Prev</button>
+            <button class="btn-next-mini" onclick="nextTask()">${current===tasks.length-1?'Finish':'Next →'}</button>
+        </div>
+    `;
+}
+
+function setBgColor(color) {
+    state.bgColor = color;
+    savedStates[current] = state;
+    renderSidePanel();
+    renderCanvas();
+    renderTaskOverlay();
+}
+
+function addText() {
+    state.elements.push({
+        id: nextId++,
+        type: 'text',
+        content: 'Your Text',
+        x: 50,
+        y: 50,
+        fontSize: 24,
+        color: '#000000'
+    });
+    savedStates[current] = state;
+    renderCanvas();
+    renderTaskOverlay();
+}
+
+function addShape(shape) {
+    state.elements.push({
+        id: nextId++,
+        type: 'shape',
+        shape: shape,
+        x: 50,
+        y: 50,
+        w: 80,
+        h: 80,
+        bgColor: '#3b82f6'
+    });
+    savedStates[current] = state;
+    renderCanvas();
+    renderTaskOverlay();
+}
+
+function updateEl(prop, value) {
+    const el = state.elements.find(e => e.id === selectedEl);
+    if (el) {
+        el[prop] = value;
+        savedStates[current] = state;
+        renderSidePanel();
+        renderCanvas();
+        renderTaskOverlay();
+    }
+}
+
+function deleteSelected() {
+    state.elements = state.elements.filter(e => e.id !== selectedEl);
+    selectedEl = null;
+    savedStates[current] = state;
+    renderSidePanel();
+    renderCanvas();
+    renderTaskOverlay();
+}
+
+let dragOffset = { x: 0, y: 0 };
+
+function startDrag(e) {
+    const elDiv = e.target.closest('.canvas-element');
+    selectedEl = parseInt(elDiv.dataset.id);
+    const el = state.elements.find(e => e.id === selectedEl);
+    
+    dragOffset.x = e.offsetX;
+    dragOffset.y = e.offsetY;
+    
+    renderSidePanel();
+    renderCanvas();
+    
+    document.addEventListener('mousemove', doDrag);
+    document.addEventListener('mouseup', stopDrag);
+}
+
+function doDrag(e) {
+    const el = state.elements.find(e => e.id === selectedEl);
+    const canvas = $('designCanvas');
+    const rect = canvas.getBoundingClientRect();
+    
+    el.x = Math.max(0, e.clientX - rect.left - dragOffset.x);
+    el.y = Math.max(0, e.clientY - rect.top - dragOffset.y);
+    
+    renderCanvas();
+}
+
+function stopDrag() {
+    document.removeEventListener('mousemove', doDrag);
+    document.removeEventListener('mouseup', stopDrag);
+    savedStates[current] = state;
+    renderTaskOverlay();
+}
+
+function setTool(tool) {
+    document.querySelectorAll('.tool-btn').forEach(b => b.classList.remove('active'));
+    document.querySelector(`[data-tool="${tool}"]`)?.classList.add('active');
+}
+
+function prevTask() { if (current > 0) { current--; renderTask(); } }
+function nextTask() { if (current < tasks.length - 1) { current++; renderTask(); } else submitExam(); }
+
+function submitExam() {
+    clearInterval(timer);
+    const total = scores.reduce((a,b)=>a+b,0);
+    const pass = total >= 60;
+    
+    $('appContainer').style.display = 'none';
+    $('resultsScreen').style.display = 'flex';
+    $('resultsIcon').textContent = pass ? '🏆' : '📚';
+    $('resultsStatus').textContent = pass ? 'PASSED!' : 'KEEP PRACTICING';
+    $('resultsStatus').className = `results-status ${pass?'pass':'fail'}`;
+    $('resultsScore').textContent = `${total}%`;
+    $('resultsBreakdown').innerHTML = tasks.map((t,i) =>
+        `<div class="result-item ${scores[i]>=t.points*0.5?'pass':'fail'}"><span>${t.title}</span><span>${scores[i]}/${t.points}</span></div>`
+    ).join('');
+}
+</script>
+</body>
+</html>

@@ -364,8 +364,9 @@
         .quiz-result .r-install{font-size:.78rem;color:#888;margin:4px 0 16px;}
         .quiz-result .r-btns{display:flex;flex-direction:column;gap:8px;}
         .quiz-result .r-btns a{display:block;padding:13px;border-radius:10px;font-weight:700;text-decoration:none;font-size:.95rem;text-align:center;}
-        .quiz-trigger{display:inline-flex;align-items:center;gap:8px;background:rgba(255,255,255,.12);border:2px solid rgba(255,255,255,.4);color:#fff;padding:10px 22px;border-radius:50px;font-size:.88rem;font-weight:700;cursor:pointer;margin-top:10px;transition:all .2s;font-family:'Poppins',sans-serif;}
-        .quiz-trigger:hover{background:rgba(255,255,255,.22);}
+        .quiz-trigger{display:flex;align-items:center;justify-content:center;gap:12px;background:#FF9800;color:#fff;padding:20px 36px;border-radius:14px;font-size:1.2rem;font-weight:800;border:none;cursor:pointer;font-family:'Poppins',sans-serif;width:100%;max-width:480px;margin:22px auto 0;box-shadow:0 8px 30px rgba(255,152,0,.55);transition:transform .2s,box-shadow .2s;animation:ctaPulse 2.5s ease-in-out infinite;letter-spacing:.2px;}
+        .quiz-trigger:hover{transform:translateY(-3px);box-shadow:0 14px 38px rgba(255,152,0,.7);animation:none;background:#F57C00;}
+        @keyframes ctaPulse{0%,100%{box-shadow:0 8px 30px rgba(255,152,0,.55);}50%{box-shadow:0 8px 44px rgba(255,152,0,.9);}}
 
         /* ── STICKY VISIT BAR ── */
         .visit-bar{position:fixed;bottom:0;left:0;right:0;z-index:989;background:linear-gradient(90deg,#1B5E20 0%,#2E7D32 100%);color:#fff;display:flex;align-items:center;justify-content:center;gap:12px;padding:10px 20px;transform:translateY(100%);transition:transform .4s ease;flex-wrap:wrap;}
@@ -389,10 +390,6 @@
         .qb-tags{display:flex;flex-wrap:wrap;gap:10px;justify-content:center;margin-top:32px;}
         .qb-tag{background:rgba(0,0,0,.15);color:#fff;padding:7px 18px;border-radius:30px;font-size:.85rem;font-weight:700;border:2px solid rgba(255,255,255,.3);}
         .qb-note{color:rgba(255,255,255,.85);font-size:.85rem;margin-top:18px !important;font-weight:500;}
-
-        /* ── HERO QUIZ BUTTON ── */
-        .quiz-trigger{display:inline-flex;align-items:center;gap:8px;background:rgba(255,255,255,.12);border:2px solid rgba(255,255,255,.4);color:#fff;padding:10px 22px;border-radius:50px;font-size:.88rem;font-weight:700;cursor:pointer;margin-top:10px;transition:all .2s;font-family:'Poppins',sans-serif;}
-        .quiz-trigger:hover{background:rgba(255,255,255,.22);}
 
         /* ── EXIT POPUP ── */
         .exit-popup{display:none;position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:9999;align-items:center;justify-content:center;}
@@ -575,7 +572,7 @@
                 </a>
                 <a href="#contact" class="btn btn-ghost">Get in Touch</a>
             </div>
-            <button class="quiz-trigger" onclick="openQuiz()">🎯 Help me choose a course →</button>
+            <button class="quiz-trigger" onclick="openQuiz()">🎯 Help Me Choose a Career →</button>
             <div class="mtti-countdown" id="cdWrap">
                 <div class="mtti-cd-box"><span class="mtti-cd-num" id="cdD">--</span><span class="mtti-cd-lbl">Days</span></div>
                 <div class="mtti-cd-box"><span class="mtti-cd-num" id="cdH">--</span><span class="mtti-cd-lbl">Hours</span></div>

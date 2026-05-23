@@ -492,35 +492,6 @@
         .testi-av{width:50px;height:50px;background:linear-gradient(135deg,var(--green),var(--green-dark));border-radius:50%;display:flex;align-items:center;justify-content:center;color:#fff;font-weight:800;font-size:.95rem;flex-shrink:0;box-shadow:0 4px 12px rgba(46,125,50,.3);}
         .testi-info h4{font-size:.92rem;font-weight:700;color:var(--dark);}
         .testi-info span{font-size:.8rem;color:var(--orange);font-weight:500;}
-
-        /* ── CHATBOT ── */
-        #mtti-chat{position:fixed;bottom:150px;right:24px;z-index:998;font-family:'Poppins',sans-serif;}
-        #chat-toggle{width:52px;height:52px;background:linear-gradient(135deg,var(--green),var(--green-dark));border-radius:50%;cursor:pointer;box-shadow:0 4px 16px rgba(46,125,50,.4);display:flex;align-items:center;justify-content:center;font-size:1.4rem;border:none;transition:transform .3s;}
-        #chat-toggle:hover{transform:scale(1.08);}
-        #chat-badge{position:absolute;top:-3px;right:-3px;background:#e53935;color:#fff;width:18px;height:18px;border-radius:50%;font-size:10px;font-weight:700;display:flex;align-items:center;justify-content:center;border:2px solid #fff;}
-        #chat-box{display:none;position:absolute;bottom:64px;right:0;left:auto;width:320px;max-width:calc(100vw - 48px);background:#fff;border-radius:18px;box-shadow:0 12px 48px rgba(0,0,0,.18);overflow:hidden;animation:chatSlide .3s ease;}
-        @keyframes chatSlide{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}
-        #chat-box.open{display:block;}
-        .chat-hdr{background:linear-gradient(135deg,var(--green),var(--green-dark));color:#fff;padding:16px 18px;display:flex;align-items:center;gap:12px;}
-        .chat-av{width:38px;height:38px;background:rgba(255,255,255,.2);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:1.2rem;}
-        .chat-hdr-info{flex:1;}
-        .chat-hdr-info h4{font-size:.9rem;font-weight:700;margin:0;}
-        .chat-hdr-info span{font-size:.75rem;opacity:.9;display:flex;align-items:center;gap:4px;}
-        .online-dot{width:7px;height:7px;background:#4ade80;border-radius:50%;display:inline-block;}
-        .chat-close{cursor:pointer;font-size:1.1rem;opacity:.8;padding:4px;background:none;border:none;color:#fff;}
-        .chat-msgs{height:200px;overflow-y:auto;padding:14px;background:#f8faf8;}
-        .chat-msgs::-webkit-scrollbar{width:4px;}
-        .chat-msgs::-webkit-scrollbar-thumb{background:#ddd;border-radius:4px;}
-        .bot-msg{display:flex;gap:8px;margin-bottom:10px;}
-        .bot-bub{background:#fff;padding:10px 14px;border-radius:4px 14px 14px 14px;font-size:.82rem;line-height:1.6;box-shadow:0 2px 8px rgba(0,0,0,.06);max-width:85%;}
-        .bot-bub b{color:var(--green);}
-        .bot-bub a{color:var(--orange);font-weight:600;text-decoration:none;}
-        .chat-opts{padding:10px 14px;background:#fff;display:flex;flex-wrap:wrap;gap:6px;border-top:1px solid #eee;}
-        .chat-opt{background:#fff;border:1.5px solid var(--green);color:var(--green);padding:7px 12px;border-radius:20px;font-size:.78rem;font-weight:600;cursor:pointer;transition:all .3s;font-family:'Poppins',sans-serif;}
-        .chat-opt:hover{background:var(--green);color:#fff;}
-        .chat-opt.primary{background:var(--orange);border-color:var(--orange);color:#fff;}
-        .chat-opt.primary:hover{background:var(--orange-dark);}
-        @media(max-width:480px){#mtti-chat{bottom:90px;right:12px;left:auto;}#chat-box{width:calc(100vw - 24px);right:0;left:auto;}}
     </style>
 </head>
 <body>
@@ -1006,33 +977,6 @@
 <!-- WhatsApp Float -->
 <a href="https://wa.me/254712464936?text=Hello%20MTTI,%20I'm%20interested%20in%20enrolling" target="_blank" class="wa-float" title="Chat on WhatsApp" onclick="trackWhatsAppClick('floating_button')">💬</a>
 
-<!-- SIMPLE CHATBOT — bottom left, won't block nav -->
-<div id="mtti-chat">
-    <button id="chat-toggle" onclick="toggleChat()" title="Ask us anything">
-        💬
-        <div id="chat-badge">1</div>
-    </button>
-    <div id="chat-box">
-        <div class="chat-hdr">
-            <div class="chat-av">🎓</div>
-            <div class="chat-hdr-info">
-                <h4>MTTI Advisor</h4>
-                <span><span class="online-dot"></span> Online · Replies instantly</span>
-            </div>
-            <button class="chat-close" onclick="toggleChat()">✕</button>
-        </div>
-        <div class="chat-msgs" id="chatMsgs">
-            <div class="bot-msg"><div class="bot-bub">👋 Hi! Welcome to <b>M.T.T.I</b>.<br>How can I help you today?</div></div>
-        </div>
-        <div class="chat-opts" id="chatOpts">
-            <button class="chat-opt primary" onclick="chatReply('enroll')">📝 Online Admission</button>
-            <button class="chat-opt" onclick="chatReply('courses')">📚 View Courses</button>
-            <button class="chat-opt" onclick="chatReply('fees')">💰 Fees & Payment</button>
-            <button class="chat-opt" onclick="chatReply('location')">📍 Location</button>
-            <button class="chat-opt" onclick="chatReply('schedule')">🕐 Class Times</button>
-        </div>
-    </div>
-</div>
 
 <!-- EXIT POPUP -->
 <div class="exit-popup" id="exitPopup">
@@ -1266,34 +1210,6 @@ function playCollegeVideo(){
     v.addEventListener('ended',function(){o.classList.remove('hidden');},{once:true});
 }
 
-/* ─── SIMPLE CHATBOT ─── */
-var chatOpen=false;
-function toggleChat(){
-    chatOpen=!chatOpen;
-    document.getElementById('chat-box').classList[chatOpen?'add':'remove']('open');
-    document.getElementById('chat-badge').style.display=chatOpen?'none':'flex';
-    if(chatOpen) trackEvent('Chatbot','opened','widget');
-}
-
-var chatReplies={
-    courses:{msg:'We offer 15+ courses including:<br>💻 Computer Applications<br>🌐 Web Development<br>🎨 Graphic Design<br>🔒 Cybersecurity<br>🇩🇪 German Language & more!',opts:[{t:'💰 Fees',k:'fees'},{t:'📝 Apply Online',k:'enroll'},{t:'📍 Location',k:'location'}]},
-    fees:{msg:'Our fees start from as low as <b>KES 1,500</b> (Computer Essentials) to <b>KES 59,000</b> (CNA). We offer <b>flexible payment plans</b> — pay in installments!',opts:[{t:'📚 Courses',k:'courses'},{t:'📝 Apply Online',k:'enroll'},{t:'💬 WhatsApp Us',k:'wa'}]},
-    enroll:{msg:'Great! You can apply online and get your admission letter instantly. 🎉<br><br><a href="/online-admission/" style="display:inline-block;background:#1F4E79;color:#fff;padding:12px 20px;border-radius:8px;text-decoration:none;font-weight:700;margin-top:8px;">📝 Online Admission Form</a><br><br>Or call/WhatsApp us: <b>📞 0712 464 936</b>',opts:[{t:'📍 Location',k:'location'},{t:'🕐 Schedule',k:'schedule'}]},
-    location:{msg:'📍 We\'re at <b>Sagaas Centre, 4th Floor, Eldoret</b>.<br>Easily accessible by matatu. Open Mon–Sat 8am–6pm.',opts:[{t:'📞 Call Us',k:'call'},{t:'📝 Apply Online',k:'enroll'}]},
-    schedule:{msg:'We have <b>3 session options</b>:<br>🌅 Morning: 8am–12pm<br>☀️ Afternoon: 1pm–5pm<br>🗓️ Weekend: Sat–Sun classes<br><br>Pick what works for you!',opts:[{t:'📝 Apply Online',k:'enroll'},{t:'💬 WhatsApp',k:'wa'}]},
-    call:{msg:'Call or WhatsApp us directly:<br><b>📞 +254 712 464 936</b><br>Available Mon–Sat, 8am–6pm.',opts:[{t:'📝 Apply Online',k:'enroll'},{t:'📍 Location',k:'location'}]},
-    wa:{msg:'Tap below to open WhatsApp — our team responds within minutes! 💬<br><br><a href="https://wa.me/254712464936?text=Hello%20MTTI,%20I%20need%20more%20information" target="_blank">👉 Open WhatsApp</a>',opts:[{t:'📚 Courses',k:'courses'},{t:'📍 Location',k:'location'}]}
-};
-
-function chatReply(key){
-    var r=chatReplies[key];if(!r)return;
-    var msgs=document.getElementById('chatMsgs');
-    var opts=document.getElementById('chatOpts');
-    msgs.innerHTML+='<div class="bot-msg"><div class="bot-bub">'+r.msg+'</div></div>';
-    opts.innerHTML=r.opts.map(function(o){return'<button class="chat-opt'+(o.k==='enroll'||o.k==='wa'?' primary':'')+'" onclick="chatReply(\''+o.k+'\')">'+o.t+'</button>';}).join('');
-    msgs.scrollTop=msgs.scrollHeight;
-    trackEvent('Chatbot','reply',key);
-}
 
 
 /* ─── INTAKE COUNTDOWN ─── */
@@ -1369,47 +1285,24 @@ function quizRestart(){
     document.getElementById('quizBar').style.width='33%';
 }
 
-/* ─── STICKY VISIT BAR + CHATBOT SCROLL REVEAL ─── */
+/* ─── STICKY VISIT BAR ─── */
 (function(){
-    var chat=document.getElementById('mtti-chat');
+    if(sessionStorage.getItem('mtti_vbar')) return;
     var waFloat=document.querySelector('.wa-float');
-    // Hide chatbot until user scrolls past hero so it never blocks the quiz button
-    chat.style.opacity='0';
-    chat.style.pointerEvents='none';
-
     var vbarShown=false;
-    var chatVisible=false;
-
-    function showChat(){
-        if(chatVisible) return;
-        chatVisible=true;
-        chat.style.transition='opacity .4s';
-        chat.style.opacity='1';
-        chat.style.pointerEvents='';
-    }
-
     function showBar(){
-        if(sessionStorage.getItem('mtti_vbar')) return;
         var bar=document.getElementById('visitBar');
         bar.classList.add('show');
         vbarShown=true;
         var h=bar.offsetHeight||52;
-        waFloat.style.bottom=(88+h)+'px';
-        chat.style.bottom=(150+h)+'px';
+        if(waFloat) waFloat.style.bottom=(88+h)+'px';
     }
-
     window.addEventListener('scroll',function(){
-        var y=window.scrollY;
-        // Show chatbot after scrolling 400px (past hero)
-        if(y>400) showChat();
-        // Show visit bar after 600px
-        if(!vbarShown&&y>600) showBar();
+        if(!vbarShown&&window.scrollY>600) showBar();
     });
-
     document.querySelector('.visit-bar-close').addEventListener('click',function(){
         sessionStorage.setItem('mtti_vbar','1');
-        waFloat.style.bottom='88px';
-        chat.style.bottom='150px';
+        if(waFloat) waFloat.style.bottom='88px';
     });
 })();
 

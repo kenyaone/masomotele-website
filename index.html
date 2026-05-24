@@ -28,17 +28,17 @@
     <meta name="twitter:description" content="TVETA accredited courses in Computer Applications, Web Design, Cybersecurity, Nursing &amp; more. Real skills for real jobs. Eldoret, Kenya.">
     <meta name="twitter:image" content="https://masomoteletraining.co.ke/wp-content/uploads/2025/12/Logo.jpeg">
 
-    <!-- Schema.org: LocalBusiness -->
+    <!-- Schema.org: LocalBusiness + EducationalOrganization -->
     <script type="application/ld+json">
     {
       "@context": "https://schema.org",
-      "@type": "VocationalTraining",
+      "@type": ["EducationalOrganization", "LocalBusiness"],
       "name": "Masomotele Technical Training Institute",
-      "alternateName": "MTTI",
+      "alternateName": ["MTTI", "MTTI Eldoret"],
       "url": "https://masomoteletraining.co.ke",
       "logo": "https://masomoteletraining.co.ke/wp-content/uploads/2025/12/Logo.jpeg",
       "image": "https://masomoteletraining.co.ke/wp-content/uploads/2025/12/Logo.jpeg",
-      "description": "TVETA accredited vocational training institute in Eldoret, Kenya offering courses in ICT, Web Design, Graphic Design, Cybersecurity, Nursing Assistant, German Language and more.",
+      "description": "TVETA accredited technical training institute in Eldoret, Kenya offering courses in ICT, Web Design, Graphic Design, Cybersecurity, Certified Nursing Assistant, German Language and more. Flexible payment plans available.",
       "telephone": "+254712464936",
       "email": "info@masomoteletraining.co.ke",
       "address": {
@@ -46,6 +46,7 @@
         "streetAddress": "Sagaas Centre, 4th Floor",
         "addressLocality": "Eldoret",
         "addressRegion": "Uasin Gishu County",
+        "postalCode": "30100",
         "addressCountry": "KE"
       },
       "geo": {
@@ -53,7 +54,15 @@
         "latitude": "0.5143",
         "longitude": "35.2698"
       },
-      "openingHours": "Mo-Sa 08:00-18:00",
+      "hasMap": "https://maps.google.com/?q=Sagaas+Centre+Eldoret+Kenya",
+      "openingHoursSpecification": [
+        {"@type":"OpeningHoursSpecification","dayOfWeek":["Monday","Tuesday","Wednesday","Thursday","Friday"],"opens":"08:00","closes":"18:00"},
+        {"@type":"OpeningHoursSpecification","dayOfWeek":"Saturday","opens":"08:00","closes":"16:00"}
+      ],
+      "priceRange": "KES 1,500 – KES 59,000",
+      "currenciesAccepted": "KES",
+      "paymentAccepted": "Cash, M-Pesa, Bank Transfer",
+      "areaServed": ["Eldoret","Uasin Gishu County","Rift Valley","Kenya"],
       "sameAs": [
         "https://web.facebook.com/profile.php?id=61582282297969",
         "https://www.tiktok.com/@masomoteletechnical"
@@ -62,11 +71,14 @@
         "@type": "OfferCatalog",
         "name": "MTTI Courses",
         "itemListElement": [
-          {"@type": "Offer", "itemOffered": {"@type": "Course", "name": "Computer Applications", "provider": {"@type": "Organization", "name": "MTTI"}}},
-          {"@type": "Offer", "itemOffered": {"@type": "Course", "name": "Web Design & Development", "provider": {"@type": "Organization", "name": "MTTI"}}},
-          {"@type": "Offer", "itemOffered": {"@type": "Course", "name": "Certified Nursing Assistant", "provider": {"@type": "Organization", "name": "MTTI"}}},
-          {"@type": "Offer", "itemOffered": {"@type": "Course", "name": "Cybersecurity", "provider": {"@type": "Organization", "name": "MTTI"}}},
-          {"@type": "Offer", "itemOffered": {"@type": "Course", "name": "German Language", "provider": {"@type": "Organization", "name": "MTTI"}}}
+          {"@type": "Offer", "itemOffered": {"@type": "Course", "name": "Computer Applications", "provider": {"@type": "Organization", "name": "MTTI Eldoret"}}},
+          {"@type": "Offer", "itemOffered": {"@type": "Course", "name": "Web Design & Development", "provider": {"@type": "Organization", "name": "MTTI Eldoret"}}},
+          {"@type": "Offer", "itemOffered": {"@type": "Course", "name": "Certified Nursing Assistant (CNA)", "provider": {"@type": "Organization", "name": "MTTI Eldoret"}}},
+          {"@type": "Offer", "itemOffered": {"@type": "Course", "name": "Cybersecurity", "provider": {"@type": "Organization", "name": "MTTI Eldoret"}}},
+          {"@type": "Offer", "itemOffered": {"@type": "Course", "name": "German Language", "provider": {"@type": "Organization", "name": "MTTI Eldoret"}}},
+          {"@type": "Offer", "itemOffered": {"@type": "Course", "name": "Graphic Design", "provider": {"@type": "Organization", "name": "MTTI Eldoret"}}},
+          {"@type": "Offer", "itemOffered": {"@type": "Course", "name": "Digital Marketing", "provider": {"@type": "Organization", "name": "MTTI Eldoret"}}},
+          {"@type": "Offer", "itemOffered": {"@type": "Course", "name": "Mobile Phone Repair", "provider": {"@type": "Organization", "name": "MTTI Eldoret"}}}
         ]
       }
     }

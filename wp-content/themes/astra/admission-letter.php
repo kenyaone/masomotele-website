@@ -242,7 +242,7 @@ function generateAdmissionHTML($data) {
 
     $hasHealthCare = false;
     foreach ($data['courses'] as $course) {
-        if (stripos($course, 'Health') !== false || stripos($course, 'HCS') !== false || stripos($course, 'CNA') !== false || stripos($course, 'Care Giver') !== false || stripos($course, 'Caregiver') !== false) {
+        if (stripos($course, 'CNA') !== false || stripos($course, 'HCS-01') !== false || stripos($course, 'Health Support Assistant') !== false) {
             $hasHealthCare = true;
             break;
         }

@@ -167,6 +167,20 @@ function generateAdmissionHTML($data) {
     $coursesText = implode(', ', $data['courses']);
     $admissionDate = date('d/m/Y');
 
+    $hasHealthCare = false;
+    foreach ($data['courses'] as $course) {
+        if (stripos($course, 'CNA') !== false || stripos($course, 'HCS-01') !== false || stripos($course, 'Health Support Assistant') !== false) {
+            $hasHealthCare = true;
+            break;
+        }
+    }
+    $germanNote = $hasHealthCare
+        ? '<div style="background: #fff8e1; border-left: 4px solid #f9a825; padding: 12px 15px; margin-top: 12px; border-radius: 3px;">
+            <p style="margin: 0; font-size: 14px;">&#127467;&#127479; <strong>BONUS: Free German Language Classes Included (A1–B2)</strong></p>
+            <p style="margin: 6px 0 0 0; font-size: 13px; color: #555;">As part of your Health Care Support Services programme, you will receive <strong>FREE German Language classes (A1–B2)</strong> running concurrently throughout the 24-week course at no extra cost. This prepares you for health care opportunities in German-speaking countries.</p>
+           </div>'
+        : '';
+
     return <<<HTML
     <!DOCTYPE html>
     <html>
@@ -313,6 +327,7 @@ function generateAdmissionHTML($data) {
                 <p style="margin: 0;">
                     <strong>{$coursesText}</strong>
                 </p>
+                {$germanNote}
                 <p style="font-size: 13px; margin: 10px 0 0 0; color: #666;">
                     <strong>Preferred Start Date:</strong> {$data['startDate']}
                 </p>

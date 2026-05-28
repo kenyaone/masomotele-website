@@ -1,13 +1,10 @@
 <?php
 /**
- * MTTI Auto-Blog System — Blogs Only
- * Generates blog post via Claude → saves as WordPress draft
- * Sends WhatsApp to Masa for approval
- * On approval → publishes live → Blog2Social posts to Facebook automatically
+ * MTTI Auto-Blog System v2
+ * Generates blog post via Claude → publishes immediately → sends email notification
+ * Runs daily at 4am UTC (7am EAT) via cron
  *
- * Deploy to: /home/uvyzhdzt/public_html/autoblog/autoblog.php
- * Cron: 0 4 * * * /usr/bin/php /home/uvyzhdzt/public_html/autoblog/autoblog.php
- * (4am UTC = 7am EAT Kenya time)
+ * Cron: 0 4 * * * /usr/local/bin/php /home/uvyzhdzt/public_html/autoblog/autoblog.php
  */
 
 error_reporting(0);
@@ -19,9 +16,8 @@ ini_set('display_errors', 0);
 define('WP_URL',        'https://masomoteletraining.co.ke');
 define('WP_USER',       'admin');
 define('WP_APP_PASS',   'jLxI kXL0 UiJQ iOcI 3V3Y PREp');
-define('APPROVE_SECRET','MTTI_BLOG_APPROVE_2026');
-define('SELF_URL',      WP_URL . '/autoblog/autoblog.php');
-define('SP_PHONE',      '254712464936');
+define('NOTIFY_EMAIL',  'musilwabonface@gmail.com');
+define('FROM_EMAIL',    'noreply@masomoteletraining.co.ke');
 define('LOG_FILE',      __DIR__ . '/autoblog.log');
 define('DB_HOST',       'localhost');
 define('DB_NAME',       'uvyzhdzt_wp265');
@@ -30,39 +26,39 @@ define('DB_PASS',       'p!PS(1S17Y');
 define('DB_PREFIX',     'wpcu_');
 
 // ============================================================
-// TOPIC ROTATION — CNA most, then Computer Repair, Mobile Repair
+// TOPIC POOL — cycles through all courses over 2 weeks
 // ============================================================
-$TOPIC_ROTATION = [
-    'monday'    => ['course'=>'CNA',             'angle'=>'benefits and career opportunities for Kenyan students'],
-    'tuesday'   => ['course'=>'Computer Repair', 'angle'=>'skills, employment and self employment in Eldoret'],
-    'wednesday' => ['course'=>'CNA and Caregiver','angle'=>'entry requirements, fees and differences'],
-    'thursday'  => ['course'=>'Mobile Phone Repair','angle'=>'business opportunity and demand in Kenya'],
-    'friday'    => ['course'=>'CNA',             'angle'=>'student success stories and job placement'],
-    'saturday'  => ['course'=>'Computer Repair', 'angle'=>'starting your own tech business in Eldoret'],
-    'sunday'    => ['course'=>'All MTTI Courses','angle'=>'why MTTI graduates get employed fast'],
+$TOPICS = [
+    ['course'=>'Certified Nursing Assistant (CNA)',   'angle'=>'career opportunities and salary in Kenya healthcare sector'],
+    ['course'=>'Caregiver',                           'angle'=>'entry requirements, day-to-day duties and demand in Kenya and abroad'],
+    ['course'=>'CNA vs Caregiver',                    'angle'=>'key differences, fees, grades required and which suits you'],
+    ['course'=>'Computer Applications',               'angle'=>'office jobs, government employment and business use in Eldoret'],
+    ['course'=>'Web Design & Development',            'angle'=>'freelancing, building websites and earning online in Kenya'],
+    ['course'=>'Graphic Design',                      'angle'=>'starting a design business and working with Kenyan brands'],
+    ['course'=>'Digital Marketing',                   'angle'=>'social media management, growing businesses online and job opportunities'],
+    ['course'=>'Cybersecurity',                       'angle'=>'protecting businesses, banking sector careers and ethical hacking in Kenya'],
+    ['course'=>'Mobile Phone Repair',                 'angle'=>'self-employment, profit margins and demand in Eldoret and beyond'],
+    ['course'=>'Computer Hardware Repair',            'angle'=>'starting a computer repair shop and servicing businesses in Eldoret'],
+    ['course'=>'German Language',                     'angle'=>'working in Germany, visa requirements and demand for Kenyan professionals'],
+    ['course'=>'TVET vs University',                  'angle'=>'cost, time to employment and best choice for Kenyan students in 2025'],
+    ['course'=>'HELB and Bursary Funding',            'angle'=>'how Kenyan TVET students can access government financial support'],
+    ['course'=>'All MTTI Courses',                    'angle'=>'which course matches your career goals and personality'],
 ];
 
-// ============================================================
-// ROUTING — approval/rejection callbacks
-// ============================================================
-if (isset($_GET['action'], $_GET['secret']) && $_GET['secret'] === APPROVE_SECRET) {
-    $post_id = intval($_GET['post_id'] ?? 0);
-    if ($_GET['action'] === 'approve' && $post_id) handle_approve($post_id);
-    elseif ($_GET['action'] === 'reject' && $post_id) handle_reject($post_id);
-    exit;
-}
+// Pick today's topic based on day-of-year so it rotates through all topics
+$topic_index = intval(date('z')) % count($TOPICS);
+$topic = $TOPICS[$topic_index];
 
 // ============================================================
-// CRON / MANUAL RUN PROTECTION
+// ACCESS CONTROL
 // ============================================================
 $is_cron   = (php_sapi_name() === 'cli');
-$is_manual = isset($_GET['run']) && $_GET['run'] === APPROVE_SECRET;
+$is_manual = isset($_GET['run']) && $_GET['run'] === 'MTTI_RUN_2026';
 if (!$is_cron && !$is_manual) { http_response_code(403); die('Access denied.'); }
 
-// Respond to browser immediately, continue in background
 if (!$is_cron) {
     ob_start();
-    echo "<h2 style='font-family:sans-serif;padding:2rem;color:green'>⏳ AutoBlog running in background...<br>Check your WhatsApp in 60 seconds and WordPress Drafts.</h2>";
+    echo "<h2 style='font-family:sans-serif;padding:2rem;color:green'>⏳ AutoBlog running... check your email and WordPress in 60 seconds.</h2>";
     $size = ob_get_length();
     header("Content-Length: $size");
     header("Connection: close");
@@ -76,24 +72,21 @@ if (!$is_cron) {
 // ============================================================
 // MAIN
 // ============================================================
-log_it("=== MTTI AutoBlog Started ===");
-
-$day   = strtolower(date('l'));
-$topic = $TOPIC_ROTATION[$day];
-log_it("Day: $day | Course: {$topic['course']}");
+log_it("=== MTTI AutoBlog v2 Started ===");
+log_it("Topic #{$topic_index}: {$topic['course']} — {$topic['angle']}");
 
 // 1. Generate blog via Claude
 $blog = generate_blog($topic);
 if (!$blog) { log_it("ERROR: Blog generation failed"); exit; }
 
-// 2. Save as WordPress draft
-$post_id = save_wordpress_draft($blog);
-if (!$post_id) { log_it("ERROR: Could not save draft"); exit; }
-log_it("Draft saved. Post ID: $post_id");
+// 2. Publish immediately to WordPress
+$result = publish_post($blog);
+if (!$result) { log_it("ERROR: Could not publish post"); exit; }
 
-// 3. Send WhatsApp approval to Masa
-$sent = send_whatsapp_approval($post_id, $blog, $topic);
-log_it($sent ? "WhatsApp sent ✅" : "WARNING: WhatsApp failed");
+log_it("Published: {$result['url']} (ID {$result['id']})");
+
+// 3. Send email notification
+notify_email($result, $blog, $topic);
 
 log_it("=== Done ===");
 
@@ -101,34 +94,74 @@ log_it("=== Done ===");
 // GENERATE BLOG via Claude API
 // ============================================================
 function generate_blog($topic) {
-    $system = "You are an expert SEO content writer for MTTI (Masomotele Technical Training Institute), a TVETA-accredited technical college in Eldoret, Kenya. Write friendly, practical blog posts for Kenyan readers. Always include: CNA fee=KES59,000/6months/min grade D, Caregiver=KES29,000/3months/any grade, payment via M-Pesa Paybill 880100 Account 219391, Lipa Mdogo Mdogo payment plan, free computer classes for all students, location: Sagaas Center 4th Floor Eldoret opposite AIC Fellowship on the way to Referral Hospital, phone: 0712464936, WhatsApp: wa.me/254712464936. Return JSON only with keys: title, excerpt (2 sentences max), content (full HTML ~800 words using h2 tags, p tags, ul/li tags), seo_keyphrase, tags (array of 5 strings). No markdown, no backticks.";
+    $system = "You are an SEO content writer for MTTI (Masomotele Technical Training Institute), a TVETA-accredited college in Eldoret, Kenya. Write practical, friendly blog posts for Kenyan readers aged 18-35. Key facts to weave in naturally where relevant: CNA course KES 59,000 / 6 months / minimum D grade; Caregiver KES 29,000 / 3 months / any grade; Computer Applications from KES 5,500; Web Dev KES 18,000; Cybersecurity KES 25,000; Graphic Design KES 12,000; Digital Marketing KES 10,000; German Language per level KES 8,000; Mobile Phone Repair KES 15,000; flexible installment payment plans available; M-Pesa Paybill 880100 Account 219391; location: Sagaas Centre 4th Floor Eldoret; phone/WhatsApp: 0712464936; URL: https://masomoteletraining.co.ke. IMPORTANT: Return ONLY a raw JSON object. No markdown, no code fences, no explanation. The JSON must have these exact keys: title (string), excerpt (string, max 2 sentences), content (string, full HTML ~800 words using h2/h3/p/ul/li tags), seo_keyphrase (string), tags (array of 5 strings).";
 
-    $prompt = "Write a blog post about {$topic['course']} at MTTI Eldoret, focusing on {$topic['angle']}. Today is " . date('l, d F Y') . ". Return JSON only.";
+    $prompt = "Write a blog post about {$topic['course']} at MTTI Eldoret, focusing on: {$topic['angle']}. Today is " . date('l, d F Y') . ". Return raw JSON only — no markdown, no backticks, start directly with {";
 
-    $response = claude_api($system, $prompt, 2000);
+    $response = claude_api($system, $prompt, 2500);
     if (!$response) return null;
 
-    $clean = trim(preg_replace('/```json|```/', '', $response));
-    $data  = json_decode($clean, true);
-
-    if (!$data || empty($data['title'])) {
-        log_it("ERROR: Bad JSON from Claude: " . substr($clean, 0, 200));
+    // Robust JSON extraction — find the outermost { } block
+    $json_str = extract_json($response);
+    if (!$json_str) {
+        log_it("ERROR: Could not extract JSON from response: " . substr($response, 0, 200));
         return null;
     }
+
+    $data = json_decode($json_str, true);
+    if (!$data || empty($data['title']) || empty($data['content'])) {
+        log_it("ERROR: Bad JSON structure: " . substr($json_str, 0, 200));
+        return null;
+    }
+
     return $data;
 }
 
+// Extract the first valid JSON object from a string
+function extract_json($str) {
+    $str = trim($str);
+    // Strip markdown code fences if present
+    $str = preg_replace('/^```(?:json)?\s*/i', '', $str);
+    $str = preg_replace('/\s*```\s*$/', '', $str);
+    $str = trim($str);
+
+    // Find the start of the JSON object
+    $start = strpos($str, '{');
+    if ($start === false) return null;
+
+    // Find matching closing brace by counting depth
+    $depth = 0;
+    $in_string = false;
+    $escape_next = false;
+    $len = strlen($str);
+
+    for ($i = $start; $i < $len; $i++) {
+        $c = $str[$i];
+        if ($escape_next) { $escape_next = false; continue; }
+        if ($c === '\\' && $in_string) { $escape_next = true; continue; }
+        if ($c === '"') { $in_string = !$in_string; continue; }
+        if ($in_string) continue;
+        if ($c === '{') $depth++;
+        elseif ($c === '}') {
+            $depth--;
+            if ($depth === 0) return substr($str, $start, $i - $start + 1);
+        }
+    }
+    return null;
+}
+
 // ============================================================
-// SAVE AS WORDPRESS DRAFT via REST API
+// PUBLISH POST via WordPress REST API
 // ============================================================
-function save_wordpress_draft($blog) {
+function publish_post($blog) {
     $endpoint = WP_URL . '/wp-json/wp/v2/posts';
 
     $body = json_encode([
         'title'   => $blog['title'],
         'content' => $blog['content'],
         'excerpt' => $blog['excerpt'],
-        'status'  => 'draft',
+        'status'  => 'publish',
+        'tags'    => get_or_create_tags($blog['tags'] ?? []),
     ]);
 
     $ch = curl_init($endpoint);
@@ -153,173 +186,109 @@ function save_wordpress_draft($blog) {
     }
 
     $data = json_decode($result, true);
-    return $data['id'] ?? null;
+    return ['id' => $data['id'], 'url' => $data['link'] ?? WP_URL];
 }
 
 // ============================================================
-// SEND WHATSAPP APPROVAL MESSAGE
+// GET OR CREATE WORDPRESS TAGS
 // ============================================================
-function send_whatsapp_approval($post_id, $blog, $topic) {
-    $approve_url = SELF_URL . "?action=approve&post_id={$post_id}&secret=" . APPROVE_SECRET;
-    $reject_url  = SELF_URL . "?action=reject&post_id={$post_id}&secret=" . APPROVE_SECRET;
-    $edit_url    = WP_URL . "/wp-admin/post.php?post={$post_id}&action=edit";
+function get_or_create_tags($tag_names) {
+    $ids = [];
+    foreach ($tag_names as $name) {
+        $name = trim($name);
+        if (!$name) continue;
 
-    $message = "🤖 *MTTI AutoBlog — Daily Post Ready*\n\n"
-        . "📅 " . date('l, d F Y') . "\n"
-        . "📚 *Course:* {$topic['course']}\n\n"
-        . "📝 *Title:*\n{$blog['title']}\n\n"
-        . "📖 *Preview:*\n{$blog['excerpt']}\n\n"
-        . "━━━━━━━━━━━━━━━\n"
-        . "✅ *APPROVE & PUBLISH:*\n{$approve_url}\n\n"
-        . "❌ *REJECT (keep draft):*\n{$reject_url}\n\n"
-        . "✏️ *EDIT IN WORDPRESS:*\n{$edit_url}\n"
-        . "━━━━━━━━━━━━━━━\n"
-        . "_Blog2Social will auto-post to Facebook after approval_";
+        // Try to create (returns existing if slug already exists)
+        $ch = curl_init(WP_URL . '/wp-json/wp/v2/tags');
+        curl_setopt_array($ch, [
+            CURLOPT_RETURNTRANSFER => true,
+            CURLOPT_POST           => true,
+            CURLOPT_POSTFIELDS     => json_encode(['name' => $name]),
+            CURLOPT_HTTPHEADER     => [
+                'Content-Type: application/json',
+                'Authorization: Basic ' . base64_encode(WP_USER . ':' . WP_APP_PASS),
+            ],
+            CURLOPT_TIMEOUT => 10,
+        ]);
+        $res  = json_decode(curl_exec($ch), true);
+        $code = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+        curl_close($ch);
 
-    return sendpulse_whatsapp(SP_PHONE, $message);
-}
-
-// ============================================================
-// HANDLE APPROVAL — publish post
-// ============================================================
-function handle_approve($post_id) {
-    $ch = curl_init(WP_URL . "/wp-json/wp/v2/posts/{$post_id}");
-    curl_setopt_array($ch, [
-        CURLOPT_RETURNTRANSFER => true,
-        CURLOPT_CUSTOMREQUEST  => 'POST',
-        CURLOPT_POSTFIELDS     => json_encode(['status' => 'publish']),
-        CURLOPT_HTTPHEADER     => [
-            'Content-Type: application/json',
-            'Authorization: Basic ' . base64_encode(WP_USER . ':' . WP_APP_PASS),
-        ],
-        CURLOPT_TIMEOUT => 30,
-    ]);
-    $result = curl_exec($ch);
-    $code   = curl_getinfo($ch, CURLINFO_HTTP_CODE);
-    curl_close($ch);
-
-    if ($code === 200) {
-        $data = json_decode($result, true);
-        $url  = $data['link'] ?? WP_URL;
-        log_it("Post $post_id APPROVED and published ✅");
-        sendpulse_whatsapp(SP_PHONE,
-            "✅ *Blog published!*\n\n"
-            . "🌐 {$url}\n\n"
-            . "Blog2Social is posting to Facebook automatically. 📘"
-        );
-        echo "<h2 style='color:green;font-family:sans-serif;padding:2rem'>✅ Blog published! Blog2Social will post to Facebook automatically.</h2>";
-    } else {
-        log_it("ERROR approving post $post_id: $code");
-        echo "<h2 style='color:red;font-family:sans-serif;padding:2rem'>❌ Error publishing. Check WordPress.</h2>";
+        if ($code === 201 && isset($res['id'])) {
+            $ids[] = $res['id'];
+        } elseif ($code === 400 && isset($res['data']['term_id'])) {
+            // Tag already exists — REST API returns term_id in error
+            $ids[] = $res['data']['term_id'];
+        }
     }
+    return $ids;
 }
 
 // ============================================================
-// HANDLE REJECTION — keep as draft
+// EMAIL NOTIFICATION
 // ============================================================
-function handle_reject($post_id) {
-    log_it("Post $post_id REJECTED — kept as draft");
-    sendpulse_whatsapp(SP_PHONE,
-        "❌ *Blog rejected — kept as draft.*\n\n"
-        . "Edit here:\n" . WP_URL . "/wp-admin/post.php?post={$post_id}&action=edit"
-    );
-    echo "<h2 style='color:orange;font-family:sans-serif;padding:2rem'>Post kept as draft. Edit in WordPress when ready.</h2>";
-}
+function notify_email($result, $blog, $topic) {
+    $subject = "✅ MTTI Blog Published: " . $blog['title'];
+    $edit_url = WP_URL . "/wp-admin/post.php?post={$result['id']}&action=edit";
 
-// ============================================================
-// SENDPULSE WHATSAPP
-// ============================================================
-function sendpulse_whatsapp($phone, $message) {
-    $token = get_sendpulse_token();
-    if (!$token) return false;
+    $body = "New blog post published automatically by MTTI AutoBlog.\n\n"
+        . "Title: " . $blog['title'] . "\n"
+        . "Topic: " . $topic['course'] . " — " . $topic['angle'] . "\n\n"
+        . "Live URL:\n" . $result['url'] . "\n\n"
+        . "Edit in WordPress:\n" . $edit_url . "\n\n"
+        . "---\nMTTI AutoBlog v2 | masomoteletraining.co.ke";
 
-    $ch = curl_init('https://api.sendpulse.com/whatsapp/contacts/sendByPhone');
-    curl_setopt_array($ch, [
-        CURLOPT_RETURNTRANSFER => true,
-        CURLOPT_POST           => true,
-        CURLOPT_POSTFIELDS     => json_encode([
-            'phone'   => $phone,
-            'message' => ['type' => 'text', 'text' => $message],
-        ]),
-        CURLOPT_HTTPHEADER => [
-            'Content-Type: application/json',
-            "Authorization: Bearer $token",
-        ],
-        CURLOPT_TIMEOUT => 20,
-    ]);
-    $result = curl_exec($ch);
-    $code   = curl_getinfo($ch, CURLINFO_HTTP_CODE);
-    curl_close($ch);
-    return $code === 200;
-}
+    $headers = "From: MTTI AutoBlog <" . FROM_EMAIL . ">\r\n"
+             . "Reply-To: " . NOTIFY_EMAIL . "\r\n"
+             . "X-Mailer: PHP/" . phpversion();
 
-// ============================================================
-// SENDPULSE OAUTH TOKEN
-// ============================================================
-function get_sendpulse_token() {
-    $cache = sys_get_temp_dir() . '/mtti_sp_token.json';
-    if (file_exists($cache)) {
-        $c = json_decode(file_get_contents($cache), true);
-        if ($c && $c['expires'] > time()) return $c['token'];
-    }
-
-    $client_id     = 'dc5d02e7d81e6f4fa56543973a1b93ee';
-    $client_secret = '90a9b78f856ec5f9c4e1621f41070d35';
-    if (!$client_id || !$client_secret) {
-        log_it("ERROR: SendPulse credentials missing"); return null;
-    }
-
-    $ch = curl_init('https://api.sendpulse.com/oauth/access_token');
-    curl_setopt_array($ch, [
-        CURLOPT_RETURNTRANSFER => true,
-        CURLOPT_POST           => true,
-        CURLOPT_POSTFIELDS     => json_encode([
-            'grant_type'    => 'client_credentials',
-            'client_id'     => $client_id,
-            'client_secret' => $client_secret,
-        ]),
-        CURLOPT_HTTPHEADER => ['Content-Type: application/json'],
-        CURLOPT_TIMEOUT    => 15,
-    ]);
-    $data = json_decode(curl_exec($ch), true);
-    curl_close($ch);
-
-    if (!isset($data['access_token'])) return null;
-    file_put_contents($cache, json_encode(['token'=>$data['access_token'],'expires'=>time()+3300]));
-    return $data['access_token'];
+    $sent = mail(NOTIFY_EMAIL, $subject, $body, $headers);
+    log_it($sent ? "Email notification sent ✅" : "WARNING: Email failed");
 }
 
 // ============================================================
 // CLAUDE API
 // ============================================================
-function claude_api($system, $prompt, $max_tokens = 2000) {
+function claude_api($system, $prompt, $max_tokens = 2500) {
     $key = get_wp_option('mtti_claude_api_key');
-    if (!$key) { log_it("ERROR: Claude API key missing"); return null; }
+    if (!$key) { log_it("ERROR: Claude API key missing from WP options"); return null; }
 
-    $ch = curl_init('https://api.anthropic.com/v1/messages');
-    curl_setopt_array($ch, [
-        CURLOPT_RETURNTRANSFER => true,
-        CURLOPT_POST           => true,
-        CURLOPT_POSTFIELDS     => json_encode([
-            'model'      => 'claude-haiku-4-5-20251001',
-            'max_tokens' => $max_tokens,
-            'system'     => $system,
-            'messages'   => [['role'=>'user','content'=>$prompt]],
-        ]),
-        CURLOPT_HTTPHEADER => [
-            'Content-Type: application/json',
-            'x-api-key: ' . $key,
-            'anthropic-version: 2023-06-01',
-        ],
-        CURLOPT_TIMEOUT => 60,
+    $payload = json_encode([
+        'model'      => 'claude-haiku-4-5-20251001',
+        'max_tokens' => $max_tokens,
+        'system'     => $system,
+        'messages'   => [['role' => 'user', 'content' => $prompt]],
     ]);
-    $result = curl_exec($ch);
-    $code   = curl_getinfo($ch, CURLINFO_HTTP_CODE);
-    curl_close($ch);
 
-    if ($code !== 200) { log_it("Claude API error $code"); return null; }
-    $data = json_decode($result, true);
-    return $data['content'][0]['text'] ?? null;
+    // Try up to 2 times
+    for ($attempt = 1; $attempt <= 2; $attempt++) {
+        $ch = curl_init('https://api.anthropic.com/v1/messages');
+        curl_setopt_array($ch, [
+            CURLOPT_RETURNTRANSFER => true,
+            CURLOPT_POST           => true,
+            CURLOPT_POSTFIELDS     => $payload,
+            CURLOPT_HTTPHEADER     => [
+                'Content-Type: application/json',
+                'x-api-key: ' . $key,
+                'anthropic-version: 2023-06-01',
+            ],
+            CURLOPT_TIMEOUT        => 90,
+            CURLOPT_CONNECTTIMEOUT => 15,
+        ]);
+        $result = curl_exec($ch);
+        $code   = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+        $err    = curl_errno($ch);
+        curl_close($ch);
+
+        if ($code === 200) {
+            $data = json_decode($result, true);
+            return $data['content'][0]['text'] ?? null;
+        }
+
+        log_it("Claude API attempt $attempt failed — HTTP $code, curl err $err");
+        if ($attempt < 2) sleep(5);
+    }
+    return null;
 }
 
 // ============================================================
@@ -329,11 +298,14 @@ function get_wp_option($key) {
     static $pdo = null;
     if (!$pdo) {
         try {
-            $pdo = new PDO('mysql:host='.DB_HOST.';dbname='.DB_NAME.';charset=utf8', DB_USER, DB_PASS,
-                [PDO::ATTR_ERRMODE => PDO::ERRMODE_SILENT]);
+            $pdo = new PDO(
+                'mysql:host=' . DB_HOST . ';dbname=' . DB_NAME . ';charset=utf8',
+                DB_USER, DB_PASS,
+                [PDO::ATTR_ERRMODE => PDO::ERRMODE_SILENT]
+            );
         } catch (Exception $e) { return null; }
     }
-    $s = $pdo->prepare("SELECT option_value FROM ".DB_PREFIX."options WHERE option_name=? LIMIT 1");
+    $s = $pdo->prepare("SELECT option_value FROM " . DB_PREFIX . "options WHERE option_name=? LIMIT 1");
     $s->execute([$key]);
     $r = $s->fetch(PDO::FETCH_ASSOC);
     return $r ? $r['option_value'] : null;
@@ -343,7 +315,7 @@ function get_wp_option($key) {
 // LOG
 // ============================================================
 function log_it($msg) {
-    $line = '['.date('Y-m-d H:i:s').'] '.$msg.PHP_EOL;
+    $line = '[' . date('Y-m-d H:i:s') . '] ' . $msg . PHP_EOL;
     file_put_contents(LOG_FILE, $line, FILE_APPEND);
     if (php_sapi_name() === 'cli') echo $line;
 }

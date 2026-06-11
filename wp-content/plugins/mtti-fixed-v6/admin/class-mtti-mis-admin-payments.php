@@ -445,8 +445,9 @@ class MTTI_MIS_Admin_Payments {
                 }
             }
             ?>
-            
-            <!-- Payment Summary Cards -->
+
+            <!-- Payment Summary Cards - Admin Only -->
+            <?php if (current_user_can('manage_options')) : ?>
             <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; margin-bottom: 20px;">
                 <div style="background: linear-gradient(135deg, #4CAF50, #2E7D32); color: white; padding: 20px; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.1);">
                     <div style="font-size: 12px; opacity: 0.9; text-transform: uppercase;">Total Collected</div>
@@ -469,6 +470,7 @@ class MTTI_MIS_Admin_Payments {
                     <div style="font-size: 11px; margin-top: 5px; opacity: 0.8;">All time records</div>
                 </div>
             </div>
+            <?php endif; ?>
             
             <table class="wp-list-table widefat fixed striped">
                 <thead>

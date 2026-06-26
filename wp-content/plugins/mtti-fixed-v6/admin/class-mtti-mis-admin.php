@@ -204,8 +204,8 @@ class MTTI_MIS_Admin {
         $requires_additional_fees = false;
         $courses_list = array();
         $first_enrollment_id = $enrollments[0]->enrollment_id;
-        
-        $excluded_courses = array('computer applications', 'computer essentials', 'computer & online essentials', 'ielts');
+
+        $excluded_courses = array('computer applications', 'computer essentials', 'computer & online essentials', 'ielts', 'health care support', 'application');
         
         // Get balances for each enrollment
         foreach ($enrollments as $enrollment) {

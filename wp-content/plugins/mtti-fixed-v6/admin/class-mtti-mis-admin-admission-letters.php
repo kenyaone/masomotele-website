@@ -272,7 +272,7 @@ class MTTI_MIS_Admin_Admission_Letters {
         // Calculate fees for all courses — use stored total_fee (locked at enrollment), fall back to c.fee
         $total_tuition = 0;
         $requires_additional_fees = false; // only becomes true if a fee-requiring course is found
-        $excluded_courses = array('computer applications', 'computer essentials');
+        $excluded_courses = array('computer applications', 'computer essentials', 'health care support', 'application');
 
         foreach ($enrolled_courses as $ec) {
             // Prefer stored total_fee from student_balances over current course fee

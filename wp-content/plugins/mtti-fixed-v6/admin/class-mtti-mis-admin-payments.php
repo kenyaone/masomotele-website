@@ -1378,7 +1378,7 @@ class MTTI_MIS_Admin_Payments {
 
                             $edit_requires_additional = true;
                             $edit_course_name_lower = strtolower($edit_enrollment->course_name);
-                            $edit_excluded_courses = array('computer applications', 'computer essentials', 'computer & online essentials', 'ielts', 'health care support', 'application');
+                            $edit_excluded_courses = array('computer applications', 'computer essentials', 'computer & online essentials', 'ielts', 'application');
                             foreach ($edit_excluded_courses as $excluded) {
                                 if (strpos($edit_course_name_lower, $excluded) !== false) {
                                     $edit_requires_additional = false;

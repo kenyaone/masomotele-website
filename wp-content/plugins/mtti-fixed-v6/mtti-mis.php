@@ -74,6 +74,13 @@ function mtti_mis_check_upgrade() {
         require_once MTTI_MIS_PLUGIN_DIR . 'includes/class-mtti-mis-upgrader.php';
         MTTI_MIS_Upgrader::upgrade();
     }
+    mtti_mis_fix_lesson_visibility();
+}
+
+function mtti_mis_fix_lesson_visibility() {
+    global $wpdb;
+    $table = $wpdb->prefix . 'mtti_lessons';
+    $wpdb->query("UPDATE {$table} SET status = 'Published' WHERE status IS NULL OR status = '' OR status NOT IN ('Published', 'Draft', 'Pending Review')");
 }
 
 add_action('init', 'mtti_mis_handle_document_output', 1);

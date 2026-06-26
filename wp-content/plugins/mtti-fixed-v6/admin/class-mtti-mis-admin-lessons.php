@@ -907,8 +907,8 @@ class MTTI_MIS_Admin_Lessons {
                         <th><label for="status">Status</label></th>
                         <td>
                             <select name="status" id="status" class="regular-text">
-                                <option value="Published" <?php selected($lesson ? $lesson->status : '', 'Published'); ?>>Published</option>
-                                <option value="Draft" <?php selected($lesson ? $lesson->status : '', 'Draft'); ?>>Draft</option>
+                                <option value="Published" <?php selected($lesson ? $lesson->status : 'Published', 'Published'); ?>>Published</option>
+                                <option value="Draft" <?php selected($lesson ? $lesson->status : 'Published', 'Draft'); ?>>Draft</option>
                             </select>
                         </td>
                     </tr>

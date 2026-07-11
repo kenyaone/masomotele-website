@@ -792,4 +792,138 @@ class MTTI_MIS_Database {
             );
         }
     }
+
+    // Quiz methods
+    public function get_quizzes($args = array()) {
+        global $wpdb;
+        $table = $this->get_table_name('quizzes');
+
+        $where = "WHERE 1=1";
+        if (!empty($args['course_id'])) {
+            $where .= $wpdb->prepare(" AND q.course_id = %d", $args['course_id']);
+        }
+        if (!empty($args['unit_id'])) {
+            $where .= $wpdb->prepare(" AND q.unit_id = %d", $args['unit_id']);
+        }
+        if (!empty($args['status'])) {
+            $where .= $wpdb->prepare(" AND q.status = %s", $args['status']);
+        }
+        if (!empty($args['search'])) {
+            $search = '%' . $wpdb->esc_like($args['search']) . '%';
+            $where .= $wpdb->prepare(" AND q.title LIKE %s", $search);
+        }
+
+        $limit = isset($args['limit']) ? intval($args['limit']) : 100;
+        $offset = isset($args['offset']) ? intval($args['offset']) : 0;
+        $order = isset($args['order']) ? sanitize_sql_orderby($args['order']) : "q.created_at DESC";
+
+        $sql = "SELECT q.*, c.course_name, c.course_code, u.unit_name, s.display_name as staff_name
+                FROM {$table} q
+                LEFT JOIN {$wpdb->prefix}mtti_courses c ON q.course_id = c.course_id
+                LEFT JOIN {$wpdb->prefix}mtti_course_units u ON q.unit_id = u.unit_id
+                LEFT JOIN {$wpdb->users} s ON q.staff_id = s.ID
+                {$where}
+                ORDER BY {$order}
+                LIMIT {$limit} OFFSET {$offset}";
+
+        return $wpdb->get_results($sql);
+    }
+
+    public function get_quiz($quiz_id) {
+        global $wpdb;
+        $table = $this->get_table_name('quizzes');
+
+        $sql = $wpdb->prepare("SELECT q.*, c.course_name, c.course_code, u.unit_name, s.display_name as staff_name
+                              FROM {$table} q
+                              LEFT JOIN {$wpdb->prefix}mtti_courses c ON q.course_id = c.course_id
+                              LEFT JOIN {$wpdb->prefix}mtti_course_units u ON q.unit_id = u.unit_id
+                              LEFT JOIN {$wpdb->users} s ON q.staff_id = s.ID
+                              WHERE q.quiz_id = %d", $quiz_id);
+
+        return $wpdb->get_row($sql);
+    }
+
+    public function get_quiz_questions($quiz_id) {
+        global $wpdb;
+        $table = $this->get_table_name('quiz_questions');
+
+        $sql = $wpdb->prepare("SELECT * FROM {$table}
+                              WHERE quiz_id = %d AND status = 'Active'
+                              ORDER BY order_number ASC", $quiz_id);
+
+        return $wpdb->get_results($sql);
+    }
+
+    public function get_quiz_attempts($args = array()) {
+        global $wpdb;
+        $table = $this->get_table_name('quiz_attempts');
+
+        $where = "WHERE 1=1";
+        if (!empty($args['quiz_id'])) {
+            $where .= $wpdb->prepare(" AND qa.quiz_id = %d", $args['quiz_id']);
+        }
+        if (!empty($args['student_id'])) {
+            $where .= $wpdb->prepare(" AND qa.student_id = %d", $args['student_id']);
+        }
+        if (isset($args['passed'])) {
+            $where .= $wpdb->prepare(" AND qa.passed = %d", intval($args['passed']));
+        }
+
+        $limit = isset($args['limit']) ? intval($args['limit']) : 100;
+        $offset = isset($args['offset']) ? intval($args['offset']) : 0;
+
+        $sql = "SELECT qa.* FROM {$table} qa
+                {$where}
+                ORDER BY qa.attempted_at DESC
+                LIMIT {$limit} OFFSET {$offset}";
+
+        return $wpdb->get_results($sql);
+    }
+
+    public function get_latest_quiz_attempt($quiz_id, $student_id) {
+        global $wpdb;
+        $table = $this->get_table_name('quiz_attempts');
+
+        $sql = $wpdb->prepare("SELECT * FROM {$table}
+                              WHERE quiz_id = %d AND student_id = %d
+                              ORDER BY attempted_at DESC
+                              LIMIT 1", $quiz_id, $student_id);
+
+        return $wpdb->get_row($sql);
+    }
+
+    public function insert_quiz($data) {
+        global $wpdb;
+        $table = $this->get_table_name('quizzes');
+
+        return $wpdb->insert($table, $data, array('%d', '%d', '%d', '%d', '%d', '%s', '%s', '%f', '%d', '%d', '%d', '%d', '%s'));
+    }
+
+    public function update_quiz($quiz_id, $data) {
+        global $wpdb;
+        $table = $this->get_table_name('quizzes');
+
+        return $wpdb->update($table, $data, array('quiz_id' => $quiz_id));
+    }
+
+    public function insert_quiz_question($data) {
+        global $wpdb;
+        $table = $this->get_table_name('quiz_questions');
+
+        return $wpdb->insert($table, $data);
+    }
+
+    public function update_quiz_question($question_id, $data) {
+        global $wpdb;
+        $table = $this->get_table_name('quiz_questions');
+
+        return $wpdb->update($table, $data, array('question_id' => $question_id));
+    }
+
+    public function insert_quiz_attempt($data) {
+        global $wpdb;
+        $table = $this->get_table_name('quiz_attempts');
+
+        return $wpdb->insert($table, $data);
+    }
 }

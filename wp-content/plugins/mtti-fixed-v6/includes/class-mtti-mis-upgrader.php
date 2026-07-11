@@ -40,9 +40,14 @@ class MTTI_MIS_Upgrader {
         if (version_compare($current_version, '7.2.0', '<')) {
             self::upgrade_to_7_2_0();
         }
-        
+
+        // Create quiz system, discussion votes, extend quiz_attempts for server-side grading
+        if (version_compare($current_version, '7.4.0', '<')) {
+            self::upgrade_to_7_4_0();
+        }
+
         // Update database version
-        update_option('mtti_mis_db_version', '7.2.0');
+        update_option('mtti_mis_db_version', '7.4.0');
     }
     
     /**
@@ -273,5 +278,108 @@ class MTTI_MIS_Upgrader {
         }
 
         error_log("MTTI MIS: Database upgraded to version 7.2.0 - Back-filled {$inserted} missing student_balances rows");
+    }
+
+    /**
+     * Upgrade database to version 7.4.0
+     * Creates quiz system (mtti_quizzes, mtti_quiz_questions) and discussion_votes tables
+     * Extends mtti_quiz_attempts with quiz_id, answers, passed, attempt_number for server-side grading
+     */
+    private static function upgrade_to_7_4_0() {
+        global $wpdb;
+        require_once(ABSPATH . 'wp-admin/includes/upgrade.php');
+
+        $charset_collate = $wpdb->get_charset_collate();
+
+        // Create quizzes table
+        $sql = "CREATE TABLE IF NOT EXISTS {$wpdb->prefix}quizzes (
+            quiz_id         bigint(20) NOT NULL AUTO_INCREMENT,
+            course_id       bigint(20) NOT NULL,
+            unit_id         bigint(20) NULL,
+            lesson_id       bigint(20) NULL,
+            staff_id        bigint(20) NOT NULL,
+            title           varchar(200) NOT NULL,
+            description     text NULL,
+            pass_mark       decimal(5,2) NOT NULL DEFAULT 70.00,
+            max_attempts    int(11) NOT NULL DEFAULT 0,
+            time_limit_minutes int(11) NULL,
+            shuffle_questions tinyint(1) DEFAULT 1,
+            is_final        tinyint(1) DEFAULT 0,
+            status          varchar(20) DEFAULT 'Active',
+            created_at      datetime DEFAULT CURRENT_TIMESTAMP,
+            updated_at      datetime DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+            PRIMARY KEY  (quiz_id),
+            KEY course_id (course_id),
+            KEY unit_id (unit_id),
+            KEY staff_id (staff_id)
+        ) $charset_collate;";
+        dbDelta($sql);
+
+        // Create quiz_questions table
+        $sql = "CREATE TABLE IF NOT EXISTS {$wpdb->prefix}quiz_questions (
+            question_id     bigint(20) NOT NULL AUTO_INCREMENT,
+            quiz_id         bigint(20) NOT NULL,
+            question_text   text NOT NULL,
+            question_type   varchar(20) NOT NULL DEFAULT 'mcq',
+            options         text NULL,
+            correct_answer  text NOT NULL,
+            points          decimal(5,2) NOT NULL DEFAULT 1.00,
+            order_number    int(11) DEFAULT 0,
+            explanation     text NULL,
+            status          varchar(20) DEFAULT 'Active',
+            created_at      datetime DEFAULT CURRENT_TIMESTAMP,
+            PRIMARY KEY  (question_id),
+            KEY quiz_id (quiz_id)
+        ) $charset_collate;";
+        dbDelta($sql);
+
+        // Create discussion_votes table (was referenced but never created)
+        $sql = "CREATE TABLE IF NOT EXISTS {$wpdb->prefix}discussion_votes (
+            vote_id         bigint(20) NOT NULL AUTO_INCREMENT,
+            discussion_id   bigint(20) NOT NULL,
+            student_id      bigint(20) NOT NULL,
+            created_at      datetime DEFAULT CURRENT_TIMESTAMP,
+            PRIMARY KEY (vote_id),
+            UNIQUE KEY discussion_student (discussion_id, student_id),
+            KEY discussion_id (discussion_id),
+            KEY student_id (student_id)
+        ) $charset_collate;";
+        dbDelta($sql);
+
+        // Extend quiz_attempts table with new columns for server-side grading
+        $attempts_table = $wpdb->prefix . 'mtti_quiz_attempts';
+        $columns = $wpdb->get_results("SHOW COLUMNS FROM {$attempts_table}");
+        $column_names = array();
+        foreach ($columns as $column) {
+            $column_names[] = $column->Field;
+        }
+
+        // Add quiz_id column (nullable for backward compat with lesson_id-based old quizzes)
+        if (!in_array('quiz_id', $column_names)) {
+            $wpdb->query("ALTER TABLE {$attempts_table} ADD COLUMN quiz_id bigint(20) unsigned NULL AFTER lesson_id");
+            $wpdb->query("ALTER TABLE {$attempts_table} ADD KEY quiz_id (quiz_id)");
+        }
+
+        // Add answers column (JSON of submitted answers per question)
+        if (!in_array('answers', $column_names)) {
+            $wpdb->query("ALTER TABLE {$attempts_table} ADD COLUMN answers longtext NULL AFTER percent");
+        }
+
+        // Add passed column (1 if score >= pass_mark, 0 otherwise)
+        if (!in_array('passed', $column_names)) {
+            $wpdb->query("ALTER TABLE {$attempts_table} ADD COLUMN passed tinyint(1) DEFAULT 0 AFTER answers");
+        }
+
+        // Add attempt_number column (which attempt is this — for max_attempts tracking)
+        if (!in_array('attempt_number', $column_names)) {
+            $wpdb->query("ALTER TABLE {$attempts_table} ADD COLUMN attempt_number int(11) DEFAULT 1 AFTER passed");
+        }
+
+        // Add composite key for quiz-based queries
+        if (!in_array('quiz_student', $wpdb->get_results("SHOW KEYS FROM {$attempts_table}"))) {
+            $wpdb->query("ALTER TABLE {$attempts_table} ADD KEY quiz_student (quiz_id, student_id)");
+        }
+
+        error_log('MTTI MIS: Database upgraded to version 7.4.0 - Created quiz system (mtti_quizzes, mtti_quiz_questions, mtti_discussion_votes) and extended mtti_quiz_attempts');
     }
 }

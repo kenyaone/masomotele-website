@@ -561,6 +561,58 @@ class MTTI_MIS_Activator {
             KEY lesson_student (lesson_id, student_id)
         ) $charset_collate;";
 
+        // Quizzes table (v7.3) — structured quiz definitions with question bank
+        $sql[] = "CREATE TABLE IF NOT EXISTS {$table_prefix}quizzes (
+            quiz_id         bigint(20) NOT NULL AUTO_INCREMENT,
+            course_id       bigint(20) NOT NULL,
+            unit_id         bigint(20) NULL,
+            lesson_id       bigint(20) NULL,
+            staff_id        bigint(20) NOT NULL,
+            title           varchar(200) NOT NULL,
+            description     text NULL,
+            pass_mark       decimal(5,2) NOT NULL DEFAULT 70.00,
+            max_attempts    int(11) NOT NULL DEFAULT 0,
+            time_limit_minutes int(11) NULL,
+            shuffle_questions tinyint(1) DEFAULT 1,
+            is_final        tinyint(1) DEFAULT 0,
+            status          varchar(20) DEFAULT 'Active',
+            created_at      datetime DEFAULT CURRENT_TIMESTAMP,
+            updated_at      datetime DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+            PRIMARY KEY  (quiz_id),
+            KEY course_id (course_id),
+            KEY unit_id (unit_id),
+            KEY staff_id (staff_id)
+        ) $charset_collate;";
+
+        // Quiz Questions table (v7.3) — question bank with answer keys (never sent to client pre-submission)
+        $sql[] = "CREATE TABLE IF NOT EXISTS {$table_prefix}quiz_questions (
+            question_id     bigint(20) NOT NULL AUTO_INCREMENT,
+            quiz_id         bigint(20) NOT NULL,
+            question_text   text NOT NULL,
+            question_type   varchar(20) NOT NULL DEFAULT 'mcq',
+            options         text NULL,
+            correct_answer  text NOT NULL,
+            points          decimal(5,2) NOT NULL DEFAULT 1.00,
+            order_number    int(11) DEFAULT 0,
+            explanation     text NULL,
+            status          varchar(20) DEFAULT 'Active',
+            created_at      datetime DEFAULT CURRENT_TIMESTAMP,
+            PRIMARY KEY  (question_id),
+            KEY quiz_id (quiz_id)
+        ) $charset_collate;";
+
+        // Discussion Votes table (v7.3) — was referenced in portal but never created
+        $sql[] = "CREATE TABLE IF NOT EXISTS {$table_prefix}discussion_votes (
+            vote_id         bigint(20) NOT NULL AUTO_INCREMENT,
+            discussion_id   bigint(20) NOT NULL,
+            student_id      bigint(20) NOT NULL,
+            created_at      datetime DEFAULT CURRENT_TIMESTAMP,
+            PRIMARY KEY (vote_id),
+            UNIQUE KEY discussion_student (discussion_id, student_id),
+            KEY discussion_id (discussion_id),
+            KEY student_id (student_id)
+        ) $charset_collate;";
+
         // Execute all table creation
         foreach ($sql as $query) {
             dbDelta($query);
@@ -628,6 +680,7 @@ class MTTI_MIS_Activator {
         add_role('mtti_systems_admin', 'MTTI Systems Admin', array(
             'read' => true,
             'manage_mtti' => true,
+            'manage_finance' => true,
             'manage_students' => true,
             'view_students' => true,
             'manage_courses' => true,
@@ -681,6 +734,7 @@ class MTTI_MIS_Activator {
         add_role('mtti_accountant', 'MTTI Accountant', array(
             'read' => true,
             'manage_mtti' => true,
+            'manage_finance' => true,
             'manage_students' => true,
             'view_students' => true,
             'manage_payments' => true,

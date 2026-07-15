@@ -258,7 +258,7 @@ class MTTI_MIS_Admin_Interactive {
 
         $where = $fc ? $wpdb->prepare(' AND l.course_id=%d', $fc) : '';
         $items = $wpdb->get_results(
-            "SELECT l.lesson_id, l.title, l.description, l.content, l.created_at, l.view_count, l.status,
+            "SELECT l.lesson_id, l.title, l.description, l.content, l.created_at, l.view_count, l.status, l.interactive_role,
                     c.course_code, c.course_name,
                     wu.display_name as uploader_name
              FROM {$p}lessons l
@@ -306,6 +306,16 @@ class MTTI_MIS_Admin_Interactive {
                 <span style="margin-right:12px;font-size:11px;font-weight:700;color:'.$scol.';white-space:nowrap;">'.$slabel.'</span>
               </div>
               <div class="inside" style="padding:12px;">';
+
+            if ($it->interactive_role) {
+                $role_cfg = [
+                    'theory'    => ['#1565C0', '#e3f2fd', '📘 Theory'],
+                    'practical' => ['#E65100', '#fff3e0', '🛠 Practical'],
+                    'quiz'      => ['#7B1FA2', '#f3e5f5', '📝 Quiz'],
+                ];
+                [$rcol, $rbg, $rlabel] = $role_cfg[$it->interactive_role] ?? ['#9e9e9e', '#fafafa', $it->interactive_role];
+                echo '<span style="display:inline-block;margin-bottom:8px;font-size:10px;font-weight:700;color:'.$rcol.';background:'.$rbg.';padding:2px 8px;border-radius:10px;">'.$rlabel.'</span>';
+            }
 
             echo '<p style="margin:0 0 6px;font-size:11px;color:#646970;">
                 <strong>'.esc_html($it->course_code).'</strong> — '.esc_html($it->course_name).'

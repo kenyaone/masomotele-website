@@ -39,6 +39,10 @@ class MTTI_MIS_Learner_Portal {
         add_action('wp_ajax_mtti_post_discussion', array($this, 'ajax_post_discussion'));
         add_action('wp_ajax_mtti_get_discussions', array($this, 'ajax_get_discussions'));
         add_action('wp_ajax_mtti_learner_mark_attendance', array($this, 'ajax_learner_mark_attendance'));
+
+        // Quiz AJAX handlers (requires authentication, NOT nopriv)
+        add_action('wp_ajax_mtti_start_quiz_attempt', array($this, 'ajax_start_quiz_attempt'));
+        add_action('wp_ajax_mtti_submit_quiz_attempt', array($this, 'ajax_submit_quiz_attempt'));
     }
     
     /**
@@ -88,11 +92,22 @@ class MTTI_MIS_Learner_Portal {
      * Outputs a complete HTML page with the portal — no theme wrapper at all.
      */
     private function render_fullpage_portal() {
+        // This is a fully custom app-like shell with its own header/nav —
+        // the WP admin toolbar doesn't belong on top of it, and its fixed
+        // 32px screen-media bump (WP core's own inline `html{margin-top}`,
+        // not a body class) was throwing off the course-player's
+        // fills-the-viewport height math for any admin/staff viewing it,
+        // forcing an extra scroll to reach content that should already fit.
+        add_filter('show_admin_bar', '__return_false');
+
         // Prevent page caching — portal is always personalised per student
         if (!headers_sent()) {
             nocache_headers();
-            header('Cache-Control: no-store, no-cache, must-revalidate, max-age=0');
+            header('Cache-Control: no-store, no-cache, must-revalidate, max-age=0, post-check=0, pre-check=0, private');
             header('Pragma: no-cache');
+            header('Expires: Thu, 01 Jan 1970 00:00:01 GMT');
+            header('Last-Modified: ' . gmdate('D, d M Y H:i:s') . ' GMT');
+            header('ETag: ' . md5(get_current_user_id() . time()));
         }
         // Tell popular cache plugins to bypass this page
         if (!defined('DONOTCACHEPAGE'))    define('DONOTCACHEPAGE', true);
@@ -106,6 +121,20 @@ class MTTI_MIS_Learner_Portal {
             $portal_html = $this->render_login_form();
         } else {
             $student = $this->get_current_student();
+            // Auto-create a student record for any mtti_student role user who doesn't have one yet
+            if (!$student) {
+                $current_user = wp_get_current_user();
+                $has_student_role = in_array('mtti_student', $current_user->roles ?? []);
+                if ($has_student_role) {
+                    $student = $this->auto_create_student_record($current_user);
+                }
+            }
+            // Admins/staff without a real student record get a synthetic
+            // preview identity instead of being turned away — see
+            // is_admin_preview()/build_admin_preview_student().
+            if (!$student && $this->is_admin_preview()) {
+                $student = $this->build_admin_preview_student();
+            }
             if (!$student) {
                 $portal_html = $this->render_not_enrolled();
             } elseif ($student->status === 'Discontinued') {
@@ -114,9 +143,12 @@ class MTTI_MIS_Learner_Portal {
                 $portal_html = $this->render_certificate_completed_block($student);
             } else {
                 $tab = isset($_GET['portal_tab']) ? sanitize_key($_GET['portal_tab']) : 'dashboard';
-                
+
                 ob_start();
                 echo '<div class="mtti-portal-wrapper" id="mtti-portal">';
+                if ((int) $student->student_id === 0) {
+                    echo '<div style="background:#E8942E;color:#fff;text-align:center;font-weight:700;font-size:13px;padding:8px;">👁 Admin Preview Mode — viewing as a student would, no real enrollment or payment</div>';
+                }
                 $this->render_header($student);
                 echo '<div class="mtti-portal-container">';
                 $this->render_sidebar($tab);
@@ -127,7 +159,10 @@ class MTTI_MIS_Learner_Portal {
                     case 'units': $this->render_courses($student); break; // merged into courses
                     case 'lessons': $this->render_lessons($student); break;
                     case 'materials': $this->render_lessons($student); break; // alias
-                    case 'assignments': $this->render_assignments($student); break;
+                    case 'assignments': $this->render_dashboard($student); break; // removed — go to dashboard
+                    case 'quizzes': $this->render_quizzes($student); break;
+                    case 'discussions': $this->render_study_chat($student); break;
+                    case 'chat': $this->render_study_chat($student); break; // alias
                     case 'attendance': $this->render_learner_attendance($student); break;
                     case 'results': $this->render_results($student); break;
                     case 'transcript': $this->render_results($student); break; // merged into results
@@ -138,6 +173,7 @@ class MTTI_MIS_Learner_Portal {
                     case 'calendar': $this->render_dashboard($student); break; // removed — go to dashboard
                     case 'chat': $this->render_dashboard($student); break; // removed — go to dashboard
                     case 'leaderboard': $this->render_leaderboard($student); break;
+                    case 'live_classes': $this->render_live_classes($student); break;
                     case 'syllabus': // fallthrough
                     case 'scheme': $this->render_scheme_of_work($student); break;
                     default: $this->render_dashboard($student);
@@ -179,12 +215,35 @@ class MTTI_MIS_Learner_Portal {
 (function() {
     var currentUser = '<?php echo is_user_logged_in() ? get_current_user_id() : "0"; ?>';
     var storedUser  = sessionStorage.getItem('mtti_uid');
-    if (storedUser !== null && storedUser !== currentUser) {
+    var timestamp   = sessionStorage.getItem('mtti_ts');
+    var now         = Date.now();
+
+    // Clear session data if user changed or if more than 30 minutes has passed (session timeout)
+    if ((storedUser !== null && storedUser !== currentUser) || (timestamp && now - parseInt(timestamp) > 1800000)) {
+        // Clear all sessionStorage MTTI data
+        var keys = Object.keys(sessionStorage);
+        keys.forEach(function(key) {
+            if (key.indexOf('mtti_') === 0) {
+                sessionStorage.removeItem(key);
+            }
+        });
+        // Clear localStorage MTTI data
+        keys = Object.keys(localStorage);
+        keys.forEach(function(key) {
+            if (key.indexOf('mtti_') === 0) {
+                localStorage.removeItem(key);
+            }
+        });
         sessionStorage.setItem('mtti_uid', currentUser);
+        sessionStorage.setItem('mtti_ts', now.toString());
         window.location.reload(true);
     } else {
         sessionStorage.setItem('mtti_uid', currentUser);
+        sessionStorage.setItem('mtti_ts', now.toString());
     }
+
+    // Prevent browser back button from showing cached logged-in page
+    history.replaceState(null, document.title, window.location.href);
 })();
 </script>
 </head>
@@ -235,7 +294,35 @@ class MTTI_MIS_Learner_Portal {
     });
 })();
             ');
-            
+
+            // True fullscreen toggle for the lesson content pane (video/PDF/
+            // interactive) — takes over the whole screen via the browser
+            // Fullscreen API, no new tab, stays in the same session.
+            wp_add_inline_script('mtti-learner-portal', '
+function mttiToggleFullscreen(btn){
+    var el = btn.closest(".mtti-player-fill");
+    if (!el) return;
+    var isFs = document.fullscreenElement || document.webkitFullscreenElement || document.msFullscreenElement;
+    if (isFs) {
+        (document.exitFullscreen || document.webkitExitFullscreen || document.msExitFullscreen).call(document);
+    } else {
+        var req = el.requestFullscreen || el.webkitRequestFullscreen || el.msRequestFullscreen;
+        if (req) req.call(el);
+    }
+}
+(function(){
+    function syncLabel(){
+        var isFs = document.fullscreenElement || document.webkitFullscreenElement || document.msFullscreenElement;
+        document.querySelectorAll(".mtti-player-fullscreen-link").forEach(function(b){
+            b.textContent = isFs ? "⛶ Exit full screen" : "⛶ Full screen";
+        });
+    }
+    ["fullscreenchange", "webkitfullscreenchange", "MSFullscreenChange"].forEach(function(ev){
+        document.addEventListener(ev, syncLabel);
+    });
+})();
+            ');
+
             // Add body class for Astra theme isolation
             add_filter('body_class', function($classes) {
                 $classes[] = 'mtti-portal-active';
@@ -281,10 +368,92 @@ class MTTI_MIS_Learner_Portal {
     }
     
     /**
+     * Auto-create a minimal student record for an mtti_student WP user on first portal login.
+     * Admin can fill in full details (course, ID number, etc.) via the admin panel later.
+     */
+    private function auto_create_student_record($wp_user) {
+        global $wpdb;
+        $p      = $wpdb->prefix . 'mtti_';
+        $uid    = intval($wp_user->ID);
+
+        // Double-check no record exists (race-condition guard)
+        $exists = $wpdb->get_var($wpdb->prepare(
+            "SELECT student_id FROM {$p}students WHERE user_id = %d LIMIT 1", $uid
+        ));
+        if ($exists) return $this->get_current_student();
+
+        // Generate a unique admission number
+        $year  = date('Y');
+        $count = (int) $wpdb->get_var("SELECT COUNT(*) FROM {$p}students") + 1;
+        $admission = 'STU-' . $year . '-' . str_pad($count, 4, '0', STR_PAD_LEFT);
+        // Ensure uniqueness
+        while ($wpdb->get_var($wpdb->prepare("SELECT student_id FROM {$p}students WHERE admission_number=%s", $admission))) {
+            $count++;
+            $admission = 'STU-' . $year . '-' . str_pad($count, 4, '0', STR_PAD_LEFT);
+        }
+
+        $wpdb->insert(
+            $p . 'students',
+            array(
+                'user_id'          => $uid,
+                'admission_number' => $admission,
+                'course_id'        => null,
+                'enrollment_date'  => current_time('Y-m-d'),
+                'status'           => 'Active',
+                'created_at'       => current_time('mysql'),
+                'updated_at'       => current_time('mysql'),
+            ),
+            array('%d', '%s', '%d', '%s', '%s', '%s', '%s')
+        );
+
+        return $this->get_current_student();
+    }
+
+    /**
+     * True for site admins/MTTI staff — same capability pair used
+     * elsewhere in this plugin (e.g. class-mtti-mis-lecturer-portal.php)
+     * to mean "admin/staff account".
+     */
+    private function is_admin_preview() {
+        return current_user_can('manage_options') || current_user_can('manage_mtti');
+    }
+
+    /**
+     * A read-only stand-in for a real mtti_students row, used so an admin
+     * without a paid enrollment can still browse the portal to preview the
+     * flow. student_id = 0 is never a real row (auto_increment starts at 1)
+     * and is the sentinel get_enrolled_course_ids() checks for below.
+     * enrollment_date is set far in the past so drip-released ("release_week")
+     * content isn't locked during the preview.
+     */
+    private function build_admin_preview_student() {
+        $current_user = wp_get_current_user();
+        $student = new stdClass();
+        $student->student_id       = 0;
+        $student->user_id          = $current_user->ID;
+        $student->admission_number = 'ADMIN-PREVIEW';
+        $student->course_id        = null;
+        $student->status           = 'Active';
+        $student->enrollment_date  = '2020-01-01';
+        $student->display_name     = $current_user->display_name;
+        $student->user_email       = $current_user->user_email;
+        $student->photo_url        = null;
+        return $student;
+    }
+
+    /**
      * Get all enrolled course IDs for a student
      */
     private function get_enrolled_course_ids($student) {
         global $wpdb;
+        // Admin preview identity (see build_admin_preview_student): treat as
+        // "enrolled" in every active course rather than querying real
+        // enrollments, so admins can browse the whole catalog's lessons.
+        if ((int) $student->student_id === 0 && $this->is_admin_preview()) {
+            return array_map('intval', $wpdb->get_col(
+                "SELECT course_id FROM {$wpdb->prefix}mtti_courses WHERE status = 'Active' AND is_active = 1 AND deleted_at IS NULL"
+            ));
+        }
         $ids = $wpdb->get_col($wpdb->prepare(
             "SELECT DISTINCT e.course_id
              FROM {$wpdb->prefix}mtti_enrollments e
@@ -303,6 +472,20 @@ class MTTI_MIS_Learner_Portal {
      */
     private function get_enrolled_courses($student) {
         global $wpdb;
+        // Admin preview identity (see build_admin_preview_student): same
+        // "enrolled in everything active" treatment as get_enrolled_course_ids(),
+        // otherwise this always returns empty for student_id=0 (no real
+        // enrollment rows), which silently overrides any ?filter_course= in
+        // the URL further up the call chain (render_course_filter(),
+        // render_lessons()) since "0 or 1 enrolled courses" short-circuits
+        // to the student's primary course_id instead of the request.
+        if ((int) $student->student_id === 0 && $this->is_admin_preview()) {
+            return $wpdb->get_results(
+                "SELECT course_id, course_name, course_code FROM {$wpdb->prefix}mtti_courses
+                 WHERE status = 'Active' AND is_active = 1 AND deleted_at IS NULL
+                 ORDER BY course_name ASC"
+            );
+        }
         return $wpdb->get_results($wpdb->prepare(
             "SELECT c.course_id, c.course_name, c.course_code
              FROM {$wpdb->prefix}mtti_enrollments e
@@ -810,13 +993,12 @@ class MTTI_MIS_Learner_Portal {
             'dashboard'     => array('icon' => '📊', 'label' => 'Dashboard'),
             'courses'       => array('icon' => '📚', 'label' => 'My Courses'),
             'lessons'       => array('icon' => '📖', 'label' => 'Lessons & Materials'),
-            'assignments'   => array('icon' => '📝', 'label' => 'Assignments'),
             'attendance'    => array('icon' => '✅', 'label' => 'Attendance'),
             'results'       => array('icon' => '🏆', 'label' => 'Results & Transcript'),
             'payments'      => array('icon' => '💳', 'label' => 'Payments'),
             'notices'       => array('icon' => '🔔', 'label' => 'Notices'),
             'notifications' => array('icon' => '📬', 'label' => 'Notifications'),
-            'leaderboard'   => array('icon' => '🥇', 'label' => 'Leaderboard'),
+            'live_classes'  => array('icon' => '🎥', 'label' => 'Live Classes'),
             'profile'       => array('icon' => '👤', 'label' => 'Profile'),
         );
 
@@ -854,7 +1036,21 @@ class MTTI_MIS_Learner_Portal {
     
     private function render_dashboard($student) {
         global $wpdb;
-        
+
+        // Student exists but has no course assigned yet — show pending enrollment notice
+        if (empty($student->course_id)) {
+            echo '<div class="mtti-section-card" style="text-align:center;padding:60px 30px;">';
+            echo '<div style="font-size:3.5rem;margin-bottom:16px;">🎓</div>';
+            echo '<h2 style="margin-bottom:8px;color:#333;">Welcome, ' . esc_html($student->display_name ?: 'Student') . '!</h2>';
+            echo '<p style="color:#666;font-size:15px;max-width:480px;margin:0 auto 16px;">Your account is active. You are currently <strong>pending course enrollment</strong>.</p>';
+            echo '<div style="display:inline-block;background:#fff3cd;border:1px solid #ffc107;border-radius:8px;padding:14px 24px;color:#856404;font-size:14px;margin-bottom:20px;">';
+            echo '⏳ The administration will assign your course shortly. You will be able to access your lessons and other content once enrolled.';
+            echo '</div>';
+            echo '<div style="font-size:13px;color:#999;">Admission No: <strong>' . esc_html($student->admission_number) . '</strong></div>';
+            echo '</div>';
+            return;
+        }
+
         $has_course = !empty($student->course_id);
         
         // Fee balance — recalculate live from actual payments (same method as admin view student)
@@ -879,33 +1075,25 @@ class MTTI_MIS_Learner_Portal {
             $balance += max(0, $net_fee - $paid);
         }
         
-        // Progress = interactive practicals viewed by student ÷ total interactives for ALL enrolled courses
-        $progress_pct       = 0;
-        $interactives_done  = 0;
-        $interactives_total = 0;
+        // Realistic progress: every published step (objectives/video/theory/
+        // practical/quiz — not just interactives) counts, and a quiz step
+        // only counts once actually submitted (see is_lesson_completed()),
+        // not merely opened. Topics (a run of steps starting at an
+        // "objectives" row) are the more meaningful unit for the headline
+        // number; raw step count backs it up underneath.
         $enrolled_ids = $this->get_enrolled_course_ids($student);
-        if (!empty($enrolled_ids)) {
-            $placeholders = implode(',', array_fill(0, count($enrolled_ids), '%d'));
-            $interactives_total = intval($wpdb->get_var($wpdb->prepare(
-                "SELECT COUNT(*) FROM {$wpdb->prefix}mtti_lessons
-                 WHERE course_id IN ($placeholders) AND content_type = 'html_interactive' AND status = 'Published'
-                 AND title NOT LIKE '🤖 Quiz:%'",
-                ...$enrolled_ids
-            )));
-            $interactives_done = intval($wpdb->get_var($wpdb->prepare(
-                "SELECT COUNT(DISTINCT l.lesson_id)
-                 FROM {$wpdb->prefix}mtti_lessons l
-                 INNER JOIN {$wpdb->prefix}mtti_lesson_views lv ON lv.lesson_id = l.lesson_id
-                 WHERE l.course_id IN ($placeholders) AND l.content_type = 'html_interactive'
-                   AND l.status = 'Published' AND lv.student_id = %d
-                   AND l.title NOT LIKE '🤖 Quiz:%'",
-                ...array_merge($enrolled_ids, array($student->student_id))
-            )));
-            // Suppress any DB error if lesson_views table doesn't exist yet
-            if ($wpdb->last_error) { $interactives_done = 0; $wpdb->last_error = ''; }
-            $progress_pct = $interactives_total > 0
-                ? min(100, round(($interactives_done / $interactives_total) * 100))
-                : 0;
+        $primary_progress = $has_course ? $this->get_course_progress($student, $student->course_id) : null;
+        $progress_pct = $primary_progress ? $primary_progress['topic_pct'] : 0;
+
+        // Other enrolled courses (if any), for the compact list under the ring.
+        $other_progress = array();
+        foreach ($enrolled_ids as $eid) {
+            if ((int) $eid === (int) $student->course_id) continue;
+            $c = $wpdb->get_row($wpdb->prepare(
+                "SELECT course_id, course_code, course_name FROM {$wpdb->prefix}mtti_courses WHERE course_id = %d", $eid
+            ));
+            if (!$c) continue;
+            $other_progress[] = array_merge((array) $c, $this->get_course_progress($student, $eid));
         }
         
         // Recent results
@@ -979,13 +1167,26 @@ class MTTI_MIS_Learner_Portal {
 
             echo '<div class="mtti-ring-info">';
             echo '<h3>' . esc_html($student->course_code . ' — ' . $student->course_name) . '</h3>';
-            if ($interactives_total > 0) {
-                echo '<p>⚡ ' . $interactives_done . ' of ' . $interactives_total . ' practicals completed</p>';
+            if ($primary_progress['total_topics'] > 0) {
+                echo '<p>🎯 ' . $primary_progress['completed_topics'] . ' of ' . $primary_progress['total_topics'] . ' topics complete</p>';
+                echo '<p style="color:var(--text-3);font-size:12px;">' . $primary_progress['completed_steps'] . ' of ' . $primary_progress['total_steps'] . ' steps done (lessons, videos, practicals & quizzes)</p>';
             } else {
-                echo '<p style="color:var(--text-3);font-size:13px;">No practicals assigned yet</p>';
+                echo '<p style="color:var(--text-3);font-size:13px;">No content published yet</p>';
             }
             echo '<a href="' . esc_url(add_query_arg('portal_tab', 'lessons', get_permalink())) . '" class="mtti-btn mtti-btn-secondary" style="font-size:12px;margin-top:8px;">📖 Continue Studying</a>';
             echo '</div></div>';
+
+            if (!empty($other_progress)) {
+                echo '<div class="mtti-other-courses-progress">';
+                foreach ($other_progress as $oc) {
+                    echo '<div class="mtti-other-course-row">';
+                    echo '<span class="mtti-other-course-name">' . esc_html($oc['course_code']) . '</span>';
+                    echo '<div class="mtti-progress-bar" style="flex:1;"><div class="mtti-progress-fill" style="width:' . intval($oc['topic_pct']) . '%;"></div></div>';
+                    echo '<span class="mtti-other-course-pct">' . intval($oc['completed_topics']) . '/' . intval($oc['total_topics']) . '</span>';
+                    echo '</div>';
+                }
+                echo '</div>';
+            }
         }
         
         // ── WEEKLY GOAL ──────────────────────────────
@@ -1049,9 +1250,7 @@ class MTTI_MIS_Learner_Portal {
         echo '<div style="display:flex;flex-wrap:wrap;gap:10px;">';
         $base = get_permalink();
         $links = array(
-
             'calendar'    => array('📅', 'Calendar'),
-            'leaderboard' => array('🥇', 'Leaderboard'),
             'lessons'     => array('📖', 'Lessons'),
             'scheme'      => array('📋', 'Scheme of Work'),
             'transcript'  => array('📜', 'Transcript'),
@@ -2028,14 +2227,26 @@ class MTTI_MIS_Learner_Portal {
         
         // Get all enrolled course IDs
         $enrolled_ids = $this->get_enrolled_course_ids($student);
-        
-        // Course filter (shows switcher if multi-enrolled)
-        echo '<div class="mtti-lessons">';
-        echo '<h2 class="mtti-page-title">📖 Lessons & Materials</h2>';
-        echo '<p style="color:var(--text-2);margin-bottom:20px;">All your course content in one place — lessons, videos, notes, and downloadable files.</p>';
-        
-        $filter_course = $this->render_course_filter($student, 'lessons');
-        
+
+        // Per-student "viewed" lessons — reused for the ✓ completed markers below
+        // (same mtti_lesson_views table the dashboard progress ring and the
+        // course-player sidebar in render_course_outline_sidebar() read).
+        $viewed_ids = array_map('intval', $wpdb->get_col($wpdb->prepare(
+            "SELECT lesson_id FROM {$wpdb->prefix}mtti_lesson_views WHERE student_id = %d",
+            $student->student_id
+        )));
+
+        // Same filter-resolution rule render_course_filter() uses, computed
+        // WITHOUT its echo side-effect, so we can decide the branch below
+        // before printing anything. (Re-called for real, with its UI, in the
+        // flat-list branch further down.)
+        $courses_for_filter = $this->get_enrolled_courses($student);
+        if (count($courses_for_filter) <= 1) {
+            $filter_course = !empty($student->course_id) ? intval($student->course_id) : 0;
+        } else {
+            $filter_course = isset($_GET['filter_course']) ? intval($_GET['filter_course']) : 0;
+        }
+
         // Determine which course IDs to query
         if ($filter_course > 0 && in_array($filter_course, $enrolled_ids)) {
             $query_ids = array($filter_course);
@@ -2046,7 +2257,30 @@ class MTTI_MIS_Learner_Portal {
         } else {
             $query_ids = array();
         }
-        
+
+        // A single course in view (either explicitly picked, or the student
+        // is only enrolled in one) → jump straight into the course player,
+        // resuming at the first not-yet-viewed released lesson, same as
+        // Alison's "enter a course, land inside a lesson" pattern. The
+        // course-player's own "Back to Lessons" link appends &view=outline
+        // to reach the flat list (materials/quizzes) below instead of
+        // bouncing back here.
+        $wants_outline = isset($_GET['view']) && $_GET['view'] === 'outline';
+        if (count($query_ids) === 1 && !$wants_outline) {
+            $resume_lesson_id = $this->get_resume_lesson_id($student, $query_ids[0]);
+            if ($resume_lesson_id) {
+                $this->render_single_lesson($student, $resume_lesson_id);
+                return;
+            }
+        }
+
+        // Course filter (shows switcher if multi-enrolled)
+        echo '<div class="mtti-lessons">';
+        echo '<h2 class="mtti-page-title">📖 Lessons & Materials</h2>';
+        echo '<p style="color:var(--text-2);margin-bottom:20px;">All your course content in one place — lessons, videos, notes, and downloadable files.</p>';
+
+        $this->render_course_filter($student, 'lessons');
+
         $lessons   = array();
         $quizzes   = array();
         $materials = array();
@@ -2054,14 +2288,35 @@ class MTTI_MIS_Learner_Portal {
             $placeholders = implode(',', array_fill(0, count($query_ids), '%d'));
             
             // Real lessons — exclude AI practice quizzes
+            // ADDED: Enforce lesson locking based on release_week and enrollment date
             $lessons = $wpdb->get_results($wpdb->prepare(
-                "SELECT l.*, cu.unit_name, cu.unit_code, c.course_name, c.course_code
+                "SELECT l.*, cu.unit_name, cu.unit_code, c.course_name, c.course_code,
+                        e.enrollment_date,
+                        DATEDIFF(NOW(), e.enrollment_date) as days_enrolled,
+                        IF(l.release_week IS NOT NULL,
+                           DATEDIFF(NOW(), e.enrollment_date) >= ((l.release_week - 1) * 7),
+                           IF(l.release_date IS NOT NULL,
+                              NOW() >= l.release_date,
+                              1)
+                        ) as is_released
                  FROM {$wpdb->prefix}mtti_lessons l
                  LEFT JOIN {$wpdb->prefix}mtti_course_units cu ON l.unit_id = cu.unit_id
                  LEFT JOIN {$wpdb->prefix}mtti_courses c ON l.course_id = c.course_id
+                 LEFT JOIN {$wpdb->prefix}mtti_enrollments e ON l.course_id = e.course_id AND e.student_id = %d
                  WHERE l.course_id IN ($placeholders) AND l.status = 'Published'
                    AND l.title NOT LIKE '🤖 Quiz:%'
+                   AND l.deleted_at IS NULL
+                   AND (
+                     (l.is_locked = 0) OR
+                     (l.is_free_preview = 1) OR
+                     (l.is_locked = 1 AND (
+                       (l.release_week IS NOT NULL AND DATEDIFF(NOW(), e.enrollment_date) >= ((l.release_week - 1) * 7)) OR
+                       (l.release_date IS NOT NULL AND NOW() >= l.release_date) OR
+                       (l.release_week IS NULL AND l.release_date IS NULL)
+                     ))
+                   )
                  ORDER BY c.course_name, l.unit_id, l.order_number ASC",
+                $student->student_id,
                 ...$query_ids
             ));
 
@@ -2072,6 +2327,7 @@ class MTTI_MIS_Learner_Portal {
                  LEFT JOIN {$wpdb->prefix}mtti_courses c ON l.course_id = c.course_id
                  WHERE l.course_id IN ($placeholders) AND l.status = 'Published'
                    AND l.title LIKE '🤖 Quiz:%'
+                   AND l.deleted_at IS NULL
                  ORDER BY l.created_at DESC",
                 ...$query_ids
             ));
@@ -2160,7 +2416,15 @@ class MTTI_MIS_Learner_Portal {
                 echo '<strong style="font-size:15px;">' . esc_html($unit_data['name']) . '</strong>';
                 echo '</div>';
                 echo '<div style="display:flex;gap:12px;font-size:12px;color:var(--text-3);">';
-                if ($lcount) echo '<span>📖 ' . $lcount . ' lesson' . ($lcount != 1 ? 's' : '') . '</span>';
+                if ($lcount) {
+                    $unit_viewed = 0;
+                    foreach ($unit_data['lessons'] as $ul) {
+                        if (in_array((int) $ul->lesson_id, $viewed_ids, true)) $unit_viewed++;
+                    }
+                    $done_color = ($unit_viewed === $lcount) ? 'var(--mtti-success)' : 'var(--text-3)';
+                    echo '<span>📖 ' . $lcount . ' lesson' . ($lcount != 1 ? 's' : '') . '</span>';
+                    echo '<span style="color:' . $done_color . ';font-weight:600;">' . ($unit_viewed === $lcount && $lcount > 0 ? '✓ ' : '') . $unit_viewed . '/' . $lcount . ' complete</span>';
+                }
                 if ($mcount) echo '<span>📥 ' . $mcount . ' file' . ($mcount != 1 ? 's' : '') . '</span>';
                 echo '</div>';
                 echo '</div>';
@@ -2172,18 +2436,66 @@ class MTTI_MIS_Learner_Portal {
                     $type_icons = array('video' => '🎬', 'pdf' => '📕', 'document' => '📘', 'presentation' => '📙', 'audio' => '🎵', 'text' => '📝', 'file' => '📄', 'html_interactive' => '⚡');
                     $icon = $type_icons[$lesson->content_type] ?? '📄';
                     $lesson_url = add_query_arg(array('portal_tab' => 'lessons', 'lesson_id' => $lesson->lesson_id), get_permalink());
-                    
-                    echo '<div style="display:flex;align-items:center;gap:14px;padding:12px 0;' . ($index > 0 ? 'border-top:1px solid var(--border);' : '') . '">';
-                    echo '<div style="width:36px;height:36px;background:var(--mtti-primary-xl);border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:700;color:var(--mtti-primary);flex-shrink:0;font-size:13px;">';
-                    echo intval($lesson->order_number ?: ($index + 1));
+
+                    // Determine if lesson is released
+                    $is_released = (bool) $lesson->is_released;
+                    $locked_message = '';
+
+                    if (!$is_released) {
+                        if ($lesson->release_week) {
+                            $days_required = ($lesson->release_week - 1) * 7;
+                            $days_left = $days_required - intval($lesson->days_enrolled);
+                            $weeks_left = ceil($days_left / 7);
+                            $locked_message = "🔒 Available in " . ($weeks_left > 0 ? $weeks_left . " week" . ($weeks_left > 1 ? "s" : "") : "soon");
+                        } elseif ($lesson->release_date) {
+                            $locked_message = "🔒 Available on " . date('M d, Y', strtotime($lesson->release_date));
+                        } else {
+                            $locked_message = "🔒 Locked";
+                        }
+                    }
+
+                    $is_viewed = in_array((int) $lesson->lesson_id, $viewed_ids, true);
+
+                    echo '<div style="display:flex;align-items:center;gap:14px;padding:12px 0;' .
+                         ($index > 0 ? 'border-top:1px solid var(--border);' : '') .
+                         ($is_released ? '' : 'opacity:0.65;') . '">';
+
+                    echo '<div style="width:36px;height:36px;background:' .
+                         (!$is_released ? '#d1d5db' : ($is_viewed ? 'var(--mtti-success)' : 'var(--mtti-primary-xl)')) .
+                         ';border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:700;color:' .
+                         (!$is_released ? '#999' : ($is_viewed ? '#fff' : 'var(--mtti-primary)')) .
+                         ';flex-shrink:0;font-size:13px;">';
+                    echo ($is_released && $is_viewed) ? '✓' : intval($lesson->order_number ?: ($index + 1));
                     echo '</div>';
+
                     echo '<div style="flex:1;min-width:0;">';
-                    echo '<a href="' . esc_url($lesson_url) . '" style="color:var(--text-1);text-decoration:none;font-weight:600;font-size:14px;">' . esc_html($lesson->title) . '</a>';
-                    echo '<div style="display:flex;gap:12px;font-size:11px;color:var(--text-3);margin-top:3px;">';
-                    echo '<span>' . $icon . ' ' . ucfirst($lesson->content_type ?? 'lesson') . '</span>';
-                    if ($lesson->duration_minutes) echo '<span>⏱ ' . intval($lesson->duration_minutes) . ' min</span>';
+                    if ($is_released) {
+                        echo '<a href="' . esc_url($lesson_url) . '" style="color:var(--text-1);text-decoration:none;font-weight:600;font-size:14px;">' . esc_html($lesson->title) . '</a>';
+                    } else {
+                        echo '<span style="color:var(--text-1);font-weight:600;font-size:14px;cursor:not-allowed;">' . esc_html($lesson->title) . '</span>';
+                    }
+
+                    echo '<div style="display:flex;gap:12px;font-size:11px;color:' . ($is_released ? 'var(--text-3)' : '#f59e0b') . ';margin-top:3px;flex-wrap:wrap;">';
+                    if ($is_released) {
+                        echo '<span>' . $icon . ' ' . ucfirst($lesson->content_type ?? 'lesson') . '</span>';
+                        if ($lesson->duration_minutes) echo '<span>⏱ ' . intval($lesson->duration_minutes) . ' min</span>';
+                        if ($lesson->due_date) {
+                            $due_ts  = strtotime($lesson->due_date);
+                            $now_ts  = current_time('timestamp');
+                            $due_color = $due_ts < $now_ts ? '#ef4444' : '#f59e0b';
+                            $due_label = $due_ts < $now_ts ? '⚠ Due ' : '📅 Due ';
+                            echo '<span style="color:' . $due_color . ';font-weight:600;">' . $due_label . esc_html(date('d M Y', $due_ts)) . '</span>';
+                        }
+                    } else {
+                        echo '<span style="font-weight:600;">' . $locked_message . '</span>';
+                    }
                     echo '</div></div>';
-                    echo '<a href="' . esc_url($lesson_url) . '" class="mtti-btn mtti-btn-primary" style="padding:6px 14px;font-size:12px;flex-shrink:0;">Open</a>';
+
+                    if ($is_released) {
+                        echo '<a href="' . esc_url($lesson_url) . '" class="mtti-btn mtti-btn-primary" style="padding:6px 14px;font-size:12px;flex-shrink:0;">Open</a>';
+                    } else {
+                        echo '<span class="mtti-btn" style="padding:6px 14px;font-size:12px;flex-shrink:0;background:#d1d5db;color:#6b7280;cursor:not-allowed;border:none;">Locked</span>';
+                    }
                     echo '</div>';
                 }
                 
@@ -2278,22 +2590,323 @@ class MTTI_MIS_Learner_Portal {
         
         echo '</div>';
     }
-    
+
+    /**
+     * Picks which lesson to open when a student lands on the lessons tab
+     * for a single course with no lesson_id in the URL: the first released
+     * lesson they haven't viewed yet, or the first lesson overall if
+     * everything's already been viewed. Returns 0 if the course has no
+     * released lessons at all (caller falls back to the flat list, which
+     * shows the "No Lessons Available Yet" empty state).
+     */
+    private function get_resume_lesson_id($student, $course_id) {
+        global $wpdb;
+
+        $lessons = $wpdb->get_results($wpdb->prepare(
+            "SELECT l.lesson_id, l.interactive_role, l.release_week, l.release_date,
+                    DATEDIFF(NOW(), e.enrollment_date) as days_enrolled
+             FROM {$wpdb->prefix}mtti_lessons l
+             LEFT JOIN {$wpdb->prefix}mtti_enrollments e ON l.course_id = e.course_id AND e.student_id = %d
+             WHERE l.course_id = %d AND l.status = 'Published'
+               AND l.title NOT LIKE '🤖 Quiz:%'
+               AND l.deleted_at IS NULL
+             ORDER BY l.unit_id, l.order_number ASC",
+            $student->student_id, $course_id
+        ));
+        if (empty($lessons)) return 0;
+
+        $first_released = 0;
+        foreach ($lessons as $l) {
+            if ($l->release_week) {
+                $released = intval($l->days_enrolled) >= (($l->release_week - 1) * 7);
+            } elseif ($l->release_date) {
+                $released = (strtotime($l->release_date) <= time());
+            } else {
+                $released = true;
+            }
+            if (!$released) continue;
+            if (!$first_released) $first_released = (int) $l->lesson_id;
+            // interactive_role is NULL for every legacy lesson, so this is
+            // identical to the old plain "viewed?" check for any course that
+            // doesn't use the new quiz-attempt-based completion rule.
+            if (!$this->is_lesson_completed((int) $l->lesson_id, $l->interactive_role, $student->student_id)) {
+                return (int) $l->lesson_id;
+            }
+        }
+        return $first_released;
+    }
+
+    /**
+     * True if this course has ANY lesson using the new sequential-gating
+     * field (interactive_role IS NOT NULL) — the trigger for switching
+     * gating/prev-next from the legacy per-unit + release_week scheme to
+     * the new global-order_number, completion-based scheme. Every other
+     * course is completely unaffected by this feature.
+     */
+    private function course_uses_sequential_gating($course_id) {
+        static $cache = array();
+        $course_id = (int) $course_id;
+        if (isset($cache[$course_id])) return $cache[$course_id];
+        global $wpdb;
+        $exists = (bool) $wpdb->get_var($wpdb->prepare(
+            "SELECT 1 FROM {$wpdb->prefix}mtti_lessons WHERE course_id = %d AND interactive_role IS NOT NULL AND deleted_at IS NULL LIMIT 1",
+            $course_id
+        ));
+        return $cache[$course_id] = $exists;
+    }
+
+    /**
+     * Per-lesson completion signal: a quiz step requires a submitted
+     * attempt (mtti_quiz_attempts — opening it isn't enough, so a student
+     * can't "complete" a quiz by just closing the tab), everything else
+     * (objectives/video/theory/practical) only requires having opened it
+     * (mtti_lesson_views) — matches the unconditional view-tracking insert
+     * already in render_single_lesson().
+     */
+    private function is_lesson_completed($lesson_id, $interactive_role, $student_id) {
+        global $wpdb;
+        if ($interactive_role === 'quiz') {
+            return (bool) $wpdb->get_var($wpdb->prepare(
+                "SELECT 1 FROM {$wpdb->prefix}mtti_quiz_attempts WHERE lesson_id = %d AND student_id = %d LIMIT 1",
+                $lesson_id, $student_id
+            ));
+        }
+        return (bool) $wpdb->get_var($wpdb->prepare(
+            "SELECT 1 FROM {$wpdb->prefix}mtti_lesson_views WHERE lesson_id = %d AND student_id = %d LIMIT 1",
+            $lesson_id, $student_id
+        ));
+    }
+
+    /**
+     * Live "cannot skip" gate for sequential-gated courses: satisfied if no
+     * earlier lesson exists (course start), or the immediately-preceding
+     * Published/non-deleted lesson (by course-wide order_number) is
+     * completed. Fail-open: a missing/drafted/deleted predecessor never
+     * permanently locks everything downstream (e.g. staff re-drafting a
+     * lesson to edit it doesn't strand every student after it).
+     */
+    private function prerequisite_satisfied($course_id, $order_number, $student_id) {
+        global $wpdb;
+        $prev = $wpdb->get_row($wpdb->prepare(
+            "SELECT lesson_id, interactive_role FROM {$wpdb->prefix}mtti_lessons
+             WHERE course_id = %d AND status = 'Published' AND deleted_at IS NULL AND order_number < %d
+             ORDER BY order_number DESC LIMIT 1",
+            $course_id, $order_number
+        ));
+        if (!$prev) return true;
+        return $this->is_lesson_completed((int) $prev->lesson_id, $prev->interactive_role, $student_id);
+    }
+
+    /**
+     * Realistic per-course progress: every published step counts (not just
+     * html_interactive rows like the old dashboard metric), using the same
+     * completion rule as the sequential gate (is_lesson_completed() — a
+     * quiz step needs a submitted attempt, everything else just needs to
+     * have been opened). Steps are also grouped into "topics" — a run
+     * starting at each content_type='objectives' row — since "12 of 65
+     * topics done" is a far more honest headline than a raw step count
+     * that's mostly objectives/video placeholders for courses using the
+     * Objectives->Video->Theory->Practical->Quiz structure. Courses with no
+     * objectives rows (i.e. not rebuilt into that structure) fall back to
+     * one topic per lesson, which is just the old per-lesson percentage.
+     */
+    private function get_course_progress($student, $course_id) {
+        global $wpdb;
+
+        $lessons = $wpdb->get_results($wpdb->prepare(
+            "SELECT lesson_id, content_type, interactive_role
+             FROM {$wpdb->prefix}mtti_lessons
+             WHERE course_id = %d AND status = 'Published' AND deleted_at IS NULL
+               AND title NOT LIKE '🤖 Quiz:%'
+             ORDER BY order_number ASC",
+            $course_id
+        ));
+
+        $empty = array('total_steps' => 0, 'completed_steps' => 0, 'step_pct' => 0, 'total_topics' => 0, 'completed_topics' => 0, 'topic_pct' => 0);
+        if (empty($lessons)) return $empty;
+
+        $viewed_ids = array_map('intval', $wpdb->get_col($wpdb->prepare(
+            "SELECT lesson_id FROM {$wpdb->prefix}mtti_lesson_views WHERE student_id = %d", $student->student_id
+        )));
+        $attempted_ids = array_map('intval', $wpdb->get_col($wpdb->prepare(
+            "SELECT DISTINCT lesson_id FROM {$wpdb->prefix}mtti_quiz_attempts WHERE student_id = %d", $student->student_id
+        )));
+
+        $topics = array();
+        $current = array();
+        foreach ($lessons as $l) {
+            if ($l->content_type === 'objectives' && !empty($current)) {
+                $topics[] = $current;
+                $current = array();
+            }
+            $current[] = $l;
+        }
+        if (!empty($current)) $topics[] = $current;
+
+        $completed_steps = 0;
+        $completed_topics = 0;
+        foreach ($topics as $topic_lessons) {
+            $topic_all_done = true;
+            foreach ($topic_lessons as $l) {
+                $done = ($l->interactive_role === 'quiz')
+                    ? in_array((int) $l->lesson_id, $attempted_ids, true)
+                    : in_array((int) $l->lesson_id, $viewed_ids, true);
+                if ($done) $completed_steps++;
+                else $topic_all_done = false;
+            }
+            if ($topic_all_done) $completed_topics++;
+        }
+
+        $total_steps = count($lessons);
+        $total_topics = count($topics);
+        return array(
+            'total_steps'      => $total_steps,
+            'completed_steps'  => $completed_steps,
+            'step_pct'         => $total_steps > 0 ? min(100, round(($completed_steps / $total_steps) * 100)) : 0,
+            'total_topics'     => $total_topics,
+            'completed_topics' => $completed_topics,
+            'topic_pct'        => $total_topics > 0 ? min(100, round(($completed_topics / $total_topics) * 100)) : 0,
+        );
+    }
+
+    /**
+     * Left-hand course outline for the single-lesson "course player" view —
+     * units/lessons with per-student viewed checkmarks (from
+     * mtti_lesson_views, the same table the dashboard progress ring reads),
+     * a lock icon for lessons not yet released, and the active lesson
+     * highlighted. Release logic mirrors render_lessons()'s SQL exactly so
+     * lock state never disagrees between the list and this sidebar.
+     */
+    private function render_course_outline_sidebar($student, $course_id, $active_lesson_id) {
+        global $wpdb;
+
+        $course = $wpdb->get_row($wpdb->prepare(
+            "SELECT course_name, course_code FROM {$wpdb->prefix}mtti_courses WHERE course_id = %d",
+            $course_id
+        ));
+
+        $lessons = $wpdb->get_results($wpdb->prepare(
+            "SELECT l.lesson_id, l.title, l.unit_id, l.order_number, l.release_week, l.release_date, l.interactive_role,
+                    cu.unit_name,
+                    DATEDIFF(NOW(), e.enrollment_date) as days_enrolled
+             FROM {$wpdb->prefix}mtti_lessons l
+             LEFT JOIN {$wpdb->prefix}mtti_course_units cu ON l.unit_id = cu.unit_id
+             LEFT JOIN {$wpdb->prefix}mtti_enrollments e ON l.course_id = e.course_id AND e.student_id = %d
+             WHERE l.course_id = %d AND l.status = 'Published'
+               AND l.title NOT LIKE '🤖 Quiz:%'
+               AND l.deleted_at IS NULL
+             ORDER BY l.unit_id, l.order_number ASC",
+            $student->student_id, $course_id
+        ));
+
+        $viewed_ids = array_map('intval', $wpdb->get_col($wpdb->prepare(
+            "SELECT lesson_id FROM {$wpdb->prefix}mtti_lesson_views WHERE student_id = %d",
+            $student->student_id
+        )));
+        // Quiz steps complete on a submitted attempt, not merely opening the
+        // iframe — see is_lesson_completed(). Only fetched/used when this
+        // course actually has a quiz step to check against.
+        $attempted_ids = array_map('intval', $wpdb->get_col($wpdb->prepare(
+            "SELECT DISTINCT lesson_id FROM {$wpdb->prefix}mtti_quiz_attempts WHERE student_id = %d",
+            $student->student_id
+        )));
+        $sequential = $this->course_uses_sequential_gating($course_id);
+        $chain_unlocked = true; // nothing before the first lesson to satisfy
+
+        $by_unit = array();
+        $total = 0;
+        $viewed = 0;
+        foreach ($lessons as $l) {
+            if ($l->release_week) {
+                $released = intval($l->days_enrolled) >= (($l->release_week - 1) * 7);
+            } elseif ($l->release_date) {
+                $released = (strtotime($l->release_date) <= time());
+            } else {
+                $released = true;
+            }
+            // interactive_role NULL (every legacy lesson) => same view-based
+            // check as before. 'quiz' => needs a submitted attempt, not just
+            // an open iframe.
+            $is_complete = ($l->interactive_role === 'quiz')
+                ? in_array((int) $l->lesson_id, $attempted_ids, true)
+                : in_array((int) $l->lesson_id, $viewed_ids, true);
+
+            if ($sequential) {
+                $released = $released && $chain_unlocked;
+            }
+            $chain_unlocked = $is_complete;
+
+            $ukey = $l->unit_id ?: 'general';
+            if (!isset($by_unit[$ukey])) {
+                $by_unit[$ukey] = array('name' => $l->unit_name ?: 'General', 'lessons' => array());
+            }
+            $l->_released = $released;
+            $l->_viewed = $is_complete;
+            $by_unit[$ukey]['lessons'][] = $l;
+            $total++;
+            if ($l->_viewed) $viewed++;
+        }
+        $pct = $total > 0 ? round(($viewed / $total) * 100) : 0;
+
+        echo '<aside class="mtti-player-sidebar">';
+        echo '<div class="mtti-player-course-head">';
+        echo '<span class="mtti-player-course-code">' . esc_html($course->course_code ?? '') . '</span>';
+        echo '<h3>' . esc_html($course->course_name ?? '') . '</h3>';
+        echo '<div class="mtti-progress-bar"><div class="mtti-progress-fill" style="width:' . intval($pct) . '%;"></div></div>';
+        echo '<span class="mtti-player-progress-label">' . intval($viewed) . ' of ' . intval($total) . ' lessons complete (' . intval($pct) . '%)</span>';
+        echo '</div>';
+
+        foreach ($by_unit as $unit) {
+            echo '<div class="mtti-player-unit-group">';
+            echo '<div class="mtti-player-unit-name">' . esc_html($unit['name']) . '</div>';
+            foreach ($unit['lessons'] as $l) {
+                $is_active = ((int) $l->lesson_id === (int) $active_lesson_id);
+                $classes = 'mtti-player-lesson-row';
+                if ($is_active) $classes .= ' active';
+                if (!$l->_released) {
+                    $classes .= ' locked';
+                } elseif ($l->_viewed) {
+                    $classes .= ' completed';
+                }
+
+                if ($l->_released) {
+                    $url = add_query_arg(array('portal_tab' => 'lessons', 'lesson_id' => $l->lesson_id), get_permalink());
+                    echo '<a href="' . esc_url($url) . '" class="' . esc_attr($classes) . '">';
+                } else {
+                    echo '<span class="' . esc_attr($classes) . '">';
+                }
+                echo '<span class="mtti-player-lesson-icon">' . (!$l->_released ? '🔒' : ($l->_viewed ? '✓' : ($is_active ? '▶' : '○'))) . '</span>';
+                echo '<span class="mtti-player-lesson-title">' . esc_html($l->title) . '</span>';
+                echo $l->_released ? '</a>' : '</span>';
+            }
+            echo '</div>';
+        }
+
+        $outline_url = add_query_arg(array('portal_tab' => 'lessons', 'filter_course' => intval($course_id), 'view' => 'outline'), get_permalink());
+        echo '<div class="mtti-player-outline-link"><a href="' . esc_url($outline_url) . '">📋 View full course outline (materials & quizzes)</a></div>';
+
+        echo '</aside>';
+    }
+
     /**
      * Render single lesson view
      */
     private function render_single_lesson($student, $lesson_id) {
         global $wpdb;
-        
+
         $lesson = $wpdb->get_row($wpdb->prepare(
-            "SELECT l.*, cu.unit_name, cu.unit_code, c.course_name, c.course_code
+            "SELECT l.*, cu.unit_name, cu.unit_code, c.course_name, c.course_code,
+                    e.enrollment_date,
+                    DATEDIFF(NOW(), e.enrollment_date) as days_enrolled
              FROM {$wpdb->prefix}mtti_lessons l
              LEFT JOIN {$wpdb->prefix}mtti_course_units cu ON l.unit_id = cu.unit_id
              LEFT JOIN {$wpdb->prefix}mtti_courses c ON l.course_id = c.course_id
-             WHERE l.lesson_id = %d AND l.status = 'Published'",
+             LEFT JOIN {$wpdb->prefix}mtti_enrollments e ON l.course_id = e.course_id AND e.student_id = %d
+             WHERE l.lesson_id = %d AND l.status = 'Published' AND l.deleted_at IS NULL",
+            $student->student_id,
             $lesson_id
         ));
-        
+
         if (!$lesson) {
             echo '<div class="mtti-empty-state"><h3>Lesson not found</h3></div>';
             return;
@@ -2305,7 +2918,52 @@ class MTTI_MIS_Learner_Portal {
             echo '<div class="mtti-empty-state"><h3>Access Denied</h3><p>You are not enrolled in this course.</p></div>';
             return;
         }
-        
+
+        // Check if lesson is released (content gating) — MANDATORY ENFORCEMENT
+        // This cannot be bypassed even if release_week is manually set to NULL
+        $is_released = true;
+        $locked_message = '';
+
+        // MANDATORY: All lessons must have a release_week value
+        if (!$lesson->release_week) {
+            $lesson->release_week = 1; // Default to immediate release if not set
+        }
+
+        if ($lesson->release_week) {
+            $days_required = ($lesson->release_week - 1) * 7;
+            $is_released = intval($lesson->days_enrolled) >= $days_required;
+            if (!$is_released) {
+                $days_left = $days_required - intval($lesson->days_enrolled);
+                $weeks_left = ceil($days_left / 7);
+                $locked_message = "This lesson is part of Week " . $lesson->release_week . " and will be available in " . $weeks_left . " week" . ($weeks_left > 1 ? "s" : "") . ".";
+            }
+        } elseif ($lesson->release_date && strtotime($lesson->release_date) > time()) {
+            $is_released = false;
+            $locked_message = "This lesson will be available on " . date('F j, Y', strtotime($lesson->release_date)) . ".";
+        }
+
+        // Additive "cannot skip" gate for sequential-gated courses (e.g. the
+        // rebuilt SMD-01) — layered on top of, not instead of, the mandatory
+        // time-gate above. No-op for every other course (see
+        // course_uses_sequential_gating()).
+        if ($is_released && $this->course_uses_sequential_gating($lesson->course_id)) {
+            if (!$this->prerequisite_satisfied($lesson->course_id, $lesson->order_number, $student->student_id)) {
+                $is_released = false;
+                $locked_message = "Complete the previous step in this course first to unlock this one.";
+            }
+        }
+
+        if (!$is_released) {
+            echo '<div class="mtti-empty-state">';
+            echo '<h3>🔒 This Lesson is Not Yet Available</h3>';
+            echo '<p style="color:var(--text-3);font-size:15px;">' . esc_html($locked_message) . '</p>';
+            echo '<p style="color:var(--text-3);font-size:13px;margin-top:12px;">Keep up with your coursework and this content will unlock as scheduled.</p>';
+            $outline_url = add_query_arg(array('portal_tab' => 'lessons', 'filter_course' => intval($lesson->course_id), 'view' => 'outline'), get_permalink());
+            echo '<a href="' . esc_url($outline_url) . '" style="color:#1976D2;text-decoration:none;display:inline-block;margin-top:12px;">← Back to Lessons</a>';
+            echo '</div>';
+            return;
+        }
+
         // Update total view count
         $wpdb->query($wpdb->prepare(
             "UPDATE {$wpdb->prefix}mtti_lessons SET view_count = view_count + 1 WHERE lesson_id = %d",
@@ -2321,83 +2979,124 @@ class MTTI_MIS_Learner_Portal {
                  ON DUPLICATE KEY UPDATE viewed_at = NOW()",
                 $lesson_id, $student->student_id
             ));
+            // Covers units with no quiz content at all (e.g. SMD-01 unit
+            // 15) — those can only complete via "every lesson viewed",
+            // checked here. Units WITH quizzes complete via the quiz
+            // submission path instead (mtti_mis_maybe_complete_unit() in
+            // mtti-mis.php short-circuits to that branch on its own).
+            // Skipped for the admin-preview sentinel (student_id 0).
+            if ($lesson->unit_id && (int) $student->student_id !== 0 && function_exists('mtti_mis_maybe_complete_unit')) {
+                mtti_mis_maybe_complete_unit((int) $lesson->unit_id, (int) $student->student_id);
+            }
         }
         
-        // Get previous and next lessons
-        $prev_lesson = $wpdb->get_row($wpdb->prepare(
-            "SELECT lesson_id, title FROM {$wpdb->prefix}mtti_lessons 
-             WHERE course_id = %d AND status = 'Published' 
-             AND (unit_id = %d OR (unit_id IS NULL AND %d IS NULL))
-             AND order_number < %d 
-             ORDER BY order_number DESC LIMIT 1",
-            $lesson->course_id, $lesson->unit_id, $lesson->unit_id, $lesson->order_number
-        ));
+        // Get previous and next lessons. Sequential-gated courses (e.g. the
+        // rebuilt SMD-01) navigate by course-wide order_number so Prev/Next
+        // flows seamlessly across unit boundaries; every other course keeps
+        // its existing per-unit-scoped navigation unchanged.
+        if ($this->course_uses_sequential_gating($lesson->course_id)) {
+            $prev_lesson = $wpdb->get_row($wpdb->prepare(
+                "SELECT lesson_id, title FROM {$wpdb->prefix}mtti_lessons
+                 WHERE course_id = %d AND status = 'Published' AND deleted_at IS NULL
+                 AND order_number < %d
+                 ORDER BY order_number DESC LIMIT 1",
+                $lesson->course_id, $lesson->order_number
+            ));
+            $next_lesson = $wpdb->get_row($wpdb->prepare(
+                "SELECT lesson_id, title FROM {$wpdb->prefix}mtti_lessons
+                 WHERE course_id = %d AND status = 'Published' AND deleted_at IS NULL
+                 AND order_number > %d
+                 ORDER BY order_number ASC LIMIT 1",
+                $lesson->course_id, $lesson->order_number
+            ));
+        } else {
+            $prev_lesson = $wpdb->get_row($wpdb->prepare(
+                "SELECT lesson_id, title FROM {$wpdb->prefix}mtti_lessons
+                 WHERE course_id = %d AND status = 'Published' AND deleted_at IS NULL
+                 AND (unit_id = %d OR (unit_id IS NULL AND %d IS NULL))
+                 AND order_number < %d
+                 ORDER BY order_number DESC LIMIT 1",
+                $lesson->course_id, $lesson->unit_id, $lesson->unit_id, $lesson->order_number
+            ));
+            $next_lesson = $wpdb->get_row($wpdb->prepare(
+                "SELECT lesson_id, title FROM {$wpdb->prefix}mtti_lessons
+                 WHERE course_id = %d AND status = 'Published' AND deleted_at IS NULL
+                 AND (unit_id = %d OR (unit_id IS NULL AND %d IS NULL))
+                 AND order_number > %d
+                 ORDER BY order_number ASC LIMIT 1",
+                $lesson->course_id, $lesson->unit_id, $lesson->unit_id, $lesson->order_number
+            ));
+        }
         
-        $next_lesson = $wpdb->get_row($wpdb->prepare(
-            "SELECT lesson_id, title FROM {$wpdb->prefix}mtti_lessons 
-             WHERE course_id = %d AND status = 'Published' 
-             AND (unit_id = %d OR (unit_id IS NULL AND %d IS NULL))
-             AND order_number > %d 
-             ORDER BY order_number ASC LIMIT 1",
-            $lesson->course_id, $lesson->unit_id, $lesson->unit_id, $lesson->order_number
-        ));
-        
-        $back_url = add_query_arg('portal_tab', 'lessons', get_permalink());
-        
-        echo '<div class="mtti-single-lesson">';
-        
-        // Breadcrumb
-        echo '<div style="margin-bottom: 20px;">';
-        echo '<a href="' . esc_url($back_url) . '" style="color: #1976D2; text-decoration: none;">← Back to Lessons</a>';
-        echo '</div>';
-        
-        // Lesson header
-        echo '<div style="background: white; border-radius: 8px; padding: 25px; margin-bottom: 20px; box-shadow: 0 2px 8px rgba(0,0,0,0.1);">';
-        
-        // Course/Unit badges
-        echo '<div style="margin-bottom: 10px;">';
-        echo '<span style="background: #e3f2fd; padding: 4px 12px; border-radius: 4px; font-size: 12px; color: #1976D2;">' . esc_html($lesson->course_code) . '</span>';
+        // Points at the flat list (materials/quizzes), not back into this
+        // same auto-resumed lesson — see the &view=outline handling in
+        // render_lessons().
+        $back_url = add_query_arg(array('portal_tab' => 'lessons', 'filter_course' => intval($lesson->course_id), 'view' => 'outline'), get_permalink());
+
+        echo '<div class="mtti-course-player">';
+        $this->render_course_outline_sidebar($student, $lesson->course_id, $lesson->lesson_id);
+        echo '<div class="mtti-player-content">';
+
+        // Condensed top bar — breadcrumb + badges/title/meta on one compact
+        // strip instead of a tall header card, so it doesn't eat into the
+        // viewport height available for the actual content below.
+        $type_icons = array('video' => '🎬', 'pdf' => '📕', 'document' => '📘', 'presentation' => '📙', 'audio' => '🎵', 'text' => '📝', 'file' => '📄', 'html_interactive' => '⚡', 'objectives' => '🎯');
+        echo '<div class="mtti-player-topbar">';
+        echo '<div class="mtti-player-topbar-row">';
+        echo '<a href="' . esc_url($back_url) . '" class="mtti-player-back">← Back</a>';
+        echo '<span class="mtti-player-badge mtti-player-badge-course">' . esc_html($lesson->course_code) . '</span>';
         if ($lesson->unit_name) {
-            echo ' <span style="background: #f3e5f5; padding: 4px 12px; border-radius: 4px; font-size: 12px; color: #7B1FA2;">' . esc_html($lesson->unit_code) . '</span>';
+            echo '<span class="mtti-player-badge mtti-player-badge-unit">' . esc_html($lesson->unit_code) . '</span>';
         }
-        echo '</div>';
-        
-        echo '<h2 style="margin: 10px 0;">' . esc_html($lesson->title) . '</h2>';
-        
-        if ($lesson->description) {
-            echo '<p style="color: #666; margin: 0;">' . esc_html($lesson->description) . '</p>';
-        }
-        
-        // Meta
-        echo '<div style="margin-top: 15px; display: flex; gap: 20px; font-size: 13px; color: #888;">';
-        $type_icons = array('video' => '🎬', 'pdf' => '📕', 'document' => '📘', 'presentation' => '📙', 'audio' => '🎵', 'text' => '📝', 'file' => '📄', 'html_interactive' => '⚡');
-        echo '<span>' . ($type_icons[$lesson->content_type] ?? '📄') . ' ' . ucfirst($lesson->content_type) . '</span>';
+        // Duration is the only meta worth a line of its own — the step type
+        // (theory/practical/quiz/etc.) is already conveyed by the title
+        // suffix and the sidebar's icon, so it isn't repeated here too.
         if ($lesson->duration_minutes) {
-            echo '<span>⏱️ ' . intval($lesson->duration_minutes) . ' minutes</span>';
+            echo '<span class="mtti-player-duration">⏱️ ' . intval($lesson->duration_minutes) . ' min</span>';
         }
-        echo '<span>👁️ ' . number_format(intval($lesson->view_count)) . ' views</span>';
         echo '</div>';
-        
-        echo '</div>';
-        
+        echo '<h2>' . ($type_icons[$lesson->content_type] ?? '📄') . ' ' . esc_html($lesson->title) . '</h2>';
+        if ($lesson->description) {
+            echo '<p class="mtti-player-desc">' . esc_html($lesson->description) . '</p>';
+        }
+        echo '</div>'; // .mtti-player-topbar
+
+        // Body — fills remaining viewport height; player-like content
+        // (video/PDF/interactive iframes) stretches to fill it exactly like
+        // Alison's lesson pane, everything else just scrolls internally on
+        // its own if it's ever taller than the available space, so the
+        // topbar and Prev/Next below are never pushed off-screen.
+        echo '<div class="mtti-player-body">';
+
         // Video content
         if ($lesson->content_type == 'video' && $lesson->content_url) {
-            echo '<div style="background: #000; border-radius: 8px; overflow: hidden; margin-bottom: 20px;">';
+            echo '<div class="mtti-player-fill mtti-player-iframe-wrap" style="background:#000;">';
+            echo '<button type="button" onclick="mttiToggleFullscreen(this)" class="mtti-player-fullscreen-link">⛶ Full screen</button>';
             echo $this->embed_video_player($lesson->content_url);
             echo '</div>';
+        } elseif ($lesson->content_type == 'video' && !$lesson->content_url) {
+            // Reserved video slot with nothing uploaded yet — visible so the
+            // sequence structure is clear, but opening it still records a
+            // view (below) so it never blocks the next step.
+            echo '<div class="mtti-video-coming-soon">';
+            echo '<span class="mtti-video-coming-soon-icon">🎬</span>';
+            echo '<h3>Video Coming Soon</h3>';
+            echo '<p>This lesson\'s video is being produced — check back soon. You can continue to the next step below in the meantime.</p>';
+            echo '</div>';
         }
-        
+
         // File viewer / download
         if ($lesson->content_url && !in_array($lesson->content_type, array('video', 'text'))) {
             if ($lesson->content_type === 'pdf') {
                 // Inline PDF viewer
                 $pdf_title = esc_attr($lesson->title ?: basename($lesson->content_url));
-                echo '<div style="background:white;border-radius:8px;overflow:hidden;margin-bottom:20px;box-shadow:0 2px 8px rgba(0,0,0,0.1);">';
-                echo '<div style="background:#c62828;color:#fff;padding:8px 16px;font-size:12px;display:flex;align-items:center;justify-content:space-between;gap:10px;">';
+                echo '<div class="mtti-player-fill mtti-player-iframe-wrap" style="background:white;box-shadow:0 2px 8px rgba(0,0,0,0.1);">';
+                echo '<div style="background:#c62828;color:#fff;padding:8px 16px;font-size:12px;display:flex;align-items:center;justify-content:space-between;gap:10px;flex-shrink:0;">';
                 echo '<span>📕 ' . esc_html($lesson->title ?: 'PDF Document') . '</span>';
                 echo '<a href="' . esc_url($lesson->content_url) . '" download style="color:rgba(255,255,255,.85);font-size:11px;text-decoration:none;white-space:nowrap;">📥 Download</a>';
                 echo '</div>';
-                echo '<iframe src="' . esc_url($lesson->content_url) . '#toolbar=1&navpanes=1&view=FitH" style="width:100%;height:700px;border:none;display:block;" title="' . $pdf_title . '"></iframe>';
+                echo '<button type="button" onclick="mttiToggleFullscreen(this)" class="mtti-player-fullscreen-link">⛶ Full screen</button>';
+                echo '<iframe src="' . esc_url($lesson->content_url) . '#toolbar=1&navpanes=1&view=FitH" style="width:100%;border:none;display:block;" title="' . $pdf_title . '"></iframe>';
                 echo '</div>';
             } else {
                 echo '<div style="background: white; padding: 20px; border-radius: 8px; margin-bottom: 20px; display: flex; align-items: center; gap: 15px; box-shadow: 0 2px 8px rgba(0,0,0,0.1);">';
@@ -2412,7 +3111,7 @@ class MTTI_MIS_Learner_Portal {
                 echo '</div>';
             }
         }
-        
+
         // Lesson content
         if ($lesson->content) {
             if ($lesson->content_type === 'html_interactive') {
@@ -2423,12 +3122,21 @@ class MTTI_MIS_Learner_Portal {
                     'lesson_id' => $lesson->lesson_id,
                     'nonce'     => wp_create_nonce('serve_interactive_' . $lesson->lesson_id),
                 ), admin_url('admin-ajax.php'));
-                echo '<div style="background:white;border-radius:8px;overflow:hidden;margin-bottom:20px;box-shadow:0 2px 8px rgba(0,0,0,0.1);">';
-                echo '<div style="background:#1B5E20;color:white;padding:8px 16px;font-size:12px;display:flex;align-items:center;justify-content:space-between;">';
-                echo '<span>⚡ Interactive Content — ' . esc_html($lesson->title) . '</span>';
-                echo '<a href="' . esc_url($iframe_url) . '" target="_blank" style="color:rgba(255,255,255,.8);font-size:11px;text-decoration:none;">🔗 Open full screen</a>';
+                // No repeated title bar here — the topbar above already
+                // shows it. Just a small floating fullscreen toggle overlaid
+                // on the frame, costing zero extra vertical space — uses the
+                // real Fullscreen API (mttiToggleFullscreen, enqueued in
+                // enqueue_assets()) so it stays in this tab/session rather
+                // than navigating away.
+                echo '<div class="mtti-player-fill mtti-player-iframe-wrap">';
+                echo '<button type="button" onclick="mttiToggleFullscreen(this)" class="mtti-player-fullscreen-link">⛶ Full screen</button>';
+                echo '<iframe src="' . esc_url($iframe_url) . '" data-lesson-id="' . intval($lesson->lesson_id) . '" style="width:100%;border:none;" sandbox="allow-scripts allow-forms allow-popups"></iframe>';
                 echo '</div>';
-                echo '<iframe src="' . esc_url($iframe_url) . '" data-lesson-id="' . intval($lesson->lesson_id) . '" style="width:100%;height:700px;border:none;" sandbox="allow-scripts allow-forms allow-popups"></iframe>';
+            } elseif ($lesson->content_type === 'objectives') {
+                // Pre-rendered at import time from the topic's title/subtitle/
+                // section headings — styled distinctly via .mtti-objectives-card.
+                echo '<div class="mtti-objectives-card">';
+                echo wp_kses_post($lesson->content);
                 echo '</div>';
             } else {
                 // Regular text/HTML content
@@ -2439,39 +3147,46 @@ class MTTI_MIS_Learner_Portal {
                 echo '</div>';
             }
         }
-        
-        // Navigation
-        echo '<div style="display: flex; justify-content: space-between; gap: 20px; flex-wrap: wrap;">';
-        
+
+        echo '</div>'; // .mtti-player-body
+
+        // Nav — pinned at the bottom of the fixed-height shell, always
+        // visible without scrolling to find it (the actual ask here).
+        echo '<div class="mtti-player-navbar">';
         if ($prev_lesson) {
             $prev_url = add_query_arg(array('portal_tab' => 'lessons', 'lesson_id' => $prev_lesson->lesson_id), get_permalink());
             echo '<a href="' . esc_url($prev_url) . '" class="mtti-btn mtti-btn-secondary">← Previous: ' . esc_html(wp_trim_words($prev_lesson->title, 5)) . '</a>';
         } else {
             echo '<div></div>';
         }
-        
         if ($next_lesson) {
             $next_url = add_query_arg(array('portal_tab' => 'lessons', 'lesson_id' => $next_lesson->lesson_id), get_permalink());
             echo '<a href="' . esc_url($next_url) . '" class="mtti-btn mtti-btn-primary">Next: ' . esc_html(wp_trim_words($next_lesson->title, 5)) . ' →</a>';
         }
-        
-        echo '</div>';
-        
-        echo '</div>';
+        echo '</div>'; // .mtti-player-navbar
+
+        echo '</div>'; // .mtti-player-content
+        echo '</div>'; // .mtti-course-player
     }
-    
+
     /**
      * Embed video player for YouTube/Vimeo/direct URLs
      */
     private function embed_video_player($url) {
-        // YouTube
-        if (preg_match('/youtube\.com\/watch\?v=([a-zA-Z0-9_-]+)/', $url, $matches) ||
+        // YouTube - handle all formats: watch?v=, youtu.be/, and /embed/
+        if (preg_match('/youtube\.com\/embed\/([a-zA-Z0-9_-]+)/', $url, $matches) ||
+            preg_match('/youtube\.com\/watch\?v=([a-zA-Z0-9_-]+)/', $url, $matches) ||
             preg_match('/youtu\.be\/([a-zA-Z0-9_-]+)/', $url, $matches)) {
             $video_id = $matches[1];
-            return '<div style="position: relative; padding-bottom: 56.25%; height: 0; overflow: hidden;">
-                <iframe src="https://www.youtube.com/embed/' . esc_attr($video_id) . '" 
-                        style="position: absolute; top: 0; left: 0; width: 100%; height: 100%;" 
-                        frameborder="0" allowfullscreen></iframe>
+            return '<div oncontextmenu="return false;" style="user-select: none; -webkit-user-select: none;">
+                <iframe src="https://www.youtube.com/embed/' . esc_attr($video_id) . '?modestbranding=1&rel=0&disablekb=1&fs=0"
+                            style="width: 100%; height: 100%; border: none;"
+                            frameborder="0" allow="autoplay; encrypted-media" allowfullscreen></iframe>
+                <script>
+                    document.addEventListener("keydown", function(e) {
+                        if(e.key === "d" || e.key === "s") e.preventDefault();
+                    });
+                </script>
             </div>';
         }
         
@@ -2817,11 +3532,11 @@ function mttiSubmitAttCode(nonce) {
             $student->student_id
         )) ?: 0;
         
-        // Certificate eligibility
+        // Certificate eligibility — 70% average required on all quizzes
         $all_passed = ($failed == 0);
-        $avg_above_50 = ($overall_avg >= 50);
+        $avg_above_70 = ($overall_avg >= 70);
         $fees_cleared = ($balance <= 0);
-        $certificate_eligible = $all_passed && $avg_above_50 && $fees_cleared;
+        $certificate_eligible = $all_passed && $avg_above_70 && $fees_cleared;
         
         $settings = get_option('mtti_mis_settings', array());
         $institute_name = $settings['institute_name'] ?? 'Masomotele Technical Training Institute';
@@ -2844,9 +3559,9 @@ function mttiSubmitAttCode(nonce) {
         // Eligibility details
         if (!$certificate_eligible) {
             echo '<div style="background: #fff3cd; border: 1px solid #ffc107; padding: 15px; border-radius: 8px; margin-bottom: 20px;">';
-            echo '<strong>Certificate Requirements:</strong><ul style="margin: 10px 0 0 20px;">';
-            echo '<li>' . ($all_passed ? '✓' : '✗') . ' All units passed (50% minimum)</li>';
-            echo '<li>' . ($avg_above_50 ? '✓' : '✗') . ' Overall average above 50%</li>';
+            echo '<strong>🎖️ Certificate Requirements (Not Yet Achieved):</strong><ul style="margin: 10px 0 0 20px;">';
+            echo '<li>' . ($all_passed ? '✓' : '✗') . ' All units passed</li>';
+            echo '<li>' . ($avg_above_70 ? '✓' : '✗') . ' Average score 70% or higher (Current: ' . $overall_avg . '%)</li>';
             echo '<li>' . ($fees_cleared ? '✓' : '✗') . ' Fees fully paid (Balance: KES ' . number_format($balance, 2) . ')</li>';
             echo '</ul></div>';
         }
@@ -2916,8 +3631,8 @@ function mttiSubmitAttCode(nonce) {
         echo '</div>';
         
         // Final Result
-        echo '<div style="text-align: center; padding: 15px; background: ' . ($overall_avg >= 50 ? '#d4edda' : '#f8d7da') . '; border-radius: 6px; margin-bottom: 20px;">';
-        echo '<strong style="font-size: 1.2rem;">Final Result: ' . $overall_remarks . '</strong>';
+        echo '<div style="text-align: center; padding: 15px; background: ' . ($overall_avg >= 70 ? '#d4edda' : '#f8d7da') . '; border-radius: 6px; margin-bottom: 20px;">';
+        echo '<strong style="font-size: 1.2rem;">Final Result: ' . $overall_remarks . ' • ' . ($overall_avg >= 70 ? '✓ Certificate Eligible' : '⚠ Score below 70%') . '</strong>';
         echo '</div>';
         
         // Footer
@@ -2955,27 +3670,9 @@ function mttiSubmitAttCode(nonce) {
         // Get all enrolled course IDs
         $enrolled_ids = $this->get_enrolled_course_ids($student);
         
-        // Assignments with due dates from all enrolled courses
         if (!empty($enrolled_ids)) {
             $placeholders = implode(',', array_fill(0, count($enrolled_ids), '%d'));
-            $assignments = $wpdb->get_results($wpdb->prepare(
-                "SELECT a.title, a.due_date, c.course_code
-                 FROM {$wpdb->prefix}mtti_assignments a
-                 LEFT JOIN {$wpdb->prefix}mtti_courses c ON a.course_id = c.course_id
-                 WHERE a.course_id IN ($placeholders) AND a.status = 'Active' AND a.due_date IS NOT NULL",
-                ...$enrolled_ids
-            ));
-            foreach ($assignments as $a) {
-                $label = $a->title . ' (Due)';
-                if ($a->course_code) $label = '[' . $a->course_code . '] ' . $label;
-                $events[] = array(
-                    'date'  => date('Y-m-d', strtotime($a->due_date)),
-                    'time'  => date('g:i A', strtotime($a->due_date)),
-                    'title' => $label,
-                    'type'  => 'assignment',
-                );
-            }
-            
+
             // Live classes from all enrolled courses
             $classes = $wpdb->get_results($wpdb->prepare(
                 "SELECT lc.title, lc.scheduled_at, c.course_code
@@ -3087,7 +3784,7 @@ function mttiSubmitAttCode(nonce) {
         }
         
         // Days
-        $type_colors = array('assignment' => '#E65100', 'class' => '#2E7D32', 'notice' => '#1565C0', 'fee' => '#C62828');
+        $type_colors = array('class' => '#2E7D32', 'notice' => '#1565C0', 'fee' => '#C62828');
         
         for ($d = 1; $d <= $days_in_month; $d++) {
             $date_str = sprintf('%04d-%02d-%02d', $year, $month, $d);
@@ -3115,7 +3812,6 @@ function mttiSubmitAttCode(nonce) {
         
         // Legend
         echo '<div style="display:flex;gap:16px;margin-top:14px;flex-wrap:wrap;">';
-        echo '<div style="display:flex;align-items:center;gap:5px;font-size:11px;color:var(--text-3);"><span style="width:8px;height:8px;border-radius:50%;background:#E65100;"></span> Assignment</div>';
         echo '<div style="display:flex;align-items:center;gap:5px;font-size:11px;color:var(--text-3);"><span style="width:8px;height:8px;border-radius:50%;background:#2E7D32;"></span> Class</div>';
         echo '<div style="display:flex;align-items:center;gap:5px;font-size:11px;color:var(--text-3);"><span style="width:8px;height:8px;border-radius:50%;background:#1565C0;"></span> Notice</div>';
         echo '<div style="display:flex;align-items:center;gap:5px;font-size:11px;color:var(--text-3);"><span style="width:8px;height:8px;border-radius:50%;background:#C62828;"></span> Fee Due</div>';
@@ -3359,21 +4055,33 @@ function mttiSubmitAttCode(nonce) {
     private function render_study_chat($student) {
         global $wpdb;
         $table = $wpdb->prefix . 'mtti_discussions';
-        
+
         // Ensure table exists
         if (!$wpdb->get_var("SHOW TABLES LIKE '{$table}'")) {
             echo '<div class="mtti-empty-state"><span>💬</span><h3>Chat Setting Up</h3>';
             echo '<p>Run the SQL file <code>NEW-TABLES-v6.sql</code> to enable Study Chat.</p></div>';
             return;
         }
-        
+
+        // Get enrolled courses with filter capability
+        $enrolled_ids = $this->get_enrolled_course_ids($student);
+        if (empty($enrolled_ids)) {
+            echo '<div class="mtti-message" style="padding: 20px; background: #f5f5f5; text-align: center;">Not enrolled in any courses yet.</div>';
+            return;
+        }
+
+        $filter_course = $this->render_course_filter($student, 'discussions');
+        if (!$filter_course) {
+            return;
+        }
+
         // Handle new post
         if (isset($_POST['mtti_chat_post']) && wp_verify_nonce($_POST['mtti_chat_nonce'] ?? '', 'mtti_chat_action')) {
             $message = sanitize_textarea_field($_POST['chat_message'] ?? '');
             $parent_id = intval($_POST['parent_id'] ?? 0);
             if ($message && strlen($message) >= 3) {
                 $wpdb->insert($table, array(
-                    'course_id'  => $student->course_id,
+                    'course_id'  => $filter_course,
                     'student_id' => $student->student_id,
                     'message'    => $message,
                     'parent_id'  => $parent_id ?: null,
@@ -3406,25 +4114,33 @@ function mttiSubmitAttCode(nonce) {
         }
         
         // Load threads (top-level only, ordered by upvotes then date)
-        $threads = array();
-        if ($student->course_id) {
-            $threads = $wpdb->get_results($wpdb->prepare(
-                "SELECT d.*, u.display_name,
-                        (SELECT COUNT(*) FROM {$table} r WHERE r.parent_id = d.discussion_id AND r.status='published') as reply_count
-                 FROM {$table} d
-                 LEFT JOIN {$wpdb->users} u ON (SELECT user_id FROM {$wpdb->prefix}mtti_students WHERE student_id = d.student_id LIMIT 1) = u.ID
-                 WHERE d.course_id = %d AND d.parent_id IS NULL AND d.status = 'published'
-                 ORDER BY d.is_pinned DESC, d.upvotes DESC, d.created_at DESC
-                 LIMIT 30",
-                $student->course_id
-            ));
-        }
-        
+        $threads = $wpdb->get_results($wpdb->prepare(
+            "SELECT d.*, u.display_name,
+                    (SELECT COUNT(*) FROM {$table} r WHERE r.parent_id = d.discussion_id AND r.status='published') as reply_count
+             FROM {$table} d
+             LEFT JOIN {$wpdb->users} u ON (SELECT user_id FROM {$wpdb->prefix}mtti_students WHERE student_id = d.student_id LIMIT 1) = u.ID
+             WHERE d.course_id = %d AND d.parent_id IS NULL AND d.status = 'published'
+             ORDER BY d.is_pinned DESC, d.upvotes DESC, d.created_at DESC
+             LIMIT 30",
+            $filter_course
+        ));
+
         $base = get_permalink();
         echo '<div class="mtti-chat-page">';
         echo '<div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px;margin-bottom:20px;">';
-        echo '<h2 class="mtti-page-title" style="margin:0;">💬 Study Chat — ' . esc_html($student->course_code) . '</h2>';
-        echo '<span style="font-size:12px;color:var(--text-muted);">' . esc_html($student->course_name) . '</span>';
+
+        // Get course name for header
+        $course_name = $wpdb->get_var($wpdb->prepare(
+            "SELECT course_name FROM {$wpdb->prefix}mtti_courses WHERE course_id = %d",
+            $filter_course
+        ));
+        $course_code = $wpdb->get_var($wpdb->prepare(
+            "SELECT course_code FROM {$wpdb->prefix}mtti_courses WHERE course_id = %d",
+            $filter_course
+        ));
+
+        echo '<h2 class="mtti-page-title" style="margin:0;">💬 Discussions — ' . esc_html($course_code) . '</h2>';
+        echo '<span style="font-size:12px;color:var(--text-muted);">' . esc_html($course_name) . '</span>';
         echo '</div>';
         
         // New post form
@@ -3824,9 +4540,476 @@ function mttiSubmitAttCode(nonce) {
         wp_send_json_success('Attendance marked — you are Present for today!');
     }
 
+    /* ══════════════════════════════════════════════════
+     *  LIVE CLASSES (Jitsi Meet)
+     * ══════════════════════════════════════════════════ */
+    private function render_live_classes($student) {
+        global $wpdb;
+        $p   = $wpdb->prefix;
+        $now = current_time('timestamp');
+
+        $course_ids = $this->get_enrolled_course_ids($student);
+        if (empty($course_ids)) {
+            echo '<div class="mtti-section-card"><p style="color:#888;text-align:center;padding:40px;">You are not enrolled in any courses yet.</p></div>';
+            return;
+        }
+
+        $placeholders = implode(',', array_fill(0, count($course_ids), '%d'));
+
+        $upcoming = $wpdb->get_results(
+            $wpdb->prepare(
+                "SELECT lc.*, c.course_name, c.course_code,
+                        u.display_name AS lecturer_name
+                 FROM {$p}mtti_live_classes lc
+                 LEFT JOIN {$p}mtti_courses c ON lc.course_id = c.course_id
+                 LEFT JOIN {$p}mtti_staff   s ON lc.staff_id  = s.staff_id
+                 LEFT JOIN {$wpdb->users}   u ON s.user_id    = u.ID
+                 WHERE lc.course_id IN ($placeholders)
+                   AND lc.status NOT IN ('Ended','Cancelled')
+                 ORDER BY lc.scheduled_date ASC",
+                ...$course_ids
+            )
+        );
+
+        $past = $wpdb->get_results(
+            $wpdb->prepare(
+                "SELECT lc.*, c.course_name, c.course_code,
+                        u.display_name AS lecturer_name
+                 FROM {$p}mtti_live_classes lc
+                 LEFT JOIN {$p}mtti_courses c ON lc.course_id = c.course_id
+                 LEFT JOIN {$p}mtti_staff   s ON lc.staff_id  = s.staff_id
+                 LEFT JOIN {$wpdb->users}   u ON s.user_id    = u.ID
+                 WHERE lc.course_id IN ($placeholders)
+                   AND lc.status IN ('Ended','Completed')
+                   AND lc.scheduled_date >= DATE_SUB(NOW(), INTERVAL 14 DAY)
+                 ORDER BY lc.scheduled_date DESC
+                 LIMIT 10",
+                ...$course_ids
+            )
+        );
+
+        echo '<div class="mtti-section-card">';
+        echo '<h2 class="mtti-section-title">🎥 Live Classes</h2>';
+        echo '<p style="color:#666;margin-bottom:20px;">Join live Jitsi sessions scheduled by your lecturer.</p>';
+
+        if (empty($upcoming) && empty($past)) {
+            echo '<div style="text-align:center;padding:50px 20px;color:#888;">
+                <div style="font-size:3rem;margin-bottom:12px;">📡</div>
+                <h3 style="margin-bottom:8px;color:#555;">No Live Classes Yet</h3>
+                <p>Your lecturer will schedule live sessions here. Check back soon!</p>
+            </div>';
+        } else {
+            if (!empty($upcoming)) {
+                echo '<h3 style="font-size:13px;font-weight:700;color:#777;text-transform:uppercase;letter-spacing:.6px;margin-bottom:12px;">Upcoming &amp; Live</h3>';
+                foreach ($upcoming as $cls) {
+                    $this->render_student_class_card($cls, $now, $student);
+                }
+            }
+            if (!empty($past)) {
+                echo '<h3 style="font-size:13px;font-weight:700;color:#777;text-transform:uppercase;letter-spacing:.6px;margin:24px 0 12px;">Recent Sessions</h3>';
+                foreach ($past as $cls) {
+                    $this->render_student_class_card($cls, $now, $student, true);
+                }
+            }
+        }
+        echo '</div>';
+
+        // Jitsi overlay modal
+        echo '
+        <div id="mtti-jitsi-modal" style="display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,.92);z-index:99999;flex-direction:column;">
+            <div style="display:flex;align-items:center;justify-content:space-between;padding:10px 16px;background:#1e293b;color:#fff;flex-shrink:0;">
+                <div style="display:flex;align-items:center;gap:10px;">
+                    <strong id="mtti-jitsi-title" style="font-size:15px;"></strong>
+                    <span style="background:#16a34a;color:#fff;padding:2px 10px;border-radius:20px;font-size:11px;font-weight:700;">&#11044; LIVE</span>
+                </div>
+                <button onclick="mttiCloseJitsi()" style="background:rgba(255,255,255,.15);color:#fff;border:none;padding:7px 16px;border-radius:6px;cursor:pointer;font-size:13px;font-weight:600;">✕ Leave</button>
+            </div>
+            <iframe id="mtti-jitsi-frame" style="flex:1;width:100%;border:none;" src="" allow="camera; microphone; display-capture; fullscreen; autoplay" allowfullscreen></iframe>
+        </div>
+        <script>
+        function mttiJoinClass(room, title, displayName) {
+            document.getElementById("mtti-jitsi-title").textContent = title;
+            document.getElementById("mtti-jitsi-modal").style.display = "flex";
+            document.getElementById("mtti-jitsi-frame").src =
+                "https://meet.jit.si/" + encodeURIComponent(room) +
+                "#userInfo.displayName=" + encodeURIComponent(displayName) +
+                "&config.startWithVideoMuted=true" +
+                "&config.startWithAudioMuted=false" +
+                "&config.prejoinPageEnabled=true" +
+                "&config.disableDeepLinking=true" +
+                "&interfaceConfig.SHOW_JITSI_WATERMARK=false";
+            document.body.style.overflow = "hidden";
+        }
+        function mttiCloseJitsi() {
+            document.getElementById("mtti-jitsi-frame").src = "";
+            document.getElementById("mtti-jitsi-modal").style.display = "none";
+            document.body.style.overflow = "";
+        }
+        </script>';
+    }
+
+    private function render_student_class_card($cls, $now, $student, $is_past = false) {
+        $start_ts  = strtotime($cls->scheduled_date);
+        $end_ts    = $start_ts + (intval($cls->duration_minutes) * 60);
+        $is_live   = ($cls->status === 'Live');
+        $joinable  = $is_live || ($now >= $start_ts - 600 && $now <= $end_ts + 1800);
+        $room_name = 'mtti-live-' . intval($cls->class_id);
+        $disp_name = esc_js($student->display_name ?? 'Student');
+
+        $border = $is_live ? 'border-left:4px solid #16a34a;' : '';
+        $opacity = $is_past ? 'opacity:.75;' : '';
+
+        echo '<div style="border:1px solid #e0e0e0;border-radius:10px;padding:16px 20px;margin-bottom:12px;background:#fff;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px;' . $border . $opacity . '">';
+
+        echo '<div style="flex:1;min-width:200px;">';
+        echo '<div style="display:flex;align-items:center;gap:8px;margin-bottom:4px;">';
+        echo '<strong style="font-size:15px;">' . esc_html($cls->title) . '</strong>';
+        if ($is_live) {
+            echo '<span style="background:#16a34a;color:#fff;padding:2px 8px;border-radius:20px;font-size:11px;font-weight:700;">&#11044; LIVE</span>';
+        }
+        echo '</div>';
+        echo '<div style="font-size:13px;color:#666;">' . esc_html($cls->course_name) . ' &bull; ' . esc_html($cls->lecturer_name ?: 'Lecturer') . '</div>';
+        echo '<div style="font-size:12px;color:#888;margin-top:4px;">&#128197; ' . esc_html(date('D, d M Y g:i A', $start_ts)) . ' EAT &bull; ' . intval($cls->duration_minutes) . ' min</div>';
+        if ($cls->description) {
+            echo '<div style="font-size:13px;color:#555;margin-top:5px;">' . esc_html($cls->description) . '</div>';
+        }
+        echo '</div>';
+
+        echo '<div style="flex-shrink:0;">';
+        if ($is_past) {
+            if ($cls->recording_link) {
+                echo '<a href="' . esc_url($cls->recording_link) . '" target="_blank" rel="noopener" style="display:inline-flex;align-items:center;gap:5px;padding:8px 16px;background:#1976D2;color:#fff;border-radius:7px;text-decoration:none;font-size:13px;font-weight:600;">&#9654; Watch Recording</a>';
+            } else {
+                echo '<span style="color:#aaa;font-size:13px;">Session ended</span>';
+            }
+        } elseif ($joinable) {
+            echo '<button onclick="mttiJoinClass(\'' . $room_name . '\',\'' . esc_js($cls->title) . '\',\'' . $disp_name . '\')" style="padding:10px 22px;background:#16a34a;color:#fff;border:none;border-radius:7px;font-size:14px;font-weight:700;cursor:pointer;display:inline-flex;align-items:center;gap:6px;">📹 Join Now</button>';
+        } else {
+            $diff = $start_ts - $now;
+            if ($diff > 0 && $diff < 3600) {
+                echo '<span style="font-size:13px;color:#f59e0b;font-weight:600;">In ' . round($diff / 60) . ' min</span>';
+            } elseif ($diff > 0 && $diff < 86400) {
+                $h = floor($diff / 3600);
+                $m = floor(($diff % 3600) / 60);
+                echo '<span style="font-size:13px;color:#999;">In ' . $h . 'h ' . $m . 'm</span>';
+            } else {
+                echo '<span style="font-size:13px;color:#bbb;">Scheduled</span>';
+            }
+        }
+        echo '</div>';
+        echo '</div>';
+    }
+
+    // ========== QUIZ SYSTEM ==========
+
+    private function render_quizzes($student) {
+        global $wpdb;
+
+        // Get enrolled courses with filter capability
+        $enrolled_courses = $this->get_enrolled_courses($student);
+        if (empty($enrolled_courses)) {
+            echo '<div class="mtti-message" style="padding: 20px; background: #f5f5f5; text-align: center;">Not enrolled in any courses yet.</div>';
+            return;
+        }
+
+        $filter_course = $this->render_course_filter($student, 'quizzes');
+        if (!$filter_course) {
+            return;
+        }
+
+        $quizzes = $wpdb->get_results($wpdb->prepare("
+            SELECT q.*, c.course_code, c.course_name
+            FROM {$wpdb->prefix}mtti_quizzes q
+            INNER JOIN {$wpdb->prefix}mtti_courses c ON q.course_id = c.course_id
+            WHERE q.course_id = %d AND q.status = 'Active'
+            ORDER BY q.created_at DESC
+        ", $filter_course));
+
+        $quizzes = $quizzes ?: array();
+
+        echo '<div class="mtti-quizzes-section">';
+        echo '<h2>Quizzes for ' . esc_html($wpdb->get_var($wpdb->prepare("SELECT course_name FROM {$wpdb->prefix}mtti_courses WHERE course_id = %d", $filter_course))) . '</h2>';
+
+        if (empty($quizzes)) {
+            echo '<div class="mtti-message" style="padding: 20px; background: #f5f5f5; text-align: center;">No quizzes available for this course yet.</div>';
+            echo '</div>';
+            return;
+        }
+
+        echo '<table class="mtti-table" style="width: 100%; margin-top: 20px;">';
+        echo '<thead><tr>';
+        echo '<th>Quiz</th>';
+        echo '<th>Type</th>';
+        echo '<th>Best Score</th>';
+        echo '<th>Status</th>';
+        echo '<th>Actions</th>';
+        echo '</tr></thead>';
+        echo '<tbody>';
+
+        foreach ($quizzes as $quiz) {
+            // Get latest attempt for this student
+            $latest = $wpdb->get_row($wpdb->prepare("
+                SELECT * FROM {$wpdb->prefix}mtti_quiz_attempts
+                WHERE quiz_id = %d AND student_id = %d
+                ORDER BY attempted_at DESC
+                LIMIT 1
+            ", $quiz->quiz_id, $student->student_id));
+
+            $attempts_count = intval($wpdb->get_var($wpdb->prepare("
+                SELECT COUNT(*) FROM {$wpdb->prefix}mtti_quiz_attempts
+                WHERE quiz_id = %d AND student_id = %d
+            ", $quiz->quiz_id, $student->student_id)));
+
+            // Determine if quiz can be retaken
+            $can_retake = ($quiz->max_attempts == 0 || $attempts_count < $quiz->max_attempts);
+
+            echo '<tr>';
+            echo '<td>';
+            echo '<strong>' . esc_html($quiz->title) . '</strong>';
+            if ($quiz->is_final) {
+                echo ' <span style="background: #0d9e3a; color: white; padding: 2px 6px; border-radius: 3px; font-size: 11px;">FINAL</span>';
+            }
+            echo '</td>';
+            echo '<td>' . ($quiz->time_limit_minutes ? esc_html($quiz->time_limit_minutes) . ' min' : '—') . '</td>';
+            echo '<td>';
+            if ($latest) {
+                $percentage = ($latest->total > 0) ? round(($latest->score / $latest->total) * 100) : 0;
+                $status_color = ($latest->passed) ? '#0d9e3a' : '#d92e25';
+                echo '<span style="color: ' . $status_color . '; font-weight: bold;">' . esc_html($latest->score) . '/' . esc_html($latest->total) . ' (' . $percentage . '%)</span>';
+                echo ' (' . esc_html($attempts_count) . ' attempt' . ($attempts_count != 1 ? 's' : '') . ')';
+            } else {
+                echo '—';
+            }
+            echo '</td>';
+            echo '<td>';
+            if ($latest && $latest->passed) {
+                echo '<span style="background: #0d9e3a; color: white; padding: 3px 8px; border-radius: 3px; font-size: 11px;">PASSED</span>';
+            } elseif ($latest) {
+                echo '<span style="background: #d92e25; color: white; padding: 3px 8px; border-radius: 3px; font-size: 11px;">FAILED</span>';
+            } else {
+                echo '<span style="background: #999; color: white; padding: 3px 8px; border-radius: 3px; font-size: 11px;">NOT STARTED</span>';
+            }
+            echo '</td>';
+            echo '<td>';
+            if ($can_retake || !$latest) {
+                echo '<button class="button button-small mtti-start-quiz" data-quiz-id="' . esc_attr($quiz->quiz_id) . '" data-quiz-title="' . esc_attr($quiz->title) . '">Start Quiz</button>';
+            } else {
+                echo '<span style="color: #999;">Max attempts reached</span>';
+            }
+            echo '</td>';
+            echo '</tr>';
+        }
+
+        echo '</tbody>';
+        echo '</table>';
+        echo '</div>';
+    }
+
+    public function ajax_start_quiz_attempt() {
+        if (!is_user_logged_in()) {
+            wp_send_json_error('Not logged in');
+        }
+
+        check_ajax_referer('mtti_quiz_nonce', 'nonce');
+
+        $quiz_id = intval($_POST['quiz_id']);
+        global $wpdb;
+
+        $quiz = $wpdb->get_row($wpdb->prepare("SELECT * FROM {$wpdb->prefix}mtti_quizzes WHERE quiz_id = %d", $quiz_id));
+        if (!$quiz) {
+            wp_send_json_error('Quiz not found');
+        }
+
+        // Get questions without answer keys
+        $questions = $wpdb->get_results($wpdb->prepare("
+            SELECT question_id, quiz_id, question_text, question_type, options, points, order_number, explanation
+            FROM {$wpdb->prefix}mtti_quiz_questions
+            WHERE quiz_id = %d AND status = 'Active'
+            ORDER BY order_number ASC
+        ", $quiz_id));
+
+        // Shuffle if enabled
+        if ($quiz->shuffle_questions) {
+            shuffle($questions);
+        }
+
+        // Generate attempt token (unique per attempt)
+        $student = wp_get_current_user();
+        $attempt_token = wp_generate_password(32, false);
+
+        // Store token in transient for 1 hour
+        set_transient('mtti_quiz_attempt_' . $attempt_token, array(
+            'quiz_id'    => $quiz_id,
+            'student_id' => $student->ID,
+            'started_at' => time(),
+        ), HOUR_IN_SECONDS);
+
+        wp_send_json_success(array(
+            'quiz'           => $quiz,
+            'questions'      => $questions,
+            'attempt_token'  => $attempt_token,
+            'time_limit'     => $quiz->time_limit_minutes ?: null,
+        ));
+    }
+
+    public function ajax_submit_quiz_attempt() {
+        if (!is_user_logged_in()) {
+            wp_send_json_error('Not logged in');
+        }
+
+        check_ajax_referer('mtti_quiz_nonce', 'nonce');
+
+        global $wpdb;
+        $student = wp_get_current_user();
+        $quiz_id = intval($_POST['quiz_id']);
+        $answers = isset($_POST['answers']) ? json_decode(stripslashes($_POST['answers']), true) : array();
+        $attempt_token = sanitize_text_field($_POST['attempt_token']);
+
+        // Validate attempt token
+        $attempt_data = get_transient('mtti_quiz_attempt_' . $attempt_token);
+        if (!$attempt_data || $attempt_data['quiz_id'] != $quiz_id || $attempt_data['student_id'] != $student->ID) {
+            wp_send_json_error('Invalid attempt');
+        }
+
+        // Get quiz details
+        $quiz = $wpdb->get_row($wpdb->prepare("SELECT * FROM {$wpdb->prefix}mtti_quizzes WHERE quiz_id = %d", $quiz_id));
+        if (!$quiz) {
+            wp_send_json_error('Quiz not found');
+        }
+
+        // Get all questions with correct answers
+        $questions = $wpdb->get_results($wpdb->prepare("
+            SELECT * FROM {$wpdb->prefix}mtti_quiz_questions
+            WHERE quiz_id = %d AND status = 'Active'
+        ", $quiz_id), OBJECT_K);
+
+        // Grade the quiz server-side
+        $total_points = 0;
+        $earned_points = 0;
+        $question_results = array();
+
+        foreach ($questions as $q) {
+            $total_points += floatval($q->points);
+
+            $submitted_answer = isset($answers[$q->question_id]) ? $answers[$q->question_id] : null;
+            $correct_answer = json_decode($q->correct_answer, true) ?: $q->correct_answer;
+
+            $is_correct = false;
+
+            // Grade based on question type
+            if ($q->question_type === 'mcq') {
+                $submitted_index = intval($submitted_answer);
+                $is_correct = ($submitted_index === $correct_answer);
+            } elseif ($q->question_type === 'true_false') {
+                $is_correct = (strtolower($submitted_answer) === strtolower($correct_answer));
+            } elseif ($q->question_type === 'fill_blank') {
+                // Case-insensitive, partial match (check if answer contains correct substring)
+                $is_correct = (stripos(strtolower($submitted_answer), strtolower($correct_answer)) !== false);
+            }
+
+            if ($is_correct) {
+                $earned_points += floatval($q->points);
+            }
+
+            $question_results[$q->question_id] = array(
+                'correct'     => $is_correct,
+                'explanation' => $q->explanation,
+            );
+        }
+
+        // Calculate percentage and if passed
+        $percentage = ($total_points > 0) ? ($earned_points / $total_points) * 100 : 0;
+        $passed = ($percentage >= floatval($quiz->pass_mark));
+
+        // Count existing attempts
+        $attempt_number = intval($wpdb->get_var($wpdb->prepare("
+            SELECT COUNT(*) + 1 FROM {$wpdb->prefix}mtti_quiz_attempts
+            WHERE quiz_id = %d AND student_id = %d
+        ", $quiz_id, $student->ID)));
+
+        // Insert attempt record
+        $wpdb->insert(
+            $wpdb->prefix . 'mtti_quiz_attempts',
+            array(
+                'quiz_id'        => $quiz_id,
+                'student_id'     => $student->ID,
+                'score'          => $earned_points,
+                'total'          => $total_points,
+                'percent'        => $percentage,
+                'answers'        => json_encode($answers),
+                'passed'         => $passed ? 1 : 0,
+                'attempt_number' => $attempt_number,
+                'attempted_at'   => current_time('mysql'),
+            ),
+            array('%d', '%d', '%f', '%f', '%f', '%s', '%d', '%d', '%s')
+        );
+
+        // If passed and is_final, auto-complete unit
+        if ($passed && $quiz->is_final && $quiz->unit_id) {
+            $wpdb->insert(
+                $wpdb->prefix . 'mtti_unit_results',
+                array(
+                    'unit_id'    => $quiz->unit_id,
+                    'student_id' => $student->ID,
+                    'score'      => $earned_points,
+                    'percentage' => $percentage,
+                    'grade'      => ($percentage >= 80) ? 'A' : (($percentage >= 70) ? 'B' : (($percentage >= 60) ? 'C' : 'D')),
+                    'passed'     => 1,
+                    'remarks'    => 'Auto-graded from quiz: ' . $quiz->title,
+                ),
+                array('%d', '%d', '%f', '%f', '%s', '%d', '%s'),
+                array(
+                    'unit_id, student_id' => array('values' => array($quiz->unit_id, $student->ID), 'compare' => '=', 'type' => 'AND'),
+                ),
+                false
+            );
+
+            // Use proper UPSERT for unit_results
+            $wpdb->query($wpdb->prepare("
+                INSERT INTO {$wpdb->prefix}mtti_unit_results (unit_id, student_id, score, percentage, grade, passed, remarks)
+                VALUES (%d, %d, %f, %f, %s, %d, %s)
+                ON DUPLICATE KEY UPDATE
+                score = VALUES(score),
+                percentage = VALUES(percentage),
+                grade = VALUES(grade),
+                passed = VALUES(passed),
+                remarks = VALUES(remarks)
+            ", $quiz->unit_id, $student->ID, $earned_points, $percentage,
+                ($percentage >= 80) ? 'A' : (($percentage >= 70) ? 'B' : (($percentage >= 60) ? 'C' : 'D')),
+                1,
+                'Auto-graded from quiz: ' . $quiz->title
+            ));
+        }
+
+        // Clean up attempt token
+        delete_transient('mtti_quiz_attempt_' . $attempt_token);
+
+        wp_send_json_success(array(
+            'passed'               => $passed,
+            'score'                => $earned_points,
+            'total'                => $total_points,
+            'percentage'           => round($percentage, 2),
+            'pass_mark'            => $quiz->pass_mark,
+            'question_results'     => $question_results,
+            'auto_completed_unit'  => ($passed && $quiz->is_final && $quiz->unit_id),
+        ));
+    }
+
 } // end class MTTI_MIS_Learner_Portal
 
 } // end if (!class_exists)
+
+// Must run before WP decides whether to hook the admin bar's render/bump
+// callbacks — 'init' priority 10 (where the portal class itself loads) is
+// already too late, since WP's own admin-bar setup runs earlier than that.
+// 'after_setup_theme' is what WP core's own docs recommend for
+// show_admin_bar()/this filter specifically for that reason.
+add_action('after_setup_theme', function() {
+    $uri = $_SERVER['REQUEST_URI'] ?? '';
+    if (strpos($uri, 'student-portal') !== false || isset($_GET['mtti_portal'])) {
+        add_filter('show_admin_bar', '__return_false');
+    }
+});
 
 add_action('init', function() {
     MTTI_MIS_Learner_Portal::get_instance();

@@ -1,17 +1,20 @@
 <?php
 /**
- * Front to the WordPress application. This file doesn't do anything, but loads
- * wp-blog-header.php which does and tells WordPress to load the theme.
+ * Front to the WordPress application.
+ * Serves index.html for homepage, WordPress for everything else.
  *
  * @package WordPress
  */
 
-/**
- * Tells WordPress to load the WordPress theme and output it.
- *
- * @var bool
- */
-define( 'WP_USE_THEMES', true );
+// If this is the homepage request, serve index.html
+$request_uri = $_SERVER['REQUEST_URI'];
+if ($request_uri === '/' || $request_uri === '/index.php' || $request_uri === '/index.html') {
+    if (file_exists(__DIR__ . '/index.html')) {
+        readfile(__DIR__ . '/index.html');
+        exit;
+    }
+}
 
-/** Loads the WordPress Environment and Template */
+// Everything else goes through WordPress
+define('WP_USE_THEMES', true);
 require __DIR__ . '/wp-blog-header.php';

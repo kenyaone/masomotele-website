@@ -569,7 +569,7 @@ class MTTI_MIS_Admin_Lessons {
                     <?php if (!$quiz_filter) : ?>
                     <select name="content_type">
                         <option value="">All Types</option>
-                        <?php foreach (['video'=>'🎬 Video','pdf'=>'📕 PDF','document'=>'📘 Document','presentation'=>'📙 Presentation','audio'=>'🎵 Audio','text'=>'📝 Text','file'=>'📄 File'] as $val=>$label) : ?>
+                        <?php foreach (['video'=>'🎬 Video','pdf'=>'📕 PDF','document'=>'📘 Document','presentation'=>'📙 Presentation','audio'=>'🎵 Audio','text'=>'📝 Text','file'=>'📄 File','objectives'=>'🎯 Objectives'] as $val=>$label) : ?>
                         <option value="<?php echo $val; ?>" <?php selected($type_filter, $val); ?>><?php echo $label; ?></option>
                         <?php endforeach; ?>
                     </select>

@@ -46,8 +46,14 @@ class MTTI_MIS_Upgrader {
             self::upgrade_to_7_4_0();
         }
 
+        // Add interactive_role to lessons — distinguishes theory/practical/quiz
+        // steps within a sequential-gated course (e.g. SMD-01's course-player rebuild)
+        if (version_compare($current_version, '7.5.0', '<')) {
+            self::upgrade_to_7_5_0();
+        }
+
         // Update database version
-        update_option('mtti_mis_db_version', '7.4.0');
+        update_option('mtti_mis_db_version', '7.5.0');
     }
     
     /**
@@ -381,5 +387,29 @@ class MTTI_MIS_Upgrader {
         }
 
         error_log('MTTI MIS: Database upgraded to version 7.4.0 - Created quiz system (mtti_quizzes, mtti_quiz_questions, mtti_discussion_votes) and extended mtti_quiz_attempts');
+    }
+
+    /**
+     * Add interactive_role to lessons — nullable, only set on
+     * content_type='html_interactive' rows to distinguish which step of a
+     * sequential-gated course a lesson is (theory view-based vs quiz
+     * attempt-based completion), without touching content_type itself so
+     * mtti_mis_serve_interactive() and existing curriculum-stat queries
+     * that match content_type='html_interactive' need no changes.
+     */
+    private static function upgrade_to_7_5_0() {
+        global $wpdb;
+        $lessons_table = $wpdb->prefix . 'mtti_lessons';
+        $columns = $wpdb->get_results("SHOW COLUMNS FROM {$lessons_table}");
+        $column_names = array();
+        foreach ($columns as $column) {
+            $column_names[] = $column->Field;
+        }
+
+        if (!in_array('interactive_role', $column_names)) {
+            $wpdb->query("ALTER TABLE {$lessons_table} ADD COLUMN interactive_role ENUM('theory','practical','quiz') NULL AFTER content_type");
+        }
+
+        error_log('MTTI MIS: Database upgraded to version 7.5.0 - Added mtti_lessons.interactive_role');
     }
 }

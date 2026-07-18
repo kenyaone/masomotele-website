@@ -1673,9 +1673,12 @@ function mtti_mis_serve_interactive() {
             "SELECT student_id FROM {$wpdb->prefix}mtti_students WHERE user_id = %d LIMIT 1",
             get_current_user_id()
         )) : 0;
+        // 'Completed' is included so a student who finished this course can
+        // still open its interactive content to review it — must stay in
+        // sync with get_enrolled_course_ids() in the learner portal class.
         $is_enrolled = $student_id && $wpdb->get_var($wpdb->prepare(
             "SELECT 1 FROM {$wpdb->prefix}mtti_enrollments
-             WHERE student_id = %d AND course_id = %d AND status IN ('Active','Enrolled','In Progress')
+             WHERE student_id = %d AND course_id = %d AND status IN ('Active','Enrolled','In Progress','Completed')
              LIMIT 1",
             $student_id, $lesson->course_id
         ));
@@ -1829,6 +1832,13 @@ function mtti_mis_maybe_complete_unit($unit_id, $student_id) {
 // ============================================================
 
 function mtti_mis_save_quiz_score() {
+    // Reuses the same nonce already localized to the portal as
+    // mttiPortal.quizNonce (mtti_quiz_nonce action) — without this check,
+    // any client could POST a fabricated score/lesson_id here directly and
+    // fake a passing quiz_attempts row, bypassing the sequential
+    // "complete the previous step" lesson gate in prerequisite_satisfied().
+    check_ajax_referer('mtti_quiz_nonce', 'nonce');
+
     // Accept score, total, percent, lesson_id posted from iframe via postMessage relay
     $lesson_id  = intval($_POST['lesson_id'] ?? 0);
     $score      = floatval($_POST['score']     ?? 0);

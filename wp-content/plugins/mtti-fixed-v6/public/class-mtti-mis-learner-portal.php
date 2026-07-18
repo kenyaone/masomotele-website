@@ -308,6 +308,7 @@ class MTTI_MIS_Learner_Portal {
 
         var fd = new FormData();
         fd.append("action",    "mtti_save_quiz_score");
+        fd.append("nonce",     mttiPortal.quizNonce);
         fd.append("lesson_id", lessonId);
         fd.append("score",     d.score   || 0);
         fd.append("total",     d.total   || 0);
@@ -479,10 +480,14 @@ function mttiToggleFullscreen(btn){
                 "SELECT course_id FROM {$wpdb->prefix}mtti_courses WHERE status = 'Active' AND is_active = 1 AND deleted_at IS NULL"
             ));
         }
+        // 'Completed' is included so a student who has finished a course can
+        // still review its lessons — excluding it locked out every student
+        // who ever completed a course with "Access Denied", even though
+        // they legitimately paid for and finished it.
         $ids = $wpdb->get_col($wpdb->prepare(
             "SELECT DISTINCT e.course_id
              FROM {$wpdb->prefix}mtti_enrollments e
-             WHERE e.student_id = %d AND e.status IN ('Active', 'Enrolled', 'In Progress')",
+             WHERE e.student_id = %d AND e.status IN ('Active', 'Enrolled', 'In Progress', 'Completed')",
             $student->student_id
         ));
         // Always include the primary course_id if set
@@ -515,7 +520,7 @@ function mttiToggleFullscreen(btn){
             "SELECT c.course_id, c.course_name, c.course_code
              FROM {$wpdb->prefix}mtti_enrollments e
              JOIN {$wpdb->prefix}mtti_courses c ON e.course_id = c.course_id
-             WHERE e.student_id = %d AND e.status IN ('Active', 'Enrolled', 'In Progress')
+             WHERE e.student_id = %d AND e.status IN ('Active', 'Enrolled', 'In Progress', 'Completed')
              ORDER BY e.enrollment_date DESC",
             $student->student_id
         ));
@@ -1290,12 +1295,13 @@ function mttiToggleFullscreen(btn){
     private function render_courses($student) {
         global $wpdb;
         
-        // Get ALL enrolled courses for this student (not just primary course)
+        // Get ALL enrolled courses for this student (not just primary course),
+        // including 'Completed' so a finished course still shows up here.
         $enrolled_courses = $wpdb->get_results($wpdb->prepare(
             "SELECT c.*, e.enrollment_date, e.status as enrollment_status
              FROM {$wpdb->prefix}mtti_enrollments e
              JOIN {$wpdb->prefix}mtti_courses c ON e.course_id = c.course_id
-             WHERE e.student_id = %d AND e.status IN ('Active', 'Enrolled', 'In Progress')
+             WHERE e.student_id = %d AND e.status IN ('Active', 'Enrolled', 'In Progress', 'Completed')
              ORDER BY e.enrollment_date DESC",
             $student->student_id
         ));

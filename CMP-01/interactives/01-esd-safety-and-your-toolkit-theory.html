@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ESD Safety and Your Toolkit</title>
+<link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Fredoka:wght@500;600&display=swap" rel="stylesheet">
+<style>
+* { margin:0; padding:0; box-sizing:border-box; }
+body { font-family:'Segoe UI', -apple-system, sans-serif; line-height:1.6; color:#1e293b; background:#f8fafc; }
+.container { max-width:1000px; margin:0 auto; padding:20px; }
+header { background:linear-gradient(135deg,#387633,#259BD7); color:#fff; padding:36px 30px; border-radius:12px; margin-bottom:22px; box-shadow:0 10px 30px rgba(56,118,51,0.25); }
+header .badge { display:inline-block; background:rgba(255,255,255,0.2); padding:4px 14px; border-radius:16px; font-size:12px; font-weight:bold; letter-spacing:1px; margin-bottom:12px; }
+header h1 { font-size:30px; margin-bottom:8px; }
+section { background:#fff; border:1px solid #e2e8f0; border-radius:10px; padding:24px 28px; margin-bottom:20px; }
+section h2 { color:#387633; font-size:21px; margin-bottom:12px; padding-bottom:8px; border-bottom:3px solid #387633; }
+section h3 { color:#0f172a; font-size:16px; margin:16px 0 8px; }
+section p { margin-bottom:12px; }
+section ul, section ol { padding-left:22px; margin-bottom:12px; }
+section li { margin-bottom:5px; }
+.callout { border-left:5px solid #387633; background:#e8f5e9; padding:14px 18px; margin:14px 0; border-radius:4px; }
+.callout.tip { border-left-color:#059669; background:#ecfdf5; }
+.callout.warn { border-left-color:#dc2626; background:#fef2f2; }
+.callout strong { color:#1B5E20; }
+.callout.tip strong { color:#065f46; }
+.callout.warn strong { color:#991b1b; }
+.tech-card { background:linear-gradient(135deg,#fef3c7,#fde68a); border-radius:10px; padding:16px 20px; display:flex; gap:14px; align-items:flex-start; margin:14px 0; }
+.tech-avatar { width:52px; height:52px; border-radius:50%; background:#387633; color:#fff; display:flex; align-items:center; justify-content:center; font-size:22px; font-weight:bold; flex-shrink:0; }
+.tech-card p { color:#259BD7; margin:0; font-size:14px; }
+table { width:100%; border-collapse:collapse; margin:14px 0; font-size:13.5px; }
+th { background:#e8f5e9; color:#1B5E20; padding:9px 10px; text-align:left; border:1px solid #c8e6c9; }
+td { padding:9px 10px; border:1px solid #e2e8f0; }
+tr:nth-child(even) td { background:#f8fafc; }
+</style>
+</head>
+<body>
+<div class="container">
+<header><div class="badge">Lesson</div><h1>ESD Safety and Your Toolkit</h1></header>
+<div class="callout warn"><strong>Physical practicum required.</strong> This step teaches the judgement and correct sequence for a real hands-on repair task. To be certified competent in the physical technique itself (not just the decision-making), you must complete a supervised in-person practicum session — this online step alone does not certify hands-on ability.</div><section><h2>1. What is ESD, really?</h2><p>Electrostatic discharge (ESD) is a sudden flow of static electricity between two objects at different electrical potential. The human body can build up thousands of volts of static charge just from walking across a carpeted floor — far more than the roughly 100 volts needed to silently damage a modern CPU, RAM module or motherboard. Most ESD damage is <strong>invisible</strong>: the component doesn't die immediately, its lifespan is just quietly shortened.</p><div class="callout warn"><strong>The scary part:</strong> a static discharge below about 3,000 volts is too small for a human to even feel — but it's already enough to damage sensitive electronics.</div></section><section><h2>2. ESD protection equipment</h2><table><tr><th>Item</th><th>Purpose</th></tr><tr><td>Anti-static wrist strap</td><td>Clips to a grounded point (e.g. an unpainted metal part of the case); keeps your body at the same electrical potential as the components you touch.</td></tr><tr><td>Anti-static mat</td><td>A grounded work surface to rest components on.</td></tr><tr><td>Anti-static bags</td><td>Store spare RAM, cards and drives in these — never on a plastic table or carpet.</td></tr></table><div class="tech-card"><div class="tech-avatar">P</div><p>Peter's rule at Rafiki Computer Clinic: no wrist strap, no case opening — even for a 2-minute RAM check. It takes 10 seconds to clip on and it's the difference between a quick fix and an expensive mistake.</p></div></section><section><h2>3. The core toolkit</h2><ul><li><strong>Phillips-head screwdrivers</strong> (multiple sizes) — most case and component screws</li><li><strong>Precision/spudger set</strong> — for prying open laptop cases and disconnecting delicate ribbon cables without cracking plastic clips</li><li><strong>Thermal paste</strong> — reapplied whenever a CPU cooler is removed</li><li><strong>Cable ties / velcro straps</strong> — for tidy, airflow-friendly cable management</li><li><strong>Compressed air / soft brush</strong> — dust removal without static risk (never use a vacuum cleaner directly on internals — it generates static)</li><li><strong>Multimeter</strong> — testing PSU output voltages, continuity checks</li></ul></section><section><h2>4. Pre-repair checklist</h2><ol><li>Power off and fully unplug the machine (don't just switch off at the wall — physically unplug)</li><li>Press and hold the power button for 5 seconds to discharge any residual capacitor charge</li><li>Put on your anti-static wrist strap and clip it to bare metal on the case</li><li>Work on an anti-static mat if available</li><li>Never touch the gold connector edges of RAM or expansion cards directly</li></ol></section>
+</div>
+</body>
+</html>

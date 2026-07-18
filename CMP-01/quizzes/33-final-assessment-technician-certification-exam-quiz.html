@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CMP-01 Final Assessment</title>
+<link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Fredoka:wght@500;600&display=swap" rel="stylesheet">
+<style>
+* { margin:0; padding:0; box-sizing:border-box; }
+body { font-family:'Space Mono', monospace; background:linear-gradient(135deg,#667eea 0%,#764ba2 100%); min-height:100vh; padding:20px; color:#fff; }
+.container { max-width:900px; margin:0 auto; }
+.header { text-align:center; margin-bottom:30px; }
+.header .lesson-tag { display:inline-block; background:rgba(255,255,255,0.2); padding:6px 16px; border-radius:999px; font-size:0.85em; margin-bottom:12px; }
+.header h1 { font-family:'Fredoka', sans-serif; font-size:2.2em; margin-bottom:8px; text-shadow:3px 3px 0 rgba(0,0,0,0.2); }
+.score-board { background:rgba(255,255,255,0.15); backdrop-filter:blur(10px); border-radius:20px; padding:20px; margin-bottom:20px; display:flex; justify-content:space-around; }
+.score-item { text-align:center; }
+.score-item .label { font-size:0.85em; opacity:0.9; margin-bottom:4px; }
+.score-item .value { font-size:1.8em; font-weight:bold; font-family:'Fredoka', sans-serif; }
+.progress-bar { width:100%; height:8px; background:rgba(255,255,255,0.3); border-radius:10px; margin-bottom:25px; overflow:hidden; }
+.progress-fill { height:100%; background:linear-gradient(90deg,#fbbf24 0%,#f59e0b 100%); border-radius:10px; transition:width 0.5s ease; width:0%; }
+.exercise-card { background:white; color:#333; border-radius:25px; padding:35px; margin-bottom:20px; box-shadow:0 20px 60px rgba(0,0,0,0.3); }
+.question { font-size:1.15em; margin-bottom:20px; font-weight:700; line-height:1.4; }
+.options { display:flex; flex-direction:column; gap:12px; }
+.option { background:#f5f7fb; border:2px solid transparent; padding:16px 20px; border-radius:12px; cursor:pointer; transition:all 0.2s ease; font-family:'Space Mono', monospace; font-size:0.98em; text-align:left; }
+.option:hover:not(.disabled) { background:#eef1fb; border-color:#667eea; transform:translateX(4px); }
+.option.correct { background:#d4edda; border-color:#28a745; color:#155724; }
+.option.wrong { background:#f8d7da; border-color:#dc3545; color:#721c24; }
+.option.disabled { cursor:not-allowed; opacity:0.85; }
+.feedback { margin-top:22px; padding:18px 22px; border-radius:12px; font-size:0.98em; line-height:1.5; }
+.feedback.correct { background:#d4edda; color:#155724; border-left:4px solid #28a745; }
+.feedback.wrong { background:#f8d7da; color:#721c24; border-left:4px solid #dc3545; }
+.next-btn, .restart-btn { margin-top:20px; background:linear-gradient(135deg,#667eea 0%,#764ba2 100%); color:white; border:none; padding:14px 32px; border-radius:12px; font-size:1em; cursor:pointer; font-family:'Fredoka', sans-serif; box-shadow:0 6px 18px rgba(0,0,0,0.2); }
+.results { text-align:center; padding:25px 15px; }
+.results h2 { font-family:'Fredoka', sans-serif; font-size:2em; margin-bottom:12px; color:#333; }
+.results .final-score { font-size:3em; font-family:'Fredoka', sans-serif; color:#667eea; margin:20px 0; }
+.badge { display:inline-block; font-size:3.5em; margin:8px 0; }
+</style>
+</head>
+<body>
+<div class="container">
+<div class="header"><div class="lesson-tag">Final Assessment - Quiz</div><h1>CMP-01 Final Assessment</h1></div>
+<div class="score-board">
+<div class="score-item"><div class="label">Score</div><div class="value" id="score">0</div></div>
+<div class="score-item"><div class="label">Question</div><div class="value"><span id="current">1</span>/<span id="total">10</span></div></div>
+<div class="score-item"><div class="label">Streak</div><div class="value" id="streak">0</div></div>
+</div>
+<div class="progress-bar"><div class="progress-fill" id="progress"></div></div>
+<div class="exercise-card" id="exerciseCard"></div>
+</div>
+<script>
+const exercises = [{"id":"q1","text":"What is the recommended first step before opening any computer case for repair work?","options":["Immediately begin removing components","Power off, unplug, discharge residual power, and put on anti-static protection","Update the operating system","Call the customer for permission on every single step"],"answer":0,"explanation":"Full power-down, discharge, and ESD precautions are the mandatory first step before any internal hardware work, covered at the very start of this course."},{"id":"q2","text":"What does a bulging or domed capacitor on a motherboard typically indicate?","options":["Normal healthy operation","A likely failing component, a reliable visual sign of motherboard trouble","A cosmetic design choice with no significance","That the board is brand new"],"answer":1,"explanation":"Bulging capacitors are one of the most reliable visual indicators of motherboard failure."},{"id":"q3","text":"In a true no-power symptom, with no fans, no lights, and no beeps at all, what is a sensible cheap first check?","options":["Immediately replace the motherboard","The wall outlet and the PSU's own rear power switch","Reinstall the operating system","Replace the CPU"],"answer":1,"explanation":"Cheap, fast checks like the outlet and PSU switch come first in the troubleshooting process and catch some of the most common real-world causes."},{"id":"q4","text":"What does a successful POST confirm?","options":["That the operating system is fully healthy and will definitely boot","That core hardware like the CPU, RAM and graphics output are minimally present and functioning","That every storage drive is error-free","Nothing meaningful at all"],"answer":1,"explanation":"POST is strictly a hardware-level check run before the OS loads -- it does not guarantee OS-level health."},{"id":"q5","text":"What does S.M.A.R.T. data on a drive report?","options":["The drive's colour and brand only","Self-reported health attributes, often warning of failure before symptoms appear","Nothing useful for diagnostics","Only the drive's storage capacity"],"answer":1,"explanation":"SMART attributes are the drive's own early-warning health telemetry."},{"id":"q6","text":"What happens if two RAM sticks are installed in the wrong slot pairing for dual-channel mode?","options":["The system will not boot at all","The system still works, but silently drops back to single-channel performance","The RAM is permanently damaged","Nothing changes at all"],"answer":1,"explanation":"Incorrect slot pairing does not stop the system working, it just loses the dual-channel performance benefit."},{"id":"q7","text":"What is a likely cause when a GPU works fine at idle but crashes only under demanding gaming load?","options":["The case colour","Insufficient or unstable power delivery to the GPU","The keyboard layout","The printer driver"],"answer":1,"explanation":"Load-dependent failures commonly point toward power delivery issues to the GPU."},{"id":"q8","text":"Why does dust reduce cooling effectiveness even if a fan still spins normally?","options":["Dust has no real effect on cooling","Dust insulates heatsink fins and blocks airflow, reducing effective heat transfer","Dust makes fans spin faster","Dust only affects the power supply"],"answer":1,"explanation":"Dust physically blocks airflow and insulates against heat transfer even while the fan itself keeps spinning."},{"id":"q9","text":"What connection type does an NVMe SSD use?","options":["A SATA data and power cable, like an HDD","Directly into an M.2 slot on the motherboard, with no cables","A USB cable only","A PCIe expansion card slot, always"],"answer":1,"explanation":"NVMe SSDs plug directly into a dedicated M.2 slot with no separate cabling."},{"id":"q10","text":"What does cloning a drive accomplish that a fresh install does not?","options":["It erases all data permanently","It duplicates the entire working drive, OS and programs included, with no reinstallation needed","It only copies documents, nothing else","It is identical to a fresh Windows install"],"answer":1,"explanation":"Cloning preserves the exact working state of the source drive."},{"id":"q11","text":"What does the 3-2-1 backup rule recommend?","options":["3 copies on the same drive, checked twice a year","At least 3 copies of data, on 2 different types of media, with 1 copy off-site","1 copy is always enough if it is recent","3 different cloud services and nothing else"],"answer":1,"explanation":"The 3-2-1 rule protects against multiple failure types at once by spreading copies across media and location."},{"id":"q12","text":"What does a clicking or grinding noise from a hard drive typically suggest?","options":["Normal, healthy operation","Physical failure, often requiring specialised recovery rather than in-shop tools","A simple software glitch, easily fixed with a restart","A sign the drive needs to be used more, not less"],"answer":1,"explanation":"Unusual mechanical noises strongly indicate physical hardware failure needing specialised handling."},{"id":"q13","text":"Which BIOS/UEFI section controls the order in which devices are tried for booting?","options":["Main","Boot","Security","Exit"],"answer":1,"explanation":"The Boot section specifically manages boot order and boot device settings."},{"id":"q14","text":"What is required for Secure Boot to function at all?","options":["Legacy/CSM boot mode","UEFI boot mode","A mechanical hard drive specifically","A BIOS password"],"answer":1,"explanation":"Secure Boot is a UEFI feature requiring UEFI boot mode."},{"id":"q15","text":"Why is the drive selection screen considered the highest-risk step during a Windows installation?","options":["It has no real risk at all","With multiple drives connected, selecting the wrong one can permanently erase data meant to be kept","It only affects cosmetic settings","This step cannot be undone even with a backup"],"answer":1,"explanation":"A wrong drive selection during install can permanently wipe data that was never meant to be touched."},{"id":"q16","text":"When is rolling back a driver a sensible troubleshooting step?","options":["Never, drivers should only ever be updated, not rolled back","When a problem started right after a driver update, since the previous version was known to work","Only for printers, never for other hardware","Rolling back is always worse than a clean reinstall"],"answer":1,"explanation":"Timing right after an update is a strong clue that rolling back the driver may resolve the issue."},{"id":"q17","text":"Why is a visibly swollen lithium laptop battery treated as a safety concern?","options":["Swelling is purely cosmetic with no real risk","Damaged lithium batteries can pose a genuine fire risk and should be handled carefully","Swollen batteries always still work perfectly fine","This only matters for desktop batteries, not laptops"],"answer":1,"explanation":"Swelling indicates internal damage carrying real fire risk, requiring careful handling and proper disposal."},{"id":"q18","text":"What is the swap-test technique used for?","options":["Replacing the entire motherboard to test one connector","Swapping a suspect cable or component for a known-working one, to see if the problem follows or disappears","Formatting the drive being tested","Reinstalling the operating system"],"answer":1,"explanation":"Swap-testing directly isolates a suspect cable or component by substitution, one of the fastest diagnostic techniques covered in this course."},{"id":"q19","text":"What does 'confidently wrong' describe, in the context of using AI assistants for repair advice?","options":["AI assistants that refuse to answer any question","AI producing fluent, confident-sounding text that is nonetheless factually incorrect","A type of hardware failure","A specific BIOS setting"],"answer":1,"explanation":"Fluent, confident wording is not itself evidence of accuracy -- AI-suggested causes still need independent verification."},{"id":"q20","text":"What is a recommended response to urgency in a suspicious, unsolicited tech-support call?","options":["Act on it immediately, since urgency proves it is genuine","Resist letting urgency alone drive a decision, and pause to independently verify first","Ignore every phone call permanently, including legitimate ones","Urgency should always be rewarded with immediate payment"],"answer":1,"explanation":"Urgency is a classic manipulation tactic -- a genuine issue can withstand a brief pause for independent verification."}];
+let currentQuestion = 0, score = 0, streak = 0, answered = false;
+function updateScoreboard() {
+    document.getElementById('score').textContent = score;
+    document.getElementById('current').textContent = Math.min(currentQuestion + 1, exercises.length);
+    document.getElementById('total').textContent = exercises.length;
+    document.getElementById('streak').textContent = streak;
+    document.getElementById('progress').style.width = ((currentQuestion) / exercises.length) * 100 + '%';
+}
+function escapeHtml(s) { return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+function renderQuestion() {
+    answered = false;
+    const q = exercises[currentQuestion];
+    let html = '';
+    if (q.scenario) html += `<div class="feedback" style="background:#eef1fb;border-left:4px solid #f59e0b;margin-top:0;margin-bottom:20px;"><strong>Scenario.</strong> ${escapeHtml(q.scenario)}</div>`;
+    html += `<div class="question">${escapeHtml(q.text)}</div><div class="options">`;
+    q.options.forEach((o, i) => { html += `<button class="option" onclick="selectAnswer(${i})">${escapeHtml(o)}</button>`; });
+    html += '</div>';
+    document.getElementById('exerciseCard').innerHTML = html;
+    updateScoreboard();
+}
+function selectAnswer(i) {
+    if (answered) return;
+    answered = true;
+    const q = exercises[currentQuestion];
+    const btns = document.querySelectorAll('.option');
+    btns.forEach(b => b.classList.add('disabled'));
+    btns[q.answer].classList.add('correct');
+    const right = i === q.answer;
+    if (!right) btns[i].classList.add('wrong');
+    if (right) { score += 10; streak += 1; } else { streak = 0; }
+    const fb = document.createElement('div');
+    fb.className = 'feedback ' + (right ? 'correct' : 'wrong');
+    fb.innerHTML = `<strong>${right ? '✅ Correct.' : '❌ Not quite.'}</strong><br>${escapeHtml(q.explanation)}`;
+    document.getElementById('exerciseCard').appendChild(fb);
+    const nb = document.createElement('button');
+    nb.className = 'next-btn';
+    nb.textContent = currentQuestion === exercises.length - 1 ? 'See results →' : 'Next question →';
+    nb.onclick = nextQuestion;
+    document.getElementById('exerciseCard').appendChild(nb);
+    updateScoreboard();
+}
+function nextQuestion() {
+    currentQuestion++;
+    if (currentQuestion >= exercises.length) return showResults();
+    renderQuestion();
+}
+function showResults() {
+    document.getElementById('progress').style.width = '100%';
+    const total = exercises.length * 10;
+    const pct = Math.round(score / total * 100);
+    if (window.parent) window.parent.postMessage({type:"mtti_quiz_score", score: score, total: total, percent: pct}, "*");
+    let badge = '🔧', msg = 'Excellent — you have a solid grasp of this topic.';
+    if (pct < 50) { badge = '🌱'; msg = 'Good first attempt. Review the lesson and try again.'; }
+    else if (pct < 80) { badge = '🛠️'; msg = 'Solid progress. Review what you missed and retry.'; }
+    document.getElementById('exerciseCard').innerHTML = `<div class="results"><span class="badge">${badge}</span><h2>Quiz Complete</h2><div class="final-score">${score} / ${total}</div><p><strong>${pct}%</strong> · Longest streak: ${streak}</p><p>${msg}</p><button class="restart-btn" onclick="restart()">Try again 🔁</button></div>`;
+}
+function restart() { currentQuestion = 0; score = 0; streak = 0; renderQuestion(); }
+renderQuestion();
+</script>
+</body>
+</html>

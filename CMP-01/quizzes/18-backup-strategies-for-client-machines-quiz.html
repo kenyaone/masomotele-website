@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Backup Strategies for Client Machines -- Quiz</title>
+<link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Fredoka:wght@500;600&display=swap" rel="stylesheet">
+<style>
+* { margin:0; padding:0; box-sizing:border-box; }
+body { font-family:'Space Mono', monospace; background:linear-gradient(135deg,#667eea 0%,#764ba2 100%); min-height:100vh; padding:20px; color:#fff; }
+.container { max-width:900px; margin:0 auto; }
+.header { text-align:center; margin-bottom:30px; }
+.header .lesson-tag { display:inline-block; background:rgba(255,255,255,0.2); padding:6px 16px; border-radius:999px; font-size:0.85em; margin-bottom:12px; }
+.header h1 { font-family:'Fredoka', sans-serif; font-size:2.2em; margin-bottom:8px; text-shadow:3px 3px 0 rgba(0,0,0,0.2); }
+.score-board { background:rgba(255,255,255,0.15); backdrop-filter:blur(10px); border-radius:20px; padding:20px; margin-bottom:20px; display:flex; justify-content:space-around; }
+.score-item { text-align:center; }
+.score-item .label { font-size:0.85em; opacity:0.9; margin-bottom:4px; }
+.score-item .value { font-size:1.8em; font-weight:bold; font-family:'Fredoka', sans-serif; }
+.progress-bar { width:100%; height:8px; background:rgba(255,255,255,0.3); border-radius:10px; margin-bottom:25px; overflow:hidden; }
+.progress-fill { height:100%; background:linear-gradient(90deg,#fbbf24 0%,#f59e0b 100%); border-radius:10px; transition:width 0.5s ease; width:0%; }
+.exercise-card { background:white; color:#333; border-radius:25px; padding:35px; margin-bottom:20px; box-shadow:0 20px 60px rgba(0,0,0,0.3); }
+.question { font-size:1.15em; margin-bottom:20px; font-weight:700; line-height:1.4; }
+.options { display:flex; flex-direction:column; gap:12px; }
+.option { background:#f5f7fb; border:2px solid transparent; padding:16px 20px; border-radius:12px; cursor:pointer; transition:all 0.2s ease; font-family:'Space Mono', monospace; font-size:0.98em; text-align:left; }
+.option:hover:not(.disabled) { background:#eef1fb; border-color:#667eea; transform:translateX(4px); }
+.option.correct { background:#d4edda; border-color:#28a745; color:#155724; }
+.option.wrong { background:#f8d7da; border-color:#dc3545; color:#721c24; }
+.option.disabled { cursor:not-allowed; opacity:0.85; }
+.feedback { margin-top:22px; padding:18px 22px; border-radius:12px; font-size:0.98em; line-height:1.5; }
+.feedback.correct { background:#d4edda; color:#155724; border-left:4px solid #28a745; }
+.feedback.wrong { background:#f8d7da; color:#721c24; border-left:4px solid #dc3545; }
+.next-btn, .restart-btn { margin-top:20px; background:linear-gradient(135deg,#667eea 0%,#764ba2 100%); color:white; border:none; padding:14px 32px; border-radius:12px; font-size:1em; cursor:pointer; font-family:'Fredoka', sans-serif; box-shadow:0 6px 18px rgba(0,0,0,0.2); }
+.results { text-align:center; padding:25px 15px; }
+.results h2 { font-family:'Fredoka', sans-serif; font-size:2em; margin-bottom:12px; color:#333; }
+.results .final-score { font-size:3em; font-family:'Fredoka', sans-serif; color:#667eea; margin:20px 0; }
+.badge { display:inline-block; font-size:3.5em; margin:8px 0; }
+</style>
+</head>
+<body>
+<div class="container">
+<div class="header"><div class="lesson-tag">Quiz</div><h1>Backup Strategies for Client Machines -- Quiz</h1></div>
+<div class="score-board">
+<div class="score-item"><div class="label">Score</div><div class="value" id="score">0</div></div>
+<div class="score-item"><div class="label">Question</div><div class="value"><span id="current">1</span>/<span id="total">10</span></div></div>
+<div class="score-item"><div class="label">Streak</div><div class="value" id="streak">0</div></div>
+</div>
+<div class="progress-bar"><div class="progress-fill" id="progress"></div></div>
+<div class="exercise-card" id="exerciseCard"></div>
+</div>
+<script>
+const exercises = [{"id":"q1","text":"In the 3-2-1 backup rule, what does the '1' refer to?","options":["1 backup per year is enough","At least 1 copy stored off-site","Only 1 copy is ever needed","1 type of storage media only"],"answer":1,"explanation":"The '1' specifically means at least one copy kept off-site, protecting against local disasters like fire or theft."},{"id":"q2","text":"What is a key weakness of a local-only backup strategy, such as an external drive kept in the same room?","options":["It has no weaknesses at all","It offers no protection against theft, fire, or other events affecting the whole location","It is always slower than cloud backup","Local backups cannot store large amounts of data"],"answer":1,"explanation":"A backup stored in the same physical location as the original is vulnerable to the exact same disasters, defeating much of the purpose of having a backup at all."},{"id":"q3","text":"Why is 'I have never lost data before' considered a poor backup strategy?","options":["It is actually a perfectly reliable strategy","Drive failure is often sudden with little warning, and past luck does not predict future reliability","This statement is always false for every customer","It only applies to businesses, not individuals"],"answer":1,"explanation":"Sudden, unpredictable drive failure is common, and relying on past luck provides no actual protection going forward."},{"id":"q4","text":"What is a practical advantage of automatic, scheduled backups over manual ones?","options":["They cost significantly more with no other benefit","They remove the risk of a busy customer simply forgetting to back up regularly","They are always slower than manual backups","There is no real advantage"],"answer":1,"explanation":"Automation removes reliance on human memory and consistency, which is the most common way manual backup habits eventually break down."},{"id":"q5","text":"What is a genuine advantage of a local backup over a cloud backup?","options":["Local backups are always safer from theft and fire","Local backups typically allow faster restores, not limited by internet speed","Local backups are always free with no hardware cost","There is no advantage to local backup at all"],"answer":1,"explanation":"Restoring from a local drive is generally much faster than downloading a large restore over an internet connection, which is the main practical advantage of local backup."}];
+let currentQuestion = 0, score = 0, streak = 0, answered = false;
+function updateScoreboard() {
+    document.getElementById('score').textContent = score;
+    document.getElementById('current').textContent = Math.min(currentQuestion + 1, exercises.length);
+    document.getElementById('total').textContent = exercises.length;
+    document.getElementById('streak').textContent = streak;
+    document.getElementById('progress').style.width = ((currentQuestion) / exercises.length) * 100 + '%';
+}
+function escapeHtml(s) { return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+function renderQuestion() {
+    answered = false;
+    const q = exercises[currentQuestion];
+    let html = '';
+    if (q.scenario) html += `<div class="feedback" style="background:#eef1fb;border-left:4px solid #f59e0b;margin-top:0;margin-bottom:20px;"><strong>Scenario.</strong> ${escapeHtml(q.scenario)}</div>`;
+    html += `<div class="question">${escapeHtml(q.text)}</div><div class="options">`;
+    q.options.forEach((o, i) => { html += `<button class="option" onclick="selectAnswer(${i})">${escapeHtml(o)}</button>`; });
+    html += '</div>';
+    document.getElementById('exerciseCard').innerHTML = html;
+    updateScoreboard();
+}
+function selectAnswer(i) {
+    if (answered) return;
+    answered = true;
+    const q = exercises[currentQuestion];
+    const btns = document.querySelectorAll('.option');
+    btns.forEach(b => b.classList.add('disabled'));
+    btns[q.answer].classList.add('correct');
+    const right = i === q.answer;
+    if (!right) btns[i].classList.add('wrong');
+    if (right) { score += 10; streak += 1; } else { streak = 0; }
+    const fb = document.createElement('div');
+    fb.className = 'feedback ' + (right ? 'correct' : 'wrong');
+    fb.innerHTML = `<strong>${right ? '✅ Correct.' : '❌ Not quite.'}</strong><br>${escapeHtml(q.explanation)}`;
+    document.getElementById('exerciseCard').appendChild(fb);
+    const nb = document.createElement('button');
+    nb.className = 'next-btn';
+    nb.textContent = currentQuestion === exercises.length - 1 ? 'See results →' : 'Next question →';
+    nb.onclick = nextQuestion;
+    document.getElementById('exerciseCard').appendChild(nb);
+    updateScoreboard();
+}
+function nextQuestion() {
+    currentQuestion++;
+    if (currentQuestion >= exercises.length) return showResults();
+    renderQuestion();
+}
+function showResults() {
+    document.getElementById('progress').style.width = '100%';
+    const total = exercises.length * 10;
+    const pct = Math.round(score / total * 100);
+    if (window.parent) window.parent.postMessage({type:"mtti_quiz_score", score: score, total: total, percent: pct}, "*");
+    let badge = '🔧', msg = 'Excellent — you have a solid grasp of this topic.';
+    if (pct < 50) { badge = '🌱'; msg = 'Good first attempt. Review the lesson and try again.'; }
+    else if (pct < 80) { badge = '🛠️'; msg = 'Solid progress. Review what you missed and retry.'; }
+    document.getElementById('exerciseCard').innerHTML = `<div class="results"><span class="badge">${badge}</span><h2>Quiz Complete</h2><div class="final-score">${score} / ${total}</div><p><strong>${pct}%</strong> · Longest streak: ${streak}</p><p>${msg}</p><button class="restart-btn" onclick="restart()">Try again 🔁</button></div>`;
+}
+function restart() { currentQuestion = 0; score = 0; streak = 0; renderQuestion(); }
+renderQuestion();
+</script>
+</body>
+</html>

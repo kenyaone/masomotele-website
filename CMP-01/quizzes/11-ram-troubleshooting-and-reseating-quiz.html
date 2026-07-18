@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>RAM Troubleshooting and Reseating -- Quiz</title>
+<link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Fredoka:wght@500;600&display=swap" rel="stylesheet">
+<style>
+* { margin:0; padding:0; box-sizing:border-box; }
+body { font-family:'Space Mono', monospace; background:linear-gradient(135deg,#667eea 0%,#764ba2 100%); min-height:100vh; padding:20px; color:#fff; }
+.container { max-width:900px; margin:0 auto; }
+.header { text-align:center; margin-bottom:30px; }
+.header .lesson-tag { display:inline-block; background:rgba(255,255,255,0.2); padding:6px 16px; border-radius:999px; font-size:0.85em; margin-bottom:12px; }
+.header h1 { font-family:'Fredoka', sans-serif; font-size:2.2em; margin-bottom:8px; text-shadow:3px 3px 0 rgba(0,0,0,0.2); }
+.score-board { background:rgba(255,255,255,0.15); backdrop-filter:blur(10px); border-radius:20px; padding:20px; margin-bottom:20px; display:flex; justify-content:space-around; }
+.score-item { text-align:center; }
+.score-item .label { font-size:0.85em; opacity:0.9; margin-bottom:4px; }
+.score-item .value { font-size:1.8em; font-weight:bold; font-family:'Fredoka', sans-serif; }
+.progress-bar { width:100%; height:8px; background:rgba(255,255,255,0.3); border-radius:10px; margin-bottom:25px; overflow:hidden; }
+.progress-fill { height:100%; background:linear-gradient(90deg,#fbbf24 0%,#f59e0b 100%); border-radius:10px; transition:width 0.5s ease; width:0%; }
+.exercise-card { background:white; color:#333; border-radius:25px; padding:35px; margin-bottom:20px; box-shadow:0 20px 60px rgba(0,0,0,0.3); }
+.question { font-size:1.15em; margin-bottom:20px; font-weight:700; line-height:1.4; }
+.options { display:flex; flex-direction:column; gap:12px; }
+.option { background:#f5f7fb; border:2px solid transparent; padding:16px 20px; border-radius:12px; cursor:pointer; transition:all 0.2s ease; font-family:'Space Mono', monospace; font-size:0.98em; text-align:left; }
+.option:hover:not(.disabled) { background:#eef1fb; border-color:#667eea; transform:translateX(4px); }
+.option.correct { background:#d4edda; border-color:#28a745; color:#155724; }
+.option.wrong { background:#f8d7da; border-color:#dc3545; color:#721c24; }
+.option.disabled { cursor:not-allowed; opacity:0.85; }
+.feedback { margin-top:22px; padding:18px 22px; border-radius:12px; font-size:0.98em; line-height:1.5; }
+.feedback.correct { background:#d4edda; color:#155724; border-left:4px solid #28a745; }
+.feedback.wrong { background:#f8d7da; color:#721c24; border-left:4px solid #dc3545; }
+.next-btn, .restart-btn { margin-top:20px; background:linear-gradient(135deg,#667eea 0%,#764ba2 100%); color:white; border:none; padding:14px 32px; border-radius:12px; font-size:1em; cursor:pointer; font-family:'Fredoka', sans-serif; box-shadow:0 6px 18px rgba(0,0,0,0.2); }
+.results { text-align:center; padding:25px 15px; }
+.results h2 { font-family:'Fredoka', sans-serif; font-size:2em; margin-bottom:12px; color:#333; }
+.results .final-score { font-size:3em; font-family:'Fredoka', sans-serif; color:#667eea; margin:20px 0; }
+.badge { display:inline-block; font-size:3.5em; margin:8px 0; }
+</style>
+</head>
+<body>
+<div class="container">
+<div class="header"><div class="lesson-tag">Quiz</div><h1>RAM Troubleshooting and Reseating -- Quiz</h1></div>
+<div class="score-board">
+<div class="score-item"><div class="label">Score</div><div class="value" id="score">0</div></div>
+<div class="score-item"><div class="label">Question</div><div class="value"><span id="current">1</span>/<span id="total">10</span></div></div>
+<div class="score-item"><div class="label">Streak</div><div class="value" id="streak">0</div></div>
+</div>
+<div class="progress-bar"><div class="progress-fill" id="progress"></div></div>
+<div class="exercise-card" id="exerciseCard"></div>
+</div>
+<script>
+const exercises = [{"id":"q1","text":"What is one of the most common causes of a no-boot or intermittent-crash complaint involving RAM?","options":["A stick that is not fully seated in its slot","The RAM being the wrong colour","The case being too small","The monitor cable"],"answer":0,"explanation":"An improperly seated stick is a very common, easily-fixed cause that looks deceptively normal at a glance."},{"id":"q2","text":"What happens if two RAM sticks are installed in the wrong slot pairing for dual-channel mode?","options":["The system will not boot at all","The system still works, but silently drops back to single-channel performance","The RAM is permanently damaged","Nothing changes at all"],"answer":1,"explanation":"Incorrect slot pairing does not stop the system from working, it just quietly loses the dual-channel performance benefit."},{"id":"q3","text":"Why test one RAM stick at a time rather than swapping both at once?","options":["It is not actually a useful technique","It isolates exactly which stick is causing the fault","It always takes less time overall","Testing single sticks is impossible on most motherboards"],"answer":1,"explanation":"Testing one variable at a time is the core isolation technique that pinpoints the actual faulty component."},{"id":"q4","text":"What should be done before removing a RAM stick for inspection?","options":["Nothing extra is needed","Power off, unplug, discharge residual power, and use anti-static protection","Leave the system powered on to save time","Remove the PSU first"],"answer":1,"explanation":"Full power-down and ESD precautions are required before handling RAM, as with any internal component work."},{"id":"q5","text":"Random Blue Screens with varying, inconsistent error codes are a classic signature of what kind of fault?","options":["A cosmetic issue with the case","A likely RAM fault","A monitor cable issue","A printer driver issue"],"answer":1,"explanation":"Inconsistent, varying crash signatures are a well-known indicator pointing toward memory faults rather than a single, specific software bug."}];
+let currentQuestion = 0, score = 0, streak = 0, answered = false;
+function updateScoreboard() {
+    document.getElementById('score').textContent = score;
+    document.getElementById('current').textContent = Math.min(currentQuestion + 1, exercises.length);
+    document.getElementById('total').textContent = exercises.length;
+    document.getElementById('streak').textContent = streak;
+    document.getElementById('progress').style.width = ((currentQuestion) / exercises.length) * 100 + '%';
+}
+function escapeHtml(s) { return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+function renderQuestion() {
+    answered = false;
+    const q = exercises[currentQuestion];
+    let html = '';
+    if (q.scenario) html += `<div class="feedback" style="background:#eef1fb;border-left:4px solid #f59e0b;margin-top:0;margin-bottom:20px;"><strong>Scenario.</strong> ${escapeHtml(q.scenario)}</div>`;
+    html += `<div class="question">${escapeHtml(q.text)}</div><div class="options">`;
+    q.options.forEach((o, i) => { html += `<button class="option" onclick="selectAnswer(${i})">${escapeHtml(o)}</button>`; });
+    html += '</div>';
+    document.getElementById('exerciseCard').innerHTML = html;
+    updateScoreboard();
+}
+function selectAnswer(i) {
+    if (answered) return;
+    answered = true;
+    const q = exercises[currentQuestion];
+    const btns = document.querySelectorAll('.option');
+    btns.forEach(b => b.classList.add('disabled'));
+    btns[q.answer].classList.add('correct');
+    const right = i === q.answer;
+    if (!right) btns[i].classList.add('wrong');
+    if (right) { score += 10; streak += 1; } else { streak = 0; }
+    const fb = document.createElement('div');
+    fb.className = 'feedback ' + (right ? 'correct' : 'wrong');
+    fb.innerHTML = `<strong>${right ? '✅ Correct.' : '❌ Not quite.'}</strong><br>${escapeHtml(q.explanation)}`;
+    document.getElementById('exerciseCard').appendChild(fb);
+    const nb = document.createElement('button');
+    nb.className = 'next-btn';
+    nb.textContent = currentQuestion === exercises.length - 1 ? 'See results →' : 'Next question →';
+    nb.onclick = nextQuestion;
+    document.getElementById('exerciseCard').appendChild(nb);
+    updateScoreboard();
+}
+function nextQuestion() {
+    currentQuestion++;
+    if (currentQuestion >= exercises.length) return showResults();
+    renderQuestion();
+}
+function showResults() {
+    document.getElementById('progress').style.width = '100%';
+    const total = exercises.length * 10;
+    const pct = Math.round(score / total * 100);
+    if (window.parent) window.parent.postMessage({type:"mtti_quiz_score", score: score, total: total, percent: pct}, "*");
+    let badge = '🔧', msg = 'Excellent — you have a solid grasp of this topic.';
+    if (pct < 50) { badge = '🌱'; msg = 'Good first attempt. Review the lesson and try again.'; }
+    else if (pct < 80) { badge = '🛠️'; msg = 'Solid progress. Review what you missed and retry.'; }
+    document.getElementById('exerciseCard').innerHTML = `<div class="results"><span class="badge">${badge}</span><h2>Quiz Complete</h2><div class="final-score">${score} / ${total}</div><p><strong>${pct}%</strong> · Longest streak: ${streak}</p><p>${msg}</p><button class="restart-btn" onclick="restart()">Try again 🔁</button></div>`;
+}
+function restart() { currentQuestion = 0; score = 0; streak = 0; renderQuestion(); }
+renderQuestion();
+</script>
+</body>
+</html>

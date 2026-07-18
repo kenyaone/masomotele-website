@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>HDD vs SSD vs NVMe -- Replacement and Upgrade</title>
+<link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Fredoka:wght@500;600&display=swap" rel="stylesheet">
+<style>
+* { margin:0; padding:0; box-sizing:border-box; }
+body { font-family:'Segoe UI', -apple-system, sans-serif; line-height:1.6; color:#1e293b; background:#f8fafc; }
+.container { max-width:1000px; margin:0 auto; padding:20px; }
+header { background:linear-gradient(135deg,#387633,#259BD7); color:#fff; padding:36px 30px; border-radius:12px; margin-bottom:22px; box-shadow:0 10px 30px rgba(56,118,51,0.25); }
+header .badge { display:inline-block; background:rgba(255,255,255,0.2); padding:4px 14px; border-radius:16px; font-size:12px; font-weight:bold; letter-spacing:1px; margin-bottom:12px; }
+header h1 { font-size:30px; margin-bottom:8px; }
+section { background:#fff; border:1px solid #e2e8f0; border-radius:10px; padding:24px 28px; margin-bottom:20px; }
+section h2 { color:#387633; font-size:21px; margin-bottom:12px; padding-bottom:8px; border-bottom:3px solid #387633; }
+section h3 { color:#0f172a; font-size:16px; margin:16px 0 8px; }
+section p { margin-bottom:12px; }
+section ul, section ol { padding-left:22px; margin-bottom:12px; }
+section li { margin-bottom:5px; }
+.callout { border-left:5px solid #387633; background:#e8f5e9; padding:14px 18px; margin:14px 0; border-radius:4px; }
+.callout.tip { border-left-color:#059669; background:#ecfdf5; }
+.callout.warn { border-left-color:#dc2626; background:#fef2f2; }
+.callout strong { color:#1B5E20; }
+.callout.tip strong { color:#065f46; }
+.callout.warn strong { color:#991b1b; }
+.tech-card { background:linear-gradient(135deg,#fef3c7,#fde68a); border-radius:10px; padding:16px 20px; display:flex; gap:14px; align-items:flex-start; margin:14px 0; }
+.tech-avatar { width:52px; height:52px; border-radius:50%; background:#387633; color:#fff; display:flex; align-items:center; justify-content:center; font-size:22px; font-weight:bold; flex-shrink:0; }
+.tech-card p { color:#259BD7; margin:0; font-size:14px; }
+table { width:100%; border-collapse:collapse; margin:14px 0; font-size:13.5px; }
+th { background:#e8f5e9; color:#1B5E20; padding:9px 10px; text-align:left; border:1px solid #c8e6c9; }
+td { padding:9px 10px; border:1px solid #e2e8f0; }
+tr:nth-child(even) td { background:#f8fafc; }
+</style>
+</head>
+<body>
+<div class="container">
+<header><div class="badge">Lesson</div><h1>HDD vs SSD vs NVMe -- Replacement and Upgrade</h1></header>
+<div class="callout warn"><strong>Physical practicum required.</strong> This step teaches the judgement and correct sequence for a real hands-on repair task. To be certified competent in the physical technique itself (not just the decision-making), you must complete a supervised in-person practicum session — this online step alone does not certify hands-on ability.</div><section><h2>1. The three main storage types</h2><table><tr><th>Type</th><th>Connection</th><th>Typical speed</th><th>Notes</th></tr><tr><td>HDD</td><td>SATA cable (data + power)</td><td>Slowest, mechanical spinning platters</td><td>Cheapest per gigabyte, good for bulk storage, not for the OS drive</td></tr><tr><td>SATA SSD</td><td>SATA cable (data + power)</td><td>Much faster than HDD, no moving parts</td><td>A drop-in HDD replacement using the same cables and connectors</td></tr><tr><td>NVMe SSD</td><td>M.2 slot directly on motherboard, no cables</td><td>Fastest of the three by a wide margin</td><td>Requires an available M.2 slot on the motherboard</td></tr></table></section><section><h2>2. Why SSDs are the highest-value upgrade</h2><div class="callout tip">For an old, slow machine still running on a mechanical HDD, swapping in even a basic SATA SSD is very often the single biggest, most noticeable speed improvement available -- often more impactful than a CPU or RAM upgrade, and usually far cheaper.</div></section><section><h2>3. Physical installation</h2><p><strong>SATA drive (HDD or SSD):</strong> mount in an available drive bay, connect a SATA data cable to the motherboard and a SATA power cable from the PSU.</p><p><strong>NVMe SSD:</strong> insert at an angle into the M.2 slot, press down flat, and secure with the small retention screw. No cables at all are involved.</p></section><section><h2>4. Setting the correct boot drive</h2><p>After installing a new drive, especially when replacing the drive Windows was originally installed on, the BIOS boot order must be checked and set correctly, or the system may try to boot from the wrong drive, or fail to boot entirely. This is covered in more depth in the Software and Operating Systems unit.</p></section>
+</div>
+</body>
+</html>

@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>The Systematic Troubleshooting Process</title>
+<link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Fredoka:wght@500;600&display=swap" rel="stylesheet">
+<style>
+* { margin:0; padding:0; box-sizing:border-box; }
+body { font-family:'Segoe UI', -apple-system, sans-serif; line-height:1.6; color:#1e293b; background:#f8fafc; }
+.container { max-width:1000px; margin:0 auto; padding:20px; }
+header { background:linear-gradient(135deg,#387633,#259BD7); color:#fff; padding:36px 30px; border-radius:12px; margin-bottom:22px; box-shadow:0 10px 30px rgba(56,118,51,0.25); }
+header .badge { display:inline-block; background:rgba(255,255,255,0.2); padding:4px 14px; border-radius:16px; font-size:12px; font-weight:bold; letter-spacing:1px; margin-bottom:12px; }
+header h1 { font-size:30px; margin-bottom:8px; }
+section { background:#fff; border:1px solid #e2e8f0; border-radius:10px; padding:24px 28px; margin-bottom:20px; }
+section h2 { color:#387633; font-size:21px; margin-bottom:12px; padding-bottom:8px; border-bottom:3px solid #387633; }
+section h3 { color:#0f172a; font-size:16px; margin:16px 0 8px; }
+section p { margin-bottom:12px; }
+section ul, section ol { padding-left:22px; margin-bottom:12px; }
+section li { margin-bottom:5px; }
+.callout { border-left:5px solid #387633; background:#e8f5e9; padding:14px 18px; margin:14px 0; border-radius:4px; }
+.callout.tip { border-left-color:#059669; background:#ecfdf5; }
+.callout.warn { border-left-color:#dc2626; background:#fef2f2; }
+.callout strong { color:#1B5E20; }
+.callout.tip strong { color:#065f46; }
+.callout.warn strong { color:#991b1b; }
+.tech-card { background:linear-gradient(135deg,#fef3c7,#fde68a); border-radius:10px; padding:16px 20px; display:flex; gap:14px; align-items:flex-start; margin:14px 0; }
+.tech-avatar { width:52px; height:52px; border-radius:50%; background:#387633; color:#fff; display:flex; align-items:center; justify-content:center; font-size:22px; font-weight:bold; flex-shrink:0; }
+.tech-card p { color:#259BD7; margin:0; font-size:14px; }
+table { width:100%; border-collapse:collapse; margin:14px 0; font-size:13.5px; }
+th { background:#e8f5e9; color:#1B5E20; padding:9px 10px; text-align:left; border:1px solid #c8e6c9; }
+td { padding:9px 10px; border:1px solid #e2e8f0; }
+tr:nth-child(even) td { background:#f8fafc; }
+</style>
+</head>
+<body>
+<div class="container">
+<header><div class="badge">Lesson</div><h1>The Systematic Troubleshooting Process</h1></header>
+<section><h2>1. The 6-step process</h2><ol><li><strong>Identify the problem</strong> -- get a precise description from the customer: what exactly happens, when did it start, what changed recently?</li><li><strong>Establish a theory of probable cause</strong> -- start with the simplest, most common explanation first (a loose cable is far more likely than a dead motherboard)</li><li><strong>Test the theory</strong> -- verify before you act; do not replace a part just because you suspect it</li><li><strong>Establish a plan of action</strong> -- once confirmed, decide the fix and any needed parts</li><li><strong>Implement the fix and verify full functionality</strong> -- after fixing, retest thoroughly, not just the original symptom</li><li><strong>Document findings and actions</strong> -- what was wrong, what was done, useful for warranty and future reference</li></ol></section><section><h2>2. Simplest cause first</h2><div class="tech-card"><div class="tech-avatar">P</div><p>Peter has a saying: check the cable before you blame the chip. The overwhelming majority of no-power, no-display and no-network complaints trace back to something simple -- a loose connector, an unplugged cable, a switched-off power strip -- not a failed component. Jumping straight to replacing parts wastes money and often does not even fix the real problem.</p></div><p>A good troubleshooting order moves from cheap and quick checks to expensive and slow ones: visual inspection, then cable and connection checks, then software-level checks, then component-level testing, then replacement.</p></section><section><h2>3. Isolating variables</h2><p>Change <strong>one thing at a time</strong>. If you swap the RAM, the GPU and the PSU all at once and the problem goes away, you genuinely do not know which one fixed it -- which means you cannot confidently diagnose the same problem faster next time, and you may have replaced parts that were never actually faulty.</p></section><section><h2>4. Documentation</h2><p>A simple job log -- symptom, what was tested, what was found, what was fixed -- protects you if the customer returns with a related or unrelated issue, and builds a personal reference library of common patterns over time.</p></section>
+</div>
+</body>
+</html>

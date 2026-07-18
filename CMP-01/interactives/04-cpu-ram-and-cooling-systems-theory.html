@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CPU, RAM and Cooling Systems</title>
+<link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Fredoka:wght@500;600&display=swap" rel="stylesheet">
+<style>
+* { margin:0; padding:0; box-sizing:border-box; }
+body { font-family:'Segoe UI', -apple-system, sans-serif; line-height:1.6; color:#1e293b; background:#f8fafc; }
+.container { max-width:1000px; margin:0 auto; padding:20px; }
+header { background:linear-gradient(135deg,#387633,#259BD7); color:#fff; padding:36px 30px; border-radius:12px; margin-bottom:22px; box-shadow:0 10px 30px rgba(56,118,51,0.25); }
+header .badge { display:inline-block; background:rgba(255,255,255,0.2); padding:4px 14px; border-radius:16px; font-size:12px; font-weight:bold; letter-spacing:1px; margin-bottom:12px; }
+header h1 { font-size:30px; margin-bottom:8px; }
+section { background:#fff; border:1px solid #e2e8f0; border-radius:10px; padding:24px 28px; margin-bottom:20px; }
+section h2 { color:#387633; font-size:21px; margin-bottom:12px; padding-bottom:8px; border-bottom:3px solid #387633; }
+section h3 { color:#0f172a; font-size:16px; margin:16px 0 8px; }
+section p { margin-bottom:12px; }
+section ul, section ol { padding-left:22px; margin-bottom:12px; }
+section li { margin-bottom:5px; }
+.callout { border-left:5px solid #387633; background:#e8f5e9; padding:14px 18px; margin:14px 0; border-radius:4px; }
+.callout.tip { border-left-color:#059669; background:#ecfdf5; }
+.callout.warn { border-left-color:#dc2626; background:#fef2f2; }
+.callout strong { color:#1B5E20; }
+.callout.tip strong { color:#065f46; }
+.callout.warn strong { color:#991b1b; }
+.tech-card { background:linear-gradient(135deg,#fef3c7,#fde68a); border-radius:10px; padding:16px 20px; display:flex; gap:14px; align-items:flex-start; margin:14px 0; }
+.tech-avatar { width:52px; height:52px; border-radius:50%; background:#387633; color:#fff; display:flex; align-items:center; justify-content:center; font-size:22px; font-weight:bold; flex-shrink:0; }
+.tech-card p { color:#259BD7; margin:0; font-size:14px; }
+table { width:100%; border-collapse:collapse; margin:14px 0; font-size:13.5px; }
+th { background:#e8f5e9; color:#1B5E20; padding:9px 10px; text-align:left; border:1px solid #c8e6c9; }
+td { padding:9px 10px; border:1px solid #e2e8f0; }
+tr:nth-child(even) td { background:#f8fafc; }
+</style>
+</head>
+<body>
+<div class="container">
+<header><div class="badge">Lesson</div><h1>CPU, RAM and Cooling Systems</h1></header>
+<div class="callout warn"><strong>Physical practicum required.</strong> This step teaches the judgement and correct sequence for a real hands-on repair task. To be certified competent in the physical technique itself (not just the decision-making), you must complete a supervised in-person practicum session — this online step alone does not certify hands-on ability.</div><section><h2>1. The CPU in plain terms</h2><p>The CPU (Central Processing Unit) executes instructions. Three specs matter most day-to-day: <strong>core count</strong> (how many independent tasks it can truly run in parallel), <strong>clock speed</strong> (how many cycles per second each core runs, in GHz), and <strong>cache</strong> (small, extremely fast on-chip memory that avoids slower trips to RAM for frequently used data).</p></section><section><h2>2. RAM basics</h2><p>RAM (Random Access Memory) is volatile, high-speed working memory — everything currently open and in-use lives here, and it's wiped on shutdown. Two RAM sticks of matching speed installed in the correctly paired slots run in <strong>dual-channel mode</strong>, roughly doubling memory bandwidth compared to a single stick of the same total capacity — this is a real, measurable performance difference, not a marketing claim.</p><div class="callout warn"><strong>Common mistake:</strong> mixing RAM sticks of different speeds. The system will run, but every stick is forced down to the speed of the slowest one.</div></section><section><h2>3. Cooling: air vs liquid</h2><table><tr><th></th><th>Air cooling</th><th>Liquid (AIO) cooling</th></tr><tr><td>How it works</td><td>Heatsink + fan(s) draw heat away from the CPU directly into airflow</td><td>A pump circulates coolant through a block on the CPU to a radiator, cooled by fans</td></tr><tr><td>Reliability</td><td>Very few moving parts to fail</td><td>Pump can fail; more parts overall</td></tr><tr><td>Best for</td><td>Most builds, budget-friendly, easy maintenance</td><td>High-end CPUs generating a lot of heat, or tight case clearance</td></tr></table></section><section><h2>4. Why thermal paste matters</h2><p>Even a perfectly flat metal cooler base has microscopic gaps and imperfections against the CPU's surface — air trapped in those gaps insulates heat rather than conducting it. Thermal paste fills those microscopic gaps, dramatically improving heat transfer from CPU to cooler. Paste that has dried out (common after 2–5 years) loses effectiveness and causes rising temperatures even with an otherwise healthy cooler — this is one of the most common, easily-fixed causes of an "overheating" complaint Peter sees.</p></section>
+</div>
+</body>
+</html>

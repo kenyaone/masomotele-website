@@ -37,8 +37,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         } else {
             // Check unique username — exclude self when editing
             $chkSql = $edit_id
-                ? "SELECT id FROM users WHERE username=? AND id!=?"
-                : "SELECT id FROM users WHERE username=?";
+                ? "SELECT id FROM lms_users WHERE username=? AND id!=?"
+                : "SELECT id FROM lms_users WHERE username=?";
             $chkParams = $edit_id ? [$username, $edit_id] : [$username];
             $chk = $pdo->prepare($chkSql);
             $chk->execute($chkParams);
@@ -52,7 +52,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
                 if ($edit_id) {
                     // Update
-                    $sql = "UPDATE users SET name=?,username=?,full_name=?,email=?,role=?,phone=?,is_active=?,status=?";
+                    $sql = "UPDATE lms_users SET name=?,username=?,full_name=?,email=?,role=?,phone=?,is_active=?,status=?";
                     $params = [$full_name,$username,$full_name,$email,$userRole,$phone,$active,$active?'active':'inactive'];
                     if ($password) { $sql .= ",password=?"; $params[] = password_hash($password, PASSWORD_DEFAULT); }
                     $sql .= " WHERE id=?"; $params[] = $edit_id;
@@ -60,16 +60,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
                     // Update teacher class assignments
                     if ($userRole === 'teacher') {
-                        $pdo->prepare("UPDATE classes SET instructor_id=NULL WHERE instructor_id=?")->execute([$edit_id]);
+                        $pdo->prepare("UPDATE lms_classes SET instructor_id=NULL WHERE instructor_id=?")->execute([$edit_id]);
                         foreach (($_POST['teacher_classes'] ?? []) as $cid) {
-                            $pdo->prepare("UPDATE classes SET instructor_id=? WHERE id=?")->execute([$edit_id,(int)$cid]);
+                            $pdo->prepare("UPDATE lms_classes SET instructor_id=? WHERE id=?")->execute([$edit_id,(int)$cid]);
                         }
                     }
                     header('Location: ' . SITE_URL . '/admin-users.php?msg=updated'); exit;
 
                 } else {
                     // Insert
-                    $pdo->prepare("INSERT INTO users (name,username,full_name,email,role,phone,is_active,status,password,created_at)
+                    $pdo->prepare("INSERT INTO lms_users (name,username,full_name,email,role,phone,is_active,status,password,created_at)
                         VALUES (?,?,?,?,?,?,?,?,?,NOW())")
                         ->execute([$full_name,$username,$full_name,$email,$userRole,$phone,$active,$active?'active':'inactive',
                                    password_hash($password, PASSWORD_DEFAULT)]);
@@ -78,7 +78,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     // Assign teacher to classes
                     if ($userRole === 'teacher') {
                         foreach (($_POST['teacher_classes'] ?? []) as $cid) {
-                            $pdo->prepare("UPDATE classes SET instructor_id=? WHERE id=?")->execute([$newId,(int)$cid]);
+                            $pdo->prepare("UPDATE lms_classes SET instructor_id=? WHERE id=?")->execute([$newId,(int)$cid]);
                         }
                     }
                     header('Location: ' . SITE_URL . '/admin-users.php?msg=created'); exit;
@@ -92,7 +92,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $uid = (int)($_POST['user_id'] ?? 0);
         $np  = trim($_POST['new_password'] ?? '');
         if ($uid && $np) {
-            $pdo->prepare("UPDATE users SET password=? WHERE id=?")->execute([password_hash($np, PASSWORD_DEFAULT), $uid]);
+            $pdo->prepare("UPDATE lms_users SET password=? WHERE id=?")->execute([password_hash($np, PASSWORD_DEFAULT), $uid]);
             header('Location: ' . SITE_URL . '/admin-users.php?msg=updated'); exit;
         }
     }
@@ -100,7 +100,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     // ── Toggle active ──────────────────────────────────
     if ($postAction === 'toggle_active') {
         $uid = (int)($_POST['user_id'] ?? 0);
-        $pdo->prepare("UPDATE users SET is_active=1-is_active, status=IF(is_active=1,'inactive','active') WHERE id=?")->execute([$uid]);
+        $pdo->prepare("UPDATE lms_users SET is_active=1-is_active, status=IF(is_active=1,'inactive','active') WHERE id=?")->execute([$uid]);
         header('Location: ' . SITE_URL . '/admin-users.php'); exit;
     }
 
@@ -108,8 +108,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     if ($postAction === 'delete_user') {
         $uid = (int)($_POST['user_id'] ?? 0);
         if ($uid && $uid !== $currentId) {
-            $pdo->prepare("DELETE FROM enrolments WHERE user_id=?")->execute([$uid]);
-            $pdo->prepare("DELETE FROM users WHERE id=?")->execute([$uid]);
+            $pdo->prepare("DELETE FROM lms_enrolments WHERE user_id=?")->execute([$uid]);
+            $pdo->prepare("DELETE FROM lms_users WHERE id=?")->execute([$uid]);
         }
         header('Location: ' . SITE_URL . '/admin-users.php'); exit;
     }
@@ -120,12 +120,12 @@ $search      = trim($_GET['search'] ?? '');
 $filter_role = $_GET['role'] ?? '';
 $edit_user   = null;
 if (isset($_GET['edit'])) {
-    $e = $pdo->prepare("SELECT * FROM users WHERE id=?");
+    $e = $pdo->prepare("SELECT * FROM lms_users WHERE id=?");
     $e->execute([(int)$_GET['edit']]);
     $edit_user = $e->fetch(PDO::FETCH_ASSOC);
 }
 
-$sql    = "SELECT id, COALESCE(full_name,name) as full_name, username, email, phone, role, is_active, status, last_login FROM users WHERE 1=1";
+$sql    = "SELECT id, COALESCE(full_name,name) as full_name, username, email, phone, role, is_active, status, last_login FROM lms_users WHERE 1=1";
 $params = [];
 if ($search) { $sql .= " AND (username LIKE ? OR full_name LIKE ? OR name LIKE ? OR email LIKE ?)"; $s="%$search%"; $params=[$s,$s,$s,$s]; }
 if ($filter_role) { $sql .= " AND role=?"; $params[] = $filter_role; }
@@ -133,14 +133,14 @@ $sql .= " ORDER BY role, full_name";
 $stmt = $pdo->prepare($sql); $stmt->execute($params);
 $users = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
-$classes   = $pdo->query("SELECT id, title as name FROM classes WHERE status='active' ORDER BY title")->fetchAll(PDO::FETCH_ASSOC);
-$stats     = $pdo->query("SELECT role, COUNT(*) as cnt, SUM(is_active) as active_cnt FROM users GROUP BY role")->fetchAll(PDO::FETCH_ASSOC);
+$classes   = $pdo->query("SELECT id, title as name FROM lms_classes WHERE status='active' ORDER BY title")->fetchAll(PDO::FETCH_ASSOC);
+$stats     = $pdo->query("SELECT role, COUNT(*) as cnt, SUM(is_active) as active_cnt FROM lms_users GROUP BY role")->fetchAll(PDO::FETCH_ASSOC);
 $stats_map = array_column($stats, null, 'role');
 
 // Teacher's currently assigned classes
 $teacherClasses = [];
 if ($edit_user && $edit_user['role']==='teacher') {
-    $tc = $pdo->prepare("SELECT id FROM classes WHERE instructor_id=?");
+    $tc = $pdo->prepare("SELECT id FROM lms_classes WHERE instructor_id=?");
     $tc->execute([$edit_user['id']]);
     $teacherClasses = array_column($tc->fetchAll(PDO::FETCH_ASSOC), 'id');
 }
@@ -281,7 +281,7 @@ tbody tr:hover td{background:#f8fafc}
                     </label>
                     <?php endforeach; ?>
                 </div>
-                <span class="hint">Check all classes this teacher will manage</span>
+                <span class="hint">Check all lms_classes this teacher will manage</span>
             </div>
 
             <div class="fg fg-full" style="display:flex;align-items:center;gap:8px;margin-top:4px">

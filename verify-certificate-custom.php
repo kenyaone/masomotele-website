@@ -455,7 +455,7 @@
 
             <?php
             // WordPress database connection
-            require_once('../../../wp-load.php');
+            require_once(__DIR__ . '/wp-load.php');
             global $wpdb;
             
             $search_term = '';

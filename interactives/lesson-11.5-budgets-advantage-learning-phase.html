@@ -1,0 +1,458 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lesson 11.5 — Budgets, Advantage+, Learning Phase (Interactive)</title>
+<style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: 'Segoe UI', -apple-system, sans-serif; line-height: 1.55; color: #1e293b; background: #f1f5f9; min-height: 100vh; }
+    .container { max-width: 1200px; margin: 0 auto; padding: 20px; }
+    header {
+        background: linear-gradient(135deg, #2E7D32, #1B5E20);
+        color: #fff; padding: 40px 30px; border-radius: 12px; margin-bottom: 24px;
+        box-shadow: 0 10px 30px rgba(24,119,242,0.25);
+    }
+    header .badge { display: inline-block; background: rgba(255,255,255,0.2); padding: 4px 14px; border-radius: 16px; font-size: 12px; font-weight: bold; letter-spacing: 1px; margin-bottom: 14px; }
+    header h1 { font-size: 34px; margin-bottom: 8px; }
+    header .subtitle { font-size: 17px; opacity: 0.95; margin-bottom: 20px; }
+    .meta-strip { display: flex; flex-wrap: wrap; gap: 12px; }
+    .meta-strip span { background: rgba(255,255,255,0.18); padding: 6px 14px; border-radius: 20px; font-size: 13px; }
+    .toc { background: #fff; border: 1px solid #e2e8f0; border-radius: 10px; padding: 22px 26px; margin-bottom: 22px; }
+    .toc h3 { color: #1877f2; margin-bottom: 10px; }
+    .toc ol { padding-left: 20px; }
+    .toc a { color: #1877f2; text-decoration: none; font-weight: 600; }
+    section { background: #fff; border: 1px solid #e2e8f0; border-radius: 10px; padding: 26px 30px; margin-bottom: 22px; }
+    section h2 { color: #1877f2; font-size: 22px; margin-bottom: 12px; padding-bottom: 8px; border-bottom: 3px solid #1877f2; }
+    section h3 { color: #0f172a; font-size: 17px; margin: 18px 0 8px; }
+    section p { margin-bottom: 12px; }
+    .callout { border-left: 5px solid #1877f2; background: #eff6ff; padding: 14px 18px; margin: 14px 0; border-radius: 4px; }
+    .callout.warn { border-left-color: #dc2626; background: #fef2f2; }
+    .callout.tip { border-left-color: #059669; background: #ecfdf5; }
+    .callout strong { color: #1877f2; }
+    .callout.warn strong { color: #dc2626; }
+    .callout.tip strong { color: #059669; }
+
+    /* Campaign mock */
+    .camp { background: #fff; border: 1px solid #dadce0; border-radius: 8px; overflow: hidden; margin: 14px 0; box-shadow: 0 2px 6px rgba(0,0,0,0.05); }
+    .camp-top { background: #f0f2f5; padding: 12px 16px; display: flex; align-items: center; gap: 12px; border-bottom: 1px solid #e5e7eb; }
+    .camp-top .logo { width: 32px; height: 32px; border-radius: 6px; background: #1877f2; color:#fff; display:flex;align-items:center;justify-content:center; font-weight:bold; }
+    .camp-top .title { font-weight: 600; color: #050505; font-size: 15px; }
+    .camp-top .sub { font-size: 12px; color: #65676b; }
+    .camp-body { padding: 22px; }
+
+    /* Advantage+ toggle */
+    .adv-box { background: #eff6ff; border: 2px solid #1877f2; border-radius: 10px; padding: 16px; margin-bottom: 16px; display: flex; align-items: center; gap: 14px; }
+    .adv-box .info { flex: 1; }
+    .adv-box h5 { color: #050505; font-size: 15px; margin-bottom: 3px; }
+    .adv-box p { color: #65676b; font-size: 13px; margin: 0; }
+    .toggle { position: relative; width: 44px; height: 24px; background: #cbd5e1; border-radius: 12px; cursor: pointer; transition: background 0.2s; flex-shrink: 0; }
+    .toggle::after { content: ''; position: absolute; top: 2px; left: 2px; width: 20px; height: 20px; background: #fff; border-radius: 50%; transition: transform 0.2s; }
+    .toggle.on { background: #059669; }
+    .toggle.on::after { transform: translateX(20px); }
+
+    /* Budget mode picker */
+    .mode-picker { display: flex; gap: 8px; margin-bottom: 12px; }
+    .mode-picker button { flex: 1; background: #fff; border: 1.5px solid #cbd5e1; padding: 12px 14px; border-radius: 8px; font-size: 14px; font-weight: 600; cursor: pointer; color: #475569; text-align: left; }
+    .mode-picker button.active { background: #eff6ff; border-color: #1877f2; color: #1877f2; }
+    .mode-picker button small { display: block; font-weight: 400; font-size: 12px; color: #65676b; margin-top: 2px; }
+
+    /* Currency input */
+    .money-wrap { display: flex; align-items: center; border: 1.5px solid #cbd5e1; border-radius: 8px; overflow: hidden; background: #fff; margin-bottom: 12px; }
+    .money-wrap .kes { padding: 12px 14px; background: #f7f8fa; font-weight: 700; color: #050505; border-right: 1.5px solid #cbd5e1; }
+    .money-wrap input { flex: 1; padding: 12px 14px; border: none; outline: none; font-size: 16px; font-weight: 600; }
+    .money-wrap .per { padding: 12px 14px; color: #65676b; font-size: 13px; }
+
+    /* Ad set panel */
+    .adset-panel { background: #fff; border: 1.5px solid #cbd5e1; border-radius: 10px; padding: 16px; margin-bottom: 12px; }
+    .adset-panel h5 { color: #050505; font-size: 15px; margin-bottom: 4px; }
+    .adset-panel .desc { color: #65676b; font-size: 12px; margin-bottom: 10px; }
+    .slider-row { display: flex; align-items: center; gap: 10px; }
+    .slider-row input[type="range"] { flex: 1; height: 6px; -webkit-appearance: none; appearance: none; background: #dbeafe; border-radius: 3px; outline: none; }
+    .slider-row input[type="range"]::-webkit-slider-thumb { -webkit-appearance: none; appearance: none; width: 20px; height: 20px; background: #1877f2; border-radius: 50%; cursor: pointer; border: 2px solid #fff; box-shadow: 0 1px 4px rgba(24,119,242,0.4); }
+    .slider-row input[type="range"]::-moz-range-thumb { width: 20px; height: 20px; background: #1877f2; border-radius: 50%; cursor: pointer; border: 2px solid #fff; }
+    .adset-bar { height: 22px; background: #eff6ff; border-radius: 4px; margin-top: 8px; overflow: hidden; position: relative; }
+    .adset-fill { height: 100%; background: linear-gradient(90deg, #1877f2, #0866ff); border-radius: 4px; transition: width 0.15s; display: flex; align-items: center; justify-content: flex-end; padding-right: 8px; color: #fff; font-size: 11px; font-weight: 600; }
+    .allocation { font-weight: 700; color: #1877f2; min-width: 100px; text-align: right; }
+
+    .total-box { background: #0f172a; color: #fff; border-radius: 8px; padding: 12px 16px; display: flex; align-items: center; justify-content: space-between; margin-top: 8px; }
+    .total-box.err { background: #7f1d1d; }
+    .total-box.ok { background: #14532d; }
+
+    /* Learning phase pill + bar */
+    .lp-block { background: #fef3c7; border: 1.5px solid #f59e0b; border-radius: 10px; padding: 16px; margin: 14px 0; }
+    .lp-block.exit { background: #dcfce7; border-color: #059669; }
+    .lp-title { display: flex; align-items: center; gap: 10px; margin-bottom: 10px; }
+    .lp-pill { padding: 4px 12px; border-radius: 12px; font-size: 12px; font-weight: 700; background: #f59e0b; color: #fff; }
+    .lp-block.exit .lp-pill { background: #059669; }
+    .lp-track { height: 26px; background: rgba(0,0,0,0.08); border-radius: 6px; overflow: hidden; margin-top: 8px; position: relative; }
+    .lp-fill { height: 100%; background: #f59e0b; transition: width 0.3s; display: flex; align-items: center; justify-content: flex-end; padding-right: 8px; color: #fff; font-size: 12px; font-weight: 600; }
+    .lp-block.exit .lp-fill { background: #059669; width: 100%; }
+    .lp-marker { position: absolute; right: 0; top: 0; bottom: 0; width: 2px; background: #0f172a; }
+
+    /* Scaling calc */
+    .calc-box { background: #eff6ff; border: 2px solid #1877f2; border-radius: 10px; padding: 20px; margin: 14px 0; }
+    .calc-box h4 { color: #1877f2; margin-bottom: 12px; }
+    .calc-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+    @media (max-width: 700px) { .calc-grid { grid-template-columns: 1fr; } }
+    .calc-side { background: #fff; border: 1.5px solid #cbd5e1; border-radius: 8px; padding: 14px; }
+    .calc-side .lbl { font-size: 12px; color: #65676b; text-transform: uppercase; letter-spacing: 0.5px; }
+    .calc-side .val { font-size: 26px; color: #1877f2; font-weight: 700; margin-top: 4px; }
+    .calc-side .footnote { font-size: 12px; color: #65676b; margin-top: 6px; }
+    .calc-note { background: #fef3c7; border-left: 4px solid #f59e0b; padding: 10px 14px; border-radius: 4px; margin-top: 10px; font-size: 13px; color: #78350f; font-weight: 600; }
+
+    /* Challenge */
+    .challenge { background: #eff6ff; border: 2px solid #1877f2; border-radius: 10px; padding: 20px; margin: 18px 0; }
+    .challenge h4 { color: #1877f2; margin-bottom: 12px; }
+    .challenge .cq { margin-bottom: 14px; }
+    .challenge label { display: block; padding: 8px 12px; background: #fff; border: 1px solid #e2e8f0; border-radius: 6px; margin-bottom: 6px; cursor: pointer; font-size: 14px; }
+    .challenge label:hover { background: #eff6ff; }
+    .challenge input[type="radio"] { margin-right: 10px; }
+    .challenge-btn { background: #1877f2; color: #fff; border: none; padding: 10px 20px; border-radius: 6px; font-weight: 600; cursor: pointer; font-size: 15px; }
+    .verdict { padding: 14px 16px; border-radius: 8px; margin-top: 14px; font-weight: 600; display: none; }
+    .verdict.show { display: block; }
+    .verdict.good { background: #d1fae5; color: #065f46; border-left: 4px solid #059669; }
+    .verdict.mid { background: #fef3c7; color: #78350f; border-left: 4px solid #d97706; }
+    .verdict.bad { background: #fee2e2; color: #991b1b; border-left: 4px solid #dc2626; }
+
+    footer { text-align: center; color: #64748b; padding: 24px; font-size: 13px; }
+    @media (max-width: 800px) { header h1 { font-size: 26px; } }
+
+    /* MTTI logo stamp */
+    .mtti-logo-stamp {
+        position: fixed; top: 14px; right: 18px; z-index: 999;
+        opacity: 0.88; transition: opacity 0.2s;
+    }
+    .mtti-logo-stamp:hover { opacity: 1; }
+    .mtti-logo-stamp img { width: 56px; height: 56px; border-radius: 50%; box-shadow: 0 2px 8px rgba(0,0,0,0.18); }
+</style>
+</head>
+<body>
+<div class="mtti-logo-stamp">
+    <img src="../../Resources/Logo.jpeg" alt="MTTI" title="Masomotele Technical Training Institute — Start learning, Start earning">
+</div>
+
+<div class="container">
+
+<header>
+    <div class="badge">LESSON 11.5  ·  META ADS DEEP DIVE  ·  INTERACTIVE</div>
+    <h1>Budgets, Advantage+ &amp; Learning Phase</h1>
+    <div class="subtitle">Split Sarah's KES 15,000/mo across three ad sets, exit Learning in 2 weeks, scale winners by +20% cadence.</div>
+    <div class="meta-strip">
+        <span><strong>Duration:</strong> ~30 min interactive</span>
+        <span><strong>Level:</strong> Intermediate</span>
+        <span><strong>Tool:</strong> Ads Manager · Campaign</span>
+        <span><strong>Handbook:</strong> Part 11, §11.5</span>
+        <span><strong>Companion:</strong> Practical 11.5 / Quiz 11.5</span>
+    </div>
+</header>
+
+<div class="toc">
+    <h3>What you'll do in this lesson</h3>
+    <ol>
+        <li><a href="#s1">Daily vs Lifetime budget</a></li>
+        <li><a href="#s2">Advantage+ Campaign Budget toggle</a></li>
+        <li><a href="#s3">Sarah's KES 15,000 split across 3 ad sets</a></li>
+        <li><a href="#s4">Learning Phase status pill</a></li>
+        <li><a href="#s5">Scaling calculator (+20% cap)</a></li>
+        <li><a href="#s6">Kill-decision challenge (auto-marked)</a></li>
+    </ol>
+</div>
+
+<section id="s1">
+    <h2>1. Campaign setup — daily vs lifetime</h2>
+
+    <div class="camp">
+        <div class="camp-top">
+            <div class="logo">🎯</div>
+            <div>
+                <div class="title">Campaign · Karibu Kitchen Lunch Orders</div>
+                <div class="sub">Objective: Sales · Currency: KES</div>
+            </div>
+        </div>
+        <div class="camp-body">
+
+            <div class="adv-box">
+                <div class="info">
+                    <h5>Advantage+ Campaign Budget</h5>
+                    <p>One budget at campaign level. Meta redistributes across ad sets in real time. Recommended for 3+ ad sets.</p>
+                </div>
+                <div class="toggle on" id="tAdv" onclick="toggleAdv()"></div>
+            </div>
+
+            <h3>Budget mode</h3>
+            <div class="mode-picker">
+                <button class="active" data-mode="daily" onclick="setMode('daily')">Daily<small>Fixed cap per day — best for ongoing campaigns</small></button>
+                <button data-mode="lifetime" onclick="setMode('lifetime')">Lifetime<small>Total across schedule — best for time-bound promos</small></button>
+            </div>
+
+            <h3>Campaign budget</h3>
+            <div class="money-wrap">
+                <span class="kes">KES</span>
+                <input type="number" id="campBudget" value="500" oninput="onBudgetInput()">
+                <span class="per" id="budgetPer">/ day (≈ KES 15,000 / month)</span>
+            </div>
+            <div class="callout tip" id="modeNote">
+                <strong>Sarah's pick:</strong> Daily budget of KES 500 = ~KES 15,000/month. Predictable and lets her sleep. She switches to Lifetime only for the Ramadan iftar promo which has a hard end date.
+            </div>
+
+            <h3>Ad sets — allocation sliders</h3>
+            <p style="color:#65676b;font-size:13px;">Drag each slider. Bars must sum to <strong>100%</strong> of Sarah's KES 15,000/mo (or KES 500/day).</p>
+
+            <div class="adset-panel">
+                <h5>1. Advantage+ Sales <span style="font-size:11px; color:#059669;">● Cold prospecting</span></h5>
+                <div class="desc">Broad Kenya + Pixel-optimised. Sarah's carousel + video.</div>
+                <div class="slider-row">
+                    <input type="range" id="as1" min="0" max="100" value="40" oninput="recalc()">
+                    <span class="allocation" id="as1-val">KES 6,000 / mo</span>
+                </div>
+                <div class="adset-bar"><div class="adset-fill" id="as1-fill" style="width:40%">40%</div></div>
+            </div>
+
+            <div class="adset-panel">
+                <h5>2. Retargeting <span style="font-size:11px; color:#f59e0b;">● Warm</span></h5>
+                <div class="desc">Cart abandoners 14d + past visitors 30d. "Your lunch is waiting."</div>
+                <div class="slider-row">
+                    <input type="range" id="as2" min="0" max="100" value="30" oninput="recalc()">
+                    <span class="allocation" id="as2-val">KES 4,500 / mo</span>
+                </div>
+                <div class="adset-bar"><div class="adset-fill" id="as2-fill" style="width:30%">30%</div></div>
+            </div>
+
+            <div class="adset-panel">
+                <h5>3. Reels Awareness <span style="font-size:11px; color:#F57C00;">● Discovery</span></h5>
+                <div class="desc">1–3% Lookalike of purchasers. Vertical Reels of Sarah cooking.</div>
+                <div class="slider-row">
+                    <input type="range" id="as3" min="0" max="100" value="30" oninput="recalc()">
+                    <span class="allocation" id="as3-val">KES 4,500 / mo</span>
+                </div>
+                <div class="adset-bar"><div class="adset-fill" id="as3-fill" style="width:30%">30%</div></div>
+            </div>
+
+            <div class="total-box ok" id="totalBox">
+                <span>Total allocated</span>
+                <strong id="totalPct">100%</strong>
+                <span id="totalKes">KES 15,000 / mo</span>
+            </div>
+
+        </div>
+    </div>
+</section>
+
+<section id="s2">
+    <h2>2. Advantage+ Campaign Budget — the toggle</h2>
+    <p>Advantage+ (previously CBO) lets Meta re-distribute your campaign-level budget in real time across ad sets — more to the winner, less to the laggard. Sarah moves to it the day she launches her third ad set.</p>
+    <div class="callout tip">
+        <strong>Rule:</strong> 1–2 ad sets → ad-set-level budgets are fine. 3+ ad sets → Advantage+ Campaign Budget almost always wins.
+    </div>
+</section>
+
+<section id="s3">
+    <h2>3. The KES 15,000 split — try the sliders above</h2>
+    <p>Sarah's baseline split (40 / 30 / 30) already loaded. Try dragging — but keep the total at 100%. Watch the total pill change colour when you drift off target.</p>
+</section>
+
+<section id="s4">
+    <h2>4. Learning Phase status pill</h2>
+    <p>Every new ad set enters a Learning Phase — Meta's algorithm needs ~50 optimisation events in a rolling 7-day window to stabilise. Below 50 → wild swings. Above 50 → predictable cost per result.</p>
+
+    <div class="lp-block" id="lpBlock">
+        <div class="lp-title">
+            <span class="lp-pill" id="lpPill">● In learning</span>
+            <span style="color:#78350f;font-weight:600;" id="lpText">Advantage+ Sales — 32/50 optimisation events (7d)</span>
+        </div>
+        <div class="lp-track">
+            <div class="lp-fill" id="lpFill" style="width:64%">32/50</div>
+            <div class="lp-marker"></div>
+        </div>
+        <p style="font-size:13px; color:#78350f; margin-top:8px;">Do NOT edit the ad set. Any budget, audience, or creative change resets the 50-event counter.</p>
+        <button class="challenge-btn" style="margin-top:8px;" onclick="advanceLearning()">Fast-forward 1 day →</button>
+        <button class="challenge-btn" style="margin-top:8px; background:#64748b;" onclick="resetLearning()">Reset</button>
+    </div>
+
+    <div class="callout warn">
+        <strong>3 events that RESET learning:</strong> changing budget by more than 20%, changing audience or placements, replacing the creative. Duplicate the ad set for the test — don't touch the live one.
+    </div>
+</section>
+
+<section id="s5">
+    <h2>5. Scaling calculator — +20% cap</h2>
+    <p>Sarah's Retargeting ad set is winning. She wants to spend more without resetting learning. The rule: <strong>raise daily budget by no more than 20% every 3–4 days</strong>.</p>
+
+    <div class="calc-box">
+        <h4>Scaling calculator</h4>
+        <div class="calc-grid">
+            <div class="calc-side">
+                <div class="lbl">Current daily budget</div>
+                <div class="money-wrap" style="margin-top:6px;margin-bottom:0;">
+                    <span class="kes">KES</span>
+                    <input type="number" id="scaleIn" value="150" oninput="scaleCalc()">
+                    <span class="per">/ day</span>
+                </div>
+                <div class="footnote">Enter today's daily budget for one ad set.</div>
+            </div>
+            <div class="calc-side">
+                <div class="lbl">Max next-week daily budget (+20%)</div>
+                <div class="val" id="scaleOut">KES 180</div>
+                <div class="footnote" id="scaleTip">Safe scaling target — Meta will not re-enter Learning.</div>
+            </div>
+        </div>
+        <div class="calc-note">3-week ladder: KES 150 → 180 → 215 → 258. Almost doubles the spend without a single re-learn.</div>
+    </div>
+</section>
+
+<section id="s6">
+    <h2>6. Kill-decision challenge</h2>
+    <p>Three triggers for killing an ad set: frequency &gt; 3, CPA &gt; target × 5, ROAS drop &gt; 30% held 4 days. Score out of 4.</p>
+    <div class="challenge">
+        <div class="cq">
+            <p><strong>Q1.</strong> Ad set frequency is 4.2 after 6 days. CTR has halved. What do you do?</p>
+            <label><input type="radio" name="cq1" value="A"> A) Raise budget 30% to hit more people</label>
+            <label><input type="radio" name="cq1" value="B"> B) Refresh creative or turn off — audience is fatigued</label>
+            <label><input type="radio" name="cq1" value="C"> C) Change audience only</label>
+            <label><input type="radio" name="cq1" value="D"> D) Nothing — 4.2 is fine</label>
+        </div>
+        <div class="cq">
+            <p><strong>Q2.</strong> CPA target is KES 300/order. Ad set spent KES 1,800 and got zero purchases. Best call?</p>
+            <label><input type="radio" name="cq2" value="A"> A) Kill it — 6× CPA target with no result</label>
+            <label><input type="radio" name="cq2" value="B"> B) Double budget to speed learning</label>
+            <label><input type="radio" name="cq2" value="C"> C) Wait another 30 days</label>
+            <label><input type="radio" name="cq2" value="D"> D) Change objective mid-flight</label>
+        </div>
+        <div class="cq">
+            <p><strong>Q3.</strong> Winning ad set at KES 150/day. Safe scaling target for next week?</p>
+            <label><input type="radio" name="cq3" value="A"> A) KES 500/day (jump)</label>
+            <label><input type="radio" name="cq3" value="B"> B) KES 180/day (+20%)</label>
+            <label><input type="radio" name="cq3" value="C"> C) KES 150/day (no change)</label>
+            <label><input type="radio" name="cq3" value="D"> D) KES 75/day (halve it)</label>
+        </div>
+        <div class="cq">
+            <p><strong>Q4.</strong> New ad set is at 32/50 events at Day 5. Should Sarah edit the creative to try a better hook?</p>
+            <label><input type="radio" name="cq4" value="A"> A) Yes — edit immediately</label>
+            <label><input type="radio" name="cq4" value="B"> B) No — any edit resets Learning. Duplicate the ad set instead</label>
+            <label><input type="radio" name="cq4" value="C"> C) Only edit the headline</label>
+            <label><input type="radio" name="cq4" value="D"> D) Delete and restart</label>
+        </div>
+        <button class="challenge-btn" onclick="markChallenge()">Score my picks</button>
+        <div class="verdict" id="chVerdict"></div>
+    </div>
+</section>
+
+<footer>
+    <p>Lesson 11.5 — Budgets, Advantage+, Learning Phase · Masomotele Technical Training Institute · Handbook Part 11, §11.5</p>
+    <p>Module 11 complete. Next: <strong>Module 12 — LinkedIn &amp; TikTok Ads</strong></p>
+</footer>
+
+</div>
+
+<script>
+let mode = 'daily';       // daily or lifetime
+let advOn = true;
+let monthly = 15000;
+let daily = 500;
+
+function toggleAdv() {
+    advOn = !advOn;
+    document.getElementById('tAdv').classList.toggle('on');
+}
+
+function setMode(m) {
+    mode = m;
+    document.querySelectorAll('.mode-picker button').forEach(b => b.classList.remove('active'));
+    document.querySelector('.mode-picker button[data-mode="' + m + '"]').classList.add('active');
+    document.getElementById('budgetPer').textContent = m === 'daily'
+        ? '/ day (≈ KES ' + (daily*30).toLocaleString() + ' / month)'
+        : '/ lifetime (across the whole schedule)';
+    document.getElementById('modeNote').innerHTML = m === 'daily'
+        ? '<strong>Sarah\'s pick:</strong> Daily budget of KES 500 = ~KES 15,000/month. Predictable and lets her sleep. She switches to Lifetime only for the Ramadan iftar promo which has a hard end date.'
+        : '<strong>Lifetime mode:</strong> Meta spends the total across the schedule — some days high, some low — to hit the best conversion moments. Best for time-bound promos (2 weeks max).';
+}
+
+function onBudgetInput() {
+    daily = parseInt(document.getElementById('campBudget').value) || 0;
+    monthly = daily * 30;
+    if (mode === 'daily') {
+        document.getElementById('budgetPer').textContent = '/ day (≈ KES ' + monthly.toLocaleString() + ' / month)';
+    }
+    recalc();
+}
+
+function recalc() {
+    const v1 = parseInt(document.getElementById('as1').value);
+    const v2 = parseInt(document.getElementById('as2').value);
+    const v3 = parseInt(document.getElementById('as3').value);
+    const total = v1 + v2 + v3;
+
+    document.getElementById('as1-fill').style.width = v1 + '%';
+    document.getElementById('as1-fill').textContent = v1 + '%';
+    document.getElementById('as2-fill').style.width = v2 + '%';
+    document.getElementById('as2-fill').textContent = v2 + '%';
+    document.getElementById('as3-fill').style.width = v3 + '%';
+    document.getElementById('as3-fill').textContent = v3 + '%';
+
+    document.getElementById('as1-val').textContent = 'KES ' + Math.round(monthly * v1/100).toLocaleString() + ' / mo';
+    document.getElementById('as2-val').textContent = 'KES ' + Math.round(monthly * v2/100).toLocaleString() + ' / mo';
+    document.getElementById('as3-val').textContent = 'KES ' + Math.round(monthly * v3/100).toLocaleString() + ' / mo';
+
+    const totalBox = document.getElementById('totalBox');
+    document.getElementById('totalPct').textContent = total + '%';
+    document.getElementById('totalKes').textContent = 'KES ' + Math.round(monthly * total/100).toLocaleString() + ' / mo';
+    if (total === 100) totalBox.className = 'total-box ok';
+    else totalBox.className = 'total-box err';
+}
+recalc();
+
+// Learning phase
+let lpEvents = 32;
+function advanceLearning() {
+    lpEvents = Math.min(60, lpEvents + Math.floor(Math.random()*8) + 4);
+    updateLp();
+}
+function resetLearning() {
+    lpEvents = 32;
+    updateLp();
+}
+function updateLp() {
+    const block = document.getElementById('lpBlock');
+    const pill = document.getElementById('lpPill');
+    const txt = document.getElementById('lpText');
+    const fill = document.getElementById('lpFill');
+    if (lpEvents >= 50) {
+        block.classList.add('exit');
+        pill.textContent = '● Active';
+        txt.textContent = 'Advantage+ Sales — Exited Learning (' + lpEvents + ' events / 7d) · Cost per result stabilised.';
+        fill.style.width = '100%';
+        fill.textContent = lpEvents + '+';
+    } else {
+        block.classList.remove('exit');
+        pill.textContent = '● In learning';
+        txt.textContent = 'Advantage+ Sales — ' + lpEvents + '/50 optimisation events (7d)';
+        fill.style.width = (lpEvents / 50 * 100) + '%';
+        fill.textContent = lpEvents + '/50';
+    }
+}
+
+function scaleCalc() {
+    const curr = parseInt(document.getElementById('scaleIn').value) || 0;
+    const max = Math.round(curr * 1.2);
+    document.getElementById('scaleOut').textContent = 'KES ' + max.toLocaleString();
+    document.getElementById('scaleTip').textContent = 'Raise to KES ' + max.toLocaleString() + '/day in 3–4 days. Bigger jumps re-enter Learning.';
+}
+scaleCalc();
+
+const correct = { cq1: 'B', cq2: 'A', cq3: 'B', cq4: 'B' };
+function markChallenge() {
+    let score = 0;
+    for (const q in correct) {
+        const p = document.querySelector('input[name="' + q + '"]:checked');
+        if (p && p.value === correct[q]) score++;
+    }
+    const v = document.getElementById('chVerdict');
+    v.classList.add('show');
+    if (score === 4) { v.className = 'verdict show good'; v.textContent = 'Perfect ' + score + '/4. Module 11 complete — you can run pro Meta Ads for any Kenyan business.'; }
+    else if (score >= 2) { v.className = 'verdict show mid'; v.textContent = 'Halfway: ' + score + '/4. Revisit the kill-triggers and the +20% cap.'; }
+    else { v.className = 'verdict show bad'; v.textContent = 'Only ' + score + '/4. Rewatch the video before scaling any budget.'; }
+}
+</script>
+</body>
+</html>

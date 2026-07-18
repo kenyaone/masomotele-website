@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>System Hardening Basics (Lesson) | MTTI Computer Applications</title>
+<link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Fredoka:wght@500;600&display=swap" rel="stylesheet">
+<style>
+* { margin:0; padding:0; box-sizing:border-box; }
+body { font-family:'Space Mono', monospace; background:linear-gradient(135deg,#2E7D32 0%,#1565C0 100%); min-height:100vh; padding:20px; color:#fff; }
+.container { max-width:820px; margin:0 auto; }
+.header { text-align:center; margin-bottom:24px; }
+.lesson-tag { display:inline-block; background:rgba(255,255,255,0.2); padding:6px 16px; border-radius:999px; font-size:0.85em; margin-bottom:12px; }
+.header h1 { font-family:'Fredoka', sans-serif; font-size:2em; margin-bottom:6px; text-shadow:3px 3px 0 rgba(0,0,0,0.2); }
+.card { background:#fff; color:#333; border-radius:22px; padding:32px; margin-bottom:20px; box-shadow:0 20px 60px rgba(0,0,0,0.3); }
+.section { margin-bottom:26px; }
+.section:last-child { margin-bottom:0; }
+.section h2 { font-family:'Fredoka', sans-serif; font-size:1.2em; margin-bottom:10px; color:#1565C0; }
+.section .body { line-height:1.65; font-size:0.98em; }
+.section .body p { margin-bottom:10px; }
+.section .body code { background:#f5f7fb; padding:2px 6px; border-radius:4px; font-size:0.92em; }
+.keypoint { background:#fff8e1; border-left:4px solid #ffc107; padding:12px 16px; border-radius:8px; margin-top:12px; font-size:0.92em; }
+</style>
+</head>
+<body>
+<div class="container">
+<div class="header"><div class="lesson-tag">Module 2 · Lesson 2.4</div><h1>System Hardening Basics</h1></div>
+<div class="card"><div class="section"><h2>Attack Surface</h2><div class="body"><p>A system's <strong>attack surface</strong> is everything an attacker could potentially target — every running service, open port, installed application, and enabled feature. A smaller attack surface simply gives an attacker fewer possible ways in.</p></div><div class="keypoint"><strong>Key Point.</strong> Hardening is largely about subtraction — removing or disabling anything not actually needed, rather than adding more security tools on top of everything.</div></div><div class="section"><h2>Unnecessary Services and Default Accounts</h2><div class="body"><p>Many systems ship with services enabled and default accounts (sometimes with well-known default passwords) that most deployments never actually use. Disabling unused services and removing/renaming default accounts closes off paths an attacker could otherwise exploit without ever needing a "real" vulnerability.</p></div></div><div class="section"><h2>Closing Unused Ports</h2><div class="body"><p>A network port left open for a service nobody uses is an unnecessary open door. Auditing which ports are actually required for a system's real function, and closing the rest, reduces the attack surface concretely and measurably.</p></div></div><div class="section"><h2>Secure Defaults vs Convenient Defaults</h2><div class="body"><p>Many products ship with defaults optimised for easy setup, not maximum security (e.g. a default admin password, or remote management enabled by default). Reviewing and changing insecure-but-convenient defaults is a standard, necessary hardening step before any new system goes into production at SafariPay.</p></div></div></div>
+</div>
+</body>
+</html>

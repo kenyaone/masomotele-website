@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>System Hardening Basics | MTTI Computer Applications</title>
+    <link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Fredoka:wght@500;600&display=swap" rel="stylesheet">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Space Mono', monospace; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); min-height: 100vh; padding: 20px; color: #fff; }
+        .container { max-width: 900px; margin: 0 auto; }
+        .header { text-align: center; margin-bottom: 30px; }
+        .header .lesson-tag { display: inline-block; background: rgba(255,255,255,0.2); padding: 6px 16px; border-radius: 999px; font-size: 0.85em; margin-bottom: 12px; }
+        .header h1 { font-family: 'Fredoka', sans-serif; font-size: 2.2em; margin-bottom: 8px; text-shadow: 3px 3px 0 rgba(0,0,0,0.2); }
+        .score-board { background: rgba(255,255,255,0.15); backdrop-filter: blur(10px); border-radius: 20px; padding: 20px; margin-bottom: 20px; display: flex; justify-content: space-around; }
+        .score-item { text-align: center; }
+        .score-item .label { font-size: 0.85em; opacity: 0.9; margin-bottom: 4px; }
+        .score-item .value { font-size: 1.8em; font-weight: bold; font-family: 'Fredoka', sans-serif; }
+        .progress-bar { width: 100%; height: 8px; background: rgba(255,255,255,0.3); border-radius: 10px; margin-bottom: 25px; overflow: hidden; }
+        .progress-fill { height: 100%; background: linear-gradient(90deg, #f093fb 0%, #f5576c 100%); border-radius: 10px; transition: width 0.5s ease; width: 0%; }
+        .exercise-card { background: white; color: #333; border-radius: 25px; padding: 35px; margin-bottom: 20px; box-shadow: 0 20px 60px rgba(0,0,0,0.3); }
+        .scenario { background: linear-gradient(135deg, #fff8e1 0%, #ffecb3 100%); border-left: 5px solid #ffc107; padding: 20px 24px; border-radius: 12px; margin-bottom: 24px; font-size: 0.98em; line-height: 1.55; }
+        .scenario strong { color: #7a5a00; font-family: 'Fredoka', sans-serif; }
+        .question { font-size: 1.15em; margin-bottom: 20px; font-weight: 700; line-height: 1.4; }
+        .options { display: flex; flex-direction: column; gap: 12px; }
+        .option { background: #f5f7fb; border: 2px solid transparent; padding: 16px 20px; border-radius: 12px; cursor: pointer; transition: all 0.2s ease; font-family: 'Space Mono', monospace; font-size: 0.98em; text-align: left; }
+        .option:hover:not(.disabled) { background: #eef1fb; border-color: #667eea; transform: translateX(4px); }
+        .option.correct { background: #d4edda; border-color: #28a745; color: #155724; }
+        .option.wrong { background: #f8d7da; border-color: #dc3545; color: #721c24; }
+        .option.disabled { cursor: not-allowed; opacity: 0.85; }
+        .feedback { margin-top: 22px; padding: 18px 22px; border-radius: 12px; font-size: 0.98em; line-height: 1.5; }
+        .feedback.correct { background: #d4edda; color: #155724; border-left: 4px solid #28a745; }
+        .feedback.wrong { background: #f8d7da; color: #721c24; border-left: 4px solid #dc3545; }
+        .next-btn, .restart-btn { margin-top: 20px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; border: none; padding: 14px 32px; border-radius: 12px; font-size: 1em; cursor: pointer; font-family: 'Fredoka', sans-serif; box-shadow: 0 6px 18px rgba(0,0,0,0.2); }
+        .results { text-align: center; padding: 25px 15px; }
+        .results h2 { font-family: 'Fredoka', sans-serif; font-size: 2em; margin-bottom: 12px; color: #333; }
+        .results .final-score { font-size: 3em; font-family: 'Fredoka', sans-serif; color: #667eea; margin: 20px 0; }
+        .results p { color: #555; margin-bottom: 12px; }
+        .badge { display: inline-block; font-size: 3.5em; margin: 8px 0; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <div class="lesson-tag">Module 2 · Lesson 2.4 · Quiz</div>
+            <h1>System Hardening Basics</h1>
+        </div>
+        <div class="score-board">
+            <div class="score-item"><div class="label">Score</div><div class="value" id="score">0</div></div>
+            <div class="score-item"><div class="label">Question</div><div class="value"><span id="current">1</span>/<span id="total">10</span></div></div>
+            <div class="score-item"><div class="label">Streak</div><div class="value" id="streak">0</div></div>
+        </div>
+        <div class="progress-bar"><div class="progress-fill" id="progress"></div></div>
+        <div class="exercise-card" id="exerciseCard"></div>
+    </div>
+    <script>
+        const exercises = [{"scenario":"Grace is explaining the concept of 'attack surface' to a new SafariPay systems administrator.","question":"Which description fits best?","options":["The physical size of a server room","Everything a system exposes that could potentially be targeted \u2014 services, ports, accounts, features","A type of malware","The speed of a network connection"],"correct":1,"explanation":"Attack surface refers to the total set of exposed, potentially exploitable elements of a system."},{"scenario":"A server has 15 background services running, but SafariPay's actual use case only requires 4 of them.","question":"What hardening action addresses the unused 11 services?","options":["Leave them all enabled for flexibility","Disable the unused services to reduce the attack surface","Add authentication to each service instead of disabling any","Unused services pose no risk and can be ignored"],"correct":1,"explanation":"Disabling services that serve no actual purpose directly shrinks the number of potential targets on the system."},{"scenario":"A newly deployed device ships with a default admin account whose password is published in the vendor's public manual.","question":"What is the necessary hardening step here?","options":["No action needed since it is documented by the vendor","Change the default password immediately, since a publicly known default password is a critical, easily-exploited weakness","Only change it if an incident actually occurs first","Default passwords are not a real security concern"],"correct":1,"explanation":"A publicly documented default password is trivially exploitable and must be changed before any real deployment."},{"scenario":"Grace is auditing which network ports are genuinely required for a server's actual function.","question":"What should happen to ports found open but not actually required?","options":["Leave them open regardless of findings","Close them, since each unnecessary open port is an avoidable additional entry point","Open additional unrelated ports as well","Port audits have no practical security value"],"correct":1,"explanation":"Closing genuinely unnecessary open ports is a direct, concrete way to reduce the attack surface."},{"scenario":"Grace explains that hardening is largely a process of subtraction rather than addition.","question":"What does this mean in practice?","options":["Adding as many additional security tools as possible","Removing or disabling unnecessary services, accounts, and open ports, rather than only adding new protective layers on top","Hardening always requires purchasing new software","Subtraction has no place in system hardening"],"correct":1,"explanation":"A core hardening principle is removing/disabling what is not needed, which is fundamentally about reducing exposure, not just adding more tools."},{"scenario":"A new system ships configured for maximum ease of initial setup, with several insecure-but-convenient defaults enabled.","question":"What should happen before this system goes into production at SafariPay?","options":["Deploy immediately using the convenient defaults as-is","Review and change the insecure-but-convenient defaults as a standard pre-production hardening step","Defaults are always already optimised for security and need no review","Only review defaults after an incident occurs"],"correct":1,"explanation":"Reviewing and correcting convenience-optimised (not security-optimised) defaults before going live is a standard, necessary hardening practice."}];
+        let currentQuestion = 0, score = 0, streak = 0, answered = false;
+        function updateScoreboard() {
+            document.getElementById('score').textContent = score;
+            document.getElementById('current').textContent = Math.min(currentQuestion + 1, exercises.length);
+            document.getElementById('total').textContent = exercises.length;
+            document.getElementById('streak').textContent = streak;
+            document.getElementById('progress').style.width = ((currentQuestion) / exercises.length) * 100 + '%';
+        }
+        function escapeHtml(s) { return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+        function renderQuestion() {
+            answered = false;
+            const q = exercises[currentQuestion];
+            let html = '';
+            if (q.scenario) html += `<div class="scenario"><strong>Scenario.</strong> ${escapeHtml(q.scenario)}</div>`;
+            html += `<div class="question">${escapeHtml(q.question)}</div>`;
+            html += '<div class="options">';
+            q.options.forEach((o, i) => { html += `<button class="option" onclick="selectAnswer(${i})">${escapeHtml(o)}</button>`; });
+            html += '</div>';
+            document.getElementById('exerciseCard').innerHTML = html;
+            updateScoreboard();
+        }
+        function selectAnswer(i) {
+            if (answered) return;
+            answered = true;
+            const q = exercises[currentQuestion];
+            const btns = document.querySelectorAll('.option');
+            btns.forEach(b => b.classList.add('disabled'));
+            btns[q.correct].classList.add('correct');
+            const right = i === q.correct;
+            if (!right) btns[i].classList.add('wrong');
+            if (right) { score += 10; streak += 1; } else { streak = 0; }
+            const fb = document.createElement('div');
+            fb.className = 'feedback ' + (right ? 'correct' : 'wrong');
+            fb.innerHTML = `<strong>${right ? '✅ Correct.' : '❌ Not quite.'}</strong><br>${escapeHtml(q.explanation)}`;
+            document.getElementById('exerciseCard').appendChild(fb);
+            const nb = document.createElement('button');
+            nb.className = 'next-btn';
+            nb.textContent = currentQuestion === exercises.length - 1 ? 'See results →' : 'Next scenario →';
+            nb.onclick = nextQuestion;
+            document.getElementById('exerciseCard').appendChild(nb);
+            updateScoreboard();
+        }
+        function nextQuestion() { currentQuestion++; if (currentQuestion >= exercises.length) return showResults(); renderQuestion(); }
+        function showResults() {
+            document.getElementById('progress').style.width = '100%';
+            const total = exercises.length * 10;
+            const pct = Math.round(score / total * 100);
+            if (window.parent) { window.parent.postMessage({type:"mtti_quiz_score", score: score, total: total, percent: pct}, "*"); }
+            let badge = '🌟', msg = 'Excellent work. You have a professional grasp of this lesson.';
+            if (pct < 50) { badge = '🌱'; msg = 'Good first attempt. Review the lesson and try again.'; }
+            else if (pct < 80) { badge = '📚'; msg = 'Solid progress. Review the scenarios you missed and retry.'; }
+            document.getElementById('exerciseCard').innerHTML = `
+                <div class="results">
+                    <span class="badge">${badge}</span>
+                    <h2>Quiz Complete</h2>
+                    <div class="final-score">${score} / ${total}</div>
+                    <p><strong>${pct}%</strong> · Longest streak: ${streak}</p>
+                    <p>${msg}</p>
+                    <button class="restart-btn" onclick="restart()">Try again 🔁</button>
+                </div>`;
+        }
+        function restart() { currentQuestion = 0; score = 0; streak = 0; renderQuestion(); }
+        renderQuestion();
+    </script>
+</body>
+</html>

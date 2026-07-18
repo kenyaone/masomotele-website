@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SIEM and Log Monitoring (Lesson) | MTTI Computer Applications</title>
+<link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Fredoka:wght@500;600&display=swap" rel="stylesheet">
+<style>
+* { margin:0; padding:0; box-sizing:border-box; }
+body { font-family:'Space Mono', monospace; background:linear-gradient(135deg,#2E7D32 0%,#1565C0 100%); min-height:100vh; padding:20px; color:#fff; }
+.container { max-width:820px; margin:0 auto; }
+.header { text-align:center; margin-bottom:24px; }
+.lesson-tag { display:inline-block; background:rgba(255,255,255,0.2); padding:6px 16px; border-radius:999px; font-size:0.85em; margin-bottom:12px; }
+.header h1 { font-family:'Fredoka', sans-serif; font-size:2em; margin-bottom:6px; text-shadow:3px 3px 0 rgba(0,0,0,0.2); }
+.card { background:#fff; color:#333; border-radius:22px; padding:32px; margin-bottom:20px; box-shadow:0 20px 60px rgba(0,0,0,0.3); }
+.section { margin-bottom:26px; }
+.section:last-child { margin-bottom:0; }
+.section h2 { font-family:'Fredoka', sans-serif; font-size:1.2em; margin-bottom:10px; color:#1565C0; }
+.section .body { line-height:1.65; font-size:0.98em; }
+.section .body p { margin-bottom:10px; }
+.section .body code { background:#f5f7fb; padding:2px 6px; border-radius:4px; font-size:0.92em; }
+.keypoint { background:#fff8e1; border-left:4px solid #ffc107; padding:12px 16px; border-radius:8px; margin-top:12px; font-size:0.92em; }
+</style>
+</head>
+<body>
+<div class="container">
+<div class="header"><div class="lesson-tag">Module 7 · Lesson 7.2</div><h1>SIEM and Log Monitoring</h1></div>
+<div style="background:#fff;color:#333;border-radius:16px;padding:16px;margin-bottom:20px;box-shadow:0 8px 24px rgba(0,0,0,0.12);text-align:center;"><svg viewBox="0 0 500 140" style="width:100%;max-width:560px;height:140px;" xmlns="http://www.w3.org/2000/svg">
+<rect x="10" y="10" width="80" height="30" rx="4" fill="#94a3b8"/><text x="50" y="29" font-size="8" text-anchor="middle" fill="#fff">Firewall logs</text>
+<rect x="10" y="55" width="80" height="30" rx="4" fill="#94a3b8"/><text x="50" y="74" font-size="8" text-anchor="middle" fill="#fff">Server logs</text>
+<rect x="10" y="100" width="80" height="30" rx="4" fill="#94a3b8"/><text x="50" y="119" font-size="8" text-anchor="middle" fill="#fff">App logs</text>
+<path d="M95,25 L200,65" stroke="#999" stroke-width="1.5"/>
+<path d="M95,70 L200,68" stroke="#999" stroke-width="1.5"/>
+<path d="M95,115 L200,72" stroke="#999" stroke-width="1.5"/>
+<rect x="200" y="35" width="110" height="65" rx="8" fill="#259BD7"/><text x="255" y="63" font-size="10" text-anchor="middle" fill="#fff">SIEM</text><text x="255" y="78" font-size="8" text-anchor="middle" fill="#fff">correlate</text>
+<path d="M315,68 h45" stroke="#E8942E" stroke-width="2" marker-end="url(#arrS)"/>
+<rect x="365" y="45" width="110" height="45" rx="6" fill="#E8942E"/><text x="420" y="72" font-size="9" text-anchor="middle" fill="#fff">Alert for Grace</text>
+<defs><marker id="arrS" markerWidth="8" markerHeight="8" refX="6" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8 Z" fill="#E8942E"/></marker></defs>
+</svg></div><div class="card"><div class="section"><h2>What a SIEM Does</h2><div class="body"><p>A <strong>SIEM</strong> (Security Information and Event Management) platform collects logs from many different sources across SafariPay's environment — servers, firewalls, applications — into one central place, making it possible to search, analyse, and correlate activity that would otherwise sit scattered across dozens of separate systems.</p></div></div><div class="section"><h2>Correlation</h2><div class="body"><p><strong>Correlation</strong> connects related events across different systems that might look harmless individually but reveal something significant together — a failed login on the VPN, followed minutes later by an unusual database query from that same account, correlated together tells a very different story than either event alone.</p></div><div class="keypoint"><strong>Key Point.</strong> The real power of a SIEM often lies in correlation — spotting the meaningful pattern across multiple individually-unremarkable events, not any single log line in isolation.</div></div><div class="section"><h2>Detection Rules</h2><div class="body"><p>A SIEM uses <strong>detection rules</strong> to automatically flag patterns matching known suspicious behaviour (e.g. "alert if the same account fails login 10 times within 2 minutes"), turning raw log data into actionable alerts rather than requiring manual review of every single log entry.</p></div></div><div class="section"><h2>Only as Good as Its Logs</h2><div class="body"><p>A SIEM cannot detect or correlate what it never receives — if a critical system is not sending its logs into the SIEM at all, that entire source is effectively invisible to it, regardless of how well the SIEM itself is configured otherwise.</p></div></div></div>
+</div>
+</body>
+</html>

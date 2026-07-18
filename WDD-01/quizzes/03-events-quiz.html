@@ -1,0 +1,346 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Events | MTTI Web Design</title>
+    <link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Fredoka:wght@500;600&display=swap" rel="stylesheet">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Space Mono', monospace;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh; padding: 20px; color: #fff;
+        }
+        .container { max-width: 900px; margin: 0 auto; }
+        .header { text-align: center; margin-bottom: 30px; animation: slideDown 0.6s ease-out; }
+        .header .lesson-tag {
+            display: inline-block; background: rgba(255,255,255,0.2);
+            padding: 6px 16px; border-radius: 999px;
+            font-size: 0.85em; margin-bottom: 12px;
+        }
+        .header h1 {
+            font-family: 'Fredoka', sans-serif; font-size: 2.2em;
+            margin-bottom: 8px; text-shadow: 3px 3px 0 rgba(0,0,0,0.2);
+        }
+        .header p { opacity: 0.95; font-size: 0.95em; }
+        .score-board {
+            background: rgba(255,255,255,0.15); backdrop-filter: blur(10px);
+            border-radius: 20px; padding: 20px; margin-bottom: 20px;
+            display: flex; justify-content: space-around;
+            animation: fadeIn 0.8s ease-out 0.2s both;
+        }
+        .score-item { text-align: center; }
+        .score-item .label { font-size: 0.85em; opacity: 0.9; margin-bottom: 4px; }
+        .score-item .value {
+            font-size: 1.8em; font-weight: bold; font-family: 'Fredoka', sans-serif;
+        }
+        .progress-bar {
+            width: 100%; height: 8px; background: rgba(255,255,255,0.3);
+            border-radius: 10px; margin-bottom: 25px; overflow: hidden;
+        }
+        .progress-fill {
+            height: 100%; background: linear-gradient(90deg, #f093fb 0%, #f5576c 100%);
+            border-radius: 10px; transition: width 0.5s ease; width: 0%;
+        }
+        .exercise-card {
+            background: white; color: #333; border-radius: 25px;
+            padding: 35px; margin-bottom: 20px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            animation: fadeIn 0.6s ease-out both;
+        }
+        .scenario {
+            background: linear-gradient(135deg, #fff8e1 0%, #ffecb3 100%);
+            border-left: 5px solid #ffc107;
+            padding: 20px 24px; border-radius: 12px;
+            margin-bottom: 24px;
+            font-size: 0.98em; line-height: 1.55;
+        }
+        .scenario strong { color: #7a5a00; font-family: 'Fredoka', sans-serif; }
+        .question {
+            font-size: 1.15em; margin-bottom: 20px;
+            font-weight: 700; line-height: 1.4;
+        }
+        .options { display: flex; flex-direction: column; gap: 12px; }
+        .option {
+            background: #f5f7fb; border: 2px solid transparent;
+            padding: 16px 20px; border-radius: 12px;
+            cursor: pointer; transition: all 0.2s ease;
+            font-family: 'Space Mono', monospace; font-size: 0.98em; text-align: left;
+        }
+        .option:hover:not(.disabled) {
+            background: #eef1fb; border-color: #667eea; transform: translateX(4px);
+        }
+        .option.correct { background: #d4edda; border-color: #28a745; color: #155724; }
+        .option.wrong { background: #f8d7da; border-color: #dc3545; color: #721c24; animation: shake 0.4s; }
+        .option.disabled { cursor: not-allowed; opacity: 0.85; }
+        .feedback {
+            margin-top: 22px; padding: 18px 22px; border-radius: 12px;
+            animation: slideUp 0.4s ease-out;
+            font-size: 0.98em; line-height: 1.5;
+        }
+        .feedback.correct { background: #d4edda; color: #155724; border-left: 4px solid #28a745; }
+        .feedback.wrong { background: #f8d7da; color: #721c24; border-left: 4px solid #dc3545; }
+        .feedback strong { font-family: 'Fredoka', sans-serif; }
+        .next-btn, .restart-btn {
+            margin-top: 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white; border: none;
+            padding: 14px 32px; border-radius: 12px;
+            font-size: 1em; cursor: pointer;
+            font-family: 'Fredoka', sans-serif;
+            box-shadow: 0 6px 18px rgba(0,0,0,0.2);
+            transition: transform 0.2s ease;
+        }
+        .next-btn:hover, .restart-btn:hover { transform: scale(1.04); }
+        .results {
+            text-align: center; padding: 25px 15px;
+            animation: bounceIn 0.6s ease-out;
+        }
+        .results h2 {
+            font-family: 'Fredoka', sans-serif; font-size: 2em;
+            margin-bottom: 12px; color: #333;
+        }
+        .results .final-score {
+            font-size: 3em; font-family: 'Fredoka', sans-serif;
+            color: #667eea; margin: 20px 0;
+        }
+        .results p { color: #555; margin-bottom: 12px; }
+        .badge { display: inline-block; font-size: 3.5em; margin: 8px 0; }
+        @keyframes slideDown { from { opacity: 0; transform: translateY(-30px); } to { opacity: 1; transform: translateY(0); } }
+        @keyframes fadeIn { from { opacity: 0; transform: scale(0.96); } to { opacity: 1; transform: scale(1); } }
+        @keyframes slideUp { from { opacity: 0; transform: translateY(15px); } to { opacity: 1; transform: translateY(0); } }
+        @keyframes shake { 0%,100% { transform: translateX(0); } 25% { transform: translateX(-8px); } 75% { transform: translateX(8px); } }
+        @keyframes bounceIn { 0% { opacity: 0; transform: scale(0.4); } 60% { transform: scale(1.05); } 100% { opacity: 1; transform: scale(1); } }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <div class="lesson-tag">Module 3 · Lesson 3.4 · Quiz</div>
+            <h1>Events</h1>
+            <p></p>
+        </div>
+
+        <div class="score-board">
+            <div class="score-item"><div class="label">Score</div><div class="value" id="score">0</div></div>
+            <div class="score-item"><div class="label">Question</div><div class="value"><span id="current">1</span>/<span id="total">10</span></div></div>
+            <div class="score-item"><div class="label">Streak</div><div class="value" id="streak">0</div></div>
+        </div>
+
+        <div class="progress-bar"><div class="progress-fill" id="progress"></div></div>
+
+        <div class="exercise-card" id="exerciseCard"></div>
+    </div>
+
+    <script>
+        const exercises = [
+  {
+    "id": "q1",
+    "text": "James writes btn.addEventListener('click', handleClick). What does this line do?",
+    "options": [
+      "Calls handleClick immediately",
+      "Registers handleClick to be called every time btn fires a 'click' event",
+      "Creates a new button element with the handleClick function",
+      "Removes any existing click handlers on btn"
+    ],
+    "answer": 1,
+    "explanation": "addEventListener(type, handler) registers an event listener. The handler is not called now — it runs every time the specified event type fires on the element. Multiple listeners can be added for the same event type."
+  },
+  {
+    "id": "q2",
+    "text": "James uses an inline event handler: <button onclick=\"showForm()\">. What is the main disadvantage?",
+    "options": [
+      "Inline handlers do not work in Safari",
+      "It mixes behaviour (JavaScript) into HTML, allows only one handler, and is harder to maintain",
+      "onclick is deprecated and removed from HTML5",
+      "Inline handlers run before DOMContentLoaded fires"
+    ],
+    "answer": 1,
+    "explanation": "Inline handlers mix concerns (HTML and JS in one place), can attach only one handler per event, cannot be easily removed with removeEventListener, and scatter logic across HTML files. The separation of concerns principle says JS belongs in .js files."
+  },
+  {
+    "id": "q3",
+    "text": "What does event.preventDefault() do on a form submit event?",
+    "options": [
+      "Stops all event listeners on the form from running",
+      "Prevents the browser's default action — the form won't submit and the page won't reload",
+      "Validates the form fields automatically",
+      "Prevents the event from bubbling up to parent elements"
+    ],
+    "answer": 1,
+    "explanation": "preventDefault() cancels the browser's default action for the event. For submit, the default is to send the form data and reload the page. Calling it gives JavaScript control — you can validate, then submit with fetch() or form.submit() when ready."
+  },
+  {
+    "id": "q4",
+    "text": "James has 50 product cards, each needing a click handler. What is the most performant approach?",
+    "options": [
+      "Loop through all 50 cards and add an addEventListener to each",
+      "Add one click listener to the parent container and check event.target inside the handler (event delegation)",
+      "Use CSS :active instead of JavaScript for click handling",
+      "Add the same onclick attribute to each card in the HTML"
+    ],
+    "answer": 1,
+    "explanation": "Event delegation: one listener on the parent catches all child events via bubbling. It uses less memory than 50 individual listeners, and also works for dynamically added cards (new listeners aren't needed when new cards are inserted)."
+  },
+  {
+    "id": "q5",
+    "text": "James wraps his DOM code in document.addEventListener('DOMContentLoaded', ...). Why?",
+    "options": [
+      "DOMContentLoaded fires when images and CSS are fully loaded",
+      "DOMContentLoaded fires when the HTML is parsed and the DOM is ready — ensuring elements exist before the code tries to select them",
+      "It speeds up page rendering by deferring non-critical scripts",
+      "It prevents the script from running more than once"
+    ],
+    "answer": 1,
+    "explanation": "DOMContentLoaded fires when the HTML document is fully parsed and the DOM is built — before images and stylesheets finish loading. It ensures getElementById and querySelector will find elements, not null."
+  },
+  {
+    "id": "q6",
+    "text": "What is event bubbling?",
+    "options": [
+      "An animation effect when clicking buttons",
+      "Events propagate from the target element up through its ancestors — a click on a child also fires on all parent elements",
+      "The event fires multiple times on the same element",
+      "Browser events queue up and fire in order"
+    ],
+    "answer": 1,
+    "explanation": "When an event fires on an element, it bubbles up through the DOM tree — firing on the parent, grandparent, and so on up to the document. Event delegation relies on this: a click on a .product-card bubbles up to the parent .product-grid listener."
+  },
+  {
+    "id": "q7",
+    "text": "James uses event delegation. He adds a click listener to .product-grid. Inside the handler, how does he identify which specific card was clicked?",
+    "options": [
+      "event.currentTarget.id",
+      "event.target or event.target.closest('.product-card')",
+      "this.element.className",
+      "event.source.id"
+    ],
+    "answer": 1,
+    "explanation": "event.target is the element that was actually clicked (may be a child element like a button inside the card). event.target.closest('.product-card') walks up the DOM tree to find the nearest ancestor matching the selector — reliable even when the inner element is clicked."
+  },
+  {
+    "id": "q8",
+    "text": "Which event fires CHARACTER BY CHARACTER as the user types into an input field — useful for live search?",
+    "options": [
+      "change",
+      "keypress",
+      "input",
+      "blur"
+    ],
+    "answer": 2,
+    "explanation": "The input event fires every time the value of an input changes — including typing, pasting, and autocomplete. change fires only when focus leaves the field and the value is different. input is the correct event for live validation and live search."
+  },
+  {
+    "id": "q9",
+    "text": "James removes an event listener with removeEventListener('click', handleClick). For this to work, what must be true?",
+    "options": [
+      "The element must be hidden first",
+      "handleClick must be a named function reference — anonymous functions cannot be removed this way",
+      "The event listener must have been added with onclick, not addEventListener",
+      "The element must have only one event listener"
+    ],
+    "answer": 1,
+    "explanation": "removeEventListener requires the exact same function reference that was passed to addEventListener. Anonymous functions (arrow functions or inline function expressions) create a new reference each time — you can't remove them because you can't reference the same function again."
+  },
+  {
+    "id": "q10",
+    "text": "James adds a keyboard event listener for the Escape key to close the mobile menu. Which event and property combination correctly detects the Escape key?",
+    "options": [
+      "'keypress' event, event.char === 'Escape'",
+      "'keydown' event, event.key === 'Escape'",
+      "'keyup' event, event.code === 27",
+      "'keyboard' event, event.value === 'esc'"
+    ],
+    "answer": 1,
+    "explanation": "keydown fires when a key is pressed. event.key returns the key value as a string — 'Escape', 'Enter', 'ArrowUp', etc. event.keyCode (deprecated) returns numeric codes. 'keyboard' is not a valid event; event.code returns the physical key position (e.g. 'Escape')."
+  }
+];
+
+        let currentQuestion = 0, score = 0, streak = 0, answered = false;
+
+        function updateScoreboard() {
+            document.getElementById('score').textContent = score;
+            document.getElementById('current').textContent = Math.min(currentQuestion + 1, exercises.length);
+            document.getElementById('total').textContent = exercises.length;
+            document.getElementById('streak').textContent = streak;
+            document.getElementById('progress').style.width = ((currentQuestion) / exercises.length) * 100 + '%';
+        }
+
+        function escapeHtml(s) {
+            return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+        }
+
+        function renderQuestion() {
+            answered = false;
+            const q = exercises[currentQuestion];
+            let html = '';
+            if (q.scenario) {
+                html += `<div class="scenario"><strong>Scenario.</strong> ${escapeHtml(q.scenario)}</div>`;
+            }
+            html += `<div class="question">${escapeHtml(q.text)}</div>`;
+            html += '<div class="options">';
+            q.options.forEach((o, i) => {
+                html += `<button class="option" onclick="selectAnswer(${i})">${escapeHtml(o)}</button>`;
+            });
+            html += '</div>';
+            document.getElementById('exerciseCard').innerHTML = html;
+            updateScoreboard();
+        }
+
+        function selectAnswer(i) {
+            if (answered) return;
+            answered = true;
+            const q = exercises[currentQuestion];
+            const btns = document.querySelectorAll('.option');
+            btns.forEach(b => b.classList.add('disabled'));
+            btns[q.answer].classList.add('correct');
+            const right = i === q.answer;
+            if (!right) btns[i].classList.add('wrong');
+            if (right) { score += 10; streak += 1; } else { streak = 0; }
+            const fb = document.createElement('div');
+            fb.className = 'feedback ' + (right ? 'correct' : 'wrong');
+            fb.innerHTML = `<strong>${right ? '✅ Correct.' : '❌ Not quite.'}</strong><br>${escapeHtml(q.explanation)}`;
+            document.getElementById('exerciseCard').appendChild(fb);
+            const nb = document.createElement('button');
+            nb.className = 'next-btn';
+            nb.textContent = currentQuestion === exercises.length - 1 ? 'See results →' : 'Next scenario →';
+            nb.onclick = nextQuestion;
+            document.getElementById('exerciseCard').appendChild(nb);
+            updateScoreboard();
+        }
+
+        function nextQuestion() {
+            currentQuestion++;
+            if (currentQuestion >= exercises.length) return showResults();
+            renderQuestion();
+        }
+
+        function showResults() {
+            document.getElementById('progress').style.width = '100%';
+            const total = exercises.length * 10;
+            const pct = Math.round(score / total * 100);
+            if (window.parent) { window.parent.postMessage({type:"mtti_quiz_score", score: score, total: total, percent: pct}, "*"); }
+            let badge = '🌟', msg = 'Excellent work. You have a professional grasp of this lesson.';
+            if (pct < 50) { badge = '🌱'; msg = 'Good first attempt. Re-watch the lesson video and try again.'; }
+            else if (pct < 80) { badge = '📚'; msg = 'Solid progress. Review the scenarios you missed and retry.'; }
+            document.getElementById('exerciseCard').innerHTML = `
+                <div class="results">
+                    <span class="badge">${badge}</span>
+                    <h2>Quiz Complete</h2>
+                    <div class="final-score">${score} / ${total}</div>
+                    <p><strong>${pct}%</strong> · Longest streak: ${streak}</p>
+                    <p>${msg}</p>
+                    <button class="restart-btn" onclick="restart()">Try again 🔁</button>
+                </div>`;
+        }
+
+        function restart() {
+            currentQuestion = 0; score = 0; streak = 0;
+            renderQuestion();
+        }
+
+        renderQuestion();
+    </script>
+</body>
+</html>

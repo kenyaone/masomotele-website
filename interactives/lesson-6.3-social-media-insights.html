@@ -1,0 +1,306 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lesson 6.3 — Social Media Insights (Interactive)</title>
+<style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: 'Segoe UI', -apple-system, sans-serif; line-height: 1.55; color: #1e293b; background: #f8fafc; min-height: 100vh; }
+    .container { max-width: 1150px; margin: 0 auto; padding: 20px; }
+    header { background: linear-gradient(135deg, #2E7D32, #1B5E20); color: #fff; padding: 40px 30px; border-radius: 12px; margin-bottom: 24px; box-shadow: 0 10px 30px rgba(236,72,153,0.25); }
+    header .badge { display: inline-block; background: rgba(255,255,255,0.2); padding: 4px 14px; border-radius: 16px; font-size: 12px; font-weight: bold; letter-spacing: 1px; margin-bottom: 14px; }
+    header h1 { font-size: 34px; margin-bottom: 8px; }
+    header .subtitle { font-size: 17px; opacity: 0.95; margin-bottom: 20px; }
+    .meta-strip { display: flex; flex-wrap: wrap; gap: 12px; }
+    .meta-strip span { background: rgba(255,255,255,0.18); padding: 6px 14px; border-radius: 20px; font-size: 13px; }
+    .toc { background: #fff; border: 1px solid #e2e8f0; border-radius: 10px; padding: 22px 26px; margin-bottom: 22px; }
+    .toc h3 { color: #ec4899; margin-bottom: 10px; }
+    .toc ol { padding-left: 20px; }
+    .toc a { color: #ec4899; text-decoration: none; font-weight: 600; }
+    section { background: #fff; border: 1px solid #e2e8f0; border-radius: 10px; padding: 26px 30px; margin-bottom: 22px; }
+    section h2 { color: #ec4899; font-size: 22px; margin-bottom: 12px; padding-bottom: 8px; border-bottom: 3px solid #ec4899; }
+    section p { margin-bottom: 12px; }
+    section ul, section ol { padding-left: 22px; margin-bottom: 12px; }
+    .callout { border-left: 5px solid #ec4899; background: #fdf2f8; padding: 14px 18px; margin: 14px 0; border-radius: 4px; }
+    .callout.warn { border-left-color: #dc2626; background: #fef2f2; }
+    .callout.tip { border-left-color: #059669; background: #ecfdf5; }
+    .callout strong { color: #ec4899; }
+
+    /* Mock Meta Business Suite */
+    .mbs { background: #fff; border: 1px solid #e2e8f0; border-radius: 8px; overflow: hidden; margin: 14px 0; }
+    .mbs-top { background: linear-gradient(90deg, #1877f2, #833ab4); color: #fff; padding: 12px 18px; display: flex; align-items: center; gap: 10px; font-size: 14px; }
+    .mbs-top .brand { font-weight: bold; }
+    .mbs-body { padding: 18px; background: #fafbfc; }
+    .mbs-kpis { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 12px; margin-bottom: 14px; }
+    .mbs-kpi { background: #fff; border: 1px solid #e2e8f0; border-radius: 8px; padding: 14px; text-align: center; }
+    .mbs-kpi .l { font-size: 12px; color: #64748b; text-transform: uppercase; }
+    .mbs-kpi .v { font-size: 24px; color: #1e293b; font-weight: bold; margin-top: 4px; }
+    .mbs-kpi .c { font-size: 11px; margin-top: 2px; }
+    .mbs-kpi .c.up { color: #059669; }
+    .mbs-kpi .c.down { color: #dc2626; }
+
+    /* Which post won — flagship */
+    .abpost { background: #fdf2f8; border: 2px solid #ec4899; border-radius: 10px; padding: 18px; margin: 14px 0; }
+    .abpost h4 { color: #be185d; margin-bottom: 10px; }
+    .post-choice { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+    @media (max-width: 700px) { .post-choice { grid-template-columns: 1fr; } }
+    .post { background: #fff; border: 2px solid #cbd5e1; border-radius: 10px; padding: 14px; cursor: pointer; transition: all 0.2s; }
+    .post:hover { border-color: #ec4899; }
+    .post.picked-a, .post.picked-b { border-width: 3px; }
+    .post h5 { font-size: 13px; margin-bottom: 6px; }
+    .post .visual { height: 140px; border-radius: 6px; display: flex; align-items: center; justify-content: center; color: #fff; font-weight: bold; }
+    .post .p-a .visual { background: linear-gradient(135deg, #78350f, #d97706); }
+    .post .p-b .visual { background: linear-gradient(135deg, #ec4899, #be185d); }
+    .post .caption { font-size: 13px; color: #1e293b; margin-top: 8px; }
+    .post .stats { display: flex; gap: 12px; margin-top: 8px; font-size: 12px; color: #64748b; }
+
+    .abpost-reveal {
+        display: none;
+        margin-top: 14px;
+        padding: 14px;
+        background: #d1fae5;
+        border-left: 4px solid #059669;
+        border-radius: 6px;
+    }
+    .abpost-reveal.show { display: block; }
+    .abpost-reveal h5 { color: #065f46; margin-bottom: 6px; }
+
+    /* Top posts */
+    .top-posts { display: grid; gap: 10px; margin: 14px 0; }
+    .top-row { display: grid; grid-template-columns: 40px 1fr 100px 60px; gap: 12px; align-items: center; padding: 10px 14px; background: #f8fafc; border-radius: 8px; }
+    .top-row .rank { font-size: 20px; font-weight: bold; color: #ec4899; }
+    .top-row .thumb { font-size: 20px; }
+    .top-row .type { font-size: 11px; color: #64748b; text-transform: uppercase; }
+    .top-row .desc { font-size: 13px; color: #1e293b; }
+    .top-row .eng { font-family: 'Courier New', monospace; text-align: right; color: #059669; font-weight: bold; }
+
+    /* 80/20 rule visual */
+    .rule80 { display: grid; grid-template-columns: 1fr 4fr; gap: 8px; margin: 14px 0; height: 100px; }
+    .rule80 > div { border-radius: 8px; display: flex; align-items: center; justify-content: center; color: #fff; font-weight: bold; padding: 10px; text-align: center; }
+    .rule80 .r80 { background: #059669; grid-column: 1; font-size: 14px; }
+    .rule80 .r20 { background: #ec4899; grid-column: 2; font-size: 20px; }
+
+    .quiz-question { background: #fff; border: 2px solid #cbd5e1; border-radius: 10px; padding: 18px; margin: 14px 0; }
+    .quiz-question.correct { border-color: #059669; background: #ecfdf5; }
+    .quiz-question.wrong { border-color: #dc2626; background: #fef2f2; }
+    .quiz-question h4 { margin-bottom: 12px; font-size: 15px; color: #1e293b; }
+    .quiz-question .options label { display: block; padding: 10px 14px; margin-bottom: 6px; background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 6px; cursor: pointer; font-size: 14px; }
+    .quiz-question .options label:hover { background: #fdf2f8; }
+    .quiz-question .options input[type="radio"] { margin-right: 10px; }
+    .quiz-question .explanation { display: none; margin-top: 12px; padding: 10px 14px; border-radius: 6px; font-size: 14px; }
+    .quiz-question.correct .explanation { display: block; background: #d1fae5; color: #065f46; border-left: 4px solid #059669; }
+    .quiz-question.wrong .explanation { display: block; background: #fee2e2; color: #991b1b; border-left: 4px solid #dc2626; }
+    .quiz-summary { text-align: center; padding: 30px; background: linear-gradient(135deg, #fdf2f8, #fce7f3); border-radius: 10px; margin: 20px 0; display: none; }
+    .quiz-summary.show { display: block; }
+    .quiz-summary .score { font-size: 48px; font-weight: bold; color: #ec4899; margin-bottom: 8px; }
+    button.btn { background: #ec4899; color: #fff; border: none; padding: 10px 20px; border-radius: 6px; font-size: 15px; font-weight: 600; cursor: pointer; }
+    button.btn:hover { background: #be185d; }
+    button.btn.reset { background: #64748b; margin-left: 8px; }
+    footer { text-align: center; color: #64748b; padding: 24px; font-size: 13px; }
+
+    /* MTTI logo stamp */
+    .mtti-logo-stamp {
+        position: fixed; top: 14px; right: 18px; z-index: 999;
+        opacity: 0.88; transition: opacity 0.2s;
+    }
+    .mtti-logo-stamp:hover { opacity: 1; }
+    .mtti-logo-stamp img { width: 56px; height: 56px; border-radius: 50%; box-shadow: 0 2px 8px rgba(0,0,0,0.18); }
+</style>
+</head>
+<body>
+<div class="mtti-logo-stamp">
+    <img src="../../Resources/Logo.jpeg" alt="MTTI" title="Masomotele Technical Training Institute — Start learning, Start earning">
+</div>
+
+<div class="container">
+<header>
+    <div class="badge">LESSON 6.3  ·  ANALYTICS  ·  INTERACTIVE</div>
+    <h1>Social Media Insights</h1>
+    <div class="subtitle">Every platform has free analytics built in. The 5 terms, 5 tools, and the 80/20 content rule.</div>
+    <div class="meta-strip"><span><strong>Duration:</strong> ~30 min</span><span><strong>Handbook:</strong> Part 6, §6.3</span></div>
+</header>
+
+<div class="toc">
+    <h3>What you'll do</h3>
+    <ol>
+        <li><a href="#s1">The 5 terms</a></li>
+        <li><a href="#s2">The 5 platform tools</a></li>
+        <li><a href="#s3"><strong>Mock Meta Business Suite dashboard</strong></a></li>
+        <li><a href="#s4"><strong>"Which post won?" A/B analysis</strong></a></li>
+        <li><a href="#s5">3 common mistakes</a></li>
+        <li><a href="#s6">The 80/20 content rule</a></li>
+        <li><a href="#s7">Sarah's Friday 30-min habit</a></li>
+        <li><a href="#s8">Self-check quiz</a></li>
+    </ol>
+</div>
+
+<section id="s1">
+    <h2>1. The 5 terms</h2>
+    <table style="width:100%; border-collapse:collapse; font-size:14px;">
+        <tr><th style="background:#ec4899;color:#fff;padding:10px;text-align:left;">Term</th><th style="background:#ec4899;color:#fff;padding:10px;text-align:left;">Meaning</th></tr>
+        <tr><td style="padding:10px;border:1px solid #e2e8f0;"><strong>Engagement</strong></td><td style="padding:10px;border:1px solid #e2e8f0;">Likes + comments + shares + saves</td></tr>
+        <tr><td style="padding:10px;border:1px solid #e2e8f0;"><strong>Reach</strong></td><td style="padding:10px;border:1px solid #e2e8f0;">Unique people who saw the content</td></tr>
+        <tr><td style="padding:10px;border:1px solid #e2e8f0;"><strong>Mentions</strong></td><td style="padding:10px;border:1px solid #e2e8f0;">Times your brand was tagged by others</td></tr>
+        <tr><td style="padding:10px;border:1px solid #e2e8f0;"><strong>Trends</strong></td><td style="padding:10px;border:1px solid #e2e8f0;">Patterns over time (WoW, MoM)</td></tr>
+        <tr><td style="padding:10px;border:1px solid #e2e8f0;"><strong>Inbound links</strong></td><td style="padding:10px;border:1px solid #e2e8f0;">Other sites/profiles pointing to you</td></tr>
+    </table>
+</section>
+
+<section id="s2">
+    <h2>2. The 5 platform tools</h2>
+    <ul>
+        <li><strong>Meta Business Suite Insights</strong> — Facebook AND Instagram. Sarah's main dashboard.</li>
+        <li><strong>X Analytics</strong> — free for any X account.</li>
+        <li><strong>LinkedIn Analytics</strong> — free for Business Page owners.</li>
+        <li><strong>TikTok Analytics</strong> — free in every Business account.</li>
+        <li><strong>Hootsuite</strong> — paid, multi-platform. Only worth it if you manage 3+ accounts across 2+ platforms.</li>
+    </ul>
+    <div class="callout tip"><strong>For most Kenyan SMEs</strong>, the built-in free tools are enough.</div>
+</section>
+
+<section id="s3">
+    <h2>3. Mock Meta Business Suite dashboard</h2>
+    <div class="mbs">
+        <div class="mbs-top">
+            <span class="brand">Meta Business Suite</span>
+            <span style="opacity:0.9;">·</span>
+            <span>Insights · Last 30 days</span>
+            <span style="margin-left:auto; opacity:0.85; font-size:12px;">Karibu Kitchen (FB + IG)</span>
+        </div>
+        <div class="mbs-body">
+            <div class="mbs-kpis">
+                <div class="mbs-kpi"><div class="l">Total reach</div><div class="v">42,140</div><div class="c up">↑ 28%</div></div>
+                <div class="mbs-kpi"><div class="l">Engagement</div><div class="v">3,205</div><div class="c up">↑ 41%</div></div>
+                <div class="mbs-kpi"><div class="l">Follower growth</div><div class="v">+120</div><div class="c up">↑ 12%</div></div>
+                <div class="mbs-kpi"><div class="l">Best time</div><div class="v" style="font-size:18px;">19:45</div><div class="c">Weekday evenings</div></div>
+                <div class="mbs-kpi"><div class="l">Best format</div><div class="v" style="font-size:18px;">Reels</div><div class="c">3× images</div></div>
+                <div class="mbs-kpi"><div class="l">Best day</div><div class="v" style="font-size:18px;">Thu</div><div class="c">Highest reach</div></div>
+            </div>
+
+            <h4 style="color:#1e293b; font-size:14px; margin:12px 0 8px;">Top 3 posts this month</h4>
+            <div class="top-posts">
+                <div class="top-row"><div class="rank">#1</div><div><div class="type">Reel · Sarah on camera</div><div class="desc">"Cooking today's ugali & beef stew" — 22 sec vertical</div></div><div class="type">Reels</div><div class="eng">842</div></div>
+                <div class="top-row"><div class="rank">#2</div><div><div class="type">Reel · Delivery pack</div><div class="desc">"Fresh lunch packed and out the door" — 18 sec vertical</div></div><div class="type">Reels</div><div class="eng">651</div></div>
+                <div class="top-row"><div class="rank">#3</div><div><div class="type">Reel · Customer thanks</div><div class="desc">"@AndaMwenda thanking us for lunch delivery" — 14 sec</div></div><div class="type">Reels</div><div class="eng">438</div></div>
+            </div>
+            <div class="callout tip" style="margin-top:12px;"><strong>Sarah's learning:</strong> All top 3 are Reels. All show real people. All post around 19:45. She now knows what to make more of.</div>
+        </div>
+    </div>
+</section>
+
+<section id="s4">
+    <h2>4. "Which post won?" — A/B analysis</h2>
+    <p>Click the post you think performed better. Reveal shows the actual numbers.</p>
+    <div class="abpost">
+        <h4>Sarah posted these two on the same day. Which won?</h4>
+        <div class="post-choice">
+            <div class="post p-a" onclick="pickPost('a', this)">
+                <h5>Post A · 10 AM · Static image</h5>
+                <div class="visual">🍲 Ugali &amp; stew plate photo</div>
+                <div class="caption">"Today's lunch. Order via WhatsApp 0782-XXX-XXX. #KaribuKitchen #EldoretFood"</div>
+                <div class="stats"><span>Length: image</span><span>Time: 10:00</span></div>
+            </div>
+            <div class="post p-b" onclick="pickPost('b', this)">
+                <h5>Post B · 19:45 · Reel with Sarah</h5>
+                <div class="visual">🎥 Sarah cooking on camera · 22s</div>
+                <div class="caption">"Watch me plate today's lunch. Order now — delivery in 30 min. Kapsoya · Elgon View · Racecourse."</div>
+                <div class="stats"><span>Length: 22s Reel</span><span>Time: 19:45</span></div>
+            </div>
+        </div>
+        <div class="abpost-reveal" id="abReveal">
+            <h5>The numbers</h5>
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:8px;">
+                <div><strong>Post A</strong>: 3,200 reach · 84 engagement · <strong>2.6% engagement rate</strong> · 4 WhatsApp clicks</div>
+                <div><strong>Post B</strong>: 5,150 reach · 421 engagement · <strong>8.2% engagement rate</strong> · 47 WhatsApp clicks</div>
+            </div>
+            <p style="margin-top:10px;"><strong>Post B won</strong> — better time (evening decision moment), Sarah on camera, action language ("watch me"), clear delivery zones. Do more like this.</p>
+        </div>
+    </div>
+</section>
+
+<section id="s5">
+    <h2>5. 3 common mistakes</h2>
+    <ol>
+        <li><strong>Measuring too short a period.</strong> One bad post in a week ≠ broken strategy. Look at a full month.</li>
+        <li><strong>Comparing to unrelated benchmarks.</strong> Sarah's KES 40k budget ≠ Safaricom's. Compare to yourself, MoM.</li>
+        <li><strong>Fixating on follower count.</strong> Vanity metric. Total sales beats total followers every time.</li>
+    </ol>
+</section>
+
+<section id="s6">
+    <h2>6. The 80/20 content rule</h2>
+    <p>Every review ends with the same conclusion:</p>
+    <div class="rule80">
+        <div class="r80">80% engagement</div>
+        <div class="r20">from 20% of posts</div>
+    </div>
+    <p><strong>Your job:</strong> identify the 20%, understand why they work, produce more.</p>
+    <div class="callout">
+        <strong>Sarah's top 20% share 3 features:</strong> all Reels · all show her face · all end with a clear "Order Now" CTA. That's her formula. She stops experimenting randomly.
+    </div>
+</section>
+
+<section id="s7">
+    <h2>7. Sarah's Friday 30-min habit</h2>
+    <table style="width:100%; border-collapse:collapse; font-size:14px;">
+        <tr><th style="background:#ec4899;color:#fff;padding:10px;text-align:left;">Time</th><th style="background:#ec4899;color:#fff;padding:10px;text-align:left;">Where</th><th style="background:#ec4899;color:#fff;padding:10px;text-align:left;">What</th></tr>
+        <tr><td style="padding:10px;border:1px solid #e2e8f0;">15 min</td><td style="padding:10px;border:1px solid #e2e8f0;">Meta Business Suite</td><td style="padding:10px;border:1px solid #e2e8f0;">FB + IG insights</td></tr>
+        <tr><td style="padding:10px;border:1px solid #e2e8f0;">5 min</td><td style="padding:10px;border:1px solid #e2e8f0;">Google Business Profile</td><td style="padding:10px;border:1px solid #e2e8f0;">Who found her via Maps</td></tr>
+        <tr><td style="padding:10px;border:1px solid #e2e8f0;">5 min</td><td style="padding:10px;border:1px solid #e2e8f0;">TikTok Analytics</td><td style="padding:10px;border:1px solid #e2e8f0;">If she posted</td></tr>
+        <tr><td style="padding:10px;border:1px solid #e2e8f0;">5 min</td><td style="padding:10px;border:1px solid #e2e8f0;">WhatsApp Business</td><td style="padding:10px;border:1px solid #e2e8f0;">Reply speed &amp; volume</td></tr>
+    </table>
+    <p style="margin-top:10px;">Every insight → 2-column notebook: <strong>What worked</strong> | <strong>What to try next week</strong>.</p>
+</section>
+
+<section id="s8">
+    <h2>8. Self-check quiz</h2>
+
+    <div class="quiz-question" data-correct="B"><h4>1. Engagement =</h4><div class="options"><label><input type="radio" name="q1" value="A"> A) Reach</label><label><input type="radio" name="q1" value="B"> B) Likes + comments + shares + saves</label><label><input type="radio" name="q1" value="C"> C) Follower count</label><label><input type="radio" name="q1" value="D"> D) Ad spend</label></div><div class="explanation">Correct — interactions on your content.</div></div>
+
+    <div class="quiz-question" data-correct="A"><h4>2. Meta Business Suite covers…</h4><div class="options"><label><input type="radio" name="q2" value="A"> A) Facebook AND Instagram</label><label><input type="radio" name="q2" value="B"> B) Facebook only</label><label><input type="radio" name="q2" value="C"> C) TikTok</label><label><input type="radio" name="q2" value="D"> D) LinkedIn</label></div><div class="explanation">Correct — one dashboard for both.</div></div>
+
+    <div class="quiz-question" data-correct="C"><h4>3. 80/20 rule says…</h4><div class="options"><label><input type="radio" name="q3" value="A"> A) Post 80% videos</label><label><input type="radio" name="q3" value="B"> B) 20% success rate</label><label><input type="radio" name="q3" value="C"> C) 80% engagement comes from 20% of posts</label><label><input type="radio" name="q3" value="D"> D) Charge 20% more</label></div><div class="explanation">Correct — find that 20% and replicate.</div></div>
+
+    <div class="quiz-question" data-correct="D"><h4>4. Best analytics review period?</h4><div class="options"><label><input type="radio" name="q4" value="A"> A) 1 day</label><label><input type="radio" name="q4" value="B"> B) 1 hour</label><label><input type="radio" name="q4" value="C"> C) 5 minutes</label><label><input type="radio" name="q4" value="D"> D) At least 1 month for conclusions</label></div><div class="explanation">Correct — one bad week ≠ broken strategy.</div></div>
+
+    <div class="quiz-question" data-correct="A"><h4>5. Sarah's top posts all share 3 features. What are they?</h4><div class="options"><label><input type="radio" name="q5" value="A"> A) Reels · Sarah on camera · clear "Order Now" CTA</label><label><input type="radio" name="q5" value="B"> B) Random images</label><label><input type="radio" name="q5" value="C"> C) Posted at 3 AM</label><label><input type="radio" name="q5" value="D"> D) No caption</label></div><div class="explanation">Correct — her winning formula.</div></div>
+
+    <div class="quiz-question" data-correct="B"><h4>6. Which is a common mistake?</h4><div class="options"><label><input type="radio" name="q6" value="A"> A) Replying to comments</label><label><input type="radio" name="q6" value="B"> B) Comparing your small budget to Safaricom's</label><label><input type="radio" name="q6" value="C"> C) Posting Reels</label><label><input type="radio" name="q6" value="D"> D) Tracking engagement rate</label></div><div class="explanation">Correct — compare to yourself MoM.</div></div>
+
+    <div class="quiz-question" data-correct="C"><h4>7. Follower count is a…</h4><div class="options"><label><input type="radio" name="q7" value="A"> A) KPI</label><label><input type="radio" name="q7" value="B"> B) ROAS metric</label><label><input type="radio" name="q7" value="C"> C) Vanity metric</label><label><input type="radio" name="q7" value="D"> D) Bounce rate</label></div><div class="explanation">Correct — sales beat followers.</div></div>
+
+    <div class="quiz-question" data-correct="A"><h4>8. Competitive benchmarking =</h4><div class="options"><label><input type="radio" name="q8" value="A"> A) Openly studying competitors' public analytics</label><label><input type="radio" name="q8" value="B"> B) Spying</label><label><input type="radio" name="q8" value="C"> C) Illegal</label><label><input type="radio" name="q8" value="D"> D) Hacking their accounts</label></div><div class="explanation">Correct — public info, professional practice.</div></div>
+
+    <div class="quiz-question" data-correct="D"><h4>9. Sarah's Friday routine takes…</h4><div class="options"><label><input type="radio" name="q9" value="A"> A) 5 hours</label><label><input type="radio" name="q9" value="B"> B) All day</label><label><input type="radio" name="q9" value="C"> C) 5 minutes</label><label><input type="radio" name="q9" value="D"> D) 30 minutes across 4 platforms</label></div><div class="explanation">Correct — disciplined, focused.</div></div>
+
+    <div class="quiz-question" data-correct="B"><h4>10. Best posting time in Sarah's insights?</h4><div class="options"><label><input type="radio" name="q10" value="A"> A) 06:00</label><label><input type="radio" name="q10" value="B"> B) 19:45 weekday evenings</label><label><input type="radio" name="q10" value="C"> C) 03:00</label><label><input type="radio" name="q10" value="D"> D) Any time</label></div><div class="explanation">Correct — when her office-worker customers are deciding dinner.</div></div>
+
+    <div style="margin-top:20px;">
+        <button class="btn" onclick="markQuiz()">Mark my quiz</button>
+        <button class="btn reset" onclick="resetQuiz()">Reset</button>
+    </div>
+    <div class="quiz-summary" id="quizSummary"><div class="score" id="scoreDisplay">0 / 10</div><p id="scoreMessage"></p></div>
+</section>
+
+<footer><p>Lesson 6.3 — Social Media Insights · MTTI · Handbook Part 6, §6.3</p><p>Next: <strong>Lesson 6.4 — Email &amp; Advertising Analytics</strong></p></footer>
+</div>
+
+<script>
+function pickPost(v, el) {
+    document.querySelectorAll('.post').forEach(p => p.classList.remove('picked-a','picked-b'));
+    el.classList.add('picked-' + v);
+    document.getElementById('abReveal').classList.add('show');
+}
+
+function markQuiz() {
+    const qs = document.querySelectorAll('.quiz-question'); let s = 0;
+    qs.forEach((q, i) => { const c = q.dataset.correct; const p = q.querySelector(`input[name="q${i+1}"]:checked`); q.classList.remove('correct','wrong'); if (p && p.value === c) { q.classList.add('correct'); s++; } else if (p) q.classList.add('wrong'); });
+    const su = document.getElementById('quizSummary'); su.classList.add('show');
+    document.getElementById('scoreDisplay').textContent = `${s} / 10`;
+    document.getElementById('scoreMessage').textContent = s === 10 ? 'Perfect. Move to 6.4.' : s >= 7 ? 'Strong.' : 'Redo the dashboard tour.';
+    su.scrollIntoView({behavior:'smooth',block:'center'});
+}
+function resetQuiz() { document.querySelectorAll('.quiz-question').forEach(q => { q.classList.remove('correct','wrong'); q.querySelectorAll('input[type=radio]').forEach(r => r.checked = false); }); document.getElementById('quizSummary').classList.remove('show'); }
+</script>
+</body></html>

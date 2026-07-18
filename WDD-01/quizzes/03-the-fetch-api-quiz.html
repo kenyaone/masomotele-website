@@ -1,0 +1,346 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>The Fetch API | MTTI Web Design</title>
+    <link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Fredoka:wght@500;600&display=swap" rel="stylesheet">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Space Mono', monospace;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh; padding: 20px; color: #fff;
+        }
+        .container { max-width: 900px; margin: 0 auto; }
+        .header { text-align: center; margin-bottom: 30px; animation: slideDown 0.6s ease-out; }
+        .header .lesson-tag {
+            display: inline-block; background: rgba(255,255,255,0.2);
+            padding: 6px 16px; border-radius: 999px;
+            font-size: 0.85em; margin-bottom: 12px;
+        }
+        .header h1 {
+            font-family: 'Fredoka', sans-serif; font-size: 2.2em;
+            margin-bottom: 8px; text-shadow: 3px 3px 0 rgba(0,0,0,0.2);
+        }
+        .header p { opacity: 0.95; font-size: 0.95em; }
+        .score-board {
+            background: rgba(255,255,255,0.15); backdrop-filter: blur(10px);
+            border-radius: 20px; padding: 20px; margin-bottom: 20px;
+            display: flex; justify-content: space-around;
+            animation: fadeIn 0.8s ease-out 0.2s both;
+        }
+        .score-item { text-align: center; }
+        .score-item .label { font-size: 0.85em; opacity: 0.9; margin-bottom: 4px; }
+        .score-item .value {
+            font-size: 1.8em; font-weight: bold; font-family: 'Fredoka', sans-serif;
+        }
+        .progress-bar {
+            width: 100%; height: 8px; background: rgba(255,255,255,0.3);
+            border-radius: 10px; margin-bottom: 25px; overflow: hidden;
+        }
+        .progress-fill {
+            height: 100%; background: linear-gradient(90deg, #f093fb 0%, #f5576c 100%);
+            border-radius: 10px; transition: width 0.5s ease; width: 0%;
+        }
+        .exercise-card {
+            background: white; color: #333; border-radius: 25px;
+            padding: 35px; margin-bottom: 20px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            animation: fadeIn 0.6s ease-out both;
+        }
+        .scenario {
+            background: linear-gradient(135deg, #fff8e1 0%, #ffecb3 100%);
+            border-left: 5px solid #ffc107;
+            padding: 20px 24px; border-radius: 12px;
+            margin-bottom: 24px;
+            font-size: 0.98em; line-height: 1.55;
+        }
+        .scenario strong { color: #7a5a00; font-family: 'Fredoka', sans-serif; }
+        .question {
+            font-size: 1.15em; margin-bottom: 20px;
+            font-weight: 700; line-height: 1.4;
+        }
+        .options { display: flex; flex-direction: column; gap: 12px; }
+        .option {
+            background: #f5f7fb; border: 2px solid transparent;
+            padding: 16px 20px; border-radius: 12px;
+            cursor: pointer; transition: all 0.2s ease;
+            font-family: 'Space Mono', monospace; font-size: 0.98em; text-align: left;
+        }
+        .option:hover:not(.disabled) {
+            background: #eef1fb; border-color: #667eea; transform: translateX(4px);
+        }
+        .option.correct { background: #d4edda; border-color: #28a745; color: #155724; }
+        .option.wrong { background: #f8d7da; border-color: #dc3545; color: #721c24; animation: shake 0.4s; }
+        .option.disabled { cursor: not-allowed; opacity: 0.85; }
+        .feedback {
+            margin-top: 22px; padding: 18px 22px; border-radius: 12px;
+            animation: slideUp 0.4s ease-out;
+            font-size: 0.98em; line-height: 1.5;
+        }
+        .feedback.correct { background: #d4edda; color: #155724; border-left: 4px solid #28a745; }
+        .feedback.wrong { background: #f8d7da; color: #721c24; border-left: 4px solid #dc3545; }
+        .feedback strong { font-family: 'Fredoka', sans-serif; }
+        .next-btn, .restart-btn {
+            margin-top: 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white; border: none;
+            padding: 14px 32px; border-radius: 12px;
+            font-size: 1em; cursor: pointer;
+            font-family: 'Fredoka', sans-serif;
+            box-shadow: 0 6px 18px rgba(0,0,0,0.2);
+            transition: transform 0.2s ease;
+        }
+        .next-btn:hover, .restart-btn:hover { transform: scale(1.04); }
+        .results {
+            text-align: center; padding: 25px 15px;
+            animation: bounceIn 0.6s ease-out;
+        }
+        .results h2 {
+            font-family: 'Fredoka', sans-serif; font-size: 2em;
+            margin-bottom: 12px; color: #333;
+        }
+        .results .final-score {
+            font-size: 3em; font-family: 'Fredoka', sans-serif;
+            color: #667eea; margin: 20px 0;
+        }
+        .results p { color: #555; margin-bottom: 12px; }
+        .badge { display: inline-block; font-size: 3.5em; margin: 8px 0; }
+        @keyframes slideDown { from { opacity: 0; transform: translateY(-30px); } to { opacity: 1; transform: translateY(0); } }
+        @keyframes fadeIn { from { opacity: 0; transform: scale(0.96); } to { opacity: 1; transform: scale(1); } }
+        @keyframes slideUp { from { opacity: 0; transform: translateY(15px); } to { opacity: 1; transform: translateY(0); } }
+        @keyframes shake { 0%,100% { transform: translateX(0); } 25% { transform: translateX(-8px); } 75% { transform: translateX(8px); } }
+        @keyframes bounceIn { 0% { opacity: 0; transform: scale(0.4); } 60% { transform: scale(1.05); } 100% { opacity: 1; transform: scale(1); } }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <div class="lesson-tag">Module 3 · Lesson 3.7 · Quiz</div>
+            <h1>The Fetch API</h1>
+            <p></p>
+        </div>
+
+        <div class="score-board">
+            <div class="score-item"><div class="label">Score</div><div class="value" id="score">0</div></div>
+            <div class="score-item"><div class="label">Question</div><div class="value"><span id="current">1</span>/<span id="total">10</span></div></div>
+            <div class="score-item"><div class="label">Streak</div><div class="value" id="streak">0</div></div>
+        </div>
+
+        <div class="progress-bar"><div class="progress-fill" id="progress"></div></div>
+
+        <div class="exercise-card" id="exerciseCard"></div>
+    </div>
+
+    <script>
+        const exercises = [
+  {
+    "id": "q1",
+    "text": "James calls fetch('products.json'). What does fetch() return immediately?",
+    "options": [
+      "The parsed JSON data",
+      "The raw text of the file",
+      "A Promise that will resolve with a Response object",
+      "An error if the file doesn't exist yet"
+    ],
+    "answer": 2,
+    "explanation": "fetch() is asynchronous — it returns a Promise immediately, before the network request completes. The Promise resolves with a Response object when the server replies. You must chain .then() or use await to work with the response."
+  },
+  {
+    "id": "q2",
+    "text": "James chains .then(response => response.json()). What does response.json() do?",
+    "options": [
+      "Validates that the response is valid JSON",
+      "Parses the response body as JSON and returns another Promise resolving with the parsed data",
+      "Converts the response to a string",
+      "Checks the HTTP status code"
+    ],
+    "answer": 1,
+    "explanation": "response.json() reads the response body stream and parses it as JSON, returning a new Promise. This is a two-step process: first fetch resolves with a Response (headers available), then .json() reads and parses the body. Both steps are async."
+  },
+  {
+    "id": "q3",
+    "text": "James's fetch call resolves but response.ok is false. What does this mean?",
+    "options": [
+      "The network is offline",
+      "The server returned an error status (4xx or 5xx) — fetch() only rejects on network failure, not HTTP errors",
+      "The JSON was invalid and could not be parsed",
+      "CORS blocked the request"
+    ],
+    "answer": 1,
+    "explanation": "fetch() only rejects its Promise for network failures (offline, DNS failure). A 404 or 500 response RESOLVES the Promise with response.ok = false. Always check response.ok before calling response.json() to handle server errors."
+  },
+  {
+    "id": "q4",
+    "text": "Which is the async/await equivalent of: fetch(url).then(r => r.json()).then(data => console.log(data))?",
+    "options": [
+      "const data = await fetch(url).json()",
+      "const response = await fetch(url); const data = await response.json(); console.log(data);",
+      "const data = fetch.await(url).json()",
+      "await const data = fetch(url)"
+    ],
+    "answer": 1,
+    "explanation": "await pauses execution at each async step. First await fetch(url) for the Response, then await response.json() for the data. This must be inside an async function. The two awaits correspond to the two .then() chains."
+  },
+  {
+    "id": "q5",
+    "text": "James omits .catch() from his fetch chain. A customer in Kisumu with poor network visits the site. What happens?",
+    "options": [
+      "The browser shows a default error page",
+      "The Promise rejection goes unhandled — the page silently shows nothing and the error may appear in the console only",
+      "JavaScript retries the request automatically 3 times",
+      "The browser shows an alert with the error message"
+    ],
+    "answer": 1,
+    "explanation": "Unhandled Promise rejections are silent to the user — they produce no visible error. The page shows whatever was there before (often a 'Loading...' placeholder) and the error only appears in DevTools console. Always add .catch() to show meaningful feedback."
+  },
+  {
+    "id": "q6",
+    "text": "James wants to POST form data to his server using fetch. Which configuration object should he pass?",
+    "options": [
+      "fetch(url, { type: 'POST', body: data })",
+      "fetch(url, { method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify(data) })",
+      "fetch.post(url, data)",
+      "fetch(url, 'POST', JSON.stringify(data))"
+    ],
+    "answer": 1,
+    "explanation": "fetch() accepts a second options argument with method, headers, body, credentials, etc. For POST with JSON: method: 'POST', the Content-Type header tells the server what format the body is in, and JSON.stringify() converts the JS object to a JSON string for transmission."
+  },
+  {
+    "id": "q7",
+    "text": "James fetches the same static product list every time a filter button is clicked (20 clicks = 20 requests). What is the better approach?",
+    "options": [
+      "Use async/await to make the requests faster",
+      "Fetch once, store the data in a variable, then filter the local copy on each button click",
+      "Batch all 20 requests into one fetch call",
+      "Use a CDN to cache the requests automatically"
+    ],
+    "answer": 1,
+    "explanation": "Fetching static data repeatedly wastes bandwidth (expensive for Kenyan mobile users) and adds latency. Fetch once into a variable (const products = await fetchProducts()), then filter products client-side on each button click — instant response, zero additional requests."
+  },
+  {
+    "id": "q8",
+    "text": "What is the purpose of try/catch around an async/await fetch call?",
+    "options": [
+      "try/catch is required syntax for async functions",
+      "It catches both network errors (fetch rejects) and JSON parse errors (response.json() throws), handling both in one place",
+      "try/catch automatically retries failed requests",
+      "It prevents the await from blocking the main thread"
+    ],
+    "answer": 1,
+    "explanation": "try/catch in an async function catches rejected Promises (thrown errors). This covers network failures AND JSON parse errors in one block — equivalent to chaining both a .catch() and error handling in .then(). Comprehensive error handling with clean syntax."
+  },
+  {
+    "id": "q9",
+    "text": "James makes 100 fetch requests in a for loop. What is the problem?",
+    "options": [
+      "for loops cannot contain async code",
+      "100 simultaneous requests overwhelm the server and hit browser connection limits (~6 per domain)",
+      "fetch() only allows 10 requests per page load",
+      "The responses will arrive out of order"
+    ],
+    "answer": 1,
+    "explanation": "Browsers limit concurrent connections per domain (typically 6). 100 requests queuing simultaneously creates a request flood, delays all other page resources (CSS, images), and can overload a small shared hosting server. Batch or debounce requests instead."
+  },
+  {
+    "id": "q10",
+    "text": "James uses async/await and writes async function loadProducts() { ... }. How must he call this function?",
+    "options": [
+      "loadProducts() — calling async functions is identical to calling regular functions",
+      "await loadProducts() — only inside another async function, or using .then() if at the top level",
+      "async loadProducts()",
+      "call async loadProducts()"
+    ],
+    "answer": 1,
+    "explanation": "An async function always returns a Promise. You can call it like a regular function if you don't need the result. To await its result, use await loadProducts() inside another async function, or chain .then() on the returned Promise at the top level."
+  }
+];
+
+        let currentQuestion = 0, score = 0, streak = 0, answered = false;
+
+        function updateScoreboard() {
+            document.getElementById('score').textContent = score;
+            document.getElementById('current').textContent = Math.min(currentQuestion + 1, exercises.length);
+            document.getElementById('total').textContent = exercises.length;
+            document.getElementById('streak').textContent = streak;
+            document.getElementById('progress').style.width = ((currentQuestion) / exercises.length) * 100 + '%';
+        }
+
+        function escapeHtml(s) {
+            return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+        }
+
+        function renderQuestion() {
+            answered = false;
+            const q = exercises[currentQuestion];
+            let html = '';
+            if (q.scenario) {
+                html += `<div class="scenario"><strong>Scenario.</strong> ${escapeHtml(q.scenario)}</div>`;
+            }
+            html += `<div class="question">${escapeHtml(q.text)}</div>`;
+            html += '<div class="options">';
+            q.options.forEach((o, i) => {
+                html += `<button class="option" onclick="selectAnswer(${i})">${escapeHtml(o)}</button>`;
+            });
+            html += '</div>';
+            document.getElementById('exerciseCard').innerHTML = html;
+            updateScoreboard();
+        }
+
+        function selectAnswer(i) {
+            if (answered) return;
+            answered = true;
+            const q = exercises[currentQuestion];
+            const btns = document.querySelectorAll('.option');
+            btns.forEach(b => b.classList.add('disabled'));
+            btns[q.answer].classList.add('correct');
+            const right = i === q.answer;
+            if (!right) btns[i].classList.add('wrong');
+            if (right) { score += 10; streak += 1; } else { streak = 0; }
+            const fb = document.createElement('div');
+            fb.className = 'feedback ' + (right ? 'correct' : 'wrong');
+            fb.innerHTML = `<strong>${right ? '✅ Correct.' : '❌ Not quite.'}</strong><br>${escapeHtml(q.explanation)}`;
+            document.getElementById('exerciseCard').appendChild(fb);
+            const nb = document.createElement('button');
+            nb.className = 'next-btn';
+            nb.textContent = currentQuestion === exercises.length - 1 ? 'See results →' : 'Next scenario →';
+            nb.onclick = nextQuestion;
+            document.getElementById('exerciseCard').appendChild(nb);
+            updateScoreboard();
+        }
+
+        function nextQuestion() {
+            currentQuestion++;
+            if (currentQuestion >= exercises.length) return showResults();
+            renderQuestion();
+        }
+
+        function showResults() {
+            document.getElementById('progress').style.width = '100%';
+            const total = exercises.length * 10;
+            const pct = Math.round(score / total * 100);
+            if (window.parent) { window.parent.postMessage({type:"mtti_quiz_score", score: score, total: total, percent: pct}, "*"); }
+            let badge = '🌟', msg = 'Excellent work. You have a professional grasp of this lesson.';
+            if (pct < 50) { badge = '🌱'; msg = 'Good first attempt. Re-watch the lesson video and try again.'; }
+            else if (pct < 80) { badge = '📚'; msg = 'Solid progress. Review the scenarios you missed and retry.'; }
+            document.getElementById('exerciseCard').innerHTML = `
+                <div class="results">
+                    <span class="badge">${badge}</span>
+                    <h2>Quiz Complete</h2>
+                    <div class="final-score">${score} / ${total}</div>
+                    <p><strong>${pct}%</strong> · Longest streak: ${streak}</p>
+                    <p>${msg}</p>
+                    <button class="restart-btn" onclick="restart()">Try again 🔁</button>
+                </div>`;
+        }
+
+        function restart() {
+            currentQuestion = 0; score = 0; streak = 0;
+            renderQuestion();
+        }
+
+        renderQuestion();
+    </script>
+</body>
+</html>

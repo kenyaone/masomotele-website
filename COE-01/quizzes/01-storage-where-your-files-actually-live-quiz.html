@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Storage: Where Your Files Actually Live | MTTI Computer Applications</title>
+    <link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Fredoka:wght@500;600&display=swap" rel="stylesheet">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Space Mono', monospace; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); min-height: 100vh; padding: 20px; color: #fff; }
+        .container { max-width: 900px; margin: 0 auto; }
+        .header { text-align: center; margin-bottom: 30px; }
+        .header .lesson-tag { display: inline-block; background: rgba(255,255,255,0.2); padding: 6px 16px; border-radius: 999px; font-size: 0.85em; margin-bottom: 12px; }
+        .header h1 { font-family: 'Fredoka', sans-serif; font-size: 2.2em; margin-bottom: 8px; text-shadow: 3px 3px 0 rgba(0,0,0,0.2); }
+        .score-board { background: rgba(255,255,255,0.15); backdrop-filter: blur(10px); border-radius: 20px; padding: 20px; margin-bottom: 20px; display: flex; justify-content: space-around; }
+        .score-item { text-align: center; }
+        .score-item .label { font-size: 0.85em; opacity: 0.9; margin-bottom: 4px; }
+        .score-item .value { font-size: 1.8em; font-weight: bold; font-family: 'Fredoka', sans-serif; }
+        .progress-bar { width: 100%; height: 8px; background: rgba(255,255,255,0.3); border-radius: 10px; margin-bottom: 25px; overflow: hidden; }
+        .progress-fill { height: 100%; background: linear-gradient(90deg, #f093fb 0%, #f5576c 100%); border-radius: 10px; transition: width 0.5s ease; width: 0%; }
+        .exercise-card { background: white; color: #333; border-radius: 25px; padding: 35px; margin-bottom: 20px; box-shadow: 0 20px 60px rgba(0,0,0,0.3); }
+        .scenario { background: linear-gradient(135deg, #fff8e1 0%, #ffecb3 100%); border-left: 5px solid #ffc107; padding: 20px 24px; border-radius: 12px; margin-bottom: 24px; font-size: 0.98em; line-height: 1.55; }
+        .scenario strong { color: #7a5a00; font-family: 'Fredoka', sans-serif; }
+        .question { font-size: 1.15em; margin-bottom: 20px; font-weight: 700; line-height: 1.4; }
+        .options { display: flex; flex-direction: column; gap: 12px; }
+        .option { background: #f5f7fb; border: 2px solid transparent; padding: 16px 20px; border-radius: 12px; cursor: pointer; transition: all 0.2s ease; font-family: 'Space Mono', monospace; font-size: 0.98em; text-align: left; }
+        .option:hover:not(.disabled) { background: #eef1fb; border-color: #667eea; transform: translateX(4px); }
+        .option.correct { background: #d4edda; border-color: #28a745; color: #155724; }
+        .option.wrong { background: #f8d7da; border-color: #dc3545; color: #721c24; }
+        .option.disabled { cursor: not-allowed; opacity: 0.85; }
+        .feedback { margin-top: 22px; padding: 18px 22px; border-radius: 12px; font-size: 0.98em; line-height: 1.5; }
+        .feedback.correct { background: #d4edda; color: #155724; border-left: 4px solid #28a745; }
+        .feedback.wrong { background: #f8d7da; color: #721c24; border-left: 4px solid #dc3545; }
+        .next-btn, .restart-btn { margin-top: 20px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; border: none; padding: 14px 32px; border-radius: 12px; font-size: 1em; cursor: pointer; font-family: 'Fredoka', sans-serif; box-shadow: 0 6px 18px rgba(0,0,0,0.2); }
+        .results { text-align: center; padding: 25px 15px; }
+        .results h2 { font-family: 'Fredoka', sans-serif; font-size: 2em; margin-bottom: 12px; color: #333; }
+        .results .final-score { font-size: 3em; font-family: 'Fredoka', sans-serif; color: #667eea; margin: 20px 0; }
+        .results p { color: #555; margin-bottom: 12px; }
+        .badge { display: inline-block; font-size: 3.5em; margin: 8px 0; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <div class="lesson-tag">Module 1 · Lesson 1.3 · Quiz</div>
+            <h1>Storage: Where Your Files Actually Live</h1>
+        </div>
+        <div class="score-board">
+            <div class="score-item"><div class="label">Score</div><div class="value" id="score">0</div></div>
+            <div class="score-item"><div class="label">Question</div><div class="value"><span id="current">1</span>/<span id="total">10</span></div></div>
+            <div class="score-item"><div class="label">Streak</div><div class="value" id="streak">0</div></div>
+        </div>
+        <div class="progress-bar"><div class="progress-fill" id="progress"></div></div>
+        <div class="exercise-card" id="exerciseCard"></div>
+    </div>
+    <script>
+        const exercises = [{"scenario":"Faith wants to know why turning off the computer doesn't delete her saved documents.","question":"What is the correct explanation?","options":["Saved documents are stored in RAM, which survives shutdown","Saved documents are stored on the hard drive/SSD, which keeps data permanently even when powered off","Nothing is ever really saved","Documents are stored only in the monitor"],"correct":1,"explanation":"The hard drive/SSD is designed for permanent storage that survives power-off, unlike RAM."},{"scenario":"A colleague explains that RAM is cleared every time the computer restarts.","question":"What does this mean for unsaved work when the computer restarts unexpectedly?","options":["Unsaved work is safe because RAM keeps everything","Unsaved work still in RAM (not yet saved to the hard drive) is lost on restart","Restarting has no effect on any files","Only USB files are affected"],"correct":1,"explanation":"Since RAM is temporary, anything not yet saved to permanent storage disappears when the computer restarts."},{"scenario":"Faith wants to bring a copy of a form to a different computer at another clinic branch.","question":"Which of these would let her do that?","options":["Leaving it only in the computer's RAM","Copying it to a USB flash drive or saving it to cloud storage","Printing a screenshot only","This is not possible with any storage method"],"correct":1,"explanation":"Both a USB drive and cloud storage are portable/accessible from other computers, unlike internal storage tied to one machine."},{"scenario":"Faith uploaded a file to Google Drive from the office computer.","question":"What is the key benefit of this compared to saving it only on the office hard drive?","options":["No benefit, they are identical","It can now be accessed from a different computer or phone with an internet connection","It becomes permanently deleted from her computer","It makes the file open faster only on this computer"],"correct":1,"explanation":"Cloud storage's main advantage is accessibility from multiple devices, unlike a file tied only to one computer's internal storage."},{"scenario":"Faith's supervisor asks if a single copy on the office hard drive counts as a proper backup.","question":"What should Faith say?","options":["Yes, one copy on one hard drive is a complete backup strategy","No, a true backup means a separate additional copy exists elsewhere too (USB or cloud), not just the original","Backups are unnecessary for any files","RAM automatically backs up all files"],"correct":1,"explanation":"A single copy on one drive is not a backup \u2014 a backup specifically means an additional separate copy exists elsewhere in case the original is lost."},{"scenario":"Faith is deciding between saving a large batch of scanned patient forms to a USB drive or to the computer's internal hard drive only.","question":"What is the main difference in terms of portability?","options":["No difference, both are equally portable","A USB drive can be physically carried to another computer; internal storage stays fixed inside this one tower","Internal storage is more portable","Neither is portable"],"correct":1,"explanation":"USB drives are removable and portable between computers, while internal storage is physically fixed inside one specific tower."}];
+        let currentQuestion = 0, score = 0, streak = 0, answered = false;
+        function updateScoreboard() {
+            document.getElementById('score').textContent = score;
+            document.getElementById('current').textContent = Math.min(currentQuestion + 1, exercises.length);
+            document.getElementById('total').textContent = exercises.length;
+            document.getElementById('streak').textContent = streak;
+            document.getElementById('progress').style.width = ((currentQuestion) / exercises.length) * 100 + '%';
+        }
+        function escapeHtml(s) { return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+        function renderQuestion() {
+            answered = false;
+            const q = exercises[currentQuestion];
+            let html = '';
+            if (q.scenario) html += `<div class="scenario"><strong>Scenario.</strong> ${escapeHtml(q.scenario)}</div>`;
+            html += `<div class="question">${escapeHtml(q.question)}</div>`;
+            html += '<div class="options">';
+            q.options.forEach((o, i) => { html += `<button class="option" onclick="selectAnswer(${i})">${escapeHtml(o)}</button>`; });
+            html += '</div>';
+            document.getElementById('exerciseCard').innerHTML = html;
+            updateScoreboard();
+        }
+        function selectAnswer(i) {
+            if (answered) return;
+            answered = true;
+            const q = exercises[currentQuestion];
+            const btns = document.querySelectorAll('.option');
+            btns.forEach(b => b.classList.add('disabled'));
+            btns[q.correct].classList.add('correct');
+            const right = i === q.correct;
+            if (!right) btns[i].classList.add('wrong');
+            if (right) { score += 10; streak += 1; } else { streak = 0; }
+            const fb = document.createElement('div');
+            fb.className = 'feedback ' + (right ? 'correct' : 'wrong');
+            fb.innerHTML = `<strong>${right ? '✅ Correct.' : '❌ Not quite.'}</strong><br>${escapeHtml(q.explanation)}`;
+            document.getElementById('exerciseCard').appendChild(fb);
+            const nb = document.createElement('button');
+            nb.className = 'next-btn';
+            nb.textContent = currentQuestion === exercises.length - 1 ? 'See results →' : 'Next scenario →';
+            nb.onclick = nextQuestion;
+            document.getElementById('exerciseCard').appendChild(nb);
+            updateScoreboard();
+        }
+        function nextQuestion() { currentQuestion++; if (currentQuestion >= exercises.length) return showResults(); renderQuestion(); }
+        function showResults() {
+            document.getElementById('progress').style.width = '100%';
+            const total = exercises.length * 10;
+            const pct = Math.round(score / total * 100);
+            if (window.parent) { window.parent.postMessage({type:"mtti_quiz_score", score: score, total: total, percent: pct}, "*"); }
+            let badge = '🌟', msg = 'Excellent work. You have a professional grasp of this lesson.';
+            if (pct < 50) { badge = '🌱'; msg = 'Good first attempt. Review the lesson and try again.'; }
+            else if (pct < 80) { badge = '📚'; msg = 'Solid progress. Review the scenarios you missed and retry.'; }
+            document.getElementById('exerciseCard').innerHTML = `
+                <div class="results">
+                    <span class="badge">${badge}</span>
+                    <h2>Quiz Complete</h2>
+                    <div class="final-score">${score} / ${total}</div>
+                    <p><strong>${pct}%</strong> · Longest streak: ${streak}</p>
+                    <p>${msg}</p>
+                    <button class="restart-btn" onclick="restart()">Try again 🔁</button>
+                </div>`;
+        }
+        function restart() { currentQuestion = 0; score = 0; streak = 0; renderQuestion(); }
+        renderQuestion();
+    </script>
+</body>
+</html>

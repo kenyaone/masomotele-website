@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Logging and Auditing (Lesson) | MTTI Computer Applications</title>
+<link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Fredoka:wght@500;600&display=swap" rel="stylesheet">
+<style>
+* { margin:0; padding:0; box-sizing:border-box; }
+body { font-family:'Space Mono', monospace; background:linear-gradient(135deg,#2E7D32 0%,#1565C0 100%); min-height:100vh; padding:20px; color:#fff; }
+.container { max-width:820px; margin:0 auto; }
+.header { text-align:center; margin-bottom:24px; }
+.lesson-tag { display:inline-block; background:rgba(255,255,255,0.2); padding:6px 16px; border-radius:999px; font-size:0.85em; margin-bottom:12px; }
+.header h1 { font-family:'Fredoka', sans-serif; font-size:2em; margin-bottom:6px; text-shadow:3px 3px 0 rgba(0,0,0,0.2); }
+.card { background:#fff; color:#333; border-radius:22px; padding:32px; margin-bottom:20px; box-shadow:0 20px 60px rgba(0,0,0,0.3); }
+.section { margin-bottom:26px; }
+.section:last-child { margin-bottom:0; }
+.section h2 { font-family:'Fredoka', sans-serif; font-size:1.2em; margin-bottom:10px; color:#1565C0; }
+.section .body { line-height:1.65; font-size:0.98em; }
+.section .body p { margin-bottom:10px; }
+.section .body code { background:#f5f7fb; padding:2px 6px; border-radius:4px; font-size:0.92em; }
+.keypoint { background:#fff8e1; border-left:4px solid #ffc107; padding:12px 16px; border-radius:8px; margin-top:12px; font-size:0.92em; }
+</style>
+</head>
+<body>
+<div class="container">
+<div class="header"><div class="lesson-tag">Module 2 · Lesson 2.5</div><h1>Logging and Auditing</h1></div>
+<div class="card"><div class="section"><h2>What Logs Record</h2><div class="body"><p>System <strong>logs</strong> record events — logins, file access, configuration changes, errors — each typically with a timestamp and the account involved. Individually mundane, but collectively they let Grace reconstruct a sequence of events after something has gone wrong.</p></div></div><div class="section"><h2>Logs Matter Most in Hindsight</h2><div class="body"><p>Nobody reviews every log line as it happens — their real value often appears only during an investigation, when Grace needs to answer "when did this account first log in from an unusual location?" Without logging enabled beforehand, that question becomes unanswerable after the fact.</p></div><div class="keypoint"><strong>Key Point.</strong> Logging has to be turned on and working before an incident happens — there is no way to retroactively generate logs for events that already occurred unlogged.</div></div><div class="section"><h2>Centralising Logs</h2><div class="body"><p>If logs are only stored locally on the same system an attacker has compromised, that attacker can often delete or alter them to cover their tracks. Sending logs to a separate, centralised logging system as they are generated protects them from tampering on the compromised system itself.</p></div></div><div class="section"><h2>Log Retention</h2><div class="body"><p>Logs deleted or overwritten too quickly (e.g. after just a few days) may already be gone by the time an incident is discovered and investigated — some breaches go undetected for weeks or months. A sensible retention period balances storage cost against genuine investigative usefulness.</p></div></div></div>
+</div>
+</body>
+</html>

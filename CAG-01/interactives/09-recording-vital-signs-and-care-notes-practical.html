@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Recording Vital Signs and Care Notes | MTTI Caregiving</title>
+<link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Fredoka:wght@500;600&display=swap" rel="stylesheet">
+<style>
+* { margin:0; padding:0; box-sizing:border-box; }
+body { font-family:'Space Mono', monospace; background:linear-gradient(135deg,#387633 0%,#259BD7 100%); min-height:100vh; padding:20px; color:#fff; }
+.container { max-width:720px; margin:0 auto; }
+.header { text-align:center; margin-bottom:16px; }
+.lesson-tag { display:inline-block; background:rgba(255,255,255,0.2); padding:6px 16px; border-radius:999px; font-size:0.85em; margin-bottom:10px; }
+.header h1 { font-family:'Fredoka', sans-serif; font-size:1.7em; margin-bottom:4px; text-shadow:2px 2px 0 rgba(0,0,0,0.2); }
+.ranges { background:rgba(255,255,255,0.14); backdrop-filter:blur(10px); border-radius:14px; padding:12px 18px; margin-bottom:16px; font-size:0.85em; line-height:1.6; }
+.ranges strong { color:#ffd54f; }
+.progress { text-align:center; margin-bottom:14px; font-size:0.9em; opacity:0.9; }
+.card { background:#fff; color:#333; border-radius:20px; padding:26px; box-shadow:0 16px 40px rgba(0,0,0,0.25); }
+.scenario { background:linear-gradient(135deg,#fff8e1 0%,#ffecb3 100%); border-left:5px solid #ffc107; padding:16px 20px; border-radius:12px; margin-bottom:18px; font-size:0.95em; line-height:1.55; }
+.readings { background:#f5f7fb; border-radius:12px; padding:16px 20px; margin-bottom:20px; }
+.readings h3 { font-family:'Fredoka', sans-serif; font-size:1em; margin-bottom:10px; color:#1565C0; }
+.readings-grid { display:grid; grid-template-columns:1fr 1fr; gap:8px; font-size:0.92em; }
+.chart-form { margin-bottom:16px; }
+.chart-form h3 { font-family:'Fredoka', sans-serif; font-size:1em; margin-bottom:10px; color:#387633; }
+.field-row { display:flex; align-items:center; gap:10px; margin-bottom:10px; }
+.field-row label { flex:0 0 150px; font-size:0.88em; }
+.field-row input { flex:1; padding:8px 10px; border:2px solid #e5e7f0; border-radius:8px; font-family:'Space Mono', monospace; font-size:0.92em; }
+.field-row input.correct { border-color:#28a745; background:#d4edda; }
+.field-row input.wrong { border-color:#dc3545; background:#f8d7da; }
+.btn { background:linear-gradient(135deg,#387633 0%,#259BD7 100%); color:#fff; border:none; padding:12px 26px; border-radius:10px; font-size:0.95em; cursor:pointer; font-family:'Fredoka', sans-serif; box-shadow:0 6px 16px rgba(0,0,0,0.15); margin-top:4px; }
+.btn:disabled { opacity:0.5; cursor:not-allowed; }
+.category-options { display:flex; gap:10px; margin:14px 0; flex-wrap:wrap; }
+.cat-btn { flex:1; min-width:140px; padding:12px; border-radius:10px; border:2px solid #e5e7f0; background:#f5f7fb; cursor:pointer; font-family:'Space Mono', monospace; font-size:0.88em; text-align:center; }
+.cat-btn:hover:not(.disabled) { background:#e8f5e9; }
+.cat-btn.correct { background:#d4edda; border-color:#28a745; }
+.cat-btn.wrong { background:#f8d7da; border-color:#dc3545; }
+.cat-btn.disabled { cursor:not-allowed; }
+.feedback { margin-top:10px; padding:14px 18px; border-radius:10px; font-size:0.9em; line-height:1.5; }
+.feedback.correct { background:#d4edda; color:#155724; border-left:4px solid #28a745; }
+.feedback.wrong { background:#f8d7da; color:#721c24; border-left:4px solid #dc3545; }
+textarea { width:100%; min-height:100px; padding:12px; border:2px solid #e5e7f0; border-radius:10px; font-family:'Space Mono', monospace; font-size:0.9em; resize:vertical; }
+.model-note { background:#eef6ff; border-left:4px solid #259BD7; padding:14px 18px; border-radius:10px; margin-top:14px; font-size:0.88em; line-height:1.55; }
+.model-note h4 { font-family:'Fredoka', sans-serif; margin-bottom:8px; color:#1565C0; }
+.checklist { margin-top:10px; padding-left:18px; }
+.checklist li { margin-bottom:4px; }
+.hidden { display:none; }
+.done-banner { text-align:center; padding:20px; font-family:'Fredoka', sans-serif; font-size:1.1em; }
+</style>
+</head>
+<body>
+<div class="container">
+<div class="header">
+  <div class="lesson-tag">Module 9 · Practical</div>
+  <h1>Recording Vital Signs and Care Notes</h1>
+</div>
+<div class="ranges">
+  <strong>Normal adult reference ranges</strong> (for this exercise): Temperature 36.1–37.2°C · Pulse 60–100 bpm · Respiration 12–20/min · Blood Pressure ~90/60–120/80 mmHg
+</div>
+<div class="progress">Case <span id="caseNum">1</span> of <span id="caseTotal">3</span></div>
+<div class="card" id="caseCard"></div>
+<div class="done-banner hidden" id="doneBanner">✅ All three cases complete — you've practised charting and categorising a normal, a concerning, and a borderline reading.</div>
+</div>
+
+<script>
+const cases = [
+  {
+    name: "Mzee Kiptoo",
+    scenario: "Mzee Kiptoo has just finished his morning tea and says he feels fine. You take his routine vital signs as part of your daily check, at 09:15.",
+    readings: { temp: "36.8°C", pulse: "74 bpm", resp: "16 breaths/min", bpSys: "118", bpDia: "76" },
+    category: "normal",
+    modelNote: "09:15 — Mzee Kiptoo's vital signs taken after breakfast: Temp 36.8°C, Pulse 74bpm regular, Resp 16/min, BP 118/76mmHg. All within normal range. Client reports feeling well, alert and oriented. No concerns noted. — Njeri"
+  },
+  {
+    name: "Bibi Wanjiru",
+    scenario: "Bibi Wanjiru has been resting in bed and tells you she feels hot and tired. You take her vital signs at 14:30.",
+    readings: { temp: "39.2°C", pulse: "118 bpm", resp: "26 breaths/min", bpSys: "90", bpDia: "58" },
+    category: "report",
+    modelNote: "14:30 — Bibi Wanjiru reports feeling hot and tired, resting in bed. Vital signs: Temp 39.2°C (elevated), Pulse 118bpm (elevated), Resp 26/min (elevated), BP 90/58mmHg (low). Signs of possible fever with low blood pressure. Supervisor/nurse notified immediately at 14:35. Client kept resting, fluids offered. — Njeri"
+  },
+  {
+    name: "Bwana Otieno",
+    scenario: "Bwana Otieno seems a little more tired than usual today but says he is fine. You take his routine vital signs at 16:00.",
+    readings: { temp: "37.4°C", pulse: "96 bpm", resp: "20 breaths/min", bpSys: "128", bpDia: "82" },
+    category: "watch",
+    modelNote: "16:00 — Bwana Otieno appears more tired than usual, states he feels fine. Vital signs: Temp 37.4°C (slightly elevated), Pulse 96bpm (upper normal), Resp 20/min (upper normal), BP 128/82mmHg (slightly elevated). No acute distress noted. Will monitor closely and recheck vitals in 2 hours; will report to supervisor if any value rises further or client's condition changes. — Njeri"
+  }
+];
+
+let current = 0;
+let chartChecked = false;
+let categoryChosen = false;
+
+function escapeHtml(s) { return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+
+function render() {
+  chartChecked = false;
+  categoryChosen = false;
+  const c = cases[current];
+  document.getElementById('caseNum').textContent = current + 1;
+  document.getElementById('caseCard').innerHTML = `
+    <div class="scenario"><strong>Scenario.</strong> ${escapeHtml(c.scenario)}</div>
+    <div class="readings">
+      <h3>What the instruments show</h3>
+      <div class="readings-grid">
+        <div>🌡️ Thermometer: <strong>${c.readings.temp}</strong></div>
+        <div>💓 Pulse (60 sec count): <strong>${c.readings.pulse}</strong></div>
+        <div>🫁 Respiration: <strong>${c.readings.resp}</strong></div>
+        <div>🩺 Blood pressure cuff: <strong>${c.readings.bpSys}/${c.readings.bpDia} mmHg</strong></div>
+      </div>
+    </div>
+    <div class="chart-form">
+      <h3>Step 1 — Chart it accurately</h3>
+      <div class="field-row"><label>Temperature (°C)</label><input type="text" id="f-temp" placeholder="e.g. 36.8"></div>
+      <div class="field-row"><label>Pulse (bpm)</label><input type="text" id="f-pulse" placeholder="e.g. 74"></div>
+      <div class="field-row"><label>Respiration (/min)</label><input type="text" id="f-resp" placeholder="e.g. 16"></div>
+      <div class="field-row"><label>BP Systolic</label><input type="text" id="f-sys" placeholder="e.g. 118"></div>
+      <div class="field-row"><label>BP Diastolic</label><input type="text" id="f-dia" placeholder="e.g. 76"></div>
+      <button class="btn" onclick="checkChart()">Check my chart</button>
+      <div id="chartFeedback"></div>
+    </div>
+    <div id="categorySection" class="hidden">
+      <h3 style="font-family:'Fredoka',sans-serif;color:#387633;margin-bottom:6px;">Step 2 — Categorise this reading</h3>
+      <div class="category-options">
+        <button class="cat-btn" onclick="chooseCategory('normal')">✅ Normal</button>
+        <button class="cat-btn" onclick="chooseCategory('watch')">👀 Watch Closely</button>
+        <button class="cat-btn" onclick="chooseCategory('report')">🚨 Report Immediately</button>
+      </div>
+      <div id="categoryFeedback"></div>
+    </div>
+    <div id="noteSection" class="hidden">
+      <h3 style="font-family:'Fredoka',sans-serif;color:#387633;margin:16px 0 6px;">Step 3 — Write a short care note</h3>
+      <textarea id="noteText" placeholder="Write your note as you would in a real client file..."></textarea>
+      <button class="btn" onclick="revealModel()" style="margin-top:10px;">Compare to a model note</button>
+      <div id="modelSection"></div>
+    </div>
+    <div id="nextSection" class="hidden" style="text-align:center;margin-top:18px;">
+      <button class="btn" onclick="nextCase()">${current === cases.length - 1 ? 'Finish' : 'Next case →'}</button>
+    </div>
+  `;
+}
+
+function parseNum(s) { return parseFloat(String(s).replace(/[^\d.]/g, '')); }
+
+function checkChart() {
+  if (chartChecked) return;
+  chartChecked = true;
+  const c = cases[current];
+  const expected = {
+    'f-temp': parseNum(c.readings.temp),
+    'f-pulse': parseNum(c.readings.pulse),
+    'f-resp': parseNum(c.readings.resp),
+    'f-sys': parseNum(c.readings.bpSys),
+    'f-dia': parseNum(c.readings.bpDia),
+  };
+  let allCorrect = true;
+  for (const id in expected) {
+    const el = document.getElementById(id);
+    const val = parseNum(el.value);
+    const ok = !isNaN(val) && Math.abs(val - expected[id]) < 0.15;
+    el.classList.add(ok ? 'correct' : 'wrong');
+    el.disabled = true;
+    if (!ok) allCorrect = false;
+  }
+  const fb = document.getElementById('chartFeedback');
+  fb.innerHTML = `<div class="feedback ${allCorrect ? 'correct' : 'wrong'}">
+    <strong>${allCorrect ? '✅ Accurately charted.' : '❌ One or more values do not match the instrument readings.'}</strong><br>
+    Accurate transcription matters — a charting error can lead to a wrong decision later, even if the original reading was correct.
+  </div>`;
+  document.getElementById('categorySection').classList.remove('hidden');
+}
+
+function chooseCategory(choice) {
+  if (categoryChosen) return;
+  categoryChosen = true;
+  const c = cases[current];
+  const btns = document.querySelectorAll('.cat-btn');
+  btns.forEach(b => b.classList.add('disabled'));
+  const labels = { normal: '✅ Normal', watch: '👀 Watch Closely', report: '🚨 Report Immediately' };
+  btns.forEach(b => { if (b.textContent.trim() === labels[c.category]) b.classList.add('correct'); });
+  const right = choice === c.category;
+  if (!right) btns.forEach(b => { if (b.textContent.trim() === labels[choice]) b.classList.add('wrong'); });
+
+  const explanations = {
+    normal: "All readings sit comfortably within the normal reference ranges, and the client reports feeling well — routine documentation is all that's needed.",
+    watch: "These readings are borderline — not in a normal/comfortable range, but not acutely dangerous either. The right response is closer monitoring and rechecking soon, not panic and not ignoring it.",
+    report: "Multiple readings are clearly outside safe ranges together (high temp, high pulse, high respiration, low BP) — this combination should be reported immediately, not just documented and left for later."
+  };
+  document.getElementById('categoryFeedback').innerHTML = `<div class="feedback ${right ? 'correct' : 'wrong'}">
+    <strong>${right ? '✅ Correct.' : '❌ Not quite — correct answer highlighted above.'}</strong><br>${explanations[c.category]}
+  </div>`;
+  document.getElementById('noteSection').classList.remove('hidden');
+}
+
+function revealModel() {
+  const c = cases[current];
+  document.getElementById('modelSection').innerHTML = `
+    <div class="model-note">
+      <h4>Model note for comparison</h4>
+      <p>${escapeHtml(c.modelNote)}</p>
+      <p style="margin-top:10px;"><strong>Self-check your own note against this checklist:</strong></p>
+      <ul class="checklist">
+        <li>Did you include the time of the observation?</li>
+        <li>Did you record the specific vital sign values, not just "vitals taken"?</li>
+        <li>Did you note the client's own report (how they said they felt)?</li>
+        <li>Did you state what you did about it — including who you told, if anything was concerning?</li>
+      </ul>
+    </div>`;
+  document.getElementById('nextSection').classList.remove('hidden');
+}
+
+function nextCase() {
+  current++;
+  if (current >= cases.length) {
+    document.getElementById('caseCard').classList.add('hidden');
+    document.querySelector('.progress').classList.add('hidden');
+    document.getElementById('doneBanner').classList.remove('hidden');
+    return;
+  }
+  render();
+}
+
+render();
+</script>
+</body>
+</html>

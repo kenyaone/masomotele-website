@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Using AI Assistants Safely for Security Work | MTTI Computer Applications</title>
+    <link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Fredoka:wght@500;600&display=swap" rel="stylesheet">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Space Mono', monospace; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); min-height: 100vh; padding: 20px; color: #fff; }
+        .container { max-width: 900px; margin: 0 auto; }
+        .header { text-align: center; margin-bottom: 30px; }
+        .header .lesson-tag { display: inline-block; background: rgba(255,255,255,0.2); padding: 6px 16px; border-radius: 999px; font-size: 0.85em; margin-bottom: 12px; }
+        .header h1 { font-family: 'Fredoka', sans-serif; font-size: 2.2em; margin-bottom: 8px; text-shadow: 3px 3px 0 rgba(0,0,0,0.2); }
+        .score-board { background: rgba(255,255,255,0.15); backdrop-filter: blur(10px); border-radius: 20px; padding: 20px; margin-bottom: 20px; display: flex; justify-content: space-around; }
+        .score-item { text-align: center; }
+        .score-item .label { font-size: 0.85em; opacity: 0.9; margin-bottom: 4px; }
+        .score-item .value { font-size: 1.8em; font-weight: bold; font-family: 'Fredoka', sans-serif; }
+        .progress-bar { width: 100%; height: 8px; background: rgba(255,255,255,0.3); border-radius: 10px; margin-bottom: 25px; overflow: hidden; }
+        .progress-fill { height: 100%; background: linear-gradient(90deg, #f093fb 0%, #f5576c 100%); border-radius: 10px; transition: width 0.5s ease; width: 0%; }
+        .exercise-card { background: white; color: #333; border-radius: 25px; padding: 35px; margin-bottom: 20px; box-shadow: 0 20px 60px rgba(0,0,0,0.3); }
+        .scenario { background: linear-gradient(135deg, #fff8e1 0%, #ffecb3 100%); border-left: 5px solid #ffc107; padding: 20px 24px; border-radius: 12px; margin-bottom: 24px; font-size: 0.98em; line-height: 1.55; }
+        .scenario strong { color: #7a5a00; font-family: 'Fredoka', sans-serif; }
+        .question { font-size: 1.15em; margin-bottom: 20px; font-weight: 700; line-height: 1.4; }
+        .options { display: flex; flex-direction: column; gap: 12px; }
+        .option { background: #f5f7fb; border: 2px solid transparent; padding: 16px 20px; border-radius: 12px; cursor: pointer; transition: all 0.2s ease; font-family: 'Space Mono', monospace; font-size: 0.98em; text-align: left; }
+        .option:hover:not(.disabled) { background: #eef1fb; border-color: #667eea; transform: translateX(4px); }
+        .option.correct { background: #d4edda; border-color: #28a745; color: #155724; }
+        .option.wrong { background: #f8d7da; border-color: #dc3545; color: #721c24; }
+        .option.disabled { cursor: not-allowed; opacity: 0.85; }
+        .feedback { margin-top: 22px; padding: 18px 22px; border-radius: 12px; font-size: 0.98em; line-height: 1.5; }
+        .feedback.correct { background: #d4edda; color: #155724; border-left: 4px solid #28a745; }
+        .feedback.wrong { background: #f8d7da; color: #721c24; border-left: 4px solid #dc3545; }
+        .next-btn, .restart-btn { margin-top: 20px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; border: none; padding: 14px 32px; border-radius: 12px; font-size: 1em; cursor: pointer; font-family: 'Fredoka', sans-serif; box-shadow: 0 6px 18px rgba(0,0,0,0.2); }
+        .results { text-align: center; padding: 25px 15px; }
+        .results h2 { font-family: 'Fredoka', sans-serif; font-size: 2em; margin-bottom: 12px; color: #333; }
+        .results .final-score { font-size: 3em; font-family: 'Fredoka', sans-serif; color: #667eea; margin: 20px 0; }
+        .results p { color: #555; margin-bottom: 12px; }
+        .badge { display: inline-block; font-size: 3.5em; margin: 8px 0; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <div class="lesson-tag">Module 8 · Lesson 8.3 · Quiz</div>
+            <h1>Using AI Assistants Safely for Security Work</h1>
+        </div>
+        <div class="score-board">
+            <div class="score-item"><div class="label">Score</div><div class="value" id="score">0</div></div>
+            <div class="score-item"><div class="label">Question</div><div class="value"><span id="current">1</span>/<span id="total">10</span></div></div>
+            <div class="score-item"><div class="label">Streak</div><div class="value" id="streak">0</div></div>
+        </div>
+        <div class="progress-bar"><div class="progress-fill" id="progress"></div></div>
+        <div class="exercise-card" id="exerciseCard"></div>
+    </div>
+    <script>
+        const exercises = [{"scenario":"Grace uses an AI assistant to help draft the wording of a generic, non-sensitive section of a security report.","question":"Is this a reasonable use of AI assistance?","options":["No, AI should never be used for any part of security work","Yes, drafting help for well-bounded, non-sensitive tasks is a legitimate, reasonable use","This is only acceptable for senior staff","This violates security principles inherently"],"correct":1,"explanation":"Using AI for drafting help on non-sensitive, well-bounded tasks is a genuinely reasonable and common legitimate use."},{"scenario":"Grace considers pasting actual customer transaction records into a general-purpose external AI chatbot to save time summarising them.","question":"What is the concern with this specific action?","options":["No concern, external AI tools are always fully secure with sensitive data","Sensitive customer data pasted into an uncontrolled external tool risks being retained, logged, or exposed outside SafariPay's control","This is standard, recommended practice at most companies","This has no relation to data protection principles"],"correct":1,"explanation":"Pasting sensitive data into an external tool without proper controls creates real exposure risk, regardless of convenience."},{"scenario":"An AI assistant suggests a specific security configuration change that Grace is considering deploying directly to production.","question":"What should happen before deployment?","options":["Deploy immediately with full confidence in the AI suggestion","Expert review of the suggestion against SafariPay's specific environment before deployment","Skip review only for suggestions that sound confident","Configuration suggestions never need any review"],"correct":1,"explanation":"AI-suggested technical changes need expert validation against the real, specific environment before being trusted in production."},{"scenario":"Grace is unsure whether a specific AI tool is approved for handling SafariPay's security-related work.","question":"What is the appropriate way to resolve this uncertainty?","options":["Use whichever tool seems most convenient personally, regardless of policy","Consult SafariPay's actual established policy on approved AI tools and permitted use","Assume all AI tools are equally acceptable for any purpose","Avoid ever asking and just guess"],"correct":1,"explanation":"Deferring to established company policy is the appropriate way to resolve uncertainty about approved tool usage."},{"scenario":"Grace applies the same judgement to what she pastes into an AI tool as she would to what she'd post in a public forum.","question":"What principle does this reflect?","options":["If information would be inappropriate to share publicly, it should also not be pasted into an uncontrolled external AI tool","AI tools and public forums have no meaningful similarity in risk","This overly cautious approach provides no real practical benefit","Only literal public forums carry any data exposure risk"],"correct":0,"explanation":"This is a useful practical heuristic \u2014 treating uncontrolled external AI tools with the same sensitivity judgement as public sharing."},{"scenario":"Grace wants a one-sentence summary of how her own team should approach using AI assistants for security work.","question":"Which summary fits best?","options":["AI assistants should never be used for any security-related task whatsoever","AI assistants are useful for well-bounded, non-sensitive tasks, but sensitive data must never be shared with uncontrolled external tools, and technical suggestions still require expert human review","AI-suggested configurations can always be trusted and deployed without review","There is no need for any company policy on AI tool usage"],"correct":1,"explanation":"This captures the balanced, practical approach \u2014 real usefulness within clear, sensible limits around data sensitivity and technical review."}];
+        let currentQuestion = 0, score = 0, streak = 0, answered = false;
+        function updateScoreboard() {
+            document.getElementById('score').textContent = score;
+            document.getElementById('current').textContent = Math.min(currentQuestion + 1, exercises.length);
+            document.getElementById('total').textContent = exercises.length;
+            document.getElementById('streak').textContent = streak;
+            document.getElementById('progress').style.width = ((currentQuestion) / exercises.length) * 100 + '%';
+        }
+        function escapeHtml(s) { return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+        function renderQuestion() {
+            answered = false;
+            const q = exercises[currentQuestion];
+            let html = '';
+            if (q.scenario) html += `<div class="scenario"><strong>Scenario.</strong> ${escapeHtml(q.scenario)}</div>`;
+            html += `<div class="question">${escapeHtml(q.question)}</div>`;
+            html += '<div class="options">';
+            q.options.forEach((o, i) => { html += `<button class="option" onclick="selectAnswer(${i})">${escapeHtml(o)}</button>`; });
+            html += '</div>';
+            document.getElementById('exerciseCard').innerHTML = html;
+            updateScoreboard();
+        }
+        function selectAnswer(i) {
+            if (answered) return;
+            answered = true;
+            const q = exercises[currentQuestion];
+            const btns = document.querySelectorAll('.option');
+            btns.forEach(b => b.classList.add('disabled'));
+            btns[q.correct].classList.add('correct');
+            const right = i === q.correct;
+            if (!right) btns[i].classList.add('wrong');
+            if (right) { score += 10; streak += 1; } else { streak = 0; }
+            const fb = document.createElement('div');
+            fb.className = 'feedback ' + (right ? 'correct' : 'wrong');
+            fb.innerHTML = `<strong>${right ? '✅ Correct.' : '❌ Not quite.'}</strong><br>${escapeHtml(q.explanation)}`;
+            document.getElementById('exerciseCard').appendChild(fb);
+            const nb = document.createElement('button');
+            nb.className = 'next-btn';
+            nb.textContent = currentQuestion === exercises.length - 1 ? 'See results →' : 'Next scenario →';
+            nb.onclick = nextQuestion;
+            document.getElementById('exerciseCard').appendChild(nb);
+            updateScoreboard();
+        }
+        function nextQuestion() { currentQuestion++; if (currentQuestion >= exercises.length) return showResults(); renderQuestion(); }
+        function showResults() {
+            document.getElementById('progress').style.width = '100%';
+            const total = exercises.length * 10;
+            const pct = Math.round(score / total * 100);
+            if (window.parent) { window.parent.postMessage({type:"mtti_quiz_score", score: score, total: total, percent: pct}, "*"); }
+            let badge = '🌟', msg = 'Excellent work. You have a professional grasp of this lesson.';
+            if (pct < 50) { badge = '🌱'; msg = 'Good first attempt. Review the lesson and try again.'; }
+            else if (pct < 80) { badge = '📚'; msg = 'Solid progress. Review the scenarios you missed and retry.'; }
+            document.getElementById('exerciseCard').innerHTML = `
+                <div class="results">
+                    <span class="badge">${badge}</span>
+                    <h2>Quiz Complete</h2>
+                    <div class="final-score">${score} / ${total}</div>
+                    <p><strong>${pct}%</strong> · Longest streak: ${streak}</p>
+                    <p>${msg}</p>
+                    <button class="restart-btn" onclick="restart()">Try again 🔁</button>
+                </div>`;
+        }
+        function restart() { currentQuestion = 0; score = 0; streak = 0; renderQuestion(); }
+        renderQuestion();
+    </script>
+</body>
+</html>

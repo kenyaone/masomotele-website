@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Your First HTML Page (Lesson) | MTTI Computer Applications</title>
+<link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Fredoka:wght@500;600&display=swap" rel="stylesheet">
+<style>
+* { margin:0; padding:0; box-sizing:border-box; }
+body { font-family:'Space Mono', monospace; background:linear-gradient(135deg,#2E7D32 0%,#1565C0 100%); min-height:100vh; padding:20px; color:#fff; }
+.container { max-width:820px; margin:0 auto; }
+.header { text-align:center; margin-bottom:24px; }
+.lesson-tag { display:inline-block; background:rgba(255,255,255,0.2); padding:6px 16px; border-radius:999px; font-size:0.85em; margin-bottom:12px; }
+.header h1 { font-family:'Fredoka', sans-serif; font-size:2em; margin-bottom:6px; text-shadow:3px 3px 0 rgba(0,0,0,0.2); }
+.card { background:#fff; color:#333; border-radius:22px; padding:32px; margin-bottom:20px; box-shadow:0 20px 60px rgba(0,0,0,0.3); }
+.section { margin-bottom:26px; }
+.section:last-child { margin-bottom:0; }
+.section h2 { font-family:'Fredoka', sans-serif; font-size:1.2em; margin-bottom:10px; color:#1565C0; }
+.section .body { line-height:1.65; font-size:0.98em; }
+.section .body p { margin-bottom:10px; }
+.section .body code { background:#f5f7fb; padding:2px 6px; border-radius:4px; font-size:0.92em; }
+.keypoint { background:#fff8e1; border-left:4px solid #ffc107; padding:12px 16px; border-radius:8px; margin-top:12px; font-size:0.92em; }
+</style>
+</head>
+<body>
+<div class="container">
+<div class="header"><div class="lesson-tag">Module 1 · Lesson 1.2</div><h1>Your First HTML Page</h1></div>
+<div style="background:#fff;color:#333;border-radius:16px;padding:16px;margin-bottom:20px;box-shadow:0 8px 24px rgba(0,0,0,0.12);text-align:center;"><svg viewBox="0 0 440 200" style="width:100%;max-width:560px;height:210px;" xmlns="http://www.w3.org/2000/svg">
+<rect x="30" y="10" width="380" height="180" fill="none" stroke="#1e293b" stroke-width="2" rx="6"/>
+<text x="45" y="30" font-size="11" font-family="monospace" fill="#1e293b">&lt;html&gt;</text>
+<rect x="45" y="40" width="350" height="60" fill="#eef6ff" stroke="#259BD7" stroke-dasharray="3,2"/>
+<text x="55" y="55" font-size="10" font-family="monospace" fill="#259BD7">&lt;head&gt;</text>
+<text x="70" y="72" font-size="9" font-family="monospace" fill="#555">&lt;title&gt;My Page&lt;/title&gt;</text>
+<text x="55" y="90" font-size="10" font-family="monospace" fill="#259BD7">&lt;/head&gt;</text>
+<rect x="45" y="105" width="350" height="65" fill="#eafbea" stroke="#387633" stroke-dasharray="3,2"/>
+<text x="55" y="120" font-size="10" font-family="monospace" fill="#387633">&lt;body&gt;</text>
+<text x="70" y="137" font-size="9" font-family="monospace" fill="#555">&lt;h1&gt;Hello!&lt;/h1&gt;</text>
+<text x="55" y="155" font-size="10" font-family="monospace" fill="#387633">&lt;/body&gt;</text>
+<text x="45" y="182" font-size="11" font-family="monospace" fill="#1e293b">&lt;/html&gt;</text>
+</svg></div><div class="card"><div class="section"><h2>The Basic Skeleton</h2><div class="body"><p>Every HTML page starts with the same skeleton: <code>&lt;!DOCTYPE html&gt;</code> tells the browser this is a modern HTML document, then a single <code>&lt;html&gt;</code> element wraps everything else, containing exactly one <code>&lt;head&gt;</code> and one <code>&lt;body&gt;</code>.</p></div></div><div class="section"><h2>Head vs Body</h2><div class="body"><p>The <code>&lt;head&gt;</code> holds information about the page that is not directly displayed — the page title shown in the browser tab, links to stylesheets, character encoding. The <code>&lt;body&gt;</code> holds everything that actually appears on the page — headings, paragraphs, images, links.</p></div><div class="keypoint"><strong>Key Point.</strong> Content placed in the head, like the title, never appears directly inside the page itself — only in the browser tab or search results.</div></div><div class="section"><h2>Tags Usually Come in Pairs</h2><div class="body"><p>Most HTML elements have an opening tag and a matching closing tag, like <code>&lt;h1&gt;Hello&lt;/h1&gt;</code> — the closing tag has a forward slash. Forgetting a closing tag is one of the most common early mistakes and can make the rest of the page render unpredictably.</p></div></div></div>
+</div>
+</body>
+</html>

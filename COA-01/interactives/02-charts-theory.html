@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Charts (Lesson) | MTTI Computer Applications</title>
+<link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Fredoka:wght@500;600&display=swap" rel="stylesheet">
+<style>
+* { margin:0; padding:0; box-sizing:border-box; }
+body { font-family:'Space Mono', monospace; background:linear-gradient(135deg,#2E7D32 0%,#1565C0 100%); min-height:100vh; padding:20px; color:#fff; }
+.container { max-width:820px; margin:0 auto; }
+.header { text-align:center; margin-bottom:24px; }
+.lesson-tag { display:inline-block; background:rgba(255,255,255,0.2); padding:6px 16px; border-radius:999px; font-size:0.85em; margin-bottom:12px; }
+.header h1 { font-family:'Fredoka', sans-serif; font-size:2em; margin-bottom:6px; text-shadow:3px 3px 0 rgba(0,0,0,0.2); }
+.card { background:#fff; color:#333; border-radius:22px; padding:32px; margin-bottom:20px; box-shadow:0 20px 60px rgba(0,0,0,0.3); }
+.section { margin-bottom:26px; }
+.section:last-child { margin-bottom:0; }
+.section h2 { font-family:'Fredoka', sans-serif; font-size:1.2em; margin-bottom:10px; color:#1565C0; }
+.section .body { line-height:1.65; font-size:0.98em; }
+.section .body p { margin-bottom:10px; }
+.section .body code { background:#f5f7fb; padding:2px 6px; border-radius:4px; font-size:0.92em; }
+.keypoint { background:#fff8e1; border-left:4px solid #ffc107; padding:12px 16px; border-radius:8px; margin-top:12px; font-size:0.92em; }
+</style>
+</head>
+<body>
+<div class="container">
+<div class="header"><div class="lesson-tag">Module 2 · Lesson 2.5</div><h1>Charts</h1></div>
+<div style="background:#fff;color:#333;border-radius:16px;padding:16px;margin-bottom:20px;box-shadow:0 8px 24px rgba(0,0,0,0.12);text-align:center;"><svg viewBox="0 0 500 185" style="width:100%;max-width:560px;height:175px;" xmlns="http://www.w3.org/2000/svg">
+<line x1="40" y1="20" x2="40" y2="160" stroke="#999" stroke-width="1.5"/>
+<line x1="40" y1="160" x2="460" y2="160" stroke="#999" stroke-width="1.5"/>
+<rect x="70" y="100" width="50" height="60" fill="#217346"/><text x="95" y="175" font-size="9" text-anchor="middle">Mon</text>
+<rect x="150" y="70" width="50" height="90" fill="#217346"/><text x="175" y="175" font-size="9" text-anchor="middle">Tue</text>
+<rect x="230" y="40" width="50" height="120" fill="#387633"/><text x="255" y="175" font-size="9" text-anchor="middle">Wed</text>
+<rect x="310" y="90" width="50" height="70" fill="#217346"/><text x="335" y="175" font-size="9" text-anchor="middle">Thu</text>
+<rect x="390" y="55" width="50" height="105" fill="#217346"/><text x="415" y="175" font-size="9" text-anchor="middle">Fri</text>
+<text x="250" y="12" font-size="11" text-anchor="middle" font-weight="bold" fill="#1e293b">Daily Sales - This Week</text>
+</svg></div><div class="card"><div class="section"><h2>Choosing a Chart Type</h2><div class="body"><p>A <strong>line chart</strong> suits a trend over time (sales each day this month). A <strong>bar/column chart</strong> suits comparing separate categories (sales by product type). A <strong>pie chart</strong> suits showing parts of a whole (percentage of sales per product), and works poorly with more than about 5-6 slices.</p></div><div class="keypoint"><strong>Key Point.</strong> Picking the wrong chart type (e.g. a pie chart for a monthly trend) actively confuses the reader, even with correct data.</div></div><div class="section"><h2>Inserting and Editing a Chart</h2><div class="body"><p>Select the data range (including headers), then Insert → Charts → choose a type. Clicking the chart reveals Chart Design/Format tools to add a title, label axes, and change colours. A clear title (e.g. "Amani Stationers — Daily Sales, July 2026") makes the chart understandable without extra explanation.</p></div></div><div class="section"><h2>Charts Update Automatically</h2><div class="body"><p>A chart stays linked to its source data — editing a number in the original range instantly updates the chart. This is why charts should be built directly from the live data range, not from a manually retyped copy.</p></div><div class="keypoint"><strong>Key Point.</strong> Never manually retype numbers just to build a chart — link it to the live data so it always reflects reality.</div></div></div>
+</div>
+</body>
+</html>

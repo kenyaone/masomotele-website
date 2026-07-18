@@ -487,4 +487,229 @@
         $replies.slideToggle(180);
     });
 
+    // ─── QUIZ SYSTEM ──────────────────────────────────────
+    $(document).on('click', '.mtti-start-quiz', function(e) {
+        e.preventDefault();
+        var $btn = $(this);
+        var quizId = $btn.data('quiz-id');
+        var quizTitle = $btn.data('quiz-title');
+
+        $btn.prop('disabled', true).text('Starting...');
+
+        $.ajax({
+            url: mttiPortal.ajaxUrl,
+            type: 'POST',
+            data: {
+                action: 'mtti_start_quiz_attempt',
+                nonce: mttiPortal.quizNonce,
+                quiz_id: quizId
+            },
+            success: function(response) {
+                if (response.success) {
+                    mttiShowQuizUI(response.data);
+                } else {
+                    alert('Error starting quiz: ' + (response.data || 'Unknown error'));
+                    $btn.prop('disabled', false).text('Start Quiz');
+                }
+            },
+            error: function() {
+                alert('Error starting quiz. Please try again.');
+                $btn.prop('disabled', false).text('Start Quiz');
+            }
+        });
+    });
+
+    function mttiShowQuizUI(data) {
+        var quiz = data.quiz;
+        var questions = data.questions;
+        var attemptToken = data.attempt_token;
+        var timeLimit = data.time_limit ? data.time_limit * 60 : null;
+
+        var $modal = $('<div class="mtti-quiz-modal" style="display:none;"></div>');
+        var html = '<div class="mtti-quiz-container" style="max-width: 800px; margin: 0 auto; background: white; border-radius: 8px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); overflow: hidden;">';
+
+        html += '<div class="mtti-quiz-header" style="background: linear-gradient(135deg, #0d9e3a 0%, #0a7a2d 100%); color: white; padding: 20px;">';
+        html += '<h2 style="margin: 0 0 10px 0;">' + escapeHtml(quiz.title) + '</h2>';
+        if (quiz.description) {
+            html += '<p style="margin: 0; font-size: 14px; opacity: 0.9;">' + escapeHtml(quiz.description) + '</p>';
+        }
+        html += '<div style="font-size: 12px; margin-top: 10px;">';
+        html += 'Questions: <strong>' + questions.length + '</strong> | ';
+        html += 'Pass Mark: <strong>' + quiz.pass_mark + '%</strong>';
+        if (timeLimit) {
+            html += ' | Time: <strong id="mtti-quiz-timer">' + Math.floor(timeLimit / 60) + ':00</strong>';
+        }
+        html += '</div>';
+        html += '</div>';
+
+        html += '<div class="mtti-quiz-body" style="padding: 30px; overflow-y: auto; max-height: 60vh;">';
+        html += '<form id="mtti-quiz-form">';
+
+        // Render each question
+        $.each(questions, function(i, q) {
+            var qNum = i + 1;
+            html += '<div class="mtti-question" style="margin-bottom: 30px; padding-bottom: 30px; border-bottom: 1px solid #eee;">';
+            html += '<h4 style="color: #333; margin: 0 0 15px 0; font-size: 16px;">';
+            html += '<span style="background: #0d9e3a; color: white; border-radius: 50%; width: 24px; height: 24px; display: inline-flex; align-items: center; justify-content: center; font-size: 12px; margin-right: 10px;">' + qNum + '</span>';
+            html += escapeHtml(q.question_text);
+            html += '</h4>';
+
+            if (q.question_type === 'mcq') {
+                var options = JSON.parse(q.options);
+                $.each(options, function(idx, opt) {
+                    html += '<label style="display: block; margin: 10px 0; cursor: pointer; padding: 10px; border-radius: 4px; border: 1px solid #ddd; transition: all 0.2s;">';
+                    html += '<input type="radio" name="q' + q.question_id + '" value="' + idx + '" style="margin-right: 10px;"> ';
+                    html += escapeHtml(opt);
+                    html += '</label>';
+                });
+            } else if (q.question_type === 'true_false') {
+                html += '<label style="display: block; margin: 10px 0; cursor: pointer; padding: 10px; border-radius: 4px; border: 1px solid #ddd;">';
+                html += '<input type="radio" name="q' + q.question_id + '" value="true" style="margin-right: 10px;"> True';
+                html += '</label>';
+                html += '<label style="display: block; margin: 10px 0; cursor: pointer; padding: 10px; border-radius: 4px; border: 1px solid #ddd;">';
+                html += '<input type="radio" name="q' + q.question_id + '" value="false" style="margin-right: 10px;"> False';
+                html += '</label>';
+            } else if (q.question_type === 'fill_blank') {
+                html += '<input type="text" name="q' + q.question_id + '" style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 4px; font-size: 14px; box-sizing: border-box;" placeholder="Your answer...">';
+            }
+
+            html += '</div>';
+        });
+
+        html += '</form>';
+        html += '</div>';
+
+        html += '<div class="mtti-quiz-footer" style="background: #f5f5f5; padding: 20px; text-align: right; border-top: 1px solid #ddd;">';
+        html += '<button type="button" class="button button-secondary" id="mtti-quiz-cancel">Cancel</button> ';
+        html += '<button type="button" class="button button-primary" id="mtti-quiz-submit">Submit Quiz</button>';
+        html += '</div>';
+
+        html += '</div>';
+        $modal.html(html);
+
+        // Show modal as overlay
+        var overlayHtml = '<div id="mtti-quiz-overlay" style="position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.5); z-index: 9999; overflow-y: auto; padding: 20px;"></div>';
+        $('body').append(overlayHtml);
+        $('#mtti-quiz-overlay').append($modal).fadeIn();
+        $modal.fadeIn();
+
+        // Timer
+        if (timeLimit) {
+            var timeRemaining = timeLimit;
+            setInterval(function() {
+                timeRemaining--;
+                var mins = Math.floor(timeRemaining / 60);
+                var secs = timeRemaining % 60;
+                $('#mtti-quiz-timer').text(mins + ':' + (secs < 10 ? '0' : '') + secs);
+                if (timeRemaining <= 0) {
+                    $('#mtti-quiz-submit').click();
+                }
+            }, 1000);
+        }
+
+        // Cancel button
+        $('#mtti-quiz-cancel').on('click', function() {
+            if (confirm('Cancel this quiz attempt?')) {
+                $('#mtti-quiz-overlay').fadeOut(function() { $(this).remove(); });
+                $modal.fadeOut();
+            }
+        });
+
+        // Submit button
+        $('#mtti-quiz-submit').on('click', function() {
+            var answers = {};
+            $('#mtti-quiz-form').find('input[type="radio"]:checked, input[type="text"]').each(function() {
+                var name = $(this).attr('name');
+                var qId = parseInt(name.substring(1));
+                answers[qId] = $(this).val();
+            });
+
+            $.ajax({
+                url: mttiPortal.ajaxUrl,
+                type: 'POST',
+                data: {
+                    action: 'mtti_submit_quiz_attempt',
+                    nonce: mttiPortal.quizNonce,
+                    quiz_id: quiz.quiz_id,
+                    answers: JSON.stringify(answers),
+                    attempt_token: attemptToken
+                },
+                success: function(response) {
+                    if (response.success) {
+                        mttiShowQuizResults(response.data, questions);
+                    } else {
+                        alert('Error submitting quiz: ' + (response.data || 'Unknown error'));
+                    }
+                },
+                error: function() {
+                    alert('Error submitting quiz. Please try again.');
+                }
+            });
+        });
+    }
+
+    function mttiShowQuizResults(results, questions) {
+        var html = '<div class="mtti-quiz-results" style="max-width: 800px; margin: 0 auto; background: white; border-radius: 8px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); overflow: hidden;">';
+
+        var resultColor = results.passed ? '#0d9e3a' : '#d92e25';
+        var resultText = results.passed ? 'PASSED' : 'FAILED';
+
+        html += '<div class="mtti-results-header" style="background: linear-gradient(135deg, ' + resultColor + ' 0%, ' + (results.passed ? '#0a7a2d' : '#a31f15') + ' 100%); color: white; padding: 40px; text-align: center;">';
+        html += '<h2 style="margin: 0 0 10px 0; font-size: 28px;">' + resultText + '</h2>';
+        html += '<div style="font-size: 48px; font-weight: bold; margin: 20px 0;">' + results.percentage.toFixed(1) + '%</div>';
+        html += '<div style="font-size: 18px;">Score: <strong>' + results.score.toFixed(2) + '/' + results.total.toFixed(2) + '</strong></div>';
+        html += '<div style="margin-top: 10px; font-size: 14px;">Pass Mark: ' + results.pass_mark + '%</div>';
+        html += '</div>';
+
+        html += '<div class="mtti-results-body" style="padding: 30px; max-height: 60vh; overflow-y: auto;">';
+        html += '<h3>Review Your Answers</h3>';
+
+        var questionMap = {};
+        $.each(questions, function(i, q) {
+            questionMap[q.question_id] = q;
+        });
+
+        $.each(results.question_results, function(qId, result) {
+            var q = questionMap[qId];
+            if (!q) return;
+
+            var bgColor = result.correct ? '#e8f5e9' : '#ffebee';
+            var borderColor = result.correct ? '#4caf50' : '#f44336';
+            var statusText = result.correct ? '✓ Correct' : '✗ Incorrect';
+            var statusColor = result.correct ? '#0d9e3a' : '#d92e25';
+
+            html += '<div style="margin: 20px 0; padding: 15px; background: ' + bgColor + '; border-left: 4px solid ' + borderColor + '; border-radius: 4px;">';
+            html += '<strong>' + escapeHtml(q.question_text) + '</strong><br>';
+            html += '<span style="color: ' + statusColor + '; font-weight: bold; font-size: 14px;">' + statusText + '</span>';
+            if (result.explanation) {
+                html += '<div style="margin-top: 10px; padding-top: 10px; border-top: 1px solid rgba(0,0,0,0.1); font-size: 13px; color: #666;"><strong>Explanation:</strong> ' + escapeHtml(result.explanation) + '</div>';
+            }
+            html += '</div>';
+        });
+
+        html += '</div>';
+
+        html += '<div class="mtti-results-footer" style="background: #f5f5f5; padding: 20px; text-align: center; border-top: 1px solid #ddd;">';
+        html += '<button type="button" class="button button-primary" onclick="location.reload();">Back to Quizzes</button>';
+        html += '</div>';
+
+        html += '</div>';
+
+        $('#mtti-quiz-overlay').find('.mtti-quiz-container').fadeOut(function() {
+            $(this).replaceWith(html);
+            $('html, body').animate({ scrollTop: $('#mtti-quiz-overlay').offset().top - 50 }, 300);
+        });
+    }
+
+    function escapeHtml(text) {
+        var map = {
+            '&': '&amp;',
+            '<': '&lt;',
+            '>': '&gt;',
+            '"': '&quot;',
+            "'": '&#039;'
+        };
+        return text.replace(/[&<>"']/g, function(m) { return map[m]; });
+    }
+
 })(jQuery);

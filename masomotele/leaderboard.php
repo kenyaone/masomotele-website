@@ -10,10 +10,10 @@ $db = Database::getInstance();
 $userId = $auth->getUserId();
 $classId = (int)($_GET['class_id'] ?? 0);
 
-// Get all classes if no class specified
-$classes = $db->fetchAll("SELECT c.* FROM classes c JOIN enrolments e ON c.id=e.class_id WHERE e.user_id=? AND c.status='active'", [$userId]);
+// Get all lms_classes if no class specified
+$classes = $db->fetchAll("SELECT c.* FROM lms_classes c JOIN enrolments e ON c.id=e.class_id WHERE e.user_id=? AND c.status='active'", [$userId]);
 if (!$classId && !empty($classes)) $classId = $classes[0]['id'];
-$class = $classId ? $db->fetchOne("SELECT * FROM classes WHERE id=?", [$classId]) : null;
+$class = $classId ? $db->fetchOne("SELECT * FROM lms_classes WHERE id=?", [$classId]) : null;
 
 // Leaderboard data
 $leaders = $classId ? $db->fetchAll(
@@ -22,9 +22,9 @@ $leaders = $classId ? $db->fetchAll(
         COALESCE(ux.level,1) as level,
         COALESCE(ux.streak_days,0) as streak,
         COALESCE(ux.total_lessons_watched,0) as lessons_done,
-        (SELECT COUNT(*) FROM user_badges WHERE user_id=u.id) as badge_count,
-        (SELECT COUNT(*) FROM completions WHERE user_id=u.id AND class_id=?) as completed
-     FROM users u
+        (SELECT COUNT(*) FROM lms_user_badges WHERE user_id=u.id) as badge_count,
+        (SELECT COUNT(*) FROM lms_completions WHERE user_id=u.id AND class_id=?) as completed
+     FROM lms_users u
      JOIN enrolments e ON u.id=e.user_id
      LEFT JOIN user_xp ux ON u.id=ux.user_id AND ux.class_id=?
      WHERE e.class_id=? AND u.role='student' AND u.status='active'
@@ -39,11 +39,11 @@ foreach ($leaders as $i => $l) { if ($l['id'] == $userId) { $myRank = $i + 1; br
 
 // My badges
 $myBadges = $db->fetchAll(
-    "SELECT b.*, ub.earned_at FROM badges b JOIN user_badges ub ON b.id=ub.badge_id WHERE ub.user_id=? ORDER BY ub.earned_at DESC",
+    "SELECT b.*, ub.earned_at FROM lms_badges b JOIN user_badges ub ON b.id=ub.badge_id WHERE ub.user_id=? ORDER BY ub.earned_at DESC",
     [$userId]);
 
 // All badges (for display)
-$allBadges = $db->fetchAll("SELECT * FROM badges ORDER BY sort_order");
+$allBadges = $db->fetchAll("SELECT * FROM lms_badges ORDER BY sort_order");
 $myBadgeSlugs = array_column($myBadges, 'slug');
 
 // Hardcode emoji icons (DB charset workaround)
@@ -198,7 +198,7 @@ body{background:#f0f4f8}
         $rowClass = $isMe?'me':($rank===1?'top1':($rank===2?'top2':($rank===3?'top3':'')));
         $initial = strtoupper(substr($l['name'],0,1));
         // Get top 3 badges for this user
-        $ubadges = $db->fetchAll("SELECT b.icon, b.color FROM user_badges ub JOIN badges b ON ub.badge_id=b.id WHERE ub.user_id=? ORDER BY ub.earned_at DESC LIMIT 3", [$l['id']]);
+        $ubadges = $db->fetchAll("SELECT b.icon, b.color FROM lms_user_badges ub JOIN badges b ON ub.badge_id=b.id WHERE ub.user_id=? ORDER BY ub.earned_at DESC LIMIT 3", [$l['id']]);
       ?>
       <div class="lb-row <?= $rowClass ?>">
         <div class="lb-rank <?= $rank<=3?'rank-'.$rank:'' ?>"><?= $rankIcon ?></div>

@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hashing and Data Integrity | MTTI Computer Applications</title>
+    <link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Fredoka:wght@500;600&display=swap" rel="stylesheet">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Space Mono', monospace; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); min-height: 100vh; padding: 20px; color: #fff; }
+        .container { max-width: 900px; margin: 0 auto; }
+        .header { text-align: center; margin-bottom: 30px; }
+        .header .lesson-tag { display: inline-block; background: rgba(255,255,255,0.2); padding: 6px 16px; border-radius: 999px; font-size: 0.85em; margin-bottom: 12px; }
+        .header h1 { font-family: 'Fredoka', sans-serif; font-size: 2.2em; margin-bottom: 8px; text-shadow: 3px 3px 0 rgba(0,0,0,0.2); }
+        .score-board { background: rgba(255,255,255,0.15); backdrop-filter: blur(10px); border-radius: 20px; padding: 20px; margin-bottom: 20px; display: flex; justify-content: space-around; }
+        .score-item { text-align: center; }
+        .score-item .label { font-size: 0.85em; opacity: 0.9; margin-bottom: 4px; }
+        .score-item .value { font-size: 1.8em; font-weight: bold; font-family: 'Fredoka', sans-serif; }
+        .progress-bar { width: 100%; height: 8px; background: rgba(255,255,255,0.3); border-radius: 10px; margin-bottom: 25px; overflow: hidden; }
+        .progress-fill { height: 100%; background: linear-gradient(90deg, #f093fb 0%, #f5576c 100%); border-radius: 10px; transition: width 0.5s ease; width: 0%; }
+        .exercise-card { background: white; color: #333; border-radius: 25px; padding: 35px; margin-bottom: 20px; box-shadow: 0 20px 60px rgba(0,0,0,0.3); }
+        .scenario { background: linear-gradient(135deg, #fff8e1 0%, #ffecb3 100%); border-left: 5px solid #ffc107; padding: 20px 24px; border-radius: 12px; margin-bottom: 24px; font-size: 0.98em; line-height: 1.55; }
+        .scenario strong { color: #7a5a00; font-family: 'Fredoka', sans-serif; }
+        .question { font-size: 1.15em; margin-bottom: 20px; font-weight: 700; line-height: 1.4; }
+        .options { display: flex; flex-direction: column; gap: 12px; }
+        .option { background: #f5f7fb; border: 2px solid transparent; padding: 16px 20px; border-radius: 12px; cursor: pointer; transition: all 0.2s ease; font-family: 'Space Mono', monospace; font-size: 0.98em; text-align: left; }
+        .option:hover:not(.disabled) { background: #eef1fb; border-color: #667eea; transform: translateX(4px); }
+        .option.correct { background: #d4edda; border-color: #28a745; color: #155724; }
+        .option.wrong { background: #f8d7da; border-color: #dc3545; color: #721c24; }
+        .option.disabled { cursor: not-allowed; opacity: 0.85; }
+        .feedback { margin-top: 22px; padding: 18px 22px; border-radius: 12px; font-size: 0.98em; line-height: 1.5; }
+        .feedback.correct { background: #d4edda; color: #155724; border-left: 4px solid #28a745; }
+        .feedback.wrong { background: #f8d7da; color: #721c24; border-left: 4px solid #dc3545; }
+        .next-btn, .restart-btn { margin-top: 20px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; border: none; padding: 14px 32px; border-radius: 12px; font-size: 1em; cursor: pointer; font-family: 'Fredoka', sans-serif; box-shadow: 0 6px 18px rgba(0,0,0,0.2); }
+        .results { text-align: center; padding: 25px 15px; }
+        .results h2 { font-family: 'Fredoka', sans-serif; font-size: 2em; margin-bottom: 12px; color: #333; }
+        .results .final-score { font-size: 3em; font-family: 'Fredoka', sans-serif; color: #667eea; margin: 20px 0; }
+        .results p { color: #555; margin-bottom: 12px; }
+        .badge { display: inline-block; font-size: 3.5em; margin: 8px 0; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <div class="lesson-tag">Module 4 · Lesson 4.2 · Quiz</div>
+            <h1>Hashing and Data Integrity</h1>
+        </div>
+        <div class="score-board">
+            <div class="score-item"><div class="label">Score</div><div class="value" id="score">0</div></div>
+            <div class="score-item"><div class="label">Question</div><div class="value"><span id="current">1</span>/<span id="total">10</span></div></div>
+            <div class="score-item"><div class="label">Streak</div><div class="value" id="streak">0</div></div>
+        </div>
+        <div class="progress-bar"><div class="progress-fill" id="progress"></div></div>
+        <div class="exercise-card" id="exerciseCard"></div>
+    </div>
+    <script>
+        const exercises = [{"scenario":"Grace explains that even a single-character change to a file produces a completely different hash value.","question":"What property of hash functions does this illustrate?","options":["Hashes are reversible back to the original input","Hash functions are highly sensitive to input changes, making them effective for detecting even tiny alterations","This means hash functions are unreliable","Hashes are identical regardless of input changes"],"correct":1,"explanation":"This sensitivity to even minimal input changes is precisely what makes hashing useful for detecting tampering."},{"scenario":"A developer suggests hashing could be reversed to recover an original password if truly needed.","question":"Is this accurate?","options":["Yes, hashing is fully reversible like encryption","No, hashing is designed to be one-way and is not intended to be reversible","Hashing and encryption are the exact same thing","Only asymmetric hashing is reversible"],"correct":1,"explanation":"Hashing is deliberately one-way \u2014 this is a core design property distinguishing it from encryption, which is meant to be reversible with a key."},{"scenario":"SafariPay's database, storing plaintext passwords, is breached by an attacker.","question":"What is the direct consequence compared to if password hashes had been stored instead?","options":["No difference, plaintext and hashes are equally usable to an attacker","The attacker gets immediately usable passwords, whereas stored hashes alone are not directly usable without additional cracking effort","Plaintext storage is actually safer in a breach","Hashes are easier for attackers to use than plaintext"],"correct":1,"explanation":"Plaintext exposure hands attackers immediately usable credentials; hashes require significant additional effort (and are much harder if properly salted)."},{"scenario":"Two customers with the identical password would produce identical stored hashes if no salt were used.","question":"What risk does this identical-hash situation create?","options":["No risk, identical hashes have no security implication","An attacker who cracks one password instantly knows every other account sharing that same underlying password","This situation cannot actually occur","Identical hashes are actually more secure"],"correct":1,"explanation":"Identical hashes for identical passwords let a single successful crack immediately reveal every other account sharing that password."},{"scenario":"Grace explains that salting adds a unique random value to each password before hashing.","question":"What does this achieve?","options":["It makes every stored hash unique, even for identical passwords, preventing correlation and defeating precomputed lookup-table attacks","It makes hashing reversible","It has no real security benefit","It only matters for very short passwords"],"correct":0,"explanation":"Salting's core purpose is ensuring uniqueness of stored hashes regardless of password reuse, and defeating precomputed (\"rainbow table\") attacks."},{"scenario":"Grace wants a one-sentence summary of why hashing (rather than encryption) is the right tool for storing passwords.","question":"Which summary fits best?","options":["Passwords need to be recoverable in plaintext, so encryption is required instead","Since a stored password never needs to be reversed back to plaintext (only compared against a fresh hash at login), one-way hashing is the appropriate, safer tool","Hashing and encryption serve identical purposes for passwords","Passwords should never be transformed at all before storage"],"correct":1,"explanation":"Because login only requires comparing hashes (not recovering the original password), hashing's one-way property is exactly the right fit, and safer than reversible encryption."}];
+        let currentQuestion = 0, score = 0, streak = 0, answered = false;
+        function updateScoreboard() {
+            document.getElementById('score').textContent = score;
+            document.getElementById('current').textContent = Math.min(currentQuestion + 1, exercises.length);
+            document.getElementById('total').textContent = exercises.length;
+            document.getElementById('streak').textContent = streak;
+            document.getElementById('progress').style.width = ((currentQuestion) / exercises.length) * 100 + '%';
+        }
+        function escapeHtml(s) { return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+        function renderQuestion() {
+            answered = false;
+            const q = exercises[currentQuestion];
+            let html = '';
+            if (q.scenario) html += `<div class="scenario"><strong>Scenario.</strong> ${escapeHtml(q.scenario)}</div>`;
+            html += `<div class="question">${escapeHtml(q.question)}</div>`;
+            html += '<div class="options">';
+            q.options.forEach((o, i) => { html += `<button class="option" onclick="selectAnswer(${i})">${escapeHtml(o)}</button>`; });
+            html += '</div>';
+            document.getElementById('exerciseCard').innerHTML = html;
+            updateScoreboard();
+        }
+        function selectAnswer(i) {
+            if (answered) return;
+            answered = true;
+            const q = exercises[currentQuestion];
+            const btns = document.querySelectorAll('.option');
+            btns.forEach(b => b.classList.add('disabled'));
+            btns[q.correct].classList.add('correct');
+            const right = i === q.correct;
+            if (!right) btns[i].classList.add('wrong');
+            if (right) { score += 10; streak += 1; } else { streak = 0; }
+            const fb = document.createElement('div');
+            fb.className = 'feedback ' + (right ? 'correct' : 'wrong');
+            fb.innerHTML = `<strong>${right ? '✅ Correct.' : '❌ Not quite.'}</strong><br>${escapeHtml(q.explanation)}`;
+            document.getElementById('exerciseCard').appendChild(fb);
+            const nb = document.createElement('button');
+            nb.className = 'next-btn';
+            nb.textContent = currentQuestion === exercises.length - 1 ? 'See results →' : 'Next scenario →';
+            nb.onclick = nextQuestion;
+            document.getElementById('exerciseCard').appendChild(nb);
+            updateScoreboard();
+        }
+        function nextQuestion() { currentQuestion++; if (currentQuestion >= exercises.length) return showResults(); renderQuestion(); }
+        function showResults() {
+            document.getElementById('progress').style.width = '100%';
+            const total = exercises.length * 10;
+            const pct = Math.round(score / total * 100);
+            if (window.parent) { window.parent.postMessage({type:"mtti_quiz_score", score: score, total: total, percent: pct}, "*"); }
+            let badge = '🌟', msg = 'Excellent work. You have a professional grasp of this lesson.';
+            if (pct < 50) { badge = '🌱'; msg = 'Good first attempt. Review the lesson and try again.'; }
+            else if (pct < 80) { badge = '📚'; msg = 'Solid progress. Review the scenarios you missed and retry.'; }
+            document.getElementById('exerciseCard').innerHTML = `
+                <div class="results">
+                    <span class="badge">${badge}</span>
+                    <h2>Quiz Complete</h2>
+                    <div class="final-score">${score} / ${total}</div>
+                    <p><strong>${pct}%</strong> · Longest streak: ${streak}</p>
+                    <p>${msg}</p>
+                    <button class="restart-btn" onclick="restart()">Try again 🔁</button>
+                </div>`;
+        }
+        function restart() { currentQuestion = 0; score = 0; streak = 0; renderQuestion(); }
+        renderQuestion();
+    </script>
+</body>
+</html>

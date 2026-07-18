@@ -1,0 +1,346 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DOM Manipulation | MTTI Web Design</title>
+    <link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Fredoka:wght@500;600&display=swap" rel="stylesheet">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Space Mono', monospace;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh; padding: 20px; color: #fff;
+        }
+        .container { max-width: 900px; margin: 0 auto; }
+        .header { text-align: center; margin-bottom: 30px; animation: slideDown 0.6s ease-out; }
+        .header .lesson-tag {
+            display: inline-block; background: rgba(255,255,255,0.2);
+            padding: 6px 16px; border-radius: 999px;
+            font-size: 0.85em; margin-bottom: 12px;
+        }
+        .header h1 {
+            font-family: 'Fredoka', sans-serif; font-size: 2.2em;
+            margin-bottom: 8px; text-shadow: 3px 3px 0 rgba(0,0,0,0.2);
+        }
+        .header p { opacity: 0.95; font-size: 0.95em; }
+        .score-board {
+            background: rgba(255,255,255,0.15); backdrop-filter: blur(10px);
+            border-radius: 20px; padding: 20px; margin-bottom: 20px;
+            display: flex; justify-content: space-around;
+            animation: fadeIn 0.8s ease-out 0.2s both;
+        }
+        .score-item { text-align: center; }
+        .score-item .label { font-size: 0.85em; opacity: 0.9; margin-bottom: 4px; }
+        .score-item .value {
+            font-size: 1.8em; font-weight: bold; font-family: 'Fredoka', sans-serif;
+        }
+        .progress-bar {
+            width: 100%; height: 8px; background: rgba(255,255,255,0.3);
+            border-radius: 10px; margin-bottom: 25px; overflow: hidden;
+        }
+        .progress-fill {
+            height: 100%; background: linear-gradient(90deg, #f093fb 0%, #f5576c 100%);
+            border-radius: 10px; transition: width 0.5s ease; width: 0%;
+        }
+        .exercise-card {
+            background: white; color: #333; border-radius: 25px;
+            padding: 35px; margin-bottom: 20px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            animation: fadeIn 0.6s ease-out both;
+        }
+        .scenario {
+            background: linear-gradient(135deg, #fff8e1 0%, #ffecb3 100%);
+            border-left: 5px solid #ffc107;
+            padding: 20px 24px; border-radius: 12px;
+            margin-bottom: 24px;
+            font-size: 0.98em; line-height: 1.55;
+        }
+        .scenario strong { color: #7a5a00; font-family: 'Fredoka', sans-serif; }
+        .question {
+            font-size: 1.15em; margin-bottom: 20px;
+            font-weight: 700; line-height: 1.4;
+        }
+        .options { display: flex; flex-direction: column; gap: 12px; }
+        .option {
+            background: #f5f7fb; border: 2px solid transparent;
+            padding: 16px 20px; border-radius: 12px;
+            cursor: pointer; transition: all 0.2s ease;
+            font-family: 'Space Mono', monospace; font-size: 0.98em; text-align: left;
+        }
+        .option:hover:not(.disabled) {
+            background: #eef1fb; border-color: #667eea; transform: translateX(4px);
+        }
+        .option.correct { background: #d4edda; border-color: #28a745; color: #155724; }
+        .option.wrong { background: #f8d7da; border-color: #dc3545; color: #721c24; animation: shake 0.4s; }
+        .option.disabled { cursor: not-allowed; opacity: 0.85; }
+        .feedback {
+            margin-top: 22px; padding: 18px 22px; border-radius: 12px;
+            animation: slideUp 0.4s ease-out;
+            font-size: 0.98em; line-height: 1.5;
+        }
+        .feedback.correct { background: #d4edda; color: #155724; border-left: 4px solid #28a745; }
+        .feedback.wrong { background: #f8d7da; color: #721c24; border-left: 4px solid #dc3545; }
+        .feedback strong { font-family: 'Fredoka', sans-serif; }
+        .next-btn, .restart-btn {
+            margin-top: 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white; border: none;
+            padding: 14px 32px; border-radius: 12px;
+            font-size: 1em; cursor: pointer;
+            font-family: 'Fredoka', sans-serif;
+            box-shadow: 0 6px 18px rgba(0,0,0,0.2);
+            transition: transform 0.2s ease;
+        }
+        .next-btn:hover, .restart-btn:hover { transform: scale(1.04); }
+        .results {
+            text-align: center; padding: 25px 15px;
+            animation: bounceIn 0.6s ease-out;
+        }
+        .results h2 {
+            font-family: 'Fredoka', sans-serif; font-size: 2em;
+            margin-bottom: 12px; color: #333;
+        }
+        .results .final-score {
+            font-size: 3em; font-family: 'Fredoka', sans-serif;
+            color: #667eea; margin: 20px 0;
+        }
+        .results p { color: #555; margin-bottom: 12px; }
+        .badge { display: inline-block; font-size: 3.5em; margin: 8px 0; }
+        @keyframes slideDown { from { opacity: 0; transform: translateY(-30px); } to { opacity: 1; transform: translateY(0); } }
+        @keyframes fadeIn { from { opacity: 0; transform: scale(0.96); } to { opacity: 1; transform: scale(1); } }
+        @keyframes slideUp { from { opacity: 0; transform: translateY(15px); } to { opacity: 1; transform: translateY(0); } }
+        @keyframes shake { 0%,100% { transform: translateX(0); } 25% { transform: translateX(-8px); } 75% { transform: translateX(8px); } }
+        @keyframes bounceIn { 0% { opacity: 0; transform: scale(0.4); } 60% { transform: scale(1.05); } 100% { opacity: 1; transform: scale(1); } }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <div class="lesson-tag">Module 3 · Lesson 3.3 · Quiz</div>
+            <h1>DOM Manipulation</h1>
+            <p></p>
+        </div>
+
+        <div class="score-board">
+            <div class="score-item"><div class="label">Score</div><div class="value" id="score">0</div></div>
+            <div class="score-item"><div class="label">Question</div><div class="value"><span id="current">1</span>/<span id="total">10</span></div></div>
+            <div class="score-item"><div class="label">Streak</div><div class="value" id="streak">0</div></div>
+        </div>
+
+        <div class="progress-bar"><div class="progress-fill" id="progress"></div></div>
+
+        <div class="exercise-card" id="exerciseCard"></div>
+    </div>
+
+    <script>
+        const exercises = [
+  {
+    "id": "q1",
+    "text": "James writes document.getElementById('price'). What does this return if the element exists?",
+    "options": [
+      "The text content of the element as a string",
+      "A reference to the DOM element object",
+      "The HTML tag name as a string",
+      "An array of all matching elements"
+    ],
+    "answer": 1,
+    "explanation": "getElementById returns the DOM element object — a live reference to the actual HTML element. You can then read or modify its properties (.textContent, .style, .classList). It returns null if no element with that id exists."
+  },
+  {
+    "id": "q2",
+    "text": "James wants to select ALL product cards (class .product-card) at once. Which method returns a NodeList?",
+    "options": [
+      "document.getElementById('.product-card')",
+      "document.getElementsByClassName('product-card')[0]",
+      "document.querySelector('.product-card')",
+      "document.querySelectorAll('.product-card')"
+    ],
+    "answer": 3,
+    "explanation": "querySelectorAll returns a static NodeList of ALL matching elements. querySelector returns only the FIRST match. getElementsByClassName returns a live HTMLCollection. querySelectorAll accepts any CSS selector and is the most flexible."
+  },
+  {
+    "id": "q3",
+    "text": "What is the difference between textContent and innerHTML?",
+    "options": [
+      "textContent only works on <p> tags; innerHTML works on all elements",
+      "textContent sets/reads the plain text content (no HTML parsed); innerHTML sets/reads the HTML markup including tags",
+      "innerHTML is faster than textContent",
+      "textContent replaces the element; innerHTML appends to it"
+    ],
+    "answer": 1,
+    "explanation": "textContent treats content as plain text — any HTML tags are escaped and displayed literally. innerHTML parses HTML — you can inject real elements. Use textContent when setting text from user input (XSS safe); use innerHTML only for trusted HTML."
+  },
+  {
+    "id": "q4",
+    "text": "James writes: document.querySelector('.price').textContent = 'KES 850'. Why is textContent safer than innerHTML here?",
+    "options": [
+      "textContent is faster to parse than innerHTML",
+      "textContent treats the value as plain text — no HTML is parsed, preventing XSS attacks if the value came from user input",
+      "innerHTML cannot set text content directly",
+      "textContent auto-formats currency values"
+    ],
+    "answer": 1,
+    "explanation": "If James used innerHTML and the price string came from user input, a malicious user could inject <script> tags or event handlers — an XSS vulnerability. textContent escapes all HTML characters, rendering them as text rather than executing them."
+  },
+  {
+    "id": "q5",
+    "text": "James wants to add class 'featured' to a product card without removing its existing classes. Which method does this?",
+    "options": [
+      "element.className = 'featured'",
+      "element.classList.add('featured')",
+      "element.class = 'featured'",
+      "element.setAttribute('featured', true)"
+    ],
+    "answer": 1,
+    "explanation": "classList.add() appends a class without touching existing classes. Setting element.className = 'featured' REPLACES all existing classes with just 'featured'. classList is the correct API for working with classes: .add(), .remove(), .toggle(), .contains()."
+  },
+  {
+    "id": "q6",
+    "text": "James creates a new list item and appends it to a <ul>. Which methods does he need?",
+    "options": [
+      "document.createElement('li') and parentElement.appendChild(newLi)",
+      "document.newElement('li') and parentElement.addChild(newLi)",
+      "document.insertElement('li') and parentElement.push(newLi)",
+      "new HTMLElement('li') and parentElement.insert(newLi)"
+    ],
+    "answer": 0,
+    "explanation": "document.createElement('li') creates a new element node. appendChild(node) appends it as the last child of the parent. This is the standard DOM API. insertAdjacentElement and prepend are alternatives. newElement, addChild, and push are not DOM methods."
+  },
+  {
+    "id": "q7",
+    "text": "James selects an element before the DOM has fully loaded. What does getElementById return?",
+    "options": [
+      "The element, retrieved from the browser's render cache",
+      "null — the element doesn't exist yet in the DOM",
+      "undefined",
+      "An empty element placeholder"
+    ],
+    "answer": 1,
+    "explanation": "If the script runs before the HTML is parsed, the element doesn't exist yet and getElementById returns null. Calling .textContent on null throws a TypeError. Solution: wrap code in DOMContentLoaded or place the script before </body>."
+  },
+  {
+    "id": "q8",
+    "text": "What does element.setAttribute('href', '/products') do?",
+    "options": [
+      "Reads the href attribute value",
+      "Sets (or creates) the href attribute with the value '/products'",
+      "Removes the href attribute",
+      "Appends '/products' to the existing href value"
+    ],
+    "answer": 1,
+    "explanation": "setAttribute(name, value) sets the named attribute to the given value, creating it if it doesn't exist. To read: getAttribute(). To remove: removeAttribute(). For common properties like src, href, id, direct property access (element.href = ...) also works."
+  },
+  {
+    "id": "q9",
+    "text": "James wants to remove a product card from the page. Which DOM method removes an element?",
+    "options": [
+      "element.hide()",
+      "element.delete()",
+      "element.remove()",
+      "element.destroy()"
+    ],
+    "answer": 2,
+    "explanation": "element.remove() removes the element from the DOM. It's a modern, concise method. The older alternative is element.parentNode.removeChild(element). hide(), delete(), and destroy() are not DOM methods."
+  },
+  {
+    "id": "q10",
+    "text": "James writes element.classList.toggle('hidden'). What does toggle do?",
+    "options": [
+      "Adds 'hidden' if present, removes it if absent",
+      "Removes 'hidden' if present, adds it if absent",
+      "Adds 'hidden' unconditionally",
+      "Swaps 'hidden' with 'visible'"
+    ],
+    "answer": 1,
+    "explanation": "classList.toggle() removes the class if it is present, or adds it if it is absent — a single line to handle both show and hide. This is the standard pattern for mobile menu toggles and accordion reveals. Passing a second boolean argument forces add (true) or remove (false)."
+  }
+];
+
+        let currentQuestion = 0, score = 0, streak = 0, answered = false;
+
+        function updateScoreboard() {
+            document.getElementById('score').textContent = score;
+            document.getElementById('current').textContent = Math.min(currentQuestion + 1, exercises.length);
+            document.getElementById('total').textContent = exercises.length;
+            document.getElementById('streak').textContent = streak;
+            document.getElementById('progress').style.width = ((currentQuestion) / exercises.length) * 100 + '%';
+        }
+
+        function escapeHtml(s) {
+            return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+        }
+
+        function renderQuestion() {
+            answered = false;
+            const q = exercises[currentQuestion];
+            let html = '';
+            if (q.scenario) {
+                html += `<div class="scenario"><strong>Scenario.</strong> ${escapeHtml(q.scenario)}</div>`;
+            }
+            html += `<div class="question">${escapeHtml(q.text)}</div>`;
+            html += '<div class="options">';
+            q.options.forEach((o, i) => {
+                html += `<button class="option" onclick="selectAnswer(${i})">${escapeHtml(o)}</button>`;
+            });
+            html += '</div>';
+            document.getElementById('exerciseCard').innerHTML = html;
+            updateScoreboard();
+        }
+
+        function selectAnswer(i) {
+            if (answered) return;
+            answered = true;
+            const q = exercises[currentQuestion];
+            const btns = document.querySelectorAll('.option');
+            btns.forEach(b => b.classList.add('disabled'));
+            btns[q.answer].classList.add('correct');
+            const right = i === q.answer;
+            if (!right) btns[i].classList.add('wrong');
+            if (right) { score += 10; streak += 1; } else { streak = 0; }
+            const fb = document.createElement('div');
+            fb.className = 'feedback ' + (right ? 'correct' : 'wrong');
+            fb.innerHTML = `<strong>${right ? '✅ Correct.' : '❌ Not quite.'}</strong><br>${escapeHtml(q.explanation)}`;
+            document.getElementById('exerciseCard').appendChild(fb);
+            const nb = document.createElement('button');
+            nb.className = 'next-btn';
+            nb.textContent = currentQuestion === exercises.length - 1 ? 'See results →' : 'Next scenario →';
+            nb.onclick = nextQuestion;
+            document.getElementById('exerciseCard').appendChild(nb);
+            updateScoreboard();
+        }
+
+        function nextQuestion() {
+            currentQuestion++;
+            if (currentQuestion >= exercises.length) return showResults();
+            renderQuestion();
+        }
+
+        function showResults() {
+            document.getElementById('progress').style.width = '100%';
+            const total = exercises.length * 10;
+            const pct = Math.round(score / total * 100);
+            if (window.parent) { window.parent.postMessage({type:"mtti_quiz_score", score: score, total: total, percent: pct}, "*"); }
+            let badge = '🌟', msg = 'Excellent work. You have a professional grasp of this lesson.';
+            if (pct < 50) { badge = '🌱'; msg = 'Good first attempt. Re-watch the lesson video and try again.'; }
+            else if (pct < 80) { badge = '📚'; msg = 'Solid progress. Review the scenarios you missed and retry.'; }
+            document.getElementById('exerciseCard').innerHTML = `
+                <div class="results">
+                    <span class="badge">${badge}</span>
+                    <h2>Quiz Complete</h2>
+                    <div class="final-score">${score} / ${total}</div>
+                    <p><strong>${pct}%</strong> · Longest streak: ${streak}</p>
+                    <p>${msg}</p>
+                    <button class="restart-btn" onclick="restart()">Try again 🔁</button>
+                </div>`;
+        }
+
+        function restart() {
+            currentQuestion = 0; score = 0; streak = 0;
+            renderQuestion();
+        }
+
+        renderQuestion();
+    </script>
+</body>
+</html>

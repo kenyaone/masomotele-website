@@ -238,6 +238,22 @@ class MTTI_MIS_Public_Admission_Form {
                 box-shadow: 0 0 0 3px rgba(46,125,50,.12);
             }
             .mtti-adm-field input::placeholder { color: #bbb; }
+            .mtti-adm-radio-group { display: flex; flex-direction: column; gap: 8px; }
+            .mtti-adm-radio {
+                display: flex; align-items: center; gap: 10px;
+                padding: 11px 13px;
+                border: 1.5px solid #dde3dd;
+                border-radius: 8px;
+                font-size: 14px;
+                font-weight: 400;
+                text-transform: none;
+                letter-spacing: normal;
+                color: var(--dark);
+                cursor: pointer;
+                transition: border-color .2s, background .2s;
+            }
+            .mtti-adm-radio:has(input:checked) { border-color: var(--mg); background: rgba(46,125,50,.06); }
+            .mtti-adm-radio input[type="radio"] { width: auto; flex: none; margin: 0; accent-color: var(--mg); }
             .req { color: var(--mo-dark); }
 
             /* ── FEE PILL ── */
@@ -429,8 +445,10 @@ class MTTI_MIS_Public_Admission_Form {
                                     onchange="mttiShowFee(this)">
                                 <option value="">-- Select a Course --</option>
                                 <?php foreach ($courses as $c): ?>
+                                <?php $c_online_fee = (!is_null($c->online_fee) && $c->online_fee > 0) ? $c->online_fee : $c->fee; ?>
                                 <option value="<?php echo esc_attr($c->course_id); ?>"
                                         data-fee="<?php echo esc_attr($c->fee); ?>"
+                                        data-online-fee="<?php echo esc_attr($c_online_fee); ?>"
                                         data-weeks="<?php echo esc_attr($c->duration_weeks); ?>"
                                     <?php selected($old['course_id'] ?? '', $c->course_id); ?>>
                                     <?php echo esc_html($c->course_name . ' (' . $c->course_code . ')'); ?>
@@ -438,6 +456,25 @@ class MTTI_MIS_Public_Admission_Form {
                                 <?php endforeach; ?>
                             </select>
                             <div class="mtti-fee-info" id="mtti_fee_info"></div>
+                        </div>
+                    </div>
+                    <div class="mtti-adm-row">
+                        <div class="mtti-adm-field">
+                            <label>How will you be attending? <span class="req">*</span></label>
+                            <div class="mtti-adm-radio-group">
+                                <label class="mtti-adm-radio">
+                                    <input type="radio" name="delivery_mode" value="online" required
+                                        onchange="mttiShowFee(document.getElementById('mtti_adm_course'))"
+                                        <?php checked(($old['delivery_mode'] ?? 'online'), 'online'); ?>>
+                                    Online — I'll study and take quizzes through the student portal
+                                </label>
+                                <label class="mtti-adm-radio">
+                                    <input type="radio" name="delivery_mode" value="physical" required
+                                        onchange="mttiShowFee(document.getElementById('mtti_adm_course'))"
+                                        <?php checked(($old['delivery_mode'] ?? ''), 'physical'); ?>>
+                                    Physical — I'll attend in-person classes and sit exams with a teacher
+                                </label>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -455,13 +492,20 @@ class MTTI_MIS_Public_Admission_Form {
         <script>
         function mttiShowFee(sel) {
             var opt = sel.options[sel.selectedIndex];
-            var fee   = parseFloat(opt.dataset.fee || 0);
+            var mode  = (document.querySelector('input[name="delivery_mode"]:checked') || {}).value || 'online';
+            var fee   = parseFloat((mode === 'online' ? opt.dataset.onlineFee : opt.dataset.fee) || 0);
             var weeks = opt.dataset.weeks;
             var box   = document.getElementById('mtti_fee_info');
             if (fee > 0) {
                 box.style.display = 'block';
-                box.innerHTML = '<strong>Course Fee:</strong> KES ' + fee.toLocaleString()
-                    + (weeks ? ' &nbsp;|&nbsp; <strong>Duration:</strong> ' + weeks + ' Weeks' : '');
+                // Online pace depends on how fast the learner works through the
+                // material, so we don't quote a fixed week count for it — only
+                // physical classes run on the campus's fixed weekly schedule.
+                var durationText = (mode === 'online')
+                    ? 'Self-paced — go at your own speed'
+                    : (weeks ? weeks + ' Weeks' : '');
+                box.innerHTML = '<strong>' + (mode === 'online' ? 'Online Fee' : 'Course Fee') + ':</strong> KES ' + fee.toLocaleString()
+                    + (durationText ? ' &nbsp;|&nbsp; <strong>Duration:</strong> ' + durationText : '');
             } else {
                 box.style.display = 'none';
             }
@@ -494,6 +538,7 @@ class MTTI_MIS_Public_Admission_Form {
         $emergency_contact = sanitize_text_field($_POST['emergency_contact'] ?? '');
         $emergency_phone   = sanitize_text_field($_POST['emergency_phone']   ?? '');
         $course_id         = intval($_POST['course_id']                      ?? 0);
+        $delivery_mode     = (($_POST['delivery_mode'] ?? '') === 'physical') ? 'physical' : 'online';
 
         // Validate required fields
         $errors = [];
@@ -596,7 +641,7 @@ class MTTI_MIS_Public_Admission_Form {
         }
 
         // Enroll in selected course + all its active units
-        $this->enroll_student($student_id, $course_id);
+        $this->enroll_student($student_id, $course_id, $delivery_mode);
 
         // Store student ID in a transient keyed by a random token (valid 2 hours)
         $token = bin2hex(random_bytes(20));
@@ -612,8 +657,9 @@ class MTTI_MIS_Public_Admission_Form {
     // ENROLLMENT HELPER
     // ---------------------------------------------------------------
 
-    private function enroll_student($student_id, $course_id) {
+    private function enroll_student($student_id, $course_id, $delivery_mode = 'online') {
         global $wpdb;
+        $delivery_mode = ($delivery_mode === 'physical') ? 'physical' : 'online';
 
         $enrollments_table      = $wpdb->prefix . 'mtti_enrollments';
         $balances_table         = $wpdb->prefix . 'mtti_student_balances';
@@ -636,6 +682,7 @@ class MTTI_MIS_Public_Admission_Form {
             'course_id'       => $course_id,
             'enrollment_date' => current_time('Y-m-d'),
             'status'          => 'Active',
+            'delivery_mode'   => $delivery_mode,
         );
         if ($has_discount_col) {
             $enrollment_data['discount_amount'] = 0;
@@ -645,7 +692,9 @@ class MTTI_MIS_Public_Admission_Form {
         $enrollment_id = (int) $wpdb->insert_id;
 
         if ($enrollment_id) {
-            $fee = floatval($course->fee);
+            $fee = ($delivery_mode === 'online' && !is_null($course->online_fee) && $course->online_fee > 0)
+                ? floatval($course->online_fee)
+                : floatval($course->fee);
             $wpdb->insert(
                 $balances_table,
                 array(

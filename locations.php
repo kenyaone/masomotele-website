@@ -1,330 +1,390 @@
 <?php
-session_start();
+const STALE_SECS = 7200;
 
-define('MAP_PASSWORD', 'mtti2026');
-define('DB_FILE', __DIR__ . '/../data/mtti_map.db');
+const COUNTY_CENTROIDS = [
+    'nairobi'=>[-1.2921,36.8219],'mombasa'=>[-4.0435,39.6682],'kisumu'=>[-0.0917,34.7679],
+    'nakuru'=>[-0.3031,36.0800],'eldoret'=>[0.5143,35.2698],'uasin gishu'=>[0.5500,35.2700],
+    'kakamega'=>[0.2827,34.7519],'meru'=>[0.0476,37.6490],'nyeri'=>[-0.4167,36.9500],
+    'machakos'=>[-1.5177,37.2634],'kitui'=>[-1.3671,38.0106],'kiambu'=>[-1.0312,36.8318],
+    'muranga'=>[-0.7167,37.1500],'kirinyaga'=>[-0.5600,37.3300],'embu'=>[-0.5330,37.4500],
+    'tharaka nithi'=>[-0.3000,38.0000],'isiolo'=>[0.3542,37.5821],'marsabit'=>[2.3284,37.9899],
+    'garissa'=>[-0.4532,39.6461],'wajir'=>[1.7471,40.0573],'mandera'=>[3.9366,41.8670],
+    'turkana'=>[3.1000,35.6000],'west pokot'=>[1.7167,35.1167],'samburu'=>[1.2000,36.9000],
+    'trans nzoia'=>[1.0566,35.0020],'baringo'=>[0.8000,35.9500],'laikipia'=>[-0.2000,36.7000],
+    'nyandarua'=>[-0.1833,36.5000],'bungoma'=>[0.5635,34.5606],'busia'=>[0.4608,34.1110],
+    'siaya'=>[-0.0617,34.2422],'homa bay'=>[-0.5177,34.4569],'migori'=>[-1.0634,34.4731],
+    'kisii'=>[-0.6817,34.7660],'nyamira'=>[-0.5667,34.9333],'bomet'=>[-0.7833,35.3500],
+    'kericho'=>[-0.3690,35.2863],'nandi'=>[0.1833,35.1000],'vihiga'=>[0.0833,34.7167],
+    'narok'=>[-1.0834,35.8699],'kajiado'=>[-1.8520,36.7820],'makueni'=>[-1.8036,37.6236],
+    'taita taveta'=>[-3.3167,38.4833],'kwale'=>[-4.1736,39.4525],'kilifi'=>[-3.5107,39.8499],
+    'tana river'=>[-1.5000,40.1000],'lamu'=>[-2.2717,40.9022],
+];
 
-// ─── AUTH ─────────────────────────────────────────────────────────────────────
-if (isset($_POST['logout'])) { session_destroy(); header('Location: '.$_SERVER['PHP_SELF']); exit; }
-
-$loginError = '';
-if (isset($_POST['password']) && !isset($_SESSION['mtti_map_auth'])) {
-    if (trim($_POST['password']) === MAP_PASSWORD) $_SESSION['mtti_map_auth'] = true;
-    else $loginError = 'Incorrect password. Please try again.';
+function county_coords(string $c): ?array {
+    $k=strtolower(trim($c)); if($k==='') return null;
+    foreach(COUNTY_CENTROIDS as $ck=>$v){ if(str_starts_with($k,$ck)||str_starts_with($ck,$k)) return $v; }
+    return null;
 }
 
-if (!isset($_SESSION['mtti_map_auth'])) {
-?><!DOCTYPE html>
-<html lang="en">
-<head>
-<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>MTTI — Schools Map</title>
-<style>
-*{margin:0;padding:0;box-sizing:border-box;}
-body{font-family:'Segoe UI',Arial,sans-serif;background:linear-gradient(135deg,#0f3460 0%,#16213e 50%,#533483 100%);min-height:100vh;display:flex;align-items:center;justify-content:center;}
-.card{background:white;border-radius:16px;padding:40px 36px;width:100%;max-width:400px;box-shadow:0 20px 60px rgba(0,0,0,.35);}
-.logo{text-align:center;margin-bottom:28px;}
-.logo h1{font-size:1.8rem;color:#0f3460;font-weight:900;letter-spacing:1px;}
-.logo p{color:#666;font-size:.88rem;margin-top:4px;}
-.badge{display:inline-block;background:#0f3460;color:white;padding:3px 12px;border-radius:20px;font-size:.75rem;font-weight:700;margin-top:6px;}
-label{display:block;font-weight:600;color:#333;margin-bottom:6px;font-size:.9rem;}
-input[type=password]{width:100%;padding:12px 16px;border:2px solid #e5e7eb;border-radius:8px;font-size:1rem;outline:none;transition:.2s;}
-input[type=password]:focus{border-color:#0f3460;}
-.btn{width:100%;padding:13px;background:#0f3460;color:white;border:none;border-radius:8px;font-size:1rem;font-weight:700;cursor:pointer;margin-top:16px;transition:.2s;}
-.btn:hover{background:#1a4a8a;}
-.error{background:#fee2e2;color:#991b1b;padding:10px 14px;border-radius:6px;font-size:.88rem;margin-bottom:16px;}
-</style>
-</head>
-<body>
-<div class="card">
-    <div class="logo">
-        <h1>M.T.T.I</h1>
-        <p>Schools Performance Map</p>
-        <span class="badge">RESTRICTED ACCESS</span>
-    </div>
-    <?php if ($loginError): ?><div class="error">⚠ <?= htmlspecialchars($loginError) ?></div><?php endif; ?>
-    <form method="POST">
-        <label for="pw">Access Password</label>
-        <input type="password" id="pw" name="password" placeholder="Enter access password" autofocus required>
-        <button type="submit" class="btn">Access Dashboard →</button>
-    </form>
-</div>
-</body>
-</html><?php
-    exit;
+$m=@new mysqli('localhost','uvyzhdzt_mtti','mtti_sync_2026!','uvyzhdzt_mtti');
+$dbError=$m->connect_errno?$m->connect_error:null;
+if(!$dbError)$m->set_charset('utf8mb4');
+
+function h($s){return htmlspecialchars((string)$s,ENT_QUOTES,'UTF-8');}
+function num($n,$dp=0){return $n===null?'—':number_format((float)$n,$dp);}
+function pct($n,$dp=1){return($n===null||$n==='')?'—':number_format((float)$n,$dp).'%';}
+function lastSeen(?int $s):string{
+    if($s===null)return 'never';
+    if($s<120)return 'just now';
+    if($s<3600)return floor($s/60).' min ago';
+    if($s<86400)return floor($s/3600).' hr ago';
+    $d=floor($s/86400);return $d===1.0?'yesterday':((int)$d).' days ago';
+}
+function milestone(int $n):?string{
+    if($n>=100)return '🏆';if($n>=50)return '🌳';if($n>=25)return '🌿';if($n>=10)return '🌱';return null;
 }
 
-// ─── LOAD DATA ────────────────────────────────────────────────────────────────
-$schools = [];
-$lastSync = null;
-$dbError = null;
-$total_students = 0;
-$total_lessons  = 0;
-$total_certs    = 0;
-$global_avg     = 0;
-$total_active30 = 0;
+$groups=[];$markers=[];$nowTs=time();
+$totalDevices=0;$totalStudents=0;$totalLessons=0;$totalCerts=0;$onlineCount=0;
+$weightedScoreNum=0.0;$weightedScoreDen=0;
 
-if (!file_exists(DB_FILE)) {
-    $dbError = 'No data yet — sync from the MTTI LMS admin panel to populate this map.';
-} else {
-    try {
-        $db = new SQLite3(DB_FILE, SQLITE3_OPEN_READONLY);
-        $r = $db->query("SELECT * FROM schools ORDER BY enrolled DESC, name ASC");
-        while ($row = $r->fetchArray(SQLITE3_ASSOC)) $schools[] = $row;
-        $meta = $db->querySingle("SELECT last_sync_at, source FROM sync_meta", true);
-        if ($meta) $lastSync = $meta['last_sync_at'];
+if(!$dbError){
+    $r=$m->query("SELECT device_id,name,county,region,lat,lng,
+                         student_count,student_count_prev,lesson_completions,
+                         quiz_attempts,avg_score,cert_count,active_last_30,
+                         avg_sync_interval_secs,last_sync_at,is_active
+                  FROM devices WHERE is_active=1 AND last_sync_at IS NOT NULL
+                  ORDER BY region,name");
+    if($r) while($row=$r->fetch_assoc()){
+        $totalDevices++;
+        $totalStudents+=(int)$row['student_count'];
+        $totalLessons+=(int)$row['lesson_completions'];
+        $totalCerts+=(int)$row['cert_count'];
+        if((int)$row['quiz_attempts']>0&&$row['avg_score']!==null){
+            $weightedScoreNum+=(float)$row['avg_score']*(int)$row['quiz_attempts'];
+            $weightedScoreDen+=(int)$row['quiz_attempts'];
+        }
 
-        $total_students = array_sum(array_column($schools, 'enrolled'));
-        $total_lessons  = array_sum(array_column($schools, 'total_lessons'));
-        $total_certs    = array_sum(array_column($schools, 'certificates'));
-        $total_active30 = array_sum(array_column($schools, 'active_30d'));
-        $scored = array_filter($schools, fn($s) => $s['avg_score'] > 0);
-        if ($scored) $global_avg = round(array_sum(array_column($scored, 'avg_score')) / count($scored), 1);
-    } catch (Exception $e) {
-        $dbError = 'Data read error: ' . $e->getMessage();
+        $syncTs=$row['last_sync_at']?strtotime($row['last_sync_at']):null;
+        $ageSec=$syncTs?max(0,$nowTs-$syncTs):null;
+        $isStale=$ageSec===null||$ageSec>STALE_SECS;
+        if(!$isStale)$onlineCount++;
+
+        $offlineLabel=null;
+        if($isStale&&$ageSec!==null){
+            $days=floor($ageSec/86400);$hrs=floor(($ageSec%86400)/3600);
+            $offlineLabel=$days>0?"Offline {$days}d".($hrs>0?" {$hrs}h":''):"Offline {$hrs}h";
+        } elseif($isStale){$offlineLabel='Never synced';}
+
+        $certRate=($row['student_count']>0&&$row['cert_count']>0)
+            ?round($row['cert_count']/$row['student_count']*100,1):null;
+
+        $row['_age']=$ageSec;$row['_stale']=$isStale;
+        $row['_offline_label']=$offlineLabel;$row['_cert_rate']=$certRate;
+
+        $group=trim((string)($row['region']??''))?:(trim((string)$row['county'])?:'Unassigned');
+        if(!isset($groups[$group]))$groups[$group]=[];
+        $groups[$group][]=$row;
+
+        $hasGps=!empty($row['lat'])&&!empty($row['lng']);
+        $lat=$hasGps?(float)$row['lat']:null;
+        $lng=$hasGps?(float)$row['lng']:null;
+        if(!$hasGps){$c=county_coords((string)($row['county']?:$row['region']?:''));if($c)[$lat,$lng]=$c;}
+
+        if($lat&&$lng){
+            $markers[]=[
+                'name'=>$row['name'],'group'=>$group,'county'=>$row['county'],
+                'lat'=>$lat,'lng'=>$lng,'has_gps'=>$hasGps,
+                'students'=>(int)$row['student_count'],
+                'lessons'=>(int)$row['lesson_completions'],
+                'quizzes'=>(int)$row['quiz_attempts'],
+                'avg_score'=>$row['avg_score']===null?null:(float)$row['avg_score'],
+                'certs'=>(int)$row['cert_count'],'cert_rate'=>$certRate,
+                'active_30'=>(int)$row['active_last_30'],
+                'stale'=>$isStale,'last_seen'=>lastSeen($ageSec),
+                'offline_label'=>$offlineLabel,'device_id'=>$row['device_id'],
+                'sync_interval'=>$row['avg_sync_interval_secs']?round($row['avg_sync_interval_secs']/60,1):null,
+                'student_delta'=>$row['student_count_prev']!==null?((int)$row['student_count']-(int)$row['student_count_prev']):null,
+                'milestone'=>milestone((int)$row['student_count']),
+            ];
+        }
     }
 }
 
-$schoolsJson = json_encode($schools);
+$globalAvgScore=$weightedScoreDen>0?round($weightedScoreNum/$weightedScoreDen,1):null;
+$globalCertRate=$totalStudents>0?round($totalCerts/$totalStudents*100,1):null;
+
+// Region rollup
+$regionRollup=[];
+foreach($groups as $gName=>$devs){
+    $rl=['students'=>0,'certs'=>0,'devices'=>count($devs),'online'=>0,'score_sum'=>0,'score_n'=>0];
+    foreach($devs as $d){
+        $rl['students']+=(int)$d['student_count'];$rl['certs']+=(int)$d['cert_count'];
+        if(!$d['_stale'])$rl['online']++;
+        if($d['avg_score']!==null&&(int)$d['quiz_attempts']>0){$rl['score_sum']+=(float)$d['avg_score']*(int)$d['quiz_attempts'];$rl['score_n']+=(int)$d['quiz_attempts'];}
+    }
+    $rl['cert_rate']=$rl['students']>0?round($rl['certs']/$rl['students']*100,1):null;
+    $rl['avg_score']=$rl['score_n']>0?round($rl['score_sum']/$rl['score_n'],1):null;
+    $regionRollup[$gName]=$rl;
+}
+ksort($groups);
+$markersJson=json_encode($markers,JSON_UNESCAPED_UNICODE);
 ?>
 <!DOCTYPE html>
 <html lang="en">
-<head>
-<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>MTTI — Schools Map</title>
-<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.20.3/xlsx.full.min.js"></script>
+<head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>MTTI LMS — Field Devices Map</title>
+<link rel="stylesheet" href="/leaflet.css">
 <style>
-*{margin:0;padding:0;box-sizing:border-box;}
-body{font-family:'Segoe UI',Arial,sans-serif;background:linear-gradient(135deg,#0f3460 0%,#16213e 50%,#533483 100%);background-attachment:fixed;min-height:100vh;color:#1a1a1a;}
-.container{max-width:1200px;margin:0 auto;padding:20px;}
-.header{background:rgba(255,255,255,.97);border-radius:12px;padding:22px 25px;margin-bottom:20px;box-shadow:0 4px 12px rgba(0,0,0,.12);}
-.header-top{display:flex;justify-content:space-between;align-items:center;margin-bottom:18px;flex-wrap:wrap;gap:12px;}
-.header-top h1{font-size:1.8rem;color:#0f3460;display:flex;align-items:center;gap:10px;}
-.header-actions{display:flex;gap:10px;align-items:center;flex-wrap:wrap;}
-.role-badge{background:#0f3460;color:white;padding:5px 14px;border-radius:20px;font-size:.8rem;font-weight:700;}
-.btn-action{color:white;border:none;padding:10px 20px;border-radius:8px;font-weight:700;cursor:pointer;font-size:.88rem;transition:.2s;}
-.btn-excel{background:#1d6f42;} .btn-excel:hover{background:#166134;}
-.btn-print{background:#0f3460;} .btn-print:hover{background:#1a4a8a;}
-.logout-btn{background:transparent;color:#dc2626;border:2px solid #dc2626;padding:9px 18px;border-radius:8px;font-weight:700;cursor:pointer;font-size:.85rem;}
-.logout-btn:hover{background:#dc2626;color:white;}
-.alert{background:#fff3cd;border:1px solid #ffc107;color:#856404;padding:12px;border-radius:8px;margin-bottom:16px;}
-.alert.error{background:#f8d7da;border-color:#f5c6cb;color:#721c24;}
-.sync-note{font-size:.8rem;color:#888;margin-top:4px;}
-.stats-bar{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:14px;}
-.stat-item{background:linear-gradient(135deg,#0f3460,#1a4a8a);color:white;padding:15px;border-radius:8px;text-align:center;}
-.stat-item .number{font-size:1.7rem;font-weight:900;}
-.stat-item .label{font-size:.82rem;opacity:.9;margin-top:4px;}
-.map-section{background:white;border-radius:12px;overflow:hidden;margin-bottom:20px;box-shadow:0 4px 12px rgba(0,0,0,.1);}
-#map{height:500px;width:100%;}
-.schools-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(270px,1fr));gap:18px;margin-top:20px;}
-.school-card{background:white;border-radius:12px;padding:18px;box-shadow:0 2px 8px rgba(0,0,0,.1);border-left:4px solid #0f3460;transition:.2s;position:relative;}
-.school-card.no-students{border-left-color:#f59e0b;opacity:.9;}
-.school-card:hover{transform:translateY(-3px);box-shadow:0 4px 16px rgba(0,0,0,.15);}
-.school-card h3{color:#0f3460;font-size:1rem;margin-bottom:5px;padding-right:34px;}
-.school-card .location-tag{color:#4a7aab;font-weight:600;margin-bottom:10px;font-size:.85rem;}
-.metric{display:flex;justify-content:space-between;padding:5px 0;border-top:1px solid #f0f0f0;}
-.metric-label{color:#666;font-size:.83rem;}
-.metric-value{font-weight:700;color:#0f3460;font-size:.83rem;}
-.badge-empty{display:inline-block;background:#fef3c7;color:#92400e;border:1px solid #f59e0b;padding:2px 8px;border-radius:10px;font-size:.72rem;font-weight:700;margin-bottom:8px;}
-.enroll-num{position:absolute;top:14px;right:14px;background:#0f3460;color:white;width:34px;height:34px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:900;font-size:.9rem;}
-.section-heading{color:white;font-size:1.1rem;font-weight:800;margin:20px 0 12px;display:flex;align-items:center;gap:8px;}
-.no-data-msg{background:rgba(255,255,255,.95);border-radius:12px;padding:40px;text-align:center;margin-top:20px;color:#666;}
-.footer{background:rgba(255,255,255,.92);border-radius:12px;padding:16px;text-align:center;color:#666;font-size:.83rem;margin-top:20px;}
-@media(max-width:768px){.header-top h1{font-size:1.3rem;}#map{height:320px;}.schools-grid{grid-template-columns:1fr;}}
-@media print{body{background:white;}.btn-action,.logout-btn{display:none;}#map{height:400px;}}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:'Segoe UI',Roboto,Arial,sans-serif;background:#f5f7fa;color:#1f2937;line-height:1.5;}
+header{background:linear-gradient(135deg,#1e3a8a,#2563eb);color:#fff;padding:24px 20px;text-align:center;}
+header h1{font-size:1.6rem;margin-bottom:4px;}
+header p{font-size:.9rem;opacity:.9;}
+.kpis{display:flex;gap:12px;max-width:1100px;margin:20px auto;padding:0 16px;flex-wrap:wrap;}
+.kpi{background:#fff;border-radius:12px;padding:16px;flex:1 1 140px;text-align:center;box-shadow:0 1px 3px rgba(0,0,0,.06);}
+.kpi .num{font-size:1.7rem;font-weight:800;color:#1e3a8a;}
+.kpi .lbl{font-size:.75rem;color:#6b7280;text-transform:uppercase;letter-spacing:.04em;margin-top:4px;}
+#map{height:480px;max-width:1100px;margin:16px auto;border-radius:12px;overflow:hidden;box-shadow:0 1px 3px rgba(0,0,0,.06);background:#e5e7eb;}
+.map-cap{max-width:1100px;margin:6px auto 0;padding:0 16px;font-size:.78rem;color:#6b7280;text-align:right;}
+.map-cap a{color:#6b7280;text-decoration:none;}
+/* toolbar */
+.toolbar{max-width:1100px;margin:16px auto 0;padding:0 16px;display:flex;gap:10px;flex-wrap:wrap;align-items:center;}
+.toolbar input{flex:1;min-width:180px;padding:8px 14px;border:1px solid #d1d5db;border-radius:8px;font-size:.9rem;outline:none;}
+.toolbar input:focus{border-color:#2563eb;}
+.view-btns{display:flex;border:1px solid #d1d5db;border-radius:8px;overflow:hidden;}
+.view-btn{padding:7px 16px;font-size:.82rem;font-weight:600;background:#fff;border:none;cursor:pointer;color:#374151;}
+.view-btn.active{background:#1e3a8a;color:#fff;}
+/* groups */
+.groups{max-width:1100px;margin:16px auto 60px;padding:0 16px;}
+.group{margin-bottom:28px;}
+.group-head{display:flex;align-items:center;gap:10px;margin-bottom:12px;padding-bottom:8px;border-bottom:2px solid #dbeafe;}
+.group-head h2{font-size:1.1rem;color:#1e3a8a;}
+.cards{display:grid;grid-template-columns:repeat(auto-fill,minmax(270px,1fr));gap:14px;}
+/* card */
+.card{background:#fff;border-radius:10px;padding:16px;border-left:4px solid #2563eb;box-shadow:0 1px 3px rgba(0,0,0,.05);transition:box-shadow .15s;}
+.card:hover{box-shadow:0 4px 12px rgba(0,0,0,.1);}
+.card.stale{border-left-color:#9ca3af;background:#fafafa;}
+.card.stale h3{color:#6b7280;}
+.card-title{display:flex;align-items:flex-start;justify-content:space-between;gap:6px;margin-bottom:4px;}
+.card h3{font-size:1rem;color:#111827;flex:1;}
+.milestone-badge{font-size:1.2rem;line-height:1;}
+.card .sub{font-size:.78rem;color:#6b7280;margin-bottom:10px;display:flex;gap:6px;flex-wrap:wrap;align-items:center;}
+.tag-region{background:#dbeafe;color:#1e40af;font-size:.7rem;font-weight:700;padding:2px 8px;border-radius:8px;}
+.cert-rate{display:inline-flex;align-items:center;gap:4px;background:#eff6ff;color:#1d4ed8;font-size:.75rem;font-weight:700;padding:2px 8px;border-radius:8px;}
+.metric{display:flex;justify-content:space-between;padding:3px 0;font-size:.85rem;}
+.metric .lbl{color:#555;}
+.metric .val{font-weight:700;color:#1e3a8a;}
+.val.fresh{background:#dcfce7;color:#166534;font-size:.8rem;padding:1px 8px;border-radius:10px;}
+.val.stale-lbl{background:#f3f4f6;color:#6b7280;font-size:.8rem;padding:1px 8px;border-radius:10px;}
+/* score bar */
+.score-wrap{margin:8px 0 4px;}
+.score-labels{display:flex;justify-content:space-between;font-size:.75rem;color:#6b7280;margin-bottom:3px;}
+.score-val{font-weight:700;}
+.score-track{height:8px;background:#f3f4f6;border-radius:4px;overflow:hidden;}
+.score-bar{height:100%;border-radius:4px;transition:width .3s;}
+/* rollup */
+.rollup-card{background:#fff;border-radius:10px;padding:16px;box-shadow:0 1px 3px rgba(0,0,0,.05);border-top:4px solid #1e3a8a;}
+.rollup-card h3{font-size:1.05rem;color:#1e3a8a;margin-bottom:12px;}
+.rollup-stats{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:12px;}
+.rs{text-align:center;padding:8px;background:#f9fafb;border-radius:8px;}
+.rs .rv{font-size:1.2rem;font-weight:800;color:#1e3a8a;}
+.rs .rl{font-size:.7rem;color:#6b7280;text-transform:uppercase;}
+.empty{text-align:center;padding:40px;color:#6b7280;}
+footer{text-align:center;font-size:.78rem;color:#6b7280;padding:18px;}
+.hidden{display:none!important;}
+/* popup */
+.leaflet-popup-content{margin:10px 14px;font-family:'Segoe UI',Roboto,Arial,sans-serif;min-width:220px;}
+.leaflet-popup-content h4{font-size:1rem;color:#1e3a8a;margin-bottom:6px;}
+.pop-row{display:flex;justify-content:space-between;gap:14px;font-size:.84rem;padding:2px 0;}
+.pop-row .l{color:#555;}.pop-row .v{font-weight:700;color:#1e3a8a;}
+.pop-score{margin:6px 0 2px;padding:6px 8px;background:#eff6ff;border-radius:6px;font-size:.82rem;}
+@media(max-width:600px){#map{height:340px;}.kpi .num{font-size:1.4rem;}.rollup-stats{grid-template-columns:repeat(2,1fr);}}
 </style>
 </head>
 <body>
-<div class="container">
+<header>
+  <h1>📡 MTTI LMS — Field Devices</h1>
+  <p>Masomotele Technical Training Institute · Live sync dashboard</p>
+</header>
 
-    <div class="header">
-        <div class="header-top">
-            <h1>🗺 MTTI Schools Map</h1>
-            <div class="header-actions">
-                <span class="role-badge">⭐ Admin View</span>
-                <button class="btn-action btn-excel" onclick="exportExcel()">📊 Export Excel</button>
-                <button class="btn-action btn-print" onclick="window.print()">🖨 Print / PDF</button>
-                <form method="POST" style="display:inline;">
-                    <button type="submit" name="logout" class="logout-btn">Logout</button>
-                </form>
-            </div>
-        </div>
+<section class="kpis">
+  <div class="kpi"><div class="num"><?= $totalDevices ?></div><div class="lbl">Devices</div></div>
+  <div class="kpi"><div class="num"><?= $onlineCount ?>/<?= $totalDevices ?></div><div class="lbl">Online &lt;2h</div></div>
+  <div class="kpi"><div class="num"><?= num($totalStudents) ?></div><div class="lbl">Students</div></div>
+  <div class="kpi"><div class="num"><?= $globalCertRate!==null?pct($globalCertRate):'—' ?></div><div class="lbl">Cert Rate</div></div>
+  <div class="kpi"><div class="num"><?= $globalAvgScore!==null?pct($globalAvgScore):'—' ?></div><div class="lbl">Avg Quiz Score</div></div>
+  <div class="kpi"><div class="num"><?= num($totalLessons) ?></div><div class="lbl">Lessons Done</div></div>
+  <div class="kpi"><div class="num"><?= num($totalCerts) ?></div><div class="lbl">Certificates</div></div>
+</section>
 
-        <?php if ($dbError): ?>
-        <div class="alert <?= strpos($dbError,'No data') !== false ? '' : 'error' ?>"><?= htmlspecialchars($dbError) ?></div>
-        <?php endif; ?>
-        <?php if ($lastSync): ?>
-        <p class="sync-note">Last sync: <?= htmlspecialchars($lastSync) ?> EAT</p>
-        <?php endif; ?>
-
-        <div class="stats-bar">
-            <div class="stat-item">
-                <div class="number"><?= count($schools) ?: '—' ?></div>
-                <div class="label">Active Schools</div>
-            </div>
-            <div class="stat-item">
-                <div class="number"><?= $total_students ? number_format($total_students) : '—' ?></div>
-                <div class="label">Total Students</div>
-            </div>
-            <div class="stat-item">
-                <div class="number"><?= $total_lessons ? number_format($total_lessons) : '—' ?></div>
-                <div class="label">Total Lessons</div>
-            </div>
-            <div class="stat-item">
-                <div class="number"><?= $total_certs ? number_format($total_certs) : '—' ?></div>
-                <div class="label">Certificates</div>
-            </div>
-            <div class="stat-item" style="background:linear-gradient(135deg,#0369a1,#0ea5e9);">
-                <div class="number"><?= $global_avg ? number_format($global_avg,1).'%' : '—' ?></div>
-                <div class="label">Avg Quiz Score</div>
-            </div>
-            <div class="stat-item" style="background:linear-gradient(135deg,#059669,#10b981);">
-                <div class="number"><?= $total_active30 ?: '—' ?></div>
-                <div class="label">Active Last 30 Days</div>
-            </div>
-        </div>
-    </div>
-
-    <div class="map-section"><div id="map"></div></div>
-
-    <?php if (count($schools) > 0): ?>
-    <div class="section-heading">🏫 All Schools (<?= count($schools) ?>)</div>
-    <div class="schools-grid" id="schoolsGrid">
-    <?php foreach ($schools as $s):
-        $enrolled  = (int)$s['enrolled'];
-        $active30  = (int)$s['active_30d'];
-        $avgScore  = $s['avg_score'] ? number_format((float)$s['avg_score'],1).'%' : '—';
-        $certs     = (int)$s['certificates'];
-        $subjects  = (int)$s['total_subjects'];
-        $lessons   = (int)$s['total_lessons'];
-        $completed = (int)$s['lessons_completed'];
-        $compRate  = ($lessons > 0) ? round(100*$completed/max($lessons,1),1).'%' : '—';
-        $glMap = ['pre_primary'=>'Pre-Primary','lower_primary'=>'Lower Primary','upper_primary'=>'Upper Primary',
-                  'junior_secondary'=>'Junior Secondary','secondary'=>'Secondary','senior_secondary'=>'Senior Secondary'];
-        $glLabel = $glMap[$s['grade_level']] ?? $s['grade_level'];
-    ?>
-    <div class="school-card <?= $enrolled===0?'no-students':'' ?>" data-id="<?= (int)$s['id'] ?>">
-        <?php if ($enrolled > 0): ?>
-        <div class="enroll-num"><?= $enrolled ?></div>
-        <?php else: ?><span class="badge-empty">⏳ No enrolments</span><?php endif; ?>
-        <h3><?= htmlspecialchars($s['name']) ?></h3>
-        <p class="location-tag">📌 <?= htmlspecialchars($s['location']) ?></p>
-        <?php if ($glLabel): ?><p style="font-size:.78rem;color:#888;margin-bottom:8px;"><?= htmlspecialchars($glLabel) ?></p><?php endif; ?>
-        <div class="metric"><span class="metric-label">Enrolled Students</span><span class="metric-value"><?= $enrolled?:'—' ?></span></div>
-        <div class="metric"><span class="metric-label">Active (last 30 days)</span><span class="metric-value"><?= $active30?:'—' ?></span></div>
-        <div class="metric"><span class="metric-label">Subjects</span><span class="metric-value"><?= $subjects?:'—' ?></span></div>
-        <div class="metric"><span class="metric-label">Total Lessons</span><span class="metric-value"><?= $lessons?:'—' ?></span></div>
-        <div class="metric"><span class="metric-label">Lessons Completed</span><span class="metric-value"><?= $completed?:'—' ?></span></div>
-        <div class="metric"><span class="metric-label">Completion Rate</span><span class="metric-value"><?= $compRate ?></span></div>
-        <div class="metric"><span class="metric-label">Quiz Avg Score</span><span class="metric-value"><?= $avgScore ?></span></div>
-        <div class="metric"><span class="metric-label">Certificates</span><span class="metric-value"><?= $certs?:'—' ?></span></div>
-    </div>
-    <?php endforeach; ?>
-    </div>
-
-    <?php else: ?>
-    <div class="no-data-msg">
-        <p style="font-size:1.2rem;margin-bottom:8px;">No school data yet.</p>
-        <p style="font-size:.9rem;">Sync from the MTTI LMS admin panel (DataPost → Sync to Map) to populate this page.</p>
-    </div>
-    <?php endif; ?>
-
-    <div class="footer">
-        M.T.T.I LMS — Schools Performance Map &nbsp;|&nbsp;
-        Generated <?= date('d M Y, H:i') ?> EAT &nbsp;|&nbsp;
-        <a href="/" style="color:#0f3460;font-weight:600;">masomoteletraining.co.ke</a>
-    </div>
+<div id="map"></div>
+<div class="map-cap">
+  🔵 Online (GPS) &nbsp; 🟣 Online (approx.) &nbsp; ⚫ Offline &nbsp;·&nbsp;
+  &copy; <a href="https://openstreetmap.org/copyright" target="_blank" rel="noopener">OpenStreetMap</a>
+  &copy; <a href="https://carto.com/attributions" target="_blank" rel="noopener">CARTO</a>
 </div>
 
-<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<div class="toolbar">
+  <input type="search" id="search" placeholder="🔍  Search devices..." oninput="filterCards()">
+  <div class="view-btns">
+    <button class="view-btn active" id="btn-devices" onclick="setView('devices')">Devices</button>
+    <button class="view-btn" id="btn-regions" onclick="setView('regions')">Regions</button>
+  </div>
+</div>
+
+<!-- Devices view -->
+<section class="groups" id="view-devices">
+<?php if(!$groups): ?>
+  <div class="empty">No devices have synced yet.</div>
+<?php else: foreach($groups as $groupName=>$devs): ?>
+  <div class="group" data-group="<?= h($groupName) ?>">
+    <div class="group-head">
+      <h2><?= h($groupName) ?></h2>
+      <span style="font-size:.8rem;color:#9ca3af;">· <?= count($devs) ?> device<?= count($devs)!==1?'s':'' ?></span>
+    </div>
+    <div class="cards">
+    <?php foreach($devs as $d):
+        $ms=milestone((int)$d['student_count']);
+        $cr=$d['_cert_rate'];
+        $score=$d['avg_score']!==null&&(int)$d['quiz_attempts']>0?(float)$d['avg_score']:null;
+        $scoreColor=$score===null?'#9ca3af':($score>=70?'#16a34a':($score>=50?'#d97706':'#dc2626'));
+    ?>
+      <div class="card<?= $d['_stale']?' stale':'' ?>" data-name="<?= h(strtolower($d['name'])) ?>" data-group="<?= h(strtolower($groupName)) ?>">
+        <div class="card-title">
+          <h3><?= h($d['name']) ?></h3>
+          <?php if($ms): ?><span class="milestone-badge" title="<?= $ms==='🏆'?'100+':($ms==='🌳'?'50+':($ms==='🌿'?'25+':'10+')) ?> students"><?= $ms ?></span><?php endif; ?>
+        </div>
+        <div class="sub">
+          <?php if(!empty($d['region'])): ?><span class="tag-region">📍 <?= h($d['region']) ?></span><?php endif; ?>
+          <?= h($d['county']?:'—') ?>
+          <?php if($cr!==null): ?><span class="cert-rate">🎓 <?= pct($cr) ?> certified</span><?php endif; ?>
+        </div>
+
+        <?php if($score!==null): ?>
+        <div class="score-wrap">
+          <div class="score-labels">
+            <span>Quiz avg score</span>
+            <span class="score-val" style="color:<?= $scoreColor ?>"><?= pct($score) ?></span>
+          </div>
+          <div class="score-track">
+            <div class="score-bar" style="width:<?= min(100,$score) ?>%;background:<?= $scoreColor ?>"></div>
+          </div>
+        </div>
+        <?php endif; ?>
+
+        <div class="metric"><span class="lbl">📟 Device</span><span class="val" style="font-family:monospace;font-size:.76rem;color:#6b7280;"><?= h($d['device_id']) ?></span></div>
+        <div class="metric"><span class="lbl">👥 Students</span><span class="val"><?= num($d['student_count']) ?>
+          <?php if($d['student_count_prev']!==null):$delta=(int)$d['student_count']-(int)$d['student_count_prev'];if($delta>0):?><span style="color:#16a34a;font-size:.78rem"> +<?= $delta ?></span><?php elseif($delta<0):?><span style="color:#dc2626;font-size:.78rem"> <?= $delta ?></span><?php endif;endif;?></span></div>
+        <div class="metric"><span class="lbl">📚 Lessons done</span><span class="val"><?= num($d['lesson_completions']) ?></span></div>
+        <div class="metric"><span class="lbl">🎓 Certificates</span><span class="val"><?= num($d['cert_count']) ?></span></div>
+        <?php if($d['active_last_30']>0):?>
+        <div class="metric"><span class="lbl">🟢 Active (30d)</span><span class="val"><?= num($d['active_last_30']) ?></span></div>
+        <?php endif;?>
+        <?php if(!empty($d['avg_sync_interval_secs'])):$mins=round($d['avg_sync_interval_secs']/60,1);$col=$mins<=2?'#166534':($mins<=10?'#92400e':'#991b1b');?>
+        <div class="metric"><span class="lbl">🔁 Sync rate</span><span class="val" style="color:<?= $col ?>;font-size:.82rem;">every ~<?= $mins ?> min</span></div>
+        <?php endif;?>
+        <div class="metric"><span class="lbl">📡 Last sync</span><span class="val <?= $d['_stale']?'stale-lbl':'fresh' ?>"><?= lastSeen($d['_age']) ?></span></div>
+        <?php if($d['_stale']&&$d['_offline_label']):?>
+        <div class="metric"><span class="lbl">🔴 Status</span><span class="val" style="color:#dc2626;"><?= h($d['_offline_label']) ?></span></div>
+        <?php endif;?>
+      </div>
+    <?php endforeach;?>
+    </div>
+  </div>
+<?php endforeach;endif;?>
+</section>
+
+<!-- Region rollup view -->
+<section class="groups hidden" id="view-regions">
+  <div class="cards">
+  <?php foreach($regionRollup as $rName=>$rl):
+      $sc=$rl['avg_score'];
+      $scColor=$sc===null?'#9ca3af':($sc>=70?'#16a34a':($sc>=50?'#d97706':'#dc2626'));
+  ?>
+  <div class="rollup-card">
+    <h3>📍 <?= h($rName) ?> <span style="font-size:.8rem;color:#6b7280;font-weight:400;"><?= $rl['devices'] ?> device<?= $rl['devices']!==1?'s':'' ?> · <?= $rl['online'] ?> online</span></h3>
+    <div class="rollup-stats">
+      <div class="rs"><div class="rv"><?= num($rl['students']) ?></div><div class="rl">Students</div></div>
+      <div class="rs"><div class="rv"><?= $rl['cert_rate']!==null?pct($rl['cert_rate']):'—' ?></div><div class="rl">Cert rate</div></div>
+      <div class="rs"><div class="rv"><?= $sc!==null?pct($sc):'—' ?></div><div class="rl">Quiz avg</div></div>
+    </div>
+    <?php if($sc!==null):?>
+    <div class="score-wrap">
+      <div class="score-labels"><span>Quiz average</span><span class="score-val" style="color:<?= $scColor ?>"><?= pct($sc) ?></span></div>
+      <div class="score-track"><div class="score-bar" style="width:<?= min(100,$sc) ?>%;background:<?= $scColor ?>"></div></div>
+    </div>
+    <?php endif;?>
+  </div>
+  <?php endforeach;?>
+  </div>
+</section>
+
+<footer>MTTI LMS · live data from field devices · updates every minute</footer>
+
+<script src="/leaflet.js"></script>
 <script>
-const schoolsData = <?= $schoolsJson ?>;
+(function(){
+  if(typeof L==='undefined'){document.getElementById('map').innerHTML='<div style="display:flex;align-items:center;justify-content:center;height:100%;color:#6b7280;">Map unavailable</div>';return;}
+  var markers=<?= $markersJson?:'[]' ?>;
+  var map=L.map('map',{scrollWheelZoom:true}).setView([0.5,37.5],6);
+  L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}.png',{maxZoom:19,subdomains:'abcd',attribution:''}).addTo(map);
+  function esc(s){return String(s==null?'':s).replace(/[&<>"']/g,function(c){return({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'})[c];});}
+  function fmt(n){return n==null?'—':Number(n).toLocaleString();}
+  function pc(n){return n==null?'—':Number(n).toFixed(1)+'%';}
+  if(!markers.length)return;
+  var grp=L.featureGroup();
+  markers.forEach(function(m){
+    var r=m.students>=100?13:(m.students>=50?11:(m.students>=25?10:(m.students>=10?9:8)));
+    var sc=m.avg_score;
+    var scColor=sc==null?'#9ca3af':(sc>=70?'#16a34a':(sc>=50?'#d97706':'#dc2626'));
+    var scHtml='';
+    if(sc!==null){
+      scHtml='<div class="pop-score">📝 Quiz avg <b style="color:'+scColor+'">'+pc(sc)+'</b>'
+        +'<div style="height:6px;background:#f3f4f6;border-radius:3px;margin-top:4px;overflow:hidden;">'
+        +'<div style="height:100%;width:'+Math.min(100,sc)+'%;background:'+scColor+';border-radius:3px;"></div></div></div>';
+    }
+    var rows=[
+      ['📟 Device','<span style="font-family:monospace;font-size:.78em;color:#6b7280;">'+esc(m.device_id)+'</span>'],
+      ['👥 Students',fmt(m.students)+(m.milestone?' '+m.milestone:'')+(m.student_delta>0?' <span style="color:#16a34a">+'+m.student_delta+'</span>':(m.student_delta<0?' <span style="color:#dc2626">'+m.student_delta+'</span>':''))],
+      m.cert_rate!==null?['🎓 Cert rate','<b style="color:#1d4ed8">'+pc(m.cert_rate)+'</b> ('+fmt(m.certs)+')']:null,
+      ['📚 Lessons done',fmt(m.lessons)],
+      m.active_30>0?['🟢 Active 30d',fmt(m.active_30)]:null,
+      m.sync_interval?['🔁 Sync rate','every ~'+m.sync_interval+' min']:null,
+      ['📡 Last sync',m.last_seen],
+      m.stale&&m.offline_label?['🔴 Status','<span style="color:#dc2626;font-weight:700;">'+esc(m.offline_label)+'</span>']:null,
+    ].filter(Boolean);
+    var html='<h4>'+esc(m.name)+(m.milestone?' '+m.milestone:'')+'</h4>';
+    html+='<div style="font-size:.72rem;color:#6b7280;margin-bottom:6px;">📍 '+esc(m.group)+(m.county&&m.county!==m.group?' · '+esc(m.county):'')+'</div>';
+    html+='<div style="font-size:.7rem;margin-bottom:8px;"><span style="background:'+(m.has_gps?'#dcfce7':'#ede9fe')+';color:'+(m.has_gps?'#166534':'#5b21b6')+';padding:2px 8px;border-radius:8px;font-weight:700;">'+(m.has_gps?'🛰 GPS':'📍 Approx. ('+esc(m.county)+')')+'</span></div>';
+    html+=scHtml;
+    rows.forEach(function(r){html+='<div class="pop-row"><span class="l">'+r[0]+'</span><span class="v">'+r[1]+'</span></div>';});
+    var color=m.stale?'#9ca3af':'#2563eb';
+    if(!m.has_gps)color=m.stale?'#d1d5db':'#7c3aed';
+    var marker=m.has_gps
+      ?L.circleMarker([m.lat,m.lng],{radius:r,color:'#fff',weight:2,fillColor:color,fillOpacity:m.stale?.65:.95})
+      :L.marker([m.lat,m.lng],{icon:L.divIcon({className:'',html:'<div style="background:'+color+';width:28px;height:28px;border-radius:50%;border:3px solid #fff;box-shadow:0 2px 6px rgba(0,0,0,.3);display:flex;align-items:center;justify-content:center;font-size:14px;">📍</div>',iconSize:[28,28],iconAnchor:[14,14]})});
+    marker.bindPopup(html,{maxWidth:300}).addTo(grp);
+  });
+  grp.addTo(map);
+  if(markers.length===1){map.setView([markers[0].lat,markers[0].lng],10);}
+  else{map.fitBounds(grp.getBounds().pad(0.2));}
+})();
 
-const map = L.map('map', { center: [0.5, 37.0], zoom: 6 });
-L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-    attribution: '© OpenStreetMap contributors', maxZoom: 18
-}).addTo(map);
-
-function jitterGroups(schools) {
-    const groups = {};
-    schools.forEach(s => {
-        const key = `${parseFloat(s.lat).toFixed(4)}_${parseFloat(s.lng).toFixed(4)}`;
-        if (!groups[key]) groups[key] = [];
-        groups[key].push(s);
-    });
-    const result = [];
-    Object.values(groups).forEach(group => {
-        if (group.length === 1) { result.push({...group[0],jlat:+group[0].lat,jlng:+group[0].lng}); return; }
-        const golden = 2.39996;
-        group.forEach((s,i) => {
-            const r = 0.025 * Math.sqrt(i+1);
-            const a = i * golden;
-            result.push({...s, jlat:+s.lat+r*Math.sin(a), jlng:+s.lng+r*Math.cos(a)});
-        });
-    });
-    return result;
+function filterCards(){
+  var q=document.getElementById('search').value.toLowerCase().trim();
+  document.querySelectorAll('#view-devices .card').forEach(function(c){
+    c.style.display=(!q||c.dataset.name.includes(q)||c.dataset.group.includes(q))?'':'none';
+  });
+  document.querySelectorAll('#view-devices .group').forEach(function(g){
+    g.style.display=[].slice.call(g.querySelectorAll('.card')).some(function(c){return c.style.display!=='none';})?'':'none';
+  });
 }
-
-const jittered = jitterGroups(schoolsData);
-const bounds = [];
-
-jittered.forEach(s => {
-    const enrolled = parseInt(s.enrolled)||0;
-    const color = enrolled>0 ? '#0f3460' : '#f59e0b';
-    const size  = enrolled>20?18:enrolled>5?14:11;
-    const marker = L.circleMarker([s.jlat,s.jlng],{
-        radius:size,fillColor:color,color:'white',weight:2,opacity:1,fillOpacity:.88
-    }).addTo(map);
-
-    const avg   = s.avg_score ? `${parseFloat(s.avg_score).toFixed(1)}%` : '—';
-    const tot   = parseInt(s.total_lessons)||0;
-    const comp  = parseInt(s.lessons_completed)||0;
-    const compR = tot>0 ? `${Math.round(100*comp/tot)}%` : '—';
-
-    marker.bindPopup(`
-        <strong style="color:#0f3460;font-size:.95rem;">${s.name}</strong><br>
-        <em style="color:#888;font-size:.8rem;">📌 ${s.location}</em>
-        <hr style="margin:6px 0;border-color:#eee;">
-        <table style="width:100%;font-size:.82rem;border-collapse:collapse;">
-            <tr><td style="color:#555;padding:2px 4px;">👥 Enrolled</td><td style="font-weight:700;padding:2px 4px;">${enrolled||'—'}</td></tr>
-            <tr><td style="color:#555;padding:2px 4px;">🟢 Active 30d</td><td style="font-weight:700;padding:2px 4px;">${parseInt(s.active_30d)||'—'}</td></tr>
-            <tr><td style="color:#555;padding:2px 4px;">📚 Lessons</td><td style="font-weight:700;padding:2px 4px;">${tot||'—'}</td></tr>
-            <tr><td style="color:#555;padding:2px 4px;">✅ Completion</td><td style="font-weight:700;padding:2px 4px;">${compR}</td></tr>
-            <tr><td style="color:#555;padding:2px 4px;">📝 Quiz Avg</td><td style="font-weight:700;padding:2px 4px;">${avg}</td></tr>
-            <tr><td style="color:#555;padding:2px 4px;">🎓 Certs</td><td style="font-weight:700;padding:2px 4px;">${parseInt(s.certificates)||'—'}</td></tr>
-        </table>
-    `, {maxWidth:220});
-
-    if (enrolled>0) marker.on('click',()=>{
-        const card = document.querySelector(`.school-card[data-id="${s.id}"]`);
-        if (card){card.scrollIntoView({behavior:'smooth',block:'center'});card.style.boxShadow='0 0 0 3px #0f3460';setTimeout(()=>card.style.boxShadow='',2000);}
-    });
-
-    if (+s.lat!==0&&+s.lng!==0) bounds.push([s.jlat,s.jlng]);
-});
-
-if (bounds.length>0){
-    if (bounds.length===1) map.setView(bounds[0],10);
-    else map.fitBounds(bounds,{padding:[40,40]});
-} else { map.setView([0.5,35.27],10); }
-
-function exportExcel() {
-    const wb = XLSX.utils.book_new();
-    const date = new Date().toLocaleDateString('en-KE',{day:'2-digit',month:'short',year:'numeric'}).replace(/ /g,'-');
-    const headers=['School Name','Location','Grade Level','Enrolled','Active 30d','Subjects','Total Lessons','Lessons Completed','Completion %','Quiz Avg %','Certificates'];
-    const rows = schoolsData.map(s=>{
-        const tot=parseInt(s.total_lessons)||0;
-        const comp=parseInt(s.lessons_completed)||0;
-        return [s.name,s.location,s.grade_level||'',parseInt(s.enrolled)||0,parseInt(s.active_30d)||0,
-                parseInt(s.total_subjects)||0,tot,comp,tot>0?Math.round(100*comp/tot):'',
-                s.avg_score?parseFloat(s.avg_score):'',parseInt(s.certificates)||0];
-    });
-    const ws=XLSX.utils.aoa_to_sheet([headers,...rows]);
-    ws['!cols']=[28,28,16,10,10,10,12,14,12,12,12].map(w=>({wch:w}));
-    XLSX.utils.book_append_sheet(wb,ws,'Schools');
-    XLSX.writeFile(wb,`MTTI-Schools-${date}.xlsx`);
+function setView(v){
+  document.getElementById('view-devices').classList.toggle('hidden',v!=='devices');
+  document.getElementById('view-regions').classList.toggle('hidden',v!=='regions');
+  document.getElementById('btn-devices').classList.toggle('active',v==='devices');
+  document.getElementById('btn-regions').classList.toggle('active',v==='regions');
 }
 </script>
-</body>
-</html>
+</body></html>

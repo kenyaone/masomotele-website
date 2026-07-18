@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Active Listening and Empathy | MTTI Caregiving</title>
+<link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Fredoka:wght@500;600&display=swap" rel="stylesheet">
+<style>
+* { margin:0; padding:0; box-sizing:border-box; }
+body { font-family:'Space Mono', monospace; background:linear-gradient(135deg,#387633 0%,#259BD7 100%); min-height:100vh; padding:20px; color:#fff; }
+.container { max-width:720px; margin:0 auto; }
+.header { text-align:center; margin-bottom:16px; }
+.lesson-tag { display:inline-block; background:rgba(255,255,255,0.2); padding:6px 16px; border-radius:999px; font-size:0.85em; margin-bottom:10px; }
+.header h1 { font-family:'Fredoka', sans-serif; font-size:1.7em; margin-bottom:4px; text-shadow:2px 2px 0 rgba(0,0,0,0.2); }
+.progress { text-align:center; margin-bottom:14px; font-size:0.9em; opacity:0.9; }
+.card { background:#fff; color:#333; border-radius:20px; padding:26px; box-shadow:0 16px 40px rgba(0,0,0,0.25); }
+.scenario { background:linear-gradient(135deg,#fff8e1 0%,#ffecb3 100%); border-left:5px solid #ffc107; padding:16px 20px; border-radius:12px; margin-bottom:18px; font-size:0.95em; line-height:1.55; }
+.said { background:#f5f7fb; border-radius:12px; padding:16px 20px; margin-bottom:18px; font-style:italic; font-size:0.98em; }
+.pitfall-options { display:flex; gap:10px; margin:14px 0; flex-wrap:wrap; }
+.cat-btn { flex:1; min-width:150px; padding:12px; border-radius:10px; border:2px solid #e5e7f0; background:#f5f7fb; cursor:pointer; font-family:'Space Mono', monospace; font-size:0.85em; text-align:center; }
+.cat-btn:hover:not(.disabled) { background:#e8f5e9; }
+.cat-btn.correct { background:#d4edda; border-color:#28a745; }
+.cat-btn.wrong { background:#f8d7da; border-color:#dc3545; }
+.cat-btn.disabled { cursor:not-allowed; }
+.feedback { margin-top:10px; padding:14px 18px; border-radius:10px; font-size:0.9em; line-height:1.5; }
+.feedback.correct { background:#d4edda; color:#155724; border-left:4px solid #28a745; }
+.feedback.wrong { background:#f8d7da; color:#721c24; border-left:4px solid #dc3545; }
+h3.step { font-family:'Fredoka', sans-serif; font-size:1em; margin:16px 0 8px; color:#387633; }
+textarea { width:100%; min-height:100px; padding:12px; border:2px solid #e5e7f0; border-radius:10px; font-family:'Space Mono', monospace; font-size:0.9em; resize:vertical; }
+.btn { background:linear-gradient(135deg,#387633 0%,#259BD7 100%); color:#fff; border:none; padding:12px 26px; border-radius:10px; font-size:0.95em; cursor:pointer; font-family:'Fredoka', sans-serif; box-shadow:0 6px 16px rgba(0,0,0,0.15); margin-top:4px; }
+.model-note { background:#eef6ff; border-left:4px solid #259BD7; padding:14px 18px; border-radius:10px; margin-top:14px; font-size:0.88em; line-height:1.55; }
+.model-note h4 { font-family:'Fredoka', sans-serif; margin-bottom:8px; color:#1565C0; }
+.checklist { margin-top:10px; padding-left:18px; }
+.checklist li { margin-bottom:4px; }
+.hidden { display:none; }
+.done-banner { text-align:center; padding:20px; font-family:'Fredoka', sans-serif; font-size:1.1em; }
+</style>
+</head>
+<body>
+<div class="container">
+<div class="header">
+  <div class="lesson-tag">Module 4 · Practical</div>
+  <h1>Active Listening and Empathy</h1>
+</div>
+<div class="progress">Case <span id="caseNum">1</span> of <span id="caseTotal">3</span></div>
+<div class="card" id="caseCard"></div>
+<div class="done-banner hidden" id="doneBanner">All three cases complete - you have practised spotting a common pitfall and writing your own empathetic response, three times over.</div>
+</div>
+
+<script>
+const cases = [
+  {
+    intro: "Bwana Chege has needed increasing help lately and says this to you:",
+    said: "I feel like such a burden on my family now. They should not have to do all this for me.",
+    pitfall: "reassure",
+    pitfallExplain: "The instinctive first move here is often quick reassurance - \"do not be silly, you are not a burden!\" - which, however well meant, brushes past the feeling instead of acknowledging it.",
+    modelNote: "That sounds like a heavy thing to carry. Needing more help than before is a big change to sit with - can you tell me more about what has been on your mind?"
+  },
+  {
+    intro: "Bibi Nafula has been alone most of the week and tells you:",
+    said: "Nobody visits me anymore. Sometimes I wonder if anyone would even notice.",
+    pitfall: "fix",
+    pitfallExplain: "The instinctive first move here is often to jump straight to solving it - \"I will call your daughter right now!\" - before the feeling itself has even been acknowledged.",
+    modelNote: "It sounds like you have been feeling really alone lately, and that is a painful thing to carry. I am glad you told me. Would it help to talk about who you would like to hear from?"
+  },
+  {
+    intro: "Bwana Mutai has an appointment coming up and says:",
+    said: "I do not want to go to the doctor. They always find something wrong with me.",
+    pitfall: "sympathy",
+    pitfallExplain: "A common response here is sympathy from the outside - \"oh, that is so sad, poor you\" - which can feel distancing rather than genuinely understanding, compared to a response that tries to see it from his side.",
+    modelNote: "It makes sense that appointments feel stressful when they often bring difficult news. What is it about this next visit that is worrying you most?"
+  }
+];
+
+let current = 0;
+let pitfallChosen = false;
+
+function escapeHtml(s) { return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+
+function render() {
+  pitfallChosen = false;
+  const c = cases[current];
+  document.getElementById('caseNum').textContent = current + 1;
+  document.getElementById('caseCard').innerHTML = `
+    <div class="scenario"><strong>Scenario.</strong> ${escapeHtml(c.intro)}</div>
+    <div class="said">"${escapeHtml(c.said)}"</div>
+    <h3 class="step">Step 1 - Which pitfall is easiest to fall into here?</h3>
+    <div class="pitfall-options">
+      <button class="cat-btn" onclick="choosePitfall('fix')">Rushing to fix it</button>
+      <button class="cat-btn" onclick="choosePitfall('sympathy')">Sympathy, not empathy</button>
+      <button class="cat-btn" onclick="choosePitfall('reassure')">Quick reassurance that brushes it aside</button>
+    </div>
+    <div id="pitfallFeedback"></div>
+    <div id="noteSection" class="hidden">
+      <h3 class="step">Step 2 - Write your own empathetic response</h3>
+      <textarea id="noteText" placeholder="What would you actually say back to them?"></textarea>
+      <button class="btn" onclick="revealModel()" style="margin-top:10px;">Compare to a model response</button>
+      <div id="modelSection"></div>
+    </div>
+    <div id="nextSection" class="hidden" style="text-align:center;margin-top:18px;">
+      <button class="btn" onclick="nextCase()">${current === cases.length - 1 ? 'Finish' : 'Next case &rarr;'}</button>
+    </div>
+  `;
+}
+
+function choosePitfall(choice) {
+  if (pitfallChosen) return;
+  pitfallChosen = true;
+  const c = cases[current];
+  const btns = document.querySelectorAll('.cat-btn');
+  btns.forEach(b => b.classList.add('disabled'));
+  const labels = { fix: 'Rushing to fix it', sympathy: 'Sympathy, not empathy', reassure: 'Quick reassurance that brushes it aside' };
+  btns.forEach(b => { if (b.textContent.trim() === labels[c.pitfall]) b.classList.add('correct'); });
+  const right = choice === c.pitfall;
+  if (!right) btns.forEach(b => { if (b.textContent.trim() === labels[choice]) b.classList.add('wrong'); });
+
+  document.getElementById('pitfallFeedback').innerHTML = `<div class="feedback ${right ? 'correct' : 'wrong'}">
+    <strong>${right ? 'Correct.' : 'Not quite - correct answer highlighted above.'}</strong><br>${c.pitfallExplain}
+  </div>`;
+  document.getElementById('noteSection').classList.remove('hidden');
+}
+
+function revealModel() {
+  const c = cases[current];
+  document.getElementById('modelSection').innerHTML = `
+    <div class="model-note">
+      <h4>A model empathetic response</h4>
+      <p>"${escapeHtml(c.modelNote)}"</p>
+      <p style="margin-top:10px;"><strong>Self-check your own response against this checklist:</strong></p>
+      <ul class="checklist">
+        <li>Did you reflect back the feeling, rather than argue with it?</li>
+        <li>Did you avoid dismissing it ("do not worry") or immediately jumping to fix it?</li>
+        <li>Does it sound like something you would actually say out loud, not a script?</li>
+        <li>Does it invite them to say more, rather than closing the conversation down?</li>
+      </ul>
+    </div>`;
+  document.getElementById('nextSection').classList.remove('hidden');
+}
+
+function nextCase() {
+  current++;
+  if (current >= cases.length) {
+    document.getElementById('caseCard').classList.add('hidden');
+    document.querySelector('.progress').classList.add('hidden');
+    document.getElementById('doneBanner').classList.remove('hidden');
+    return;
+  }
+  render();
+}
+
+render();
+</script>
+</body>
+</html>

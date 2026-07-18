@@ -1,0 +1,346 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Domains and cPanel Hosting | MTTI Web Design</title>
+    <link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Fredoka:wght@500;600&display=swap" rel="stylesheet">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Space Mono', monospace;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh; padding: 20px; color: #fff;
+        }
+        .container { max-width: 900px; margin: 0 auto; }
+        .header { text-align: center; margin-bottom: 30px; animation: slideDown 0.6s ease-out; }
+        .header .lesson-tag {
+            display: inline-block; background: rgba(255,255,255,0.2);
+            padding: 6px 16px; border-radius: 999px;
+            font-size: 0.85em; margin-bottom: 12px;
+        }
+        .header h1 {
+            font-family: 'Fredoka', sans-serif; font-size: 2.2em;
+            margin-bottom: 8px; text-shadow: 3px 3px 0 rgba(0,0,0,0.2);
+        }
+        .header p { opacity: 0.95; font-size: 0.95em; }
+        .score-board {
+            background: rgba(255,255,255,0.15); backdrop-filter: blur(10px);
+            border-radius: 20px; padding: 20px; margin-bottom: 20px;
+            display: flex; justify-content: space-around;
+            animation: fadeIn 0.8s ease-out 0.2s both;
+        }
+        .score-item { text-align: center; }
+        .score-item .label { font-size: 0.85em; opacity: 0.9; margin-bottom: 4px; }
+        .score-item .value {
+            font-size: 1.8em; font-weight: bold; font-family: 'Fredoka', sans-serif;
+        }
+        .progress-bar {
+            width: 100%; height: 8px; background: rgba(255,255,255,0.3);
+            border-radius: 10px; margin-bottom: 25px; overflow: hidden;
+        }
+        .progress-fill {
+            height: 100%; background: linear-gradient(90deg, #f093fb 0%, #f5576c 100%);
+            border-radius: 10px; transition: width 0.5s ease; width: 0%;
+        }
+        .exercise-card {
+            background: white; color: #333; border-radius: 25px;
+            padding: 35px; margin-bottom: 20px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            animation: fadeIn 0.6s ease-out both;
+        }
+        .scenario {
+            background: linear-gradient(135deg, #fff8e1 0%, #ffecb3 100%);
+            border-left: 5px solid #ffc107;
+            padding: 20px 24px; border-radius: 12px;
+            margin-bottom: 24px;
+            font-size: 0.98em; line-height: 1.55;
+        }
+        .scenario strong { color: #7a5a00; font-family: 'Fredoka', sans-serif; }
+        .question {
+            font-size: 1.15em; margin-bottom: 20px;
+            font-weight: 700; line-height: 1.4;
+        }
+        .options { display: flex; flex-direction: column; gap: 12px; }
+        .option {
+            background: #f5f7fb; border: 2px solid transparent;
+            padding: 16px 20px; border-radius: 12px;
+            cursor: pointer; transition: all 0.2s ease;
+            font-family: 'Space Mono', monospace; font-size: 0.98em; text-align: left;
+        }
+        .option:hover:not(.disabled) {
+            background: #eef1fb; border-color: #667eea; transform: translateX(4px);
+        }
+        .option.correct { background: #d4edda; border-color: #28a745; color: #155724; }
+        .option.wrong { background: #f8d7da; border-color: #dc3545; color: #721c24; animation: shake 0.4s; }
+        .option.disabled { cursor: not-allowed; opacity: 0.85; }
+        .feedback {
+            margin-top: 22px; padding: 18px 22px; border-radius: 12px;
+            animation: slideUp 0.4s ease-out;
+            font-size: 0.98em; line-height: 1.5;
+        }
+        .feedback.correct { background: #d4edda; color: #155724; border-left: 4px solid #28a745; }
+        .feedback.wrong { background: #f8d7da; color: #721c24; border-left: 4px solid #dc3545; }
+        .feedback strong { font-family: 'Fredoka', sans-serif; }
+        .next-btn, .restart-btn {
+            margin-top: 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white; border: none;
+            padding: 14px 32px; border-radius: 12px;
+            font-size: 1em; cursor: pointer;
+            font-family: 'Fredoka', sans-serif;
+            box-shadow: 0 6px 18px rgba(0,0,0,0.2);
+            transition: transform 0.2s ease;
+        }
+        .next-btn:hover, .restart-btn:hover { transform: scale(1.04); }
+        .results {
+            text-align: center; padding: 25px 15px;
+            animation: bounceIn 0.6s ease-out;
+        }
+        .results h2 {
+            font-family: 'Fredoka', sans-serif; font-size: 2em;
+            margin-bottom: 12px; color: #333;
+        }
+        .results .final-score {
+            font-size: 3em; font-family: 'Fredoka', sans-serif;
+            color: #667eea; margin: 20px 0;
+        }
+        .results p { color: #555; margin-bottom: 12px; }
+        .badge { display: inline-block; font-size: 3.5em; margin: 8px 0; }
+        @keyframes slideDown { from { opacity: 0; transform: translateY(-30px); } to { opacity: 1; transform: translateY(0); } }
+        @keyframes fadeIn { from { opacity: 0; transform: scale(0.96); } to { opacity: 1; transform: scale(1); } }
+        @keyframes slideUp { from { opacity: 0; transform: translateY(15px); } to { opacity: 1; transform: translateY(0); } }
+        @keyframes shake { 0%,100% { transform: translateX(0); } 25% { transform: translateX(-8px); } 75% { transform: translateX(8px); } }
+        @keyframes bounceIn { 0% { opacity: 0; transform: scale(0.4); } 60% { transform: scale(1.05); } 100% { opacity: 1; transform: scale(1); } }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <div class="lesson-tag">Module 4 · Lesson 4.4 · Quiz</div>
+            <h1>Domains and cPanel Hosting</h1>
+            <p></p>
+        </div>
+
+        <div class="score-board">
+            <div class="score-item"><div class="label">Score</div><div class="value" id="score">0</div></div>
+            <div class="score-item"><div class="label">Question</div><div class="value"><span id="current">1</span>/<span id="total">10</span></div></div>
+            <div class="score-item"><div class="label">Streak</div><div class="value" id="streak">0</div></div>
+        </div>
+
+        <div class="progress-bar"><div class="progress-fill" id="progress"></div></div>
+
+        <div class="exercise-card" id="exerciseCard"></div>
+    </div>
+
+    <script>
+        const exercises = [
+  {
+    "id": "q1",
+    "text": "James registers nakuruhardwarehub.co.ke. Which organisation manages .co.ke domain registrations?",
+    "options": [
+      "ICANN",
+      "Kenya Revenue Authority",
+      "KeNIC (Kenya Network Information Centre)",
+      "Communications Authority of Kenya"
+    ],
+    "answer": 2,
+    "explanation": "KeNIC (Kenya Network Information Centre) is the official registry for .ke domains including .co.ke. They accredit Kenyan registrars like Truehost, Safaricom, and others. ICANN oversees global domains (.com, .org) but not country-specific ones like .ke."
+  },
+  {
+    "id": "q2",
+    "text": "James buys hosting and updates his domain's nameservers to ns1.truehost.co.ke. How long might it take for this change to propagate globally?",
+    "options": [
+      "Instantaneous — DNS updates apply immediately",
+      "5–30 minutes",
+      "Up to 24–48 hours",
+      "Up to 7 days"
+    ],
+    "answer": 2,
+    "explanation": "DNS propagation can take up to 24–48 hours because DNS records are cached across thousands of servers globally. Most users see the update within a few hours, but some ISPs cache DNS longer. During propagation, some users may see the old server while others see the new one."
+  },
+  {
+    "id": "q3",
+    "text": "James uploads his site files to cPanel File Manager. Which directory must the files go in for them to be publicly accessible at nakuruhardwarehub.co.ke?",
+    "options": [
+      "home/jkariuki/",
+      "www/",
+      "public/",
+      "public_html/"
+    ],
+    "answer": 3,
+    "explanation": "cPanel's web root is public_html/. Files placed here are served at the domain root. www/ is often a symlink to public_html/. Files outside public_html are not accessible to the public — they can be used for private configs, scripts, and data."
+  },
+  {
+    "id": "q4",
+    "text": "James wants to receive emails at james@nakuruhardwarehub.co.ke. Which DNS record type handles email routing?",
+    "options": [
+      "A record",
+      "CNAME record",
+      "MX record",
+      "TXT record"
+    ],
+    "answer": 2,
+    "explanation": "MX (Mail Exchanger) records specify which mail servers handle email for the domain. Without an MX record, emails to @nakuruhardwarehub.co.ke cannot be delivered. cPanel can host email, or the MX records can point to Google Workspace or Microsoft 365."
+  },
+  {
+    "id": "q5",
+    "text": "James's cPanel shows that file permissions on his index.html are set to 777. What is the security risk?",
+    "options": [
+      "777 permissions prevent the web server from reading the file",
+      "777 (rwxrwxrwx) allows any user on the server to read, write, and execute the file — malicious users could overwrite or inject code",
+      "777 is the correct permission for HTML files on Apache",
+      "File permissions only affect server performance, not security"
+    ],
+    "answer": 1,
+    "explanation": "Permission 777 grants read+write+execute to owner, group, and others — anyone with server access can modify the file. HTML files should be 644 (rw-r--r--: owner can write, others can only read). Directories should be 755."
+  },
+  {
+    "id": "q6",
+    "text": "James installs a Let's Encrypt SSL certificate via cPanel. What does SSL enable for his site?",
+    "options": [
+      "The site loads twice as fast",
+      "HTTPS — encrypted communication between the visitor's browser and the server, plus a padlock in the address bar",
+      "Automatic daily backups of the website",
+      "Protection against SQL injection attacks"
+    ],
+    "answer": 1,
+    "explanation": "Let's Encrypt provides free SSL/TLS certificates that enable HTTPS. HTTPS encrypts data in transit (contact form submissions, user behaviour) and displays a padlock — modern browsers warn users about HTTP sites, which kills conversion rates."
+  },
+  {
+    "id": "q7",
+    "text": "James wants to redirect all HTTP traffic to HTTPS automatically. He should add rules to which file?",
+    "options": [
+      "index.html (add a <meta> redirect)",
+      "style.css (add a redirect property)",
+      ".htaccess (Apache's per-directory configuration file)",
+      "robots.txt (tell crawlers to use HTTPS)"
+    ],
+    "answer": 2,
+    "explanation": ".htaccess is Apache's per-directory configuration file — placed in public_html/, it applies rules for that directory and subdirectories. HTTP→HTTPS redirect rules, URL rewrites, and security headers are commonly configured here. cPanel's 'Force HTTPS' tool writes these rules automatically."
+  },
+  {
+    "id": "q8",
+    "text": "James's domain expires in 3 days and he misses the renewal. What typically happens?",
+    "options": [
+      "The domain is immediately sold to another buyer",
+      "The site goes offline; after a grace period (~30 days) the domain enters redemption, then deletion — becomes available to others",
+      "cPanel keeps the site running on a different URL",
+      "The registrar automatically renews and charges his card"
+    ],
+    "answer": 1,
+    "explanation": "Domain expiry workflow: expires → grace period (site offline, you can still renew) → redemption period (higher renewal fee) → deletion (domain released to the public). Enable auto-renew and keep payment details current to avoid losing your domain."
+  },
+  {
+    "id": "q9",
+    "text": "James sets up a CNAME record: www → nakuruhardwarehub.co.ke. What does this do?",
+    "options": [
+      "Creates a subdomain www.nakuruhardwarehub.co.ke that is an alias for the bare domain",
+      "Points the domain to a different hosting provider",
+      "Creates an email alias www@nakuruhardwarehub.co.ke",
+      "Redirects HTTP to HTTPS for the www version"
+    ],
+    "answer": 0,
+    "explanation": "A CNAME (Canonical Name) record creates an alias — www.nakuruhardwarehub.co.ke resolves to the same IP as nakuruhardwarehub.co.ke. This ensures both www and non-www versions work, then you redirect one to the other for SEO consistency."
+  },
+  {
+    "id": "q10",
+    "text": "James uses cPanel's built-in File Manager to edit his live CSS directly in production. What is the risk?",
+    "options": [
+      "cPanel's editor doesn't support CSS syntax highlighting",
+      "Edits bypass Git — the change is not in version control, there's no test step, and a typo can break the live site with no easy rollback",
+      "cPanel file edits are slower than FTP uploads",
+      "The browser cache will show visitors the old CSS for 24 hours"
+    ],
+    "answer": 1,
+    "explanation": "Editing directly on the production server skips version control, code review, and testing. One syntax error can break the entire site. The correct workflow: edit locally, test, commit to Git, then deploy. Production is not a testing environment."
+  }
+];
+
+        let currentQuestion = 0, score = 0, streak = 0, answered = false;
+
+        function updateScoreboard() {
+            document.getElementById('score').textContent = score;
+            document.getElementById('current').textContent = Math.min(currentQuestion + 1, exercises.length);
+            document.getElementById('total').textContent = exercises.length;
+            document.getElementById('streak').textContent = streak;
+            document.getElementById('progress').style.width = ((currentQuestion) / exercises.length) * 100 + '%';
+        }
+
+        function escapeHtml(s) {
+            return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+        }
+
+        function renderQuestion() {
+            answered = false;
+            const q = exercises[currentQuestion];
+            let html = '';
+            if (q.scenario) {
+                html += `<div class="scenario"><strong>Scenario.</strong> ${escapeHtml(q.scenario)}</div>`;
+            }
+            html += `<div class="question">${escapeHtml(q.text)}</div>`;
+            html += '<div class="options">';
+            q.options.forEach((o, i) => {
+                html += `<button class="option" onclick="selectAnswer(${i})">${escapeHtml(o)}</button>`;
+            });
+            html += '</div>';
+            document.getElementById('exerciseCard').innerHTML = html;
+            updateScoreboard();
+        }
+
+        function selectAnswer(i) {
+            if (answered) return;
+            answered = true;
+            const q = exercises[currentQuestion];
+            const btns = document.querySelectorAll('.option');
+            btns.forEach(b => b.classList.add('disabled'));
+            btns[q.answer].classList.add('correct');
+            const right = i === q.answer;
+            if (!right) btns[i].classList.add('wrong');
+            if (right) { score += 10; streak += 1; } else { streak = 0; }
+            const fb = document.createElement('div');
+            fb.className = 'feedback ' + (right ? 'correct' : 'wrong');
+            fb.innerHTML = `<strong>${right ? '✅ Correct.' : '❌ Not quite.'}</strong><br>${escapeHtml(q.explanation)}`;
+            document.getElementById('exerciseCard').appendChild(fb);
+            const nb = document.createElement('button');
+            nb.className = 'next-btn';
+            nb.textContent = currentQuestion === exercises.length - 1 ? 'See results →' : 'Next scenario →';
+            nb.onclick = nextQuestion;
+            document.getElementById('exerciseCard').appendChild(nb);
+            updateScoreboard();
+        }
+
+        function nextQuestion() {
+            currentQuestion++;
+            if (currentQuestion >= exercises.length) return showResults();
+            renderQuestion();
+        }
+
+        function showResults() {
+            document.getElementById('progress').style.width = '100%';
+            const total = exercises.length * 10;
+            const pct = Math.round(score / total * 100);
+            if (window.parent) { window.parent.postMessage({type:"mtti_quiz_score", score: score, total: total, percent: pct}, "*"); }
+            let badge = '🌟', msg = 'Excellent work. You have a professional grasp of this lesson.';
+            if (pct < 50) { badge = '🌱'; msg = 'Good first attempt. Re-watch the lesson video and try again.'; }
+            else if (pct < 80) { badge = '📚'; msg = 'Solid progress. Review the scenarios you missed and retry.'; }
+            document.getElementById('exerciseCard').innerHTML = `
+                <div class="results">
+                    <span class="badge">${badge}</span>
+                    <h2>Quiz Complete</h2>
+                    <div class="final-score">${score} / ${total}</div>
+                    <p><strong>${pct}%</strong> · Longest streak: ${streak}</p>
+                    <p>${msg}</p>
+                    <button class="restart-btn" onclick="restart()">Try again 🔁</button>
+                </div>`;
+        }
+
+        function restart() {
+            currentQuestion = 0; score = 0; streak = 0;
+            renderQuestion();
+        }
+
+        renderQuestion();
+    </script>
+</body>
+</html>

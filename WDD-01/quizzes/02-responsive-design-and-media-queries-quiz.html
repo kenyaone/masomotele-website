@@ -1,0 +1,346 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Responsive Design | MTTI Web Design</title>
+    <link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Fredoka:wght@500;600&display=swap" rel="stylesheet">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Space Mono', monospace;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh; padding: 20px; color: #fff;
+        }
+        .container { max-width: 900px; margin: 0 auto; }
+        .header { text-align: center; margin-bottom: 30px; animation: slideDown 0.6s ease-out; }
+        .header .lesson-tag {
+            display: inline-block; background: rgba(255,255,255,0.2);
+            padding: 6px 16px; border-radius: 999px;
+            font-size: 0.85em; margin-bottom: 12px;
+        }
+        .header h1 {
+            font-family: 'Fredoka', sans-serif; font-size: 2.2em;
+            margin-bottom: 8px; text-shadow: 3px 3px 0 rgba(0,0,0,0.2);
+        }
+        .header p { opacity: 0.95; font-size: 0.95em; }
+        .score-board {
+            background: rgba(255,255,255,0.15); backdrop-filter: blur(10px);
+            border-radius: 20px; padding: 20px; margin-bottom: 20px;
+            display: flex; justify-content: space-around;
+            animation: fadeIn 0.8s ease-out 0.2s both;
+        }
+        .score-item { text-align: center; }
+        .score-item .label { font-size: 0.85em; opacity: 0.9; margin-bottom: 4px; }
+        .score-item .value {
+            font-size: 1.8em; font-weight: bold; font-family: 'Fredoka', sans-serif;
+        }
+        .progress-bar {
+            width: 100%; height: 8px; background: rgba(255,255,255,0.3);
+            border-radius: 10px; margin-bottom: 25px; overflow: hidden;
+        }
+        .progress-fill {
+            height: 100%; background: linear-gradient(90deg, #f093fb 0%, #f5576c 100%);
+            border-radius: 10px; transition: width 0.5s ease; width: 0%;
+        }
+        .exercise-card {
+            background: white; color: #333; border-radius: 25px;
+            padding: 35px; margin-bottom: 20px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            animation: fadeIn 0.6s ease-out both;
+        }
+        .scenario {
+            background: linear-gradient(135deg, #fff8e1 0%, #ffecb3 100%);
+            border-left: 5px solid #ffc107;
+            padding: 20px 24px; border-radius: 12px;
+            margin-bottom: 24px;
+            font-size: 0.98em; line-height: 1.55;
+        }
+        .scenario strong { color: #7a5a00; font-family: 'Fredoka', sans-serif; }
+        .question {
+            font-size: 1.15em; margin-bottom: 20px;
+            font-weight: 700; line-height: 1.4;
+        }
+        .options { display: flex; flex-direction: column; gap: 12px; }
+        .option {
+            background: #f5f7fb; border: 2px solid transparent;
+            padding: 16px 20px; border-radius: 12px;
+            cursor: pointer; transition: all 0.2s ease;
+            font-family: 'Space Mono', monospace; font-size: 0.98em; text-align: left;
+        }
+        .option:hover:not(.disabled) {
+            background: #eef1fb; border-color: #667eea; transform: translateX(4px);
+        }
+        .option.correct { background: #d4edda; border-color: #28a745; color: #155724; }
+        .option.wrong { background: #f8d7da; border-color: #dc3545; color: #721c24; animation: shake 0.4s; }
+        .option.disabled { cursor: not-allowed; opacity: 0.85; }
+        .feedback {
+            margin-top: 22px; padding: 18px 22px; border-radius: 12px;
+            animation: slideUp 0.4s ease-out;
+            font-size: 0.98em; line-height: 1.5;
+        }
+        .feedback.correct { background: #d4edda; color: #155724; border-left: 4px solid #28a745; }
+        .feedback.wrong { background: #f8d7da; color: #721c24; border-left: 4px solid #dc3545; }
+        .feedback strong { font-family: 'Fredoka', sans-serif; }
+        .next-btn, .restart-btn {
+            margin-top: 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white; border: none;
+            padding: 14px 32px; border-radius: 12px;
+            font-size: 1em; cursor: pointer;
+            font-family: 'Fredoka', sans-serif;
+            box-shadow: 0 6px 18px rgba(0,0,0,0.2);
+            transition: transform 0.2s ease;
+        }
+        .next-btn:hover, .restart-btn:hover { transform: scale(1.04); }
+        .results {
+            text-align: center; padding: 25px 15px;
+            animation: bounceIn 0.6s ease-out;
+        }
+        .results h2 {
+            font-family: 'Fredoka', sans-serif; font-size: 2em;
+            margin-bottom: 12px; color: #333;
+        }
+        .results .final-score {
+            font-size: 3em; font-family: 'Fredoka', sans-serif;
+            color: #667eea; margin: 20px 0;
+        }
+        .results p { color: #555; margin-bottom: 12px; }
+        .badge { display: inline-block; font-size: 3.5em; margin: 8px 0; }
+        @keyframes slideDown { from { opacity: 0; transform: translateY(-30px); } to { opacity: 1; transform: translateY(0); } }
+        @keyframes fadeIn { from { opacity: 0; transform: scale(0.96); } to { opacity: 1; transform: scale(1); } }
+        @keyframes slideUp { from { opacity: 0; transform: translateY(15px); } to { opacity: 1; transform: translateY(0); } }
+        @keyframes shake { 0%,100% { transform: translateX(0); } 25% { transform: translateX(-8px); } 75% { transform: translateX(8px); } }
+        @keyframes bounceIn { 0% { opacity: 0; transform: scale(0.4); } 60% { transform: scale(1.05); } 100% { opacity: 1; transform: scale(1); } }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <div class="lesson-tag">Module 2 · Lesson 2.6 · Quiz</div>
+            <h1>Responsive Design</h1>
+            <p></p>
+        </div>
+
+        <div class="score-board">
+            <div class="score-item"><div class="label">Score</div><div class="value" id="score">0</div></div>
+            <div class="score-item"><div class="label">Question</div><div class="value"><span id="current">1</span>/<span id="total">10</span></div></div>
+            <div class="score-item"><div class="label">Streak</div><div class="value" id="streak">0</div></div>
+        </div>
+
+        <div class="progress-bar"><div class="progress-fill" id="progress"></div></div>
+
+        <div class="exercise-card" id="exerciseCard"></div>
+    </div>
+
+    <script>
+        const exercises = [
+  {
+    "id": "q1",
+    "text": "James's desktop site looks fine on a PC but appears tiny on a phone — customers can't read the text. What is the most likely cause?",
+    "options": [
+      "The CSS font-size is set too small",
+      "The viewport meta tag is missing — the browser defaults to a desktop-width viewport and zooms out",
+      "The HTML is not valid",
+      "The site is cached from a desktop view"
+    ],
+    "answer": 1,
+    "explanation": "Without <meta name=\"viewport\" content=\"width=device-width, initial-scale=1\">, mobile browsers render the page at 980px (desktop width) and scale it down to fit the screen — making everything appear tiny. This is the single most important tag for responsive design."
+  },
+  {
+    "id": "q2",
+    "text": "James writes @media (max-width: 600px) { ... }. When do the styles inside apply?",
+    "options": [
+      "Only on screens wider than 600px",
+      "Only on screens 600px wide or narrower",
+      "On all screens except exactly 600px",
+      "Only when the user resizes the browser manually"
+    ],
+    "answer": 1,
+    "explanation": "max-width: 600px matches screens whose viewport width is 600px or less. Styles inside the media query override the default styles for small screens. This is the desktop-first approach — default styles are for large screens, overrides for small."
+  },
+  {
+    "id": "q3",
+    "text": "What is the MOBILE-FIRST approach in responsive CSS?",
+    "options": [
+      "Designing the mobile app before the website",
+      "Writing base styles for small screens, then using min-width media queries to add styles for larger screens",
+      "Testing only on Android before desktop",
+      "Setting all widths in pixels, then overriding with % on mobile"
+    ],
+    "answer": 1,
+    "explanation": "Mobile-first writes the base CSS for small screens (no media query needed) and then adds progressive enhancements for larger screens using min-width media queries. This produces leaner CSS for mobile and better performance on low-bandwidth connections."
+  },
+  {
+    "id": "q4",
+    "text": "James sets img { max-width: 100%; } in his CSS. What does this do for images on small screens?",
+    "options": [
+      "Scales images up to fill 100% of the viewport at all times",
+      "Allows images to shrink to fit their container but never grow beyond their natural size",
+      "Sets all images to a fixed 100px width",
+      "Removes images on screens under 100px wide"
+    ],
+    "answer": 1,
+    "explanation": "max-width: 100% means the image cannot exceed the width of its container but CAN be smaller. This prevents images from overflowing their containers on small screens while letting them display at full natural size on large screens."
+  },
+  {
+    "id": "q5",
+    "text": "James wants his three-column desktop layout to become one column on mobile. Which media query approach is correct?",
+    "options": [
+      "@media print { .columns { grid-template-columns: 1fr; } }",
+      "@media (max-width: 768px) { .columns { grid-template-columns: 1fr; } }",
+      "@media screen and (min-width: 768px) { .columns { grid-template-columns: 1fr 1fr 1fr; } } with base: 1fr",
+      "Both B and C are valid (desktop-first and mobile-first respectively)"
+    ],
+    "answer": 3,
+    "explanation": "Both approaches are valid. Desktop-first: default is 3 columns, max-width query overrides to 1 column on small screens. Mobile-first: default is 1 column, min-width query adds 3 columns on large screens. The result is identical — the approach depends on your default styles."
+  },
+  {
+    "id": "q6",
+    "text": "James sets font-size: 5vw for his heading. What does vw mean?",
+    "options": [
+      "Vertical width — the element height",
+      "Viewport width — 1vw equals 1% of the viewport width",
+      "Variable weight — adjusts with font-weight",
+      "Visual weight — a perceptual brightness unit"
+    ],
+    "answer": 1,
+    "explanation": "vw (viewport width) is a relative unit: 1vw = 1% of the current viewport width. 5vw on a 400px screen = 20px; on a 1200px screen = 60px. Useful for fluid typography that scales with screen size."
+  },
+  {
+    "id": "q7",
+    "text": "James tests his site on Chrome DevTools' device toolbar. This is useful for what?",
+    "options": [
+      "Testing site performance under 3G connection speeds",
+      "Simulating various screen sizes and pixel densities without needing a physical device",
+      "Testing HTTPS certificate validation",
+      "Running automated accessibility audits"
+    ],
+    "answer": 1,
+    "explanation": "Chrome DevTools' device toolbar (Ctrl+Shift+M) simulates various device widths, pixel ratios, and touch events. It's faster than having every device physically, though real-device testing is still important for final QA."
+  },
+  {
+    "id": "q8",
+    "text": "James uses a fixed width of width: 960px on his main container. What is the problem on smaller screens?",
+    "options": [
+      "960px is not supported in CSS3",
+      "The container overflows screens narrower than 960px — horizontal scrolling appears",
+      "Fixed widths in px are slower to render than %",
+      "960px containers cannot be styled with flexbox"
+    ],
+    "answer": 1,
+    "explanation": "A fixed 960px width on a 375px phone creates horizontal scrollbars — the layout breaks out of the screen. Use max-width: 960px instead, which caps width on large screens but allows it to shrink on smaller ones."
+  },
+  {
+    "id": "q9",
+    "text": "Which meta tag is essential for responsive design to work correctly on mobile browsers?",
+    "options": [
+      "<meta name=\"mobile\" content=\"true\">",
+      "<meta name=\"viewport\" content=\"width=device-width, initial-scale=1\">",
+      "<meta charset=\"UTF-8\">",
+      "<meta name=\"responsive\" content=\"yes\">"
+    ],
+    "answer": 1,
+    "explanation": "The viewport meta tag tells mobile browsers to set the viewport width to the device's actual screen width and start at 1× zoom. Without it, all responsive media queries may still fire incorrectly because the browser uses a simulated desktop viewport."
+  },
+  {
+    "id": "q10",
+    "text": "James wants his product grid to use 3 columns on desktop, 2 on tablet, and 1 on mobile. What is the most concise CSS Grid solution?",
+    "options": [
+      "Three separate media queries with explicit column counts",
+      "grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)) with no media queries",
+      "display: flex with flex-wrap: wrap",
+      "A JavaScript function that reads window.innerWidth and applies classes"
+    ],
+    "answer": 1,
+    "explanation": "repeat(auto-fill, minmax(280px, 1fr)) creates as many 280px+ columns as fit the container width — automatically 3 on desktop, 2 on tablet, 1 on phone. This eliminates the need for breakpoint media queries entirely for grid layouts."
+  }
+];
+
+        let currentQuestion = 0, score = 0, streak = 0, answered = false;
+
+        function updateScoreboard() {
+            document.getElementById('score').textContent = score;
+            document.getElementById('current').textContent = Math.min(currentQuestion + 1, exercises.length);
+            document.getElementById('total').textContent = exercises.length;
+            document.getElementById('streak').textContent = streak;
+            document.getElementById('progress').style.width = ((currentQuestion) / exercises.length) * 100 + '%';
+        }
+
+        function escapeHtml(s) {
+            return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+        }
+
+        function renderQuestion() {
+            answered = false;
+            const q = exercises[currentQuestion];
+            let html = '';
+            if (q.scenario) {
+                html += `<div class="scenario"><strong>Scenario.</strong> ${escapeHtml(q.scenario)}</div>`;
+            }
+            html += `<div class="question">${escapeHtml(q.text)}</div>`;
+            html += '<div class="options">';
+            q.options.forEach((o, i) => {
+                html += `<button class="option" onclick="selectAnswer(${i})">${escapeHtml(o)}</button>`;
+            });
+            html += '</div>';
+            document.getElementById('exerciseCard').innerHTML = html;
+            updateScoreboard();
+        }
+
+        function selectAnswer(i) {
+            if (answered) return;
+            answered = true;
+            const q = exercises[currentQuestion];
+            const btns = document.querySelectorAll('.option');
+            btns.forEach(b => b.classList.add('disabled'));
+            btns[q.answer].classList.add('correct');
+            const right = i === q.answer;
+            if (!right) btns[i].classList.add('wrong');
+            if (right) { score += 10; streak += 1; } else { streak = 0; }
+            const fb = document.createElement('div');
+            fb.className = 'feedback ' + (right ? 'correct' : 'wrong');
+            fb.innerHTML = `<strong>${right ? '✅ Correct.' : '❌ Not quite.'}</strong><br>${escapeHtml(q.explanation)}`;
+            document.getElementById('exerciseCard').appendChild(fb);
+            const nb = document.createElement('button');
+            nb.className = 'next-btn';
+            nb.textContent = currentQuestion === exercises.length - 1 ? 'See results →' : 'Next scenario →';
+            nb.onclick = nextQuestion;
+            document.getElementById('exerciseCard').appendChild(nb);
+            updateScoreboard();
+        }
+
+        function nextQuestion() {
+            currentQuestion++;
+            if (currentQuestion >= exercises.length) return showResults();
+            renderQuestion();
+        }
+
+        function showResults() {
+            document.getElementById('progress').style.width = '100%';
+            const total = exercises.length * 10;
+            const pct = Math.round(score / total * 100);
+            if (window.parent) { window.parent.postMessage({type:"mtti_quiz_score", score: score, total: total, percent: pct}, "*"); }
+            let badge = '🌟', msg = 'Excellent work. You have a professional grasp of this lesson.';
+            if (pct < 50) { badge = '🌱'; msg = 'Good first attempt. Re-watch the lesson video and try again.'; }
+            else if (pct < 80) { badge = '📚'; msg = 'Solid progress. Review the scenarios you missed and retry.'; }
+            document.getElementById('exerciseCard').innerHTML = `
+                <div class="results">
+                    <span class="badge">${badge}</span>
+                    <h2>Quiz Complete</h2>
+                    <div class="final-score">${score} / ${total}</div>
+                    <p><strong>${pct}%</strong> · Longest streak: ${streak}</p>
+                    <p>${msg}</p>
+                    <button class="restart-btn" onclick="restart()">Try again 🔁</button>
+                </div>`;
+        }
+
+        function restart() {
+            currentQuestion = 0; score = 0; streak = 0;
+            renderQuestion();
+        }
+
+        renderQuestion();
+    </script>
+</body>
+</html>

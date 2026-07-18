@@ -3,7 +3,7 @@ require_once __DIR__ . '/includes/init.php';
 $pageTitle = 'My Grades - ' . SITE_NAME;
 $auth = new Auth(); $auth->requireLogin();
 $db = Database::getInstance();
-$grades = $db->fetchAll("SELECT g.*, c.title as class_title, q.title as quiz_title FROM grades g JOIN classes c ON g.class_id=c.id LEFT JOIN quizzes q ON g.quiz_id=q.id WHERE g.user_id=? ORDER BY g.created_at DESC", [$auth->getUserId()]);
+$grades = $db->fetchAll("SELECT g.*, c.title as class_title, q.title as quiz_title FROM grades g JOIN lms_classes c ON g.class_id=c.id LEFT JOIN quizzes q ON g.quiz_id=q.id WHERE g.user_id=? ORDER BY g.created_at DESC", [$auth->getUserId()]);
 require_once __DIR__ . '/templates/header.php';
 ?>
 <div class="container">

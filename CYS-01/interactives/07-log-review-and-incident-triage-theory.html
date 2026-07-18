@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Log Review and Incident Triage (Lesson) | MTTI Computer Applications</title>
+<link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Fredoka:wght@500;600&display=swap" rel="stylesheet">
+<style>
+* { margin:0; padding:0; box-sizing:border-box; }
+body { font-family:'Space Mono', monospace; background:linear-gradient(135deg,#2E7D32 0%,#1565C0 100%); min-height:100vh; padding:20px; color:#fff; }
+.container { max-width:820px; margin:0 auto; }
+.header { text-align:center; margin-bottom:24px; }
+.lesson-tag { display:inline-block; background:rgba(255,255,255,0.2); padding:6px 16px; border-radius:999px; font-size:0.85em; margin-bottom:12px; }
+.header h1 { font-family:'Fredoka', sans-serif; font-size:2em; margin-bottom:6px; text-shadow:3px 3px 0 rgba(0,0,0,0.2); }
+.card { background:#fff; color:#333; border-radius:22px; padding:32px; margin-bottom:20px; box-shadow:0 20px 60px rgba(0,0,0,0.3); }
+.section { margin-bottom:26px; }
+.section:last-child { margin-bottom:0; }
+.section h2 { font-family:'Fredoka', sans-serif; font-size:1.2em; margin-bottom:10px; color:#1565C0; }
+.section .body { line-height:1.65; font-size:0.98em; }
+.section .body p { margin-bottom:10px; }
+.section .body code { background:#f5f7fb; padding:2px 6px; border-radius:4px; font-size:0.92em; }
+.keypoint { background:#fff8e1; border-left:4px solid #ffc107; padding:12px 16px; border-radius:8px; margin-top:12px; font-size:0.92em; }
+</style>
+</head>
+<body>
+<div class="container">
+<div class="header"><div class="lesson-tag">Module 7 · Lesson 7.6</div><h1>Log Review and Incident Triage</h1></div>
+<div class="card"><div class="section"><h2>Why the Log Entry Itself Matters</h2><div class="body"><p>A Tier 2 analyst, Grace's manager, or an auditor may only ever see the log entry, not the original raw alert — an inaccurate or vague entry means whoever reads it later has to redo the investigation from scratch, or worse, misses something entirely.</p></div><div class="keypoint"><strong>Key Point.</strong> The log entry is often the only surviving record of what an analyst actually saw and decided — accuracy here has real downstream consequences.</div></div><div class="section"><h2>Reading the Indicators</h2><div class="body"><p>Four fields do most of the work in a first-pass triage: the <strong>account</strong> involved (a routine user vs. a privileged admin account), the <strong>source</strong> (a known office IP vs. an unrecognised or foreign one), the <strong>timing</strong> (business hours vs. the middle of the night), and any <strong>outbound data transfer</strong> (none vs. an unusually large one). No single field alone tells the whole story — it is the combination that matters.</p></div></div><div class="section"><h2>Triaging Severity</h2><div class="body"><p><strong>Benign</strong> fits a pattern with an ordinary explanation (one failed login, then success, from a known location during business hours). <strong>Monitor</strong> fits something unusual but not clearly malicious (a new location, outside normal hours, but otherwise normal behaviour) — verify and watch, rather than dismiss or panic. <strong>Escalate Immediately</strong> fits multiple strong indicators appearing together (a burst of failed attempts, an unrecognised foreign source, success, then a large outbound transfer).</p></div><div class="keypoint"><strong>Key Point.</strong> This mirrors the same &quot;Normal / Watch Closely / Report Immediately&quot; judgement used in other caregiving-style contexts — three tiers of response, matched to genuine severity, not treated identically.</div></div><div class="section"><h2>Writing a Clear Incident Note</h2><div class="body"><p>A genuinely useful note includes the time, the specific values that drove the decision (not just "suspicious activity"), the reasoning behind the triage category chosen, and what action was actually taken — including who was told, if anyone. A vague note like "checked the alert, looked fine" gives the next reader almost nothing to work with.</p></div></div></div>
+</div>
+</body>
+</html>

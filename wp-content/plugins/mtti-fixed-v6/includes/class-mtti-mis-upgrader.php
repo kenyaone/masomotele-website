@@ -52,8 +52,25 @@ class MTTI_MIS_Upgrader {
             self::upgrade_to_7_5_0();
         }
 
+        // Physical vs. online learner distinction, and self-service course
+        // purchases for online-only enrollment-on-payment
+        if (version_compare($current_version, '7.6.0', '<')) {
+            self::upgrade_to_7_6_0();
+        }
+
+        // Separate online_fee for courses — the online self-checkout flow
+        // charges this instead of the campus fee when it's set
+        if (version_compare($current_version, '7.7.0', '<')) {
+            self::upgrade_to_7_7_0();
+        }
+
+        // PesaPal order tracking on course_purchases
+        if (version_compare($current_version, '7.8.0', '<')) {
+            self::upgrade_to_7_8_0();
+        }
+
         // Update database version
-        update_option('mtti_mis_db_version', '7.5.0');
+        update_option('mtti_mis_db_version', '7.8.0');
     }
     
     /**
@@ -411,5 +428,77 @@ class MTTI_MIS_Upgrader {
         }
 
         error_log('MTTI MIS: Database upgraded to version 7.5.0 - Added mtti_lessons.interactive_role');
+    }
+
+    private static function upgrade_to_7_6_0() {
+        global $wpdb;
+
+        $enrollments_table = $wpdb->prefix . 'mtti_enrollments';
+        $columns = $wpdb->get_results("SHOW COLUMNS FROM {$enrollments_table}");
+        $column_names = array();
+        foreach ($columns as $column) {
+            $column_names[] = $column->Field;
+        }
+        if (!in_array('delivery_mode', $column_names)) {
+            $wpdb->query("ALTER TABLE {$enrollments_table} ADD COLUMN delivery_mode VARCHAR(10) NOT NULL DEFAULT 'online' AFTER status");
+        }
+
+        $purchases_table = $wpdb->prefix . 'mtti_course_purchases';
+        $sql = "CREATE TABLE IF NOT EXISTS {$purchases_table} (
+            purchase_id BIGINT NOT NULL AUTO_INCREMENT,
+            reference_code VARCHAR(20) NOT NULL,
+            course_id BIGINT NOT NULL,
+            first_name VARCHAR(100) NOT NULL,
+            last_name VARCHAR(100) NOT NULL,
+            email VARCHAR(100) NULL,
+            phone VARCHAR(20) NOT NULL,
+            amount DECIMAL(10,2) NOT NULL,
+            status VARCHAR(20) NOT NULL DEFAULT 'awaiting_payment',
+            mpesa_receipt VARCHAR(50) NULL,
+            student_id BIGINT NULL,
+            notes TEXT NULL,
+            created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+            updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+            PRIMARY KEY (purchase_id),
+            UNIQUE KEY reference_code (reference_code),
+            KEY course_id (course_id),
+            KEY status (status),
+            KEY student_id (student_id)
+        ) {$wpdb->get_charset_collate()};";
+        dbDelta($sql);
+
+        error_log('MTTI MIS: Database upgraded to version 7.6.0 - Added mtti_enrollments.delivery_mode and mtti_course_purchases');
+    }
+
+    private static function upgrade_to_7_7_0() {
+        global $wpdb;
+
+        $courses_table = $wpdb->prefix . 'mtti_courses';
+        $columns = $wpdb->get_results("SHOW COLUMNS FROM {$courses_table}");
+        $column_names = array();
+        foreach ($columns as $column) {
+            $column_names[] = $column->Field;
+        }
+        if (!in_array('online_fee', $column_names)) {
+            $wpdb->query("ALTER TABLE {$courses_table} ADD COLUMN online_fee DECIMAL(10,2) NULL DEFAULT NULL AFTER fee");
+        }
+
+        error_log('MTTI MIS: Database upgraded to version 7.7.0 - Added mtti_courses.online_fee');
+    }
+
+    private static function upgrade_to_7_8_0() {
+        global $wpdb;
+
+        $purchases_table = $wpdb->prefix . 'mtti_course_purchases';
+        $columns = $wpdb->get_results("SHOW COLUMNS FROM {$purchases_table}");
+        $column_names = array();
+        foreach ($columns as $column) {
+            $column_names[] = $column->Field;
+        }
+        if (!in_array('pesapal_tracking_id', $column_names)) {
+            $wpdb->query("ALTER TABLE {$purchases_table} ADD COLUMN pesapal_tracking_id VARCHAR(100) NULL DEFAULT NULL AFTER mpesa_receipt, ADD KEY pesapal_tracking_id (pesapal_tracking_id)");
+        }
+
+        error_log('MTTI MIS: Database upgraded to version 7.8.0 - Added mtti_course_purchases.pesapal_tracking_id');
     }
 }

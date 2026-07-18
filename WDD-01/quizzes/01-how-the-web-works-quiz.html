@@ -1,0 +1,346 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>How the Web Works | MTTI Web Design</title>
+    <link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Fredoka:wght@500;600&display=swap" rel="stylesheet">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Space Mono', monospace;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh; padding: 20px; color: #fff;
+        }
+        .container { max-width: 900px; margin: 0 auto; }
+        .header { text-align: center; margin-bottom: 30px; animation: slideDown 0.6s ease-out; }
+        .header .lesson-tag {
+            display: inline-block; background: rgba(255,255,255,0.2);
+            padding: 6px 16px; border-radius: 999px;
+            font-size: 0.85em; margin-bottom: 12px;
+        }
+        .header h1 {
+            font-family: 'Fredoka', sans-serif; font-size: 2.2em;
+            margin-bottom: 8px; text-shadow: 3px 3px 0 rgba(0,0,0,0.2);
+        }
+        .header p { opacity: 0.95; font-size: 0.95em; }
+        .score-board {
+            background: rgba(255,255,255,0.15); backdrop-filter: blur(10px);
+            border-radius: 20px; padding: 20px; margin-bottom: 20px;
+            display: flex; justify-content: space-around;
+            animation: fadeIn 0.8s ease-out 0.2s both;
+        }
+        .score-item { text-align: center; }
+        .score-item .label { font-size: 0.85em; opacity: 0.9; margin-bottom: 4px; }
+        .score-item .value {
+            font-size: 1.8em; font-weight: bold; font-family: 'Fredoka', sans-serif;
+        }
+        .progress-bar {
+            width: 100%; height: 8px; background: rgba(255,255,255,0.3);
+            border-radius: 10px; margin-bottom: 25px; overflow: hidden;
+        }
+        .progress-fill {
+            height: 100%; background: linear-gradient(90deg, #f093fb 0%, #f5576c 100%);
+            border-radius: 10px; transition: width 0.5s ease; width: 0%;
+        }
+        .exercise-card {
+            background: white; color: #333; border-radius: 25px;
+            padding: 35px; margin-bottom: 20px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            animation: fadeIn 0.6s ease-out both;
+        }
+        .scenario {
+            background: linear-gradient(135deg, #fff8e1 0%, #ffecb3 100%);
+            border-left: 5px solid #ffc107;
+            padding: 20px 24px; border-radius: 12px;
+            margin-bottom: 24px;
+            font-size: 0.98em; line-height: 1.55;
+        }
+        .scenario strong { color: #7a5a00; font-family: 'Fredoka', sans-serif; }
+        .question {
+            font-size: 1.15em; margin-bottom: 20px;
+            font-weight: 700; line-height: 1.4;
+        }
+        .options { display: flex; flex-direction: column; gap: 12px; }
+        .option {
+            background: #f5f7fb; border: 2px solid transparent;
+            padding: 16px 20px; border-radius: 12px;
+            cursor: pointer; transition: all 0.2s ease;
+            font-family: 'Space Mono', monospace; font-size: 0.98em; text-align: left;
+        }
+        .option:hover:not(.disabled) {
+            background: #eef1fb; border-color: #667eea; transform: translateX(4px);
+        }
+        .option.correct { background: #d4edda; border-color: #28a745; color: #155724; }
+        .option.wrong { background: #f8d7da; border-color: #dc3545; color: #721c24; animation: shake 0.4s; }
+        .option.disabled { cursor: not-allowed; opacity: 0.85; }
+        .feedback {
+            margin-top: 22px; padding: 18px 22px; border-radius: 12px;
+            animation: slideUp 0.4s ease-out;
+            font-size: 0.98em; line-height: 1.5;
+        }
+        .feedback.correct { background: #d4edda; color: #155724; border-left: 4px solid #28a745; }
+        .feedback.wrong { background: #f8d7da; color: #721c24; border-left: 4px solid #dc3545; }
+        .feedback strong { font-family: 'Fredoka', sans-serif; }
+        .next-btn, .restart-btn {
+            margin-top: 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white; border: none;
+            padding: 14px 32px; border-radius: 12px;
+            font-size: 1em; cursor: pointer;
+            font-family: 'Fredoka', sans-serif;
+            box-shadow: 0 6px 18px rgba(0,0,0,0.2);
+            transition: transform 0.2s ease;
+        }
+        .next-btn:hover, .restart-btn:hover { transform: scale(1.04); }
+        .results {
+            text-align: center; padding: 25px 15px;
+            animation: bounceIn 0.6s ease-out;
+        }
+        .results h2 {
+            font-family: 'Fredoka', sans-serif; font-size: 2em;
+            margin-bottom: 12px; color: #333;
+        }
+        .results .final-score {
+            font-size: 3em; font-family: 'Fredoka', sans-serif;
+            color: #667eea; margin: 20px 0;
+        }
+        .results p { color: #555; margin-bottom: 12px; }
+        .badge { display: inline-block; font-size: 3.5em; margin: 8px 0; }
+        @keyframes slideDown { from { opacity: 0; transform: translateY(-30px); } to { opacity: 1; transform: translateY(0); } }
+        @keyframes fadeIn { from { opacity: 0; transform: scale(0.96); } to { opacity: 1; transform: scale(1); } }
+        @keyframes slideUp { from { opacity: 0; transform: translateY(15px); } to { opacity: 1; transform: translateY(0); } }
+        @keyframes shake { 0%,100% { transform: translateX(0); } 25% { transform: translateX(-8px); } 75% { transform: translateX(8px); } }
+        @keyframes bounceIn { 0% { opacity: 0; transform: scale(0.4); } 60% { transform: scale(1.05); } 100% { opacity: 1; transform: scale(1); } }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <div class="lesson-tag">Module 1 · Lesson 1.1 · Quiz</div>
+            <h1>How the Web Works</h1>
+            <p></p>
+        </div>
+
+        <div class="score-board">
+            <div class="score-item"><div class="label">Score</div><div class="value" id="score">0</div></div>
+            <div class="score-item"><div class="label">Question</div><div class="value"><span id="current">1</span>/<span id="total">10</span></div></div>
+            <div class="score-item"><div class="label">Streak</div><div class="value" id="streak">0</div></div>
+        </div>
+
+        <div class="progress-bar"><div class="progress-fill" id="progress"></div></div>
+
+        <div class="exercise-card" id="exerciseCard"></div>
+    </div>
+
+    <script>
+        const exercises = [
+  {
+    "id": "q1",
+    "text": "James types nakuruhardwarehub.co.ke into his browser. What is the FIRST step the browser takes before it can load the page?",
+    "options": [
+      "Download the HTML file from the server",
+      "Translate the domain name to an IP address using DNS",
+      "Render the CSS styles on screen",
+      "Send an HTTP POST request to the server"
+    ],
+    "answer": 1,
+    "explanation": "DNS (Domain Name System) resolves the human-readable domain name to a numeric IP address before any connection is made. Without this step, the browser would not know which server to contact."
+  },
+  {
+    "id": "q2",
+    "text": "A customer loads James's product page and the browser shows a padlock icon. What does this mean?",
+    "options": [
+      "The page has a password protecting it",
+      "The connection uses HTTPS — data is encrypted in transit",
+      "The page is cached locally on the device",
+      "The server is located in Kenya"
+    ],
+    "answer": 1,
+    "explanation": "A padlock indicates HTTPS (HTTP Secure), which uses TLS encryption to protect data between the browser and server. It also builds customer trust, especially for a contact form."
+  },
+  {
+    "id": "q3",
+    "text": "When a browser requests a web page, it sends an HTTP request. Which HTTP status code means 'the page was found and returned successfully'?",
+    "options": [
+      "404",
+      "500",
+      "200",
+      "301"
+    ],
+    "answer": 2,
+    "explanation": "HTTP 200 OK means the server found and returned the requested resource successfully. 404 = Not Found, 500 = Server Error, 301 = Permanent Redirect."
+  },
+  {
+    "id": "q4",
+    "text": "James hears the terms 'client' and 'server'. On the web, which is the CLIENT?",
+    "options": [
+      "The cPanel control panel on the hosting account",
+      "The database storing product information",
+      "The browser on a customer's phone or computer",
+      "The web server software (Apache/Nginx)"
+    ],
+    "answer": 2,
+    "explanation": "The client is the software (browser) that requests resources from a server. The server is the remote computer that stores and sends back the files. Every web transaction has at least one client and one server."
+  },
+  {
+    "id": "q5",
+    "text": "Which of these is a SERVER-SIDE technology — code that runs on the web server, not in the browser?",
+    "options": [
+      "JavaScript in a <script> tag",
+      "CSS in a stylesheet",
+      "PHP processing a contact form",
+      "HTML in an index.html file"
+    ],
+    "answer": 2,
+    "explanation": "PHP runs on the server and can process form submissions, query databases, and generate dynamic HTML before sending a response. HTML, CSS, and JavaScript (in the browser) all run client-side."
+  },
+  {
+    "id": "q6",
+    "text": "James wants a .co.ke domain for his hardware shop. Which organisation manages .co.ke domain registrations in Kenya?",
+    "options": [
+      "ICANN (Internet Corporation for Assigned Names and Numbers)",
+      "KeNIC (Kenya Network Information Centre)",
+      "Communications Authority of Kenya",
+      "Kenya Revenue Authority"
+    ],
+    "answer": 1,
+    "explanation": "KeNIC (Kenya Network Information Centre) is the official registry for .ke domain names, including .co.ke. They set the rules and accredit registrars. ICANN oversees global top-level domains (.com, .org, etc.)."
+  },
+  {
+    "id": "q7",
+    "text": "What are the THREE core technologies that every web page is built with?",
+    "options": [
+      "PHP, MySQL, and Apache",
+      "HTML, CSS, and JavaScript",
+      "Python, Django, and PostgreSQL",
+      "React, Node.js, and MongoDB"
+    ],
+    "answer": 1,
+    "explanation": "HTML (structure), CSS (presentation), and JavaScript (behaviour) are the three foundational client-side technologies of the web. All other tools and frameworks are built on top of these."
+  },
+  {
+    "id": "q8",
+    "text": "James's product page URL is https://nakuruhardwarehub.co.ke/products/cement. What does the path '/products/cement' tell the server?",
+    "options": [
+      "The geographic location of the server",
+      "Which specific resource or page to return",
+      "The protocol to use for the connection",
+      "The IP address of the client's device"
+    ],
+    "answer": 1,
+    "explanation": "The path (everything after the domain) tells the server which resource to return. The server maps the path to a specific file or generates a response dynamically based on the path."
+  },
+  {
+    "id": "q9",
+    "text": "What is the difference between HTTP and HTTPS?",
+    "options": [
+      "HTTPS loads pages faster than HTTP",
+      "HTTPS encrypts data between client and server; HTTP does not",
+      "HTTP is for websites, HTTPS is only for web apps",
+      "HTTPS requires a paid domain, HTTP is free"
+    ],
+    "answer": 1,
+    "explanation": "HTTPS adds TLS (Transport Layer Security) encryption on top of HTTP, protecting data in transit from interception. The difference is security — page speed, domain type, and payment are unrelated to the protocol."
+  },
+  {
+    "id": "q10",
+    "text": "A customer's browser caches James's homepage. What does caching mean in this context?",
+    "options": [
+      "The browser sends the page to Google's servers for indexing",
+      "The browser stores a local copy so it doesn't have to re-download it on the next visit",
+      "The server compresses the HTML before sending it",
+      "The browser deletes old cookies to free up memory"
+    ],
+    "answer": 1,
+    "explanation": "Caching stores a copy of a resource locally (in the browser or on a proxy server). On the next visit, the browser serves the cached copy instead of downloading it again — reducing load time and data usage."
+  }
+];
+
+        let currentQuestion = 0, score = 0, streak = 0, answered = false;
+
+        function updateScoreboard() {
+            document.getElementById('score').textContent = score;
+            document.getElementById('current').textContent = Math.min(currentQuestion + 1, exercises.length);
+            document.getElementById('total').textContent = exercises.length;
+            document.getElementById('streak').textContent = streak;
+            document.getElementById('progress').style.width = ((currentQuestion) / exercises.length) * 100 + '%';
+        }
+
+        function escapeHtml(s) {
+            return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+        }
+
+        function renderQuestion() {
+            answered = false;
+            const q = exercises[currentQuestion];
+            let html = '';
+            if (q.scenario) {
+                html += `<div class="scenario"><strong>Scenario.</strong> ${escapeHtml(q.scenario)}</div>`;
+            }
+            html += `<div class="question">${escapeHtml(q.text)}</div>`;
+            html += '<div class="options">';
+            q.options.forEach((o, i) => {
+                html += `<button class="option" onclick="selectAnswer(${i})">${escapeHtml(o)}</button>`;
+            });
+            html += '</div>';
+            document.getElementById('exerciseCard').innerHTML = html;
+            updateScoreboard();
+        }
+
+        function selectAnswer(i) {
+            if (answered) return;
+            answered = true;
+            const q = exercises[currentQuestion];
+            const btns = document.querySelectorAll('.option');
+            btns.forEach(b => b.classList.add('disabled'));
+            btns[q.answer].classList.add('correct');
+            const right = i === q.answer;
+            if (!right) btns[i].classList.add('wrong');
+            if (right) { score += 10; streak += 1; } else { streak = 0; }
+            const fb = document.createElement('div');
+            fb.className = 'feedback ' + (right ? 'correct' : 'wrong');
+            fb.innerHTML = `<strong>${right ? '✅ Correct.' : '❌ Not quite.'}</strong><br>${escapeHtml(q.explanation)}`;
+            document.getElementById('exerciseCard').appendChild(fb);
+            const nb = document.createElement('button');
+            nb.className = 'next-btn';
+            nb.textContent = currentQuestion === exercises.length - 1 ? 'See results →' : 'Next scenario →';
+            nb.onclick = nextQuestion;
+            document.getElementById('exerciseCard').appendChild(nb);
+            updateScoreboard();
+        }
+
+        function nextQuestion() {
+            currentQuestion++;
+            if (currentQuestion >= exercises.length) return showResults();
+            renderQuestion();
+        }
+
+        function showResults() {
+            document.getElementById('progress').style.width = '100%';
+            const total = exercises.length * 10;
+            const pct = Math.round(score / total * 100);
+            if (window.parent) { window.parent.postMessage({type:"mtti_quiz_score", score: score, total: total, percent: pct}, "*"); }
+            let badge = '🌟', msg = 'Excellent work. You have a professional grasp of this lesson.';
+            if (pct < 50) { badge = '🌱'; msg = 'Good first attempt. Re-watch the lesson video and try again.'; }
+            else if (pct < 80) { badge = '📚'; msg = 'Solid progress. Review the scenarios you missed and retry.'; }
+            document.getElementById('exerciseCard').innerHTML = `
+                <div class="results">
+                    <span class="badge">${badge}</span>
+                    <h2>Quiz Complete</h2>
+                    <div class="final-score">${score} / ${total}</div>
+                    <p><strong>${pct}%</strong> · Longest streak: ${streak}</p>
+                    <p>${msg}</p>
+                    <button class="restart-btn" onclick="restart()">Try again 🔁</button>
+                </div>`;
+        }
+
+        function restart() {
+            currentQuestion = 0; score = 0; streak = 0;
+            renderQuestion();
+        }
+
+        renderQuestion();
+    </script>
+</body>
+</html>

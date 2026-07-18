@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Interface and Document Basics (Lesson) | MTTI Computer Applications</title>
+<link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Fredoka:wght@500;600&display=swap" rel="stylesheet">
+<style>
+* { margin:0; padding:0; box-sizing:border-box; }
+body { font-family:'Space Mono', monospace; background:linear-gradient(135deg,#2E7D32 0%,#1565C0 100%); min-height:100vh; padding:20px; color:#fff; }
+.container { max-width:820px; margin:0 auto; }
+.header { text-align:center; margin-bottom:24px; }
+.lesson-tag { display:inline-block; background:rgba(255,255,255,0.2); padding:6px 16px; border-radius:999px; font-size:0.85em; margin-bottom:12px; }
+.header h1 { font-family:'Fredoka', sans-serif; font-size:2em; margin-bottom:6px; text-shadow:3px 3px 0 rgba(0,0,0,0.2); }
+.card { background:#fff; color:#333; border-radius:22px; padding:32px; margin-bottom:20px; box-shadow:0 20px 60px rgba(0,0,0,0.3); }
+.section { margin-bottom:26px; }
+.section:last-child { margin-bottom:0; }
+.section h2 { font-family:'Fredoka', sans-serif; font-size:1.2em; margin-bottom:10px; color:#1565C0; }
+.section .body { line-height:1.65; font-size:0.98em; }
+.section .body p { margin-bottom:10px; }
+.section .body code { background:#f5f7fb; padding:2px 6px; border-radius:4px; font-size:0.92em; }
+.keypoint { background:#fff8e1; border-left:4px solid #ffc107; padding:12px 16px; border-radius:8px; margin-top:12px; font-size:0.92em; }
+</style>
+</head>
+<body>
+<div class="container">
+<div class="header"><div class="lesson-tag">Module 1 · Lesson 1.1</div><h1>Interface and Document Basics</h1></div>
+<div style="background:#fff;color:#333;border-radius:16px;padding:16px;margin-bottom:20px;box-shadow:0 8px 24px rgba(0,0,0,0.12);text-align:center;"><svg viewBox="0 0 520 220" style="width:100%;max-width:560px;height:210px;" xmlns="http://www.w3.org/2000/svg">
+<rect x="10" y="10" width="500" height="200" rx="4" fill="#fff" stroke="#ccc"/>
+<rect x="10" y="10" width="500" height="26" fill="#2b579a"/>
+<text x="260" y="27" font-size="11" text-anchor="middle" fill="#fff">Document1 - Word</text>
+<circle cx="30" cy="20" r="4" fill="#fff"/>
+<rect x="10" y="36" width="500" height="26" fill="#f3f2f1"/>
+<text x="30" y="53" font-size="10" fill="#2b579a" font-weight="bold">Home</text>
+<text x="75" y="53" font-size="10" fill="#555">Insert</text>
+<text x="120" y="53" font-size="10" fill="#555">Layout</text>
+<text x="170" y="53" font-size="10" fill="#555">References</text>
+<rect x="10" y="62" width="500" height="34" fill="#faf9f8"/>
+<rect x="20" y="68" width="26" height="22" rx="2" fill="#fff" stroke="#999"/><text x="33" y="82" font-size="12" text-anchor="middle" font-weight="bold">B</text>
+<rect x="50" y="68" width="26" height="22" rx="2" fill="#fff" stroke="#999"/><text x="63" y="82" font-size="12" text-anchor="middle" font-style="italic">I</text>
+<rect x="80" y="68" width="26" height="22" rx="2" fill="#fff" stroke="#999"/><text x="93" y="82" font-size="12" text-anchor="middle" text-decoration="underline">U</text>
+<text x="30" y="15" font-size="9" fill="#333"></text>
+<rect x="30" y="106" width="450" height="94" fill="#fff" stroke="#ddd"/>
+<rect x="45" y="118" width="200" height="6" fill="#ccc"/>
+<rect x="45" y="132" width="420" height="6" fill="#ccc"/>
+<rect x="45" y="146" width="420" height="6" fill="#ccc"/>
+<rect x="45" y="160" width="300" height="6" fill="#ccc"/>
+<rect x="10" y="204" width="500" height="16" fill="#f3f2f1"/>
+<text x="20" y="216" font-size="9" fill="#555">Page 1 of 1</text>
+<text x="250" y="216" font-size="9" fill="#555">Words: 245</text>
+<text x="470" y="216" font-size="9" fill="#555">100%</text>
+</svg></div><div class="card"><div class="section"><h2>The Word Screen</h2><div class="body"><p>Word's window has three areas you will use constantly: the <strong>Ribbon</strong> at the top (tabs like Home, Insert, Layout, each holding grouped commands), the <strong>document area</strong> in the middle where you type, and the <strong>status bar</strong> at the bottom (word count, page number, zoom).</p><p>The small <strong>Quick Access Toolbar</strong> above the Ribbon holds Save, Undo, and Redo — the three commands you will click most often.</p></div><div class="keypoint"><strong>Key Point.</strong> If you cannot find a command, look for it inside a Ribbon tab first — almost everything in Word lives there.</div></div><div class="section"><h2>Saving Properly</h2><div class="body"><p><code>Ctrl+S</code> (Save) writes your changes to the same file. <strong>Save As</strong> (<code>F12</code>) creates a new file with a new name or location — use it when you want to keep the original untouched, e.g. saving this month's price list as a copy of last month's.</p><p>Brenda at Amani Stationers lost two hours of supplier letters once because she never saved until the power went out. A document only exists safely once it has been saved to disk.</p></div><div class="keypoint"><strong>Key Point.</strong> Save early, save often — Ctrl+S costs one second and prevents hours of lost work.</div></div><div class="section"><h2>AutoCorrect and Undo</h2><div class="body"><p>Word's AutoCorrect fixes common typos automatically (<code>teh</code> → <code>the</code>) but can also "correct" things you meant, like a supplier's name. <code>Ctrl+Z</code> (Undo) reverses the last action — including an unwanted AutoCorrect — and <code>Ctrl+Y</code> (Redo) reapplies it.</p></div><div class="keypoint"><strong>Key Point.</strong> Undo works on almost anything: typing, formatting, deleting an image. When in doubt, Ctrl+Z.</div></div></div>
+</div>
+</body>
+</html>

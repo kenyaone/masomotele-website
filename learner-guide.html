@@ -1,0 +1,601 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="A practical, illustrated guide to using the MTTI student portal — lessons, quizzes, progress, transcripts, and certificates.">
+<title>MTTI Student Portal — Learner's Guide</title>
+<style>
+  :root {
+    --paper: #faf9f4;
+    --paper-raised: #ffffff;
+    --ink: #16241c;
+    --ink-soft: #4a564c;
+    --ink-faint: #7c8880;
+    --line: #dfe0d4;
+    --line-soft: #ebece2;
+    --green: #2e7d32;
+    --green-deep: #1b5e20;
+    --green-wash: #eaf3ea;
+    --blue: #1976d2;
+    --blue-wash: #e9f1fb;
+    --amber: #f9a825;
+    --amber-wash: #fdf3de;
+    --red: #c62828;
+    --red-wash: #fbeaea;
+    --radius: 10px;
+    --shadow: 0 1px 2px rgba(22,36,28,0.06), 0 8px 24px -12px rgba(22,36,28,0.12);
+    --font-display: ui-rounded, "SF Pro Rounded", "Segoe UI", system-ui, -apple-system, sans-serif;
+    --font-body: -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    --font-ui: ui-monospace, "SF Mono", "Cascadia Code", "Segoe UI Mono", Menlo, Consolas, monospace;
+  }
+
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --paper: #10160f;
+      --paper-raised: #182018;
+      --ink: #e8ede6;
+      --ink-soft: #aab5a4;
+      --ink-faint: #74806e;
+      --line: #2a332a;
+      --line-soft: #202920;
+      --green: #57ab5c;
+      --green-deep: #4CAF50;
+      --green-wash: #16261a;
+      --blue: #6fb1f0;
+      --blue-wash: #16212e;
+      --amber: #f6c05e;
+      --amber-wash: #2a2313;
+      --red: #e57373;
+      --red-wash: #2c1616;
+      --shadow: 0 1px 2px rgba(0,0,0,0.3), 0 8px 24px -12px rgba(0,0,0,0.5);
+    }
+  }
+  :root[data-theme="dark"] {
+    --paper: #10160f; --paper-raised: #182018; --ink: #e8ede6; --ink-soft: #aab5a4; --ink-faint: #74806e;
+    --line: #2a332a; --line-soft: #202920; --green: #57ab5c; --green-deep: #4CAF50; --green-wash: #16261a;
+    --blue: #6fb1f0; --blue-wash: #16212e; --amber: #f6c05e; --amber-wash: #2a2313; --red: #e57373; --red-wash: #2c1616;
+    --shadow: 0 1px 2px rgba(0,0,0,0.3), 0 8px 24px -12px rgba(0,0,0,0.5);
+  }
+  :root[data-theme="light"] {
+    --paper: #faf9f4; --paper-raised: #ffffff; --ink: #16241c; --ink-soft: #4a564c; --ink-faint: #7c8880;
+    --line: #dfe0d4; --line-soft: #ebece2; --green: #2e7d32; --green-deep: #1b5e20; --green-wash: #eaf3ea;
+    --blue: #1976d2; --blue-wash: #e9f1fb; --amber: #f9a825; --amber-wash: #fdf3de; --red: #c62828; --red-wash: #fbeaea;
+    --shadow: 0 1px 2px rgba(22,36,28,0.06), 0 8px 24px -12px rgba(22,36,28,0.12);
+  }
+
+  * { box-sizing: border-box; }
+  html { background: var(--paper); }
+  body {
+    margin: 0;
+    background: var(--paper);
+    color: var(--ink);
+    font-family: var(--font-body);
+    font-size: 16px;
+    line-height: 1.65;
+    -webkit-font-smoothing: antialiased;
+  }
+  a { color: var(--blue); }
+  a:focus-visible, button:focus-visible, summary:focus-visible {
+    outline: 2px solid var(--blue);
+    outline-offset: 2px;
+    border-radius: 4px;
+  }
+
+  /* ---------- Header band ---------- */
+  .masthead {
+    background: linear-gradient(135deg, var(--green) 0%, var(--green-deep) 100%);
+    color: #fff;
+    padding: 40px 24px 34px;
+  }
+  .masthead-inner { max-width: 1040px; margin: 0 auto; }
+  .masthead-eyebrow {
+    font-family: var(--font-ui);
+    font-size: 12px;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    opacity: 0.85;
+    margin: 0 0 10px;
+  }
+  .masthead h1 {
+    font-family: var(--font-display);
+    font-size: clamp(28px, 4.4vw, 40px);
+    font-weight: 800;
+    letter-spacing: -0.01em;
+    margin: 0 0 8px;
+    text-wrap: balance;
+  }
+  .masthead-motto {
+    font-style: italic;
+    color: #ffe082;
+    margin: 0 0 18px;
+    font-size: 15px;
+  }
+  .masthead-meta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px 18px;
+    font-size: 13px;
+    color: rgba(255,255,255,0.88);
+  }
+  .masthead-meta span { display: inline-flex; align-items: center; gap: 6px; }
+
+  /* ---------- Page shell ---------- */
+  .shell {
+    max-width: 1040px;
+    margin: 0 auto;
+    padding: 0 24px 80px;
+    display: grid;
+    grid-template-columns: 220px minmax(0,1fr);
+    gap: 48px;
+    align-items: start;
+  }
+  @media (max-width: 780px) {
+    .shell { grid-template-columns: 1fr; }
+  }
+
+  /* ---------- TOC ---------- */
+  .toc {
+    position: sticky;
+    top: 24px;
+    padding: 18px 0 0;
+    font-size: 13.5px;
+  }
+  .toc-title {
+    font-family: var(--font-ui);
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    font-size: 11px;
+    color: var(--ink-faint);
+    margin: 0 0 10px;
+  }
+  .toc ol { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 2px; }
+  .toc a {
+    display: block;
+    color: var(--ink-soft);
+    text-decoration: none;
+    padding: 5px 0 5px 12px;
+    border-left: 2px solid transparent;
+  }
+  .toc a:hover { color: var(--green); border-left-color: var(--line); }
+  @media (max-width: 780px) {
+    .toc { position: static; }
+    .toc ol { columns: 2; column-gap: 20px; }
+  }
+
+  /* ---------- Content ---------- */
+  main { min-width: 0; padding-top: 18px; }
+  .lede {
+    font-size: 18px;
+    color: var(--ink-soft);
+    max-width: 62ch;
+    margin: 0 0 40px;
+  }
+
+  section.guide-section {
+    padding: 40px 0;
+    border-top: 1px solid var(--line-soft);
+    max-width: 66ch;
+  }
+  section.guide-section:first-of-type { border-top: none; padding-top: 0; }
+
+  .section-head { display: flex; align-items: baseline; gap: 10px; margin: 0 0 6px; }
+  .section-icon {
+    font-size: 15px;
+    line-height: 1;
+    filter: grayscale(0.15);
+  }
+  h2 {
+    font-family: var(--font-display);
+    font-size: 24px;
+    font-weight: 700;
+    letter-spacing: -0.01em;
+    margin: 0;
+    text-wrap: balance;
+  }
+  .section-sub { color: var(--ink-faint); font-size: 14px; margin: 0 0 22px; }
+
+  h3 {
+    font-family: var(--font-display);
+    font-size: 16.5px;
+    font-weight: 700;
+    margin: 26px 0 8px;
+  }
+  p { margin: 0 0 14px; color: var(--ink); }
+  ul.plain, ol.plain { margin: 0 0 14px; padding-left: 22px; }
+  ul.plain li, ol.plain li { margin-bottom: 6px; }
+
+  /* literal on-screen UI text */
+  .ui {
+    font-family: var(--font-ui);
+    font-size: 0.88em;
+    background: var(--line-soft);
+    border: 1px solid var(--line);
+    border-radius: 5px;
+    padding: 1px 6px;
+    white-space: nowrap;
+  }
+
+  /* numbered step sequence — used only where a real fixed order exists */
+  ol.steps { list-style: none; margin: 18px 0; padding: 0; counter-reset: step; }
+  ol.steps li {
+    counter-increment: step;
+    position: relative;
+    padding: 2px 0 20px 40px;
+    border-left: 2px solid var(--line);
+    margin-left: 15px;
+  }
+  ol.steps li:last-child { border-color: transparent; padding-bottom: 2px; }
+  ol.steps li::before {
+    content: counter(step);
+    position: absolute;
+    left: -15px;
+    top: 0;
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    background: var(--green);
+    color: #fff;
+    font-family: var(--font-display);
+    font-weight: 700;
+    font-size: 13px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  ol.steps .step-title { font-weight: 700; margin-bottom: 2px; }
+  ol.steps .step-body { color: var(--ink-soft); font-size: 14.5px; }
+
+  /* callout boxes */
+  .box {
+    border-radius: var(--radius);
+    padding: 14px 18px;
+    margin: 18px 0;
+    font-size: 14.5px;
+    border: 1px solid var(--line);
+  }
+  .box-title { font-weight: 700; display: block; margin-bottom: 3px; }
+  .box.tip { background: var(--blue-wash); border-color: color-mix(in srgb, var(--blue) 30%, var(--line)); }
+  .box.tip .box-title { color: var(--blue); }
+  .box.warn { background: var(--amber-wash); border-color: color-mix(in srgb, var(--amber) 40%, var(--line)); }
+  .box.warn .box-title { color: color-mix(in srgb, var(--amber) 70%, var(--ink)); }
+  .box.locked { background: var(--red-wash); border-color: color-mix(in srgb, var(--red) 30%, var(--line)); }
+  .box.locked .box-title { color: var(--red); }
+
+  /* status pill */
+  .pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    font-family: var(--font-ui);
+    font-size: 11.5px;
+    font-weight: 600;
+    padding: 2px 9px;
+    border-radius: 999px;
+  }
+  .pill.done { background: var(--green-wash); color: var(--green-deep); }
+  .pill.locked { background: var(--red-wash); color: var(--red); }
+  .pill.progress { background: var(--amber-wash); color: color-mix(in srgb, var(--amber) 65%, var(--ink)); }
+
+  /* nav tab table */
+  .navtable { width: 100%; border-collapse: collapse; margin: 16px 0; font-size: 14.5px; }
+  .navtable th, .navtable td { text-align: left; padding: 9px 10px; border-bottom: 1px solid var(--line-soft); vertical-align: top; }
+  .navtable th { font-family: var(--font-ui); font-size: 11px; text-transform: uppercase; letter-spacing: 0.06em; color: var(--ink-faint); font-weight: 600; }
+  .navtable td:first-child { white-space: nowrap; }
+  .table-wrap { overflow-x: auto; }
+
+  /* mock browser chrome for illustrating screens */
+  .mock {
+    background: var(--paper-raised);
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+    box-shadow: var(--shadow);
+    margin: 20px 0;
+    overflow: hidden;
+  }
+  .mock-bar {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 9px 12px;
+    background: var(--line-soft);
+    border-bottom: 1px solid var(--line);
+  }
+  .mock-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--line); }
+  .mock-url { font-family: var(--font-ui); font-size: 11.5px; color: var(--ink-faint); margin-left: 4px; }
+  .mock-body { padding: 16px; font-size: 14px; }
+
+  .lesson-row { display: flex; align-items: center; gap: 10px; padding: 8px 0; border-bottom: 1px solid var(--line-soft); }
+  .lesson-row:last-child { border-bottom: none; }
+  .lesson-row .dot { width: 8px; height: 8px; border-radius: 50%; flex: none; }
+  .lesson-row .dot.done { background: var(--green); }
+  .lesson-row .dot.active { background: var(--blue); }
+  .lesson-row .dot.locked { background: var(--ink-faint); }
+  .lesson-row .label { flex: 1; }
+  .lesson-row .tag { font-family: var(--font-ui); font-size: 11px; color: var(--ink-faint); }
+
+  /* quick reference table */
+  .quickref { width: 100%; border-collapse: collapse; font-size: 14px; margin-top: 12px; }
+  .quickref th, .quickref td { padding: 10px 12px; border-bottom: 1px solid var(--line-soft); text-align: left; }
+  .quickref th { font-family: var(--font-ui); font-size: 10.5px; text-transform: uppercase; letter-spacing: 0.07em; color: var(--ink-faint); }
+  .quickref tr:last-child td { border-bottom: none; }
+
+  footer {
+    max-width: 1040px;
+    margin: 0 auto;
+    padding: 30px 24px 50px;
+    border-top: 1px solid var(--line-soft);
+    color: var(--ink-faint);
+    font-size: 13px;
+    display: flex;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 10px;
+  }
+
+  @media print {
+    .toc { display: none; }
+    .shell { grid-template-columns: 1fr; }
+    .masthead { background: var(--green) !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+  }
+</style>
+</head>
+<body>
+
+<div class="masthead">
+  <div class="masthead-inner">
+    <p class="masthead-eyebrow">Masomotele Technical Training Institute</p>
+    <h1>Your Guide to the Student Portal</h1>
+    <p class="masthead-motto">"Start Learning, Start Earning"</p>
+    <div class="masthead-meta">
+      <span>🎓 For enrolled and prospective learners</span>
+      <span>📍 Sagaas Center, Eldoret · TVETA Accredited</span>
+      <span>☎ 0712 464 936</span>
+    </div>
+  </div>
+</div>
+
+<div class="shell">
+  <nav class="toc" aria-label="Table of contents">
+    <p class="toc-title">On this page</p>
+    <ol>
+      <li><a href="#start">1. Getting started</a></li>
+      <li><a href="#dashboard">2. Your dashboard</a></li>
+      <li><a href="#navigate">3. Finding your way</a></li>
+      <li><a href="#lesson">4. How a lesson works</a></li>
+      <li><a href="#locked">5. When something's locked</a></li>
+      <li><a href="#quiz">6. Taking a quiz</a></li>
+      <li><a href="#progress">7. Tracking your progress</a></li>
+      <li><a href="#transcripts">8. Transcripts &amp; certificates</a></li>
+      <li><a href="#payments">9. Fees &amp; payments</a></li>
+      <li><a href="#help">10. Getting help</a></li>
+      <li><a href="#quickref">Quick reference</a></li>
+    </ol>
+  </nav>
+
+  <main>
+    <p class="lede">This guide walks through everything you need to study on the MTTI student portal — from logging in for the first time to downloading the transcript for a unit you've completed. Keep it open in another tab while you work through your course.</p>
+
+    <section class="guide-section" id="start">
+      <div class="section-head"><span class="section-icon">🔑</span><h2>1. Getting started</h2></div>
+      <p class="section-sub">Logging in and understanding what you can see before you're enrolled</p>
+
+      <p>Your student portal is a page on the MTTI website — there's nothing separate to install. You'll log in with the email and password set up when you registered or were admitted, either through the <span class="ui">Online Admission</span> form or by an administrator.</p>
+
+      <h3>Free preview vs. enrolled access</h3>
+      <p>Some lessons are marked as <strong>free preview</strong> and are open to any logged-in learner, even before enrollment — a way to see what a course is actually like. Everything else opens up once your enrollment is <strong>Active</strong>. If a course you expect to see is missing, or a lesson says you're not enrolled, that's the first thing to check with the office.</p>
+
+      <div class="box tip">
+        <span class="box-title">Tip</span>
+        Bookmark the portal page once you're logged in. It remembers which tab you were last on, so returning to it drops you back where you left off.
+      </div>
+    </section>
+
+    <section class="guide-section" id="dashboard">
+      <div class="section-head"><span class="section-icon">🏠</span><h2>2. Your dashboard</h2></div>
+      <p class="section-sub">What greets you when you log in</p>
+
+      <p>The dashboard is your home screen. At a glance it shows:</p>
+      <ul class="plain">
+        <li>A <strong>progress ring</strong> for your main course — the percentage of topics you've actually completed, not just opened</li>
+        <li>How many of your total lessons, videos, practicals and quizzes are done</li>
+        <li>Recent <strong>notices</strong> from the institute, with a link to see all of them</li>
+        <li>A <strong>Quick Access</strong> row — shortcuts straight to Calendar, Lessons, Scheme of Work, and your Transcripts</li>
+      </ul>
+      <p>If you're enrolled in more than one course, the other courses each get a small progress bar of their own underneath the main ring.</p>
+    </section>
+
+    <section class="guide-section" id="navigate">
+      <div class="section-head"><span class="section-icon">🧭</span><h2>3. Finding your way</h2></div>
+      <p class="section-sub">The sidebar tabs, and what lives in each one</p>
+
+      <p>The sidebar is always visible on the left (or behind a menu button on a phone). Here's what each tab is actually for:</p>
+
+      <div class="table-wrap">
+        <table class="navtable">
+          <thead><tr><th>Tab</th><th>What it's for</th></tr></thead>
+          <tbody>
+            <tr><td>📚 My Courses</td><td>Every course you're enrolled in, with an overall progress bar for each.</td></tr>
+            <tr><td>📖 Lessons</td><td>All your course content — lessons, videos, notes, downloadable files. Opening it drops you straight into your next unfinished lesson.</td></tr>
+            <tr><td>📝 Quizzes</td><td>Standalone practice quizzes, kept separate from your graded results.</td></tr>
+            <tr><td>🏆 My Results</td><td>Your graded units, quiz scores in progress, and links to per-unit transcripts.</td></tr>
+            <tr><td>📜 Transcripts</td><td>A list of every unit you've fully completed, each with its own official, printable transcript.</td></tr>
+            <tr><td>💳 Payments</td><td>Your fee balance and payment history.</td></tr>
+            <tr><td>🔔 Notices</td><td>Announcements from the institute.</td></tr>
+            <tr><td>📋 Scheme of Work</td><td>The full syllabus and timing for your course.</td></tr>
+            <tr><td>💬 Discussions</td><td>Class chat and Q&amp;A with instructors and classmates.</td></tr>
+            <tr><td>🎥 Live Classes</td><td>Scheduled live sessions, where offered.</td></tr>
+            <tr><td>🏅 Leaderboard</td><td>See how your progress compares with your peers.</td></tr>
+            <tr><td>👤 Profile</td><td>Your personal details and photo.</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <section class="guide-section" id="lesson">
+      <div class="section-head"><span class="section-icon">📖</span><h2>4. How a lesson works</h2></div>
+      <p class="section-sub">Every topic follows the same five-step pattern</p>
+
+      <p>Course content is organized into <strong>topics</strong>, and every topic — no matter the course — walks through the same five steps in the same order:</p>
+
+      <ol class="steps">
+        <li>
+          <div class="step-title">Overview</div>
+          <div class="step-body">A short summary of what the topic covers and what you'll be able to do by the end of it.</div>
+        </li>
+        <li>
+          <div class="step-title">Video</div>
+          <div class="step-body">A short video walking through the topic, where one is available.</div>
+        </li>
+        <li>
+          <div class="step-title">Lesson</div>
+          <div class="step-body">The written theory — the core explanation you'll be tested on.</div>
+        </li>
+        <li>
+          <div class="step-title">Practical</div>
+          <div class="step-body">Realistic, scenario-based tasks that put the theory to use, with feedback after each answer.</div>
+        </li>
+        <li>
+          <div class="step-title">Quiz</div>
+          <div class="step-body">A scored quiz on the topic. This is the step that actually counts toward your graded progress.</div>
+        </li>
+      </ol>
+
+      <p>The player screen shows an outline of your current unit down the side, with a status dot next to each step:</p>
+
+      <div class="mock">
+        <div class="mock-bar"><span class="mock-dot"></span><span class="mock-dot"></span><span class="mock-dot"></span><span class="mock-url">student-portal/?portal_tab=lessons</span></div>
+        <div class="mock-body">
+          <div class="lesson-row"><span class="dot done"></span><span class="label">Understanding the Caregiver Role — Lesson</span><span class="tag">viewed</span></div>
+          <div class="lesson-row"><span class="dot active"></span><span class="label">Understanding the Caregiver Role — Quiz</span><span class="tag">up next</span></div>
+          <div class="lesson-row"><span class="dot locked"></span><span class="label">Cleaning and Hygiene Standards — Overview</span><span class="tag">locked</span></div>
+        </div>
+      </div>
+
+      <p>Use the <span class="ui">← Previous</span> and <span class="ui">Next →</span> buttons at the bottom of the lesson screen to move through a unit in order.</p>
+    </section>
+
+    <section class="guide-section" id="locked">
+      <div class="section-head"><span class="section-icon">🔒</span><h2>5. When something's locked</h2></div>
+      <p class="section-sub">Two different reasons content can be unavailable, and what each one means</p>
+
+      <div class="box locked">
+        <span class="box-title">🔒 This Lesson is Not Yet Available</span>
+        You'll see this for one of two reasons: either the lesson is scheduled to release later in your course timeline, or — in courses that gate content step-by-step — you haven't yet completed the step directly before it. The message on screen tells you which.
+      </div>
+
+      <p>If it's a scheduling lock, it will simply say when the content unlocks, and there's nothing to do but wait. If it's a "complete the previous step" lock, go back and finish that step's quiz — the moment it's recorded, the next step opens.</p>
+
+      <div class="box warn">
+        <span class="box-title">If a quiz score seems slow to register</span>
+        After you finish a quiz, the portal saves your score in the background before letting you move on — you'll briefly see the <span class="ui">Next</span> button change to <em>"⏳ Saving your score…"</em>. Wait for it to finish before clicking away; if the save ever fails, the button will say so plainly (<em>"⚠️ Score save failed"</em>) rather than silently losing your result.
+      </div>
+    </section>
+
+    <section class="guide-section" id="quiz">
+      <div class="section-head"><span class="section-icon">📝</span><h2>6. Taking a quiz</h2></div>
+      <p class="section-sub">How scoring and passing actually work</p>
+
+      <ul class="plain">
+        <li>Each question gives immediate feedback — a short explanation of why the answer was right or wrong, right after you choose.</li>
+        <li><strong>50% is the pass mark</strong> for a quiz, used consistently across every course and every graded result on the portal.</li>
+        <li>Opening a quiz doesn't count as completing it — you have to actually submit an attempt.</li>
+        <li>You can retake most quizzes; your best attempt is the one that counts toward your results.</li>
+      </ul>
+    </section>
+
+    <section class="guide-section" id="progress">
+      <div class="section-head"><span class="section-icon">📈</span><h2>7. Tracking your progress</h2></div>
+      <p class="section-sub">Three different views of the same underlying progress</p>
+
+      <h3>The dashboard progress ring</h3>
+      <p>A running percentage of every topic you've completed in your main course — the most immediate view of where you stand.</p>
+
+      <h3>Quiz Scores So Far</h3>
+      <p>On the <span class="ui">🏆 My Results</span> page, any unit you've started but not yet finished shows up here — every quiz in that unit listed individually, with your best score and a pass/fail status, plus which ones you haven't attempted yet.</p>
+
+      <div class="mock">
+        <div class="mock-bar"><span class="mock-dot"></span><span class="mock-dot"></span><span class="mock-dot"></span><span class="mock-url">student-portal/?portal_tab=results</span></div>
+        <div class="mock-body">
+          <p style="margin:0 0 8px;font-weight:700;">First Aid Services — 4 of 6 quizzes attempted</p>
+          <div class="lesson-row"><span class="label">Scene Safety and Primary Assessment</span><span class="pill done">✓ 92%</span></div>
+          <div class="lesson-row"><span class="label">Choking Response</span><span class="pill done">✓ 78%</span></div>
+          <div class="lesson-row"><span class="label">CPR Basics and the Recovery Position</span><span class="pill progress">44% · not yet passed</span></div>
+          <div class="lesson-row"><span class="label">Burns and Poisoning</span><span class="pill locked">not attempted</span></div>
+        </div>
+      </div>
+
+      <h3>A finished unit's official grade</h3>
+      <p>Once every quiz in a unit is passed, that unit graduates to the main results table above — with a final <strong>Marks</strong>, <strong>Grade</strong> (Distinction, Credit, Pass, or Refer), and <strong>Status</strong>. This is the number that feeds into your transcript and, eventually, your certificate.</p>
+    </section>
+
+    <section class="guide-section" id="transcripts">
+      <div class="section-head"><span class="section-icon">📜</span><h2>8. Transcripts &amp; certificates</h2></div>
+      <p class="section-sub">One official transcript per completed unit</p>
+
+      <p>MTTI issues a transcript for each <strong>unit</strong>, not one combined document for a whole course — the same way each unit is separately certifiable. As soon as a unit is fully graded, you can view and print its own official transcript: institute letterhead, your details, the unit's grade, and a signed, stamped seal.</p>
+
+      <ol class="steps">
+        <li><div class="step-title">Finish every quiz in a unit</div><div class="step-body">Check "Quiz Scores So Far" on My Results to see exactly what's left.</div></li>
+        <li><div class="step-title">Find it on My Results or Transcripts</div><div class="step-body">A "📄 Transcript" link appears next to the unit the moment it's graded.</div></li>
+        <li><div class="step-title">View, print, or save it</div><div class="step-body">It opens as its own page, ready to print — use your browser's Print to save it as a PDF if you need a digital copy.</div></li>
+      </ol>
+
+      <h3>Certificates</h3>
+      <p>A full course certificate is issued once <strong>every unit in the course is passed and your fees are fully cleared</strong>. Certificates are issued by the institute, not generated automatically — once you're eligible, contact the MTTI office to have yours prepared. If one has already been issued to you, a <span class="ui">🎓 Download Certificate</span> button appears on My Results.</p>
+    </section>
+
+    <section class="guide-section" id="payments">
+      <div class="section-head"><span class="section-icon">💳</span><h2>9. Fees &amp; payments</h2></div>
+      <p class="section-sub">Why your balance matters beyond just enrollment</p>
+
+      <p>The <span class="ui">💳 Payments</span> tab shows your running balance and payment history. Keep an eye on it — <strong>an outstanding balance is one of the two conditions for certificate eligibility</strong>, alongside passing every unit, so clearing it promptly matters even after you've finished the coursework.</p>
+    </section>
+
+    <section class="guide-section" id="help">
+      <div class="section-head"><span class="section-icon">🆘</span><h2>10. Getting help</h2></div>
+      <p class="section-sub">Common situations and what to do about them</p>
+
+      <h3>"Access Denied" on a lesson</h3>
+      <p>This means you're not currently enrolled in that particular course. Use the <span class="ui">📚 Go to My Courses</span> button on that screen to see what you are enrolled in, and contact the office if you believe it's a mistake.</p>
+
+      <h3>My Results shows nothing yet</h3>
+      <p>That's expected until you've passed every quiz in at least one unit — check "Quiz Scores So Far" on the same page to see your progress toward that first graded unit.</p>
+
+      <h3>Still stuck?</h3>
+      <p>Reach the MTTI office directly:</p>
+      <ul class="plain">
+        <li>☎ Phone: 0712 464 936</li>
+        <li>📍 Sagaas Center, Fourth Floor, Eldoret, Kenya</li>
+        <li>✉ P.O. Box 33247-30100, Eldoret</li>
+      </ul>
+    </section>
+
+    <section class="guide-section" id="quickref">
+      <div class="section-head"><span class="section-icon">⚡</span><h2>Quick reference</h2></div>
+      <p class="section-sub">The whole guide, compressed</p>
+
+      <div class="table-wrap">
+        <table class="quickref">
+          <thead><tr><th>You want to…</th><th>Go to</th></tr></thead>
+          <tbody>
+            <tr><td>Continue where you left off</td><td class="ui">📖 Lessons</td></tr>
+            <tr><td>See what's unlocked and what isn't</td><td>the outline sidebar inside a lesson</td></tr>
+            <tr><td>Check a score before a unit is fully graded</td><td>"Quiz Scores So Far" on <span class="ui">🏆 My Results</span></td></tr>
+            <tr><td>Download an official unit transcript</td><td class="ui">📜 Transcripts</td></tr>
+            <tr><td>Check if you're certificate-eligible</td><td class="ui">🏆 My Results</td></tr>
+            <tr><td>Clear an outstanding balance</td><td class="ui">💳 Payments</td></tr>
+            <tr><td>Read an announcement</td><td class="ui">🔔 Notices</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+  </main>
+</div>
+
+<footer>
+  <span>Masomotele Technical Training Institute · Learner's Guide</span>
+  <span>Start Learning, Start Earning</span>
+</footer>
+</body>
+</html>

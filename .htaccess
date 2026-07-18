@@ -1,21 +1,116 @@
-# Set DirectoryIndex to prioritize index.html
-DirectoryIndex index.html index.php
+<FilesMatch "index\.(html|htm)$">
+AddDefaultCharset UTF-8
+<ifModule mod_headers.c>
+FileETag None
+Header unset ETag
+Header set Cache-Control "public, max-age=3600"
+Header set Pragma "public"
+Header set Expires "Wed, 15 Jul 2026 08:10:00 GMT"
+</ifModule>
+</FilesMatch>
+# END WpFastestCache
+# BEGIN GzipWpFastestCache
+<IfModule mod_deflate.c>
+AddType x-font/woff .woff
+AddType x-font/ttf .ttf
+AddOutputFilterByType DEFLATE image/svg+xml
+AddOutputFilterByType DEFLATE text/plain
+AddOutputFilterByType DEFLATE text/html
+AddOutputFilterByType DEFLATE text/xml
+AddOutputFilterByType DEFLATE text/css
+AddOutputFilterByType DEFLATE text/javascript
+AddOutputFilterByType DEFLATE application/xml
+AddOutputFilterByType DEFLATE application/xhtml+xml
+AddOutputFilterByType DEFLATE application/rss+xml
+AddOutputFilterByType DEFLATE application/javascript
+AddOutputFilterByType DEFLATE application/x-javascript
+AddOutputFilterByType DEFLATE application/x-font-ttf
+AddOutputFilterByType DEFLATE x-font/ttf
+AddOutputFilterByType DEFLATE application/vnd.ms-fontobject
+AddOutputFilterByType DEFLATE font/opentype font/ttf font/eot font/otf
+</IfModule>
+# END GzipWpFastestCache
+# BEGIN LBCWpFastestCache
+<FilesMatch "\.(webm|ogg|mp4|ico|pdf|flv|avif|jpg|jpeg|png|gif|webp|js|css|swf|x-html|xml|woff|woff2|otf|ttf|svg|eot)(\.gz)?$">
+<IfModule mod_expires.c>
+AddType application/font-woff2 .woff2
+AddType application/x-font-opentype .otf
+ExpiresActive On
+ExpiresDefault A0
+ExpiresByType video/webm A31536000
+ExpiresByType video/ogg A31536000
+ExpiresByType video/mp4 A31536000
+ExpiresByType image/avif A31536000
+ExpiresByType image/webp A31536000
+ExpiresByType image/gif A31536000
+ExpiresByType image/png A31536000
+ExpiresByType image/jpg A31536000
+ExpiresByType image/jpeg A31536000
+ExpiresByType image/ico A31536000
+ExpiresByType image/svg+xml A31536000
+ExpiresByType text/css A31536000
+ExpiresByType text/javascript A31536000
+ExpiresByType application/javascript A31536000
+ExpiresByType application/x-javascript A31536000
+ExpiresByType application/font-woff2 A31536000
+ExpiresByType application/x-font-opentype A31536000
+ExpiresByType application/x-font-truetype A31536000
+</IfModule>
+<IfModule mod_headers.c>
+Header set Cache-Control "public, max-age=31536000"
+Header unset ETag
+Header set Connection keep-alive
+FileETag None
+</IfModule>
+</FilesMatch>
+# END LBCWpFastestCache
+# DirectoryIndex must be index.php only — Apache picks the index file by path
+# alone, ignoring query strings, so "index.html index.php" here served the
+# static homepage for EVERY request to "/" including "?page_id=X&preview=true",
+# bypassing WordPress entirely. index.php already replicates the fast static
+# homepage serve (readfile of index.html) for the true bare "/" case.
+DirectoryIndex index.php
+
 # Enable mod_rewrite
 <IfModule mod_rewrite.c>
     RewriteEngine On
     RewriteBase /
-    
+
     # Redirect non-www to www (optional - remove if not needed)
     # RewriteCond %{HTTP_HOST} !^www\. [NC]
     # RewriteRule ^(.*)$ https://www.%{HTTP_HOST}/$1 [R=301,L]
-    
+
+    # Explicitly serve robots.txt and sitemap.xml without redirect
+    RewriteRule ^(robots\.txt|sitemap\.xml)$ - [L,NC]
+
     # Redirect HTTP to HTTPS
     RewriteCond %{HTTPS} off
     RewriteRule ^(.*)$ https://%{HTTP_HOST}%{REQUEST_URI} [L,R=301]
-    
+
+    # index.html exists as a real file (the fast homepage snapshot index.php
+    # reads directly — see comment above), so without this rule Apache would
+    # serve it as a static asset before PHP ever runs, leaving "index.html"
+    # visibly stuck in the address bar. index.php already 301s "/index.php"
+    # the same way; this is the matching rule for the literal .html path.
+    RewriteRule ^index\.html$ / [R=301,L]
+
     # Clean URLs
     RewriteRule ^locations/?$ /locations.php [L]
     RewriteRule ^mtti-sync/?$ /mtti-sync.php [L]
+
+    # Free Learning Portal — internally maps /portal/* to the standalone /masomotele/* app.
+    # NOTE: /student-portal/ is the WordPress [mtti_learner_portal] page (WP page ID 2241).
+    # It is intentionally NOT rewritten here so WordPress serves it (see WP rules below).
+    RewriteCond %{REQUEST_FILENAME} !-f
+    RewriteCond %{REQUEST_FILENAME} !-d
+    RewriteRule ^portal(/.*)?$ /masomotele$1 [L,QSA]
+
+    # NOTE: online-admission.html (a legacy static form posting to an
+    # external Google Sheets script, with no delivery-mode question, no fee
+    # tracking, and no real student/enrollment record) used to be forced
+    # here instead of the real [mtti_admission_form] WordPress page. That
+    # rule is intentionally removed — /online-admission/ now falls through
+    # to WordPress like any other page.
 
     # WordPress rewrite rules
     RewriteCond %{REQUEST_FILENAME} !-f
@@ -41,7 +136,7 @@ DirectoryIndex index.html index.php
 # Browser caching
 <IfModule mod_expires.c>
     ExpiresActive On
-    ExpiresByType text/html "access plus 0 seconds"
+    ExpiresByType text/html "access plus 12 hours"
     ExpiresByType text/css "access plus 1 month"
     ExpiresByType text/javascript "access plus 1 month"
     ExpiresByType application/javascript "access plus 1 month"
@@ -63,11 +158,17 @@ DirectoryIndex index.html index.php
 
 <IfModule mod_headers.c>
     Header unset ETag
-    # No cache for HTML pages
-    <FilesMatch "\.(html|htm|php)$">
-        Header set Cache-Control "no-cache, no-store, must-revalidate"
-        Header set Pragma "no-cache"
-        Header set Expires "0"
+    # SEO-optimized caching - allow browser and CDN caching
+    <FilesMatch "\.(html|htm)$">
+        Header set Cache-Control "public, max-age=3600"
+        Header unset Pragma
+    </FilesMatch>
+    <FilesMatch "\.(php)$">
+        Header set Cache-Control "public, max-age=300"
+        Header unset Pragma
+    </FilesMatch>
+    <FilesMatch "\.(jpg|jpeg|png|gif|webp|woff|woff2|ttf|eot|pdf)$">
+        Header set Cache-Control "public, max-age=2592000"
     </FilesMatch>
 </IfModule>
 
@@ -77,6 +178,12 @@ DirectoryIndex index.html index.php
     Header set X-Frame-Options "SAMEORIGIN"
     Header set X-XSS-Protection "1; mode=block"
 </IfModule>
+
+# Block direct access to leads CSV (stored outside web root, but belt-and-suspenders)
+<FilesMatch "^leads\.csv$">
+    Order Allow,Deny
+    Deny from all
+</FilesMatch>
 
 # Disable directory indexing
 <IfModule mod_autoindex.c>

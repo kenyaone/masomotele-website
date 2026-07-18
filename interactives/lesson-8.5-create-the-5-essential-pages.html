@@ -1,0 +1,485 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lesson 8.5 — Create the 5 Essential Pages (Interactive)</title>
+<style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: 'Segoe UI', -apple-system, sans-serif; line-height: 1.55; color: #1e293b; background: #f8fafc; min-height: 100vh; }
+    .container { max-width: 1150px; margin: 0 auto; padding: 20px; }
+    header {
+        background: linear-gradient(135deg, #2E7D32, #1B5E20);
+        color: #fff; padding: 40px 30px; border-radius: 12px; margin-bottom: 24px;
+        box-shadow: 0 10px 30px rgba(8,145,178,0.25);
+    }
+    header .badge { display: inline-block; background: rgba(255,255,255,0.2); padding: 4px 14px; border-radius: 16px; font-size: 12px; font-weight: bold; letter-spacing: 1px; margin-bottom: 14px; }
+    header h1 { font-size: 34px; margin-bottom: 8px; }
+    header .subtitle { font-size: 17px; opacity: 0.95; margin-bottom: 20px; }
+    .meta-strip { display: flex; flex-wrap: wrap; gap: 12px; }
+    .meta-strip span { background: rgba(255,255,255,0.18); padding: 6px 14px; border-radius: 20px; font-size: 13px; }
+    .toc { background: #fff; border: 1px solid #e2e8f0; border-radius: 10px; padding: 22px 26px; margin-bottom: 22px; }
+    .toc h3 { color: #0891b2; margin-bottom: 10px; }
+    .toc ol { padding-left: 20px; }
+    .toc a { color: #0891b2; text-decoration: none; font-weight: 600; }
+    section { background: #fff; border: 1px solid #e2e8f0; border-radius: 10px; padding: 26px 30px; margin-bottom: 22px; }
+    section h2 { color: #0891b2; font-size: 22px; margin-bottom: 12px; padding-bottom: 8px; border-bottom: 3px solid #0891b2; }
+    section h3 { color: #0f172a; font-size: 17px; margin: 18px 0 8px; }
+    section p { margin-bottom: 12px; }
+    section ul, section ol { padding-left: 22px; margin-bottom: 12px; }
+    section li { margin-bottom: 4px; }
+    .callout { border-left: 5px solid #0891b2; background: #ecfeff; padding: 14px 18px; margin: 14px 0; border-radius: 4px; }
+    .callout.warn { border-left-color: #dc2626; background: #fef2f2; }
+    .callout.tip { border-left-color: #059669; background: #ecfdf5; }
+    .callout strong { color: #0891b2; }
+
+    /* Page cards */
+    .pages-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 12px; margin: 14px 0; }
+    .page-card { background: #f8fafc; border: 2px solid #cbd5e1; border-radius: 10px; padding: 14px; text-align: center; }
+    .page-card .icon { font-size: 36px; margin-bottom: 4px; }
+    .page-card h4 { color: #0f172a; margin-bottom: 4px; font-size: 15px; }
+    .page-card p { font-size: 12.5px; color: #64748b; margin: 0; }
+
+    /* Wireframe */
+    .wireframe { background: #f1f5f9; border: 1px solid #cbd5e1; border-radius: 8px; padding: 12px; margin: 14px 0; }
+    .wf-block { background: #fff; border: 1.5px dashed #94a3b8; padding: 12px; border-radius: 6px; text-align: center; margin-bottom: 8px; color: #475569; font-size: 13px; }
+    .wf-nav { background: #0f172a; color: #fff; padding: 10px; border: 0; border-radius: 6px; }
+    .wf-hero { background: linear-gradient(135deg, #fef3c7, #fbbf24); color: #78350f; font-weight: bold; padding: 40px 12px; border: 0; }
+    .wf-cols { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 6px; }
+    .wf-cols > div { background: #e2e8f0; padding: 20px 8px; border-radius: 4px; font-size: 12px; color: #475569; }
+    .wf-footer { background: #334155; color: #cbd5e1; padding: 12px; border: 0; }
+
+    /* Page picker tabs + checklist grader */
+    .page-tabs {
+        display: flex; gap: 6px; flex-wrap: wrap;
+        border-bottom: 2px solid #e2e8f0;
+        margin: 18px 0 0;
+    }
+    .page-tabs button {
+        background: none; border: none;
+        padding: 10px 16px;
+        cursor: pointer;
+        font-size: 14px; font-weight: 600;
+        color: #64748b;
+        border-bottom: 3px solid transparent;
+        margin-bottom: -2px;
+    }
+    .page-tabs button.active { color: #0891b2; border-bottom-color: #0891b2; }
+    .page-panel { display: none; padding: 18px 0; }
+    .page-panel.active { display: block; }
+
+    .checklist { background: #f8fafc; border: 1.5px solid #cbd5e1; border-radius: 10px; padding: 16px; }
+    .check-row { display: flex; align-items: flex-start; gap: 12px; padding: 8px 0; border-bottom: 1px solid #e2e8f0; }
+    .check-row:last-child { border-bottom: 0; }
+    .check-row input[type=checkbox] { margin-top: 4px; width: 18px; height: 18px; accent-color: #0891b2; cursor: pointer; }
+    .check-row label { flex: 1; font-size: 14px; cursor: pointer; }
+    .check-row label small { display: block; color: #64748b; font-size: 12px; margin-top: 2px; }
+    .check-row.done { opacity: 0.6; }
+    .check-row.done label { text-decoration: line-through; }
+
+    .page-score {
+        margin-top: 14px;
+        padding: 14px;
+        border-radius: 10px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+    .page-score .bar {
+        flex: 1; margin: 0 14px;
+        height: 8px; background: #e2e8f0;
+        border-radius: 4px; overflow: hidden;
+    }
+    .page-score .bar-fill {
+        height: 100%; background: #0891b2;
+        transition: width 0.4s;
+    }
+    .page-score.red { background: #fee2e2; }
+    .page-score.red .bar-fill { background: #dc2626; }
+    .page-score.amber { background: #fef3c7; }
+    .page-score.amber .bar-fill { background: #d97706; }
+    .page-score.green { background: #d1fae5; }
+    .page-score.green .bar-fill { background: #059669; }
+    .page-score .num { font-size: 24px; font-weight: bold; }
+    .page-score .lbl { font-size: 13px; font-weight: 600; }
+
+    /* Block editor mock */
+    .editor {
+        background: #f0f0f1;
+        border: 1px solid #cbd5e1;
+        border-radius: 10px;
+        overflow: hidden;
+        margin: 14px 0;
+    }
+    .editor-top {
+        background: #1e293b;
+        color: #fff;
+        padding: 10px 14px;
+        display: flex; justify-content: space-between; align-items: center;
+        font-size: 13px;
+    }
+    .editor-top .left, .editor-top .right { display: flex; gap: 10px; align-items: center; }
+    .editor-top button {
+        background: #334155; color: #fff; border: 1px solid #475569;
+        padding: 4px 10px; border-radius: 4px; font-size: 12px; cursor: pointer;
+    }
+    .editor-top button.publish { background: #0891b2; border-color: #0891b2; }
+    .editor-body { display: grid; grid-template-columns: 200px 1fr 200px; min-height: 300px; }
+    @media (max-width: 800px) { .editor-body { grid-template-columns: 1fr; } .editor-lib, .editor-sidebar { display: none; } }
+    .editor-lib { background: #fff; padding: 12px; border-right: 1px solid #e2e8f0; font-size: 12px; }
+    .editor-lib h5 { color: #64748b; margin-bottom: 8px; text-transform: uppercase; font-size: 10px; letter-spacing: 1px; }
+    .editor-lib .block-item { padding: 6px 8px; border-radius: 4px; cursor: pointer; }
+    .editor-lib .block-item:hover { background: #ecfeff; }
+    .editor-canvas { background: #fff; padding: 20px; }
+    .editor-canvas .title-input { font-size: 24px; font-weight: bold; border: 0; border-bottom: 1px dashed #cbd5e1; width: 100%; padding: 8px 0; margin-bottom: 14px; }
+    .editor-canvas .canvas-block { padding: 12px; border: 1px dashed transparent; border-radius: 4px; margin-bottom: 8px; cursor: pointer; }
+    .editor-canvas .canvas-block:hover { border-color: #0891b2; background: #ecfeff; }
+    .editor-sidebar { background: #f8fafc; padding: 12px; border-left: 1px solid #e2e8f0; font-size: 12px; }
+    .editor-sidebar h5 { color: #64748b; margin-bottom: 8px; text-transform: uppercase; font-size: 10px; letter-spacing: 1px; }
+
+    /* Block types */
+    .block-types { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 10px; margin: 14px 0; }
+    .bt-card { background: #ecfeff; border: 1.5px solid #67e8f9; border-radius: 8px; padding: 12px; }
+    .bt-card h5 { color: #0e7490; font-size: 14px; margin-bottom: 4px; }
+    .bt-card p { font-size: 12.5px; color: #164e63; margin: 0; }
+
+    .quiz-question { background: #fff; border: 2px solid #cbd5e1; border-radius: 10px; padding: 18px; margin: 14px 0; }
+    .quiz-question.correct { border-color: #059669; background: #ecfdf5; }
+    .quiz-question.wrong { border-color: #dc2626; background: #fef2f2; }
+    .quiz-question h4 { margin-bottom: 12px; font-size: 15px; color: #1e293b; }
+    .quiz-question .options label { display: block; padding: 10px 14px; margin-bottom: 6px; background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 6px; cursor: pointer; font-size: 14px; }
+    .quiz-question .options label:hover { background: #ecfeff; }
+    .quiz-question .options input[type="radio"] { margin-right: 10px; }
+    .quiz-question .explanation { display: none; margin-top: 12px; padding: 10px 14px; border-radius: 6px; font-size: 14px; }
+    .quiz-question.correct .explanation { display: block; background: #d1fae5; color: #065f46; border-left: 4px solid #059669; }
+    .quiz-question.wrong .explanation { display: block; background: #fee2e2; color: #991b1b; border-left: 4px solid #dc2626; }
+    .quiz-summary { text-align: center; padding: 30px; background: linear-gradient(135deg, #ecfeff 0%, #a5f3fc 100%); border-radius: 10px; margin: 20px 0; display: none; }
+    .quiz-summary.show { display: block; }
+    .quiz-summary .score { font-size: 48px; font-weight: bold; color: #0891b2; margin-bottom: 8px; }
+    button.btn { background: #0891b2; color: #fff; border: none; padding: 10px 20px; border-radius: 6px; font-size: 15px; font-weight: 600; cursor: pointer; }
+    button.btn:hover { background: #0e7490; }
+    button.btn.reset { background: #64748b; margin-left: 8px; }
+    footer { text-align: center; color: #64748b; padding: 24px; font-size: 13px; }
+
+    /* MTTI logo stamp */
+    .mtti-logo-stamp {
+        position: fixed; top: 14px; right: 18px; z-index: 999;
+        opacity: 0.88; transition: opacity 0.2s;
+    }
+    .mtti-logo-stamp:hover { opacity: 1; }
+    .mtti-logo-stamp img { width: 56px; height: 56px; border-radius: 50%; box-shadow: 0 2px 8px rgba(0,0,0,0.18); }
+</style>
+</head>
+<body>
+<div class="mtti-logo-stamp">
+    <img src="../../Resources/Logo.jpeg" alt="MTTI" title="Masomotele Technical Training Institute — Start learning, Start earning">
+</div>
+
+<div class="container">
+
+<header>
+    <div class="badge">LESSON 8.5  ·  WORDPRESS BUILD  ·  INTERACTIVE</div>
+    <h1>Create the 5 Essential Pages</h1>
+    <div class="subtitle">Home, About, Menu, Delivery, Contact — every Kenyan business needs these five. Build them in the block editor.</div>
+    <div class="meta-strip">
+        <span><strong>Duration:</strong> ~40 min interactive</span>
+        <span><strong>Level:</strong> Beginner–Intermediate</span>
+        <span><strong>Tool:</strong> WordPress block editor</span>
+        <span><strong>Handbook:</strong> Part 8, §8.5</span>
+    </div>
+</header>
+
+<div class="toc">
+    <h3>What you'll do in this lesson</h3>
+    <ol>
+        <li><a href="#s1">The 5 pages every business needs</a></li>
+        <li><a href="#s2">Sarah's Home page wireframe</a></li>
+        <li><a href="#s3">The block editor tour</a></li>
+        <li><a href="#s4">The 5 block types you actually need</a></li>
+        <li><a href="#s5"><strong>Grade each of the 5 pages (live)</strong></a></li>
+        <li><a href="#s6">The publishing checklist</a></li>
+        <li><a href="#s7">Self-check quiz (10 questions)</a></li>
+    </ol>
+</div>
+
+<section id="s1">
+    <h2>1. The 5 pages every business needs</h2>
+    <div class="pages-grid">
+        <div class="page-card"><div class="icon">🏠</div><h4>Home</h4><p>The front door — every visitor lands here first.</p></div>
+        <div class="page-card"><div class="icon">👥</div><h4>About</h4><p>Your story — why the business exists.</p></div>
+        <div class="page-card"><div class="icon">🍽️</div><h4>Menu / Services</h4><p>What you actually sell.</p></div>
+        <div class="page-card"><div class="icon">🛵</div><h4>Delivery / How to Order</h4><p>The practical logistics.</p></div>
+        <div class="page-card"><div class="icon">📞</div><h4>Contact</h4><p>Every way a customer can reach you.</p></div>
+    </div>
+    <div class="callout warn">
+        <strong>Miss any of these five and you lose customers.</strong> A gorgeous home page can't rescue a missing Contact page.
+    </div>
+</section>
+
+<section id="s2">
+    <h2>2. Sarah's Home page wireframe</h2>
+    <p>Five sections. Each is a block in the WordPress editor.</p>
+    <div class="wireframe">
+        <div class="wf-block wf-nav">🍽️ KARIBU KITCHEN &nbsp;·&nbsp; Home &nbsp;·&nbsp; About &nbsp;·&nbsp; Menu &nbsp;·&nbsp; Delivery &nbsp;·&nbsp; Contact</div>
+        <div class="wf-block wf-hero">🖼️ Full-width lunch photo<br>"Fresh lunch, delivered to your desk"<br>[Order via WhatsApp]</div>
+        <div class="wf-block wf-cols">
+            <div>Today's<br>Specials</div>
+            <div>Where we<br>deliver</div>
+            <div>How to<br>order</div>
+        </div>
+        <div class="wf-block">💬 Testimonials (later)</div>
+        <div class="wf-block wf-footer">© 2026 Karibu Kitchen · Eldoret CBD · 0782 XXX XXX</div>
+    </div>
+</section>
+
+<section id="s3">
+    <h2>3. The block editor tour</h2>
+    <p>Every WordPress page is a stack of blocks. Study the mock editor below.</p>
+    <div class="editor">
+        <div class="editor-top">
+            <div class="left">
+                <button>+</button>
+                <button>↶</button>
+                <button>↷</button>
+                <span style="color:#94a3b8;font-size:12px;">Home page — draft</span>
+            </div>
+            <div class="right">
+                <button>👁 Preview</button>
+                <button class="publish">Publish</button>
+            </div>
+        </div>
+        <div class="editor-body">
+            <div class="editor-lib">
+                <h5>Block library</h5>
+                <div class="block-item">🖼️ Cover</div>
+                <div class="block-item">📝 Heading</div>
+                <div class="block-item">¶ Paragraph</div>
+                <div class="block-item">🔘 Buttons</div>
+                <div class="block-item">▦ Columns</div>
+                <div class="block-item">🖼 Image</div>
+                <div class="block-item">🎥 Video</div>
+                <div class="block-item">📋 List</div>
+            </div>
+            <div class="editor-canvas">
+                <div class="title-input">Home</div>
+                <div class="canvas-block" style="background:linear-gradient(135deg,#fef3c7,#fbbf24);color:#78350f;font-weight:bold;text-align:center;padding:30px;">🖼️ Cover block — hero image + headline</div>
+                <div class="canvas-block"><strong style="color:#0891b2;">H1:</strong> Fresh lunch, delivered to your desk.</div>
+                <div class="canvas-block" style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:6px;">
+                    <div style="padding:8px;background:#f1f5f9;border-radius:4px;">Column 1<br>Specials</div>
+                    <div style="padding:8px;background:#f1f5f9;border-radius:4px;">Column 2<br>Delivery</div>
+                    <div style="padding:8px;background:#f1f5f9;border-radius:4px;">Column 3<br>How to order</div>
+                </div>
+                <div class="canvas-block" style="text-align:center;"><button style="background:#0891b2;color:#fff;border:0;padding:8px 16px;border-radius:4px;">🔘 Order via WhatsApp</button></div>
+            </div>
+            <div class="editor-sidebar">
+                <h5>Cover block settings</h5>
+                <div style="margin-bottom:6px;">Image: <code style="font-size:11px;">hero.webp</code></div>
+                <div style="margin-bottom:6px;">Overlay: 30%</div>
+                <div style="margin-bottom:6px;">Min height: 500px</div>
+                <div>Focal point: centre</div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<section id="s4">
+    <h2>4. The 5 block types you actually need</h2>
+    <p>WordPress has 80+ blocks. You need five.</p>
+    <div class="block-types">
+        <div class="bt-card"><h5>🖼️ Cover</h5><p>Full-width image with text on top. Perfect for hero sections.</p></div>
+        <div class="bt-card"><h5>📝 Heading</h5><p>Section titles. Pick H2 for main, H3 for sub.</p></div>
+        <div class="bt-card"><h5>¶ Paragraph</h5><p>Body text — the default block.</p></div>
+        <div class="bt-card"><h5>🔘 Buttons</h5><p>CTAs like "Order via WhatsApp".</p></div>
+        <div class="bt-card"><h5>▦ Columns</h5><p>2/3/4 column layouts side-by-side.</p></div>
+    </div>
+</section>
+
+<section id="s5">
+    <h2>5. Grade each of the 5 pages (live)</h2>
+    <p>Tick the checklist for each of Sarah's pages. The score updates in real time. All five pages should hit green before publishing.</p>
+
+    <div class="page-tabs">
+        <button class="active" onclick="showPage('home', this)">🏠 Home</button>
+        <button onclick="showPage('about', this)">👥 About</button>
+        <button onclick="showPage('menu', this)">🍽️ Menu</button>
+        <button onclick="showPage('delivery', this)">🛵 Delivery</button>
+        <button onclick="showPage('contact', this)">📞 Contact</button>
+    </div>
+
+    <!-- HOME -->
+    <div class="page-panel active" id="pp-home">
+        <div class="checklist" data-page="home">
+            <div class="check-row"><input type="checkbox" id="h1"><label for="h1">Hero image with headline + subheadline<small>Full-width Cover block — food photo</small></label></div>
+            <div class="check-row"><input type="checkbox" id="h2"><label for="h2">Single H1 heading (page title)<small>e.g. "Fresh lunch, delivered to your desk"</small></label></div>
+            <div class="check-row"><input type="checkbox" id="h3"><label for="h3">Primary CTA button linking to WhatsApp<small>NOT the placeholder # link</small></label></div>
+            <div class="check-row"><input type="checkbox" id="h4"><label for="h4">3-column feature tiles (Specials, Delivery zones, How to order)<small>Columns block with 3 mini sections</small></label></div>
+            <div class="check-row"><input type="checkbox" id="h5"><label for="h5">Top navigation showing all 5 pages<small>Set in Appearance → Menus</small></label></div>
+            <div class="check-row"><input type="checkbox" id="h6"><label for="h6">Featured image set (for social share previews)<small>Right sidebar → Featured Image</small></label></div>
+            <div class="check-row"><input type="checkbox" id="h7"><label for="h7">Mobile preview looks right<small>Click phone icon in top bar to check</small></label></div>
+            <div class="check-row"><input type="checkbox" id="h8"><label for="h8">Footer with address + phone + copyright<small>Set in Appearance → Widgets → Footer</small></label></div>
+        </div>
+        <div class="page-score red" id="score-home"><div class="lbl" id="scoreLbl-home">0 / 8</div><div class="bar"><div class="bar-fill" style="width:0%;"></div></div><div class="num">0%</div></div>
+    </div>
+
+    <!-- ABOUT -->
+    <div class="page-panel" id="pp-about">
+        <div class="checklist" data-page="about">
+            <div class="check-row"><input type="checkbox" id="a1"><label for="a1">H1 with page title (e.g. "About Karibu Kitchen")<small></small></label></div>
+            <div class="check-row"><input type="checkbox" id="a2"><label for="a2">Photo of Sarah / the team<small>Personal photos build trust</small></label></div>
+            <div class="check-row"><input type="checkbox" id="a3"><label for="a3">3 paragraphs telling her story<small>Why she started, who she serves, what makes her food different</small></label></div>
+            <div class="check-row"><input type="checkbox" id="a4"><label for="a4">Values or mission (2–3 short bullet points)<small></small></label></div>
+            <div class="check-row"><input type="checkbox" id="a5"><label for="a5">CTA button to Menu or Contact<small>Give the reader a next step</small></label></div>
+            <div class="check-row"><input type="checkbox" id="a6"><label for="a6">Featured image set<small></small></label></div>
+        </div>
+        <div class="page-score red" id="score-about"><div class="lbl" id="scoreLbl-about">0 / 6</div><div class="bar"><div class="bar-fill" style="width:0%;"></div></div><div class="num">0%</div></div>
+    </div>
+
+    <!-- MENU -->
+    <div class="page-panel" id="pp-menu">
+        <div class="checklist" data-page="menu">
+            <div class="check-row"><input type="checkbox" id="m1"><label for="m1">H1 heading "Menu"<small></small></label></div>
+            <div class="check-row"><input type="checkbox" id="m2"><label for="m2">4 category sections (mains, sides, drinks, dessert)<small>Columns block</small></label></div>
+            <div class="check-row"><input type="checkbox" id="m3"><label for="m3">Each item has a name, price, description<small>KES 350 · Ugali & beef stew · slow-cooked</small></label></div>
+            <div class="check-row"><input type="checkbox" id="m4"><label for="m4">At least one food photo per section<small>WebP, correctly sized</small></label></div>
+            <div class="check-row"><input type="checkbox" id="m5"><label for="m5">"Order via WhatsApp" CTA at the bottom<small></small></label></div>
+            <div class="check-row"><input type="checkbox" id="m6"><label for="m6">Prices are all in KES<small>Include the currency</small></label></div>
+            <div class="check-row"><input type="checkbox" id="m7"><label for="m7">Featured image set<small></small></label></div>
+        </div>
+        <div class="page-score red" id="score-menu"><div class="lbl" id="scoreLbl-menu">0 / 7</div><div class="bar"><div class="bar-fill" style="width:0%;"></div></div><div class="num">0%</div></div>
+    </div>
+
+    <!-- DELIVERY -->
+    <div class="page-panel" id="pp-delivery">
+        <div class="checklist" data-page="delivery">
+            <div class="check-row"><input type="checkbox" id="d1"><label for="d1">H1 heading "Delivery" or "How to Order"<small></small></label></div>
+            <div class="check-row"><input type="checkbox" id="d2"><label for="d2">Delivery zones listed (Kapsoya, Elgon View, Racecourse, CBD)<small></small></label></div>
+            <div class="check-row"><input type="checkbox" id="d3"><label for="d3">Delivery fee structure<small>Free over KES 500, KES 100 flat under</small></label></div>
+            <div class="check-row"><input type="checkbox" id="d4"><label for="d4">Minimum order value<small></small></label></div>
+            <div class="check-row"><input type="checkbox" id="d5"><label for="d5">Order cutoff time (e.g. "Order by 12, eat by 1")<small></small></label></div>
+            <div class="check-row"><input type="checkbox" id="d6"><label for="d6">Payment options (M-Pesa Paybill, cash on delivery)<small></small></label></div>
+            <div class="check-row"><input type="checkbox" id="d7"><label for="d7">Map image of coverage area<small></small></label></div>
+            <div class="check-row"><input type="checkbox" id="d8"><label for="d8">Featured image set<small></small></label></div>
+        </div>
+        <div class="page-score red" id="score-delivery"><div class="lbl" id="scoreLbl-delivery">0 / 8</div><div class="bar"><div class="bar-fill" style="width:0%;"></div></div><div class="num">0%</div></div>
+    </div>
+
+    <!-- CONTACT -->
+    <div class="page-panel" id="pp-contact">
+        <div class="checklist" data-page="contact">
+            <div class="check-row"><input type="checkbox" id="c1"><label for="c1">H1 heading "Contact"<small></small></label></div>
+            <div class="check-row"><input type="checkbox" id="c2"><label for="c2">WhatsApp number as a big button<small>Not just plain text</small></label></div>
+            <div class="check-row"><input type="checkbox" id="c3"><label for="c3">Phone number for calls<small></small></label></div>
+            <div class="check-row"><input type="checkbox" id="c4"><label for="c4">Physical address<small>Even if you're delivery-only — trust signal</small></label></div>
+            <div class="check-row"><input type="checkbox" id="c5"><label for="c5">Business hours<small>e.g. Mon–Fri 8am–8pm</small></label></div>
+            <div class="check-row"><input type="checkbox" id="c6"><label for="c6">Contact form (Contact Form 7 or WPForms)<small>Installed in Lesson 8.7</small></label></div>
+            <div class="check-row"><input type="checkbox" id="c7"><label for="c7">Featured image set<small></small></label></div>
+        </div>
+        <div class="page-score red" id="score-contact"><div class="lbl" id="scoreLbl-contact">0 / 7</div><div class="bar"><div class="bar-fill" style="width:0%;"></div></div><div class="num">0%</div></div>
+    </div>
+</section>
+
+<section id="s6">
+    <h2>6. The publishing checklist</h2>
+    <p>Before you click Publish on ANY page, run through this five-item checklist:</p>
+    <ol>
+        <li><strong>Title matches URL</strong> — clear and readable.</li>
+        <li><strong>Featured image is set</strong> — appears in social share previews.</li>
+        <li><strong>Heading levels correct</strong> — H1 for page title, H2 for main sections, H3 for sub-sections.</li>
+        <li><strong>Every button has a real URL</strong> — no placeholder # links.</li>
+        <li><strong>Mobile preview looks right</strong> — click the phone icon at the top of the editor.</li>
+    </ol>
+    <div class="callout tip">
+        <strong>Only then click Publish.</strong> A single missed step (wrong featured image, broken button URL) can mean months of ugly social previews or broken checkout flows.
+    </div>
+</section>
+
+<section id="s7">
+    <h2>7. Self-check quiz</h2>
+
+    <div class="quiz-question" data-correct="B"><h4>1. Which is NOT one of the 5 essential pages?</h4><div class="options"><label><input type="radio" name="q1" value="A"> A) Home</label><label><input type="radio" name="q1" value="B"> B) Sitemap</label><label><input type="radio" name="q1" value="C"> C) Contact</label><label><input type="radio" name="q1" value="D"> D) About</label></div><div class="explanation">Correct — sitemap is a file, not a page. The five are Home, About, Menu, Delivery, Contact.</div></div>
+
+    <div class="quiz-question" data-correct="A"><h4>2. Which block builds a full-width hero image with text?</h4><div class="options"><label><input type="radio" name="q2" value="A"> A) Cover block</label><label><input type="radio" name="q2" value="B"> B) Paragraph block</label><label><input type="radio" name="q2" value="C"> C) Image block</label><label><input type="radio" name="q2" value="D"> D) Heading block</label></div><div class="explanation">Correct — Cover is designed exactly for hero sections.</div></div>
+
+    <div class="quiz-question" data-correct="C"><h4>3. How many H1 headings per page?</h4><div class="options"><label><input type="radio" name="q3" value="A"> A) At least three</label><label><input type="radio" name="q3" value="B"> B) None</label><label><input type="radio" name="q3" value="C"> C) Exactly one</label><label><input type="radio" name="q3" value="D"> D) Depends on the page</label></div><div class="explanation">Correct — one H1 per page. Use H2/H3 for sections.</div></div>
+
+    <div class="quiz-question" data-correct="D"><h4>4. What does the "featured image" do?</h4><div class="options"><label><input type="radio" name="q4" value="A"> A) Nothing.</label><label><input type="radio" name="q4" value="B"> B) Sets the page background.</label><label><input type="radio" name="q4" value="C"> C) Enables comments.</label><label><input type="radio" name="q4" value="D"> D) Shows in social share previews (WhatsApp, FB, Twitter).</label></div><div class="explanation">Correct — the meta thumbnail for shares.</div></div>
+
+    <div class="quiz-question" data-correct="B"><h4>5. Which block is best for a menu with 4 categories side-by-side?</h4><div class="options"><label><input type="radio" name="q5" value="A"> A) Buttons block</label><label><input type="radio" name="q5" value="B"> B) Columns block</label><label><input type="radio" name="q5" value="C"> C) Heading block</label><label><input type="radio" name="q5" value="D"> D) Cover block</label></div><div class="explanation">Correct — Columns handles 2/3/4 column layouts.</div></div>
+
+    <div class="quiz-question" data-correct="A"><h4>6. Sarah's Contact page MUST include…</h4><div class="options"><label><input type="radio" name="q6" value="A"> A) WhatsApp / phone / address / hours / form</label><label><input type="radio" name="q6" value="B"> B) Only a WhatsApp link</label><label><input type="radio" name="q6" value="C"> C) A blog feed</label><label><input type="radio" name="q6" value="D"> D) An About section</label></div><div class="explanation">Correct — every way a customer can reach you AND a form for those who prefer typing.</div></div>
+
+    <div class="quiz-question" data-correct="C"><h4>7. Which is a common publishing mistake?</h4><div class="options"><label><input type="radio" name="q7" value="A"> A) Setting a featured image.</label><label><input type="radio" name="q7" value="B"> B) Previewing on mobile.</label><label><input type="radio" name="q7" value="C"> C) Leaving buttons with a placeholder "#" URL.</label><label><input type="radio" name="q7" value="D"> D) Adding H2 sections.</label></div><div class="explanation">Correct — placeholder URLs create broken buttons in production. Always test.</div></div>
+
+    <div class="quiz-question" data-correct="C"><h4>8. What should Sarah's Home hero CTA link to?</h4><div class="options"><label><input type="radio" name="q8" value="A"> A) The About page.</label><label><input type="radio" name="q8" value="B"> B) A random page.</label><label><input type="radio" name="q8" value="C"> C) Her WhatsApp order link.</label><label><input type="radio" name="q8" value="D"> D) Google.</label></div><div class="explanation">Correct — the primary CTA on Home should drive to the ordering channel.</div></div>
+
+    <div class="quiz-question" data-correct="D"><h4>9. Before Publish, check the mobile preview because…</h4><div class="options"><label><input type="radio" name="q9" value="A"> A) It's a trend.</label><label><input type="radio" name="q9" value="B"> B) It's cheaper.</label><label><input type="radio" name="q9" value="C"> C) Only Sarah uses mobile.</label><label><input type="radio" name="q9" value="D"> D) 80%+ of Kenya traffic is mobile.</label></div><div class="explanation">Correct — mobile-first isn't optional in Kenya.</div></div>
+
+    <div class="quiz-question" data-correct="A"><h4>10. Sarah has 5 pages published but no top navigation. What's the fix?</h4><div class="options"><label><input type="radio" name="q10" value="A"> A) Appearance → Menus → add pages to Primary menu</label><label><input type="radio" name="q10" value="B"> B) Re-install WordPress</label><label><input type="radio" name="q10" value="C"> C) Change themes</label><label><input type="radio" name="q10" value="D"> D) Nothing — WordPress does it automatically</label></div><div class="explanation">Correct — navigation is set explicitly in Appearance → Menus.</div></div>
+
+    <div style="margin-top: 20px;">
+        <button class="btn" onclick="markQuiz()">Mark my quiz</button>
+        <button class="btn reset" onclick="resetQuiz()">Reset</button>
+    </div>
+    <div class="quiz-summary" id="quizSummary"><div class="score" id="scoreDisplay">0 / 10</div><p id="scoreMessage"></p></div>
+</section>
+
+<footer>
+    <p>Lesson 8.5 — Create the 5 Essential Pages · Masomotele Technical Training Institute · Handbook Part 8, §8.5</p>
+    <p>Next: <strong>Lesson 8.6 — Install and Customise a Theme</strong></p>
+</footer>
+</div>
+
+<script>
+function showPage(id, btn) {
+    document.querySelectorAll('.page-panel').forEach(p => p.classList.remove('active'));
+    document.querySelectorAll('.page-tabs button').forEach(b => b.classList.remove('active'));
+    document.getElementById('pp-' + id).classList.add('active');
+    btn.classList.add('active');
+}
+
+function updateScores() {
+    document.querySelectorAll('.checklist').forEach(cl => {
+        const page = cl.dataset.page;
+        const boxes = cl.querySelectorAll('input[type=checkbox]');
+        const total = boxes.length;
+        let done = 0;
+        boxes.forEach(b => {
+            const row = b.closest('.check-row');
+            if (b.checked) { done++; row.classList.add('done'); } else row.classList.remove('done');
+        });
+        const pct = Math.round((done / total) * 100);
+        const scoreBox = document.getElementById('score-' + page);
+        scoreBox.querySelector('.bar-fill').style.width = pct + '%';
+        scoreBox.querySelector('.num').textContent = pct + '%';
+        document.getElementById('scoreLbl-' + page).textContent = done + ' / ' + total;
+        scoreBox.className = 'page-score ' + (pct === 100 ? 'green' : pct >= 60 ? 'amber' : 'red');
+    });
+}
+document.querySelectorAll('.checklist input[type=checkbox]').forEach(cb => cb.addEventListener('change', updateScores));
+
+function markQuiz() {
+    const questions = document.querySelectorAll('.quiz-question');
+    let score = 0;
+    questions.forEach((q, i) => {
+        const correct = q.dataset.correct;
+        const picked = q.querySelector(`input[name="q${i+1}"]:checked`);
+        q.classList.remove('correct', 'wrong');
+        if (picked && picked.value === correct) { q.classList.add('correct'); score++; }
+        else if (picked) q.classList.add('wrong');
+    });
+    const summary = document.getElementById('quizSummary');
+    summary.classList.add('show');
+    document.getElementById('scoreDisplay').textContent = `${score} / 10`;
+    const msg = document.getElementById('scoreMessage');
+    if (score === 10) msg.textContent = 'Perfect. Move to 8.6 — Theme customisation.';
+    else if (score >= 7) msg.textContent = 'Strong. Fix the missed answers.';
+    else msg.textContent = 'Return to the page grader and get all five to green.';
+    summary.scrollIntoView({ behavior: 'smooth', block: 'center' });
+}
+function resetQuiz() {
+    document.querySelectorAll('.quiz-question').forEach(q => { q.classList.remove('correct', 'wrong'); q.querySelectorAll('input[type=radio]').forEach(r => r.checked = false); });
+    document.getElementById('quizSummary').classList.remove('show');
+}
+</script>
+</body>
+</html>

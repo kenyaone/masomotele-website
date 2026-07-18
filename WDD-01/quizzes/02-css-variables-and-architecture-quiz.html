@@ -1,0 +1,346 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CSS Architecture | MTTI Web Design</title>
+    <link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Fredoka:wght@500;600&display=swap" rel="stylesheet">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Space Mono', monospace;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh; padding: 20px; color: #fff;
+        }
+        .container { max-width: 900px; margin: 0 auto; }
+        .header { text-align: center; margin-bottom: 30px; animation: slideDown 0.6s ease-out; }
+        .header .lesson-tag {
+            display: inline-block; background: rgba(255,255,255,0.2);
+            padding: 6px 16px; border-radius: 999px;
+            font-size: 0.85em; margin-bottom: 12px;
+        }
+        .header h1 {
+            font-family: 'Fredoka', sans-serif; font-size: 2.2em;
+            margin-bottom: 8px; text-shadow: 3px 3px 0 rgba(0,0,0,0.2);
+        }
+        .header p { opacity: 0.95; font-size: 0.95em; }
+        .score-board {
+            background: rgba(255,255,255,0.15); backdrop-filter: blur(10px);
+            border-radius: 20px; padding: 20px; margin-bottom: 20px;
+            display: flex; justify-content: space-around;
+            animation: fadeIn 0.8s ease-out 0.2s both;
+        }
+        .score-item { text-align: center; }
+        .score-item .label { font-size: 0.85em; opacity: 0.9; margin-bottom: 4px; }
+        .score-item .value {
+            font-size: 1.8em; font-weight: bold; font-family: 'Fredoka', sans-serif;
+        }
+        .progress-bar {
+            width: 100%; height: 8px; background: rgba(255,255,255,0.3);
+            border-radius: 10px; margin-bottom: 25px; overflow: hidden;
+        }
+        .progress-fill {
+            height: 100%; background: linear-gradient(90deg, #f093fb 0%, #f5576c 100%);
+            border-radius: 10px; transition: width 0.5s ease; width: 0%;
+        }
+        .exercise-card {
+            background: white; color: #333; border-radius: 25px;
+            padding: 35px; margin-bottom: 20px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            animation: fadeIn 0.6s ease-out both;
+        }
+        .scenario {
+            background: linear-gradient(135deg, #fff8e1 0%, #ffecb3 100%);
+            border-left: 5px solid #ffc107;
+            padding: 20px 24px; border-radius: 12px;
+            margin-bottom: 24px;
+            font-size: 0.98em; line-height: 1.55;
+        }
+        .scenario strong { color: #7a5a00; font-family: 'Fredoka', sans-serif; }
+        .question {
+            font-size: 1.15em; margin-bottom: 20px;
+            font-weight: 700; line-height: 1.4;
+        }
+        .options { display: flex; flex-direction: column; gap: 12px; }
+        .option {
+            background: #f5f7fb; border: 2px solid transparent;
+            padding: 16px 20px; border-radius: 12px;
+            cursor: pointer; transition: all 0.2s ease;
+            font-family: 'Space Mono', monospace; font-size: 0.98em; text-align: left;
+        }
+        .option:hover:not(.disabled) {
+            background: #eef1fb; border-color: #667eea; transform: translateX(4px);
+        }
+        .option.correct { background: #d4edda; border-color: #28a745; color: #155724; }
+        .option.wrong { background: #f8d7da; border-color: #dc3545; color: #721c24; animation: shake 0.4s; }
+        .option.disabled { cursor: not-allowed; opacity: 0.85; }
+        .feedback {
+            margin-top: 22px; padding: 18px 22px; border-radius: 12px;
+            animation: slideUp 0.4s ease-out;
+            font-size: 0.98em; line-height: 1.5;
+        }
+        .feedback.correct { background: #d4edda; color: #155724; border-left: 4px solid #28a745; }
+        .feedback.wrong { background: #f8d7da; color: #721c24; border-left: 4px solid #dc3545; }
+        .feedback strong { font-family: 'Fredoka', sans-serif; }
+        .next-btn, .restart-btn {
+            margin-top: 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white; border: none;
+            padding: 14px 32px; border-radius: 12px;
+            font-size: 1em; cursor: pointer;
+            font-family: 'Fredoka', sans-serif;
+            box-shadow: 0 6px 18px rgba(0,0,0,0.2);
+            transition: transform 0.2s ease;
+        }
+        .next-btn:hover, .restart-btn:hover { transform: scale(1.04); }
+        .results {
+            text-align: center; padding: 25px 15px;
+            animation: bounceIn 0.6s ease-out;
+        }
+        .results h2 {
+            font-family: 'Fredoka', sans-serif; font-size: 2em;
+            margin-bottom: 12px; color: #333;
+        }
+        .results .final-score {
+            font-size: 3em; font-family: 'Fredoka', sans-serif;
+            color: #667eea; margin: 20px 0;
+        }
+        .results p { color: #555; margin-bottom: 12px; }
+        .badge { display: inline-block; font-size: 3.5em; margin: 8px 0; }
+        @keyframes slideDown { from { opacity: 0; transform: translateY(-30px); } to { opacity: 1; transform: translateY(0); } }
+        @keyframes fadeIn { from { opacity: 0; transform: scale(0.96); } to { opacity: 1; transform: scale(1); } }
+        @keyframes slideUp { from { opacity: 0; transform: translateY(15px); } to { opacity: 1; transform: translateY(0); } }
+        @keyframes shake { 0%,100% { transform: translateX(0); } 25% { transform: translateX(-8px); } 75% { transform: translateX(8px); } }
+        @keyframes bounceIn { 0% { opacity: 0; transform: scale(0.4); } 60% { transform: scale(1.05); } 100% { opacity: 1; transform: scale(1); } }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <div class="lesson-tag">Module 2 · Lesson 2.8 · Quiz</div>
+            <h1>CSS Architecture</h1>
+            <p></p>
+        </div>
+
+        <div class="score-board">
+            <div class="score-item"><div class="label">Score</div><div class="value" id="score">0</div></div>
+            <div class="score-item"><div class="label">Question</div><div class="value"><span id="current">1</span>/<span id="total">10</span></div></div>
+            <div class="score-item"><div class="label">Streak</div><div class="value" id="streak">0</div></div>
+        </div>
+
+        <div class="progress-bar"><div class="progress-fill" id="progress"></div></div>
+
+        <div class="exercise-card" id="exerciseCard"></div>
+    </div>
+
+    <script>
+        const exercises = [
+  {
+    "id": "q1",
+    "text": "James defines --brand-green: #2E7D32 in :root. How does he use this variable in a button's background?",
+    "options": [
+      "background: brand-green;",
+      "background: var(--brand-green);",
+      "background: $brand-green;",
+      "background: @brand-green;"
+    ],
+    "answer": 1,
+    "explanation": "CSS custom properties are accessed with var(). The double-dash prefix (--) is required in the definition. $variable syntax is Sass/SCSS; @variable is Less. Native CSS uses var(--property-name)."
+  },
+  {
+    "id": "q2",
+    "text": "What is the main benefit of defining all brand colours and spacing values as CSS custom properties in :root?",
+    "options": [
+      "Custom properties load faster than hardcoded values",
+      "Changing one value in :root updates every element that uses it — a brand refresh requires one edit, not dozens",
+      "Custom properties are required for CSS Grid to work",
+      "They prevent the browser from caching old colour values"
+    ],
+    "answer": 1,
+    "explanation": "Centralising design tokens (colours, spacing, fonts) in :root as custom properties means a single change propagates everywhere. Without variables, the same hex code may appear 40+ times across a stylesheet — changing it means 40 risky find-and-replaces."
+  },
+  {
+    "id": "q3",
+    "text": "James overrides a custom property in a media query: @media (prefers-color-scheme: dark) { :root { --bg: #111; } }. What does this demonstrate?",
+    "options": [
+      "Custom properties cannot be used in media queries",
+      "Custom properties can be scoped and overridden contextually — the same variable can hold different values in different contexts",
+      "The dark mode override applies to all CSS files on the page",
+      "This will cause a CSS parse error"
+    ],
+    "answer": 1,
+    "explanation": "Custom properties live in the cascade — overriding --bg in :root inside a media query changes it globally for that context. All elements using var(--bg) automatically update. This is how single-variable dark mode theming works."
+  },
+  {
+    "id": "q4",
+    "text": "James has 800 lines of CSS in one file. He wants to split it into modules. Which CSS feature lets him import multiple files into one main stylesheet?",
+    "options": [
+      "@require",
+      "@include",
+      "@import",
+      "@use"
+    ],
+    "answer": 2,
+    "explanation": "@import url('typography.css') imports another stylesheet. Modern CSS also supports @layer for cascade ordering. Note: multiple @import statements can create a request waterfall — a bundler (Webpack, Vite) or Sass @use is preferred in production."
+  },
+  {
+    "id": "q5",
+    "text": "What naming convention does BEM (Block Element Modifier) use for CSS classes?",
+    "options": [
+      ".block-element-modifier (hyphens throughout)",
+      ".block__element--modifier (double underscore, double hyphen)",
+      ".Block.Element.Modifier (dot-chained)",
+      ".block_element_modifier (single underscores)"
+    ],
+    "answer": 1,
+    "explanation": "BEM uses: .block (component), .block__element (child of block, double underscore), .block--modifier (variant, double hyphen). Example: .card, .card__title, .card--featured. It prevents specificity conflicts and makes relationships visible in class names."
+  },
+  {
+    "id": "q6",
+    "text": "James writes !important on 15 rules to fix specificity conflicts. What is the long-term consequence?",
+    "options": [
+      "!important rules execute faster because they bypass the cascade",
+      "Each !important starts an escalation — to override it you need another !important, making the stylesheet impossible to maintain",
+      "!important is valid CSS but has no effect in modern browsers",
+      "It causes all other styles to be ignored"
+    ],
+    "answer": 1,
+    "explanation": "!important overrides the cascade entirely. To override an !important you need a more specific !important — or another !important. This creates a specificity war that makes the stylesheet brittle. The fix is to understand and use specificity correctly, not override it."
+  },
+  {
+    "id": "q7",
+    "text": "James wants a spacing scale for consistency: 4px, 8px, 16px, 24px, 32px. Which approach makes this easiest to use?",
+    "options": [
+      "Define each as a magic number directly in each rule",
+      "Store them as custom properties: --space-1: 4px; --space-2: 8px; etc. in :root",
+      "Use a CSS preprocessor like Sass only",
+      "Put spacing values in a JavaScript config file"
+    ],
+    "answer": 1,
+    "explanation": "CSS custom properties in :root for a spacing scale centralise the values and give them semantic names. --space-2: 8px is more readable than padding: 8px and easier to update consistently. This is a design token pattern used by major design systems."
+  },
+  {
+    "id": "q8",
+    "text": "James's CSS file has grown to 1,200 lines. A colleague can't find where the button styles are. Which approach improves maintainability?",
+    "options": [
+      "Alphabetically sort all CSS rules",
+      "Split CSS into component files (buttons.css, cards.css, nav.css) and import them into a main.css",
+      "Move all styles inline with style= attributes",
+      "Use shorter class names to reduce file size"
+    ],
+    "answer": 1,
+    "explanation": "Splitting CSS into component files maps CSS structure to the HTML components it styles. buttons.css contains only button styles — a colleague looks there first. This is the basis of every CSS architecture methodology (BEM, SMACSS, ITCSS)."
+  },
+  {
+    "id": "q9",
+    "text": "James wants to define a fallback value for a custom property in case it hasn't been set. Which syntax is correct?",
+    "options": [
+      "var(--brand-green, #2E7D32)",
+      "var(--brand-green || #2E7D32)",
+      "var(--brand-green, default: #2E7D32)",
+      "fallback(--brand-green, #2E7D32)"
+    ],
+    "answer": 0,
+    "explanation": "var(--property, fallback) accepts an optional second argument as a fallback value. If --brand-green is not defined, the browser uses #2E7D32 instead. This makes custom property usage safe even when variables might not be set."
+  },
+  {
+    "id": "q10",
+    "text": "Which CSS selector targets an element ONLY when it has both class 'card' AND class 'featured' simultaneously?",
+    "options": [
+      ".card .featured { }",
+      ".card, .featured { }",
+      ".card.featured { }",
+      ".card > .featured { }"
+    ],
+    "answer": 2,
+    "explanation": ".card.featured (no space) targets elements that have BOTH classes simultaneously on the same element: <div class=\"card featured\">. .card .featured (space) targets .featured elements that are descendants of .card — a descendant combinator, not a multi-class selector."
+  }
+];
+
+        let currentQuestion = 0, score = 0, streak = 0, answered = false;
+
+        function updateScoreboard() {
+            document.getElementById('score').textContent = score;
+            document.getElementById('current').textContent = Math.min(currentQuestion + 1, exercises.length);
+            document.getElementById('total').textContent = exercises.length;
+            document.getElementById('streak').textContent = streak;
+            document.getElementById('progress').style.width = ((currentQuestion) / exercises.length) * 100 + '%';
+        }
+
+        function escapeHtml(s) {
+            return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+        }
+
+        function renderQuestion() {
+            answered = false;
+            const q = exercises[currentQuestion];
+            let html = '';
+            if (q.scenario) {
+                html += `<div class="scenario"><strong>Scenario.</strong> ${escapeHtml(q.scenario)}</div>`;
+            }
+            html += `<div class="question">${escapeHtml(q.text)}</div>`;
+            html += '<div class="options">';
+            q.options.forEach((o, i) => {
+                html += `<button class="option" onclick="selectAnswer(${i})">${escapeHtml(o)}</button>`;
+            });
+            html += '</div>';
+            document.getElementById('exerciseCard').innerHTML = html;
+            updateScoreboard();
+        }
+
+        function selectAnswer(i) {
+            if (answered) return;
+            answered = true;
+            const q = exercises[currentQuestion];
+            const btns = document.querySelectorAll('.option');
+            btns.forEach(b => b.classList.add('disabled'));
+            btns[q.answer].classList.add('correct');
+            const right = i === q.answer;
+            if (!right) btns[i].classList.add('wrong');
+            if (right) { score += 10; streak += 1; } else { streak = 0; }
+            const fb = document.createElement('div');
+            fb.className = 'feedback ' + (right ? 'correct' : 'wrong');
+            fb.innerHTML = `<strong>${right ? '✅ Correct.' : '❌ Not quite.'}</strong><br>${escapeHtml(q.explanation)}`;
+            document.getElementById('exerciseCard').appendChild(fb);
+            const nb = document.createElement('button');
+            nb.className = 'next-btn';
+            nb.textContent = currentQuestion === exercises.length - 1 ? 'See results →' : 'Next scenario →';
+            nb.onclick = nextQuestion;
+            document.getElementById('exerciseCard').appendChild(nb);
+            updateScoreboard();
+        }
+
+        function nextQuestion() {
+            currentQuestion++;
+            if (currentQuestion >= exercises.length) return showResults();
+            renderQuestion();
+        }
+
+        function showResults() {
+            document.getElementById('progress').style.width = '100%';
+            const total = exercises.length * 10;
+            const pct = Math.round(score / total * 100);
+            if (window.parent) { window.parent.postMessage({type:"mtti_quiz_score", score: score, total: total, percent: pct}, "*"); }
+            let badge = '🌟', msg = 'Excellent work. You have a professional grasp of this lesson.';
+            if (pct < 50) { badge = '🌱'; msg = 'Good first attempt. Re-watch the lesson video and try again.'; }
+            else if (pct < 80) { badge = '📚'; msg = 'Solid progress. Review the scenarios you missed and retry.'; }
+            document.getElementById('exerciseCard').innerHTML = `
+                <div class="results">
+                    <span class="badge">${badge}</span>
+                    <h2>Quiz Complete</h2>
+                    <div class="final-score">${score} / ${total}</div>
+                    <p><strong>${pct}%</strong> · Longest streak: ${streak}</p>
+                    <p>${msg}</p>
+                    <button class="restart-btn" onclick="restart()">Try again 🔁</button>
+                </div>`;
+        }
+
+        function restart() {
+            currentQuestion = 0; score = 0; streak = 0;
+            renderQuestion();
+        }
+
+        renderQuestion();
+    </script>
+</body>
+</html>

@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Variables and Data Types (Lesson) | MTTI Computer Applications</title>
+<link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Fredoka:wght@500;600&display=swap" rel="stylesheet">
+<style>
+* { margin:0; padding:0; box-sizing:border-box; }
+body { font-family:'Space Mono', monospace; background:linear-gradient(135deg,#2E7D32 0%,#1565C0 100%); min-height:100vh; padding:20px; color:#fff; }
+.container { max-width:820px; margin:0 auto; }
+.header { text-align:center; margin-bottom:24px; }
+.lesson-tag { display:inline-block; background:rgba(255,255,255,0.2); padding:6px 16px; border-radius:999px; font-size:0.85em; margin-bottom:12px; }
+.header h1 { font-family:'Fredoka', sans-serif; font-size:2em; margin-bottom:6px; text-shadow:3px 3px 0 rgba(0,0,0,0.2); }
+.card { background:#fff; color:#333; border-radius:22px; padding:32px; margin-bottom:20px; box-shadow:0 20px 60px rgba(0,0,0,0.3); }
+.section { margin-bottom:26px; }
+.section:last-child { margin-bottom:0; }
+.section h2 { font-family:'Fredoka', sans-serif; font-size:1.2em; margin-bottom:10px; color:#1565C0; }
+.section .body { line-height:1.65; font-size:0.98em; }
+.section .body p { margin-bottom:10px; }
+.section .body code { background:#f5f7fb; padding:2px 6px; border-radius:4px; font-size:0.92em; }
+.keypoint { background:#fff8e1; border-left:4px solid #ffc107; padding:12px 16px; border-radius:8px; margin-top:12px; font-size:0.92em; }
+</style>
+</head>
+<body>
+<div class="container">
+<div class="header"><div class="lesson-tag">Module 3 · Lesson 3.1</div><h1>Variables and Data Types</h1></div>
+<div class="card"><div class="section"><h2>Declaring Variables</h2><div class="body"><p><code>let</code> declares a variable whose value can change later; <code>const</code> declares one that cannot be reassigned after its initial value. Preferring <code>const</code> by default, using <code>let</code> only when a value genuinely needs to change, makes code easier to reason about.</p></div></div><div class="section"><h2>Basic Data Types</h2><div class="body"><p>JavaScript's core types include <strong>string</strong> (text, in quotes), <strong>number</strong> (both whole and decimal numbers), <strong>boolean</strong> (true/false), and <strong>undefined</strong>/<strong>null</strong> (representing "no value" in slightly different ways).</p></div></div><div class="section"><h2>Type Matters for Behaviour</h2><div class="body"><p><code>"5" + 3</code> and <code>5 + 3</code> produce different results in JavaScript (string concatenation vs numeric addition) because one operand is text and the other is a number — a common source of confusing bugs for beginners.</p></div><div class="keypoint"><strong>Key Point.</strong> JavaScript will often try to convert between types automatically rather than throwing an error — convenient, but a frequent source of subtle bugs if you are not aware it is happening.</div></div></div>
+</div>
+</body>
+</html>

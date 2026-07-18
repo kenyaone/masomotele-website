@@ -1,0 +1,484 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lesson 12.4 — Trend-jacking + Creative Center (Interactive)</title>
+<style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: 'Segoe UI', -apple-system, sans-serif; line-height: 1.55; color: #1e293b; background: #f1f5f9; min-height: 100vh; }
+    .container { max-width: 1200px; margin: 0 auto; padding: 20px; }
+    header {
+        background: linear-gradient(135deg, #2E7D32, #1B5E20);
+        color: #fff; padding: 40px 30px; border-radius: 12px; margin-bottom: 24px;
+        box-shadow: 0 10px 30px rgba(254,44,85,0.25);
+        position: relative; overflow: hidden;
+    }
+    header::after { content: ''; position: absolute; top: -30px; right: -30px; width: 200px; height: 200px; background: rgba(0,0,0,0.15); border-radius: 50%; }
+    header .badge { display: inline-block; background: rgba(0,0,0,0.35); padding: 4px 14px; border-radius: 16px; font-size: 12px; font-weight: bold; letter-spacing: 1px; margin-bottom: 14px; position: relative; z-index: 1; }
+    header h1 { font-size: 34px; margin-bottom: 8px; position: relative; z-index: 1; text-shadow: 0 2px 8px rgba(0,0,0,0.25); }
+    header .subtitle { font-size: 17px; opacity: 0.95; margin-bottom: 20px; position: relative; z-index: 1; }
+    .meta-strip { display: flex; flex-wrap: wrap; gap: 12px; position: relative; z-index: 1; }
+    .meta-strip span { background: rgba(0,0,0,0.35); padding: 6px 14px; border-radius: 20px; font-size: 13px; }
+    .toc { background: #fff; border: 1px solid #e2e8f0; border-radius: 10px; padding: 22px 26px; margin-bottom: 22px; }
+    .toc h3 { color: #fe2c55; margin-bottom: 10px; }
+    .toc ol { padding-left: 20px; }
+    .toc a { color: #fe2c55; text-decoration: none; font-weight: 600; }
+    section { background: #fff; border: 1px solid #e2e8f0; border-radius: 10px; padding: 26px 30px; margin-bottom: 22px; }
+    section h2 { color: #161823; font-size: 22px; margin-bottom: 12px; padding-bottom: 8px; border-bottom: 3px solid; border-image: linear-gradient(90deg, #25f4ee, #fe2c55) 1; }
+    section h3 { color: #0f172a; font-size: 17px; margin: 18px 0 8px; }
+    section p { margin-bottom: 12px; }
+    section ul, section ol { padding-left: 22px; margin-bottom: 12px; }
+    .callout { border-left: 5px solid #25f4ee; background: #ecfeff; padding: 14px 18px; margin: 14px 0; border-radius: 4px; }
+    .callout.warn { border-left-color: #fe2c55; background: #fef2f4; }
+    .callout.tip { border-left-color: #059669; background: #ecfdf5; }
+    .callout strong { color: #0891b2; }
+    .callout.warn strong { color: #fe2c55; }
+    .callout.tip strong { color: #059669; }
+
+    /* Creative Center mock */
+    .cc { background: #161823; border-radius: 10px; overflow: hidden; margin: 14px 0; border: 1px solid #262837; }
+    .cc-top { background: #000; padding: 10px 18px; display: flex; align-items: center; gap: 14px; }
+    .cc-top .brand { color: #fff; font-weight: 700; font-size: 15px; }
+    .cc-top .brand .a { color: #25f4ee; }
+    .cc-top .brand .b { color: #fe2c55; }
+    .cc-top .url { margin-left: auto; color: #9ca3af; font-size: 12.5px; display: none; }
+    @media (min-width: 800px) { .cc-top .url { display: inline; } }
+    .cc-filters { background: #0d0e15; padding: 12px 18px; border-bottom: 1px solid #262837; display: flex; gap: 10px; flex-wrap: wrap; align-items: center; }
+    .cc-filters label { color: #9ca3af; font-size: 12px; }
+    .cc-filters select { background: #161823; color: #fff; border: 1px solid #262837; padding: 6px 10px; border-radius: 6px; font-size: 13px; }
+    .cc-tabs { background: #0d0e15; padding: 0 12px; display: flex; gap: 4px; border-bottom: 1px solid #262837; overflow-x: auto; }
+    .cc-tab { padding: 12px 16px; color: #9ca3af; cursor: pointer; font-size: 13px; font-weight: 600; border-bottom: 3px solid transparent; white-space: nowrap; }
+    .cc-tab.active { color: #fff; border-bottom-color: #fe2c55; }
+    .cc-body { padding: 18px; background: #0d0e15; }
+    .cc-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 12px; }
+    .trend {
+        background: #161823; border: 1px solid #262837; border-radius: 10px; padding: 14px;
+        color: #e5e7eb; font-size: 13px; transition: all 0.2s;
+    }
+    .trend:hover { border-color: #25f4ee; transform: translateY(-2px); }
+    .trend .cat { color: #9ca3af; font-size: 11px; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 4px; }
+    .trend .name { color: #fff; font-weight: 700; font-size: 14px; margin-bottom: 8px; }
+    .trend .meta { color: #6b7280; font-size: 12px; margin-bottom: 10px; }
+    .trend .rank { display: inline-block; background: linear-gradient(90deg,#25f4ee,#fe2c55); color: #000; padding: 2px 10px; border-radius: 10px; font-weight: 700; font-size: 11px; margin-right: 6px; }
+    .trend .growth { color: #34d399; font-size: 12px; font-weight: 700; }
+    .trend button { background: linear-gradient(90deg,#25f4ee,#fe2c55); color: #fff; border: 0; padding: 6px 14px; border-radius: 6px; cursor: pointer; font-size: 12px; font-weight: 700; margin-top: 8px; width: 100%; }
+
+    /* Hook generator */
+    .hook {
+        background: #f8fafc; border: 1.5px solid #cbd5e1; border-radius: 10px; padding: 18px; margin: 14px 0;
+    }
+    .hook-style {
+        display: flex; gap: 8px; flex-wrap: wrap; margin: 8px 0 14px;
+    }
+    .hook-style button {
+        background: #fff; border: 2px solid #e2e8f0; padding: 10px 16px; border-radius: 20px;
+        cursor: pointer; font-size: 13px; font-weight: 600; color: #64748b;
+    }
+    .hook-style button.active { background: linear-gradient(90deg,#25f4ee,#fe2c55); color: #fff; border-color: transparent; }
+    .hook-lines { }
+    .hook-line {
+        background: #fff; border-left: 4px solid #fe2c55; padding: 12px 14px;
+        border-radius: 4px; margin-bottom: 8px; font-size: 14px; color: #161823;
+    }
+    .hook-line em { color: #64748b; font-size: 12px; }
+
+    /* Sarah cameo */
+    .cameo {
+        background: linear-gradient(135deg, #fff7ed 0%, #fef3c7 100%);
+        border: 2px solid #f59e0b; border-radius: 12px; padding: 20px; margin: 14px 0;
+    }
+    .cameo h4 { color: #78350f; margin-bottom: 8px; }
+    .cameo .arc { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 10px; margin-top: 12px; }
+    .cameo .arc-step { background: #fff; padding: 10px 12px; border-radius: 8px; font-size: 12.5px; border-top: 3px solid #f59e0b; }
+    .cameo .arc-step strong { display: block; color: #78350f; margin-bottom: 4px; font-size: 12px; letter-spacing: 1px; }
+
+    /* Challenge — auto-marked */
+    .challenge {
+        background: linear-gradient(135deg, #ecfeff 0%, #fef2f4 100%);
+        border: 2px solid #25f4ee; border-radius: 12px; padding: 20px; margin: 14px 0;
+    }
+    .challenge h3 { color: #0891b2; margin-bottom: 8px; }
+
+    /* Quiz */
+    .quiz-question { background: #fff; border: 2px solid #cbd5e1; border-radius: 10px; padding: 18px; margin: 14px 0; }
+    .quiz-question.correct { border-color: #059669; background: #ecfdf5; }
+    .quiz-question.wrong { border-color: #dc2626; background: #fef2f2; }
+    .quiz-question h4 { margin-bottom: 12px; font-size: 15px; color: #1e293b; }
+    .quiz-question .options label { display: block; padding: 10px 14px; margin-bottom: 6px; background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 6px; cursor: pointer; font-size: 14px; }
+    .quiz-question .options label:hover { background: #ecfeff; }
+    .quiz-question .options input[type="radio"] { margin-right: 10px; }
+    .quiz-question .explanation { display: none; margin-top: 12px; padding: 10px 14px; border-radius: 6px; font-size: 14px; }
+    .quiz-question.correct .explanation { display: block; background: #d1fae5; color: #065f46; border-left: 4px solid #059669; }
+    .quiz-question.wrong .explanation { display: block; background: #fee2e2; color: #991b1b; border-left: 4px solid #dc2626; }
+    .quiz-summary { text-align: center; padding: 30px; background: linear-gradient(135deg, #ecfeff 0%, #fef2f4 100%); border-radius: 10px; margin: 20px 0; display: none; }
+    .quiz-summary.show { display: block; }
+    .quiz-summary .score { font-size: 48px; font-weight: bold; background: linear-gradient(90deg,#25f4ee,#fe2c55); -webkit-background-clip: text; -webkit-text-fill-color: transparent; margin-bottom: 8px; }
+    button.btn { background: linear-gradient(90deg,#25f4ee,#fe2c55); color: #fff; border: none; padding: 10px 20px; border-radius: 6px; font-size: 15px; font-weight: 700; cursor: pointer; }
+    button.btn:hover { box-shadow: 0 6px 16px rgba(254,44,85,0.35); }
+    button.btn.reset { background: #64748b; margin-left: 8px; }
+    footer { text-align: center; color: #64748b; padding: 24px; font-size: 13px; }
+
+    /* MTTI logo stamp */
+    .mtti-logo-stamp {
+        position: fixed; top: 14px; right: 18px; z-index: 999;
+        opacity: 0.88; transition: opacity 0.2s;
+    }
+    .mtti-logo-stamp:hover { opacity: 1; }
+    .mtti-logo-stamp img { width: 56px; height: 56px; border-radius: 50%; box-shadow: 0 2px 8px rgba(0,0,0,0.18); }
+</style>
+</head>
+<body>
+<div class="mtti-logo-stamp">
+    <img src="../../Resources/Logo.jpeg" alt="MTTI" title="Masomotele Technical Training Institute — Start learning, Start earning">
+</div>
+
+<div class="container">
+
+<header>
+    <div class="badge">LESSON 12.4  ·  TIKTOK ADS DEEP DIVE  ·  INTERACTIVE</div>
+    <h1>Trend-jacking + Creative Center</h1>
+    <div class="subtitle">Find TikTok trends before your competition. Master the three-second hook. And watch Sarah trend-jack a menu reveal.</div>
+    <div class="meta-strip">
+        <span><strong>Duration:</strong> ~40 min interactive</span>
+        <span><strong>Level:</strong> Intermediate</span>
+        <span><strong>Prerequisite:</strong> Lesson 12.3</span>
+        <span><strong>Handbook:</strong> Part 12, §12.4</span>
+    </div>
+</header>
+
+<div class="toc">
+    <h3>What you'll do in this lesson</h3>
+    <ol>
+        <li><a href="#s1">Mock TikTok Creative Center — 4 trend tabs</a></li>
+        <li><a href="#s2">What "trend-jacking" actually means</a></li>
+        <li><a href="#s3">Hook Generator — 4 hook styles</a></li>
+        <li><a href="#s4">The 30- and 60-second arcs</a></li>
+        <li><a href="#s5">Sarah's cameo — Karibu Kitchen menu-reveal trend-jack</a></li>
+        <li><a href="#s6">Challenge — pick the right trend-jack for Chapa</a></li>
+        <li><a href="#s7">Self-check quiz (8 questions)</a></li>
+    </ol>
+</div>
+
+<section id="s1">
+    <h2>1. Mock TikTok Creative Center — 4 trend tabs</h2>
+    <p>Live at <strong>ads.tiktok.com/business/creativecenter</strong>. Free, Kenya-filterable, updated daily. Click the tabs to browse each trend category.</p>
+    <div class="cc">
+        <div class="cc-top">
+            <span class="brand"><span class="a">Tik</span><span class="b">Tok</span> · Creative Center</span>
+            <span class="url">ads.tiktok.com/business/creativecenter</span>
+        </div>
+        <div class="cc-filters">
+            <label>Region</label>
+            <select id="ccRegion" onchange="renderTrends()">
+                <option value="ke">Kenya</option>
+                <option value="ea">East Africa</option>
+                <option value="global">Global</option>
+            </select>
+            <label>Industry</label>
+            <select id="ccIndustry" onchange="renderTrends()">
+                <option value="fitness">Fitness / Wellness</option>
+                <option value="food">Food / Beverage</option>
+                <option value="fashion">Fashion / Streetwear</option>
+                <option value="all">All industries</option>
+            </select>
+            <label>Window</label>
+            <select id="ccWindow" onchange="renderTrends()">
+                <option value="7d">Last 7 days</option>
+                <option value="30d">Last 30 days</option>
+                <option value="120d">Last 120 days</option>
+            </select>
+        </div>
+        <div class="cc-tabs">
+            <div class="cc-tab active" onclick="showTab('songs', this)">Trending Songs</div>
+            <div class="cc-tab" onclick="showTab('hashtags', this)">Trending Hashtags</div>
+            <div class="cc-tab" onclick="showTab('creators', this)">Trending Creators</div>
+            <div class="cc-tab" onclick="showTab('videos', this)">Trending Videos</div>
+        </div>
+        <div class="cc-body">
+            <div class="cc-grid" id="ccGrid"></div>
+        </div>
+    </div>
+    <div class="callout tip"><strong>The Sunday session:</strong> Brian and Sarah both live in Creative Center for 30 minutes on a Sunday evening before filming anything. Trends found here beat trends found on the For You feed by a full week.</div>
+</section>
+
+<section id="s2">
+    <h2>2. What "trend-jacking" actually means</h2>
+    <p>Trend-jacking is NOT posting your brand on top of a random trending sound. That is a corporate ad in a costume — viewers can smell it in three seconds.</p>
+    <p><strong>Real trend-jacking is a two-step:</strong></p>
+    <ol>
+        <li><strong>Find</strong> a trending format, sound, or transition that fits your brand's world.</li>
+        <li><strong>Swap</strong> the original context for your product context while keeping the format intact.</li>
+    </ol>
+    <div class="callout">
+        <strong>Chapa Fitness example:</strong> A trending Nairobi TikTok sound goes viral for "when your matatu tout gives you exact change". Brian's swap: <em>"when you find shorts that survive both leg-day AND a matatu ride"</em>. Same sound. Same rhythm. Chapa Fitness context. Native trend-jacking.
+    </div>
+</section>
+
+<section id="s3">
+    <h2>3. Hook Generator — 4 hook styles</h2>
+    <p>TikTok's average watch time on a scrolled video before swipe-away is under 3 seconds. If the hook does not land, the ad dies. Four hook types to master. Pick one below to generate 3 first-line examples for Chapa Fitness.</p>
+    <div class="hook">
+        <div class="hook-style">
+            <button class="active" onclick="showHook('question', this)">Question</button>
+            <button onclick="showHook('contradiction', this)">Contradiction</button>
+            <button onclick="showHook('stakes', this)">Stakes</button>
+            <button onclick="showHook('curiosity', this)">Curiosity gap</button>
+        </div>
+        <div class="hook-lines" id="hookLines"></div>
+    </div>
+    <div class="callout tip"><strong>Rule:</strong> every hook is a promise the video must keep. If the first three seconds tease something the rest doesn't deliver, retention collapses at second 8 and TikTok stops serving.</div>
+</section>
+
+<section id="s4">
+    <h2>4. The 30- and 60-second arcs</h2>
+    <p>Two useful lengths. Both start with the hook.</p>
+    <table style="width:100%; border-collapse:collapse; font-size:14px;">
+        <tr><th style="background:#161823;color:#25f4ee;padding:10px;text-align:left;">Segment</th><th style="background:#161823;color:#25f4ee;padding:10px;text-align:left;">30-second arc</th><th style="background:#161823;color:#25f4ee;padding:10px;text-align:left;">60-second arc</th></tr>
+        <tr><td style="padding:10px;border:1px solid #e2e8f0;">0–3s</td><td style="padding:10px;border:1px solid #e2e8f0;">Hook</td><td style="padding:10px;border:1px solid #e2e8f0;">Hook</td></tr>
+        <tr><td style="padding:10px;border:1px solid #e2e8f0;">Product story</td><td style="padding:10px;border:1px solid #e2e8f0;">3–15s</td><td style="padding:10px;border:1px solid #e2e8f0;">3–20s (more nuance)</td></tr>
+        <tr><td style="padding:10px;border:1px solid #e2e8f0;">Proof</td><td style="padding:10px;border:1px solid #e2e8f0;">15–25s (testimonial / before-after)</td><td style="padding:10px;border:1px solid #e2e8f0;">20–40s (two proof points)</td></tr>
+        <tr><td style="padding:10px;border:1px solid #e2e8f0;">Twist</td><td style="padding:10px;border:1px solid #e2e8f0;">—</td><td style="padding:10px;border:1px solid #e2e8f0;">40–55s (attention reset)</td></tr>
+        <tr><td style="padding:10px;border:1px solid #e2e8f0;">CTA</td><td style="padding:10px;border:1px solid #e2e8f0;">25–30s (on-screen text)</td><td style="padding:10px;border:1px solid #e2e8f0;">55–60s</td></tr>
+    </table>
+    <div class="callout warn"><strong>Wandering videos lose retention.</strong> Lost retention kills reach. Every second past 15 needs a reason to still be watching.</div>
+</section>
+
+<section id="s5">
+    <h2>5. Sarah's cameo — Karibu Kitchen menu-reveal trend-jack</h2>
+    <div class="cameo">
+        <h4>Karibu Kitchen — Kapsoya, Eldoret</h4>
+        <p>Sarah spots a trending Kenyan sound used for outfit-reveal transitions. She thinks: <em>menus can reveal, too.</em> She spends 30 minutes in Creative Center on a Sunday, films Monday morning, posts Tuesday. Fifty-two thousand organic views.</p>
+        <div class="arc">
+            <div class="arc-step"><strong>0–3s HOOK</strong>"The three lunches every Eldoret office ordered this week"</div>
+            <div class="arc-step"><strong>3–15s TRANSITIONS</strong>Three quick transitions on the trending sound, each swap revealing a different plate</div>
+            <div class="arc-step"><strong>15–25s PROOF</strong>Customer receipts + WhatsApp screenshots</div>
+            <div class="arc-step"><strong>25–30s CTA</strong>"Tomorrow's menu drops at 8am. WhatsApp us."</div>
+        </div>
+        <p style="margin-top:12px; font-size:13.5px; color:#78350f;"><strong>Lesson:</strong> even a lunch kitchen can trend-jack. So can any small business willing to sit in Creative Center for 30 minutes on a Sunday. The trend was the outfit-reveal sound. The swap was menu items. Format kept. Context swapped. Native.</p>
+    </div>
+</section>
+
+<section id="s6">
+    <h2>6. Challenge — pick the right trend-jack for Chapa Fitness</h2>
+    <div class="challenge">
+        <h3>The scenario</h3>
+        <p>Three trending sounds are on Creative Center this week for Kenya. Brian must pick which one to trend-jack for Chapa Fitness training shorts. Pick the best fit — this is auto-marked.</p>
+
+        <div class="quiz-question" data-correct="B" id="ch1">
+            <h4>1. Which sound is the strongest trend-jack for Chapa Fitness?</h4>
+            <div class="options">
+                <label><input type="radio" name="ch1" value="A"> A) A trending romantic ballad — soft, slow, currently used for wedding montages</label>
+                <label><input type="radio" name="ch1" value="B"> B) The Nairobi "matatu exact change" sound — punchy, urban, currently used for relatable everyday moments</label>
+                <label><input type="radio" name="ch1" value="C"> C) A trending kids' nursery rhyme remix — currently used for dance challenges by primary schoolers</label>
+                <label><input type="radio" name="ch1" value="D"> D) A trending funeral hymn variant — currently used for tribute videos</label>
+            </div>
+            <div class="explanation">Correct — the matatu sound is punchy, urban, and used for relatable everyday Nairobi moments. Brian's swap: "when you find shorts that survive both leg-day AND a matatu ride". Fits the brand's world without stretching.</div>
+        </div>
+
+        <div class="quiz-question" data-correct="C" id="ch2">
+            <h4>2. Brian's video is 42 seconds. Where should the CTA land?</h4>
+            <div class="options">
+                <label><input type="radio" name="ch2" value="A"> A) At 5 seconds — as early as possible</label>
+                <label><input type="radio" name="ch2" value="B"> B) At 20 seconds — halfway through</label>
+                <label><input type="radio" name="ch2" value="C"> C) At 38–42 seconds — after the product story and proof, at the end</label>
+                <label><input type="radio" name="ch2" value="D"> D) Every 5 seconds throughout</label>
+            </div>
+            <div class="explanation">Correct — the CTA comes AFTER the hook, product story, and proof land. Rushing it kills conversion. The 60-second arc puts CTA at 55–60s; a 42-second video puts it in the last 4.</div>
+        </div>
+
+        <div class="quiz-question" data-correct="A" id="ch3">
+            <h4>3. Auto-captions or burnt-in captions?</h4>
+            <div class="options">
+                <label><input type="radio" name="ch3" value="A"> A) Burnt-in — consistent brand font, timing, colour</label>
+                <label><input type="radio" name="ch3" value="B"> B) Auto-captions — TikTok will handle it</label>
+                <label><input type="radio" name="ch3" value="C"> C) No captions — sound-on is fine</label>
+                <label><input type="radio" name="ch3" value="D"> D) English + Swahili at the same time</label>
+            </div>
+            <div class="explanation">Correct — TikTok's auto-captions are inconsistent. Burnt-in captions match brand every time. Both Brian and Sarah use CapCut's caption template.</div>
+        </div>
+
+        <div style="margin-top: 16px;">
+            <button class="btn" onclick="markChallenge()">Mark the challenge</button>
+            <button class="btn reset" onclick="resetChallenge()">Reset</button>
+        </div>
+        <div id="chScore" style="display:none; margin-top:14px; padding:14px; background:#fff; border-radius:8px; text-align:center; font-weight:700;"></div>
+    </div>
+</section>
+
+<section id="s7">
+    <h2>7. Self-check quiz</h2>
+
+    <div class="quiz-question" data-correct="B"><h4>1. Where do TikTok professionals find trends before the For You feed shows them?</h4><div class="options"><label><input type="radio" name="q1" value="A"> A) The Discovery tab in the app</label><label><input type="radio" name="q1" value="B"> B) TikTok Creative Center at ads.tiktok.com/business/creativecenter</label><label><input type="radio" name="q1" value="C"> C) A Google Sheet</label><label><input type="radio" name="q1" value="D"> D) BuzzFeed</label></div><div class="explanation">Correct — Creative Center is TikTok's own trend intelligence platform. Free, Kenya-filterable, updated daily.</div></div>
+
+    <div class="quiz-question" data-correct="D"><h4>2. Real trend-jacking is…</h4><div class="options"><label><input type="radio" name="q2" value="A"> A) Posting your brand on the loudest trending sound</label><label><input type="radio" name="q2" value="B"> B) Copying a competitor exactly</label><label><input type="radio" name="q2" value="C"> C) Making a completely original video</label><label><input type="radio" name="q2" value="D"> D) Finding a format that fits your brand's world, then swapping context while keeping the format</label></div><div class="explanation">Correct — the swap preserves format and swaps context. That is the trick.</div></div>
+
+    <div class="quiz-question" data-correct="C"><h4>3. TikTok's average watch time before a swipe-away is…</h4><div class="options"><label><input type="radio" name="q3" value="A"> A) 10 seconds</label><label><input type="radio" name="q3" value="B"> B) 15 seconds</label><label><input type="radio" name="q3" value="C"> C) Under 3 seconds</label><label><input type="radio" name="q3" value="D"> D) 30 seconds</label></div><div class="explanation">Correct — under 3 seconds. If the hook does not land, the ad dies.</div></div>
+
+    <div class="quiz-question" data-correct="A"><h4>4. Which is NOT one of the 4 hook types?</h4><div class="options"><label><input type="radio" name="q4" value="A"> A) The apology</label><label><input type="radio" name="q4" value="B"> B) The question</label><label><input type="radio" name="q4" value="C"> C) The contradiction</label><label><input type="radio" name="q4" value="D"> D) The curiosity gap</label></div><div class="explanation">Correct — the four are question, contradiction, stakes, curiosity gap. Not "apology".</div></div>
+
+    <div class="quiz-question" data-correct="B"><h4>5. In a 30-second arc, when does the CTA appear?</h4><div class="options"><label><input type="radio" name="q5" value="A"> A) 3–15s</label><label><input type="radio" name="q5" value="B"> B) 25–30s (last 5 seconds)</label><label><input type="radio" name="q5" value="C"> C) 15–25s</label><label><input type="radio" name="q5" value="D"> D) 0–3s (right after the hook)</label></div><div class="explanation">Correct — CTA lives in the last 5 seconds, after hook, product story, and proof have all landed.</div></div>
+
+    <div class="quiz-question" data-correct="D"><h4>6. Sarah's Karibu Kitchen trend-jack got how many organic views?</h4><div class="options"><label><input type="radio" name="q6" value="A"> A) 500</label><label><input type="radio" name="q6" value="B"> B) 5,000</label><label><input type="radio" name="q6" value="C"> C) 12,000</label><label><input type="radio" name="q6" value="D"> D) 52,000</label></div><div class="explanation">Correct — 52,000 views on organic, without paid boost. Proof that even a small kitchen can trend-jack.</div></div>
+
+    <div class="quiz-question" data-correct="C"><h4>7. Sound-on vs sound-off for TikTok ads?</h4><div class="options"><label><input type="radio" name="q7" value="A"> A) Design for sound-off — most watch on mute</label><label><input type="radio" name="q7" value="B"> B) Design without sound</label><label><input type="radio" name="q7" value="C"> C) Sound-on primary (88% watch with sound) plus burnt-in captions for muted placements</label><label><input type="radio" name="q7" value="D"> D) Sound doesn't matter</label></div><div class="explanation">Correct — TikTok is sound-first (unlike Facebook/YouTube). But burn captions in for the mute placements.</div></div>
+
+    <div class="quiz-question" data-correct="B"><h4>8. What does the Inspiration tab in Creative Center show?</h4><div class="options"><label><input type="radio" name="q8" value="A"> A) Only Brian's own videos</label><label><input type="radio" name="q8" value="B"> B) Top-performing ads across every industry, filterable by objective</label><label><input type="radio" name="q8" value="C"> C) Random unrelated content</label><label><input type="radio" name="q8" value="D"> D) TikTok policy updates</label></div><div class="explanation">Correct — Brian studies the top three fitness ads globally every Monday morning to steal structural ideas.</div></div>
+
+    <div style="margin-top: 20px;">
+        <button class="btn" onclick="markQuiz()">Mark my quiz</button>
+        <button class="btn reset" onclick="resetQuiz()">Reset</button>
+    </div>
+    <div class="quiz-summary" id="quizSummary"><div class="score" id="scoreDisplay">0 / 8</div><p id="scoreMessage"></p></div>
+</section>
+
+<footer>
+    <p>Lesson 12.4 — Trend-jacking + Creative Center · Masomotele Technical Training Institute · Handbook Part 12, §12.4</p>
+    <p>Next: <strong>Lesson 12.5 — Ads Manager Analytics + Optimisation</strong></p>
+</footer>
+</div>
+
+<script>
+const trendData = {
+    songs: [
+        { rank: 1, name: '"Matatu Exact Change" remix', meta: 'Original: @wnyakwar · 2:14', growth: '+412%', use: 'Relatable moments, everyday Nairobi', videos: '184k' },
+        { rank: 2, name: '"Sipangwingi" instrumental cut', meta: 'Kenyan trap · 24s loop', growth: '+287%', use: 'Streetwear, gym, hustle content', videos: '92k' },
+        { rank: 3, name: 'Sauti Sol · "Insecure" hook', meta: 'Chorus loop · 18s', growth: '+156%', use: 'Emotional reveals, transitions', videos: '76k' },
+        { rank: 4, name: 'Bien · "Inauma" bridge', meta: 'Slowed variant · 22s', growth: '+134%', use: 'Nostalgia, storytelling', videos: '54k' },
+        { rank: 5, name: '"Piga Kicks" gym cut', meta: 'Kenya afro-house · 30s', growth: '+118%', use: 'Workout, fitness, energy content', videos: '48k' },
+        { rank: 6, name: '"Chapaa Life" remix', meta: 'Nairobi drill · 16s hook', growth: '+94%', use: 'Money, hustle, product wins', videos: '39k' },
+        { rank: 7, name: '"Kuchoma Nyama" sample', meta: 'Nyayo era · comedy cut', growth: '+82%', use: 'Food reveals, cooking prep', videos: '31k' },
+        { rank: 8, name: 'Amapiano · Nairobi mashup', meta: 'Amapiano fusion · 28s', growth: '+68%', use: 'Style transitions, fashion reveals', videos: '27k' }
+    ],
+    hashtags: [
+        { rank: 1, name: '#NairobiFit', meta: 'Fitness · Kenya', growth: '+520%', use: 'Nairobi gym and fitness content', videos: '18.4M' },
+        { rank: 2, name: '#OfficeLunchKE', meta: 'Food · Kenya', growth: '+340%', use: 'Weekday lunch delivery, office meals', videos: '4.2M' },
+        { rank: 3, name: '#EldoretEats', meta: 'Food · Rift Valley', growth: '+278%', use: 'Eldoret local food scene', videos: '1.9M' },
+        { rank: 4, name: '#ShortsChallenge', meta: 'Fashion · Global with Kenya spike', growth: '+215%', use: 'Streetwear shorts fits', videos: '9.7M' },
+        { rank: 5, name: '#GymShareKE', meta: 'Fitness · Kenya', growth: '+184%', use: 'Gym progress, transformations', videos: '3.1M' },
+        { rank: 6, name: '#MatatuStories', meta: 'Lifestyle · Kenya', growth: '+152%', use: 'Everyday Nairobi commuter humour', videos: '6.8M' },
+        { rank: 7, name: '#KuluManu', meta: 'Food · Kenya', growth: '+134%', use: 'Kenyan home cooking', videos: '2.4M' },
+        { rank: 8, name: '#WhereToBuyKE', meta: 'Shopping · Kenya', growth: '+118%', use: 'Product reveals, links in bio', videos: '1.2M' }
+    ],
+    creators: [
+        { rank: 1, name: '@wanjiku.fit', meta: 'Nairobi · Fitness · 52k', growth: '+38%', use: 'Product reviews, gym wear', videos: '214' },
+        { rank: 2, name: '@amina.style.ke', meta: 'Nairobi · Streetwear · 80k', growth: '+31%', use: 'Style transitions', videos: '402' },
+        { rank: 3, name: '@karibu.kitchen', meta: 'Eldoret · Food · 8k', growth: '+42%', use: 'Menu reveals — Sarah!', videos: '61' },
+        { rank: 4, name: '@kev.streetfit', meta: 'Nairobi · Fitness · 68k', growth: '+22%', use: 'Calisthenics tutorials', videos: '275' },
+        { rank: 5, name: '@mercy.moves', meta: 'Nairobi · Yoga · 24k', growth: '+27%', use: 'Yoga, mindful movement', videos: '91' },
+        { rank: 6, name: '@otieno.trains', meta: 'Nairobi · Fitness · 12k', growth: '+19%', use: 'Personal training clips', videos: '168' }
+    ],
+    videos: [
+        { rank: 1, name: '"POV: You find the perfect gym shorts"', meta: '@nrbtok · 1.2M views', growth: '+680%', use: 'Product-reveal format', videos: '38k copies' },
+        { rank: 2, name: '"Menu reveal — three plates one sound"', meta: '@karibu.kitchen · 52k views', growth: '+412%', use: 'Menu format for restaurants', videos: '2.4k copies' },
+        { rank: 3, name: '"Matatu commute humour"', meta: '@nairobifm · 4.1M views', growth: '+298%', use: 'Everyday Kenya relatable', videos: '184k copies' },
+        { rank: 4, name: '"Before / after leg day"', meta: '@wanjiku.fit · 890k views', growth: '+246%', use: 'Transformation format', videos: '12k copies' },
+        { rank: 5, name: '"Streetwear-to-gym transition"', meta: '@amina.style.ke · 2.8M views', growth: '+218%', use: 'Style transition format', videos: '31k copies' },
+        { rank: 6, name: '"Order arrival ASMR"', meta: '@ke.eats · 620k views', growth: '+184%', use: 'Product unboxing', videos: '4.8k copies' }
+    ]
+};
+let currentTab = 'songs';
+function showTab(k, el) {
+    document.querySelectorAll('.cc-tab').forEach(t => t.classList.remove('active'));
+    el.classList.add('active');
+    currentTab = k;
+    renderTrends();
+}
+function renderTrends() {
+    const items = trendData[currentTab];
+    document.getElementById('ccGrid').innerHTML = items.map(t => `
+        <div class="trend">
+            <div class="cat"><span class="rank">#${t.rank}</span><span class="growth">${t.growth}</span></div>
+            <div class="name">${t.name}</div>
+            <div class="meta">${t.meta}</div>
+            <div style="color:#9ca3af; font-size:12px; margin-bottom:6px;">Use case: ${t.use}</div>
+            <div style="color:#25f4ee; font-size:12px;">Videos in trend: ${t.videos}</div>
+            <button onclick="alert('Trend added to Chapa Fitness draft list. Film this weekend.')">Use this trend</button>
+        </div>
+    `).join('');
+}
+renderTrends();
+
+const hooks = {
+    question: [
+        { text: '"Why do most training shorts rip in three weeks?"', note: 'Opens a problem the viewer knows.' },
+        { text: '"What if your gym wear could survive both leg-day AND a matatu?"', note: 'Question layered with product benefit.' },
+        { text: '"Which of these three shorts do you own — and which one wins on leg-day?"', note: 'Question that demands comparison.' }
+    ],
+    contradiction: [
+        { text: '"Everyone says do more cardio. That is the wrong advice."', note: 'Reversal of common wisdom pulls attention.' },
+        { text: '"Expensive gym wear is not what makes you train harder — this is."', note: 'Contradiction of a premium assumption.' },
+        { text: '"Sweat is not the problem. What you\'re wearing under it, is."', note: 'Reframe of a widely-accepted truth.' }
+    ],
+    stakes: [
+        { text: '"This is the last drop of these shorts before we sell out for December."', note: 'Scarcity + time — urgency drives action.' },
+        { text: '"If you leg-day tomorrow in the wrong shorts, this is what happens."', note: 'Cost of doing nothing is visible.' },
+        { text: '"You have 48 hours before this discount code expires."', note: 'Time-bound stakes with clear countdown.' }
+    ],
+    curiosity: [
+        { text: '"I found the one Chapa Fitness detail no other brand copies — watch."', note: 'Curiosity gap forces watching to close it.' },
+        { text: '"Nobody talks about what happens inside these seams — but I will."', note: 'Behind-the-curtain promise.' },
+        { text: '"The three-second test every serious pair of shorts must pass."', note: 'Framework tease pulls the viewer to the reveal.' }
+    ]
+};
+function showHook(k, btn) {
+    document.querySelectorAll('.hook-style button').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    document.getElementById('hookLines').innerHTML = hooks[k].map(h => `
+        <div class="hook-line">${h.text}<br><em>${h.note}</em></div>
+    `).join('');
+}
+showHook('question', document.querySelector('.hook-style button'));
+
+function markChallenge() {
+    const qs = [document.getElementById('ch1'), document.getElementById('ch2'), document.getElementById('ch3')];
+    let score = 0;
+    qs.forEach((q, i) => {
+        const correct = q.dataset.correct;
+        const name = q.querySelector('input').name;
+        const picked = q.querySelector(`input[name="${name}"]:checked`);
+        q.classList.remove('correct', 'wrong');
+        if (picked && picked.value === correct) { q.classList.add('correct'); score++; }
+        else if (picked) q.classList.add('wrong');
+    });
+    const box = document.getElementById('chScore');
+    box.style.display = 'block';
+    if (score === 3) { box.innerHTML = 'Perfect · 3/3 — Brian films this weekend.'; box.style.background = '#d1fae5'; box.style.color = '#065f46'; }
+    else if (score >= 2) { box.innerHTML = score + ' / 3 — solid.'; box.style.background = '#fef3c7'; box.style.color = '#78350f'; }
+    else { box.innerHTML = score + ' / 3 — re-read the trend-jack section.'; box.style.background = '#fee2e2'; box.style.color = '#991b1b'; }
+}
+function resetChallenge() {
+    ['ch1','ch2','ch3'].forEach(id => {
+        const q = document.getElementById(id);
+        q.classList.remove('correct','wrong');
+        q.querySelectorAll('input[type=radio]').forEach(r => r.checked = false);
+    });
+    document.getElementById('chScore').style.display = 'none';
+}
+
+function markQuiz() {
+    const questions = document.querySelectorAll('#s7 .quiz-question');
+    let score = 0;
+    questions.forEach((q, i) => {
+        const correct = q.dataset.correct;
+        const picked = q.querySelector(`input[name="q${i+1}"]:checked`);
+        q.classList.remove('correct', 'wrong');
+        if (picked && picked.value === correct) { q.classList.add('correct'); score++; }
+        else if (picked) q.classList.add('wrong');
+    });
+    const summary = document.getElementById('quizSummary');
+    summary.classList.add('show');
+    document.getElementById('scoreDisplay').textContent = `${score} / 8`;
+    const msg = document.getElementById('scoreMessage');
+    if (score === 8) msg.textContent = 'Perfect. Move to 12.5 — the closing analytics + optimisation lesson.';
+    else if (score >= 6) msg.textContent = 'Strong. Review the missed answers.';
+    else msg.textContent = 'Go back to Creative Center and the hook generator, then retake.';
+    summary.scrollIntoView({ behavior: 'smooth', block: 'center' });
+}
+function resetQuiz() {
+    document.querySelectorAll('#s7 .quiz-question').forEach(q => { q.classList.remove('correct', 'wrong'); q.querySelectorAll('input[type=radio]').forEach(r => r.checked = false); });
+    document.getElementById('quizSummary').classList.remove('show');
+}
+</script>
+</body>
+</html>

@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>What AI Tools Can Help Caregivers With | MTTI Computer Applications</title>
+    <link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Fredoka:wght@500;600&display=swap" rel="stylesheet">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Space Mono', monospace; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); min-height: 100vh; padding: 20px; color: #fff; }
+        .container { max-width: 900px; margin: 0 auto; }
+        .header { text-align: center; margin-bottom: 30px; }
+        .header .lesson-tag { display: inline-block; background: rgba(255,255,255,0.2); padding: 6px 16px; border-radius: 999px; font-size: 0.85em; margin-bottom: 12px; }
+        .header h1 { font-family: 'Fredoka', sans-serif; font-size: 2.2em; margin-bottom: 8px; text-shadow: 3px 3px 0 rgba(0,0,0,0.2); }
+        .score-board { background: rgba(255,255,255,0.15); backdrop-filter: blur(10px); border-radius: 20px; padding: 20px; margin-bottom: 20px; display: flex; justify-content: space-around; }
+        .score-item { text-align: center; }
+        .score-item .label { font-size: 0.85em; opacity: 0.9; margin-bottom: 4px; }
+        .score-item .value { font-size: 1.8em; font-weight: bold; font-family: 'Fredoka', sans-serif; }
+        .progress-bar { width: 100%; height: 8px; background: rgba(255,255,255,0.3); border-radius: 10px; margin-bottom: 25px; overflow: hidden; }
+        .progress-fill { height: 100%; background: linear-gradient(90deg, #f093fb 0%, #f5576c 100%); border-radius: 10px; transition: width 0.5s ease; width: 0%; }
+        .exercise-card { background: white; color: #333; border-radius: 25px; padding: 35px; margin-bottom: 20px; box-shadow: 0 20px 60px rgba(0,0,0,0.3); }
+        .scenario { background: linear-gradient(135deg, #fff8e1 0%, #ffecb3 100%); border-left: 5px solid #ffc107; padding: 20px 24px; border-radius: 12px; margin-bottom: 24px; font-size: 0.98em; line-height: 1.55; }
+        .scenario strong { color: #7a5a00; font-family: 'Fredoka', sans-serif; }
+        .question { font-size: 1.15em; margin-bottom: 20px; font-weight: 700; line-height: 1.4; }
+        .options { display: flex; flex-direction: column; gap: 12px; }
+        .option { background: #f5f7fb; border: 2px solid transparent; padding: 16px 20px; border-radius: 12px; cursor: pointer; transition: all 0.2s ease; font-family: 'Space Mono', monospace; font-size: 0.98em; text-align: left; }
+        .option:hover:not(.disabled) { background: #eef1fb; border-color: #667eea; transform: translateX(4px); }
+        .option.correct { background: #d4edda; border-color: #28a745; color: #155724; }
+        .option.wrong { background: #f8d7da; border-color: #dc3545; color: #721c24; }
+        .option.disabled { cursor: not-allowed; opacity: 0.85; }
+        .feedback { margin-top: 22px; padding: 18px 22px; border-radius: 12px; font-size: 0.98em; line-height: 1.5; }
+        .feedback.correct { background: #d4edda; color: #155724; border-left: 4px solid #28a745; }
+        .feedback.wrong { background: #f8d7da; color: #721c24; border-left: 4px solid #dc3545; }
+        .next-btn, .restart-btn { margin-top: 20px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; border: none; padding: 14px 32px; border-radius: 12px; font-size: 1em; cursor: pointer; font-family: 'Fredoka', sans-serif; box-shadow: 0 6px 18px rgba(0,0,0,0.2); }
+        .results { text-align: center; padding: 25px 15px; }
+        .results h2 { font-family: 'Fredoka', sans-serif; font-size: 2em; margin-bottom: 12px; color: #333; }
+        .results .final-score { font-size: 3em; font-family: 'Fredoka', sans-serif; color: #667eea; margin: 20px 0; }
+        .results p { color: #555; margin-bottom: 12px; }
+        .badge { display: inline-block; font-size: 3.5em; margin: 8px 0; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <div class="lesson-tag">Module 10 · Lesson 10.1 · Quiz</div>
+            <h1>What AI Tools Can Help Caregivers With</h1>
+        </div>
+        <div class="score-board">
+            <div class="score-item"><div class="label">Score</div><div class="value" id="score">0</div></div>
+            <div class="score-item"><div class="label">Question</div><div class="value"><span id="current">1</span>/<span id="total">10</span></div></div>
+            <div class="score-item"><div class="label">Streak</div><div class="value" id="streak">0</div></div>
+        </div>
+        <div class="progress-bar"><div class="progress-fill" id="progress"></div></div>
+        <div class="exercise-card" id="exerciseCard"></div>
+    </div>
+    <script>
+        const exercises = [{"scenario":"Njeri wants help translating a phrase for a client who speaks a different language.","question":"Is this a reasonable use of an AI assistant?","options":["Yes, this is a genuinely useful, everyday task AI assistance is well suited for","This would be an inappropriate use","No, translation is not something AI can help with","Only professional translators may use AI for this"],"correct":0,"explanation":"Translation help for everyday communication is a reasonable, practical use of an AI assistant."},{"scenario":"Njeri considers asking an AI assistant whether to administer a specific medication right now, and acting on its answer alone.","question":"What is the concern with this approach?","options":["This is exactly what AI assistants are designed for","The AI has no access to the client's actual medical history or current condition, making this an inappropriate use for an actual medical decision","No concern, AI assistants always have accurate specific medical knowledge","Medication decisions carry no particular risk either way"],"correct":1,"explanation":"An AI assistant lacks access to the specific client's real medical situation, making it unsuitable for an actual medication decision."},{"scenario":"Njeri asks an AI assistant a vague question, 'tell me about health stuff,' and receives an unhelpful, generic answer.","question":"What would likely improve the response?","options":["Asking a more specific question about what she actually needs to understand","Giving up on using AI assistance entirely","Repeating the exact same vague question","Assuming AI cannot ever provide useful health information"],"correct":0,"explanation":"A more specific question consistently produces a more useful, tailored answer."},{"scenario":"Njeri wonders whether an AI assistant knows anything about her specific client without her telling it.","question":"What is the accurate view?","options":["This depends on which specific AI tool is used","AI assistants can examine clients directly","No \u2014 a text-based AI tool has no information about a specific client unless Njeri explicitly provides it","Yes, AI assistants automatically know about any client's specific medical situation"],"correct":2,"explanation":"AI assistants only know what is explicitly told to them \u2014 they have no automatic access to any specific client's actual situation."},{"scenario":"Njeri wants to know the general boundary between reasonable and inappropriate uses of AI assistance in her caregiving work.","question":"Which boundary best reflects this lesson?","options":["AI is reasonably used for everyday drafting\/explaining tasks, but should not replace professional medical judgement for actual client-specific decisions","AI should be trusted completely for all decisions, including medical ones","There is no meaningful boundary to consider","AI should never be used for anything caregiving-related"],"correct":0,"explanation":"This captures the balanced view \u2014 genuine everyday usefulness within clear limits around actual medical decision-making."},{"scenario":"Njeri wants a one-sentence summary of what AI assistants can genuinely help caregivers with.","question":"Which summary fits best?","options":["AI assistants know everything about every specific client automatically","AI assistants have no genuine practical use in caregiving","AI assistants genuinely help with everyday tasks like translation, drafting, and explaining concepts, but should not replace professional judgement for actual client-specific medical decisions","AI assistants can fully replace professional medical judgement for any client"],"correct":2,"explanation":"This captures the lesson's core, balanced message about genuine usefulness within clear limits."}];
+        let currentQuestion = 0, score = 0, streak = 0, answered = false;
+        function updateScoreboard() {
+            document.getElementById('score').textContent = score;
+            document.getElementById('current').textContent = Math.min(currentQuestion + 1, exercises.length);
+            document.getElementById('total').textContent = exercises.length;
+            document.getElementById('streak').textContent = streak;
+            document.getElementById('progress').style.width = ((currentQuestion) / exercises.length) * 100 + '%';
+        }
+        function escapeHtml(s) { return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+        function renderQuestion() {
+            answered = false;
+            const q = exercises[currentQuestion];
+            let html = '';
+            if (q.scenario) html += `<div class="scenario"><strong>Scenario.</strong> ${escapeHtml(q.scenario)}</div>`;
+            html += `<div class="question">${escapeHtml(q.question)}</div>`;
+            html += '<div class="options">';
+            q.options.forEach((o, i) => { html += `<button class="option" onclick="selectAnswer(${i})">${escapeHtml(o)}</button>`; });
+            html += '</div>';
+            document.getElementById('exerciseCard').innerHTML = html;
+            updateScoreboard();
+        }
+        function selectAnswer(i) {
+            if (answered) return;
+            answered = true;
+            const q = exercises[currentQuestion];
+            const btns = document.querySelectorAll('.option');
+            btns.forEach(b => b.classList.add('disabled'));
+            btns[q.correct].classList.add('correct');
+            const right = i === q.correct;
+            if (!right) btns[i].classList.add('wrong');
+            if (right) { score += 10; streak += 1; } else { streak = 0; }
+            const fb = document.createElement('div');
+            fb.className = 'feedback ' + (right ? 'correct' : 'wrong');
+            fb.innerHTML = `<strong>${right ? '✅ Correct.' : '❌ Not quite.'}</strong><br>${escapeHtml(q.explanation)}`;
+            document.getElementById('exerciseCard').appendChild(fb);
+            const nb = document.createElement('button');
+            nb.className = 'next-btn';
+            nb.textContent = currentQuestion === exercises.length - 1 ? 'See results →' : 'Next scenario →';
+            nb.onclick = nextQuestion;
+            document.getElementById('exerciseCard').appendChild(nb);
+            updateScoreboard();
+        }
+        function nextQuestion() { currentQuestion++; if (currentQuestion >= exercises.length) return showResults(); renderQuestion(); }
+        function showResults() {
+            document.getElementById('progress').style.width = '100%';
+            const total = exercises.length * 10;
+            const pct = Math.round(score / total * 100);
+            if (window.parent) { window.parent.postMessage({type:"mtti_quiz_score", score: score, total: total, percent: pct}, "*"); }
+            let badge = '🌟', msg = 'Excellent work. You have a professional grasp of this lesson.';
+            if (pct < 50) { badge = '🌱'; msg = 'Good first attempt. Review the lesson and try again.'; }
+            else if (pct < 80) { badge = '📚'; msg = 'Solid progress. Review the scenarios you missed and retry.'; }
+            document.getElementById('exerciseCard').innerHTML = `
+                <div class="results">
+                    <span class="badge">${badge}</span>
+                    <h2>Quiz Complete</h2>
+                    <div class="final-score">${score} / ${total}</div>
+                    <p><strong>${pct}%</strong> · Longest streak: ${streak}</p>
+                    <p>${msg}</p>
+                    <button class="restart-btn" onclick="restart()">Try again 🔁</button>
+                </div>`;
+        }
+        function restart() { currentQuestion = 0; score = 0; streak = 0; renderQuestion(); }
+        renderQuestion();
+    </script>
+</body>
+</html>

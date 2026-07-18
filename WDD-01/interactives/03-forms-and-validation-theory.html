@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Forms and Validation (Lesson) | MTTI Computer Applications</title>
+<link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Fredoka:wght@500;600&display=swap" rel="stylesheet">
+<style>
+* { margin:0; padding:0; box-sizing:border-box; }
+body { font-family:'Space Mono', monospace; background:linear-gradient(135deg,#2E7D32 0%,#1565C0 100%); min-height:100vh; padding:20px; color:#fff; }
+.container { max-width:820px; margin:0 auto; }
+.header { text-align:center; margin-bottom:24px; }
+.lesson-tag { display:inline-block; background:rgba(255,255,255,0.2); padding:6px 16px; border-radius:999px; font-size:0.85em; margin-bottom:12px; }
+.header h1 { font-family:'Fredoka', sans-serif; font-size:2em; margin-bottom:6px; text-shadow:3px 3px 0 rgba(0,0,0,0.2); }
+.card { background:#fff; color:#333; border-radius:22px; padding:32px; margin-bottom:20px; box-shadow:0 20px 60px rgba(0,0,0,0.3); }
+.section { margin-bottom:26px; }
+.section:last-child { margin-bottom:0; }
+.section h2 { font-family:'Fredoka', sans-serif; font-size:1.2em; margin-bottom:10px; color:#1565C0; }
+.section .body { line-height:1.65; font-size:0.98em; }
+.section .body p { margin-bottom:10px; }
+.section .body code { background:#f5f7fb; padding:2px 6px; border-radius:4px; font-size:0.92em; }
+.keypoint { background:#fff8e1; border-left:4px solid #ffc107; padding:12px 16px; border-radius:8px; margin-top:12px; font-size:0.92em; }
+</style>
+</head>
+<body>
+<div class="container">
+<div class="header"><div class="lesson-tag">Module 3 · Lesson 3.8</div><h1>Forms and Validation</h1></div>
+<div class="card"><div class="section"><h2>Reading Form Input</h2><div class="body"><p>JavaScript can read what a user typed into a form field via <code>input.value</code>, and can run this check before the form is actually submitted, catching problems early rather than after a server round-trip.</p></div></div><div class="section"><h2>Client-Side Validation</h2><div class="body"><p>Checking that a required field is not empty, or that an email field contains an "@", before submission gives the user immediate feedback — but as covered in the caregiving-adjacent lesson on secure coding elsewhere, this is a UX convenience, not a security control.</p></div><div class="keypoint"><strong>Key Point.</strong> Client-side validation can always be bypassed by a determined user — genuine security-relevant validation must also happen on the server, never only in the browser.</div></div><div class="section"><h2>Preventing Default Submission</h2><div class="body"><p><code>event.preventDefault()</code> inside a form's submit handler stops the browser's normal full-page-reload submission, letting JavaScript handle the data instead (e.g. sending it via fetch without reloading the page).</p></div></div></div>
+</div>
+</body>
+</html>

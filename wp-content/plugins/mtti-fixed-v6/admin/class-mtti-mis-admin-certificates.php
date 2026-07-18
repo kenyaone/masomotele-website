@@ -47,19 +47,20 @@ class MTTI_MIS_Admin_Certificates {
     
     private function display_list() {
         global $wpdb;
-        
+
         // Get all active students with their course info
         $students_table = $this->db->get_table_name('students');
         $courses_table = $this->db->get_table_name('courses');
         $units_table = $this->db->get_table_name('course_units');
         $unit_results_table = $this->db->get_table_name('unit_results');
         $enrollments_table = $this->db->get_table_name('enrollments');
-        
-        // FIX: Query via enrollments so students enrolled in multiple courses
-        // appear once per course (e.g. Mercy Jepkemboi enrolled in COE and COA
-        // will produce two rows — one for each course).
-        // Previously this joined on s.course_id (primary course only), hiding
-        // any additional enrollment.
+
+        // MULTI-COURSE FIX: Query via enrollments so students enrolled in multiple courses
+        // appear once per course (e.g. Emmanuel Ebenyo enrolled in CYS-01, PRP-01, WDD-01
+        // will produce three rows — one per course).
+        // Each row contains the SPECIFIC enrollment's course_id, not the student's primary course.
+        // This ensures certificate eligibility is checked correctly for each individual course.
+        // Previously this joined on s.course_id (primary course only), hiding any additional enrollment.
         $students = $wpdb->get_results("
             SELECT s.*, u.display_name, u.user_email,
                    c.course_id, c.course_name, c.course_code,
@@ -111,10 +112,20 @@ class MTTI_MIS_Admin_Certificates {
             $unit_avg = 0;
             
             if ($student->course_id) {
-                $total_units = intval($wpdb->get_var($wpdb->prepare(
+                // Get required units from course config, fall back to counting active units
+                $required_units = intval($wpdb->get_var($wpdb->prepare(
+                    "SELECT required_units FROM {$courses_table} WHERE course_id = %d",
+                    $student->course_id
+                )));
+
+                // Count total active units as reference
+                $total_active_units = intval($wpdb->get_var($wpdb->prepare(
                     "SELECT COUNT(*) FROM {$units_table} WHERE course_id = %d AND status = 'Active'",
                     $student->course_id
                 )));
+
+                // Use required_units if set, otherwise fall back to total active
+                $total_units = ($required_units > 0) ? $required_units : $total_active_units;
                 if ($total_units > 0) {
                     // Count how many units have results AND get pass/fail/avg
                     $unit_stats = $wpdb->get_row($wpdb->prepare(
@@ -144,6 +155,8 @@ class MTTI_MIS_Admin_Certificates {
                 $display_failed  = $units_failed;
                 $display_total   = $completed_units;
                 $display_avg     = $unit_avg;
+                // FIX: Show completed units vs REQUIRED units (not total units in course)
+                // $total_units already correctly set to required_units if available, else total_active
                 $display_label   = $completed_units . '/' . $total_units . ' units';
             } else {
                 $display_passed  = $passed;
@@ -262,7 +275,7 @@ class MTTI_MIS_Admin_Certificates {
                             </a>
                             <?php endif; ?>
                             <?php if ($data['eligible'] && $student->course_id) : ?>
-                            <a href="?page=mtti-mis-certificates&action=generate&student_id=<?php echo $student->student_id; ?>" 
+                            <a href="?page=mtti-mis-certificates&action=generate&student_id=<?php echo $student->student_id; ?>&course_id=<?php echo $student->course_id; ?>"
                                class="button" style="background: #00b894; color: white; border-color: #00b894;">
                                 🎓 Certificate
                             </a>
@@ -1185,12 +1198,22 @@ class MTTI_MIS_Admin_Certificates {
         }
         
         // --- Check completion via EITHER unit_results OR exam_results ---
-        
+
         // Method 1: Check unit_results (new unit-based system)
-        $total_units = $wpdb->get_var($wpdb->prepare(
+        // Get required units from course config, fall back to counting active units
+        $required_units = intval($wpdb->get_var($wpdb->prepare(
+            "SELECT required_units FROM {$courses_table} WHERE course_id = %d",
+            $course_id
+        )));
+
+        // Count total active units as reference
+        $total_active_units = intval($wpdb->get_var($wpdb->prepare(
             "SELECT COUNT(*) FROM {$units_table} WHERE course_id = %d AND status = 'Active'",
             $course_id
-        ));
+        )));
+
+        // Use required_units if set, otherwise fall back to total active
+        $total_units = ($required_units > 0) ? $required_units : $total_active_units;
         
         $completed_units = 0;
         $units_complete = false;
@@ -1260,12 +1283,29 @@ class MTTI_MIS_Admin_Certificates {
     
     private function display_certificate_form() {
         global $wpdb;
-        
+
         $student_id = isset($_GET['student_id']) ? intval($_GET['student_id']) : 0;
+        // MULTI-COURSE FIX: Read the specific course_id from URL parameter.
+        // This allows students with multiple enrollments to generate certificates for each course independently.
+        $course_id = isset($_GET['course_id']) ? intval($_GET['course_id']) : 0;
+
         $student = $this->db->get_student($student_id);
-        
+
         if (!$student) {
             wp_die('Invalid student ID');
+        }
+
+        // MULTI-COURSE FIX: Override the student's primary course_id with the specific enrollment's course_id.
+        // This ensures eligibility checks, unit calculations, and fees are evaluated for the CORRECT course,
+        // not the student's primary course. Essential for students with multiple active enrollments.
+        // Example: Emmanuel enrolled in CYS-01 (primary) + PRP-01 + WDD-01
+        // When generating PRP-01 certificate, course_id=9 overrides student.course_id=8
+        if ($course_id > 0) {
+            $student->course_id = $course_id;
+        }
+
+        if (!$student->course_id) {
+            wp_die('Student has no course assigned');
         }
         
         // Get exam results for this student (legacy HTML exams)
@@ -1291,6 +1331,7 @@ class MTTI_MIS_Admin_Certificates {
         $exams_eligible = $all_exams_passed && $avg_above_50;
         
         // Check unit_results eligibility (unit-based system)
+        $courses_table = $this->db->get_table_name('courses');
         $units_table = $this->db->get_table_name('course_units');
         $unit_results_table = $this->db->get_table_name('unit_results');
         $total_units = 0;
@@ -1298,12 +1339,19 @@ class MTTI_MIS_Admin_Certificates {
         $units_eligible = false;
         $unit_avg_score = 0;
         $unit_avg_grade = 'D';
-        
+
         if ($student->course_id) {
-            $total_units = (int) $wpdb->get_var($wpdb->prepare(
+            // FIX: Use required_units from course config if set, else count total active units
+            $required_units = (int) $wpdb->get_var($wpdb->prepare(
+                "SELECT required_units FROM {$courses_table} WHERE course_id = %d",
+                $student->course_id
+            ));
+            $total_active_units = (int) $wpdb->get_var($wpdb->prepare(
                 "SELECT COUNT(*) FROM {$units_table} WHERE course_id = %d AND status = 'Active'",
                 $student->course_id
             ));
+            $total_units = ($required_units > 0) ? $required_units : $total_active_units;
+
             if ($total_units > 0) {
                 $completed_units = (int) $wpdb->get_var($wpdb->prepare(
                     "SELECT COUNT(DISTINCT ur.unit_id) FROM {$unit_results_table} ur

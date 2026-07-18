@@ -1,0 +1,432 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lesson 9.4 — Technical SEO / Core Web Vitals (Interactive)</title>
+<style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: 'Segoe UI', -apple-system, sans-serif; line-height: 1.55; color: #1e293b; background: #f8fafc; min-height: 100vh; }
+    .container { max-width: 1150px; margin: 0 auto; padding: 20px; }
+    header {
+        background: linear-gradient(135deg, #2E7D32, #1B5E20);
+        color: #fff; padding: 40px 30px; border-radius: 12px; margin-bottom: 24px;
+        box-shadow: 0 10px 30px rgba(2,132,199,0.25);
+    }
+    header .badge { display: inline-block; background: rgba(255,255,255,0.2); padding: 4px 14px; border-radius: 16px; font-size: 12px; font-weight: bold; letter-spacing: 1px; margin-bottom: 14px; }
+    header h1 { font-size: 34px; margin-bottom: 8px; }
+    header .subtitle { font-size: 17px; opacity: 0.95; margin-bottom: 20px; }
+    .meta-strip { display: flex; flex-wrap: wrap; gap: 12px; }
+    .meta-strip span { background: rgba(255,255,255,0.18); padding: 6px 14px; border-radius: 20px; font-size: 13px; }
+    .toc { background: #fff; border: 1px solid #e2e8f0; border-radius: 10px; padding: 22px 26px; margin-bottom: 22px; }
+    .toc h3 { color: #0284c7; margin-bottom: 10px; }
+    .toc ol { padding-left: 20px; }
+    .toc a { color: #0284c7; text-decoration: none; font-weight: 600; }
+    section { background: #fff; border: 1px solid #e2e8f0; border-radius: 10px; padding: 26px 30px; margin-bottom: 22px; }
+    section h2 { color: #0284c7; font-size: 22px; margin-bottom: 12px; padding-bottom: 8px; border-bottom: 3px solid #0284c7; }
+    section h3 { color: #0f172a; font-size: 17px; margin: 18px 0 8px; }
+    section p { margin-bottom: 12px; }
+    section ul, section ol { padding-left: 22px; margin-bottom: 12px; }
+    section li { margin-bottom: 4px; }
+    .callout { border-left: 5px solid #0284c7; background: #f0f9ff; padding: 14px 18px; margin: 14px 0; border-radius: 4px; }
+    .callout.warn { border-left-color: #dc2626; background: #fef2f2; }
+    .callout.tip { border-left-color: #059669; background: #ecfdf5; }
+    .callout strong { color: #0284c7; }
+
+    /* Core Web Vitals sliders + gauges */
+    .cwv-lab {
+        background: #0f172a;
+        border-radius: 12px;
+        padding: 20px;
+        margin: 20px 0;
+        color: #e2e8f0;
+    }
+    .cwv-lab h4 { color: #fff; font-size: 15px; margin-bottom: 4px; }
+    .cwv-lab .sub { color: #94a3b8; font-size: 12px; margin-bottom: 16px; }
+
+    .metric-row { display: grid; grid-template-columns: 90px 1fr 130px; gap: 12px; align-items: center; padding: 12px 0; border-bottom: 1px solid #334155; }
+    .metric-row:last-child { border-bottom: 0; }
+    .metric-name { font-weight: bold; font-size: 14px; color: #fff; }
+    .metric-name .sub { color: #94a3b8; font-size: 11px; font-weight: normal; }
+    .metric-slider input[type=range] { width: 100%; accent-color: #0ea5e9; }
+    .metric-slider .val { font-family: 'Courier New', monospace; font-size: 13px; color: #fbbf24; margin-top: 2px; }
+    .metric-badge {
+        text-align: center; padding: 8px 10px; border-radius: 6px;
+        font-weight: bold; font-size: 13px;
+    }
+    .metric-badge.good { background: #16a34a; color: #fff; }
+    .metric-badge.mid { background: #f59e0b; color: #fff; }
+    .metric-badge.bad { background: #dc2626; color: #fff; }
+
+    .cwv-summary { margin-top: 16px; padding: 14px; border-radius: 10px; display: flex; justify-content: space-between; align-items: center; }
+    .cwv-summary.pass { background: linear-gradient(90deg, #14532d, #16a34a); }
+    .cwv-summary.mid { background: linear-gradient(90deg, #78350f, #d97706); }
+    .cwv-summary.fail { background: linear-gradient(90deg, #7f1d1d, #dc2626); }
+    .cwv-summary .lead { font-size: 13px; color: rgba(255,255,255,0.85); text-transform: uppercase; letter-spacing: 1px; }
+    .cwv-summary .verdict { font-size: 18px; font-weight: bold; color: #fff; }
+
+    /* PageSpeed Insights mock */
+    .psi {
+        background: #fff;
+        border: 1.5px solid #cbd5e1;
+        border-radius: 10px;
+        overflow: hidden;
+        margin: 14px 0;
+    }
+    .psi-topbar { background: #f1f5f9; padding: 10px 14px; display: flex; align-items: center; gap: 10px; border-bottom: 1px solid #cbd5e1; font-size: 13px; }
+    .psi-topbar .g { display: inline-flex; align-items: center; font-weight: bold; color: #ea4335; }
+    .psi-topbar .g::before { content: 'G'; background: #ea4335; color: #fff; width: 22px; height: 22px; border-radius: 50%; display: inline-flex; align-items: center; justify-content: center; font-size: 12px; margin-right: 8px; }
+    .psi-input { padding: 14px; display: flex; gap: 8px; background: #f8fafc; border-bottom: 1px solid #e2e8f0; }
+    .psi-input input { flex: 1; padding: 8px 10px; border: 1.5px solid #cbd5e1; border-radius: 6px; font-size: 14px; }
+    .psi-input button { background: #0284c7; color: #fff; border: 0; padding: 8px 16px; border-radius: 6px; cursor: pointer; font-weight: 600; }
+    .psi-result { padding: 18px; display: none; }
+    .psi-result.show { display: block; }
+    .psi-scores { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; }
+    .psi-score { text-align: center; padding: 12px; border-radius: 10px; border: 2px solid #e2e8f0; }
+    .psi-score.g { border-color: #16a34a; }
+    .psi-score.a { border-color: #f59e0b; }
+    .psi-score.r { border-color: #dc2626; }
+    .psi-score .num { font-size: 32px; font-weight: bold; }
+    .psi-score.g .num { color: #16a34a; }
+    .psi-score.a .num { color: #f59e0b; }
+    .psi-score.r .num { color: #dc2626; }
+    .psi-score .label { font-size: 12px; color: #64748b; text-transform: uppercase; letter-spacing: 0.5px; margin-top: 4px; }
+    .psi-fixes { margin-top: 16px; }
+    .psi-fix { background: #fef3c7; border-left: 4px solid #d97706; padding: 10px 14px; border-radius: 4px; margin-bottom: 8px; font-size: 13px; color: #78350f; }
+    .psi-fix strong { color: #92400e; }
+
+    /* Image optimiser */
+    .img-fix { background: #f0f9ff; border: 1.5px solid #0284c7; border-radius: 10px; padding: 16px; margin: 14px 0; }
+    .img-fix h4 { color: #075985; margin-bottom: 10px; }
+    .img-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-top: 10px; }
+    .img-cell { background: #fff; padding: 12px; border-radius: 8px; border: 1px solid #cbd5e1; }
+    .img-cell.before { border-color: #dc2626; }
+    .img-cell.after { border-color: #16a34a; }
+    .img-cell h5 { font-size: 13px; margin-bottom: 6px; }
+    .img-cell.before h5 { color: #991b1b; }
+    .img-cell.after h5 { color: #14532d; }
+    .img-cell .stat { display: flex; justify-content: space-between; font-size: 13px; margin: 4px 0; }
+    .img-cell .stat b { color: #1e293b; }
+
+    /* Sitemap / robots */
+    .files-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin: 14px 0; }
+    .file-card { background: #f8fafc; border: 1px solid #cbd5e1; border-radius: 8px; padding: 14px; font-family: 'Courier New', monospace; font-size: 12px; }
+    .file-card .filename { font-weight: bold; color: #0284c7; margin-bottom: 6px; font-family: 'Segoe UI', sans-serif; font-size: 14px; }
+    .file-card pre { white-space: pre-wrap; color: #475569; }
+    @media (max-width: 700px) { .files-grid, .img-grid { grid-template-columns: 1fr; } .psi-scores { grid-template-columns: 1fr 1fr; } }
+
+    .quiz-question { background: #fff; border: 2px solid #cbd5e1; border-radius: 10px; padding: 18px; margin: 14px 0; }
+    .quiz-question.correct { border-color: #059669; background: #ecfdf5; }
+    .quiz-question.wrong { border-color: #dc2626; background: #fef2f2; }
+    .quiz-question h4 { margin-bottom: 12px; font-size: 15px; color: #1e293b; }
+    .quiz-question .options label { display: block; padding: 10px 14px; margin-bottom: 6px; background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 6px; cursor: pointer; font-size: 14px; }
+    .quiz-question .options label:hover { background: #f0f9ff; }
+    .quiz-question .options input[type="radio"] { margin-right: 10px; }
+    .quiz-question .explanation { display: none; margin-top: 12px; padding: 10px 14px; border-radius: 6px; font-size: 14px; }
+    .quiz-question.correct .explanation { display: block; background: #d1fae5; color: #065f46; border-left: 4px solid #059669; }
+    .quiz-question.wrong .explanation { display: block; background: #fee2e2; color: #991b1b; border-left: 4px solid #dc2626; }
+    .quiz-summary { text-align: center; padding: 30px; background: linear-gradient(135deg, #f0f9ff 0%, #bae6fd 100%); border-radius: 10px; margin: 20px 0; display: none; }
+    .quiz-summary.show { display: block; }
+    .quiz-summary .score { font-size: 48px; font-weight: bold; color: #0284c7; margin-bottom: 8px; }
+    button.btn { background: #0284c7; color: #fff; border: none; padding: 10px 20px; border-radius: 6px; font-size: 15px; font-weight: 600; cursor: pointer; }
+    button.btn:hover { background: #0369a1; }
+    button.btn.reset { background: #64748b; margin-left: 8px; }
+    footer { text-align: center; color: #64748b; padding: 24px; font-size: 13px; }
+
+    /* MTTI logo stamp */
+    .mtti-logo-stamp {
+        position: fixed; top: 14px; right: 18px; z-index: 999;
+        opacity: 0.88; transition: opacity 0.2s;
+    }
+    .mtti-logo-stamp:hover { opacity: 1; }
+    .mtti-logo-stamp img { width: 56px; height: 56px; border-radius: 50%; box-shadow: 0 2px 8px rgba(0,0,0,0.18); }
+</style>
+</head>
+<body>
+<div class="mtti-logo-stamp">
+    <img src="../../Resources/Logo.jpeg" alt="MTTI" title="Masomotele Technical Training Institute — Start learning, Start earning">
+</div>
+
+<div class="container">
+
+<header>
+    <div class="badge">LESSON 9.4  ·  SEO IMPLEMENTATION LAB  ·  INTERACTIVE</div>
+    <h1>Technical SEO — Core Web Vitals</h1>
+    <div class="subtitle">The SEO layer most Kenyan marketers ignore. Slide, test, and fix Sarah's home page speed until Google is happy.</div>
+    <div class="meta-strip">
+        <span><strong>Duration:</strong> ~35 min lab</span>
+        <span><strong>Level:</strong> Intermediate</span>
+        <span><strong>Tool:</strong> PageSpeed Insights (free)</span>
+        <span><strong>Handbook:</strong> Part 9, §9.4</span>
+    </div>
+</header>
+
+<div class="toc">
+    <h3>What you'll do in this lesson</h3>
+    <ol>
+        <li><a href="#s1">What technical SEO covers</a></li>
+        <li><a href="#s2">The 3 Core Web Vitals (LCP / INP / CLS)</a></li>
+        <li><a href="#s3"><strong>Live CWV simulator — move the sliders</strong></a></li>
+        <li><a href="#s4">Mock PageSpeed Insights — run the audit</a></li>
+        <li><a href="#s5">Image optimisation — fix the biggest problem</a></li>
+        <li><a href="#s6">Sitemap.xml + robots.txt</a></li>
+        <li><a href="#s7">Self-check quiz (10 questions)</a></li>
+    </ol>
+</div>
+
+<section id="s1">
+    <h2>1. What technical SEO covers</h2>
+    <p>Technical SEO is everything Google reads about your site <strong>other than the words and images.</strong> Yoast handled the writing (Lesson 9.3). Technical SEO handles the plumbing. Both matter equally.</p>
+    <table style="width:100%; border-collapse:collapse; font-size:14px;">
+        <tr><th style="background:#0284c7;color:#fff;padding:10px;border:1px solid #e2e8f0;text-align:left;">Layer</th><th style="background:#0284c7;color:#fff;padding:10px;border:1px solid #e2e8f0;text-align:left;">Signal</th></tr>
+        <tr><td style="padding:10px;border:1px solid #e2e8f0;">Speed</td><td style="padding:10px;border:1px solid #e2e8f0;">Core Web Vitals: LCP, INP, CLS</td></tr>
+        <tr><td style="padding:10px;border:1px solid #e2e8f0;">Mobile</td><td style="padding:10px;border:1px solid #e2e8f0;">Responsive design, mobile-friendly test</td></tr>
+        <tr><td style="padding:10px;border:1px solid #e2e8f0;">Crawlability</td><td style="padding:10px;border:1px solid #e2e8f0;">sitemap.xml, robots.txt</td></tr>
+        <tr><td style="padding:10px;border:1px solid #e2e8f0;">Security</td><td style="padding:10px;border:1px solid #e2e8f0;">HTTPS (SSL certificate)</td></tr>
+        <tr><td style="padding:10px;border:1px solid #e2e8f0;">Indexing</td><td style="padding:10px;border:1px solid #e2e8f0;">canonical tags, no-index rules</td></tr>
+    </table>
+</section>
+
+<section id="s2">
+    <h2>2. The 3 Core Web Vitals</h2>
+    <table style="width:100%; border-collapse:collapse; font-size:14px;">
+        <tr><th style="background:#0284c7;color:#fff;padding:10px;border:1px solid #e2e8f0;">Metric</th><th style="background:#0284c7;color:#fff;padding:10px;border:1px solid #e2e8f0;">What it measures</th><th style="background:#0284c7;color:#fff;padding:10px;border:1px solid #e2e8f0;">Target</th></tr>
+        <tr><td style="padding:10px;border:1px solid #e2e8f0;"><strong>LCP</strong><br><small>Largest Contentful Paint</small></td><td style="padding:10px;border:1px solid #e2e8f0;">Time until biggest visible element renders</td><td style="padding:10px;border:1px solid #e2e8f0;">≤ 2.5 s</td></tr>
+        <tr><td style="padding:10px;border:1px solid #e2e8f0;"><strong>INP</strong><br><small>Interaction to Next Paint</small></td><td style="padding:10px;border:1px solid #e2e8f0;">How fast the site responds to taps/clicks</td><td style="padding:10px;border:1px solid #e2e8f0;">≤ 200 ms</td></tr>
+        <tr><td style="padding:10px;border:1px solid #e2e8f0;"><strong>CLS</strong><br><small>Cumulative Layout Shift</small></td><td style="padding:10px;border:1px solid #e2e8f0;">How much the page jumps around while loading</td><td style="padding:10px;border:1px solid #e2e8f0;">≤ 0.1</td></tr>
+    </table>
+</section>
+
+<section id="s3">
+    <h2>3. Live CWV simulator — move the sliders</h2>
+    <p>Drag each slider. Each metric gets a badge (Good / Needs improvement / Poor). Get all three green.</p>
+    <div class="cwv-lab">
+        <h4>Sarah's Home page — live grading</h4>
+        <div class="sub">karibukitchen.co.ke · Mobile · Kenya</div>
+
+        <div class="metric-row">
+            <div class="metric-name">LCP<div class="sub">Largest Contentful Paint</div></div>
+            <div class="metric-slider">
+                <input type="range" id="sLCP" min="500" max="8000" step="100" value="3200">
+                <div class="val" id="vLCP">3.20 s</div>
+            </div>
+            <div class="metric-badge bad" id="bLCP">Poor</div>
+        </div>
+
+        <div class="metric-row">
+            <div class="metric-name">INP<div class="sub">Interaction to Next Paint</div></div>
+            <div class="metric-slider">
+                <input type="range" id="sINP" min="20" max="1000" step="10" value="180">
+                <div class="val" id="vINP">180 ms</div>
+            </div>
+            <div class="metric-badge good" id="bINP">Good</div>
+        </div>
+
+        <div class="metric-row">
+            <div class="metric-name">CLS<div class="sub">Cumulative Layout Shift</div></div>
+            <div class="metric-slider">
+                <input type="range" id="sCLS" min="0" max="0.5" step="0.01" value="0.18">
+                <div class="val" id="vCLS">0.18</div>
+            </div>
+            <div class="metric-badge mid" id="bCLS">Needs improvement</div>
+        </div>
+
+        <div class="cwv-summary mid" id="cwvSummary">
+            <div class="lead" id="cwvLead">Needs improvement</div>
+            <div class="verdict" id="cwvVerdict">2 of 3 vitals green</div>
+        </div>
+    </div>
+
+    <div class="callout warn">
+        <strong>Google's rule:</strong> ALL three vitals must be green for the page to earn the "Good" rating in Search Console. One red = Google demotes ranking. Fix the reds first.
+    </div>
+</section>
+
+<section id="s4">
+    <h2>4. Mock PageSpeed Insights</h2>
+    <p>Google's own free tool at <strong>pagespeed.web.dev</strong>. Enter a URL and get a full report. Try the simulator below.</p>
+    <div class="psi">
+        <div class="psi-topbar">
+            <span class="g">PageSpeed Insights</span>
+            <span style="margin-left:auto; color:#64748b;">pagespeed.web.dev</span>
+        </div>
+        <div class="psi-input">
+            <input id="psiUrl" value="https://karibukitchen.co.ke" placeholder="Enter URL to audit">
+            <button onclick="runPsi()">Analyze</button>
+        </div>
+        <div class="psi-result" id="psiResult">
+            <div class="psi-scores">
+                <div class="psi-score a"><div class="num">78</div><div class="label">Performance</div></div>
+                <div class="psi-score g"><div class="num">92</div><div class="label">Accessibility</div></div>
+                <div class="psi-score g"><div class="num">100</div><div class="label">Best Practices</div></div>
+                <div class="psi-score g"><div class="num">96</div><div class="label">SEO</div></div>
+            </div>
+            <div class="psi-fixes">
+                <h3 style="font-size:15px; color:#0284c7; margin-bottom:10px;">Top opportunities (biggest impact first)</h3>
+                <div class="psi-fix"><strong>Serve images in next-gen formats (WebP/AVIF)</strong> — estimated saving <b>1.2 s</b>. Sarah's PNG hero is 2 MB; WebP would be ~90 KB.</div>
+                <div class="psi-fix"><strong>Properly size images</strong> — estimated saving <b>0.8 s</b>. Hero is 3,200 px wide, phones only render 900 px.</div>
+                <div class="psi-fix"><strong>Eliminate render-blocking resources</strong> — estimated saving <b>0.4 s</b>. Two theme scripts blocking first paint.</div>
+                <div class="psi-fix"><strong>Enable text compression (gzip/brotli)</strong> — estimated saving <b>0.2 s</b>. Ask host to enable.</div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<section id="s5">
+    <h2>5. Image optimisation — fix the biggest problem</h2>
+    <div class="img-fix">
+        <h4>Sarah's hero image — before / after</h4>
+        <p style="font-size:14px; color:#075985;">Fix the single biggest LCP contributor. This one change saves 1.2 s.</p>
+        <div class="img-grid">
+            <div class="img-cell before">
+                <h5>❌ Before</h5>
+                <div class="stat"><span>Format</span><b>PNG</b></div>
+                <div class="stat"><span>Dimensions</span><b>3,200 × 2,133</b></div>
+                <div class="stat"><span>File size</span><b>2.0 MB</b></div>
+                <div class="stat"><span>Contribution to LCP</span><b>1.4 s</b></div>
+            </div>
+            <div class="img-cell after">
+                <h5>✓ After</h5>
+                <div class="stat"><span>Format</span><b>WebP</b></div>
+                <div class="stat"><span>Dimensions</span><b>900 × 600</b></div>
+                <div class="stat"><span>File size</span><b>~90 KB</b></div>
+                <div class="stat"><span>Contribution to LCP</span><b>0.2 s</b></div>
+            </div>
+        </div>
+    </div>
+    <div class="callout tip">
+        <strong>Rule:</strong> export images at the exact maximum display size, in WebP. Twenty images fixed = ~24 seconds saved in aggregate. Google notices.
+    </div>
+</section>
+
+<section id="s6">
+    <h2>6. sitemap.xml + robots.txt</h2>
+    <p>Two files every WordPress site needs. Yoast auto-generates both.</p>
+    <div class="files-grid">
+        <div class="file-card">
+            <div class="filename">/sitemap_index.xml</div>
+<pre>&lt;?xml version="1.0"?&gt;
+&lt;sitemapindex xmlns="..."&gt;
+  &lt;sitemap&gt;
+    &lt;loc&gt;karibukitchen.co.ke/
+      page-sitemap.xml&lt;/loc&gt;
+  &lt;/sitemap&gt;
+  &lt;sitemap&gt;
+    &lt;loc&gt;karibukitchen.co.ke/
+      post-sitemap.xml&lt;/loc&gt;
+  &lt;/sitemap&gt;
+&lt;/sitemapindex&gt;</pre>
+        </div>
+        <div class="file-card">
+            <div class="filename">/robots.txt</div>
+<pre>User-agent: *
+Disallow: /wp-admin/
+Allow: /wp-admin/admin-ajax.php
+
+Sitemap: https://karibukitchen.co.ke/
+  sitemap_index.xml</pre>
+        </div>
+    </div>
+    <div class="callout warn">
+        <strong>Do NOT touch robots.txt</strong> unless you know exactly what you're doing. Wrong entries can block Google entirely.
+    </div>
+</section>
+
+<section id="s7">
+    <h2>7. Self-check quiz</h2>
+
+    <div class="quiz-question" data-correct="C"><h4>1. What are Core Web Vitals?</h4><div class="options"><label><input type="radio" name="q1" value="A"> A) Cache, Volume, Loudness</label><label><input type="radio" name="q1" value="B"> B) Content, Vibes, Layout</label><label><input type="radio" name="q1" value="C"> C) LCP, INP, CLS</label><label><input type="radio" name="q1" value="D"> D) H1, H2, H3</label></div><div class="explanation">Correct — Largest Contentful Paint, Interaction to Next Paint, Cumulative Layout Shift.</div></div>
+
+    <div class="quiz-question" data-correct="B"><h4>2. LCP target?</h4><div class="options"><label><input type="radio" name="q2" value="A"> A) ≤ 10 s</label><label><input type="radio" name="q2" value="B"> B) ≤ 2.5 s</label><label><input type="radio" name="q2" value="C"> C) ≤ 200 ms</label><label><input type="radio" name="q2" value="D"> D) No limit</label></div><div class="explanation">Correct — 2.5 s or faster to hit "Good".</div></div>
+
+    <div class="quiz-question" data-correct="A"><h4>3. INP target?</h4><div class="options"><label><input type="radio" name="q3" value="A"> A) ≤ 200 ms</label><label><input type="radio" name="q3" value="B"> B) ≤ 2.5 s</label><label><input type="radio" name="q3" value="C"> C) ≤ 5 s</label><label><input type="radio" name="q3" value="D"> D) ≤ 0.1</label></div><div class="explanation">Correct — 200 ms measures tap-to-response speed.</div></div>
+
+    <div class="quiz-question" data-correct="D"><h4>4. CLS target?</h4><div class="options"><label><input type="radio" name="q4" value="A"> A) 5.0</label><label><input type="radio" name="q4" value="B"> B) 200</label><label><input type="radio" name="q4" value="C"> C) 2.5 s</label><label><input type="radio" name="q4" value="D"> D) ≤ 0.1</label></div><div class="explanation">Correct — CLS is unitless. 0.1 or lower.</div></div>
+
+    <div class="quiz-question" data-correct="C"><h4>5. Which tool grades Core Web Vitals for free?</h4><div class="options"><label><input type="radio" name="q5" value="A"> A) Yoast SEO</label><label><input type="radio" name="q5" value="B"> B) Google Ads</label><label><input type="radio" name="q5" value="C"> C) PageSpeed Insights (pagespeed.web.dev)</label><label><input type="radio" name="q5" value="D"> D) Canva</label></div><div class="explanation">Correct — free, at pagespeed.web.dev.</div></div>
+
+    <div class="quiz-question" data-correct="B"><h4>6. Sarah's hero image is 2 MB PNG at 3,200 px. Biggest fix?</h4><div class="options"><label><input type="radio" name="q6" value="A"> A) Delete it.</label><label><input type="radio" name="q6" value="B"> B) Convert to WebP at the real display size (~900 px).</label><label><input type="radio" name="q6" value="C"> C) Add more images.</label><label><input type="radio" name="q6" value="D"> D) Change hosting.</label></div><div class="explanation">Correct — right format + right size drops file to ~90 KB. LCP improves 1.2 s.</div></div>
+
+    <div class="quiz-question" data-correct="A"><h4>7. What does robots.txt do?</h4><div class="options"><label><input type="radio" name="q7" value="A"> A) Tells search engines what NOT to crawl.</label><label><input type="radio" name="q7" value="B"> B) Lists all pages on the site.</label><label><input type="radio" name="q7" value="C"> C) Compresses images.</label><label><input type="radio" name="q7" value="D"> D) Runs analytics.</label></div><div class="explanation">Correct — crawl exclusion rules.</div></div>
+
+    <div class="quiz-question" data-correct="C"><h4>8. What does sitemap.xml do?</h4><div class="options"><label><input type="radio" name="q8" value="A"> A) Draws site maps.</label><label><input type="radio" name="q8" value="B"> B) Blocks bots.</label><label><input type="radio" name="q8" value="C"> C) Lists every page on the site for search engines.</label><label><input type="radio" name="q8" value="D"> D) Speeds up images.</label></div><div class="explanation">Correct — a map of the site's pages for crawlers.</div></div>
+
+    <div class="quiz-question" data-correct="D"><h4>9. If ONE Core Web Vital is red, what happens?</h4><div class="options"><label><input type="radio" name="q9" value="A"> A) Nothing.</label><label><input type="radio" name="q9" value="B"> B) You get a bonus.</label><label><input type="radio" name="q9" value="C"> C) Google emails you.</label><label><input type="radio" name="q9" value="D"> D) Google demotes the page — ALL three must pass.</label></div><div class="explanation">Correct — one red is enough for Google to mark the page as failing CWV.</div></div>
+
+    <div class="quiz-question" data-correct="B"><h4>10. Which plugin auto-generates a WordPress sitemap?</h4><div class="options"><label><input type="radio" name="q10" value="A"> A) Elementor</label><label><input type="radio" name="q10" value="B"> B) Yoast SEO</label><label><input type="radio" name="q10" value="C"> C) WPForms</label><label><input type="radio" name="q10" value="D"> D) WooCommerce</label></div><div class="explanation">Correct — Yoast handles both on-page SEO and sitemap generation.</div></div>
+
+    <div style="margin-top: 20px;">
+        <button class="btn" onclick="markQuiz()">Mark my quiz</button>
+        <button class="btn reset" onclick="resetQuiz()">Reset</button>
+    </div>
+    <div class="quiz-summary" id="quizSummary"><div class="score" id="scoreDisplay">0 / 10</div><p id="scoreMessage"></p></div>
+</section>
+
+<footer>
+    <p>Lesson 9.4 — Technical SEO / Core Web Vitals · Masomotele Technical Training Institute · Handbook Part 9, §9.4</p>
+    <p>Next: <strong>Lesson 9.5 — Off-Page SEO (Backlinks)</strong></p>
+</footer>
+</div>
+
+<script>
+function cwv() {
+    const lcp = +document.getElementById('sLCP').value;
+    const inp = +document.getElementById('sINP').value;
+    const cls = +document.getElementById('sCLS').value;
+    document.getElementById('vLCP').textContent = (lcp/1000).toFixed(2) + ' s';
+    document.getElementById('vINP').textContent = inp + ' ms';
+    document.getElementById('vCLS').textContent = cls.toFixed(2);
+
+    const gLCP = lcp <= 2500 ? 'good' : lcp <= 4000 ? 'mid' : 'bad';
+    const gINP = inp <= 200 ? 'good' : inp <= 500 ? 'mid' : 'bad';
+    const gCLS = cls <= 0.1 ? 'good' : cls <= 0.25 ? 'mid' : 'bad';
+    const labels = { good: 'Good', mid: 'Needs improvement', bad: 'Poor' };
+    document.getElementById('bLCP').className = 'metric-badge ' + gLCP;
+    document.getElementById('bLCP').textContent = labels[gLCP];
+    document.getElementById('bINP').className = 'metric-badge ' + gINP;
+    document.getElementById('bINP').textContent = labels[gINP];
+    document.getElementById('bCLS').className = 'metric-badge ' + gCLS;
+    document.getElementById('bCLS').textContent = labels[gCLS];
+
+    const goods = [gLCP, gINP, gCLS].filter(x => x === 'good').length;
+    const s = document.getElementById('cwvSummary');
+    const l = document.getElementById('cwvLead');
+    const v = document.getElementById('cwvVerdict');
+    if (goods === 3) { s.className = 'cwv-summary pass'; l.textContent = 'All green'; v.textContent = 'Google rewards this page'; }
+    else if (goods >= 1) { s.className = 'cwv-summary mid'; l.textContent = 'Needs improvement'; v.textContent = goods + ' of 3 vitals green'; }
+    else { s.className = 'cwv-summary fail'; l.textContent = 'Poor'; v.textContent = 'Google will demote — fix now'; }
+}
+document.querySelectorAll('#sLCP, #sINP, #sCLS').forEach(el => el.addEventListener('input', cwv));
+cwv();
+
+function runPsi() {
+    document.getElementById('psiResult').classList.add('show');
+    setTimeout(() => document.getElementById('psiResult').scrollIntoView({ behavior: 'smooth', block: 'nearest' }), 100);
+}
+
+function markQuiz() {
+    const questions = document.querySelectorAll('.quiz-question');
+    let score = 0;
+    questions.forEach((q, i) => {
+        const correct = q.dataset.correct;
+        const picked = q.querySelector(`input[name="q${i+1}"]:checked`);
+        q.classList.remove('correct', 'wrong');
+        if (picked && picked.value === correct) { q.classList.add('correct'); score++; }
+        else if (picked) q.classList.add('wrong');
+    });
+    const summary = document.getElementById('quizSummary');
+    summary.classList.add('show');
+    document.getElementById('scoreDisplay').textContent = `${score} / 10`;
+    const msg = document.getElementById('scoreMessage');
+    if (score === 10) msg.textContent = 'Perfect. Move to 9.5 — Off-Page SEO.';
+    else if (score >= 7) msg.textContent = 'Strong.';
+    else msg.textContent = 'Return to the CWV simulator until all three are green.';
+    summary.scrollIntoView({ behavior: 'smooth', block: 'center' });
+}
+function resetQuiz() {
+    document.querySelectorAll('.quiz-question').forEach(q => { q.classList.remove('correct', 'wrong'); q.querySelectorAll('input[type=radio]').forEach(r => r.checked = false); });
+    document.getElementById('quizSummary').classList.remove('show');
+}
+</script>
+</body>
+</html>

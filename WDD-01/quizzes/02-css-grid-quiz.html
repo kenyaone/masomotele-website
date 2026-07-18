@@ -1,0 +1,346 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CSS Grid | MTTI Web Design</title>
+    <link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Fredoka:wght@500;600&display=swap" rel="stylesheet">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Space Mono', monospace;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh; padding: 20px; color: #fff;
+        }
+        .container { max-width: 900px; margin: 0 auto; }
+        .header { text-align: center; margin-bottom: 30px; animation: slideDown 0.6s ease-out; }
+        .header .lesson-tag {
+            display: inline-block; background: rgba(255,255,255,0.2);
+            padding: 6px 16px; border-radius: 999px;
+            font-size: 0.85em; margin-bottom: 12px;
+        }
+        .header h1 {
+            font-family: 'Fredoka', sans-serif; font-size: 2.2em;
+            margin-bottom: 8px; text-shadow: 3px 3px 0 rgba(0,0,0,0.2);
+        }
+        .header p { opacity: 0.95; font-size: 0.95em; }
+        .score-board {
+            background: rgba(255,255,255,0.15); backdrop-filter: blur(10px);
+            border-radius: 20px; padding: 20px; margin-bottom: 20px;
+            display: flex; justify-content: space-around;
+            animation: fadeIn 0.8s ease-out 0.2s both;
+        }
+        .score-item { text-align: center; }
+        .score-item .label { font-size: 0.85em; opacity: 0.9; margin-bottom: 4px; }
+        .score-item .value {
+            font-size: 1.8em; font-weight: bold; font-family: 'Fredoka', sans-serif;
+        }
+        .progress-bar {
+            width: 100%; height: 8px; background: rgba(255,255,255,0.3);
+            border-radius: 10px; margin-bottom: 25px; overflow: hidden;
+        }
+        .progress-fill {
+            height: 100%; background: linear-gradient(90deg, #f093fb 0%, #f5576c 100%);
+            border-radius: 10px; transition: width 0.5s ease; width: 0%;
+        }
+        .exercise-card {
+            background: white; color: #333; border-radius: 25px;
+            padding: 35px; margin-bottom: 20px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            animation: fadeIn 0.6s ease-out both;
+        }
+        .scenario {
+            background: linear-gradient(135deg, #fff8e1 0%, #ffecb3 100%);
+            border-left: 5px solid #ffc107;
+            padding: 20px 24px; border-radius: 12px;
+            margin-bottom: 24px;
+            font-size: 0.98em; line-height: 1.55;
+        }
+        .scenario strong { color: #7a5a00; font-family: 'Fredoka', sans-serif; }
+        .question {
+            font-size: 1.15em; margin-bottom: 20px;
+            font-weight: 700; line-height: 1.4;
+        }
+        .options { display: flex; flex-direction: column; gap: 12px; }
+        .option {
+            background: #f5f7fb; border: 2px solid transparent;
+            padding: 16px 20px; border-radius: 12px;
+            cursor: pointer; transition: all 0.2s ease;
+            font-family: 'Space Mono', monospace; font-size: 0.98em; text-align: left;
+        }
+        .option:hover:not(.disabled) {
+            background: #eef1fb; border-color: #667eea; transform: translateX(4px);
+        }
+        .option.correct { background: #d4edda; border-color: #28a745; color: #155724; }
+        .option.wrong { background: #f8d7da; border-color: #dc3545; color: #721c24; animation: shake 0.4s; }
+        .option.disabled { cursor: not-allowed; opacity: 0.85; }
+        .feedback {
+            margin-top: 22px; padding: 18px 22px; border-radius: 12px;
+            animation: slideUp 0.4s ease-out;
+            font-size: 0.98em; line-height: 1.5;
+        }
+        .feedback.correct { background: #d4edda; color: #155724; border-left: 4px solid #28a745; }
+        .feedback.wrong { background: #f8d7da; color: #721c24; border-left: 4px solid #dc3545; }
+        .feedback strong { font-family: 'Fredoka', sans-serif; }
+        .next-btn, .restart-btn {
+            margin-top: 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white; border: none;
+            padding: 14px 32px; border-radius: 12px;
+            font-size: 1em; cursor: pointer;
+            font-family: 'Fredoka', sans-serif;
+            box-shadow: 0 6px 18px rgba(0,0,0,0.2);
+            transition: transform 0.2s ease;
+        }
+        .next-btn:hover, .restart-btn:hover { transform: scale(1.04); }
+        .results {
+            text-align: center; padding: 25px 15px;
+            animation: bounceIn 0.6s ease-out;
+        }
+        .results h2 {
+            font-family: 'Fredoka', sans-serif; font-size: 2em;
+            margin-bottom: 12px; color: #333;
+        }
+        .results .final-score {
+            font-size: 3em; font-family: 'Fredoka', sans-serif;
+            color: #667eea; margin: 20px 0;
+        }
+        .results p { color: #555; margin-bottom: 12px; }
+        .badge { display: inline-block; font-size: 3.5em; margin: 8px 0; }
+        @keyframes slideDown { from { opacity: 0; transform: translateY(-30px); } to { opacity: 1; transform: translateY(0); } }
+        @keyframes fadeIn { from { opacity: 0; transform: scale(0.96); } to { opacity: 1; transform: scale(1); } }
+        @keyframes slideUp { from { opacity: 0; transform: translateY(15px); } to { opacity: 1; transform: translateY(0); } }
+        @keyframes shake { 0%,100% { transform: translateX(0); } 25% { transform: translateX(-8px); } 75% { transform: translateX(8px); } }
+        @keyframes bounceIn { 0% { opacity: 0; transform: scale(0.4); } 60% { transform: scale(1.05); } 100% { opacity: 1; transform: scale(1); } }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <div class="lesson-tag">Module 2 · Lesson 2.5 · Quiz</div>
+            <h1>CSS Grid</h1>
+            <p></p>
+        </div>
+
+        <div class="score-board">
+            <div class="score-item"><div class="label">Score</div><div class="value" id="score">0</div></div>
+            <div class="score-item"><div class="label">Question</div><div class="value"><span id="current">1</span>/<span id="total">10</span></div></div>
+            <div class="score-item"><div class="label">Streak</div><div class="value" id="streak">0</div></div>
+        </div>
+
+        <div class="progress-bar"><div class="progress-fill" id="progress"></div></div>
+
+        <div class="exercise-card" id="exerciseCard"></div>
+    </div>
+
+    <script>
+        const exercises = [
+  {
+    "id": "q1",
+    "text": "James writes display: grid on his .product-grid. What happens to its direct children?",
+    "options": [
+      "They are stacked vertically in a single column by default",
+      "They are laid out in a two-dimensional grid — rows AND columns",
+      "They are treated as flex items",
+      "They float left automatically"
+    ],
+    "answer": 1,
+    "explanation": "display: grid enables two-dimensional layout — you define both rows and columns. By default, items form a single column (one column, many rows). Use grid-template-columns to create multiple columns."
+  },
+  {
+    "id": "q2",
+    "text": "James writes grid-template-columns: repeat(3, 1fr). What layout does this create?",
+    "options": [
+      "Three rows of equal height",
+      "Three columns of equal width filling the container",
+      "A single column taking one fraction of the viewport",
+      "Three frames that each take 1px of space"
+    ],
+    "answer": 1,
+    "explanation": "repeat(3, 1fr) creates three columns, each taking one equal fraction (1/3) of the available container width. The fr unit distributes remaining space after fixed sizes are subtracted — ideal for responsive equal-width columns."
+  },
+  {
+    "id": "q3",
+    "text": "James writes grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)). What does auto-fill do?",
+    "options": [
+      "Creates as many columns as needed to fill the parent, each at least 240px wide",
+      "Fills empty grid cells with a placeholder element",
+      "Automatically fills missing product data",
+      "Creates exactly 240 columns"
+    ],
+    "answer": 0,
+    "explanation": "auto-fill creates as many columns as fit in the container given the minimum size constraint. minmax(240px, 1fr) means each column is at least 240px and can grow. On a 720px container: 3 columns. On a 480px container: 2 columns. Fully responsive with no media queries."
+  },
+  {
+    "id": "q4",
+    "text": "James wants a hero banner to span all columns in his 3-column grid. Which property on the hero element achieves this?",
+    "options": [
+      "width: 100%",
+      "grid-column: 1 / -1",
+      "grid-row: span 3",
+      "flex: 1 1 100%"
+    ],
+    "answer": 1,
+    "explanation": "grid-column: 1 / -1 makes the element span from the first grid line to the last grid line (-1 always references the last line). This spans all columns regardless of how many there are — a flexible, maintainable approach."
+  },
+  {
+    "id": "q5",
+    "text": "What is the difference between gap (grid-gap) and padding in CSS Grid?",
+    "options": [
+      "They are identical in grid layout",
+      "gap sets space between grid tracks (between items); padding adds space inside an individual item between its border and content",
+      "padding works in Grid; gap only works in Flexbox",
+      "gap is applied to items; padding is applied to the container"
+    ],
+    "answer": 1,
+    "explanation": "gap (or grid-gap) creates gutters between rows and columns — space between items. padding is an item-level property adding space inside the item's border. Both serve different purposes and are often used together."
+  },
+  {
+    "id": "q6",
+    "text": "When should James choose CSS Grid over Flexbox for his product page layout?",
+    "options": [
+      "Grid is always better than Flexbox",
+      "Grid is best for two-dimensional layouts (rows AND columns); use Flexbox for one-dimensional flows (one row or one column)",
+      "Grid is for large screens; Flexbox is for mobile",
+      "Flexbox is deprecated in favour of Grid"
+    ],
+    "answer": 1,
+    "explanation": "Grid excels at two-dimensional layouts where you control both rows and columns simultaneously (product grids, page layouts). Flexbox is better for one-dimensional flows (nav bar, card contents, button rows). They are complementary — use both."
+  },
+  {
+    "id": "q7",
+    "text": "James writes grid-area: header on his site header. What must also exist for this to work?",
+    "options": [
+      "A class named .header in the CSS",
+      "A grid-template-areas definition on the parent grid container naming 'header'",
+      "A <header> HTML element on the page",
+      "A grid-row: header property on the container"
+    ],
+    "answer": 1,
+    "explanation": "grid-area assigns a named grid area to the item. The parent container must define the layout with grid-template-areas: \"header header\" \"sidebar main\" etc. The name in grid-area must exactly match the name in grid-template-areas."
+  },
+  {
+    "id": "q8",
+    "text": "James writes grid-template-columns: 200px 1fr 1fr. What widths do the three columns get in a 700px container?",
+    "options": [
+      "200px, 200px, 200px",
+      "200px, then 250px each (remaining 500px split equally)",
+      "About 233px each",
+      "200px for all three — fr units are ignored when mixed with px"
+    ],
+    "answer": 1,
+    "explanation": "Fixed px columns are allocated first: 200px used. Remaining: 700 - 200 = 500px, split by the two 1fr columns: 250px each. The fr unit divides the remaining space after fixed/auto tracks are satisfied."
+  },
+  {
+    "id": "q9",
+    "text": "What does place-items: center do on a grid container?",
+    "options": [
+      "Centres the entire grid within its parent",
+      "Sets both align-items: center and justify-items: center — centres every grid item in its cell both horizontally and vertically",
+      "Moves all items to the center column",
+      "Places items in the center row of the grid"
+    ],
+    "answer": 1,
+    "explanation": "place-items is shorthand for align-items + justify-items. place-items: center centres each grid item within its own cell — vertically (block axis) and horizontally (inline axis). Useful for icon grids or centred card layouts."
+  },
+  {
+    "id": "q10",
+    "text": "James wants to ensure his product grid always has rows at least 200px tall, growing if content is taller. Which value achieves this for grid-auto-rows?",
+    "options": [
+      "auto",
+      "200px",
+      "minmax(200px, auto)",
+      "1fr"
+    ],
+    "answer": 2,
+    "explanation": "minmax(200px, auto) sets a minimum row height of 200px and allows it to grow automatically to fit its content. Using just 200px would clip content taller than 200px. auto alone gives no minimum. 1fr divides space equally without a minimum."
+  }
+];
+
+        let currentQuestion = 0, score = 0, streak = 0, answered = false;
+
+        function updateScoreboard() {
+            document.getElementById('score').textContent = score;
+            document.getElementById('current').textContent = Math.min(currentQuestion + 1, exercises.length);
+            document.getElementById('total').textContent = exercises.length;
+            document.getElementById('streak').textContent = streak;
+            document.getElementById('progress').style.width = ((currentQuestion) / exercises.length) * 100 + '%';
+        }
+
+        function escapeHtml(s) {
+            return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+        }
+
+        function renderQuestion() {
+            answered = false;
+            const q = exercises[currentQuestion];
+            let html = '';
+            if (q.scenario) {
+                html += `<div class="scenario"><strong>Scenario.</strong> ${escapeHtml(q.scenario)}</div>`;
+            }
+            html += `<div class="question">${escapeHtml(q.text)}</div>`;
+            html += '<div class="options">';
+            q.options.forEach((o, i) => {
+                html += `<button class="option" onclick="selectAnswer(${i})">${escapeHtml(o)}</button>`;
+            });
+            html += '</div>';
+            document.getElementById('exerciseCard').innerHTML = html;
+            updateScoreboard();
+        }
+
+        function selectAnswer(i) {
+            if (answered) return;
+            answered = true;
+            const q = exercises[currentQuestion];
+            const btns = document.querySelectorAll('.option');
+            btns.forEach(b => b.classList.add('disabled'));
+            btns[q.answer].classList.add('correct');
+            const right = i === q.answer;
+            if (!right) btns[i].classList.add('wrong');
+            if (right) { score += 10; streak += 1; } else { streak = 0; }
+            const fb = document.createElement('div');
+            fb.className = 'feedback ' + (right ? 'correct' : 'wrong');
+            fb.innerHTML = `<strong>${right ? '✅ Correct.' : '❌ Not quite.'}</strong><br>${escapeHtml(q.explanation)}`;
+            document.getElementById('exerciseCard').appendChild(fb);
+            const nb = document.createElement('button');
+            nb.className = 'next-btn';
+            nb.textContent = currentQuestion === exercises.length - 1 ? 'See results →' : 'Next scenario →';
+            nb.onclick = nextQuestion;
+            document.getElementById('exerciseCard').appendChild(nb);
+            updateScoreboard();
+        }
+
+        function nextQuestion() {
+            currentQuestion++;
+            if (currentQuestion >= exercises.length) return showResults();
+            renderQuestion();
+        }
+
+        function showResults() {
+            document.getElementById('progress').style.width = '100%';
+            const total = exercises.length * 10;
+            const pct = Math.round(score / total * 100);
+            if (window.parent) { window.parent.postMessage({type:"mtti_quiz_score", score: score, total: total, percent: pct}, "*"); }
+            let badge = '🌟', msg = 'Excellent work. You have a professional grasp of this lesson.';
+            if (pct < 50) { badge = '🌱'; msg = 'Good first attempt. Re-watch the lesson video and try again.'; }
+            else if (pct < 80) { badge = '📚'; msg = 'Solid progress. Review the scenarios you missed and retry.'; }
+            document.getElementById('exerciseCard').innerHTML = `
+                <div class="results">
+                    <span class="badge">${badge}</span>
+                    <h2>Quiz Complete</h2>
+                    <div class="final-score">${score} / ${total}</div>
+                    <p><strong>${pct}%</strong> · Longest streak: ${streak}</p>
+                    <p>${msg}</p>
+                    <button class="restart-btn" onclick="restart()">Try again 🔁</button>
+                </div>`;
+        }
+
+        function restart() {
+            currentQuestion = 0; score = 0; streak = 0;
+            renderQuestion();
+        }
+
+        renderQuestion();
+    </script>
+</body>
+</html>

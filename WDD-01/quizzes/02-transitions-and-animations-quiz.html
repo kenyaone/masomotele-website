@@ -1,0 +1,346 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Transitions and Animations | MTTI Web Design</title>
+    <link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Fredoka:wght@500;600&display=swap" rel="stylesheet">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Space Mono', monospace;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh; padding: 20px; color: #fff;
+        }
+        .container { max-width: 900px; margin: 0 auto; }
+        .header { text-align: center; margin-bottom: 30px; animation: slideDown 0.6s ease-out; }
+        .header .lesson-tag {
+            display: inline-block; background: rgba(255,255,255,0.2);
+            padding: 6px 16px; border-radius: 999px;
+            font-size: 0.85em; margin-bottom: 12px;
+        }
+        .header h1 {
+            font-family: 'Fredoka', sans-serif; font-size: 2.2em;
+            margin-bottom: 8px; text-shadow: 3px 3px 0 rgba(0,0,0,0.2);
+        }
+        .header p { opacity: 0.95; font-size: 0.95em; }
+        .score-board {
+            background: rgba(255,255,255,0.15); backdrop-filter: blur(10px);
+            border-radius: 20px; padding: 20px; margin-bottom: 20px;
+            display: flex; justify-content: space-around;
+            animation: fadeIn 0.8s ease-out 0.2s both;
+        }
+        .score-item { text-align: center; }
+        .score-item .label { font-size: 0.85em; opacity: 0.9; margin-bottom: 4px; }
+        .score-item .value {
+            font-size: 1.8em; font-weight: bold; font-family: 'Fredoka', sans-serif;
+        }
+        .progress-bar {
+            width: 100%; height: 8px; background: rgba(255,255,255,0.3);
+            border-radius: 10px; margin-bottom: 25px; overflow: hidden;
+        }
+        .progress-fill {
+            height: 100%; background: linear-gradient(90deg, #f093fb 0%, #f5576c 100%);
+            border-radius: 10px; transition: width 0.5s ease; width: 0%;
+        }
+        .exercise-card {
+            background: white; color: #333; border-radius: 25px;
+            padding: 35px; margin-bottom: 20px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            animation: fadeIn 0.6s ease-out both;
+        }
+        .scenario {
+            background: linear-gradient(135deg, #fff8e1 0%, #ffecb3 100%);
+            border-left: 5px solid #ffc107;
+            padding: 20px 24px; border-radius: 12px;
+            margin-bottom: 24px;
+            font-size: 0.98em; line-height: 1.55;
+        }
+        .scenario strong { color: #7a5a00; font-family: 'Fredoka', sans-serif; }
+        .question {
+            font-size: 1.15em; margin-bottom: 20px;
+            font-weight: 700; line-height: 1.4;
+        }
+        .options { display: flex; flex-direction: column; gap: 12px; }
+        .option {
+            background: #f5f7fb; border: 2px solid transparent;
+            padding: 16px 20px; border-radius: 12px;
+            cursor: pointer; transition: all 0.2s ease;
+            font-family: 'Space Mono', monospace; font-size: 0.98em; text-align: left;
+        }
+        .option:hover:not(.disabled) {
+            background: #eef1fb; border-color: #667eea; transform: translateX(4px);
+        }
+        .option.correct { background: #d4edda; border-color: #28a745; color: #155724; }
+        .option.wrong { background: #f8d7da; border-color: #dc3545; color: #721c24; animation: shake 0.4s; }
+        .option.disabled { cursor: not-allowed; opacity: 0.85; }
+        .feedback {
+            margin-top: 22px; padding: 18px 22px; border-radius: 12px;
+            animation: slideUp 0.4s ease-out;
+            font-size: 0.98em; line-height: 1.5;
+        }
+        .feedback.correct { background: #d4edda; color: #155724; border-left: 4px solid #28a745; }
+        .feedback.wrong { background: #f8d7da; color: #721c24; border-left: 4px solid #dc3545; }
+        .feedback strong { font-family: 'Fredoka', sans-serif; }
+        .next-btn, .restart-btn {
+            margin-top: 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white; border: none;
+            padding: 14px 32px; border-radius: 12px;
+            font-size: 1em; cursor: pointer;
+            font-family: 'Fredoka', sans-serif;
+            box-shadow: 0 6px 18px rgba(0,0,0,0.2);
+            transition: transform 0.2s ease;
+        }
+        .next-btn:hover, .restart-btn:hover { transform: scale(1.04); }
+        .results {
+            text-align: center; padding: 25px 15px;
+            animation: bounceIn 0.6s ease-out;
+        }
+        .results h2 {
+            font-family: 'Fredoka', sans-serif; font-size: 2em;
+            margin-bottom: 12px; color: #333;
+        }
+        .results .final-score {
+            font-size: 3em; font-family: 'Fredoka', sans-serif;
+            color: #667eea; margin: 20px 0;
+        }
+        .results p { color: #555; margin-bottom: 12px; }
+        .badge { display: inline-block; font-size: 3.5em; margin: 8px 0; }
+        @keyframes slideDown { from { opacity: 0; transform: translateY(-30px); } to { opacity: 1; transform: translateY(0); } }
+        @keyframes fadeIn { from { opacity: 0; transform: scale(0.96); } to { opacity: 1; transform: scale(1); } }
+        @keyframes slideUp { from { opacity: 0; transform: translateY(15px); } to { opacity: 1; transform: translateY(0); } }
+        @keyframes shake { 0%,100% { transform: translateX(0); } 25% { transform: translateX(-8px); } 75% { transform: translateX(8px); } }
+        @keyframes bounceIn { 0% { opacity: 0; transform: scale(0.4); } 60% { transform: scale(1.05); } 100% { opacity: 1; transform: scale(1); } }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <div class="lesson-tag">Module 2 · Lesson 2.7 · Quiz</div>
+            <h1>Transitions and Animations</h1>
+            <p></p>
+        </div>
+
+        <div class="score-board">
+            <div class="score-item"><div class="label">Score</div><div class="value" id="score">0</div></div>
+            <div class="score-item"><div class="label">Question</div><div class="value"><span id="current">1</span>/<span id="total">10</span></div></div>
+            <div class="score-item"><div class="label">Streak</div><div class="value" id="streak">0</div></div>
+        </div>
+
+        <div class="progress-bar"><div class="progress-fill" id="progress"></div></div>
+
+        <div class="exercise-card" id="exerciseCard"></div>
+    </div>
+
+    <script>
+        const exercises = [
+  {
+    "id": "q1",
+    "text": "James writes transition: background-color 0.3s ease on his button. When does this transition fire?",
+    "options": [
+      "Continuously while the page is loaded",
+      "Whenever the background-color property changes (e.g. on :hover or via JavaScript)",
+      "Only when the button is first rendered",
+      "Only when the user clicks the button"
+    ],
+    "answer": 1,
+    "explanation": "Transitions animate changes to CSS properties. The animation fires when the specified property changes for any reason — :hover, :focus, adding/removing a class, or direct style changes in JavaScript. It does not fire on its own."
+  },
+  {
+    "id": "q2",
+    "text": "Which transition timing function creates a realistic movement that starts fast, slows down, then speeds up at the end?",
+    "options": [
+      "linear",
+      "ease",
+      "ease-in-out",
+      "cubic-bezier(0.68,-0.55,0.27,1.55)"
+    ],
+    "answer": 2,
+    "explanation": "ease-in-out starts slow, speeds up in the middle, then slows again at the end — similar to natural physical motion. ease starts slow and ends fast. linear is constant speed. cubic-bezier allows fully custom timing curves."
+  },
+  {
+    "id": "q3",
+    "text": "James uses transform: translateY(-5px) on card hover. Why is transform preferred over changing margin-top?",
+    "options": [
+      "transform works only on hover; margin-top does not",
+      "transform uses the GPU compositor and does not cause layout reflow — it is smoother and cheaper than changing margin-top",
+      "margin-top cannot be animated",
+      "transform is easier to read in the source code"
+    ],
+    "answer": 1,
+    "explanation": "Animating transform (and opacity) is GPU-accelerated — the browser can animate them on the compositor thread without recalculating the layout. Animating margin-top triggers layout reflow on every frame, causing jank on low-end Android phones."
+  },
+  {
+    "id": "q4",
+    "text": "James creates a CSS animation that flashes a red warning badge 5 times per second. What accessibility risk does this create?",
+    "options": [
+      "It increases page load time",
+      "Flashing content between 3–50 times per second can trigger seizures in people with photosensitive epilepsy — a WCAG 2.3.1 violation",
+      "It may cause the browser tab to freeze",
+      "Screen readers will read 'flashing' on every frame"
+    ],
+    "answer": 1,
+    "explanation": "WCAG 2.3.1 (Three Flashes or Below Threshold) prohibits content that flashes more than 3 times per second. Photosensitive epilepsy affects ~1 in 4,000 people. Never use high-frequency flashing for emphasis — use subtle, slow transitions instead."
+  },
+  {
+    "id": "q5",
+    "text": "James wants his site to respect users who have 'Reduce Motion' enabled in their OS accessibility settings. Which CSS media query detects this?",
+    "options": [
+      "@media (no-animation: true)",
+      "@media (prefers-reduced-motion: reduce)",
+      "@media (user-preference: no-motion)",
+      "@media (accessibility: reduce-motion)"
+    ],
+    "answer": 1,
+    "explanation": "@media (prefers-reduced-motion: reduce) detects users who have enabled 'Reduce Motion' in their OS. Inside this query, disable or slow down animations — typically by setting animation-duration to 0.01ms or removing transitions."
+  },
+  {
+    "id": "q6",
+    "text": "What is the difference between CSS transitions and CSS animations?",
+    "options": [
+      "Transitions are for colours; animations are for movement",
+      "Transitions animate between two states (A → B) triggered by an event; animations use @keyframes for multi-step, self-starting sequences",
+      "Animations require JavaScript; transitions are CSS-only",
+      "There is no difference — they produce identical results"
+    ],
+    "answer": 1,
+    "explanation": "Transitions: two-state, event-triggered (hover → off), simple A→B change. Animations: multi-step via @keyframes, can start automatically, loop, run multiple times, and have complex sequences. Use transitions for UI interactions, animations for continuous effects."
+  },
+  {
+    "id": "q7",
+    "text": "James writes @keyframes slide-in { from { opacity: 0; transform: translateX(-30px); } to { opacity: 1; transform: translateX(0); } }. Which property applies this animation to an element?",
+    "options": [
+      "transition: slide-in 0.4s ease",
+      "animate: slide-in 0.4s ease",
+      "animation: slide-in 0.4s ease",
+      "keyframe: slide-in 0.4s ease"
+    ],
+    "answer": 2,
+    "explanation": "The animation shorthand property applies a @keyframes animation: animation: [name] [duration] [timing] [delay] [iteration] [direction] [fill-mode]. The name must exactly match the @keyframes name. transition is for property changes, not @keyframes."
+  },
+  {
+    "id": "q8",
+    "text": "James wants a loading spinner to rotate continuously. Which animation-iteration-count value achieves this?",
+    "options": [
+      "animation-iteration-count: 0",
+      "animation-iteration-count: 100",
+      "animation-iteration-count: infinite",
+      "animation-iteration-count: loop"
+    ],
+    "answer": 2,
+    "explanation": "animation-iteration-count: infinite makes the animation repeat forever. A numeric value like 3 plays it exactly 3 times. 0 would not play at all. 'loop' is not a valid value — use infinite."
+  },
+  {
+    "id": "q9",
+    "text": "What does animation-fill-mode: forwards do?",
+    "options": [
+      "Makes the animation play forwards instead of in reverse",
+      "Keeps the styles from the last keyframe after the animation ends, instead of snapping back to the original state",
+      "Makes the animation play immediately without any delay",
+      "Sets the animation to play once in the forward direction"
+    ],
+    "answer": 1,
+    "explanation": "By default, elements snap back to their original styles when an animation ends. fill-mode: forwards retains the final @keyframes styles after the animation completes — useful for slide-in entrances where you don't want elements to disappear again."
+  },
+  {
+    "id": "q10",
+    "text": "James sets transition: all 0.3s ease on his product cards. What is the potential problem with using 'all'?",
+    "options": [
+      "'all' is not a valid transition property value",
+      "It transitions every CSS property change, including height and width, which can cause expensive layout reflows",
+      "It only transitions colour changes",
+      "Cards with 'all' cannot have :hover styles"
+    ],
+    "answer": 1,
+    "explanation": "transition: all transitions every CSS property that changes — including layout properties like width, height, and padding that trigger expensive reflow. It's better to specify only the properties you intend to animate (e.g. transition: transform 0.3s, background-color 0.3s)."
+  }
+];
+
+        let currentQuestion = 0, score = 0, streak = 0, answered = false;
+
+        function updateScoreboard() {
+            document.getElementById('score').textContent = score;
+            document.getElementById('current').textContent = Math.min(currentQuestion + 1, exercises.length);
+            document.getElementById('total').textContent = exercises.length;
+            document.getElementById('streak').textContent = streak;
+            document.getElementById('progress').style.width = ((currentQuestion) / exercises.length) * 100 + '%';
+        }
+
+        function escapeHtml(s) {
+            return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+        }
+
+        function renderQuestion() {
+            answered = false;
+            const q = exercises[currentQuestion];
+            let html = '';
+            if (q.scenario) {
+                html += `<div class="scenario"><strong>Scenario.</strong> ${escapeHtml(q.scenario)}</div>`;
+            }
+            html += `<div class="question">${escapeHtml(q.text)}</div>`;
+            html += '<div class="options">';
+            q.options.forEach((o, i) => {
+                html += `<button class="option" onclick="selectAnswer(${i})">${escapeHtml(o)}</button>`;
+            });
+            html += '</div>';
+            document.getElementById('exerciseCard').innerHTML = html;
+            updateScoreboard();
+        }
+
+        function selectAnswer(i) {
+            if (answered) return;
+            answered = true;
+            const q = exercises[currentQuestion];
+            const btns = document.querySelectorAll('.option');
+            btns.forEach(b => b.classList.add('disabled'));
+            btns[q.answer].classList.add('correct');
+            const right = i === q.answer;
+            if (!right) btns[i].classList.add('wrong');
+            if (right) { score += 10; streak += 1; } else { streak = 0; }
+            const fb = document.createElement('div');
+            fb.className = 'feedback ' + (right ? 'correct' : 'wrong');
+            fb.innerHTML = `<strong>${right ? '✅ Correct.' : '❌ Not quite.'}</strong><br>${escapeHtml(q.explanation)}`;
+            document.getElementById('exerciseCard').appendChild(fb);
+            const nb = document.createElement('button');
+            nb.className = 'next-btn';
+            nb.textContent = currentQuestion === exercises.length - 1 ? 'See results →' : 'Next scenario →';
+            nb.onclick = nextQuestion;
+            document.getElementById('exerciseCard').appendChild(nb);
+            updateScoreboard();
+        }
+
+        function nextQuestion() {
+            currentQuestion++;
+            if (currentQuestion >= exercises.length) return showResults();
+            renderQuestion();
+        }
+
+        function showResults() {
+            document.getElementById('progress').style.width = '100%';
+            const total = exercises.length * 10;
+            const pct = Math.round(score / total * 100);
+            if (window.parent) { window.parent.postMessage({type:"mtti_quiz_score", score: score, total: total, percent: pct}, "*"); }
+            let badge = '🌟', msg = 'Excellent work. You have a professional grasp of this lesson.';
+            if (pct < 50) { badge = '🌱'; msg = 'Good first attempt. Re-watch the lesson video and try again.'; }
+            else if (pct < 80) { badge = '📚'; msg = 'Solid progress. Review the scenarios you missed and retry.'; }
+            document.getElementById('exerciseCard').innerHTML = `
+                <div class="results">
+                    <span class="badge">${badge}</span>
+                    <h2>Quiz Complete</h2>
+                    <div class="final-score">${score} / ${total}</div>
+                    <p><strong>${pct}%</strong> · Longest streak: ${streak}</p>
+                    <p>${msg}</p>
+                    <button class="restart-btn" onclick="restart()">Try again 🔁</button>
+                </div>`;
+        }
+
+        function restart() {
+            currentQuestion = 0; score = 0; streak = 0;
+            renderQuestion();
+        }
+
+        renderQuestion();
+    </script>
+</body>
+</html>

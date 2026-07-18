@@ -1,0 +1,346 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Colour | MTTI Web Design</title>
+    <link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Fredoka:wght@500;600&display=swap" rel="stylesheet">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Space Mono', monospace;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh; padding: 20px; color: #fff;
+        }
+        .container { max-width: 900px; margin: 0 auto; }
+        .header { text-align: center; margin-bottom: 30px; animation: slideDown 0.6s ease-out; }
+        .header .lesson-tag {
+            display: inline-block; background: rgba(255,255,255,0.2);
+            padding: 6px 16px; border-radius: 999px;
+            font-size: 0.85em; margin-bottom: 12px;
+        }
+        .header h1 {
+            font-family: 'Fredoka', sans-serif; font-size: 2.2em;
+            margin-bottom: 8px; text-shadow: 3px 3px 0 rgba(0,0,0,0.2);
+        }
+        .header p { opacity: 0.95; font-size: 0.95em; }
+        .score-board {
+            background: rgba(255,255,255,0.15); backdrop-filter: blur(10px);
+            border-radius: 20px; padding: 20px; margin-bottom: 20px;
+            display: flex; justify-content: space-around;
+            animation: fadeIn 0.8s ease-out 0.2s both;
+        }
+        .score-item { text-align: center; }
+        .score-item .label { font-size: 0.85em; opacity: 0.9; margin-bottom: 4px; }
+        .score-item .value {
+            font-size: 1.8em; font-weight: bold; font-family: 'Fredoka', sans-serif;
+        }
+        .progress-bar {
+            width: 100%; height: 8px; background: rgba(255,255,255,0.3);
+            border-radius: 10px; margin-bottom: 25px; overflow: hidden;
+        }
+        .progress-fill {
+            height: 100%; background: linear-gradient(90deg, #f093fb 0%, #f5576c 100%);
+            border-radius: 10px; transition: width 0.5s ease; width: 0%;
+        }
+        .exercise-card {
+            background: white; color: #333; border-radius: 25px;
+            padding: 35px; margin-bottom: 20px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            animation: fadeIn 0.6s ease-out both;
+        }
+        .scenario {
+            background: linear-gradient(135deg, #fff8e1 0%, #ffecb3 100%);
+            border-left: 5px solid #ffc107;
+            padding: 20px 24px; border-radius: 12px;
+            margin-bottom: 24px;
+            font-size: 0.98em; line-height: 1.55;
+        }
+        .scenario strong { color: #7a5a00; font-family: 'Fredoka', sans-serif; }
+        .question {
+            font-size: 1.15em; margin-bottom: 20px;
+            font-weight: 700; line-height: 1.4;
+        }
+        .options { display: flex; flex-direction: column; gap: 12px; }
+        .option {
+            background: #f5f7fb; border: 2px solid transparent;
+            padding: 16px 20px; border-radius: 12px;
+            cursor: pointer; transition: all 0.2s ease;
+            font-family: 'Space Mono', monospace; font-size: 0.98em; text-align: left;
+        }
+        .option:hover:not(.disabled) {
+            background: #eef1fb; border-color: #667eea; transform: translateX(4px);
+        }
+        .option.correct { background: #d4edda; border-color: #28a745; color: #155724; }
+        .option.wrong { background: #f8d7da; border-color: #dc3545; color: #721c24; animation: shake 0.4s; }
+        .option.disabled { cursor: not-allowed; opacity: 0.85; }
+        .feedback {
+            margin-top: 22px; padding: 18px 22px; border-radius: 12px;
+            animation: slideUp 0.4s ease-out;
+            font-size: 0.98em; line-height: 1.5;
+        }
+        .feedback.correct { background: #d4edda; color: #155724; border-left: 4px solid #28a745; }
+        .feedback.wrong { background: #f8d7da; color: #721c24; border-left: 4px solid #dc3545; }
+        .feedback strong { font-family: 'Fredoka', sans-serif; }
+        .next-btn, .restart-btn {
+            margin-top: 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white; border: none;
+            padding: 14px 32px; border-radius: 12px;
+            font-size: 1em; cursor: pointer;
+            font-family: 'Fredoka', sans-serif;
+            box-shadow: 0 6px 18px rgba(0,0,0,0.2);
+            transition: transform 0.2s ease;
+        }
+        .next-btn:hover, .restart-btn:hover { transform: scale(1.04); }
+        .results {
+            text-align: center; padding: 25px 15px;
+            animation: bounceIn 0.6s ease-out;
+        }
+        .results h2 {
+            font-family: 'Fredoka', sans-serif; font-size: 2em;
+            margin-bottom: 12px; color: #333;
+        }
+        .results .final-score {
+            font-size: 3em; font-family: 'Fredoka', sans-serif;
+            color: #667eea; margin: 20px 0;
+        }
+        .results p { color: #555; margin-bottom: 12px; }
+        .badge { display: inline-block; font-size: 3.5em; margin: 8px 0; }
+        @keyframes slideDown { from { opacity: 0; transform: translateY(-30px); } to { opacity: 1; transform: translateY(0); } }
+        @keyframes fadeIn { from { opacity: 0; transform: scale(0.96); } to { opacity: 1; transform: scale(1); } }
+        @keyframes slideUp { from { opacity: 0; transform: translateY(15px); } to { opacity: 1; transform: translateY(0); } }
+        @keyframes shake { 0%,100% { transform: translateX(0); } 25% { transform: translateX(-8px); } 75% { transform: translateX(8px); } }
+        @keyframes bounceIn { 0% { opacity: 0; transform: scale(0.4); } 60% { transform: scale(1.05); } 100% { opacity: 1; transform: scale(1); } }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <div class="lesson-tag">Module 2 · Lesson 2.3 · Quiz</div>
+            <h1>Colour</h1>
+            <p></p>
+        </div>
+
+        <div class="score-board">
+            <div class="score-item"><div class="label">Score</div><div class="value" id="score">0</div></div>
+            <div class="score-item"><div class="label">Question</div><div class="value"><span id="current">1</span>/<span id="total">10</span></div></div>
+            <div class="score-item"><div class="label">Streak</div><div class="value" id="streak">0</div></div>
+        </div>
+
+        <div class="progress-bar"><div class="progress-fill" id="progress"></div></div>
+
+        <div class="exercise-card" id="exerciseCard"></div>
+    </div>
+
+    <script>
+        const exercises = [
+  {
+    "id": "q1",
+    "text": "James uses the brand colour #2E7D32 in his CSS. What format is this?",
+    "options": [
+      "RGB decimal",
+      "Hexadecimal (hex)",
+      "HSL",
+      "Named colour"
+    ],
+    "answer": 1,
+    "explanation": "Hexadecimal colour values start with # followed by 6 hex digits: two each for red (2E), green (7D), and blue (32). Hex is the most common format in web CSS, compact and widely supported."
+  },
+  {
+    "id": "q2",
+    "text": "James wants a semi-transparent green overlay on a hero image. Which colour format supports transparency?",
+    "options": [
+      "#2E7D3280 (8-digit hex) or rgba(46, 125, 50, 0.5)",
+      "rgb(46, 125, 50)",
+      "hsl(123, 46%, 34%)",
+      "Named colour 'darkgreen'"
+    ],
+    "answer": 0,
+    "explanation": "Both 8-digit hex (#2E7D3280 where 80 is the alpha channel) and rgba() support transparency. rgba(r, g, b, a) where a is 0 (transparent) to 1 (opaque). Standard 6-digit hex, rgb(), hsl(), and named colours have no alpha channel."
+  },
+  {
+    "id": "q3",
+    "text": "James writes color: inherit on a paragraph inside a green header. What colour will the text be?",
+    "options": [
+      "The browser's default text colour (black)",
+      "Transparent (invisible)",
+      "The same green colour as the parent element",
+      "White — inherit always falls back to white"
+    ],
+    "answer": 2,
+    "explanation": "inherit makes a property take the computed value from the parent element. If the parent header has color: #2E7D32, the child paragraph will also be #2E7D32. This is useful to override styles without specifying a value explicitly."
+  },
+  {
+    "id": "q4",
+    "text": "What is the WCAG 2.1 AA minimum contrast ratio for normal body text against its background?",
+    "options": [
+      "2:1",
+      "3:1",
+      "4.5:1",
+      "7:1"
+    ],
+    "answer": 2,
+    "explanation": "WCAG 2.1 Level AA requires at least 4.5:1 contrast ratio for normal text (under 18pt/14pt bold). Large text (18pt or 14pt bold+) needs only 3:1. Level AAA requires 7:1 for normal text. Always check contrast before publishing."
+  },
+  {
+    "id": "q5",
+    "text": "James defines a colour using hsl(123, 46%, 34%). What do the three values represent?",
+    "options": [
+      "Hue (colour angle 0-360), Saturation (colour intensity), Lightness (brightness)",
+      "Height, Scale, Line-height",
+      "Hex, Shade, Luminance",
+      "Horizontal shift, Saturation, Level"
+    ],
+    "answer": 0,
+    "explanation": "HSL: Hue is the colour wheel angle (0=red, 120=green, 240=blue), Saturation is colour intensity (0%=grey, 100%=vivid), Lightness is brightness (0%=black, 50%=normal, 100%=white). HSL is intuitive for creating colour variations."
+  },
+  {
+    "id": "q6",
+    "text": "James wants a lighter tint of his brand green for hover states. In HSL, which value should he increase?",
+    "options": [
+      "Hue — increase the angle",
+      "Saturation — add more colour intensity",
+      "Lightness — increase the percentage",
+      "All three values equally"
+    ],
+    "answer": 2,
+    "explanation": "In HSL, lightness controls brightness. Increasing lightness from 34% to 50% creates a lighter tint of the same colour. Keeping hue and saturation constant maintains the brand colour identity while creating a variation for hover/focus states."
+  },
+  {
+    "id": "q7",
+    "text": "James uses the keyword currentColor in a CSS rule. What does it reference?",
+    "options": [
+      "The last colour used anywhere in the stylesheet",
+      "The computed color property of the same element — inherits the text colour automatically",
+      "The browser's default link colour",
+      "A custom property defined in :root"
+    ],
+    "answer": 1,
+    "explanation": "currentColor equals the element's computed color value. It's useful for making borders, box-shadows, or SVG fills automatically match the text colour — one colour change then updates all uses. Very handy for icon fills."
+  },
+  {
+    "id": "q8",
+    "text": "James creates a product badge using background: linear-gradient(to right, #2E7D32, #1565C0). What does this create?",
+    "options": [
+      "A solid green background that transitions to blue on hover",
+      "A gradient that fades from green (#2E7D32) to blue (#1565C0) from left to right",
+      "A pattern of alternating green and blue stripes",
+      "Two separate background layers, one green and one blue"
+    ],
+    "answer": 1,
+    "explanation": "linear-gradient() creates a smooth colour transition. 'to right' sets the direction. The first colour (#2E7D32, green) starts at the left and transitions to the second (#1565C0, blue) at the right. Multiple colour stops can be added for more complex gradients."
+  },
+  {
+    "id": "q9",
+    "text": "Why should James define his brand colours as CSS custom properties (variables) in :root?",
+    "options": [
+      "Custom properties make colours load faster from the server",
+      "Defining colours once in :root means a rebrand requires changing one line, not searching every CSS file",
+      "Custom properties are required for HSL colours to work",
+      "Only custom properties can be used in media queries"
+    ],
+    "answer": 1,
+    "explanation": "CSS custom properties (--brand-green: #2E7D32) centralise colour definitions. If the brand colour changes, update one variable in :root and every element using var(--brand-green) updates automatically. Without variables, the same hex code may appear dozens of times."
+  },
+  {
+    "id": "q10",
+    "text": "James uses colour alone to show which products are on sale (orange text). Why might customers miss this?",
+    "options": [
+      "Orange text is too light to read at small sizes",
+      "Colour blindness affects about 8% of men — deuteranopia makes orange and green indistinguishable from beige",
+      "Older mobile browsers don't render orange correctly",
+      "CSS named colour 'orange' displays slightly differently across browsers"
+    ],
+    "answer": 1,
+    "explanation": "Deuteranopia (red-green colour blindness) affects ~8% of males. Orange, red, and green may appear similar to them. WCAG 1.4.1 requires that colour is not the only means of conveying information — add text labels, icons, or patterns alongside colour."
+  }
+];
+
+        let currentQuestion = 0, score = 0, streak = 0, answered = false;
+
+        function updateScoreboard() {
+            document.getElementById('score').textContent = score;
+            document.getElementById('current').textContent = Math.min(currentQuestion + 1, exercises.length);
+            document.getElementById('total').textContent = exercises.length;
+            document.getElementById('streak').textContent = streak;
+            document.getElementById('progress').style.width = ((currentQuestion) / exercises.length) * 100 + '%';
+        }
+
+        function escapeHtml(s) {
+            return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+        }
+
+        function renderQuestion() {
+            answered = false;
+            const q = exercises[currentQuestion];
+            let html = '';
+            if (q.scenario) {
+                html += `<div class="scenario"><strong>Scenario.</strong> ${escapeHtml(q.scenario)}</div>`;
+            }
+            html += `<div class="question">${escapeHtml(q.text)}</div>`;
+            html += '<div class="options">';
+            q.options.forEach((o, i) => {
+                html += `<button class="option" onclick="selectAnswer(${i})">${escapeHtml(o)}</button>`;
+            });
+            html += '</div>';
+            document.getElementById('exerciseCard').innerHTML = html;
+            updateScoreboard();
+        }
+
+        function selectAnswer(i) {
+            if (answered) return;
+            answered = true;
+            const q = exercises[currentQuestion];
+            const btns = document.querySelectorAll('.option');
+            btns.forEach(b => b.classList.add('disabled'));
+            btns[q.answer].classList.add('correct');
+            const right = i === q.answer;
+            if (!right) btns[i].classList.add('wrong');
+            if (right) { score += 10; streak += 1; } else { streak = 0; }
+            const fb = document.createElement('div');
+            fb.className = 'feedback ' + (right ? 'correct' : 'wrong');
+            fb.innerHTML = `<strong>${right ? '✅ Correct.' : '❌ Not quite.'}</strong><br>${escapeHtml(q.explanation)}`;
+            document.getElementById('exerciseCard').appendChild(fb);
+            const nb = document.createElement('button');
+            nb.className = 'next-btn';
+            nb.textContent = currentQuestion === exercises.length - 1 ? 'See results →' : 'Next scenario →';
+            nb.onclick = nextQuestion;
+            document.getElementById('exerciseCard').appendChild(nb);
+            updateScoreboard();
+        }
+
+        function nextQuestion() {
+            currentQuestion++;
+            if (currentQuestion >= exercises.length) return showResults();
+            renderQuestion();
+        }
+
+        function showResults() {
+            document.getElementById('progress').style.width = '100%';
+            const total = exercises.length * 10;
+            const pct = Math.round(score / total * 100);
+            if (window.parent) { window.parent.postMessage({type:"mtti_quiz_score", score: score, total: total, percent: pct}, "*"); }
+            let badge = '🌟', msg = 'Excellent work. You have a professional grasp of this lesson.';
+            if (pct < 50) { badge = '🌱'; msg = 'Good first attempt. Re-watch the lesson video and try again.'; }
+            else if (pct < 80) { badge = '📚'; msg = 'Solid progress. Review the scenarios you missed and retry.'; }
+            document.getElementById('exerciseCard').innerHTML = `
+                <div class="results">
+                    <span class="badge">${badge}</span>
+                    <h2>Quiz Complete</h2>
+                    <div class="final-score">${score} / ${total}</div>
+                    <p><strong>${pct}%</strong> · Longest streak: ${streak}</p>
+                    <p>${msg}</p>
+                    <button class="restart-btn" onclick="restart()">Try again 🔁</button>
+                </div>`;
+        }
+
+        function restart() {
+            currentQuestion = 0; score = 0; streak = 0;
+            renderQuestion();
+        }
+
+        renderQuestion();
+    </script>
+</body>
+</html>

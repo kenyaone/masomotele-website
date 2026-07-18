@@ -1,0 +1,258 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lesson 2.2 — Website Considerations (Interactive)</title>
+<style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: 'Segoe UI', -apple-system, sans-serif; line-height: 1.55; color: #1e293b; background: #f8fafc; min-height: 100vh; }
+    .container { max-width: 1100px; margin: 0 auto; padding: 20px; }
+    header { background: linear-gradient(135deg, #2E7D32, #1B5E20); color: #fff; padding: 40px 30px; border-radius: 12px; margin-bottom: 24px; box-shadow: 0 10px 30px rgba(51,65,85,0.25); }
+    header .badge { display: inline-block; background: rgba(255,255,255,0.2); padding: 4px 14px; border-radius: 16px; font-size: 12px; font-weight: bold; letter-spacing: 1px; margin-bottom: 14px; }
+    header h1 { font-size: 34px; margin-bottom: 8px; }
+    header .subtitle { font-size: 17px; opacity: 0.95; margin-bottom: 20px; }
+    .meta-strip { display: flex; flex-wrap: wrap; gap: 12px; }
+    .meta-strip span { background: rgba(255,255,255,0.18); padding: 6px 14px; border-radius: 20px; font-size: 13px; }
+    .toc { background: #fff; border: 1px solid #e2e8f0; border-radius: 10px; padding: 22px 26px; margin-bottom: 22px; }
+    .toc h3 { color: #64748b; margin-bottom: 10px; }
+    .toc ol { padding-left: 20px; }
+    .toc a { color: #64748b; text-decoration: none; font-weight: 600; }
+    section { background: #fff; border: 1px solid #e2e8f0; border-radius: 10px; padding: 26px 30px; margin-bottom: 22px; }
+    section h2 { color: #64748b; font-size: 22px; margin-bottom: 12px; padding-bottom: 8px; border-bottom: 3px solid #64748b; }
+    section p { margin-bottom: 12px; }
+    section ul, section ol { padding-left: 22px; margin-bottom: 12px; }
+    .callout { border-left: 5px solid #64748b; background: #f1f5f9; padding: 14px 18px; margin: 14px 0; border-radius: 4px; }
+    .callout.warn { border-left-color: #dc2626; background: #fef2f2; }
+    .callout.tip { border-left-color: #059669; background: #ecfdf5; }
+    .callout strong { color: #64748b; }
+
+    /* Site score checklist — flagship */
+    .site-lab { background: #f1f5f9; border: 2px solid #64748b; border-radius: 10px; padding: 18px; margin: 14px 0; }
+    .site-lab h4 { color: #1e293b; margin-bottom: 12px; }
+    .site-check { display: flex; align-items: center; gap: 10px; padding: 8px 12px; border-radius: 6px; background: #fff; margin-bottom: 6px; cursor: pointer; }
+    .site-check input[type=checkbox] { width: 18px; height: 18px; accent-color: #64748b; }
+    .site-check label { flex: 1; font-size: 14px; cursor: pointer; }
+    .site-check label small { color: #64748b; display: block; font-size: 12px; }
+    .site-check.done { opacity: 0.55; background: #ecfdf5; }
+
+    .site-score {
+        margin-top: 14px; padding: 14px;
+        border-radius: 10px; display: flex; align-items: center;
+        justify-content: space-between;
+    }
+    .site-score .bar { flex: 1; margin: 0 14px; height: 10px; background: #cbd5e1; border-radius: 5px; overflow: hidden; }
+    .site-score .bar-fill { height: 100%; background: #64748b; transition: width 0.4s; }
+    .site-score.red { background: #fee2e2; }
+    .site-score.red .bar-fill { background: #dc2626; }
+    .site-score.amber { background: #fef3c7; }
+    .site-score.amber .bar-fill { background: #d97706; }
+    .site-score.green { background: #d1fae5; }
+    .site-score.green .bar-fill { background: #059669; }
+    .site-score .num { font-size: 24px; font-weight: bold; }
+
+    /* UI vs UX */
+    .ui-ux { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin: 14px 0; }
+    @media (max-width: 700px) { .ui-ux { grid-template-columns: 1fr; } }
+    .ux-card { background: #f8fafc; border: 2px solid #cbd5e1; border-radius: 10px; padding: 14px; }
+    .ux-card.ui { border-top: 4px solid #a855f7; }
+    .ux-card.ux { border-top: 4px solid #059669; }
+    .ux-card h4 { color: #1e293b; margin-bottom: 6px; }
+
+    .terms { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 10px; margin: 14px 0; }
+    .term { background: #f8fafc; border-left: 4px solid #64748b; padding: 12px 14px; border-radius: 4px; }
+    .term h5 { color: #334155; font-size: 14px; margin-bottom: 4px; }
+    .term p { font-size: 13px; margin: 0; color: #475569; }
+
+    .quiz-question { background: #fff; border: 2px solid #cbd5e1; border-radius: 10px; padding: 18px; margin: 14px 0; }
+    .quiz-question.correct { border-color: #059669; background: #ecfdf5; }
+    .quiz-question.wrong { border-color: #dc2626; background: #fef2f2; }
+    .quiz-question h4 { margin-bottom: 12px; font-size: 15px; color: #1e293b; }
+    .quiz-question .options label { display: block; padding: 10px 14px; margin-bottom: 6px; background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 6px; cursor: pointer; font-size: 14px; }
+    .quiz-question .options label:hover { background: #f1f5f9; }
+    .quiz-question .options input[type="radio"] { margin-right: 10px; }
+    .quiz-question .explanation { display: none; margin-top: 12px; padding: 10px 14px; border-radius: 6px; font-size: 14px; }
+    .quiz-question.correct .explanation { display: block; background: #d1fae5; color: #065f46; border-left: 4px solid #059669; }
+    .quiz-question.wrong .explanation { display: block; background: #fee2e2; color: #991b1b; border-left: 4px solid #dc2626; }
+    .quiz-summary { text-align: center; padding: 30px; background: linear-gradient(135deg, #f1f5f9, #cbd5e1); border-radius: 10px; margin: 20px 0; display: none; }
+    .quiz-summary.show { display: block; }
+    .quiz-summary .score { font-size: 48px; font-weight: bold; color: #64748b; margin-bottom: 8px; }
+    button.btn { background: #64748b; color: #fff; border: none; padding: 10px 20px; border-radius: 6px; font-size: 15px; font-weight: 600; cursor: pointer; }
+    button.btn:hover { background: #334155; }
+    button.btn.reset { background: #94a3b8; margin-left: 8px; }
+    footer { text-align: center; color: #64748b; padding: 24px; font-size: 13px; }
+
+    /* MTTI logo stamp */
+    .mtti-logo-stamp {
+        position: fixed; top: 14px; right: 18px; z-index: 999;
+        opacity: 0.88; transition: opacity 0.2s;
+    }
+    .mtti-logo-stamp:hover { opacity: 1; }
+    .mtti-logo-stamp img { width: 56px; height: 56px; border-radius: 50%; box-shadow: 0 2px 8px rgba(0,0,0,0.18); }
+</style>
+</head>
+<body>
+<div class="mtti-logo-stamp">
+    <img src="../../Resources/Logo.jpeg" alt="MTTI" title="Masomotele Technical Training Institute — Start learning, Start earning">
+</div>
+
+<div class="container">
+<header>
+    <div class="badge">LESSON 2.2  ·  WEB PRESENCE  ·  INTERACTIVE</div>
+    <h1>Website Considerations</h1>
+    <div class="subtitle">What makes a website good. 8 essential parts. 6 design terms. 6 content practices.</div>
+    <div class="meta-strip"><span><strong>Duration:</strong> ~25 min</span><span><strong>Handbook:</strong> Part 2, §2.2</span></div>
+</header>
+
+<div class="toc">
+    <h3>What you'll do</h3>
+    <ol>
+        <li><a href="#s1">The 8 essential parts</a></li>
+        <li><a href="#s2">UI vs UX</a></li>
+        <li><a href="#s3">The 6 design terms</a></li>
+        <li><a href="#s4">The 6 content practices</a></li>
+        <li><a href="#s5"><strong>Site score checklist — grade Sarah's site live</strong></a></li>
+        <li><a href="#s6">Self-check quiz</a></li>
+    </ol>
+</div>
+
+<section id="s1">
+    <h2>1. The 8 essential parts</h2>
+    <ol>
+        <li><strong>Homepage</strong> — front door + navigation hub</li>
+        <li><strong>Company info</strong> — About page</li>
+        <li><strong>Contact</strong> — phone, email, address, form</li>
+        <li><strong>News / blog</strong> — regular updates</li>
+        <li><strong>Services / product descriptions</strong> — what you sell</li>
+        <li><strong>Search</strong> — a search box</li>
+        <li><strong>E-commerce</strong> — checkout, if you're selling</li>
+        <li><strong>Sitemap</strong> — map for search engines + lost visitors</li>
+    </ol>
+    <div class="callout"><strong>Sarah needs the first 5.</strong> Not all 8 — no checkout (WhatsApp handles that), no separate blog yet.</div>
+</section>
+
+<section id="s2">
+    <h2>2. UI vs UX</h2>
+    <div class="ui-ux">
+        <div class="ux-card ui">
+            <h4>🎨 UI — User Interface</h4>
+            <p><strong>What it looks like.</strong> Buttons, menus, forms, colours.</p>
+        </div>
+        <div class="ux-card ux">
+            <h4>💚 UX — User Experience</h4>
+            <p><strong>How it feels.</strong> Overall satisfaction using the site.</p>
+        </div>
+    </div>
+    <div class="callout warn"><strong>A beautiful UI with bad UX</strong> is a site that looks like a magazine but frustrates the customer. Good UX often means <em>less</em> UI: fewer buttons, fewer choices, clearer language.</div>
+</section>
+
+<section id="s3">
+    <h2>3. The 6 design terms</h2>
+    <div class="terms">
+        <div class="term"><h5>Responsive design</h5><p>Rearranges for phone/tablet/laptop. Non-negotiable in Kenya (87% mobile).</p></div>
+        <div class="term"><h5>Accessibility</h5><p>Works for screen readers + keyboard-only users.</p></div>
+        <div class="term"><h5>Performance</h5><p>Under 3 seconds to load, or lose half your visitors.</p></div>
+        <div class="term"><h5>Browser compatibility</h5><p>Works in Chrome, Safari, Edge, Firefox — not just what you tested.</p></div>
+        <div class="term"><h5>UI</h5><p>Buttons, forms, colours — what you see.</p></div>
+        <div class="term"><h5>UX</h5><p>The felt experience of using the site.</p></div>
+    </div>
+</section>
+
+<section id="s4">
+    <h2>4. The 6 content practices</h2>
+    <ol>
+        <li><strong>Audience-focused</strong> — write for your customer, not for yourself</li>
+        <li><strong>Clear + concise</strong> — no jargon, no long sentences</li>
+        <li><strong>Keywords natural</strong> — don't stuff</li>
+        <li><strong>Consistent brand voice</strong></li>
+        <li><strong>High-quality images</strong> — professional, sharp, relevant</li>
+        <li><strong>Regularly updated</strong> — an "About Us" from 2020 is a red flag</li>
+    </ol>
+</section>
+
+<section id="s5">
+    <h2>5. Site score checklist — grade Sarah's site live</h2>
+    <p>Tick each item Sarah's site should include. Score updates in real time. Aim for 100%.</p>
+    <div class="site-lab">
+        <div class="site-check"><input type="checkbox" id="c1"><label for="c1">Homepage with clear headline + navigation<small>Front door for every visitor</small></label></div>
+        <div class="site-check"><input type="checkbox" id="c2"><label for="c2">About page (Sarah's story)<small>Trust signal</small></label></div>
+        <div class="site-check"><input type="checkbox" id="c3"><label for="c3">Menu page with prices + descriptions<small>What she actually sells</small></label></div>
+        <div class="site-check"><input type="checkbox" id="c4"><label for="c4">Delivery page (zones · fee · hours)<small>Logistics</small></label></div>
+        <div class="site-check"><input type="checkbox" id="c5"><label for="c5">Contact page (WhatsApp · phone · address · form)<small>All ways to reach her</small></label></div>
+        <div class="site-check"><input type="checkbox" id="c6"><label for="c6">Responsive (mobile-first, hamburger nav)<small>87% Kenya mobile</small></label></div>
+        <div class="site-check"><input type="checkbox" id="c7"><label for="c7">Loads under 3 seconds<small>Performance non-negotiable</small></label></div>
+        <div class="site-check"><input type="checkbox" id="c8"><label for="c8">Sharp food photos (portrait 9:16)<small>Not stock imagery</small></label></div>
+        <div class="site-check"><input type="checkbox" id="c9"><label for="c9">HTTPS enabled (green padlock)<small>Security signal</small></label></div>
+        <div class="site-check"><input type="checkbox" id="c10"><label for="c10">Sitemap.xml submitted (Yoast auto-generates)<small>Search engines find every page</small></label></div>
+        <div class="site-check"><input type="checkbox" id="c11"><label for="c11">Alt text on every image<small>Accessibility + SEO</small></label></div>
+        <div class="site-check"><input type="checkbox" id="c12"><label for="c12">Content updated in last 30 days<small>No stale "About Us"</small></label></div>
+
+        <div class="site-score red" id="scoreBox">
+            <div id="scoreLbl">0 / 12</div>
+            <div class="bar"><div class="bar-fill" style="width:0%;"></div></div>
+            <div class="num" id="scorePct">0%</div>
+        </div>
+    </div>
+</section>
+
+<section id="s6">
+    <h2>6. Self-check quiz</h2>
+
+    <div class="quiz-question" data-correct="B"><h4>1. Sarah needs how many of the 8 essential parts?</h4><div class="options"><label><input type="radio" name="q1" value="A"> A) All 8</label><label><input type="radio" name="q1" value="B"> B) The first 5</label><label><input type="radio" name="q1" value="C"> C) Only Homepage</label><label><input type="radio" name="q1" value="D"> D) 0</label></div><div class="explanation">Correct — she skips checkout (WhatsApp), search (small site), separate sitemap page.</div></div>
+
+    <div class="quiz-question" data-correct="C"><h4>2. UI = ?</h4><div class="options"><label><input type="radio" name="q2" value="A"> A) User Impact</label><label><input type="radio" name="q2" value="B"> B) Under Investigation</label><label><input type="radio" name="q2" value="C"> C) User Interface — what it looks like</label><label><input type="radio" name="q2" value="D"> D) Usage Increase</label></div><div class="explanation">Correct — visual layer.</div></div>
+
+    <div class="quiz-question" data-correct="A"><h4>3. UX = ?</h4><div class="options"><label><input type="radio" name="q3" value="A"> A) User Experience — how it feels</label><label><input type="radio" name="q3" value="B"> B) Ultimate X-factor</label><label><input type="radio" name="q3" value="C"> C) User Xtra</label><label><input type="radio" name="q3" value="D"> D) Undesigned Extension</label></div><div class="explanation">Correct — the felt experience.</div></div>
+
+    <div class="quiz-question" data-correct="D"><h4>4. Responsive design means…</h4><div class="options"><label><input type="radio" name="q4" value="A"> A) Fast replies</label><label><input type="radio" name="q4" value="B"> B) Live chat</label><label><input type="radio" name="q4" value="C"> C) Answering DMs quickly</label><label><input type="radio" name="q4" value="D"> D) Site rearranges for any screen size</label></div><div class="explanation">Correct — mobile-first is critical in Kenya.</div></div>
+
+    <div class="quiz-question" data-correct="B"><h4>5. Site loads over 3 seconds — what happens?</h4><div class="options"><label><input type="radio" name="q5" value="A"> A) Google rewards you</label><label><input type="radio" name="q5" value="B"> B) You lose about half your visitors</label><label><input type="radio" name="q5" value="C"> C) Nothing</label><label><input type="radio" name="q5" value="D"> D) Traffic doubles</label></div><div class="explanation">Correct — 3s is the industry rule.</div></div>
+
+    <div class="quiz-question" data-correct="C"><h4>6. Accessibility means…</h4><div class="options"><label><input type="radio" name="q6" value="A"> A) The site is popular</label><label><input type="radio" name="q6" value="B"> B) It has social media</label><label><input type="radio" name="q6" value="C"> C) Screen-reader + keyboard users can use it</label><label><input type="radio" name="q6" value="D"> D) It uses lots of colours</label></div><div class="explanation">Correct — disabled users can use the site.</div></div>
+
+    <div class="quiz-question" data-correct="A"><h4>7. Which is a good content practice?</h4><div class="options"><label><input type="radio" name="q7" value="A"> A) Audience-focused writing</label><label><input type="radio" name="q7" value="B"> B) Keyword stuffing</label><label><input type="radio" name="q7" value="C"> C) Long jargon-filled sentences</label><label><input type="radio" name="q7" value="D"> D) Stock photos</label></div><div class="explanation">Correct — write for the customer.</div></div>
+
+    <div class="quiz-question" data-correct="D"><h4>8. What signals a stale website?</h4><div class="options"><label><input type="radio" name="q8" value="A"> A) Fresh photos</label><label><input type="radio" name="q8" value="B"> B) Updated menu</label><label><input type="radio" name="q8" value="C"> C) Recent blog post</label><label><input type="radio" name="q8" value="D"> D) "About Us" written in 2020, unchanged</label></div><div class="explanation">Correct — red flag.</div></div>
+
+    <div class="quiz-question" data-correct="B"><h4>9. Beautiful UI + bad UX =</h4><div class="options"><label><input type="radio" name="q9" value="A"> A) Best of both worlds</label><label><input type="radio" name="q9" value="B"> B) A magazine that frustrates the customer</label><label><input type="radio" name="q9" value="C"> C) High conversion</label><label><input type="radio" name="q9" value="D"> D) Fine</label></div><div class="explanation">Correct — looks great, feels bad = bounces.</div></div>
+
+    <div class="quiz-question" data-correct="C"><h4>10. Browser compatibility means…</h4><div class="options"><label><input type="radio" name="q10" value="A"> A) Only Chrome</label><label><input type="radio" name="q10" value="B"> B) Any browser except Safari</label><label><input type="radio" name="q10" value="C"> C) Works in Chrome, Safari, Edge, Firefox</label><label><input type="radio" name="q10" value="D"> D) Doesn't matter</label></div><div class="explanation">Correct — test across the top 4.</div></div>
+
+    <div style="margin-top:20px;">
+        <button class="btn" onclick="markQuiz()">Mark my quiz</button>
+        <button class="btn reset" onclick="resetQuiz()">Reset</button>
+    </div>
+    <div class="quiz-summary" id="quizSummary"><div class="score" id="scoreDisplay">0 / 10</div><p id="scoreMessage"></p></div>
+</section>
+
+<footer><p>Lesson 2.2 — Website Considerations · MTTI · Handbook Part 2, §2.2</p><p>Next: <strong>Lesson 2.3 — SEO Theory</strong></p></footer>
+</div>
+
+<script>
+function siteScore() {
+    const boxes = document.querySelectorAll('.site-check input[type=checkbox]');
+    let done = 0;
+    boxes.forEach(b => {
+        const row = b.closest('.site-check');
+        if (b.checked) { done++; row.classList.add('done'); } else row.classList.remove('done');
+    });
+    const total = boxes.length;
+    const pct = Math.round(done / total * 100);
+    document.getElementById('scoreLbl').textContent = done + ' / ' + total;
+    document.getElementById('scorePct').textContent = pct + '%';
+    document.querySelector('#scoreBox .bar-fill').style.width = pct + '%';
+    document.getElementById('scoreBox').className = 'site-score ' + (pct === 100 ? 'green' : pct >= 60 ? 'amber' : 'red');
+}
+document.querySelectorAll('.site-check input[type=checkbox]').forEach(cb => cb.addEventListener('change', siteScore));
+
+function markQuiz() {
+    const qs = document.querySelectorAll('.quiz-question'); let s = 0;
+    qs.forEach((q, i) => { const c = q.dataset.correct; const p = q.querySelector(`input[name="q${i+1}"]:checked`); q.classList.remove('correct','wrong'); if (p && p.value === c) { q.classList.add('correct'); s++; } else if (p) q.classList.add('wrong'); });
+    const su = document.getElementById('quizSummary'); su.classList.add('show');
+    document.getElementById('scoreDisplay').textContent = `${s} / 10`;
+    document.getElementById('scoreMessage').textContent = s === 10 ? 'Perfect. Move to 2.3.' : s >= 7 ? 'Strong.' : 'Redo the checklist.';
+    su.scrollIntoView({behavior:'smooth',block:'center'});
+}
+function resetQuiz() { document.querySelectorAll('.quiz-question').forEach(q => { q.classList.remove('correct','wrong'); q.querySelectorAll('input[type=radio]').forEach(r => r.checked = false); }); document.getElementById('quizSummary').classList.remove('show'); }
+</script>
+</body></html>

@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Log Review and Incident Triage | MTTI Cyber Security</title>
+<link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Fredoka:wght@500;600&display=swap" rel="stylesheet">
+<style>
+* { margin:0; padding:0; box-sizing:border-box; }
+body { font-family:'Space Mono', monospace; background:linear-gradient(135deg,#387633 0%,#259BD7 100%); min-height:100vh; padding:20px; color:#fff; }
+.container { max-width:760px; margin:0 auto; }
+.header { text-align:center; margin-bottom:16px; }
+.lesson-tag { display:inline-block; background:rgba(255,255,255,0.2); padding:6px 16px; border-radius:999px; font-size:0.85em; margin-bottom:10px; }
+.header h1 { font-family:'Fredoka', sans-serif; font-size:1.7em; margin-bottom:4px; text-shadow:2px 2px 0 rgba(0,0,0,0.2); }
+.ranges { background:rgba(255,255,255,0.14); backdrop-filter:blur(10px); border-radius:14px; padding:12px 18px; margin-bottom:16px; font-size:0.85em; line-height:1.6; }
+.ranges strong { color:#ffd54f; }
+.progress { text-align:center; margin-bottom:14px; font-size:0.9em; opacity:0.9; }
+.card { background:#fff; color:#333; border-radius:20px; padding:26px; box-shadow:0 16px 40px rgba(0,0,0,0.25); }
+.scenario { background:linear-gradient(135deg,#fff8e1 0%,#ffecb3 100%); border-left:5px solid #ffc107; padding:16px 20px; border-radius:12px; margin-bottom:18px; font-size:0.95em; line-height:1.55; }
+.readings { background:#f5f7fb; border-radius:12px; padding:16px 20px; margin-bottom:20px; font-family:'Space Mono', monospace; }
+.readings h3 { font-family:'Fredoka', sans-serif; font-size:1em; margin-bottom:10px; color:#1565C0; }
+.readings-grid { display:grid; grid-template-columns:1fr 1fr; gap:8px; font-size:0.88em; }
+.chart-form { margin-bottom:16px; }
+.chart-form h3 { font-family:'Fredoka', sans-serif; font-size:1em; margin-bottom:10px; color:#387633; }
+.field-row { display:flex; align-items:center; gap:10px; margin-bottom:10px; }
+.field-row label { flex:0 0 170px; font-size:0.85em; }
+.field-row input { flex:1; padding:8px 10px; border:2px solid #e5e7f0; border-radius:8px; font-family:'Space Mono', monospace; font-size:0.9em; }
+.field-row input.correct { border-color:#28a745; background:#d4edda; }
+.field-row input.wrong { border-color:#dc3545; background:#f8d7da; }
+.btn { background:linear-gradient(135deg,#387633 0%,#259BD7 100%); color:#fff; border:none; padding:12px 26px; border-radius:10px; font-size:0.95em; cursor:pointer; font-family:'Fredoka', sans-serif; box-shadow:0 6px 16px rgba(0,0,0,0.15); margin-top:4px; }
+.category-options { display:flex; gap:10px; margin:14px 0; flex-wrap:wrap; }
+.cat-btn { flex:1; min-width:140px; padding:12px; border-radius:10px; border:2px solid #e5e7f0; background:#f5f7fb; cursor:pointer; font-family:'Space Mono', monospace; font-size:0.85em; text-align:center; }
+.cat-btn:hover:not(.disabled) { background:#e8f5e9; }
+.cat-btn.correct { background:#d4edda; border-color:#28a745; }
+.cat-btn.wrong { background:#f8d7da; border-color:#dc3545; }
+.cat-btn.disabled { cursor:not-allowed; }
+.feedback { margin-top:10px; padding:14px 18px; border-radius:10px; font-size:0.9em; line-height:1.5; }
+.feedback.correct { background:#d4edda; color:#155724; border-left:4px solid #28a745; }
+.feedback.wrong { background:#f8d7da; color:#721c24; border-left:4px solid #dc3545; }
+textarea { width:100%; min-height:100px; padding:12px; border:2px solid #e5e7f0; border-radius:10px; font-family:'Space Mono', monospace; font-size:0.9em; resize:vertical; }
+.model-note { background:#eef6ff; border-left:4px solid #259BD7; padding:14px 18px; border-radius:10px; margin-top:14px; font-size:0.88em; line-height:1.55; }
+.model-note h4 { font-family:'Fredoka', sans-serif; margin-bottom:8px; color:#1565C0; }
+.checklist { margin-top:10px; padding-left:18px; }
+.checklist li { margin-bottom:4px; }
+.hidden { display:none; }
+.done-banner { text-align:center; padding:20px; font-family:'Fredoka', sans-serif; font-size:1.1em; }
+</style>
+</head>
+<body>
+<div class="container">
+<div class="header">
+  <div class="lesson-tag">Module 7 · Practical</div>
+  <h1>Log Review and Incident Triage</h1>
+</div>
+<div class="ranges">
+  <strong>Common indicators worth checking each time:</strong> repeated failed logins in a short window &middot; login from an unrecognised or foreign location &middot; activity outside normal business hours &middot; unusually large outbound data transfers.
+</div>
+<div class="progress">Case <span id="caseNum">1</span> of <span id="caseTotal">3</span></div>
+<div class="card" id="caseCard"></div>
+<div class="done-banner hidden" id="doneBanner">Security Operations Center badge earned — you have practised charting, triaging, and writing up three realistic SafariPay log events.</div>
+</div>
+
+<script>
+const cases = [
+  {
+    name: "David - routine mistyped password",
+    scenario: "SafariPay's SIEM flags an alert for account dkimani at 09:03. David is a known employee logging in from the office as usual.",
+    readings: { account: "dkimani", ip: "41.90.12.5", ipNote: "known office IP", time: "09:03", attemptsNum: "1", attemptsNote: "1 failed attempt, then a successful login 2 minutes later", outbound: "0" },
+    category: "benign",
+    modelNote: "09:03 - Account dkimani: 1 failed login attempt followed by a successful login 2 minutes later, from the known office IP (41.90.12.5). Consistent with a simple mistyped password during business hours. No further action needed. - Grace"
+  },
+  {
+    name: "Unknown foreign IP - credential stuffing and exfiltration",
+    scenario: "The SIEM shows a burst of failed logins on the admin account at 02:47, from an IP address SafariPay has never seen before, followed by a successful login and a large outbound transfer.",
+    readings: { account: "admin", ip: "185.220.14.32", ipNote: "unrecognised, foreign", time: "02:47", attemptsNum: "47", attemptsNote: "47 failed attempts within 3 minutes, then a successful login", outbound: "2 GB transferred out" },
+    category: "escalate",
+    modelNote: "02:47 - Account admin: 47 failed login attempts within 3 minutes from an unrecognised foreign IP (185.220.14.32), followed by a successful login and a 2GB outbound transfer to an external server, all outside business hours. Strong indicators of credential stuffing and possible data exfiltration. Escalated immediately to the security lead; admin account disabled pending investigation. - Grace"
+  },
+  {
+    name: "Faith - travelling employee, new location",
+    scenario: "Faith, who mentioned travelling for a conference this week, logs in successfully at 19:45 from a city SafariPay has not seen her connect from before. Her activity afterward is normal.",
+    readings: { account: "fmwangi", ip: "102.68.45.19", ipNote: "Nairobi - new location for this account", time: "19:45", attemptsNum: "0", attemptsNote: "0 failed attempts, straight to a successful login", outbound: "0" },
+    category: "monitor",
+    modelNote: "19:45 - Account fmwangi: single successful login from a new, previously unseen (but domestic) location, outside normal business hours. Employee had mentioned travel for a conference this week. Post-login activity was normal (own dashboard only), no signs of compromise. Verified with the employee directly through a separate channel; will continue monitoring this account for 48 hours as a precaution. - Grace"
+  }
+];
+
+let current = 0;
+let chartChecked = false;
+let categoryChosen = false;
+
+function escapeHtml(s) { return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+
+function render() {
+  chartChecked = false;
+  categoryChosen = false;
+  const c = cases[current];
+  document.getElementById('caseNum').textContent = current + 1;
+  document.getElementById('caseCard').innerHTML = `
+    <div class="scenario"><strong>Scenario.</strong> ${escapeHtml(c.scenario)}</div>
+    <div class="readings">
+      <h3>What the SIEM alert shows</h3>
+      <div class="readings-grid">
+        <div>Account: <strong>${c.readings.account}</strong></div>
+        <div>Source IP: <strong>${c.readings.ip}</strong> (${c.readings.ipNote})</div>
+        <div>Time: <strong>${c.readings.time}</strong></div>
+        <div>Attempts: <strong>${c.readings.attemptsNum}</strong> - ${c.readings.attemptsNote}</div>
+        <div>Outbound data: <strong>${c.readings.outbound}</strong></div>
+      </div>
+    </div>
+    <div class="chart-form">
+      <h3>Step 1 - Log it accurately</h3>
+      <div class="field-row"><label>Account</label><input type="text" id="f-account" placeholder="e.g. dkimani"></div>
+      <div class="field-row"><label>Source IP / location</label><input type="text" id="f-ip" placeholder="copy from the alert above"></div>
+      <div class="field-row"><label>Time of event</label><input type="text" id="f-time" placeholder="e.g. 09:03"></div>
+      <div class="field-row"><label>Failed attempts (number)</label><input type="text" id="f-attempts" placeholder="e.g. 1 or 47"></div>
+      <button class="btn" onclick="checkChart()">Check my log entry</button>
+      <div id="chartFeedback"></div>
+    </div>
+    <div id="categorySection" class="hidden">
+      <h3 style="font-family:'Fredoka',sans-serif;color:#387633;margin-bottom:6px;">Step 2 - Triage this alert</h3>
+      <div class="category-options">
+        <button class="cat-btn" onclick="chooseCategory('benign')">Benign / Routine</button>
+        <button class="cat-btn" onclick="chooseCategory('monitor')">Monitor / Verify</button>
+        <button class="cat-btn" onclick="chooseCategory('escalate')">Escalate Immediately</button>
+      </div>
+      <div id="categoryFeedback"></div>
+    </div>
+    <div id="noteSection" class="hidden">
+      <h3 style="font-family:'Fredoka',sans-serif;color:#387633;margin:16px 0 6px;">Step 3 - Write a short incident note</h3>
+      <textarea id="noteText" placeholder="Write your note as you would in a real SOC ticket..."></textarea>
+      <button class="btn" onclick="revealModel()" style="margin-top:10px;">Compare to a model note</button>
+      <div id="modelSection"></div>
+    </div>
+    <div id="nextSection" class="hidden" style="text-align:center;margin-top:18px;">
+      <button class="btn" onclick="nextCase()">${current === cases.length - 1 ? 'Finish' : 'Next case &rarr;'}</button>
+    </div>
+  `;
+}
+
+function normalise(s) { return String(s).toLowerCase().replace(/[^a-z0-9]/g, ''); }
+
+function fuzzyContains(value, expected) {
+  const v = normalise(value);
+  const key = normalise(expected).slice(0, 6);
+  return v.length > 0 && v.includes(key);
+}
+
+function checkChart() {
+  if (chartChecked) return;
+  chartChecked = true;
+  const c = cases[current];
+  const checks = [
+    ['f-account', c.readings.account],
+    ['f-ip', c.readings.ip],
+    ['f-time', c.readings.time],
+    ['f-attempts', c.readings.attemptsNum],
+  ];
+  let allCorrect = true;
+  checks.forEach(([id, expected]) => {
+    const el = document.getElementById(id);
+    const ok = fuzzyContains(el.value, expected);
+    el.classList.add(ok ? 'correct' : 'wrong');
+    el.disabled = true;
+    if (!ok) allCorrect = false;
+  });
+  const fb = document.getElementById('chartFeedback');
+  fb.innerHTML = `<div class="feedback ${allCorrect ? 'correct' : 'wrong'}">
+    <strong>${allCorrect ? 'Accurately logged.' : 'One or more fields do not match the alert details.'}</strong><br>
+    A precise log entry is what lets a colleague (or your future self) reconstruct exactly what happened, without needing to re-check the raw alert.
+  </div>`;
+  document.getElementById('categorySection').classList.remove('hidden');
+}
+
+function chooseCategory(choice) {
+  if (categoryChosen) return;
+  categoryChosen = true;
+  const c = cases[current];
+  const btns = document.querySelectorAll('.cat-btn');
+  btns.forEach(b => b.classList.add('disabled'));
+  const labels = { benign: 'Benign / Routine', monitor: 'Monitor / Verify', escalate: 'Escalate Immediately' };
+  btns.forEach(b => { if (b.textContent.trim() === labels[c.category]) b.classList.add('correct'); });
+  const right = choice === c.category;
+  if (!right) btns.forEach(b => { if (b.textContent.trim() === labels[choice]) b.classList.add('wrong'); });
+
+  const explanations = {
+    benign: "A single failed login followed by a quick success, from a known office IP during business hours, matches an everyday mistyped password - routine logging is all that is needed.",
+    monitor: "A new (but not obviously malicious) location outside business hours, with otherwise normal activity, is exactly a case for verification and closer monitoring rather than either dismissing it or treating it as a confirmed breach.",
+    escalate: "A burst of failed logins, an unrecognised foreign IP, a successful login, and a large outbound transfer together are strong, combined indicators of an active compromise - this needs immediate escalation, not routine logging."
+  };
+  document.getElementById('categoryFeedback').innerHTML = `<div class="feedback ${right ? 'correct' : 'wrong'}">
+    <strong>${right ? 'Correct.' : 'Not quite - correct answer highlighted above.'}</strong><br>${explanations[c.category]}
+  </div>`;
+  document.getElementById('noteSection').classList.remove('hidden');
+}
+
+function revealModel() {
+  const c = cases[current];
+  document.getElementById('modelSection').innerHTML = `
+    <div class="model-note">
+      <h4>Model note for comparison</h4>
+      <p>${escapeHtml(c.modelNote)}</p>
+      <p style="margin-top:10px;"><strong>Self-check your own note against this checklist:</strong></p>
+      <ul class="checklist">
+        <li>Did you include the time of the event?</li>
+        <li>Did you record the specific account, source, and attempt details - not just "suspicious login"?</li>
+        <li>Did you state your reasoning for the triage decision?</li>
+        <li>Did you note what action was taken (or that none was needed) and who else was told, if anyone?</li>
+      </ul>
+    </div>`;
+  document.getElementById('nextSection').classList.remove('hidden');
+}
+
+function nextCase() {
+  current++;
+  if (current >= cases.length) {
+    document.getElementById('caseCard').classList.add('hidden');
+    document.querySelector('.progress').classList.add('hidden');
+    document.getElementById('doneBanner').classList.remove('hidden');
+    return;
+  }
+  render();
+}
+
+render();
+</script>
+</body>
+</html>

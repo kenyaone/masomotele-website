@@ -1,0 +1,346 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Debugging and DevTools | MTTI Web Design</title>
+    <link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Fredoka:wght@500;600&display=swap" rel="stylesheet">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Space Mono', monospace;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh; padding: 20px; color: #fff;
+        }
+        .container { max-width: 900px; margin: 0 auto; }
+        .header { text-align: center; margin-bottom: 30px; animation: slideDown 0.6s ease-out; }
+        .header .lesson-tag {
+            display: inline-block; background: rgba(255,255,255,0.2);
+            padding: 6px 16px; border-radius: 999px;
+            font-size: 0.85em; margin-bottom: 12px;
+        }
+        .header h1 {
+            font-family: 'Fredoka', sans-serif; font-size: 2.2em;
+            margin-bottom: 8px; text-shadow: 3px 3px 0 rgba(0,0,0,0.2);
+        }
+        .header p { opacity: 0.95; font-size: 0.95em; }
+        .score-board {
+            background: rgba(255,255,255,0.15); backdrop-filter: blur(10px);
+            border-radius: 20px; padding: 20px; margin-bottom: 20px;
+            display: flex; justify-content: space-around;
+            animation: fadeIn 0.8s ease-out 0.2s both;
+        }
+        .score-item { text-align: center; }
+        .score-item .label { font-size: 0.85em; opacity: 0.9; margin-bottom: 4px; }
+        .score-item .value {
+            font-size: 1.8em; font-weight: bold; font-family: 'Fredoka', sans-serif;
+        }
+        .progress-bar {
+            width: 100%; height: 8px; background: rgba(255,255,255,0.3);
+            border-radius: 10px; margin-bottom: 25px; overflow: hidden;
+        }
+        .progress-fill {
+            height: 100%; background: linear-gradient(90deg, #f093fb 0%, #f5576c 100%);
+            border-radius: 10px; transition: width 0.5s ease; width: 0%;
+        }
+        .exercise-card {
+            background: white; color: #333; border-radius: 25px;
+            padding: 35px; margin-bottom: 20px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            animation: fadeIn 0.6s ease-out both;
+        }
+        .scenario {
+            background: linear-gradient(135deg, #fff8e1 0%, #ffecb3 100%);
+            border-left: 5px solid #ffc107;
+            padding: 20px 24px; border-radius: 12px;
+            margin-bottom: 24px;
+            font-size: 0.98em; line-height: 1.55;
+        }
+        .scenario strong { color: #7a5a00; font-family: 'Fredoka', sans-serif; }
+        .question {
+            font-size: 1.15em; margin-bottom: 20px;
+            font-weight: 700; line-height: 1.4;
+        }
+        .options { display: flex; flex-direction: column; gap: 12px; }
+        .option {
+            background: #f5f7fb; border: 2px solid transparent;
+            padding: 16px 20px; border-radius: 12px;
+            cursor: pointer; transition: all 0.2s ease;
+            font-family: 'Space Mono', monospace; font-size: 0.98em; text-align: left;
+        }
+        .option:hover:not(.disabled) {
+            background: #eef1fb; border-color: #667eea; transform: translateX(4px);
+        }
+        .option.correct { background: #d4edda; border-color: #28a745; color: #155724; }
+        .option.wrong { background: #f8d7da; border-color: #dc3545; color: #721c24; animation: shake 0.4s; }
+        .option.disabled { cursor: not-allowed; opacity: 0.85; }
+        .feedback {
+            margin-top: 22px; padding: 18px 22px; border-radius: 12px;
+            animation: slideUp 0.4s ease-out;
+            font-size: 0.98em; line-height: 1.5;
+        }
+        .feedback.correct { background: #d4edda; color: #155724; border-left: 4px solid #28a745; }
+        .feedback.wrong { background: #f8d7da; color: #721c24; border-left: 4px solid #dc3545; }
+        .feedback strong { font-family: 'Fredoka', sans-serif; }
+        .next-btn, .restart-btn {
+            margin-top: 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white; border: none;
+            padding: 14px 32px; border-radius: 12px;
+            font-size: 1em; cursor: pointer;
+            font-family: 'Fredoka', sans-serif;
+            box-shadow: 0 6px 18px rgba(0,0,0,0.2);
+            transition: transform 0.2s ease;
+        }
+        .next-btn:hover, .restart-btn:hover { transform: scale(1.04); }
+        .results {
+            text-align: center; padding: 25px 15px;
+            animation: bounceIn 0.6s ease-out;
+        }
+        .results h2 {
+            font-family: 'Fredoka', sans-serif; font-size: 2em;
+            margin-bottom: 12px; color: #333;
+        }
+        .results .final-score {
+            font-size: 3em; font-family: 'Fredoka', sans-serif;
+            color: #667eea; margin: 20px 0;
+        }
+        .results p { color: #555; margin-bottom: 12px; }
+        .badge { display: inline-block; font-size: 3.5em; margin: 8px 0; }
+        @keyframes slideDown { from { opacity: 0; transform: translateY(-30px); } to { opacity: 1; transform: translateY(0); } }
+        @keyframes fadeIn { from { opacity: 0; transform: scale(0.96); } to { opacity: 1; transform: scale(1); } }
+        @keyframes slideUp { from { opacity: 0; transform: translateY(15px); } to { opacity: 1; transform: translateY(0); } }
+        @keyframes shake { 0%,100% { transform: translateX(0); } 25% { transform: translateX(-8px); } 75% { transform: translateX(8px); } }
+        @keyframes bounceIn { 0% { opacity: 0; transform: scale(0.4); } 60% { transform: scale(1.05); } 100% { opacity: 1; transform: scale(1); } }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <div class="lesson-tag">Module 3 · Lesson 3.10 · Quiz</div>
+            <h1>Debugging and DevTools</h1>
+            <p></p>
+        </div>
+
+        <div class="score-board">
+            <div class="score-item"><div class="label">Score</div><div class="value" id="score">0</div></div>
+            <div class="score-item"><div class="label">Question</div><div class="value"><span id="current">1</span>/<span id="total">10</span></div></div>
+            <div class="score-item"><div class="label">Streak</div><div class="value" id="streak">0</div></div>
+        </div>
+
+        <div class="progress-bar"><div class="progress-fill" id="progress"></div></div>
+
+        <div class="exercise-card" id="exerciseCard"></div>
+    </div>
+
+    <script>
+        const exercises = [
+  {
+    "id": "q1",
+    "text": "James opens DevTools and sees: TypeError: Cannot read properties of null (reading 'addEventListener'). What is the most likely cause?",
+    "options": [
+      "addEventListener is spelled incorrectly",
+      "The script runs before the DOM is loaded — getElementById or querySelector returned null because the element doesn't exist yet",
+      "The element has a wrong CSS class",
+      "addEventListener is not supported in this browser"
+    ],
+    "answer": 1,
+    "explanation": "null.addEventListener throws TypeError. If getElementById('btn') returns null, the element doesn't exist at the time the script runs — usually because the script is in <head> without DOMContentLoaded or defer. Wrap in DOMContentLoaded or move the script before </body>."
+  },
+  {
+    "id": "q2",
+    "text": "James wants to inspect the value of a variable at a specific line during execution. Which DevTools feature should he use?",
+    "options": [
+      "The Console tab — type the variable name after running the script",
+      "The Sources tab — set a breakpoint on that line and hover over the variable when paused",
+      "The Network tab — inspect the request payload",
+      "The Elements tab — read the variable from the DOM"
+    ],
+    "answer": 1,
+    "explanation": "Breakpoints in the Sources tab pause execution at a specific line. While paused, you can hover over variables to see their current value, use the Scope panel, or type expressions in the console. This is more precise than scattering console.log statements."
+  },
+  {
+    "id": "q3",
+    "text": "James's fetch call to products.json appears to succeed in JavaScript but shows no products. Which DevTools panel should he check first?",
+    "options": [
+      "Console — for JavaScript errors",
+      "Network — to see the actual HTTP response status and data returned by the server",
+      "Sources — to check the JavaScript file for syntax errors",
+      "Application — to clear the cache"
+    ],
+    "answer": 1,
+    "explanation": "The Network panel shows every HTTP request, its status code, response headers, and response body. If products.json returns 404 or empty data, you'll see it here immediately — without this check you might debug JavaScript for hours when the URL is simply wrong."
+  },
+  {
+    "id": "q4",
+    "text": "James leaves console.log('price:', price) in his live production site. Why is this a problem?",
+    "options": [
+      "console.log slows down JavaScript execution significantly",
+      "Logs expose internal data to anyone who opens DevTools, clutter the console, and may leak sensitive values",
+      "console.log statements cause memory leaks",
+      "Logs are blocked by HTTPS on production sites"
+    ],
+    "answer": 1,
+    "explanation": "In production, console.log exposes internal state (prices, user IDs, API keys) to any visitor who opens DevTools. It also pollutes the console for future developers debugging real issues. Remove or gate logs behind a DEBUG flag before deploying."
+  },
+  {
+    "id": "q5",
+    "text": "James steps through his code using F10 in the Sources debugger. What does F10 (Step Over) do?",
+    "options": [
+      "Exits the debugger completely",
+      "Runs the current line and pauses at the next line — stepping over function calls without going inside them",
+      "Steps into a function call to see its execution",
+      "Jumps to the next breakpoint"
+    ],
+    "answer": 1,
+    "explanation": "Step Over (F10) executes the current line and moves to the next line in the same scope. If the current line calls a function, that function runs completely and you pause after it returns. F11 (Step Into) enters the function; Shift+F11 steps out."
+  },
+  {
+    "id": "q6",
+    "text": "James wraps risky code in try/catch during development: try { riskyCode() } catch(e) { console.error(e.message) }. What does e.message contain?",
+    "options": [
+      "The line number where the error occurred",
+      "The error type (TypeError, ReferenceError)",
+      "A human-readable description of the error",
+      "The entire stack trace as a string"
+    ],
+    "answer": 2,
+    "explanation": "e.message is the human-readable error description: 'Cannot read properties of null (reading addeventlistener)'. e.name is the error type ('TypeError'). e.stack contains the full stack trace. console.error(e) logs all of these together."
+  },
+  {
+    "id": "q7",
+    "text": "James uses alert('debugging') inside a click handler to check if it fires. What is the problem with this approach?",
+    "options": [
+      "alert() is not available inside event handlers",
+      "alert() blocks the JavaScript thread — it changes the timing of async code and must be manually dismissed each test run",
+      "alert() cannot display variable values",
+      "Browsers may block alert() on HTTPS sites"
+    ],
+    "answer": 1,
+    "explanation": "alert() blocks everything — the thread pauses and all async operations are suspended. This can mask race conditions and timing-dependent bugs. It must be manually dismissed every time. Use console.log or a breakpoint instead — they don't affect execution timing."
+  },
+  {
+    "id": "q8",
+    "text": "James reads the stack trace in the Console: at handleSubmit (app.js:42). What does line 42 tell him?",
+    "options": [
+      "The error occurred at line 42 of the server-side code",
+      "The function handleSubmit was executing at line 42 of app.js when the error was thrown",
+      "42 is the error code for this type of TypeError",
+      "Line 42 is the entry point of app.js"
+    ],
+    "answer": 1,
+    "explanation": "A stack trace shows the call chain at the moment of the error. Each line shows a function name and the file:line where it was executing. The top line is where the error actually occurred. Clicking the link in DevTools opens Sources at that exact line."
+  },
+  {
+    "id": "q9",
+    "text": "James adds a conditional breakpoint: only pause if price > 1000. How does he set this in Chrome DevTools?",
+    "options": [
+      "Right-click the breakpoint and select 'Edit breakpoint', then enter the condition",
+      "Use debugger if(price > 1000) in the source code",
+      "Both A and B are valid approaches",
+      "Conditional breakpoints are not supported in Chrome DevTools"
+    ],
+    "answer": 2,
+    "explanation": "Both methods work. Right-clicking a breakpoint in Sources → 'Edit breakpoint' lets you enter a condition without modifying source code. debugger; with an if statement in source code is also valid. The DevTools UI approach is cleaner as it doesn't require code changes."
+  },
+  {
+    "id": "q10",
+    "text": "James uses the Network panel and sees his fetch request takes 4.2 seconds. What should he investigate first?",
+    "options": [
+      "Rewrite the fetch with async/await for better performance",
+      "Check whether products.json is cached, compressed (gzip), and whether the file size is reasonable",
+      "Switch from GET to POST for faster responses",
+      "Add more .then() chains to handle the response faster"
+    ],
+    "answer": 1,
+    "explanation": "4.2 seconds is a server/network problem, not a JavaScript problem. Check: file size (too large?), no caching headers (Content-Type: application/json + Cache-Control), no gzip compression, slow server response. Rewriting the JS code won't reduce a slow server response."
+  }
+];
+
+        let currentQuestion = 0, score = 0, streak = 0, answered = false;
+
+        function updateScoreboard() {
+            document.getElementById('score').textContent = score;
+            document.getElementById('current').textContent = Math.min(currentQuestion + 1, exercises.length);
+            document.getElementById('total').textContent = exercises.length;
+            document.getElementById('streak').textContent = streak;
+            document.getElementById('progress').style.width = ((currentQuestion) / exercises.length) * 100 + '%';
+        }
+
+        function escapeHtml(s) {
+            return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+        }
+
+        function renderQuestion() {
+            answered = false;
+            const q = exercises[currentQuestion];
+            let html = '';
+            if (q.scenario) {
+                html += `<div class="scenario"><strong>Scenario.</strong> ${escapeHtml(q.scenario)}</div>`;
+            }
+            html += `<div class="question">${escapeHtml(q.text)}</div>`;
+            html += '<div class="options">';
+            q.options.forEach((o, i) => {
+                html += `<button class="option" onclick="selectAnswer(${i})">${escapeHtml(o)}</button>`;
+            });
+            html += '</div>';
+            document.getElementById('exerciseCard').innerHTML = html;
+            updateScoreboard();
+        }
+
+        function selectAnswer(i) {
+            if (answered) return;
+            answered = true;
+            const q = exercises[currentQuestion];
+            const btns = document.querySelectorAll('.option');
+            btns.forEach(b => b.classList.add('disabled'));
+            btns[q.answer].classList.add('correct');
+            const right = i === q.answer;
+            if (!right) btns[i].classList.add('wrong');
+            if (right) { score += 10; streak += 1; } else { streak = 0; }
+            const fb = document.createElement('div');
+            fb.className = 'feedback ' + (right ? 'correct' : 'wrong');
+            fb.innerHTML = `<strong>${right ? '✅ Correct.' : '❌ Not quite.'}</strong><br>${escapeHtml(q.explanation)}`;
+            document.getElementById('exerciseCard').appendChild(fb);
+            const nb = document.createElement('button');
+            nb.className = 'next-btn';
+            nb.textContent = currentQuestion === exercises.length - 1 ? 'See results →' : 'Next scenario →';
+            nb.onclick = nextQuestion;
+            document.getElementById('exerciseCard').appendChild(nb);
+            updateScoreboard();
+        }
+
+        function nextQuestion() {
+            currentQuestion++;
+            if (currentQuestion >= exercises.length) return showResults();
+            renderQuestion();
+        }
+
+        function showResults() {
+            document.getElementById('progress').style.width = '100%';
+            const total = exercises.length * 10;
+            const pct = Math.round(score / total * 100);
+            if (window.parent) { window.parent.postMessage({type:"mtti_quiz_score", score: score, total: total, percent: pct}, "*"); }
+            let badge = '🌟', msg = 'Excellent work. You have a professional grasp of this lesson.';
+            if (pct < 50) { badge = '🌱'; msg = 'Good first attempt. Re-watch the lesson video and try again.'; }
+            else if (pct < 80) { badge = '📚'; msg = 'Solid progress. Review the scenarios you missed and retry.'; }
+            document.getElementById('exerciseCard').innerHTML = `
+                <div class="results">
+                    <span class="badge">${badge}</span>
+                    <h2>Quiz Complete</h2>
+                    <div class="final-score">${score} / ${total}</div>
+                    <p><strong>${pct}%</strong> · Longest streak: ${streak}</p>
+                    <p>${msg}</p>
+                    <button class="restart-btn" onclick="restart()">Try again 🔁</button>
+                </div>`;
+        }
+
+        function restart() {
+            currentQuestion = 0; score = 0; streak = 0;
+            renderQuestion();
+        }
+
+        renderQuestion();
+    </script>
+</body>
+</html>

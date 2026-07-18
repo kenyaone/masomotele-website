@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CSS Grid (Lesson) | MTTI Computer Applications</title>
+<link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Fredoka:wght@500;600&display=swap" rel="stylesheet">
+<style>
+* { margin:0; padding:0; box-sizing:border-box; }
+body { font-family:'Space Mono', monospace; background:linear-gradient(135deg,#2E7D32 0%,#1565C0 100%); min-height:100vh; padding:20px; color:#fff; }
+.container { max-width:820px; margin:0 auto; }
+.header { text-align:center; margin-bottom:24px; }
+.lesson-tag { display:inline-block; background:rgba(255,255,255,0.2); padding:6px 16px; border-radius:999px; font-size:0.85em; margin-bottom:12px; }
+.header h1 { font-family:'Fredoka', sans-serif; font-size:2em; margin-bottom:6px; text-shadow:3px 3px 0 rgba(0,0,0,0.2); }
+.card { background:#fff; color:#333; border-radius:22px; padding:32px; margin-bottom:20px; box-shadow:0 20px 60px rgba(0,0,0,0.3); }
+.section { margin-bottom:26px; }
+.section:last-child { margin-bottom:0; }
+.section h2 { font-family:'Fredoka', sans-serif; font-size:1.2em; margin-bottom:10px; color:#1565C0; }
+.section .body { line-height:1.65; font-size:0.98em; }
+.section .body p { margin-bottom:10px; }
+.section .body code { background:#f5f7fb; padding:2px 6px; border-radius:4px; font-size:0.92em; }
+.keypoint { background:#fff8e1; border-left:4px solid #ffc107; padding:12px 16px; border-radius:8px; margin-top:12px; font-size:0.92em; }
+</style>
+</head>
+<body>
+<div class="container">
+<div class="header"><div class="lesson-tag">Module 2 · Lesson 2.5</div><h1>CSS Grid</h1></div>
+<div style="background:#fff;color:#333;border-radius:16px;padding:16px;margin-bottom:20px;box-shadow:0 8px 24px rgba(0,0,0,0.12);text-align:center;"><svg viewBox="0 0 420 175" style="width:100%;max-width:560px;height:175px;" xmlns="http://www.w3.org/2000/svg">
+<text x="220" y="15" font-size="9" text-anchor="middle" fill="#555">display: grid; grid-template-columns: repeat(3, 1fr);</text>
+<rect x="30" y="30" width="120" height="60" fill="#387633"/><text x="90" y="65" font-size="10" text-anchor="middle" fill="#fff">1</text><rect x="160" y="30" width="120" height="60" fill="#259BD7"/><text x="220" y="65" font-size="10" text-anchor="middle" fill="#fff">2</text><rect x="290" y="30" width="120" height="60" fill="#E8942E"/><text x="350" y="65" font-size="10" text-anchor="middle" fill="#fff">3</text><rect x="30" y="100" width="120" height="60" fill="#8e44ad"/><text x="90" y="135" font-size="10" text-anchor="middle" fill="#fff">4</text><rect x="160" y="100" width="120" height="60" fill="#387633"/><text x="220" y="135" font-size="10" text-anchor="middle" fill="#fff">5</text><rect x="290" y="100" width="120" height="60" fill="#259BD7"/><text x="350" y="135" font-size="10" text-anchor="middle" fill="#fff">6</text>
+</svg></div><div class="card"><div class="section"><h2>Two-Dimensional Layout</h2><div class="body"><p><code>display: grid</code> lets an element lay out its children in both rows and columns simultaneously — <code>grid-template-columns: repeat(3, 1fr)</code> creates three equal-width columns, for example.</p></div></div><div class="section"><h2>Placing Items</h2><div class="body"><p>Grid items can be explicitly placed into specific rows/columns, or simply flow into the next available cell automatically — giving precise control when needed, without requiring it for every single item.</p></div></div><div class="section"><h2>Grid vs Flexbox</h2><div class="body"><p>Grid suits a genuinely two-dimensional layout (a photo gallery, a full page layout with header/sidebar/main/footer); Flexbox suits a single row or column of items. Many real pages use both together — Grid for overall page structure, Flexbox within individual sections.</p></div><div class="keypoint"><strong>Key Point.</strong> Choosing Grid vs Flexbox is about dimensionality — one axis of alignment (Flexbox) vs two (Grid) — not that one tool is simply &quot;better&quot; than the other.</div></div></div>
+</div>
+</body>
+</html>

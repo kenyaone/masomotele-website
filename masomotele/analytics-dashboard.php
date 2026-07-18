@@ -10,24 +10,24 @@ $db = Database::getInstance();
 
 // Core stats
 $stats = [
-    "total_students"   => $db->fetchColumn("SELECT COUNT(*) FROM users WHERE role=\"student\"") ?? 0,
-    "active_today"     => $db->fetchColumn("SELECT COUNT(DISTINCT user_id) FROM completions WHERE DATE(completed_at)=CURDATE()") ?? 0,
-    "active_week"      => $db->fetchColumn("SELECT COUNT(DISTINCT user_id) FROM completions WHERE completed_at >= DATE_SUB(NOW(),INTERVAL 7 DAY)") ?? 0,
-    "active_month"     => $db->fetchColumn("SELECT COUNT(DISTINCT user_id) FROM completions WHERE completed_at >= DATE_SUB(NOW(),INTERVAL 30 DAY)") ?? 0,
-    "total_lessons"    => $db->fetchColumn("SELECT COUNT(*) FROM lessons WHERE status=\"published\"") ?? 0,
-    "total_homework"   => $db->fetchColumn("SELECT COUNT(*) FROM lessons WHERE content_type=\"homework\"") ?? 0,
-    "total_completions"=> $db->fetchColumn("SELECT COUNT(*) FROM completions") ?? 0,
-    "total_papers"     => $db->fetchColumn("SELECT COUNT(*) FROM past_papers WHERE status=\"active\"") ?? 0,
-    "new_this_week"    => $db->fetchColumn("SELECT COUNT(*) FROM users WHERE role=\"student\" AND created_at >= DATE_SUB(NOW(),INTERVAL 7 DAY)") ?? 0,
+    "total_students"   => $db->fetchColumn("SELECT COUNT(*) FROM lms_users WHERE role=\"student\"") ?? 0,
+    "active_today"     => $db->fetchColumn("SELECT COUNT(DISTINCT user_id) FROM lms_completions WHERE DATE(completed_at)=CURDATE()") ?? 0,
+    "active_week"      => $db->fetchColumn("SELECT COUNT(DISTINCT user_id) FROM lms_completions WHERE completed_at >= DATE_SUB(NOW(),INTERVAL 7 DAY)") ?? 0,
+    "active_month"     => $db->fetchColumn("SELECT COUNT(DISTINCT user_id) FROM lms_completions WHERE completed_at >= DATE_SUB(NOW(),INTERVAL 30 DAY)") ?? 0,
+    "total_lessons"    => $db->fetchColumn("SELECT COUNT(*) FROM lms_lessons WHERE status=\"published\"") ?? 0,
+    "total_homework"   => $db->fetchColumn("SELECT COUNT(*) FROM lms_lessons WHERE content_type=\"homework\"") ?? 0,
+    "total_completions"=> $db->fetchColumn("SELECT COUNT(*) FROM lms_completions") ?? 0,
+    "total_papers"     => $db->fetchColumn("SELECT COUNT(*) FROM lms_past_papers WHERE status=\"active\"") ?? 0,
+    "new_this_week"    => $db->fetchColumn("SELECT COUNT(*) FROM lms_users WHERE role=\"student\" AND created_at >= DATE_SUB(NOW(),INTERVAL 7 DAY)") ?? 0,
 ];
 
-$byCounty      = $db->fetchAll("SELECT county, COUNT(*) as cnt FROM users WHERE role=\"student\" AND county IS NOT NULL AND county != \"\" GROUP BY county ORDER BY cnt DESC LIMIT 10") ?? [];
-$byPathway     = $db->fetchAll("SELECT pathway, COUNT(*) as cnt FROM users WHERE role=\"student\" GROUP BY pathway ORDER BY cnt DESC") ?? [];
-$bySubject     = $db->fetchAll("SELECT s.title, COUNT(c.id) as cnt FROM subjects s LEFT JOIN completions c ON c.subject_id=s.id WHERE s.level_type=\"subject\" GROUP BY s.id ORDER BY cnt DESC LIMIT 8") ?? [];
-$topStudents   = $db->fetchAll("SELECT u.name, u.school, u.county, COUNT(c.id) as cnt FROM users u LEFT JOIN completions c ON c.user_id=u.id WHERE u.role=\"student\" GROUP BY u.id ORDER BY cnt DESC LIMIT 10") ?? [];
-$regTrend      = $db->fetchAll("SELECT DATE(created_at) as day, COUNT(*) as cnt FROM users WHERE role=\"student\" AND created_at >= DATE_SUB(NOW(),INTERVAL 30 DAY) GROUP BY DATE(created_at) ORDER BY day") ?? [];
-$completeTrend = $db->fetchAll("SELECT DATE(completed_at) as day, COUNT(*) as cnt FROM completions WHERE completed_at >= DATE_SUB(NOW(),INTERVAL 30 DAY) GROUP BY DATE(completed_at) ORDER BY day") ?? [];
-$sponsorStats  = $db->fetchAll("SELECT name, package, impressions, clicks, status FROM sponsors ORDER BY FIELD(package,\"platinum\",\"gold\",\"silver\",\"bronze\")") ?? [];
+$byCounty      = $db->fetchAll("SELECT county, COUNT(*) as cnt FROM lms_users WHERE role=\"student\" AND county IS NOT NULL AND county != \"\" GROUP BY county ORDER BY cnt DESC LIMIT 10") ?? [];
+$byPathway     = $db->fetchAll("SELECT pathway, COUNT(*) as cnt FROM lms_users WHERE role=\"student\" GROUP BY pathway ORDER BY cnt DESC") ?? [];
+$bySubject     = $db->fetchAll("SELECT s.title, COUNT(c.id) as cnt FROM lms_subjects s LEFT JOIN completions c ON c.subject_id=s.id WHERE s.level_type=\"subject\" GROUP BY s.id ORDER BY cnt DESC LIMIT 8") ?? [];
+$topStudents   = $db->fetchAll("SELECT u.name, u.school, u.county, COUNT(c.id) as cnt FROM lms_users u LEFT JOIN completions c ON c.user_id=u.id WHERE u.role=\"student\" GROUP BY u.id ORDER BY cnt DESC LIMIT 10") ?? [];
+$regTrend      = $db->fetchAll("SELECT DATE(created_at) as day, COUNT(*) as cnt FROM lms_users WHERE role=\"student\" AND created_at >= DATE_SUB(NOW(),INTERVAL 30 DAY) GROUP BY DATE(created_at) ORDER BY day") ?? [];
+$completeTrend = $db->fetchAll("SELECT DATE(completed_at) as day, COUNT(*) as cnt FROM lms_completions WHERE completed_at >= DATE_SUB(NOW(),INTERVAL 30 DAY) GROUP BY DATE(completed_at) ORDER BY day") ?? [];
+$sponsorStats  = $db->fetchAll("SELECT name, package, impressions, clicks, status FROM lms_sponsors ORDER BY FIELD(package,\"platinum\",\"gold\",\"silver\",\"bronze\")") ?? [];
 
 require_once __DIR__ . "/templates/header.php";
 ?>

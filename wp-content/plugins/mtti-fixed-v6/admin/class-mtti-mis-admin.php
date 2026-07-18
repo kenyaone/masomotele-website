@@ -468,6 +468,16 @@ class MTTI_MIS_Admin {
             array($this, 'display_assignments')
         );
 
+        // Quizzes submenu
+        add_submenu_page(
+            'mtti-mis',
+            'Quizzes',
+            'Quizzes',
+            'manage_assessments',
+            'mtti-mis-quizzes',
+            array($this, 'display_quizzes')
+        );
+
         // Live Classes submenu
         add_submenu_page(
             'mtti-mis',
@@ -496,6 +506,17 @@ class MTTI_MIS_Admin {
             'manage_courses',
             'mtti-mis-units',
             array($this, 'display_units')
+        );
+
+        // Course Purchases submenu — online self-checkout requests awaiting
+        // payment confirmation (see [mtti_course_checkout])
+        add_submenu_page(
+            'mtti-mis',
+            'Course Purchases',
+            'Course Purchases',
+            'manage_mtti',
+            'mtti-mis-course-purchases',
+            array($this, 'display_course_purchases')
         );
 
         // Lessons submenu (for teachers to upload lessons)
@@ -535,6 +556,26 @@ class MTTI_MIS_Admin {
             'manage_courses',
             'mtti-mis-interactive',
             array($this, 'display_interactive')
+        );
+
+        // Bulk Video Import submenu
+        add_submenu_page(
+            'mtti-mis',
+            'Bulk Video Import',
+            '🎬 Video Import',
+            'manage_courses',
+            'mtti-mis-video-import',
+            array($this, 'display_video_import')
+        );
+
+        // Lesson Scheduler submenu
+        add_submenu_page(
+            'mtti-mis',
+            'Lesson Scheduler',
+            '📚 Lesson Scheduler',
+            'manage_options',
+            'mtti-lesson-scheduler',
+            array($this, 'display_lesson_scheduler')
         );
 
         // Send Notifications submenu
@@ -609,6 +650,9 @@ class MTTI_MIS_Admin {
     }
     
     public function display_finance() {
+        if ( ! current_user_can('manage_finance') ) {
+            wp_die('❌ You do not have permission to access the Finance module.');
+        }
         require_once MTTI_MIS_PLUGIN_DIR . 'admin/class-mtti-mis-admin-finance.php';
         $finance = new MTTI_MIS_Admin_Finance($this->plugin_name, $this->version);
         $finance->display();
@@ -1132,6 +1176,14 @@ class MTTI_MIS_Admin {
         $obj->display();
     }
 
+    public function display_video_import() {
+        if (!class_exists('MTTI_MIS_Admin_Video_Import')) {
+            require_once MTTI_MIS_PLUGIN_DIR . 'admin/class-mtti-mis-admin-video-import.php';
+        }
+        $obj = new MTTI_MIS_Admin_Video_Import();
+        $obj->display();
+    }
+
     public function display_students() {
         $admin_students = new MTTI_MIS_Admin_Students($this->plugin_name, $this->version);
         $admin_students->display();
@@ -1168,6 +1220,10 @@ class MTTI_MIS_Admin {
         require_once MTTI_MIS_PLUGIN_DIR . 'admin/views/assignments.php';
     }
 
+    public function display_quizzes() {
+        require_once MTTI_MIS_PLUGIN_DIR . 'admin/views/quizzes.php';
+    }
+
     public function display_live_classes() {
         require_once MTTI_MIS_PLUGIN_DIR . 'admin/views/live-classes.php';
     }
@@ -1178,6 +1234,10 @@ class MTTI_MIS_Admin {
 
     public function display_units() {
         require_once MTTI_MIS_PLUGIN_DIR . 'admin/views/units.php';
+    }
+
+    public function display_course_purchases() {
+        require_once MTTI_MIS_PLUGIN_DIR . 'admin/views/course-purchases.php';
     }
 
     public function display_notice_board() {
@@ -2145,5 +2205,198 @@ class MTTI_MIS_Admin {
         $result = ob_get_clean();
         imagedestroy($img);
         return $result ?: $raw_data;
+    }
+
+    /**
+     * Display Lesson Scheduler Page
+     */
+    public function display_lesson_scheduler() {
+        if (!current_user_can('manage_options')) {
+            wp_die('Unauthorized');
+        }
+
+        global $wpdb;
+        $courses = $wpdb->get_results("SELECT course_id, course_code, course_name FROM {$wpdb->prefix}mtti_courses WHERE status = 'Active' ORDER BY course_name");
+        ?>
+        <div class="wrap mtti-lesson-scheduler-wrap">
+            <h1>📚 Lesson Scheduler</h1>
+            <p style="margin-bottom: 30px; font-size: 16px; color: #666;">
+                Set custom lesson unlock dates for your courses. Learners will access lessons progressively based on their enrollment date.
+            </p>
+
+            <div style="display: grid; grid-template-columns: 280px 1fr; gap: 30px; margin-top: 20px;">
+                <!-- Sidebar -->
+                <div style="background: #f9f9f9; padding: 20px; border-radius: 8px; height: fit-content;">
+                    <h3 style="margin: 0 0 15px 0; font-size: 14px; font-weight: 600; color: #333; text-transform: uppercase;">Select Course</h3>
+                    <select id="courseSelect" style="width: 100%; padding: 10px 12px; border: 2px solid #ddd; border-radius: 6px; font-size: 14px;">
+                        <option value="">-- Choose a Course --</option>
+                        <?php foreach ($courses as $course): ?>
+                            <option value="<?php echo $course->course_id; ?>">
+                                <?php echo esc_html($course->course_code . ' - ' . $course->course_name); ?>
+                            </option>
+                        <?php endforeach; ?>
+                    </select>
+
+                    <div id="templateOptions" style="display:none; margin-top: 30px;">
+                        <h3 style="margin: 0 0 15px 0; font-size: 14px; font-weight: 600; color: #333; text-transform: uppercase;">Quick Templates</h3>
+                        <button class="button button-primary mtti-template-btn" data-template="immediate" style="width: 100%; margin: 8px 0; text-align: left;">⚡ All at Once</button>
+                        <button class="button button-primary mtti-template-btn" data-template="daily" style="width: 100%; margin: 8px 0; text-align: left;">📅 1 per Day</button>
+                        <button class="button button-primary mtti-template-btn" data-template="weekly" style="width: 100%; margin: 8px 0; text-align: left;">📆 1 per Week</button>
+                        <button class="button button-primary mtti-template-btn" data-template="biweekly" style="width: 100%; margin: 8px 0; text-align: left;">📊 1 per 2 Weeks</button>
+                    </div>
+                </div>
+
+                <!-- Content -->
+                <div style="background: white; padding: 20px; border-radius: 8px;">
+                    <div id="lessonsList" style="display:none;">
+                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; padding-bottom: 15px; border-bottom: 1px solid #eee;">
+                            <h3 id="selectedCourseName" style="margin: 0; font-size: 18px; color: #333; font-weight: 600;"></h3>
+                            <span id="lessonCount" style="background: #0073aa; color: white; padding: 6px 14px; border-radius: 20px; font-size: 12px; font-weight: 600;"></span>
+                        </div>
+
+                        <table style="width: 100%; border-collapse: collapse; background: white; border-radius: 6px; overflow: hidden; box-shadow: 0 1px 3px rgba(0,0,0,0.1);">
+                            <thead style="background: #f5f5f5; border-bottom: 2px solid #ddd;">
+                                <tr>
+                                    <th style="padding: 15px; text-align: left; font-weight: 600; color: #333; font-size: 13px; width: 5%;">#</th>
+                                    <th style="padding: 15px; text-align: left; font-weight: 600; color: #333; font-size: 13px; width: 45%;">Lesson Title</th>
+                                    <th style="padding: 15px; text-align: left; font-weight: 600; color: #333; font-size: 13px; width: 25%;">Release Week</th>
+                                    <th style="padding: 15px; text-align: left; font-weight: 600; color: #333; font-size: 13px; width: 25%;">Release Date</th>
+                                </tr>
+                            </thead>
+                            <tbody id="lessonsTableBody"></tbody>
+                        </table>
+
+                        <div style="margin-top: 20px; text-align: right;">
+                            <button id="saveSchedule" class="button button-primary button-large">💾 Save Schedule</button>
+                            <span id="saveStatus" style="margin-left: 15px; display: none;"></span>
+                        </div>
+                    </div>
+
+                    <div id="noSelection" style="text-align: center; padding: 60px 20px;">
+                        <p style="font-size: 18px; color: #999;">👈 Select a course to manage its lesson schedule</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <script>
+        jQuery(function($) {
+            let currentCourse = null;
+            let currentLessons = [];
+
+            $('#courseSelect').on('change', function() {
+                currentCourse = $(this).val();
+                if (!currentCourse) {
+                    $('#lessonsList').hide();
+                    $('#noSelection').show();
+                    $('#templateOptions').hide();
+                    return;
+                }
+                loadCourseLessons();
+            });
+
+            function loadCourseLessons() {
+                $.ajax({
+                    url: ajaxurl,
+                    type: 'POST',
+                    data: {
+                        action: 'mtti_get_course_lessons',
+                        course_id: currentCourse,
+                        nonce: '<?php echo wp_create_nonce('mtti_scheduler_nonce'); ?>'
+                    },
+                    success: function(response) {
+                        if (response.success) {
+                            const {course, lessons} = response.data;
+                            currentLessons = lessons;
+                            $('#selectedCourseName').text(course.course_code + ' - ' + course.course_name);
+                            $('#lessonCount').text(lessons.length + ' lessons');
+                            renderTable(lessons);
+                            $('#noSelection').hide();
+                            $('#lessonsList').show();
+                            $('#templateOptions').show();
+                        }
+                    }
+                });
+            }
+
+            function renderTable(lessons) {
+                const tbody = $('#lessonsTableBody');
+                tbody.empty();
+                lessons.forEach((lesson, index) => {
+                    const row = $(`
+                        <tr style="border-bottom: 1px solid #eee;">
+                            <td style="padding: 14px 15px;">${index + 1}</td>
+                            <td style="padding: 14px 15px;"><strong>${lesson.title}</strong></td>
+                            <td style="padding: 14px 15px;"><input type="number" class="release-week" min="1" max="52" placeholder="Week" value="${lesson.release_week || ''}" style="width: 100%; padding: 6px 10px; border: 1px solid #ddd; border-radius: 4px;"></td>
+                            <td style="padding: 14px 15px;"><input type="date" class="release-date" value="${lesson.release_date || ''}" style="width: 100%; padding: 6px 10px; border: 1px solid #ddd; border-radius: 4px;"></td>
+                        </tr>
+                    `);
+                    tbody.append(row);
+                });
+            }
+
+            $('.mtti-template-btn').on('click', function() {
+                const template = $(this).data('template');
+                if (!currentCourse) {
+                    alert('Please select a course first.');
+                    return;
+                }
+                $('#lessonsTableBody tr').each(function(index) {
+                    if (template === 'immediate') {
+                        $(this).find('.release-week').val('1');
+                        $(this).find('.release-date').val('');
+                    } else if (template === 'daily') {
+                        $(this).find('.release-week').val('');
+                        $(this).find('.release-date').val(formatDate(new Date(Date.now() + index * 86400000)));
+                    } else if (template === 'weekly') {
+                        $(this).find('.release-week').val(Math.ceil((index + 1) / 4));
+                        $(this).find('.release-date').val('');
+                    } else if (template === 'biweekly') {
+                        $(this).find('.release-week').val(Math.ceil((index + 1) / 2) * 2 - 1);
+                        $(this).find('.release-date').val('');
+                    }
+                });
+            });
+
+            $('#saveSchedule').on('click', function() {
+                const schedule = {};
+                $('#lessonsTableBody tr').each(function() {
+                    const lessonId = currentLessons[$('#lessonsTableBody tr').index(this)].lesson_id;
+                    schedule[lessonId] = {
+                        release_week: $(this).find('.release-week').val() || '',
+                        release_date: $(this).find('.release-date').val() || ''
+                    };
+                });
+
+                $.ajax({
+                    url: ajaxurl,
+                    type: 'POST',
+                    data: {
+                        action: 'mtti_save_lesson_schedule',
+                        schedule: schedule,
+                        nonce: '<?php echo wp_create_nonce('mtti_scheduler_nonce'); ?>'
+                    },
+                    success: function(response) {
+                        if (response.success) {
+                            $('#saveStatus').removeClass('error').addClass('success').text('✅ ' + response.data.message).show();
+                            setTimeout(() => $('#saveStatus').fadeOut(), 3000);
+                        } else {
+                            $('#saveStatus').removeClass('success').addClass('error').text('❌ ' + response.data.message).show();
+                        }
+                    }
+                });
+            });
+
+            function formatDate(date) {
+                return date.toISOString().split('T')[0];
+            }
+        });
+        </script>
+
+        <style>
+            #saveStatus.success { background: #d4edda; color: #155724; padding: 10px 16px; border-radius: 4px; }
+            #saveStatus.error { background: #f8d7da; color: #721c24; padding: 10px 16px; border-radius: 4px; }
+        </style>
+        <?php
     }
 }

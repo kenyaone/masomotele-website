@@ -639,11 +639,12 @@ class MTTI_MIS_Admin_Students {
                                         <tr style="background: #c8e6c9;">
                                             <th style="padding: 8px; text-align: left; border: 1px solid #a5d6a7;">Course</th>
                                             <th style="padding: 8px; text-align: left; border: 1px solid #a5d6a7;">Enrollment Date</th>
+                                            <th style="padding: 8px; text-align: left; border: 1px solid #a5d6a7;">Attendance</th>
                                             <th style="padding: 8px; text-align: left; border: 1px solid #a5d6a7;">Status</th>
                                         </tr>
                                     </thead>
                                     <tbody>
-                                    <?php foreach ($current_enrollments as $enrollment) : 
+                                    <?php foreach ($current_enrollments as $enrollment) :
                                         $enroll_date = !empty($enrollment->enrollment_date) ? date('Y-m-d', strtotime($enrollment->enrollment_date)) : '';
                                     ?>
                                         <tr style="background: #fff;">
@@ -653,9 +654,15 @@ class MTTI_MIS_Admin_Students {
                                                 <br><span style="color: #2271b1; font-size: 12px;">KES <?php echo number_format($enrollment->fee); ?></span>
                                             </td>
                                             <td style="padding: 8px; border: 1px solid #e0e0e0;">
-                                                <input type="date" name="enrollment_dates[<?php echo $enrollment->enrollment_id; ?>]" 
-                                                       value="<?php echo esc_attr($enroll_date); ?>" 
+                                                <input type="date" name="enrollment_dates[<?php echo $enrollment->enrollment_id; ?>]"
+                                                       value="<?php echo esc_attr($enroll_date); ?>"
                                                        style="width: 150px; padding: 4px;">
+                                            </td>
+                                            <td style="padding: 8px; border: 1px solid #e0e0e0;">
+                                                <select name="delivery_modes[<?php echo $enrollment->enrollment_id; ?>]" style="padding: 4px;">
+                                                    <option value="online" <?php selected($enrollment->delivery_mode, 'online'); ?>>💻 Online</option>
+                                                    <option value="physical" <?php selected($enrollment->delivery_mode, 'physical'); ?>>🏫 Physical</option>
+                                                </select>
                                             </td>
                                             <td style="padding: 8px; border: 1px solid #e0e0e0;">
                                                 <span style="color: #2E7D32; font-weight: bold;"><?php echo esc_html($enrollment->status); ?></span>
@@ -665,7 +672,7 @@ class MTTI_MIS_Admin_Students {
                                     </tbody>
                                 </table>
                                 <p class="description" style="margin-top: 10px; color: #666;">
-                                    <strong>Note:</strong> Modify enrollment dates above to correct historical records. Changes will be saved when you update the student.
+                                    <strong>Note:</strong> Modify enrollment dates or attendance mode above to correct historical records. Changes will be saved when you update the student. Physical students' official unit results only ever come from manually entered marks — the portal's automatic quiz grading is switched off for them.
                                 </p>
                             </div>
                             <?php else : ?>
@@ -1903,7 +1910,30 @@ class MTTI_MIS_Admin_Students {
                     }
                 }
             }
-            
+
+            // Handle individual attendance-mode (physical/online) updates
+            if (!empty($_POST['delivery_modes']) && is_array($_POST['delivery_modes'])) {
+                foreach ($_POST['delivery_modes'] as $enrollment_id => $delivery_mode) {
+                    $enrollment_id = intval($enrollment_id);
+                    $delivery_mode = ($delivery_mode === 'physical') ? 'physical' : 'online';
+
+                    if ($enrollment_id > 0) {
+                        $wpdb->update(
+                            $enrollments_table_update,
+                            array(
+                                'delivery_mode' => $delivery_mode
+                            ),
+                            array(
+                                'enrollment_id' => $enrollment_id,
+                                'student_id' => $student_id
+                            ),
+                            array('%s'),
+                            array('%d', '%d')
+                        );
+                    }
+                }
+            }
+
             // ============================================
             // UPDATE WORDPRESS USER (Email, Name, Phone)
             // ============================================

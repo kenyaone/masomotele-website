@@ -5,10 +5,10 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
     <!-- SEO: Title (optimised to under 75 chars) -->
-    <title>MTTI Eldoret – Real Skills, Real Jobs | Masomotele Training</title>
+    <title>Computer Courses Eldoret | TVETA Training | Enroll Now</title>
 
     <!-- SEO: Meta Description (optimised to under 160 chars) -->
-    <meta name="description" content="TVETA accredited courses in Computer Applications, Web Design, Cybersecurity, Nursing &amp; more. Real skills for real jobs. Eldoret, Kenya.">
+    <meta name="description" content="Enroll in TVETA-accredited computer, cybersecurity & web design courses in Eldoret. No minimum entry. Affordable fees. Start now. Masomotele Training Kenya.">
 
     <!-- Canonical URL -->
     <link rel="canonical" href="https://masomoteletraining.co.ke/">
@@ -16,16 +16,16 @@
     <!-- OpenGraph (Facebook & WhatsApp previews) -->
     <meta property="og:type" content="website">
     <meta property="og:url" content="https://masomoteletraining.co.ke/">
-    <meta property="og:title" content="MTTI Eldoret – Real Skills, Real Jobs | Masomotele Training">
-    <meta property="og:description" content="TVETA accredited courses in Computer Applications, Web Design, Cybersecurity, Nursing &amp; more. Real skills for real jobs. Eldoret, Kenya.">
+    <meta property="og:title" content="Computer Courses Eldoret | TVETA Training | Enroll Now">
+    <meta property="og:description" content="Enroll in TVETA-accredited computer, cybersecurity & web design courses in Eldoret. No minimum entry. Affordable fees. Start now. Masomotele Training Kenya.">
     <meta property="og:image" content="https://masomoteletraining.co.ke/wp-content/uploads/2025/12/Logo.jpeg">
     <meta property="og:site_name" content="Masomotele Technical Training Institute">
     <meta property="og:locale" content="en_KE">
 
     <!-- Twitter Card -->
     <meta name="twitter:card" content="summary_large_image">
-    <meta name="twitter:title" content="MTTI Eldoret – Real Skills, Real Jobs | Masomotele Training">
-    <meta name="twitter:description" content="TVETA accredited courses in Computer Applications, Web Design, Cybersecurity, Nursing &amp; more. Real skills for real jobs. Eldoret, Kenya.">
+    <meta name="twitter:title" content="Computer Courses Eldoret | TVETA Training | Enroll Now">
+    <meta name="twitter:description" content="Enroll in TVETA-accredited computer, cybersecurity & web design courses in Eldoret. No minimum entry. Affordable fees. Start now. Masomotele Training Kenya.">
     <meta name="twitter:image" content="https://masomoteletraining.co.ke/wp-content/uploads/2025/12/Logo.jpeg">
 
     <!-- Schema.org: LocalBusiness + EducationalOrganization -->
@@ -84,6 +84,16 @@
     }
     </script>
 
+    <!-- Google tag (gtag.js) - Google Ads Conversion Tracking -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=AW-17161883901"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+
+      gtag('config', 'AW-17161883901');
+    </script>
+
     <!-- Google Analytics -->
     <script async src="https://www.googletagmanager.com/gtag/js?id=G-8ZEH42CBVL"></script>
     <script>
@@ -101,7 +111,7 @@
 
     <!-- Meta Pixel -->
     <script>!function(f,b,e,v,n,t,s){if(f.fbq)return;n=f.fbq=function(){n.callMethod?n.callMethod.apply(n,arguments):n.queue.push(arguments)};if(!f._fbq)f._fbq=n;n.push=n;n.loaded=!0;n.version='2.0';n.queue=[];t=b.createElement(e);t.async=!0;t.src=v;s=b.getElementsByTagName(e)[0];s.parentNode.insertBefore(t,s)}(window,document,'script','https://connect.facebook.net/en_US/fbevents.js');fbq('init','893318556963600');fbq('track','PageView');</script>
-    <noscript><img height="1" width="1" style="display:none" src="https://www.facebook.com/tr?id=893318556963600&ev=PageView&noscript=1"/></noscript>
+    <noscript><img height="1" width="1" style="display:none" src="https://www.facebook.com/tr?id=893318556963600&ev=PageView&noscript=1" alt="Facebook Pixel Tracking"/></noscript>
 
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -171,6 +181,8 @@
         .btn-ghost:hover{background:#fff;color:var(--green);border-color:#fff;transform:translateY(-2px);}
         .btn-green{background:var(--green);color:#fff;}
         .btn-green:hover{background:var(--green-dark);transform:translateY(-2px);}
+        .btn-wa-hero{background:#25D366;color:#fff;box-shadow:0 6px 20px rgba(37,211,102,.35);}
+        .btn-wa-hero:hover{background:#1ebe5d;transform:translateY(-2px);box-shadow:0 10px 28px rgba(37,211,102,.5);}
 
         /* hero photo marquee */
         .hero-photos{overflow:hidden;position:relative;border-radius:20px;height:420px;}
@@ -202,6 +214,14 @@
         .sec-title{font-size:clamp(1.6rem,3.5vw,2.4rem);font-weight:800;color:var(--dark);line-height:1.2;margin-bottom:12px;}
         .sec-title span{color:var(--green);}
         .sec-sub{font-size:1rem;color:var(--gray);max-width:560px;margin:0 auto;}
+
+        /* ── COURSE FILTER TABS ── */
+        .course-tabs{display:flex;gap:10px;flex-wrap:wrap;justify-content:center;margin-bottom:32px;}
+        .ctab{padding:9px 20px;border:2px solid var(--border);border-radius:50px;background:#fff;font-family:'Poppins',sans-serif;font-size:.85rem;font-weight:600;color:var(--gray);cursor:pointer;transition:all .2s;white-space:nowrap;}
+        .ctab:hover{border-color:var(--green);color:var(--green);}
+        .ctab.active{background:var(--green);border-color:var(--green);color:#fff;box-shadow:0 4px 14px rgba(46,125,50,.3);}
+        .ctab-count{background:rgba(255,255,255,.3);border-radius:50px;padding:1px 7px;font-size:.75rem;margin-left:4px;}
+        .course-card.hidden{display:none;}
 
         /* ── GALLERY / ABOUT ── */
         .about-grid{display:grid;grid-template-columns:1fr 1fr;gap:48px;align-items:center;}
@@ -393,7 +413,7 @@
         .quiz-banner-inner{max-width:760px;margin:0 auto;position:relative;z-index:1;}
         .qb-emoji{font-size:4.5rem;display:block;margin-bottom:16px;animation:qbBounce 2s ease-in-out infinite;}
         @keyframes qbBounce{0%,100%{transform:translateY(0);}50%{transform:translateY(-10px);}}
-        .quiz-banner h2{color:#fff;font-size:clamp(2.2rem,5.5vw,3.8rem);font-weight:900;margin:0 0 16px;line-height:1.15;text-shadow:0 3px 12px rgba(0,0,0,.18);}
+        .quiz-banner-title{color:#fff;font-size:clamp(2.2rem,5.5vw,3.8rem);font-weight:900;margin:0 0 16px;line-height:1.15;text-shadow:0 3px 12px rgba(0,0,0,.18);}
         .quiz-banner>div>p{color:rgba(255,255,255,.95);font-size:clamp(1rem,2.5vw,1.25rem);margin:0 auto 36px;max-width:560px;font-weight:500;}
         .qb-btn{display:inline-flex;align-items:center;gap:12px;background:#1B5E20;color:#fff;padding:22px 56px;border-radius:60px;font-size:clamp(1.1rem,2.5vw,1.35rem);font-weight:800;border:none;cursor:pointer;font-family:'Poppins',sans-serif;box-shadow:0 10px 40px rgba(0,0,0,.25);transition:transform .2s,box-shadow .2s;position:relative;letter-spacing:.3px;}
         .qb-btn:hover{transform:translateY(-4px);box-shadow:0 18px 50px rgba(0,0,0,.3);background:#2E7D32;}
@@ -504,6 +524,52 @@
         .testi-av{width:50px;height:50px;background:linear-gradient(135deg,var(--green),var(--green-dark));border-radius:50%;display:flex;align-items:center;justify-content:center;color:#fff;font-weight:800;font-size:.95rem;flex-shrink:0;box-shadow:0 4px 12px rgba(46,125,50,.3);}
         .testi-info h4{font-size:.92rem;font-weight:700;color:var(--dark);}
         .testi-info span{font-size:.8rem;color:var(--orange);font-weight:500;}
+
+        /* ── LIGHTBOX ── */
+        .lb-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.92);z-index:10500;align-items:center;justify-content:center;}
+        .lb-overlay.open{display:flex;}
+        .lb-img-wrap{position:relative;max-width:90vw;max-height:88vh;display:flex;align-items:center;justify-content:center;}
+        .lb-img-wrap img{max-width:90vw;max-height:82vh;border-radius:10px;box-shadow:0 20px 80px rgba(0,0,0,.6);object-fit:contain;display:block;}
+        .lb-caption{position:absolute;bottom:-32px;left:0;right:0;text-align:center;color:rgba(255,255,255,.75);font-size:.85rem;}
+        .lb-close{position:fixed;top:20px;right:24px;background:none;border:none;color:#fff;font-size:2rem;cursor:pointer;opacity:.7;transition:opacity .2s;line-height:1;z-index:10501;}
+        .lb-close:hover{opacity:1;}
+        .lb-arrow{position:fixed;top:50%;transform:translateY(-50%);background:rgba(255,255,255,.12);border:none;color:#fff;font-size:1.8rem;width:50px;height:50px;border-radius:50%;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:background .2s;z-index:10501;}
+        .lb-arrow:hover{background:rgba(255,255,255,.25);}
+        .lb-prev{left:16px;}
+        .lb-next{right:16px;}
+        .lb-counter{position:fixed;bottom:20px;left:50%;transform:translateX(-50%);color:rgba(255,255,255,.6);font-size:.82rem;}
+        @media(max-width:600px){.lb-arrow{width:38px;height:38px;font-size:1.3rem;}.lb-prev{left:6px;}.lb-next{right:6px;}}
+
+        /* ── FEES STRUCTURE ── */
+        .fees-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:24px;}
+        .fees-card{background:var(--off);border-radius:18px;padding:24px;transition:all .3s;border-left:4px solid var(--green);}
+        .fees-card:hover{transform:translateY(-4px);box-shadow:0 12px 40px rgba(0,0,0,.12);border-left-color:var(--orange);}
+        .fees-card-icon{font-size:2.2rem;margin-bottom:12px;}
+        .fees-card h3{font-size:1.05rem;font-weight:700;color:var(--dark);margin-bottom:8px;}
+        .fees-card-fee{font-size:1.4rem;font-weight:800;color:var(--green);margin:12px 0;}
+        .fees-card-duration{font-size:0.85rem;color:var(--orange);font-weight:600;margin-bottom:12px;}
+        .fees-card-desc{font-size:0.85rem;color:var(--gray);margin-bottom:16px;line-height:1.6;}
+        .fees-card-btn{display:inline-flex;align-items:center;gap:6px;padding:10px 18px;background:var(--green);color:#fff;border-radius:50px;font-weight:600;font-size:0.85rem;text-decoration:none;transition:all .2s;}
+        .fees-card-btn:hover{background:var(--orange);transform:translateY(-2px);}
+
+        /* ── HOW TO ENROLL ── */
+        .enroll-sec{background:#fff;padding:60px 24px;}
+        .enroll-steps{display:grid;grid-template-columns:1fr auto 1fr auto 1fr;gap:0;align-items:start;max-width:960px;margin:0 auto;}
+        .enroll-step{background:var(--off);border-radius:20px;padding:36px 28px;text-align:center;position:relative;border-top:4px solid transparent;transition:all .3s;}
+        .enroll-step:hover{border-top-color:var(--orange);transform:translateY(-4px);box-shadow:0 16px 48px rgba(0,0,0,.1);}
+        .enroll-num{position:absolute;top:-18px;left:50%;transform:translateX(-50%);width:36px;height:36px;background:var(--orange);color:#fff;border-radius:50%;font-weight:800;font-size:.95rem;display:flex;align-items:center;justify-content:center;box-shadow:0 4px 12px rgba(255,152,0,.4);}
+        .enroll-icon{font-size:2.8rem;margin:8px 0 16px;}
+        .enroll-step h3{font-size:1.05rem;font-weight:800;color:var(--dark);margin-bottom:10px;}
+        .enroll-step p{font-size:.88rem;color:var(--gray);line-height:1.7;margin-bottom:16px;}
+        .enroll-link{font-size:.85rem;font-weight:700;color:var(--green);text-decoration:none;transition:gap .2s;}
+        .enroll-link:hover{color:var(--orange);}
+        .enroll-connector{display:flex;align-items:center;justify-content:center;padding:0 12px;margin-top:80px;}
+        .enroll-connector::after{content:'→';font-size:1.8rem;color:var(--orange);opacity:.6;font-weight:300;}
+        @media(max-width:768px){
+            .enroll-steps{grid-template-columns:1fr;gap:32px;}
+            .enroll-connector{margin-top:0;padding:0;}
+            .enroll-connector::after{content:'↓';}
+        }
     </style>
 </head>
 <body>
@@ -518,16 +584,24 @@
         <nav id="nav">
             <ul>
                 <li><a href="#about">About</a></li>
-                <li><a href="#courses">Courses</a></li>
+                <li class="nav-dropdown">
+                    <a href="#courses">Courses ▾</a>
+                    <ul class="dropdown-menu">
+                        <li><a href="#courses">All Courses</a></li>
+                        <li><a href="/german-language.html">🇩🇪 German Language (KES 10,000/month)</a></li>
+                        <li><a href="/cna.html">⚕️ Certified Nursing Assistant</a></li>
+                    </ul>
+                </li>
+                <li><a href="#fees">Fees</a></li>
                 <li><a href="#gallery">Gallery</a></li>
                 <li><a href="#blog">Blog</a></li>
                 <li class="nav-dropdown">
                     <a href="#" onclick="return false;">Portals ▾</a>
                     <ul class="dropdown-menu">
-                        <li><a href="https://masomoteletraining.co.ke/student-portal/" target="_blank">🎓 Student Portal</a></li>
-                        <li><a href="https://masomoteletraining.co.ke/lecturer-portal/" target="_blank">👨‍🏫 Lecturer Portal</a></li>
-                        <li><a href="https://masomoteletraining.co.ke/masomotele/" target="_blank">📚 Free Learning</a></li>
-                        <li><a href="https://masomoteletraining.co.ke/verify-certificate-custom.php" target="_blank">🏅 Verify Certificate</a></li>
+                        <li><a href="https://masomoteletraining.co.ke/student-portal/" target="_blank" rel="noopener noreferrer">🎓 Student Portal</a></li>
+                        <li><a href="https://masomoteletraining.co.ke/lecturer-portal/" target="_blank" rel="noopener noreferrer">👨‍🏫 Lecturer Portal</a></li>
+                        <li><a href="https://masomoteletraining.co.ke/masomotele/" target="_blank" rel="noopener noreferrer">📚 Free Learning</a></li>
+                        <li><a href="https://masomoteletraining.co.ke/verify-certificate-custom.php" target="_blank" rel="noopener noreferrer">🏅 Verify Certificate</a></li>
                     </ul>
                 </li>
                 <li><a href="#contact">Contact</a></li>
@@ -545,7 +619,7 @@
         <div class="hero-content">
             <div class="mtti-live-badge"><span class="dot"></span> <span id="enrollCount">24</span> students enrolled this month</div>
             <div class="hero-badge">🎓 <em>TVETA Accredited</em> — Eldoret, Kenya</div>
-            <h1>Transform Your <span class="hl">Future</span> With Real Skills</h1>
+            <h1>Enroll in TVETA Accredited <span class="hl">Computer Courses</span> in Eldoret</h1>
             <div class="hero-tag">"Start Learning, Start Earning"</div>
             <p>Hands-on training in <strong style="color:var(--orange)">ICT</strong> and <strong style="color:var(--orange)">Healthcare</strong> — designed to get you employed or self-employed. Affordable. Pay in installments. TVETA Certified.</p>
             <div class="hero-btns">
@@ -553,7 +627,11 @@
                     Explore Courses
                     <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
                 </a>
-                <a href="#contact" class="btn btn-ghost">Get in Touch</a>
+                <a href="#fees" class="btn btn-ghost">📥 Download Fees</a>
+                <a href="https://wa.me/254712464936?text=Hello%20MTTI%2C%20I%27m%20interested%20in%20enrolling.%20Please%20guide%20me." target="_blank" rel="noopener noreferrer" class="btn btn-wa-hero" onclick="trackWhatsAppClick('hero')">
+                    <svg width="19" height="19" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
+                    Chat on WhatsApp
+                </a>
             </div>
             <button class="quiz-trigger" onclick="openQuiz()">🎯 Help Me Choose a Career →</button>
             <div class="mtti-countdown" id="cdWrap">
@@ -566,15 +644,21 @@
         </div>
         <div class="hero-photos">
             <div class="marquee-track" id="marqueeTrack">
-                <img src="https://masomoteletraining.co.ke/wp-content/uploads/2026/04/Application-class.jpeg" alt="MTTI Class" loading="lazy">
-                <img src="https://masomoteletraining.co.ke/wp-content/uploads/2026/04/CNA.jpeg" alt="CNA Students" loading="lazy">
-                <img src="https://masomoteletraining.co.ke/wp-content/uploads/2026/04/Essentials.jpeg" alt="Essentials Training" loading="lazy">
+                <img src="https://masomoteletraining.co.ke/wp-content/uploads/2026/04/Application-class.jpeg" alt="MTTI Class">
+                <img src="https://masomoteletraining.co.ke/wp-content/uploads/2026/04/CNA.jpeg" alt="CNA Students">
+                <img src="https://masomoteletraining.co.ke/wp-content/uploads/2026/04/Essentials.jpeg" alt="Essentials Training">
+                <img src="https://masomoteletraining.co.ke/wp-content/uploads/2026/05/First-aid.jpeg" alt="First Aid Training" loading="lazy">
+                <img src="https://masomoteletraining.co.ke/wp-content/uploads/2026/05/First-Aid-2.jpeg" alt="First Aid Training 2" loading="lazy">
+                <img src="https://masomoteletraining.co.ke/wp-content/uploads/2026/05/First-Aid-three.jpeg" alt="First Aid Training 3" loading="lazy">
                 <img src="https://masomoteletraining.co.ke/wp-content/uploads/2026/04/DSC_2132.jpg" alt="Computer Lab" loading="lazy">
                 <!-- duplicated for seamless loop -->
                 <img src="https://masomoteletraining.co.ke/wp-content/uploads/2026/04/Application-class.jpeg" alt="MTTI Class" loading="lazy">
                 <img src="https://masomoteletraining.co.ke/wp-content/uploads/2026/04/CNA.jpeg" alt="CNA Students" loading="lazy">
                 <img src="https://masomoteletraining.co.ke/wp-content/uploads/2026/04/Essentials.jpeg" alt="Essentials Training" loading="lazy">
                 <img src="https://masomoteletraining.co.ke/wp-content/uploads/2026/04/DSC_2132.jpg" alt="Computer Lab" loading="lazy">
+                <img src="https://masomoteletraining.co.ke/wp-content/uploads/2026/05/First-aid.jpeg" alt="First Aid Training" loading="lazy">
+                <img src="https://masomoteletraining.co.ke/wp-content/uploads/2026/05/First-Aid-2.jpeg" alt="First Aid Training 2" loading="lazy">
+                <img src="https://masomoteletraining.co.ke/wp-content/uploads/2026/05/First-Aid-three.jpeg" alt="First Aid Training 3" loading="lazy">
             </div>
         </div>
     </div>
@@ -594,7 +678,7 @@
 <section class="quiz-banner">
     <div class="quiz-banner-inner">
         <span class="qb-emoji">🎯</span>
-        <h2>Which Course Is<br>Right For You?</h2>
+        <p class="quiz-banner-title">Which Course Is<br>Right For You?</p>
         <p>Not sure where to start? Answer 3 quick questions and get a free, personalised course recommendation in under 60 seconds.</p>
         <button class="qb-btn" onclick="openQuiz()">
             Find My Perfect Course &nbsp;→
@@ -619,7 +703,7 @@
         <p class="sec-sub">Watch how we transform students into confident, skilled professionals ready for the modern workplace.</p>
     </div>
     <div class="video-frame fade-up">
-        <video id="collegeVideo" poster="" muted playsinline preload="metadata">
+        <video id="collegeVideo" muted playsinline preload="metadata">
             <source src="https://masomoteletraining.co.ke/wp-content/uploads/2025/12/MTTI-Introduction-1.mp4" type="video/mp4">
         </video>
         <div class="v-overlay" id="videoOverlay" onclick="playCollegeVideo()">
@@ -636,9 +720,9 @@
     <div class="sec-wrap">
         <div class="about-grid">
             <div class="about-imgs">
-                <img src="https://masomoteletraining.co.ke/wp-content/uploads/2026/04/DSC_2132.jpg" alt="MTTI Lab" loading="lazy" onerror="this.src='https://placehold.co/800x220/2E7D32/white?text=MTTI+Lab'">
-                <img src="https://masomoteletraining.co.ke/wp-content/uploads/2026/04/CNA.jpeg" alt="MTTI Students" loading="lazy" onerror="this.src='https://placehold.co/400x160/1B5E20/white?text=Students'">
-                <img src="https://masomoteletraining.co.ke/wp-content/uploads/2026/04/Application-class.jpeg" alt="Computer Class" loading="lazy" onerror="this.src='https://placehold.co/400x160/2E7D32/white?text=Class'">
+                <img src="https://masomoteletraining.co.ke/wp-content/uploads/2026/04/DSC_2132.jpg" alt="MTTI Lab" onerror="this.src='https://placehold.co/800x220/2E7D32/white?text=MTTI+Lab'">
+                <img src="https://masomoteletraining.co.ke/wp-content/uploads/2026/04/CNA.jpeg" alt="MTTI Students" onerror="this.src='https://placehold.co/400x160/1B5E20/white?text=Students'">
+                <img src="https://masomoteletraining.co.ke/wp-content/uploads/2026/04/Application-class.jpeg" alt="Computer Class" onerror="this.src='https://placehold.co/400x160/2E7D32/white?text=Class'">
             </div>
             <div class="about-text">
                 <div class="sec-badge">About Us</div>
@@ -656,6 +740,20 @@
     </div>
 </section>
 
+<!-- FEATURED: GERMAN LANGUAGE COURSE -->
+<section style="background:linear-gradient(135deg,#1e3c72 0%,#2a5298 100%);padding:50px 24px;margin:40px 0;">
+    <div class="sec-wrap" style="text-align:center;color:#fff;">
+        <div style="margin-bottom:20px;font-size:3rem;">🇩🇪</div>
+        <h2 style="color:#fff;margin-bottom:15px;font-size:2.2rem;">Learn German & Earn 30-40% More</h2>
+        <p style="font-size:1.1rem;max-width:600px;margin:0 auto 25px;opacity:0.95;">Master German language skills at just <strong>KES 10,000/month</strong> — the most affordable TVETA-accredited training in Eldoret. Access global job opportunities in healthcare, tech, and business.</p>
+        <div style="display:flex;gap:12px;justify-content:center;flex-wrap:wrap;">
+            <a href="/german-language.html" class="btn btn-orange" style="padding:14px 32px;font-size:0.95rem;">📖 View Course Details</a>
+            <a href="https://wa.me/254712464936?text=I%20am%20interested%20in%20the%20German%20Language%20course%20at%20KES%2010%2C000%2Fmonth" class="btn" style="background:#25D366;color:#fff;padding:14px 32px;font-size:0.95rem;">💬 Enroll Now on WhatsApp</a>
+        </div>
+        <p style="margin-top:20px;font-size:0.9rem;opacity:0.85;">⏰ Next intake closes in 3 days • Only 5 spots left</p>
+    </div>
+</section>
+
 <!-- COURSES -->
 <section class="courses-sec" id="courses">
     <div class="sec-wrap">
@@ -663,6 +761,15 @@
             <div class="sec-badge">Our Programs</div>
             <h2 class="sec-title">Practical <span>Courses</span> For Real Skills</h2>
             <p class="sec-sub">Affordable, industry-relevant training designed to get you employed or self-employed fast.</p>
+        </div>
+        <div class="course-tabs" id="courseTabs">
+            <button class="ctab active" onclick="filterCourses('all',this)">All <span class="ctab-count" id="ctab-count-all"></span></button>
+            <button class="ctab" onclick="filterCourses('hospitality',this)">🍽️ Hospitality</button>
+            <button class="ctab" onclick="filterCourses('health',this)">🏥 Health Sciences</button>
+            <button class="ctab" onclick="filterCourses('ict',this)">💻 ICT</button>
+            <button class="ctab" onclick="filterCourses('electronics',this)">🔧 Electronics &amp; Repair</button>
+            <button class="ctab" onclick="filterCourses('media',this)">🎨 Media &amp; Creative Arts</button>
+            <button class="ctab" onclick="filterCourses('languages',this)">🌍 Languages &amp; International</button>
         </div>
         <div class="courses-grid" id="coursesGrid"></div>
     </div>
@@ -685,6 +792,48 @@
     </div>
 </section>
 
+<!-- HOW TO ENROLL -->
+<section class="enroll-sec" id="enroll">
+    <div class="sec-wrap">
+        <div class="sec-head">
+            <div class="sec-badge">Get Started</div>
+            <h2 class="sec-title">Enroll in <span>3 Simple Steps</span></h2>
+            <p class="sec-sub">From choosing your course to sitting in your first class — it takes less than 24 hours.</p>
+        </div>
+        <div class="enroll-steps">
+            <div class="enroll-step fade-up">
+                <div class="enroll-num">1</div>
+                <div class="enroll-icon">🎯</div>
+                <h3>Choose Your Course</h3>
+                <p>Browse our programs or use the course finder quiz. Not sure? Call or WhatsApp us — our team will guide you to the right fit.</p>
+                <a href="#courses" class="enroll-link">View Courses →</a>
+            </div>
+            <div class="enroll-connector"></div>
+            <div class="enroll-step fade-up">
+                <div class="enroll-num">2</div>
+                <div class="enroll-icon">💳</div>
+                <h3>Pay Deposit &amp; Register</h3>
+                <p>Pay a small deposit via M-Pesa, bank transfer, or cash at the office. Full fee can be paid in installments throughout the course.</p>
+                <a href="#contact" class="enroll-link">Inquire Now →</a>
+            </div>
+            <div class="enroll-connector"></div>
+            <div class="enroll-step fade-up">
+                <div class="enroll-num">3</div>
+                <div class="enroll-icon">🚀</div>
+                <h3>Start Learning</h3>
+                <p>Attend your first class at Sagaas Centre, 4th Floor, Eldoret. Morning, afternoon, and weekend slots available to fit your schedule.</p>
+                <a href="/online-admission/" class="enroll-link">Online Admission →</a>
+            </div>
+        </div>
+        <div style="text-align:center;margin-top:40px;">
+            <a href="https://wa.me/254712464936?text=Hello%20MTTI%2C%20I%20would%20like%20to%20enroll%20in%20a%20course." target="_blank" rel="noopener noreferrer" class="btn btn-orange" onclick="trackWhatsAppClick('enroll-section')">
+                💬 WhatsApp Us to Enroll
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+            </a>
+        </div>
+    </div>
+</section>
+
 <!-- GALLERY -->
 <section class="gallery-sec" id="gallery">
     <div class="sec-head">
@@ -699,12 +848,20 @@
                 <img src="https://masomoteletraining.co.ke/wp-content/uploads/2026/04/DSC_2132.jpg" alt="MTTI Computer Lab" loading="lazy">
                 <img src="https://masomoteletraining.co.ke/wp-content/uploads/2026/04/CNA.jpeg" alt="CNA Class" loading="lazy">
                 <img src="https://masomoteletraining.co.ke/wp-content/uploads/2026/04/Application-class.jpeg" alt="Application Class" loading="lazy">
+                <img src="https://masomoteletraining.co.ke/wp-content/uploads/2026/05/First-aid.jpeg" alt="First Aid Training" loading="lazy">
+                <img src="https://masomoteletraining.co.ke/wp-content/uploads/2026/05/First-aid.jpeg" alt="First Aid Training" loading="lazy">
+                <img src="https://masomoteletraining.co.ke/wp-content/uploads/2026/05/First-Aid-2.jpeg" alt="First Aid Training 2" loading="lazy">
+                <img src="https://masomoteletraining.co.ke/wp-content/uploads/2026/05/First-Aid-three.jpeg" alt="First Aid Training 3" loading="lazy">
                 <img src="https://masomoteletraining.co.ke/wp-content/uploads/2026/04/Essentials.jpeg" alt="Essentials Class" loading="lazy">
                 <!-- duplicates for seamless loop -->
                 <img src="https://masomoteletraining.co.ke/wp-content/uploads/2026/04/DSC_2132.jpg" alt="MTTI Computer Lab" loading="lazy">
                 <img src="https://masomoteletraining.co.ke/wp-content/uploads/2026/04/CNA.jpeg" alt="CNA Class" loading="lazy">
                 <img src="https://masomoteletraining.co.ke/wp-content/uploads/2026/04/Application-class.jpeg" alt="Application Class" loading="lazy">
                 <img src="https://masomoteletraining.co.ke/wp-content/uploads/2026/04/Essentials.jpeg" alt="Essentials Class" loading="lazy">
+                <img src="https://masomoteletraining.co.ke/wp-content/uploads/2026/05/First-aid.jpeg" alt="First Aid Training" loading="lazy">
+                <img src="https://masomoteletraining.co.ke/wp-content/uploads/2026/05/First-aid.jpeg" alt="First Aid Training" loading="lazy">
+                <img src="https://masomoteletraining.co.ke/wp-content/uploads/2026/05/First-Aid-2.jpeg" alt="First Aid Training 2" loading="lazy">
+                <img src="https://masomoteletraining.co.ke/wp-content/uploads/2026/05/First-Aid-three.jpeg" alt="First Aid Training 3" loading="lazy">
             </div>
         </div>
         <!-- Row 2: right to left (reverse) -->
@@ -724,6 +881,18 @@
     </div>
 </section>
 
+<!-- LIGHTBOX -->
+<div class="lb-overlay" id="lbOverlay" onclick="lbBgClick(event)">
+    <button class="lb-close" onclick="lbClose()" aria-label="Close">✕</button>
+    <button class="lb-arrow lb-prev" onclick="lbNav(-1)" aria-label="Previous">‹</button>
+    <div class="lb-img-wrap">
+        <img id="lbImg" src="" alt="">
+        <div class="lb-caption" id="lbCaption"></div>
+    </div>
+    <button class="lb-arrow lb-next" onclick="lbNav(1)" aria-label="Next">›</button>
+    <div class="lb-counter" id="lbCounter"></div>
+</div>
+
 <!-- BLOG -->
 <section class="blog-sec" id="blog">
     <div class="sec-wrap">
@@ -735,7 +904,7 @@
         <div id="blog-loading">⏳ Loading latest articles…</div>
         <div class="blog-grid" id="blogGrid" style="display:none;"></div>
         <div class="blog-cta">
-            <a href="https://masomoteletraining.co.ke/blog" target="_blank" class="btn btn-green">
+            <a href="https://masomoteletraining.co.ke/blog" target="_blank" rel="noopener noreferrer" class="btn btn-green">
                 View All Posts
                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
             </a>
@@ -805,7 +974,30 @@
             <div class="faq-item"><div class="faq-q" onclick="toggleFAQ(this)">What are the class schedules?</div><div class="faq-a"><p>We offer morning, afternoon, and weekend classes to accommodate different lifestyles. Contact us and we'll find a schedule that works for you.</p></div></div>
             <div class="faq-item"><div class="faq-q" onclick="toggleFAQ(this)">Can I pay in installments?</div><div class="faq-a"><p>Yes, we offer flexible payment plans. You can pay in installments throughout the course duration. Talk to our admissions team for your options.</p></div></div>
             <div class="faq-item"><div class="faq-q" onclick="toggleFAQ(this)">Where are you located?</div><div class="faq-a"><p>We're located at Sagaas Centre, 4th Floor, Eldoret, Kenya. Easily accessible by matatu or personal vehicle. Contact us for directions.</p></div></div>
+            <div class="faq-item"><div class="faq-q" onclick="toggleFAQ(this)">What are the course fees?</div><div class="faq-a"><p>Our fees vary by course, from as low as KES 1,500 for short courses to KES 59,000 for comprehensive programs like CNA. Download our complete <a href="#fees" style="color:var(--green);font-weight:600;">fees structure here</a> for detailed pricing on each course. All courses include TVETA accreditation and flexible payment plans are available.</p></div></div>
         </div>
+    </div>
+</section>
+
+<!-- FEES STRUCTURE -->
+<section id="fees" style="background:#fff;padding:60px 24px;">
+    <div class="sec-wrap">
+        <div class="sec-head">
+            <div class="sec-badge">Transparent Pricing</div>
+            <h2 class="sec-title">Course <span>Fees Structure</span></h2>
+            <p class="sec-sub">Affordable, flexible payment plans. Download complete fee details for any course.</p>
+        </div>
+
+        <!-- Download All Fees Button -->
+        <div style="text-align:center;margin-bottom:48px;">
+            <a href="/ALL_COURSES_FEE_STRUCTURES-MTTI.pdf" download="ALL_COURSES_FEE_STRUCTURES-MTTI.pdf" class="btn btn-green" style="margin-right:12px;margin-bottom:12px;">
+                📥 Download All Fees (PDF)
+            </a>
+            <span style="color:var(--gray);font-size:0.9rem;">Complete fee structure for all courses</span>
+        </div>
+
+        <!-- Fees by Category Grid -->
+        <div class="fees-grid" id="feesGrid"></div>
     </div>
 </section>
 
@@ -822,9 +1014,9 @@
                 <div class="contact-detail"><span>📧</span><span><a href="mailto:info@masomoteletraining.co.ke" style="color:#fff;text-decoration:none;">info@masomoteletraining.co.ke</a></span></div>
                 <div class="contact-detail"><span>🕐</span><span>Mon–Sat: 8am – 6pm</span></div>
                 <div class="social-row">
-                    <a href="https://web.facebook.com/profile.php?id=61582282297969" target="_blank" class="soc-btn soc-fb"><svg width="17" height="17" viewBox="0 0 24 24" fill="#fff"><path d="M24 12.073C24 5.405 18.627 0 12 0S0 5.405 0 12.073C0 18.1 4.388 23.094 10.125 24v-8.437H7.078v-3.49h3.047v-2.66c0-3.025 1.792-4.697 4.533-4.697 1.312 0 2.686.236 2.686.236v2.97h-1.513c-1.491 0-1.956.93-1.956 1.884v2.267h3.328l-.532 3.49h-2.796V24C19.612 23.094 24 18.1 24 12.073z"/></svg> Facebook</a>
-                    <a href="https://www.tiktok.com/@masomoteletechnical" target="_blank" class="soc-btn soc-tt"><svg width="17" height="17" viewBox="0 0 24 24" fill="#fff"><path d="M19.59 6.69a4.83 4.83 0 01-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 01-2.88 2.5 2.89 2.89 0 01-2.89-2.89 2.89 2.89 0 012.89-2.89c.28 0 .54.04.79.1V9.01a6.33 6.33 0 00-.79-.05 6.34 6.34 0 00-6.34 6.34 6.34 6.34 0 006.34 6.34 6.34 6.34 0 006.33-6.34V8.75a8.2 8.2 0 004.8 1.54V6.84a4.85 4.85 0 01-1.03-.15z"/></svg> TikTok</a>
-                    <a href="https://wa.me/254712464936" target="_blank" class="soc-btn soc-wa">💬 WhatsApp</a>
+                    <a href="https://web.facebook.com/profile.php?id=61582282297969" target="_blank" rel="noopener noreferrer" class="soc-btn soc-fb"><svg width="17" height="17" viewBox="0 0 24 24" fill="#fff"><path d="M24 12.073C24 5.405 18.627 0 12 0S0 5.405 0 12.073C0 18.1 4.388 23.094 10.125 24v-8.437H7.078v-3.49h3.047v-2.66c0-3.025 1.792-4.697 4.533-4.697 1.312 0 2.686.236 2.686.236v2.97h-1.513c-1.491 0-1.956.93-1.956 1.884v2.267h3.328l-.532 3.49h-2.796V24C19.612 23.094 24 18.1 24 12.073z"/></svg> Facebook</a>
+                    <a href="https://www.tiktok.com/@masomoteletechnical" target="_blank" rel="noopener noreferrer" class="soc-btn soc-tt"><svg width="17" height="17" viewBox="0 0 24 24" fill="#fff"><path d="M19.59 6.69a4.83 4.83 0 01-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 01-2.88 2.5 2.89 2.89 0 01-2.89-2.89 2.89 2.89 0 012.89-2.89c.28 0 .54.04.79.1V9.01a6.33 6.33 0 00-.79-.05 6.34 6.34 0 00-6.34 6.34 6.34 6.34 0 006.34 6.34 6.34 6.34 0 006.33-6.34V8.75a8.2 8.2 0 004.8 1.54V6.84a4.85 4.85 0 01-1.03-.15z"/></svg> TikTok</a>
+                    <a href="https://wa.me/254712464936" target="_blank" rel="noopener noreferrer" class="soc-btn soc-wa">💬 WhatsApp</a>
                 </div>
             </div>
             <div class="contact-form">
@@ -838,14 +1030,35 @@
                         <label>Course of Interest</label>
                         <select id="inq-course" required>
                             <option value="">-- Select a Course --</option>
-                            <option>Computer Essentials</option><option>Computer Applications</option>
-                            <option>Artificial Intelligence</option><option>Cybersecurity</option>
-                            <option>Programming & Coding</option><option>Web Development & Design</option>
-                            <option>Digital Marketing</option><option>Graphic Design</option>
-                            <option>Video Editing</option><option>Computer Networking</option>
-                            <option>Computer Repair</option><option>Mobile Phone Repair</option>
-                            <option>CCTV Installation</option><option>German Language</option>
-                            <option>Certified Nursing Assistant</option><option>Not Sure Yet</option>
+                            <optgroup label="School of Hospitality">
+                                <option>Baking (Level 3)</option><option>Food Production / Cookery (Level 3)</option>
+                                <option>Food Production / Cookery (Level 4)</option><option>Baking (Level 5)</option>
+                                <option>Catering & Accommodation (Level 5)</option>
+                            </optgroup>
+                            <optgroup label="School of Health Sciences">
+                                <option>Community Based Services (Level 4)</option><option>Community Health (Level 5)</option>
+                                <option>Caregiving (Short Course)</option><option>Healthcare Support Services / CNA (Level 5)</option>
+                            </optgroup>
+                            <optgroup label="School of ICT">
+                                <option>Computer & Online Essentials</option><option>Computer Applications</option>
+                                <option>Computer Networking</option><option>Web Design & Development</option>
+                                <option>Programming / Coding Principles</option><option>Artificial Intelligence</option>
+                                <option>Certificate in Cyber Security</option>
+                            </optgroup>
+                            <optgroup label="School of Electronics & Repair">
+                                <option>Computer Repair & Maintenance</option><option>Mobile Phone Repair</option>
+                                <option>Printer & Photocopier Repair & Maintenance</option><option>CCTV Installation</option>
+                            </optgroup>
+                            <optgroup label="School of Media & Creative Arts">
+                                <option>Graphic Design</option><option>Video Editing</option>
+                                <option>Social Media & Digital Marketing</option>
+                            </optgroup>
+                            <optgroup label="School of Languages & International Programs">
+                                <option>IELTS Preparation</option><option>German Language & Ausbildung — A1 Module</option>
+                                <option>German Language & Ausbildung — A2 Module</option><option>German Language & Ausbildung — B1 Module</option>
+                                <option>German Language & Ausbildung — B2 Module</option>
+                            </optgroup>
+                            <option>Not Sure Yet</option>
                         </select>
                     </div>
                     <div class="form-group"><label>Message (Optional)</label><textarea id="inq-message" placeholder="Any questions or specific needs?"></textarea></div>
@@ -858,6 +1071,15 @@
                 </div>
             </div>
         </div>
+        <!-- MAP -->
+        <div style="margin-top:40px;border-radius:16px;overflow:hidden;box-shadow:0 8px 32px rgba(0,0,0,.25);border:3px solid rgba(255,255,255,.15);">
+            <iframe
+                src="https://maps.google.com/maps?q=Sagaas+Centre+4th+Floor+Eldoret+Kenya&t=&z=16&ie=UTF8&iwloc=&output=embed"
+                width="100%" height="280" style="display:block;border:0;"
+                allowfullscreen="" loading="lazy"
+                title="MTTI Location – Sagaas Centre, 4th Floor, Eldoret">
+            </iframe>
+        </div>
     </div>
 </section>
 
@@ -869,9 +1091,9 @@
                 <a href="#" class="logo"><img src="https://masomoteletraining.co.ke/wp-content/uploads/2025/12/Logo.jpeg" alt="MTTI Logo" style="width:46px;height:46px;border-radius:10px;object-fit:cover;"><div class="logo-text">M.T.T.<span>I</span></div></a>
                 <p>Masomotele Technical Training Institute — Empowering youth with practical skills for employment and self-employment in Kenya.</p>
                 <div style="display:flex;gap:12px;margin-top:4px;">
-                    <a href="https://web.facebook.com/profile.php?id=61582282297969" target="_blank" title="Facebook" style="display:flex;align-items:center;justify-content:center;width:36px;height:36px;border-radius:50%;background:#1877f2;text-decoration:none;transition:transform .2s;" onmouseover="this.style.transform='translateY(-2px)'" onmouseout="this.style.transform='none'"><svg width="18" height="18" viewBox="0 0 24 24" fill="#fff"><path d="M24 12.073C24 5.405 18.627 0 12 0S0 5.405 0 12.073C0 18.1 4.388 23.094 10.125 24v-8.437H7.078v-3.49h3.047v-2.66c0-3.025 1.792-4.697 4.533-4.697 1.312 0 2.686.236 2.686.236v2.97h-1.513c-1.491 0-1.956.93-1.956 1.884v2.267h3.328l-.532 3.49h-2.796V24C19.612 23.094 24 18.1 24 12.073z"/></svg></a>
-                    <a href="https://www.tiktok.com/@masomoteletechnical" target="_blank" title="TikTok" style="display:flex;align-items:center;justify-content:center;width:36px;height:36px;border-radius:50%;background:#010101;text-decoration:none;transition:transform .2s;" onmouseover="this.style.transform='translateY(-2px)'" onmouseout="this.style.transform='none'"><svg width="18" height="18" viewBox="0 0 24 24" fill="#fff"><path d="M19.59 6.69a4.83 4.83 0 01-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 01-2.88 2.5 2.89 2.89 0 01-2.89-2.89 2.89 2.89 0 012.89-2.89c.28 0 .54.04.79.1V9.01a6.33 6.33 0 00-.79-.05 6.34 6.34 0 00-6.34 6.34 6.34 6.34 0 006.34 6.34 6.34 6.34 0 006.33-6.34V8.75a8.2 8.2 0 004.8 1.54V6.84a4.85 4.85 0 01-1.03-.15z"/></svg></a>
-                    <a href="https://wa.me/254712464936" target="_blank" title="WhatsApp" style="display:flex;align-items:center;justify-content:center;width:36px;height:36px;border-radius:50%;background:#25D366;text-decoration:none;transition:transform .2s;" onmouseover="this.style.transform='translateY(-2px)'" onmouseout="this.style.transform='none'"><svg width="18" height="18" viewBox="0 0 24 24" fill="#fff"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg></a>
+                    <a href="https://web.facebook.com/profile.php?id=61582282297969" target="_blank" rel="noopener noreferrer" title="Facebook" style="display:flex;align-items:center;justify-content:center;width:36px;height:36px;border-radius:50%;background:#1877f2;text-decoration:none;transition:transform .2s;" onmouseover="this.style.transform='translateY(-2px)'" onmouseout="this.style.transform='none'"><svg width="18" height="18" viewBox="0 0 24 24" fill="#fff"><path d="M24 12.073C24 5.405 18.627 0 12 0S0 5.405 0 12.073C0 18.1 4.388 23.094 10.125 24v-8.437H7.078v-3.49h3.047v-2.66c0-3.025 1.792-4.697 4.533-4.697 1.312 0 2.686.236 2.686.236v2.97h-1.513c-1.491 0-1.956.93-1.956 1.884v2.267h3.328l-.532 3.49h-2.796V24C19.612 23.094 24 18.1 24 12.073z"/></svg></a>
+                    <a href="https://www.tiktok.com/@masomoteletechnical" target="_blank" rel="noopener noreferrer" title="TikTok" style="display:flex;align-items:center;justify-content:center;width:36px;height:36px;border-radius:50%;background:#010101;text-decoration:none;transition:transform .2s;" onmouseover="this.style.transform='translateY(-2px)'" onmouseout="this.style.transform='none'"><svg width="18" height="18" viewBox="0 0 24 24" fill="#fff"><path d="M19.59 6.69a4.83 4.83 0 01-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 01-2.88 2.5 2.89 2.89 0 01-2.89-2.89 2.89 2.89 0 012.89-2.89c.28 0 .54.04.79.1V9.01a6.33 6.33 0 00-.79-.05 6.34 6.34 0 00-6.34 6.34 6.34 6.34 0 006.34 6.34 6.34 6.34 0 006.33-6.34V8.75a8.2 8.2 0 004.8 1.54V6.84a4.85 4.85 0 01-1.03-.15z"/></svg></a>
+                    <a href="https://wa.me/254712464936" target="_blank" rel="noopener noreferrer" title="WhatsApp" style="display:flex;align-items:center;justify-content:center;width:36px;height:36px;border-radius:50%;background:#25D366;text-decoration:none;transition:transform .2s;" onmouseover="this.style.transform='translateY(-2px)'" onmouseout="this.style.transform='none'"><svg width="18" height="18" viewBox="0 0 24 24" fill="#fff"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg></a>
                 </div>
             </div>
             <div class="footer-col">
@@ -880,6 +1102,7 @@
                     <li><a href="#home">Home</a></li>
                     <li><a href="#about">About Us</a></li>
                     <li><a href="#courses">Courses</a></li>
+                    <li><a href="#fees">Fees Structure</a></li>
                     <li><a href="#testimonials">Testimonials</a></li>
                     <li><a href="#blog">Blog</a></li>
                     <li><a href="#faq">FAQ</a></li>
@@ -900,10 +1123,10 @@
             <div class="footer-col">
                 <h4>Portals</h4>
                 <ul>
-                    <li><a href="https://masomoteletraining.co.ke/student-portal/" target="_blank">Student Portal</a></li>
-                    <li><a href="https://masomoteletraining.co.ke/lecturer-portal/" target="_blank">Lecturer Portal</a></li>
-                    <li><a href="https://masomoteletraining.co.ke/verify-certificate-custom.php" target="_blank">Verify Certificate</a></li>
-                    <li><a href="https://masomoteletraining.co.ke/masomotele/" target="_blank">Free Learning</a></li>
+                    <li><a href="https://masomoteletraining.co.ke/student-portal/" target="_blank" rel="noopener noreferrer">Student Portal</a></li>
+                    <li><a href="https://masomoteletraining.co.ke/lecturer-portal/" target="_blank" rel="noopener noreferrer">Lecturer Portal</a></li>
+                    <li><a href="https://masomoteletraining.co.ke/verify-certificate-custom.php" target="_blank" rel="noopener noreferrer">Verify Certificate</a></li>
+                    <li><a href="https://masomoteletraining.co.ke/masomotele/" target="_blank" rel="noopener noreferrer">Free Learning</a></li>
                 </ul>
             </div>
             <div class="footer-col">
@@ -917,7 +1140,7 @@
         </div>
         <div class="footer-bottom">
             <span>© 2026 Masomotele Technical Training Institute. All rights reserved.</span>
-            <span>Built with ❤️ for Kenyan youth | <a href="https://masomoteletraining.co.ke/verify-certificate-custom.php" target="_blank">Verify Certificate</a></span>
+            <span>Built with ❤️ for Kenyan youth | <a href="https://masomoteletraining.co.ke/verify-certificate-custom.php" target="_blank" rel="noopener noreferrer">Verify Certificate</a></span>
         </div>
     </div>
 </footer>
@@ -925,7 +1148,7 @@
 <!-- STICKY VISIT BAR -->
 <div class="visit-bar" id="visitBar">
     <span class="visit-bar-text">📍 Visit our campus in Eldoret — free consultation, no obligation</span>
-    <a href="https://wa.me/254712464936?text=Hello%20MTTI!%20I%20would%20like%20to%20book%20a%20free%20campus%20visit." target="_blank" onclick="trackEvent('Visit','bar_click','sticky_bar')">📅 Book a Free Visit</a>
+    <a href="https://wa.me/254712464936?text=Hello%20MTTI!%20I%20would%20like%20to%20book%20a%20free%20campus%20visit." target="_blank" rel="noopener noreferrer" onclick="trackEvent('Visit','bar_click','sticky_bar')">📅 Book a Free Visit</a>
     <button class="visit-bar-close" onclick="document.getElementById('visitBar').classList.remove('show');sessionStorage.setItem('mtti_vbar','1');">✕</button>
 </div>
 
@@ -987,7 +1210,7 @@
 </div>
 
 <!-- WhatsApp Float -->
-<a href="https://wa.me/254712464936?text=Hello%20MTTI,%20I'm%20interested%20in%20enrolling" target="_blank" class="wa-float" title="Chat on WhatsApp" onclick="trackWhatsAppClick('floating_button')">💬</a>
+<a href="https://wa.me/254712464936?text=Hello%20MTTI,%20I'm%20interested%20in%20enrolling" target="_blank" rel="noopener noreferrer" class="wa-float" title="Chat on WhatsApp" onclick="trackWhatsAppClick('floating_button')">💬</a>
 
 
 <!-- EXIT POPUP -->
@@ -1003,10 +1226,27 @@
             <input type="tel" name="phone" placeholder="WhatsApp Number (07XX…)" required>
             <select name="course">
                 <option value="">Which course interests you? (optional)</option>
-                <option>Computer Applications</option><option>Web Development</option>
-                <option>Graphic Design</option><option>Digital Marketing</option>
-                <option>Cybersecurity</option><option>German Language</option>
-                <option>CNA / Healthcare</option><option>Not Sure Yet</option>
+                <optgroup label="School of ICT">
+                    <option>Computer Applications</option><option>Web Design & Development</option>
+                    <option>Certificate in Cyber Security</option><option>Artificial Intelligence</option>
+                </optgroup>
+                <optgroup label="School of Media & Creative Arts">
+                    <option>Graphic Design</option><option>Video Editing</option>
+                    <option>Social Media & Digital Marketing</option>
+                </optgroup>
+                <optgroup label="School of Health Sciences">
+                    <option>Healthcare Support Services / CNA (Level 5)</option><option>Community Health (Level 5)</option>
+                </optgroup>
+                <optgroup label="School of Languages & International Programs">
+                    <option>German Language & Ausbildung — A1 Module</option><option>IELTS Preparation</option>
+                </optgroup>
+                <optgroup label="School of Hospitality">
+                    <option>Baking (Level 5)</option><option>Catering & Accommodation (Level 5)</option>
+                </optgroup>
+                <optgroup label="School of Electronics & Repair">
+                    <option>Computer Repair & Maintenance</option><option>Mobile Phone Repair</option>
+                </optgroup>
+                <option value="">Not Sure Yet</option>
             </select>
             <button type="submit">📲 Send Me the Guide on WhatsApp</button>
         </form>
@@ -1014,45 +1254,89 @@
     </div>
 </div>
 
-<script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script>
+<script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script>
 /* ─── COURSES DATA ─── */
 var courses = [
-    {name:'Computer Essentials',icon:'💻',dur:'2 Weeks',fee:'KES 1,500',url:'/computer-essentials-course-eldoret/',features:['Basic Computer Skills','MS Office Suite','Internet & Email','File Management']},
-    {name:'Computer Applications',icon:'🖥️',dur:'8 Weeks',fee:'KES 4,000',url:'/computer-applications-course-eldoret/',features:['MS Word, Excel, PowerPoint','Data Entry & Spreadsheets','Internet Research','Certificate Included'],video:'https://masomoteletraining.co.ke/wp-content/uploads/2026/02/Computer-applications.mp4'},
-    {name:'Web Design & Development',icon:'🌐',dur:'8 Weeks',fee:'KES 12,000',url:'/web-design-course-eldoret/',features:['HTML, CSS, JavaScript','Responsive Design','WordPress Development','Live Projects'],video:'https://masomoteletraining.co.ke/wp-content/uploads/2026/02/Web-design.mp4'},
-    {name:'Graphic Design',icon:'🎨',dur:'8 Weeks',fee:'KES 15,000',url:'/graphic-design-course-eldoret/',features:['CorelDRAW & Canva','Brand Identity & Logos','Print Design','Social Media Graphics'],video:'https://masomoteletraining.co.ke/wp-content/uploads/2026/02/Web-English.mp4'},
-    {name:'Digital Marketing',icon:'📱',dur:'6 Weeks',fee:'KES 10,000',url:'/digital-marketing-course-eldoret/',features:['Social Media Strategy','Content Creation','Paid Advertising','Analytics & ROI']},
-    {name:'Cyber Security',icon:'🔒',dur:'8 Weeks',fee:'KES 30,000',url:'/cybersecurity-course-eldoret/',features:['Network Security','Ethical Hacking Basics','Security Tools','Threat Prevention']},
-    {name:'Programming Principles',icon:'👨‍💻',dur:'8 Weeks',fee:'KES 10,000',url:'/coding-programming-course-eldoret/',features:['Python Programming','Problem Solving','Algorithms & Logic','Project Development']},
-    {name:'Video Editing',icon:'🎬',dur:'8 Weeks',fee:'KES 15,000',url:'/video-editing-course-eldoret/',features:['Adobe Premiere Pro','After Effects','Color Grading','Portfolio Projects'],video:'https://masomoteletraining.co.ke/wp-content/uploads/2026/02/Video-Editing.mp4'},
-    {name:'CCTV Installation',icon:'📹',dur:'6 Weeks',fee:'KES 18,000',url:'/cctv-installation-course-eldoret/',features:['Camera Setup & Types','Network Configuration','DVR/NVR Systems','Practical Installation']},
-    {name:'Computer Repair',icon:'🔧',dur:'8 Weeks',fee:'KES 15,000',url:'/computer-repair-course-eldoret/',features:['Hardware Assembly','Laptop Troubleshooting','OS Installation','Data Recovery']},
-    {name:'Mobile Phone Repair',icon:'📱',dur:'8 Weeks',fee:'KES 15,000',url:'/mobile-phone-repair-course-eldoret/',features:['Screen Replacement','Soldering & Micro-soldering','Software Troubleshooting','Water Damage Recovery']},
-    {name:'Computer Networking',icon:'🌐',dur:'8 Weeks',fee:'KES 15,000',url:'/computer-networking-course-eldoret/',features:['LAN/WAN Setup','WiFi Deployment','Network Troubleshooting','Cabling Practicals']},
-    {name:'Artificial Intelligence',icon:'🤖',dur:'4 Weeks',fee:'KES 10,000',url:'/artificial-intelligence-course-eldoret/',features:['AI Fundamentals','ChatGPT, Claude, Gemini','Prompt Engineering','AI for Business']},
-    {name:'Certified Nursing Assistant',icon:'🏥',dur:'6 Months',fee:'KES 59,000',url:'/certified-nursing-assistant-course-eldoret/',features:['Housekeeping Services','Dietary Interventions','First Aid','Caregiving & Special Needs']},
-    {name:'German Language',icon:'🇩🇪',dur:'6–8 Months',fee:'KES 24,000/level',url:'/german-language-course-eldoret/',features:['A1, A2, B1, B2 Levels','Speaking, Reading & Writing','German Culture','Goethe Exam Prep'],image:'https://masomoteletraining.co.ke/wp-content/uploads/2026/02/German-Poster.jpeg'}
+    // School of Hospitality
+    {name:'Baking (Level 3)',cat:'hospitality',icon:'🍰',dur:'2 Months',fee:'KES 15,000',entry:'KCPE',level:'Level 3',features:['Baking Basics','Pastry Preparation','Professional Techniques','TVETA Certified']},
+    {name:'Food Production / Cookery (Level 3)',cat:'hospitality',icon:'👨‍🍳',dur:'2 Months',fee:'KES 15,000',entry:'KCPE',level:'Level 3',features:['Cooking Fundamentals','Food Safety','Meal Planning','Professional Standards']},
+    {name:'Food Production / Cookery (Level 4)',cat:'hospitality',icon:'👨‍🍳',dur:'3 Months',fee:'KES 29,000',entry:'Any KCSE',level:'Level 4',features:['Advanced Cookery','Culinary Skills','Kitchen Management','Menu Development']},
+    {name:'Baking (Level 5)',cat:'hospitality',icon:'🍰',dur:'1 Year',fee:'KES 25,000/term',entry:'KCSE D- and above',level:'Level 5',features:['+ Free German A1–B2','Advanced Baking','Professional Skills','Industrial Attachment']},
+    {name:'Baking Technology (Level 5)',cat:'hospitality',icon:'🍰',dur:'1 Year',fee:'KES 25,000/term',entry:'KCSE D- and above',level:'Level 5',features:['+ Free German A1–B2','Technology in Baking','Innovation','Industrial Methods']},
+    {name:'Catering & Accommodation (Level 5)',cat:'hospitality',icon:'🏨',dur:'1 Year',fee:'KES 25,000/term',entry:'KCSE D- and above',level:'Level 5',features:['+ Free German A1–B2','Hospitality Management','Guest Services','Hotel Operations']},
+    {name:'Food Technology (Level 5)',cat:'hospitality',icon:'🍽️',dur:'1 Year',fee:'KES 25,000/term',entry:'KCSE D- and above',level:'Level 5',features:['+ Free German A1–B2','Food Science','Processing Techniques','Quality Control']},
+    {name:'Food & Beverage Operations (Level 5)',cat:'hospitality',icon:'🍷',dur:'1 Year',fee:'KES 25,000/term',entry:'KCSE D- and above',level:'Level 5',features:['+ Free German A1–B2','Operations Management','Service Excellence','Business Skills']},
+
+    // School of Health Sciences
+    {name:'Community Based Services (Level 4)',cat:'health',icon:'🏥',dur:'3 Months',fee:'KES 29,000',entry:'Any KCSE',level:'Level 4',features:['Community Health','Service Delivery','Support Skills','TVETA Certified']},
+    {name:'Community Health (Level 5)',cat:'health',icon:'❤️',dur:'1 Year',fee:'KES 25,000/term',entry:'KCSE D- and above',level:'Level 5',features:['+ Free German A1–B2','Health Promotion','Disease Prevention','Community Outreach']},
+    {name:'Caregiving (Short Course)',cat:'health',icon:'🤝',dur:'3 Months',fee:'KES 29,000',entry:'Any KCSE',level:'Short Course',features:['+ Free Computer Essentials','Elderly Care','Special Needs Support','Professional Standards']},
+    {name:'Healthcare Support Services / CNA (Level 5)',cat:'health',icon:'⚕️',dur:'6 Months',fee:'KES 59,000',entry:'KCSE D- and above',level:'Level 5',features:['+ Free German & Computer','Patient Care','First Aid','Hospital Procedures']},
+    {name:'Community Health (Level 4 / Craft)',cat:'health',icon:'💚',dur:'3 Months',fee:'KES 30,000',entry:'Any KCSE',level:'Level 4',features:['+ Free German & Computer','Community Support','Health Education','Practical Skills']},
+    {name:'Community Health (Level 5)',cat:'health',icon:'❤️',dur:'6 Months',fee:'KES 60,000',entry:'KCSE D- and above',level:'Level 5',features:['+ Free German & Computer','Advanced Health Skills','Community Development','Professional Certification']},
+
+    // School of ICT
+    {name:'Computer & Online Essentials',cat:'ict',icon:'💻',dur:'2 Weeks',fee:'KES 1,500',entry:'No minimum — open to all',level:'Short Course',features:['Basic Computer Skills','Internet & Email','File Management','MS Office Basics']},
+    {name:'Computer Applications',cat:'ict',icon:'🖥️',dur:'2 Months',fee:'KES 4,000',entry:'No minimum — open to all',level:'Short Course',features:['MS Word, Excel, PowerPoint','Data Entry','Internet Research','Certificate Included'],video:'https://masomoteletraining.co.ke/wp-content/uploads/2026/02/Computer-applications.mp4'},
+    {name:'Computer Networking',cat:'ict',icon:'🌐',dur:'2 Months',fee:'KES 15,000',entry:'No minimum — open to all',level:'Short Course',features:['LAN/WAN Setup','WiFi Deployment','Network Troubleshooting','Cabling Practicals']},
+    {name:'Web Design & Development',cat:'ict',icon:'🌐',dur:'2 Months',fee:'KES 12,000',entry:'No minimum — open to all',level:'Short Course',features:['HTML, CSS, JavaScript','Responsive Design','WordPress Development','Live Projects'],video:'https://masomoteletraining.co.ke/wp-content/uploads/2026/02/Web-design.mp4'},
+    {name:'Programming / Coding Principles',cat:'ict',icon:'👨‍💻',dur:'2 Months',fee:'KES 10,000',entry:'No minimum — open to all',level:'Short Course',features:['Python Programming','Problem Solving','Algorithms & Logic','Project Development']},
+    {name:'Artificial Intelligence',cat:'ict',icon:'🤖',dur:'1 Month',fee:'KES 10,000',entry:'No minimum — open to all',level:'Short Course',features:['AI Fundamentals','ChatGPT, Claude, Gemini','Prompt Engineering','AI for Business']},
+    {name:'Certificate in Cyber Security',cat:'ict',icon:'🔒',dur:'3 Months',fee:'KES 30,000',entry:'No minimum — open to all',level:'Certificate',features:['Network Security','Ethical Hacking Basics','Security Tools','Threat Prevention']},
+
+    // School of Electronics & Repair Technology
+    {name:'Computer Repair & Maintenance',cat:'electronics',icon:'🔧',dur:'2 Months',fee:'KES 15,000',entry:'No minimum — open to all',level:'Short Course',features:['Hardware Assembly','Laptop Troubleshooting','OS Installation','Data Recovery']},
+    {name:'Mobile Phone Repair',cat:'electronics',icon:'📱',dur:'2 Months',fee:'KES 15,000',entry:'No minimum — open to all',level:'Short Course',features:['Screen Replacement','Soldering & Micro-soldering','Software Troubleshooting','Water Damage Recovery']},
+    {name:'Printer & Photocopier Repair & Maintenance',cat:'electronics',icon:'🖨️',dur:'3 Months',fee:'KES 40,000',entry:'No minimum — open to all',level:'Short Course',features:['Equipment Repair','Maintenance Procedures','Troubleshooting','Business Skills']},
+    {name:'CCTV Installation',cat:'electronics',icon:'📹',dur:'2 Months',fee:'KES 18,000',entry:'No minimum — open to all',level:'Short Course',features:['Camera Setup & Types','Network Configuration','DVR/NVR Systems','Practical Installation']},
+
+    // School of Media & Creative Arts
+    {name:'Graphic Design',cat:'media',icon:'🎨',dur:'2 Months',fee:'KES 15,000',entry:'No minimum — open to all',level:'Short Course',features:['CorelDRAW & Canva','Brand Identity & Logos','Print Design','Social Media Graphics'],video:'https://masomoteletraining.co.ke/wp-content/uploads/2026/02/Web-English.mp4'},
+    {name:'Video Editing',cat:'media',icon:'🎬',dur:'2 Months',fee:'KES 15,000',entry:'No minimum — open to all',level:'Short Course',features:['Adobe Premiere Pro','After Effects','Color Grading','Portfolio Projects'],video:'https://masomoteletraining.co.ke/wp-content/uploads/2026/02/Video-Editing.mp4'},
+    {name:'Social Media & Digital Marketing',cat:'media',icon:'📱',dur:'2 Months',fee:'KES 12,000',entry:'No minimum — open to all',level:'Short Course',features:['Social Media Strategy','Content Creation','Paid Advertising','Analytics & ROI']},
+
+    // School of Languages & International Programs
+    {name:'IELTS Preparation',cat:'languages',icon:'🇬🇧',dur:'1 Month',fee:'KES 8,000',entry:'Form Four leavers (KCSE)',level:'Short Course',features:['IELTS Exam Prep','Speaking & Writing','Listening & Reading','Mock Exams']},
+    {name:'German Language & Ausbildung — A1 Module',cat:'languages',icon:'🇩🇪',dur:'2 Months',fee:'KES 24,000',entry:'Form Four leavers (KCSE)',level:'Module',features:['German Basics','Spoken German','Ausbildung Preparation','Cultural Immersion']},
+    {name:'German Language & Ausbildung — A2 Module',cat:'languages',icon:'🇩🇪',dur:'2 Months',fee:'KES 24,000',entry:'Form Four leavers (KCSE)',level:'Module',features:['Intermediate German','Conversational Skills','Advanced Grammar','Career Preparation']},
+    {name:'German Language & Ausbildung — B1 Module',cat:'languages',icon:'🇩🇪',dur:'2 Months',fee:'KES 24,000',entry:'Form Four leavers (KCSE)',level:'Module',features:['Upper Intermediate German','Professional Communication','Cultural Competence','Business German']},
+    {name:'German Language & Ausbildung — B2 Module',cat:'languages',icon:'🇩🇪',dur:'2 Months',fee:'KES 24,000',entry:'Form Four leavers (KCSE)',level:'Module',features:['Advanced German','Fluency & Nuance','International Employment','Goethe Exam Prep']}
 ];
 
-function renderCourses(){
+function renderCourses(filter){
+    filter = filter || 'all';
     var g=document.getElementById('coursesGrid'),html='';
-    courses.forEach(function(c,i){
+    var filtered = filter==='all' ? courses : courses.filter(function(c){return c.cat===filter;});
+    filtered.forEach(function(c){
+        var i = courses.indexOf(c);
         var media='';
         if(c.video){
             media='<div class="course-video-wrapper"><video class="course-video" id="cv'+i+'" muted playsinline preload="metadata"><source src="'+c.video+'" type="video/mp4"></video><div class="course-video-overlay" onclick="toggleVid('+i+')"><div class="course-play-btn"><svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg></div><span class="video-label">Watch Preview</span></div></div>';
         }else if(c.image){
             media='<img src="'+c.image+'" alt="'+c.name+'" class="course-img" loading="lazy">';
+        }else{
+            media='<div style="background:linear-gradient(135deg,var(--green),var(--green-dark));height:160px;display:flex;align-items:center;justify-content:center;color:#fff;font-size:3rem;">'+c.icon+'</div>';
         }
         html+='<div class="course-card">';
         html+='<div class="course-head"><div class="course-ico">'+c.icon+'</div><h3>'+c.name+'</h3><span class="course-dur">'+c.dur+'</span></div>';
         html+=media;
-        html+='<div class="course-body"><div class="course-price">'+c.fee+'</div><ul class="course-features">'+c.features.map(function(f){return'<li>'+f+'</li>';}).join('')+'</ul>';
+        html+='<div class="course-body"><div class="course-price">'+c.fee+'</div>';
+        html+='<div style="font-size:0.8rem;color:var(--gray);margin-bottom:12px;padding-bottom:12px;border-bottom:1px solid var(--border);"><strong>Entry:</strong> '+c.entry+'</div>';
+        html+='<ul class="course-features">'+c.features.map(function(f){return'<li>'+f+'</li>';}).join('')+'</ul>';
         html+='<div style="display:flex;gap:8px;flex-wrap:wrap;">';
-        if(c.url) html+='<a href="'+c.url+'" class="btn" style="background:#1B5E20;color:#fff;flex:1;text-align:center;padding:10px 12px;font-size:13px;">🔍 Learn More</a>';
-        html+='<a href="/online-admission/?course='+encodeURIComponent(c.name)+'" class="btn btn-orange" style="flex:1;text-align:center;padding:10px 12px;font-size:13px;">📝 Apply</a>';
+        html+='<a href="/online-admission/?course='+encodeURIComponent(c.name)+'" class="btn btn-orange" style="flex:1;text-align:center;padding:10px 12px;font-size:13px;">📝 Enroll Now</a>';
         html+='</div></div></div>';
     });
     g.innerHTML=html;
+    // update All tab count
+    document.getElementById('ctab-count-all').textContent=courses.length;
+}
+
+function filterCourses(cat, btn){
+    document.querySelectorAll('.ctab').forEach(function(t){t.classList.remove('active');});
+    btn.classList.add('active');
+    renderCourses(cat);
+    document.getElementById('courses').scrollIntoView({behavior:'smooth',block:'start'});
 }
 
 function toggleVid(i){
@@ -1062,6 +1346,43 @@ function toggleVid(i){
     else{v.pause();ov.classList.remove('playing');pb.innerHTML='<path d="M8 5v14l11-7z"/>';ov.querySelector('.video-label').textContent='Watch Preview';}
     v.onended=function(){ov.classList.remove('playing');pb.innerHTML='<path d="M8 5v14l11-7z"/>';ov.querySelector('.video-label').textContent='Watch Again';};
 }
+
+/* ─── RENDER FEES STRUCTURE ─── */
+function renderFees(){
+    var fg=document.getElementById('feesGrid'),html='';
+    var feesSummary=[
+        {name:'Web Design & Development',icon:'🌐',fee:'KES 12,000',dur:'2 Months',desc:'HTML, CSS, JavaScript, WordPress',pdf:'Web-Design-Development-Fees-MTTI.pdf'},
+        {name:'Video Editing',icon:'🎬',fee:'KES 15,000',dur:'2 Months',desc:'Adobe Premiere Pro, After Effects',pdf:'Video-Editing-Fees-MTTI.pdf'},
+        {name:'IELTS Preparation',icon:'🇬🇧',fee:'KES 8,000',dur:'1 Month',desc:'Complete exam prep & practice',pdf:'IELTS-Preparation-Fees-MTTI.pdf'},
+        {name:'Graphic Design',icon:'🎨',fee:'KES 15,000',dur:'2 Months',desc:'CorelDRAW, Canva, Brand Design',pdf:'Graphic-Design-Fees-MTTI.pdf'},
+        {name:'Programming / Coding',icon:'👨‍💻',fee:'KES 10,000',dur:'2 Months',desc:'Python, Problem Solving, Algorithms',pdf:'Programming-Coding-Fees-MTTI.pdf'},
+        {name:'CCTV Installation',icon:'📹',fee:'KES 18,000',dur:'2 Months',desc:'Camera Setup, DVR/NVR Systems',pdf:'CCTV-Installation-Fees-MTTI.pdf'},
+        {name:'Computer Networking',icon:'🌐',fee:'KES 15,000',dur:'2 Months',desc:'LAN/WAN Setup, WiFi Deployment',pdf:'Computer-Networking-Fees-MTTI.pdf'},
+        {name:'Computer Repair & Maintenance',icon:'🔧',fee:'KES 15,000',dur:'2 Months',desc:'Hardware, Troubleshooting, OS',pdf:'Computer-Repair-Fees-MTTI.pdf'},
+        {name:'Computer Essentials',icon:'💻',fee:'KES 1,500',dur:'2 Weeks',desc:'Basic Computer Skills & Internet',pdf:'Computer-Essentials-Fees-MTTI.pdf'},
+        {name:'Computer Applications',icon:'🖥️',fee:'KES 4,000',dur:'2 Months',desc:'MS Office Suite Mastery',pdf:'Computer-Applications-Fees-MTTI.pdf'},
+        {name:'Printer & Photocopier Repair',icon:'🖨️',fee:'KES 40,000',dur:'3 Months',desc:'Equipment Repair & Maintenance',pdf:'Printer-Photocopier-Repair-Fees-MTTI.pdf'},
+        {name:'Social Media & Digital Marketing',icon:'📱',fee:'KES 12,000',dur:'2 Months',desc:'Content, Ads, Analytics, ROI',pdf:'Social-Media-Marketing-Fees-MTTI.pdf'},
+        {name:'Artificial Intelligence',icon:'🤖',fee:'KES 10,000',dur:'1 Month',desc:'ChatGPT, Prompt Engineering, AI Tools',pdf:'Artificial-Intelligence-Fees-MTTI.pdf'},
+        {name:'Cyber Security',icon:'🔒',fee:'KES 30,000',dur:'3 Months',desc:'Network Security, Ethical Hacking',pdf:'Cyber-Security-Fees-MTTI.pdf'},
+        {name:'Baking',icon:'🍰',fee:'KES 15,000',dur:'2 Months',desc:'Professional Baking Techniques',pdf:'Baking-Fees-MTTI.pdf'},
+        {name:'Food Production / Cookery',icon:'👨‍🍳',fee:'KES 15,000',dur:'2 Months',desc:'Culinary Skills & Food Safety',pdf:'Food-Production-Cookery-Fees-MTTI.pdf'},
+        {name:'Certified Nursing Assistant',icon:'⚕️',fee:'KES 59,000',dur:'6 Months',desc:'Patient Care, First Aid, Hospital',pdf:'Community-Health-Fees-MTTI.pdf'}
+    ];
+
+    feesSummary.forEach(function(f){
+        html+='<div class="fees-card fade-up">';
+        html+='<div class="fees-card-icon">'+f.icon+'</div>';
+        html+='<h3>'+f.name+'</h3>';
+        html+='<div class="fees-card-fee">'+f.fee+'</div>';
+        html+='<div class="fees-card-duration">⏱ '+f.dur+'</div>';
+        html+='<p class="fees-card-desc">'+f.desc+'</p>';
+        html+='<a href="/'+f.pdf+'" download class="fees-card-btn">📥 Download Fees</a>';
+        html+='</div>';
+    });
+    fg.innerHTML=html;
+}
+renderFees();
 
 /* ─── BLOG FROM WORDPRESS RSS ─── */
 function loadBlog(){
@@ -1085,7 +1406,7 @@ function loadBlog(){
             renderBlogRSS(data.items);
         })
         .catch(function(){
-            document.getElementById('blog-loading').innerHTML='<p class="blog-error">Could not load blog posts. <a href="https://masomoteletraining.co.ke/blog" target="_blank" style="color:var(--green)">Visit our blog →</a></p>';
+            document.getElementById('blog-loading').innerHTML='<p class="blog-error">Could not load blog posts. <a href="https://masomoteletraining.co.ke/blog" target="_blank" rel="noopener noreferrer" style="color:var(--green)">Visit our blog →</a></p>';
         });
     });
 }
@@ -1103,7 +1424,7 @@ function renderBlog(posts){
         var imgHtml=thumb
             ?'<div class="blog-img-wrap"><img src="'+thumb+'" class="blog-thumb" alt="'+title+'" loading="lazy"><div class="blog-img-overlay"></div><span class="blog-cat-pill">MTTI Blog</span></div>'
             :'<div class="blog-img-wrap"><div class="blog-thumb-placeholder">📝</div><span class="blog-cat-pill">MTTI Blog</span></div>';
-        html+='<a class="blog-card" href="'+p.link+'" target="_blank">';
+        html+='<a class="blog-card" href="'+p.link+'" target="_blank" rel="noopener noreferrer">';
         html+=imgHtml;
         html+='<div class="blog-body">';
         html+='<div class="blog-meta-row"><span class="blog-date">📅 '+date+'</span><span class="blog-dot"></span><span class="blog-read-time">⏱ '+readTime+'</span></div>';
@@ -1129,7 +1450,7 @@ function renderBlogRSS(items){
         var imgHtml=thumb
             ?'<div class="blog-img-wrap"><img src="'+thumb+'" class="blog-thumb" alt="'+title+'" loading="lazy"><div class="blog-img-overlay"></div><span class="blog-cat-pill">MTTI Blog</span></div>'
             :'<div class="blog-img-wrap"><div class="blog-thumb-placeholder">📝</div><span class="blog-cat-pill">MTTI Blog</span></div>';
-        html+='<a class="blog-card" href="'+p.link+'" target="_blank">';
+        html+='<a class="blog-card" href="'+p.link+'" target="_blank" rel="noopener noreferrer">';
         html+=imgHtml;
         html+='<div class="blog-body">';
         html+='<div class="blog-meta-row"><span class="blog-date">📅 '+date+'</span><span class="blog-dot"></span><span class="blog-read-time">⏱ '+readTime+'</span></div>';
@@ -1184,9 +1505,16 @@ function submitExitForm(e){
 
 /* ─── SEND LEAD ─── */
 function sendLead(data){
-    console.log('Lead:',data);
-    var leads=JSON.parse(localStorage.getItem('mtti_leads')||'[]');leads.push(data);localStorage.setItem('mtti_leads',JSON.stringify(leads));
-    fetch('https://script.google.com/macros/s/YOUR_SCRIPT_ID/exec',{method:'POST',mode:'no-cors',headers:{'Content-Type':'application/json'},body:JSON.stringify(data)}).catch(function(){});
+    // localStorage backup (client-side)
+    var leads=JSON.parse(localStorage.getItem('mtti_leads')||'[]');
+    leads.push(data);
+    localStorage.setItem('mtti_leads',JSON.stringify(leads));
+    // POST to PHP handler → email + server-side CSV
+    fetch('/send-inquiry.php',{
+        method:'POST',
+        headers:{'Content-Type':'application/json'},
+        body:JSON.stringify(data)
+    }).catch(function(){});
 }
 
 /* ─── SCROLL ANIMATIONS ─── */
@@ -1258,10 +1586,10 @@ function playCollegeVideo(){
 /* ─── QUIZ ─── */
 var quizAnswers={};
 var quizRec={
-    job:{short:{name:'Computer Essentials',dur:'2 Weeks · KES 1,500',ico:'💻',url:'/computer-essentials-course-eldoret/'},medium:{name:'Computer Applications',dur:'8 Weeks · KES 4,000',ico:'🖥️',url:'/computer-applications-course-eldoret/'},long:{name:'Cyber Security',dur:'8 Weeks · KES 30,000',ico:'🔐',url:'/cybersecurity-course-eldoret/'}},
-    business:{short:{name:'Digital Marketing',dur:'6 Weeks · KES 10,000',ico:'📱',url:'/digital-marketing-course-eldoret/'},medium:{name:'Graphic Design',dur:'8 Weeks · KES 15,000',ico:'🎨',url:'/graphic-design-course-eldoret/'},long:{name:'Web Design & Development',dur:'8 Weeks · KES 12,000',ico:'🌐',url:'/web-design-course-eldoret/'}},
-    skills:{short:{name:'Artificial Intelligence',dur:'4 Weeks · KES 10,000',ico:'🤖',url:'/artificial-intelligence-course-eldoret/'},medium:{name:'Video Editing',dur:'8 Weeks · KES 15,000',ico:'🎬',url:'/video-editing-course-eldoret/'},long:{name:'Computer Networking',dur:'8 Weeks · KES 15,000',ico:'🌐',url:'/computer-networking-course-eldoret/'}},
-    abroad:{short:{name:'German Language',dur:'6–8 Months · KES 24,000/level',ico:'🇩🇪',url:'/german-language-course-eldoret/'},medium:{name:'German Language',dur:'6–8 Months · KES 24,000/level',ico:'🇩🇪',url:'/german-language-course-eldoret/'},long:{name:'Certified Nursing Assistant',dur:'6 Months · KES 59,000',ico:'🏥',url:'/certified-nursing-assistant-course-eldoret/'}}
+    job:{short:{name:'Computer & Online Essentials',dur:'2 Weeks · KES 1,500',ico:'💻',url:'/online-admission/'},medium:{name:'Computer Applications',dur:'2 Months · KES 4,000',ico:'🖥️',url:'/online-admission/'},long:{name:'Certificate in Cyber Security',dur:'3 Months · KES 30,000',ico:'🔐',url:'/online-admission/'}},
+    business:{short:{name:'Social Media & Digital Marketing',dur:'2 Months · KES 12,000',ico:'📱',url:'/online-admission/'},medium:{name:'Graphic Design',dur:'2 Months · KES 15,000',ico:'🎨',url:'/online-admission/'},long:{name:'Web Design & Development',dur:'2 Months · KES 12,000',ico:'🌐',url:'/online-admission/'}},
+    skills:{short:{name:'Artificial Intelligence',dur:'1 Month · KES 10,000',ico:'🤖',url:'/online-admission/'},medium:{name:'Video Editing',dur:'2 Months · KES 15,000',ico:'🎬',url:'/online-admission/'},long:{name:'Computer Networking',dur:'2 Months · KES 15,000',ico:'🌐',url:'/online-admission/'}},
+    abroad:{short:{name:'German Language — A1 Module',dur:'2 Months · KES 24,000',ico:'🇩🇪',url:'/online-admission/'},medium:{name:'IELTS Preparation',dur:'1 Month · KES 8,000',ico:'🇬🇧',url:'/online-admission/'},long:{name:'Healthcare Support Services / CNA',dur:'6 Months · KES 59,000',ico:'🏥',url:'/online-admission/'}}
 };
 function openQuiz(){document.getElementById('quizOverlay').classList.add('open');trackEvent('Quiz','opened','hero');}
 function closeQuiz(){document.getElementById('quizOverlay').classList.remove('open');}
@@ -1279,9 +1607,33 @@ function quizNext(step,ans){
 function showQuizResult(){
     ['qs1','qs2','qs3'].forEach(function(id){document.getElementById(id).classList.remove('active');});
     document.getElementById('quizBar').style.width='100%';
+    var who=quizAnswers.who||'fresh';
     var goal=quizAnswers.goal||'job';
     var time=quizAnswers.time||'medium';
+
+    // Base recommendation from goal + time
     var rec=quizRec[goal]&&quizRec[goal][time]?quizRec[goal][time]:quizRec['job']['medium'];
+
+    // Refine based on who
+    if(who==='business'&&goal!=='abroad'){
+        // Business owners → marketing/design regardless of goal
+        rec=quizRec['business'][time]||rec;
+    }
+    if(who==='working'&&goal==='job'&&time==='long'){
+        // Employed adults wanting career jump → high-earning Cybersecurity
+        rec={name:'Cyber Security',dur:'8 Weeks · KES 30,000',ico:'🔐',url:'/cybersecurity-course-eldoret/'};
+    }
+    if(who==='fresh'&&goal==='job'&&time==='short'){
+        // Fresh graduate, quick job → start with Computer Essentials
+        rec={name:'Computer Essentials',dur:'2 Weeks · KES 1,500',ico:'💻',url:'/computer-essentials-course-eldoret/'};
+    }
+    if(who==='career'&&time==='long'&&goal!=='abroad'){
+        // Career changer with time → Web Design or Cybersecurity (high employment)
+        rec=goal==='business'
+            ?{name:'Web Design & Development',dur:'8 Weeks · KES 12,000',ico:'🌐',url:'/web-design-course-eldoret/'}
+            :{name:'Cyber Security',dur:'8 Weeks · KES 30,000',ico:'🔐',url:'/cybersecurity-course-eldoret/'};
+    }
+
     document.getElementById('rIco').textContent=rec.ico;
     document.getElementById('rName').textContent=rec.name;
     document.getElementById('rDur').textContent=rec.dur;
@@ -1410,7 +1762,7 @@ renderCourses();
     return graduates.map((_,i) => `<button class="sp-dot${i===active?' active':''}" onclick="window.__mtti_sp_goto(${i})"></button>`).join('');
   }
 
-  const html = `<div id="mtti-sp-overlay"><div id="mtti-sp-box"><div id="mtti-sp-header"><button id="mtti-sp-close" onclick="window.__mtti_sp_close()">✕</button><div class="sp-badge">🎓 Student Success Stories</div><h2>Real Students. Real Results.</h2><p>See how MTTI graduates are thriving across Kenya</p></div><div id="mtti-sp-story">${getGrad(current)}</div><div class="sp-dots" id="mtti-sp-dots">${getDots(current)}</div><div id="mtti-sp-actions"><p>Follow us &amp; stay connected</p><div class="sp-action-grid"><a href="https://web.facebook.com/profile.php?id=61582282297969" target="_blank" class="sp-action-btn sp-fb"><svg width="15" height="15" viewBox="0 0 24 24" fill="#fff" style="flex-shrink:0"><path d="M24 12.073C24 5.405 18.627 0 12 0S0 5.405 0 12.073C0 18.1 4.388 23.094 10.125 24v-8.437H7.078v-3.49h3.047v-2.66c0-3.025 1.792-4.697 4.533-4.697 1.312 0 2.686.236 2.686.236v2.97h-1.513c-1.491 0-1.956.93-1.956 1.884v2.267h3.328l-.532 3.49h-2.796V24C19.612 23.094 24 18.1 24 12.073z"/></svg> Facebook</a><a href="https://www.tiktok.com/@masomoteletechnical" target="_blank" class="sp-action-btn sp-tt"><svg width="15" height="15" viewBox="0 0 24 24" fill="#fff" style="flex-shrink:0"><path d="M19.59 6.69a4.83 4.83 0 01-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 01-2.88 2.5 2.89 2.89 0 01-2.89-2.89 2.89 2.89 0 012.89-2.89c.28 0 .54.04.79.1V9.01a6.33 6.33 0 00-.79-.05 6.34 6.34 0 00-6.34 6.34 6.34 6.34 0 006.34 6.34 6.34 6.34 0 006.33-6.34V8.75a8.2 8.2 0 004.8 1.54V6.84a4.85 4.85 0 01-1.03-.15z"/></svg> TikTok</a><button class="sp-action-btn sp-share" onclick="window.__mtti_sp_share()">📲 Share Portal</button><a href="https://masomoteletraining.co.ke" target="_blank" class="sp-action-btn sp-web">🌐 Website</a><a href="https://wa.me/254712464936?text=Hello%20MTTI%2C%20I%20am%20interested%20in%20the%20Nursing%20Assistant%20%26%20Caregiver%20course.%20Please%20send%20me%20details." target="_blank" class="sp-action-btn sp-cna">🏥 Enquire — Certified Nursing Assistant · KES 59,000</a></div><button class="sp-skip" onclick="window.__mtti_sp_close()">Maybe later</button></div></div></div>`;
+  const html = `<div id="mtti-sp-overlay"><div id="mtti-sp-box"><div id="mtti-sp-header"><button id="mtti-sp-close" onclick="window.__mtti_sp_close()">✕</button><div class="sp-badge">🎓 Student Success Stories</div><h2>Real Students. Real Results.</h2><p>See how MTTI graduates are thriving across Kenya</p></div><div id="mtti-sp-story">${getGrad(current)}</div><div class="sp-dots" id="mtti-sp-dots">${getDots(current)}</div><div id="mtti-sp-actions"><p>Follow us &amp; stay connected</p><div class="sp-action-grid"><a href="https://web.facebook.com/profile.php?id=61582282297969" target="_blank" rel="noopener noreferrer" class="sp-action-btn sp-fb"><svg width="15" height="15" viewBox="0 0 24 24" fill="#fff" style="flex-shrink:0"><path d="M24 12.073C24 5.405 18.627 0 12 0S0 5.405 0 12.073C0 18.1 4.388 23.094 10.125 24v-8.437H7.078v-3.49h3.047v-2.66c0-3.025 1.792-4.697 4.533-4.697 1.312 0 2.686.236 2.686.236v2.97h-1.513c-1.491 0-1.956.93-1.956 1.884v2.267h3.328l-.532 3.49h-2.796V24C19.612 23.094 24 18.1 24 12.073z"/></svg> Facebook</a><a href="https://www.tiktok.com/@masomoteletechnical" target="_blank" rel="noopener noreferrer" class="sp-action-btn sp-tt"><svg width="15" height="15" viewBox="0 0 24 24" fill="#fff" style="flex-shrink:0"><path d="M19.59 6.69a4.83 4.83 0 01-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 01-2.88 2.5 2.89 2.89 0 01-2.89-2.89 2.89 2.89 0 012.89-2.89c.28 0 .54.04.79.1V9.01a6.33 6.33 0 00-.79-.05 6.34 6.34 0 00-6.34 6.34 6.34 6.34 0 006.34 6.34 6.34 6.34 0 006.33-6.34V8.75a8.2 8.2 0 004.8 1.54V6.84a4.85 4.85 0 01-1.03-.15z"/></svg> TikTok</a><button class="sp-action-btn sp-share" onclick="window.__mtti_sp_share()">📲 Share Portal</button><a href="https://masomoteletraining.co.ke" target="_blank" rel="noopener noreferrer" class="sp-action-btn sp-web">🌐 Website</a><a href="https://wa.me/254712464936?text=Hello%20MTTI%2C%20I%20am%20interested%20in%20the%20Nursing%20Assistant%20%26%20Caregiver%20course.%20Please%20send%20me%20details." target="_blank" rel="noopener noreferrer" class="sp-action-btn sp-cna">🏥 Enquire — Certified Nursing Assistant · KES 59,000</a></div><button class="sp-skip" onclick="window.__mtti_sp_close()">Maybe later</button></div></div></div>`;
 
   document.body.insertAdjacentHTML('beforeend', html);
 
@@ -1440,7 +1792,6 @@ renderCourses();
     }
   };
 
-  document.body.insertAdjacentHTML('beforeend', html);
   document.getElementById('mtti-sp-overlay').addEventListener('click', function(e){
     if (e.target === this) window.__mtti_sp_close();
   });
@@ -1450,6 +1801,79 @@ renderCourses();
   }, 2000);
   setInterval(function(){ window.__mtti_sp_goto((current + 1) % graduates.length); }, 5000);
 
+})();
+</script>
+
+<script>
+// ── GALLERY LIGHTBOX ──
+(function(){
+  // Unique images (first row only — second row is a subset)
+  var GALLERY = [
+    {src:'https://masomoteletraining.co.ke/wp-content/uploads/2026/04/DSC_2132.jpg',      alt:'MTTI Computer Lab'},
+    {src:'https://masomoteletraining.co.ke/wp-content/uploads/2026/04/CNA.jpeg',           alt:'CNA Class'},
+    {src:'https://masomoteletraining.co.ke/wp-content/uploads/2026/04/Application-class.jpeg', alt:'Application Class'},
+    {src:'https://masomoteletraining.co.ke/wp-content/uploads/2026/05/First-aid.jpeg',     alt:'First Aid Training'},
+    {src:'https://masomoteletraining.co.ke/wp-content/uploads/2026/05/First-Aid-2.jpeg',   alt:'First Aid Training'},
+    {src:'https://masomoteletraining.co.ke/wp-content/uploads/2026/05/First-Aid-three.jpeg', alt:'First Aid Training'},
+    {src:'https://masomoteletraining.co.ke/wp-content/uploads/2026/04/Essentials.jpeg',    alt:'Essentials Class'}
+  ];
+  var current = 0;
+
+  function lbOpen(src) {
+    var idx = GALLERY.findIndex(function(g){ return g.src === src; });
+    current = idx >= 0 ? idx : 0;
+    lbShow();
+  }
+
+  function lbShow() {
+    var g = GALLERY[current];
+    document.getElementById('lbImg').src = g.src;
+    document.getElementById('lbImg').alt = g.alt;
+    document.getElementById('lbCaption').textContent = g.alt;
+    document.getElementById('lbCounter').textContent = (current + 1) + ' / ' + GALLERY.length;
+    document.getElementById('lbOverlay').classList.add('open');
+    document.body.style.overflow = 'hidden';
+    // pause marquee animations
+    document.querySelectorAll('.gallery-row-inner,.marquee-track').forEach(function(el){
+      el.style.animationPlayState = 'paused';
+    });
+  }
+
+  window.lbClose = function() {
+    document.getElementById('lbOverlay').classList.remove('open');
+    document.body.style.overflow = '';
+    document.querySelectorAll('.gallery-row-inner,.marquee-track').forEach(function(el){
+      el.style.animationPlayState = '';
+    });
+  };
+
+  window.lbNav = function(dir) {
+    current = (current + dir + GALLERY.length) % GALLERY.length;
+    lbShow();
+  };
+
+  window.lbBgClick = function(e) {
+    if (e.target === document.getElementById('lbOverlay')) lbClose();
+  };
+
+  // Keyboard navigation
+  document.addEventListener('keydown', function(e) {
+    if (!document.getElementById('lbOverlay').classList.contains('open')) return;
+    if (e.key === 'Escape') lbClose();
+    if (e.key === 'ArrowLeft')  lbNav(-1);
+    if (e.key === 'ArrowRight') lbNav(1);
+  });
+
+  // Event delegation on the gallery marquee
+  document.querySelector('.gallery-marquee').addEventListener('click', function(e) {
+    var img = e.target.closest('img');
+    if (img) lbOpen(img.src);
+  });
+
+  // Add pointer cursor to gallery images
+  document.querySelectorAll('.gallery-row-inner img').forEach(function(img){
+    img.style.cursor = 'zoom-in';
+  });
 })();
 </script>
 </body>

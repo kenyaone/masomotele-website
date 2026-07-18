@@ -1,0 +1,346 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Text and Lists | MTTI Web Design</title>
+    <link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Fredoka:wght@500;600&display=swap" rel="stylesheet">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Space Mono', monospace;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh; padding: 20px; color: #fff;
+        }
+        .container { max-width: 900px; margin: 0 auto; }
+        .header { text-align: center; margin-bottom: 30px; animation: slideDown 0.6s ease-out; }
+        .header .lesson-tag {
+            display: inline-block; background: rgba(255,255,255,0.2);
+            padding: 6px 16px; border-radius: 999px;
+            font-size: 0.85em; margin-bottom: 12px;
+        }
+        .header h1 {
+            font-family: 'Fredoka', sans-serif; font-size: 2.2em;
+            margin-bottom: 8px; text-shadow: 3px 3px 0 rgba(0,0,0,0.2);
+        }
+        .header p { opacity: 0.95; font-size: 0.95em; }
+        .score-board {
+            background: rgba(255,255,255,0.15); backdrop-filter: blur(10px);
+            border-radius: 20px; padding: 20px; margin-bottom: 20px;
+            display: flex; justify-content: space-around;
+            animation: fadeIn 0.8s ease-out 0.2s both;
+        }
+        .score-item { text-align: center; }
+        .score-item .label { font-size: 0.85em; opacity: 0.9; margin-bottom: 4px; }
+        .score-item .value {
+            font-size: 1.8em; font-weight: bold; font-family: 'Fredoka', sans-serif;
+        }
+        .progress-bar {
+            width: 100%; height: 8px; background: rgba(255,255,255,0.3);
+            border-radius: 10px; margin-bottom: 25px; overflow: hidden;
+        }
+        .progress-fill {
+            height: 100%; background: linear-gradient(90deg, #f093fb 0%, #f5576c 100%);
+            border-radius: 10px; transition: width 0.5s ease; width: 0%;
+        }
+        .exercise-card {
+            background: white; color: #333; border-radius: 25px;
+            padding: 35px; margin-bottom: 20px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            animation: fadeIn 0.6s ease-out both;
+        }
+        .scenario {
+            background: linear-gradient(135deg, #fff8e1 0%, #ffecb3 100%);
+            border-left: 5px solid #ffc107;
+            padding: 20px 24px; border-radius: 12px;
+            margin-bottom: 24px;
+            font-size: 0.98em; line-height: 1.55;
+        }
+        .scenario strong { color: #7a5a00; font-family: 'Fredoka', sans-serif; }
+        .question {
+            font-size: 1.15em; margin-bottom: 20px;
+            font-weight: 700; line-height: 1.4;
+        }
+        .options { display: flex; flex-direction: column; gap: 12px; }
+        .option {
+            background: #f5f7fb; border: 2px solid transparent;
+            padding: 16px 20px; border-radius: 12px;
+            cursor: pointer; transition: all 0.2s ease;
+            font-family: 'Space Mono', monospace; font-size: 0.98em; text-align: left;
+        }
+        .option:hover:not(.disabled) {
+            background: #eef1fb; border-color: #667eea; transform: translateX(4px);
+        }
+        .option.correct { background: #d4edda; border-color: #28a745; color: #155724; }
+        .option.wrong { background: #f8d7da; border-color: #dc3545; color: #721c24; animation: shake 0.4s; }
+        .option.disabled { cursor: not-allowed; opacity: 0.85; }
+        .feedback {
+            margin-top: 22px; padding: 18px 22px; border-radius: 12px;
+            animation: slideUp 0.4s ease-out;
+            font-size: 0.98em; line-height: 1.5;
+        }
+        .feedback.correct { background: #d4edda; color: #155724; border-left: 4px solid #28a745; }
+        .feedback.wrong { background: #f8d7da; color: #721c24; border-left: 4px solid #dc3545; }
+        .feedback strong { font-family: 'Fredoka', sans-serif; }
+        .next-btn, .restart-btn {
+            margin-top: 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white; border: none;
+            padding: 14px 32px; border-radius: 12px;
+            font-size: 1em; cursor: pointer;
+            font-family: 'Fredoka', sans-serif;
+            box-shadow: 0 6px 18px rgba(0,0,0,0.2);
+            transition: transform 0.2s ease;
+        }
+        .next-btn:hover, .restart-btn:hover { transform: scale(1.04); }
+        .results {
+            text-align: center; padding: 25px 15px;
+            animation: bounceIn 0.6s ease-out;
+        }
+        .results h2 {
+            font-family: 'Fredoka', sans-serif; font-size: 2em;
+            margin-bottom: 12px; color: #333;
+        }
+        .results .final-score {
+            font-size: 3em; font-family: 'Fredoka', sans-serif;
+            color: #667eea; margin: 20px 0;
+        }
+        .results p { color: #555; margin-bottom: 12px; }
+        .badge { display: inline-block; font-size: 3.5em; margin: 8px 0; }
+        @keyframes slideDown { from { opacity: 0; transform: translateY(-30px); } to { opacity: 1; transform: translateY(0); } }
+        @keyframes fadeIn { from { opacity: 0; transform: scale(0.96); } to { opacity: 1; transform: scale(1); } }
+        @keyframes slideUp { from { opacity: 0; transform: translateY(15px); } to { opacity: 1; transform: translateY(0); } }
+        @keyframes shake { 0%,100% { transform: translateX(0); } 25% { transform: translateX(-8px); } 75% { transform: translateX(8px); } }
+        @keyframes bounceIn { 0% { opacity: 0; transform: scale(0.4); } 60% { transform: scale(1.05); } 100% { opacity: 1; transform: scale(1); } }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <div class="lesson-tag">Module 1 · Lesson 1.3 · Quiz</div>
+            <h1>Text and Lists</h1>
+            <p></p>
+        </div>
+
+        <div class="score-board">
+            <div class="score-item"><div class="label">Score</div><div class="value" id="score">0</div></div>
+            <div class="score-item"><div class="label">Question</div><div class="value"><span id="current">1</span>/<span id="total">10</span></div></div>
+            <div class="score-item"><div class="label">Streak</div><div class="value" id="streak">0</div></div>
+        </div>
+
+        <div class="progress-bar"><div class="progress-fill" id="progress"></div></div>
+
+        <div class="exercise-card" id="exerciseCard"></div>
+    </div>
+
+    <script>
+        const exercises = [
+  {
+    "id": "q1",
+    "text": "James has six product categories. Which HTML element is most appropriate for a navigation list of categories?",
+    "options": [
+      "<ol> because categories have a numbered order",
+      "<ul> because categories have no meaningful order",
+      "<dl> because each category needs a definition",
+      "<table> because it organises items into rows"
+    ],
+    "answer": 1,
+    "explanation": "<ul> (unordered list) is correct when the order of items is not meaningful. Navigation categories are not ranked — any order works. <ol> is for numbered sequences like steps or rankings."
+  },
+  {
+    "id": "q2",
+    "text": "What is the correct heading hierarchy for a product page?",
+    "options": [
+      "h3 → h1 → h2 → h4",
+      "h1 → h2 → h3 (each level appears inside the previous)",
+      "h1 can appear multiple times; use it for every product name",
+      "Heading levels can be skipped freely, e.g. h1 → h4"
+    ],
+    "answer": 1,
+    "explanation": "Headings must descend in order: one h1 for the page title, h2 for sections, h3 for sub-sections. Skipping levels (h1 → h3) confuses screen readers and hurts SEO — the hierarchy should reflect the document structure."
+  },
+  {
+    "id": "q3",
+    "text": "James wants to show the steps for placing an order. Which list element should he use?",
+    "options": [
+      "<ul> — unordered list",
+      "<ol> — ordered list",
+      "<dl> — definition list",
+      "<li> — list item only"
+    ],
+    "answer": 1,
+    "explanation": "<ol> (ordered list) is correct for sequential steps where order matters — Step 1, 2, 3. The browser automatically numbers the items. <ul> would imply the steps can be done in any order."
+  },
+  {
+    "id": "q4",
+    "text": "Which HTML element makes text bold AND signals that it is semantically important (not just visually bold)?",
+    "options": [
+      "<i>",
+      "<em>",
+      "<b>",
+      "<strong>"
+    ],
+    "answer": 3,
+    "explanation": "<strong> marks content as strongly important — it renders bold AND conveys semantic emphasis to screen readers and search engines. <b> is purely visual bold with no semantic meaning."
+  },
+  {
+    "id": "q5",
+    "text": "James writes: <br><br><br> to add vertical space between two sections. What is the problem with this approach?",
+    "options": [
+      "<br> is not a valid HTML tag",
+      "<br> is for line breaks in text, not spacing between sections — use CSS margin/padding instead",
+      "<br> only works inside <p> tags",
+      "Three <br> tags will cause a validation error"
+    ],
+    "answer": 1,
+    "explanation": "<br> is a semantic element for line breaks in content (poems, addresses) — not for creating white space. Using multiple <br> for spacing mixes presentation into HTML. Use CSS margin or padding for spacing."
+  },
+  {
+    "id": "q6",
+    "text": "What does the <em> element do and how does it differ from <i>?",
+    "options": [
+      "<em> and <i> are identical — both make text italic",
+      "<em> adds semantic emphasis (important for screen readers and SEO); <i> is purely visual italic",
+      "<em> makes text bold; <i> makes text italic",
+      "<em> is for email addresses; <i> is for icons"
+    ],
+    "answer": 1,
+    "explanation": "<em> (emphasis) is semantic — screen readers change their tone and search engines note the emphasis. <i> is presentational — it renders italic but carries no meaning. Use <em> when the emphasis affects meaning."
+  },
+  {
+    "id": "q7",
+    "text": "James links to a product page: <a href=\"products.html\">Click here</a>. What is wrong with this link text?",
+    "options": [
+      "The href should start with https://",
+      "\"Click here\" is not descriptive — screen readers and search engines can't tell where the link goes",
+      "The <a> tag must always have a target attribute",
+      "Links cannot be placed outside of list items"
+    ],
+    "answer": 1,
+    "explanation": "'Click here' is meaningless out of context. Screen reader users can hear a list of all page links — 'click here, click here, click here' tells them nothing. Use descriptive text like 'View cement products'."
+  },
+  {
+    "id": "q8",
+    "text": "Which of these is a BLOCK-LEVEL element that starts on a new line and takes full width?",
+    "options": [
+      "<span>",
+      "<a>",
+      "<strong>",
+      "<p>"
+    ],
+    "answer": 3,
+    "explanation": "<p> is a block-level element — it starts on a new line, takes the full available width, and has default top/bottom margin. <span>, <a>, and <strong> are inline elements — they flow within text."
+  },
+  {
+    "id": "q9",
+    "text": "James wants to show a glossary of building materials (term + definition pairs). Which HTML element is designed for this?",
+    "options": [
+      "<ul> with <li> pairs",
+      "<table> with two columns",
+      "<dl> with <dt> and <dd>",
+      "<ol> with numbered definitions"
+    ],
+    "answer": 2,
+    "explanation": "<dl> (description list) with <dt> (term) and <dd> (description) is the correct semantic structure for glossaries, dictionaries, and key-value pairs like product name + description."
+  },
+  {
+    "id": "q10",
+    "text": "What is the correct HTML for a nested list — a product category with two sub-items?",
+    "options": [
+      "<ul><li>Roofing<li><ul><li>Iron sheets</li><li>Nails</li></ul></li></ul>",
+      "<ul><li>Roofing</li><ul><li>Iron sheets</li><li>Nails</li></ul></ul>",
+      "<ul><li>Roofing<ul><li>Iron sheets</li><li>Nails</li></ul></li></ul>",
+      "<ul><li>Roofing</li></ul><ul><li>Iron sheets</li><li>Nails</li></ul>"
+    ],
+    "answer": 2,
+    "explanation": "The nested <ul> must be placed INSIDE the parent <li>, not after it. The parent li contains both the text 'Roofing' and the child <ul>. Placing <ul> as a direct child of the outer <ul> is invalid HTML."
+  }
+];
+
+        let currentQuestion = 0, score = 0, streak = 0, answered = false;
+
+        function updateScoreboard() {
+            document.getElementById('score').textContent = score;
+            document.getElementById('current').textContent = Math.min(currentQuestion + 1, exercises.length);
+            document.getElementById('total').textContent = exercises.length;
+            document.getElementById('streak').textContent = streak;
+            document.getElementById('progress').style.width = ((currentQuestion) / exercises.length) * 100 + '%';
+        }
+
+        function escapeHtml(s) {
+            return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+        }
+
+        function renderQuestion() {
+            answered = false;
+            const q = exercises[currentQuestion];
+            let html = '';
+            if (q.scenario) {
+                html += `<div class="scenario"><strong>Scenario.</strong> ${escapeHtml(q.scenario)}</div>`;
+            }
+            html += `<div class="question">${escapeHtml(q.text)}</div>`;
+            html += '<div class="options">';
+            q.options.forEach((o, i) => {
+                html += `<button class="option" onclick="selectAnswer(${i})">${escapeHtml(o)}</button>`;
+            });
+            html += '</div>';
+            document.getElementById('exerciseCard').innerHTML = html;
+            updateScoreboard();
+        }
+
+        function selectAnswer(i) {
+            if (answered) return;
+            answered = true;
+            const q = exercises[currentQuestion];
+            const btns = document.querySelectorAll('.option');
+            btns.forEach(b => b.classList.add('disabled'));
+            btns[q.answer].classList.add('correct');
+            const right = i === q.answer;
+            if (!right) btns[i].classList.add('wrong');
+            if (right) { score += 10; streak += 1; } else { streak = 0; }
+            const fb = document.createElement('div');
+            fb.className = 'feedback ' + (right ? 'correct' : 'wrong');
+            fb.innerHTML = `<strong>${right ? '✅ Correct.' : '❌ Not quite.'}</strong><br>${escapeHtml(q.explanation)}`;
+            document.getElementById('exerciseCard').appendChild(fb);
+            const nb = document.createElement('button');
+            nb.className = 'next-btn';
+            nb.textContent = currentQuestion === exercises.length - 1 ? 'See results →' : 'Next scenario →';
+            nb.onclick = nextQuestion;
+            document.getElementById('exerciseCard').appendChild(nb);
+            updateScoreboard();
+        }
+
+        function nextQuestion() {
+            currentQuestion++;
+            if (currentQuestion >= exercises.length) return showResults();
+            renderQuestion();
+        }
+
+        function showResults() {
+            document.getElementById('progress').style.width = '100%';
+            const total = exercises.length * 10;
+            const pct = Math.round(score / total * 100);
+            if (window.parent) { window.parent.postMessage({type:"mtti_quiz_score", score: score, total: total, percent: pct}, "*"); }
+            let badge = '🌟', msg = 'Excellent work. You have a professional grasp of this lesson.';
+            if (pct < 50) { badge = '🌱'; msg = 'Good first attempt. Re-watch the lesson video and try again.'; }
+            else if (pct < 80) { badge = '📚'; msg = 'Solid progress. Review the scenarios you missed and retry.'; }
+            document.getElementById('exerciseCard').innerHTML = `
+                <div class="results">
+                    <span class="badge">${badge}</span>
+                    <h2>Quiz Complete</h2>
+                    <div class="final-score">${score} / ${total}</div>
+                    <p><strong>${pct}%</strong> · Longest streak: ${streak}</p>
+                    <p>${msg}</p>
+                    <button class="restart-btn" onclick="restart()">Try again 🔁</button>
+                </div>`;
+        }
+
+        function restart() {
+            currentQuestion = 0; score = 0; streak = 0;
+            renderQuestion();
+        }
+
+        renderQuestion();
+    </script>
+</body>
+</html>

@@ -1,0 +1,615 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lesson 11.1 — Meta Business Manager (Interactive)</title>
+<style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: 'Segoe UI', -apple-system, sans-serif; line-height: 1.55; color: #1e293b; background: #f1f5f9; min-height: 100vh; }
+    .container { max-width: 1200px; margin: 0 auto; padding: 20px; }
+    header {
+        background: linear-gradient(135deg, #2E7D32, #1B5E20);
+        color: #fff; padding: 40px 30px; border-radius: 12px; margin-bottom: 24px;
+        box-shadow: 0 10px 30px rgba(24,119,242,0.25);
+    }
+    header .badge { display: inline-block; background: rgba(255,255,255,0.2); padding: 4px 14px; border-radius: 16px; font-size: 12px; font-weight: bold; letter-spacing: 1px; margin-bottom: 14px; }
+    header h1 { font-size: 34px; margin-bottom: 8px; }
+    header .subtitle { font-size: 17px; opacity: 0.95; margin-bottom: 20px; }
+    .meta-strip { display: flex; flex-wrap: wrap; gap: 12px; }
+    .meta-strip span { background: rgba(255,255,255,0.18); padding: 6px 14px; border-radius: 20px; font-size: 13px; }
+    .toc { background: #fff; border: 1px solid #e2e8f0; border-radius: 10px; padding: 22px 26px; margin-bottom: 22px; }
+    .toc h3 { color: #1877f2; margin-bottom: 10px; }
+    .toc ol { padding-left: 20px; }
+    .toc a { color: #1877f2; text-decoration: none; font-weight: 600; }
+    .toc a:hover { text-decoration: underline; }
+    section { background: #fff; border: 1px solid #e2e8f0; border-radius: 10px; padding: 26px 30px; margin-bottom: 22px; }
+    section h2 { color: #1877f2; font-size: 22px; margin-bottom: 12px; padding-bottom: 8px; border-bottom: 3px solid #1877f2; }
+    section h3 { color: #0f172a; font-size: 17px; margin: 18px 0 8px; }
+    section p { margin-bottom: 12px; }
+    section ul, section ol { padding-left: 22px; margin-bottom: 12px; }
+    .callout { border-left: 5px solid #1877f2; background: #eff6ff; padding: 14px 18px; margin: 14px 0; border-radius: 4px; }
+    .callout.warn { border-left-color: #dc2626; background: #fef2f2; }
+    .callout.tip { border-left-color: #059669; background: #ecfdf5; }
+    .callout strong { color: #1877f2; }
+    .callout.warn strong { color: #dc2626; }
+    .callout.tip strong { color: #059669; }
+
+    /* Business Manager mock */
+    .bm {
+        background: #fff; border: 1px solid #dadce0; border-radius: 8px;
+        overflow: hidden; margin: 14px 0; box-shadow: 0 2px 6px rgba(0,0,0,0.05);
+    }
+    .bm-top { background: #f0f2f5; padding: 12px 16px; display: flex; align-items: center; gap: 12px; border-bottom: 1px solid #e5e7eb; }
+    .bm-logo { width: 36px; height: 36px; border-radius: 50%; background: linear-gradient(135deg,#f97316,#dc2626); color:#fff; display:flex; align-items:center; justify-content:center; font-weight:bold; font-size:14px; }
+    .bm-name { font-weight: 600; color: #050505; font-size: 15px; }
+    .bm-id { font-size: 12px; color: #65676b; }
+    .bm-right { margin-left:auto; font-size:12px; color:#1877f2; }
+    .bm-body { display: grid; grid-template-columns: 220px 1fr; min-height: 480px; }
+    @media (max-width: 800px) { .bm-body { grid-template-columns: 1fr; } .bm-sidebar { display: none; } }
+    .bm-sidebar { background: #f7f8fa; border-right: 1px solid #e5e7eb; padding: 10px 0; font-size: 13px; }
+    .bm-group { padding: 10px 18px 4px; color: #65676b; font-size: 11px; text-transform: uppercase; letter-spacing: 0.5px; font-weight: 600; }
+    .bm-menu { padding: 8px 20px; color: #050505; cursor: pointer; border-left: 3px solid transparent; display: flex; align-items: center; gap: 8px; }
+    .bm-menu:hover { background: #ebedf0; }
+    .bm-menu.active { border-left-color: #1877f2; color: #1877f2; background: #e7f0fd; font-weight: 600; }
+    .bm-menu .ic { width: 18px; text-align: center; }
+    .bm-content { padding: 22px; background: #fff; }
+    .bm-title { font-size: 20px; color: #050505; margin-bottom: 4px; font-weight: 600; }
+    .bm-sub { font-size: 13px; color: #65676b; margin-bottom: 18px; }
+
+    /* Panels */
+    .panel { display: none; }
+    .panel.active { display: block; }
+
+    /* Info grid */
+    .info-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px,1fr)); gap: 12px; margin: 14px 0; }
+    .info-tile { background: #f7f8fa; border: 1px solid #e5e7eb; border-radius: 8px; padding: 12px 14px; }
+    .info-tile .k { font-size: 11px; color: #65676b; text-transform: uppercase; letter-spacing: 0.5px; }
+    .info-tile .v { font-size: 15px; color: #050505; font-weight: 600; margin-top: 4px; }
+
+    /* Users table */
+    .users-table { width: 100%; border-collapse: collapse; font-size: 14px; margin: 12px 0; background: #fff; }
+    .users-table th, .users-table td { padding: 10px 12px; text-align: left; border-bottom: 1px solid #e5e7eb; }
+    .users-table th { background: #f7f8fa; color: #65676b; font-weight: 600; font-size: 12px; text-transform: uppercase; letter-spacing: 0.5px; }
+    .avatar { width: 32px; height: 32px; border-radius: 50%; display: inline-flex; align-items: center; justify-content: center; color:#fff; font-weight: bold; font-size: 12px; margin-right: 8px; vertical-align: middle; }
+    .a1 { background: #f97316; } .a2 { background: #16a34a; } .a3 { background: #F57C00; } .a4 { background: #ea580c; }
+    .role-pill { display: inline-block; padding: 3px 10px; border-radius: 12px; font-size: 12px; font-weight: 600; }
+    .role-admin { background: #fee2e2; color: #991b1b; }
+    .role-emp { background: #dbeafe; color: #1e40af; }
+    .role-fin { background: #fef3c7; color: #78350f; }
+    .role-dev { background: #dcfce7; color: #14532d; }
+
+    .add-btn { background: #1877f2; color:#fff; border:none; padding: 10px 18px; border-radius: 6px; font-weight: 600; cursor: pointer; font-size: 14px; }
+    .add-btn:hover { background: #0866ff; }
+
+    /* Role picker */
+    .role-picker { background: #f7f8fa; border: 1.5px solid #cbd5e1; border-radius: 10px; padding: 16px; margin: 14px 0; }
+    .role-picker h4 { color: #1877f2; margin-bottom: 10px; }
+    .role-tabs { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 14px; }
+    .role-tabs button { background: #fff; border: 1.5px solid #cbd5e1; padding: 8px 14px; border-radius: 20px; font-size: 13px; font-weight: 600; cursor: pointer; color: #475569; }
+    .role-tabs button.active { background: #1877f2; color: #fff; border-color: #1877f2; }
+    .role-tabs button:hover { border-color: #1877f2; color: #1877f2; }
+    .role-tabs button.active:hover { color: #fff; }
+    .role-detail { background: #fff; border: 1px solid #e5e7eb; border-radius: 8px; padding: 14px 16px; min-height: 180px; }
+    .role-detail h5 { color: #050505; font-size: 16px; margin-bottom: 6px; }
+    .role-detail .role-desc { color: #65676b; font-size: 13px; margin-bottom: 10px; }
+    .perm-list { list-style: none; padding: 0; }
+    .perm-list li { padding: 6px 0; font-size: 14px; color: #050505; display: flex; align-items: center; gap: 8px; border-bottom: 1px dashed #e5e7eb; }
+    .perm-list li:last-child { border-bottom: none; }
+    .perm-list .yes { color: #059669; font-weight: bold; }
+    .perm-list .no { color: #dc2626; font-weight: bold; }
+
+    /* Pending invitations */
+    .invite-row { display: flex; align-items: center; gap: 12px; padding: 12px; border: 1px solid #e5e7eb; border-radius: 8px; margin-bottom: 8px; background: #fff; }
+    .invite-row .status { padding: 3px 10px; border-radius: 12px; font-size: 12px; font-weight: 600; }
+    .status-pending { background: #fef3c7; color: #78350f; }
+    .status-active { background: #dcfce7; color: #14532d; }
+    .invite-row .email { flex: 1; color: #050505; font-size: 14px; }
+    .invite-row .role-tag { font-size: 12px; color: #65676b; }
+    .invite-actions button { background: none; border: 1px solid #cbd5e1; padding: 5px 12px; border-radius: 6px; cursor: pointer; font-size: 12px; margin-left: 4px; }
+    .invite-actions .approve { border-color: #059669; color: #059669; }
+    .invite-actions .approve:hover { background: #ecfdf5; }
+    .invite-actions .reject { border-color: #dc2626; color: #dc2626; }
+    .invite-actions .reject:hover { background: #fef2f2; }
+
+    /* Add People modal-style */
+    .add-flow { background: #f7f8fa; border: 1.5px solid #1877f2; border-radius: 10px; padding: 18px; margin-top: 12px; display: none; }
+    .add-flow.show { display: block; }
+    .add-flow h4 { color: #1877f2; margin-bottom: 12px; }
+    .add-flow label { display: block; font-weight: 600; margin: 10px 0 6px; font-size: 13px; }
+    .add-flow input, .add-flow select { width: 100%; padding: 10px 12px; border: 1.5px solid #cbd5e1; border-radius: 6px; font-size: 14px; background: #fff; }
+    .add-flow .send-btn { margin-top: 14px; }
+    .toast { display:none; margin-top: 12px; padding: 10px 14px; background: #dcfce7; color: #14532d; border-left: 4px solid #059669; border-radius: 4px; font-weight: 600; font-size: 14px; }
+    .toast.show { display: block; }
+
+    /* Challenge */
+    .challenge { background: #eff6ff; border: 2px solid #1877f2; border-radius: 10px; padding: 20px; margin: 18px 0; }
+    .challenge h4 { color: #1877f2; margin-bottom: 12px; }
+    .challenge .cq { margin-bottom: 14px; }
+    .challenge label { display: block; padding: 8px 12px; background: #fff; border: 1px solid #e2e8f0; border-radius: 6px; margin-bottom: 6px; cursor: pointer; font-size: 14px; }
+    .challenge label:hover { background: #eff6ff; }
+    .challenge input[type="radio"] { margin-right: 10px; }
+    .challenge-btn { background: #1877f2; color: #fff; border: none; padding: 10px 20px; border-radius: 6px; font-weight: 600; cursor: pointer; font-size: 15px; }
+    .verdict { padding: 14px 16px; border-radius: 8px; margin-top: 14px; font-weight: 600; display: none; }
+    .verdict.show { display: block; }
+    .verdict.good { background: #d1fae5; color: #065f46; border-left: 4px solid #059669; }
+    .verdict.mid { background: #fef3c7; color: #78350f; border-left: 4px solid #d97706; }
+    .verdict.bad { background: #fee2e2; color: #991b1b; border-left: 4px solid #dc2626; }
+
+    footer { text-align: center; color: #64748b; padding: 24px; font-size: 13px; }
+    @media (max-width: 800px) { header h1 { font-size: 26px; } .info-grid { grid-template-columns: 1fr; } }
+
+    /* MTTI logo stamp */
+    .mtti-logo-stamp {
+        position: fixed; top: 14px; right: 18px; z-index: 999;
+        opacity: 0.88; transition: opacity 0.2s;
+    }
+    .mtti-logo-stamp:hover { opacity: 1; }
+    .mtti-logo-stamp img { width: 56px; height: 56px; border-radius: 50%; box-shadow: 0 2px 8px rgba(0,0,0,0.18); }
+</style>
+</head>
+<body>
+<div class="mtti-logo-stamp">
+    <img src="../../Resources/Logo.jpeg" alt="MTTI" title="Masomotele Technical Training Institute — Start learning, Start earning">
+</div>
+
+<div class="container">
+
+<header>
+    <div class="badge">LESSON 11.1  ·  META ADS DEEP DIVE  ·  INTERACTIVE</div>
+    <h1>Meta Business Manager Tour</h1>
+    <div class="subtitle">Own the container that owns your Page, Pixel, and ad accounts — the professional foundation for every serious Meta advertiser.</div>
+    <div class="meta-strip">
+        <span><strong>Duration:</strong> ~30 min interactive</span>
+        <span><strong>Level:</strong> Intermediate</span>
+        <span><strong>Tool:</strong> business.facebook.com</span>
+        <span><strong>Handbook:</strong> Part 11, §11.1</span>
+        <span><strong>Companion:</strong> Practical 11.1 / Quiz 11.1</span>
+    </div>
+</header>
+
+<div class="toc">
+    <h3>What you'll do in this lesson</h3>
+    <ol>
+        <li><a href="#s1">Personal ad account vs Business Manager</a></li>
+        <li><a href="#s2">Business Info panel (mock)</a></li>
+        <li><a href="#s3">Users tab &amp; the Add People flow</a></li>
+        <li><a href="#s4">The 6 permission roles — click each to reveal</a></li>
+        <li><a href="#s5">Ad Account panel with pending invitations</a></li>
+        <li><a href="#s6">Data Sources, Brand Safety &amp; Integrations</a></li>
+        <li><a href="#s7">Role-picker challenge (auto-marked)</a></li>
+    </ol>
+</div>
+
+<section id="s1">
+    <h2>1. Personal ad account vs Business Manager</h2>
+    <p>Sarah of <strong>Karibu Kitchen Ltd</strong> ran her first campaign in Lesson 5.4 on the personal ad account Meta auto-creates behind every profile. It worked — but it is fragile. If her personal Facebook is disabled, her ads die with it. Her cousin cannot help without logging in as Sarah.</p>
+    <p><strong>Business Manager</strong> (rebranded Meta Business Suite) is a separate container that OWNS the Page, ad account, Pixel, Instagram, and catalogue. Sarah is an Admin — but she is not the container. The <em>business itself</em> is.</p>
+    <div class="callout warn">
+        <strong>The rule of five:</strong> ownership, delegation, audit, tracking, spending limits. If any one of these matters to your business — set up Business Manager on day one.
+    </div>
+</section>
+
+<section id="s2">
+    <h2>2. Business Info panel</h2>
+    <p>The first tab you land on in Business Settings. Everything hangs off these fields — legal name, tax ID, address, primary contact.</p>
+
+    <div class="bm">
+        <div class="bm-top">
+            <div class="bm-logo">KK</div>
+            <div>
+                <div class="bm-name">Karibu Kitchen Ltd</div>
+                <div class="bm-id">Business ID: 1234567890123456 · Nairobi, Kenya</div>
+            </div>
+            <div class="bm-right">Verified ✓</div>
+        </div>
+        <div class="bm-body">
+            <div class="bm-sidebar">
+                <div class="bm-group">SETTINGS</div>
+                <div class="bm-menu active" onclick="showPanel('info', this)"><span class="ic">🏢</span>Business Info</div>
+                <div class="bm-menu" onclick="showPanel('users', this)"><span class="ic">👥</span>Users</div>
+                <div class="bm-menu" onclick="showPanel('accounts', this)"><span class="ic">💼</span>Accounts</div>
+                <div class="bm-menu" onclick="showPanel('data', this)"><span class="ic">📡</span>Data Sources</div>
+                <div class="bm-menu" onclick="showPanel('brand', this)"><span class="ic">🛡️</span>Brand Safety</div>
+                <div class="bm-menu" onclick="showPanel('integ', this)"><span class="ic">🔌</span>Integrations</div>
+                <div class="bm-group">BILLING</div>
+                <div class="bm-menu"><span class="ic">💳</span>Payment methods</div>
+                <div class="bm-menu"><span class="ic">🧾</span>Invoices</div>
+            </div>
+            <div class="bm-content">
+
+                <div class="panel active" id="p-info">
+                    <div class="bm-title">Business Info</div>
+                    <div class="bm-sub">Legal details Meta uses for verification and invoicing.</div>
+                    <div class="info-grid">
+                        <div class="info-tile"><div class="k">Legal business name</div><div class="v">Karibu Kitchen Ltd</div></div>
+                        <div class="info-tile"><div class="k">Business ID</div><div class="v">1234567890123456</div></div>
+                        <div class="info-tile"><div class="k">Country</div><div class="v">Kenya</div></div>
+                        <div class="info-tile"><div class="k">Time zone</div><div class="v">Africa/Nairobi (EAT)</div></div>
+                        <div class="info-tile"><div class="k">Primary contact</div><div class="v">sarah@karibukitchen.co.ke</div></div>
+                        <div class="info-tile"><div class="k">Tax PIN</div><div class="v">P051234567X</div></div>
+                        <div class="info-tile"><div class="k">Registered address</div><div class="v">Kapsoya, Eldoret</div></div>
+                        <div class="info-tile"><div class="k">Business verification</div><div class="v" style="color:#059669;">Verified ✓</div></div>
+                    </div>
+                    <div class="callout tip">
+                        <strong>Business verification unlocks:</strong> Conversions API, domain verification, higher spending limits (past USD 500/day cap). Upload the Kenya business registration + a utility bill in the business name.
+                    </div>
+                </div>
+
+                <div class="panel" id="p-users">
+                    <div class="bm-title">Users · People</div>
+                    <div class="bm-sub">Everyone with access to Karibu Kitchen assets.</div>
+                    <button class="add-btn" onclick="toggleAddFlow()">+ Add People</button>
+
+                    <div class="add-flow" id="addFlow">
+                        <h4>Add someone to Karibu Kitchen</h4>
+                        <label>Work email</label>
+                        <input type="email" placeholder="jane@karibukitchen.co.ke" id="newEmail">
+                        <label>Assign role</label>
+                        <select id="newRole">
+                            <option value="admin">Admin — full control</option>
+                            <option value="employee" selected>Employee — day-to-day access</option>
+                            <option value="finEd">Finance Editor — billing edit</option>
+                            <option value="finAn">Finance Analyst — billing view only</option>
+                            <option value="ipMgr">IP Manager — rights management</option>
+                            <option value="dev">Developer — API + Pixel install</option>
+                        </select>
+                        <button class="add-btn send-btn" onclick="sendInvite()">Send invitation</button>
+                        <div class="toast" id="inviteToast">✓ Invitation sent. Pending until they accept.</div>
+                    </div>
+
+                    <table class="users-table">
+                        <tr><th>Name</th><th>Email</th><th>Role</th><th>2FA</th><th>Last active</th></tr>
+                        <tr>
+                            <td><span class="avatar a1">SC</span>Sarah Chebet</td>
+                            <td>sarah@karibukitchen.co.ke</td>
+                            <td><span class="role-pill role-admin">Admin</span></td>
+                            <td style="color:#059669;">✓</td>
+                            <td>Just now</td>
+                        </tr>
+                        <tr>
+                            <td><span class="avatar a2">JM</span>Jane Mwikali</td>
+                            <td>jane@karibukitchen.co.ke</td>
+                            <td><span class="role-pill role-emp">Employee</span></td>
+                            <td style="color:#059669;">✓</td>
+                            <td>2 hrs ago</td>
+                        </tr>
+                        <tr>
+                            <td><span class="avatar a3">DK</span>David Kiprop</td>
+                            <td>david.freelance@gmail.com</td>
+                            <td><span class="role-pill role-dev">Developer</span></td>
+                            <td style="color:#dc2626;">✗</td>
+                            <td>Yesterday</td>
+                        </tr>
+                        <tr>
+                            <td><span class="avatar a4">FK</span>Faith Kimani</td>
+                            <td>faith.accounts@karibukitchen.co.ke</td>
+                            <td><span class="role-pill role-fin">Finance Editor</span></td>
+                            <td style="color:#059669;">✓</td>
+                            <td>3 days ago</td>
+                        </tr>
+                    </table>
+                    <div class="callout warn">
+                        <strong>David has no 2FA.</strong> Meta account takeovers are the #1 reason ad accounts get disabled. Enforce 2FA on every admin AND developer before granting Pixel access.
+                    </div>
+                </div>
+
+                <div class="panel" id="p-accounts">
+                    <div class="bm-title">Accounts · Ad Accounts</div>
+                    <div class="bm-sub">Billing containers under this business.</div>
+                    <div class="info-grid">
+                        <div class="info-tile"><div class="k">Ad account name</div><div class="v">Karibu Kitchen Main</div></div>
+                        <div class="info-tile"><div class="k">Account ID</div><div class="v">act_987654321</div></div>
+                        <div class="info-tile"><div class="k">Currency</div><div class="v">KES</div></div>
+                        <div class="info-tile"><div class="k">Time zone</div><div class="v">Africa/Nairobi</div></div>
+                        <div class="info-tile"><div class="k">Spending cap</div><div class="v">KES 45,000/mo</div></div>
+                        <div class="info-tile"><div class="k">Status</div><div class="v" style="color:#059669;">Active</div></div>
+                    </div>
+
+                    <h3>Pending invitations</h3>
+                    <div class="invite-row">
+                        <span class="avatar a3">DK</span>
+                        <span class="email">david.freelance@gmail.com</span>
+                        <span class="role-tag">as Advertiser</span>
+                        <span class="status status-pending">Pending 2d</span>
+                        <span class="invite-actions">
+                            <button class="approve" onclick="handleInvite(this,'approve')">Resend</button>
+                            <button class="reject" onclick="handleInvite(this,'reject')">Revoke</button>
+                        </span>
+                    </div>
+                    <div class="invite-row">
+                        <span class="avatar a2">AM</span>
+                        <span class="email">agency@shoutout.co.ke</span>
+                        <span class="role-tag">as Analyst (partner agency)</span>
+                        <span class="status status-pending">Pending 5h</span>
+                        <span class="invite-actions">
+                            <button class="approve" onclick="handleInvite(this,'approve')">Resend</button>
+                            <button class="reject" onclick="handleInvite(this,'reject')">Revoke</button>
+                        </span>
+                    </div>
+                    <div class="invite-row">
+                        <span class="avatar a4">FK</span>
+                        <span class="email">faith.accounts@karibukitchen.co.ke</span>
+                        <span class="role-tag">as Finance Editor</span>
+                        <span class="status status-active">Accepted</span>
+                    </div>
+
+                    <div class="callout tip">
+                        <strong>Task-based on top of the role:</strong> even an Advertiser can be scoped to <em>Manage campaigns</em> only, not <em>View performance</em>. Least privilege — always.
+                    </div>
+                </div>
+
+                <div class="panel" id="p-data">
+                    <div class="bm-title">Data Sources</div>
+                    <div class="bm-sub">Pixel, CAPI, offline events, catalogue.</div>
+                    <div class="info-grid">
+                        <div class="info-tile"><div class="k">Karibu Kitchen Pixel</div><div class="v" style="color:#059669;">Active</div></div>
+                        <div class="info-tile"><div class="k">Conversions API</div><div class="v" style="color:#059669;">Configured</div></div>
+                        <div class="info-tile"><div class="k">Catalogue</div><div class="v">10 menu items</div></div>
+                        <div class="info-tile"><div class="k">Offline event set</div><div class="v">Not set</div></div>
+                    </div>
+                    <p>Deep dive on the Pixel + CAPI in Lesson 11.2.</p>
+                </div>
+
+                <div class="panel" id="p-brand">
+                    <div class="bm-title">Brand Safety</div>
+                    <div class="bm-sub">Block lists and allow lists for placements.</div>
+                    <ul>
+                        <li>Publisher block list — 12 domains</li>
+                        <li>Video block list — Off</li>
+                        <li>Inventory filter — <strong>Standard</strong> (default)</li>
+                        <li>Domain verification — karibukitchen.co.ke ✓</li>
+                    </ul>
+                </div>
+
+                <div class="panel" id="p-integ">
+                    <div class="bm-title">Integrations</div>
+                    <div class="bm-sub">Third-party apps allowed to access assets.</div>
+                    <ul>
+                        <li>WhatsApp Business — connected</li>
+                        <li>Shopify — <em>not connected</em></li>
+                        <li>WooCommerce Meta plugin — connected</li>
+                        <li>Zapier — connected (limited)</li>
+                    </ul>
+                </div>
+
+            </div>
+        </div>
+    </div>
+</section>
+
+<section id="s3">
+    <h2>3. The Add People flow</h2>
+    <p>Click <em>Users</em> in the sidebar above, then <strong>+ Add People</strong>. Enter an email, pick a role, and Meta sends an invitation link. The person accepts through their own Facebook profile — nobody shares passwords.</p>
+    <div class="callout tip">
+        <strong>Why email &gt; profile lookup:</strong> the person can accept from any Facebook profile they own. Their access is tied to that profile, not to the email address.
+    </div>
+</section>
+
+<section id="s4">
+    <h2>4. The 6 permission roles — click each to reveal</h2>
+    <p>Meta ships six standard roles. Pick the tightest role that lets the person do their job.</p>
+    <div class="role-picker">
+        <h4>Role permission explorer</h4>
+        <div class="role-tabs">
+            <button class="active" onclick="showRole('admin', this)">Admin</button>
+            <button onclick="showRole('employee', this)">Employee</button>
+            <button onclick="showRole('finEd', this)">Finance Editor</button>
+            <button onclick="showRole('finAn', this)">Finance Analyst</button>
+            <button onclick="showRole('ipMgr', this)">IP Manager</button>
+            <button onclick="showRole('dev', this)">Developer</button>
+        </div>
+        <div class="role-detail" id="roleDetail">
+            <!-- filled by JS -->
+        </div>
+    </div>
+    <div class="callout warn">
+        <strong>Rule of thumb:</strong> only the owner and one deputy should ever be Admin. Everyone else — Employee, plus task-based sliders on each asset.
+    </div>
+</section>
+
+<section id="s5">
+    <h2>5. Ad Account panel with pending invitations</h2>
+    <p>Click <em>Accounts</em> in the sidebar of the mock above. You'll see three pending invitations — Sarah must Resend (nudge) or Revoke. Long-pending invites are a common security hole.</p>
+    <div class="callout warn">
+        <strong>Revoke pending invites older than 7 days.</strong> Attackers hunt for stale invitation links.
+    </div>
+</section>
+
+<section id="s6">
+    <h2>6. Data Sources, Brand Safety &amp; Integrations</h2>
+    <p>Three tabs you will visit often once you're at scale:</p>
+    <ul>
+        <li><strong>Data Sources</strong> — where the Pixel and CAPI live (Lesson 11.2).</li>
+        <li><strong>Brand Safety</strong> — block lists so your ad never runs next to content you would not sponsor.</li>
+        <li><strong>Integrations</strong> — WhatsApp Business, WooCommerce, Shopify. Revoke any app you no longer use.</li>
+    </ul>
+</section>
+
+<section id="s7">
+    <h2>7. Role-picker challenge (auto-marked)</h2>
+    <p>Sarah needs to grant access to four new people. Pick the correct role for each. You'll be scored out of 4.</p>
+    <div class="challenge">
+        <div class="cq">
+            <p><strong>Q1.</strong> Sarah's cousin Jane will post daily photos to the Karibu Kitchen Page but should NOT touch billing.</p>
+            <label><input type="radio" name="cq1" value="employee"> Employee</label>
+            <label><input type="radio" name="cq1" value="admin"> Admin</label>
+            <label><input type="radio" name="cq1" value="finEd"> Finance Editor</label>
+            <label><input type="radio" name="cq1" value="dev"> Developer</label>
+        </div>
+        <div class="cq">
+            <p><strong>Q2.</strong> A freelance developer, David, will install the Meta Pixel on the WordPress site and set up CAPI.</p>
+            <label><input type="radio" name="cq2" value="dev"> Developer</label>
+            <label><input type="radio" name="cq2" value="admin"> Admin</label>
+            <label><input type="radio" name="cq2" value="finAn"> Finance Analyst</label>
+            <label><input type="radio" name="cq2" value="ipMgr"> IP Manager</label>
+        </div>
+        <div class="cq">
+            <p><strong>Q3.</strong> Faith, Sarah's accountant, must download monthly invoices and update the M-Pesa payment method.</p>
+            <label><input type="radio" name="cq3" value="finEd"> Finance Editor</label>
+            <label><input type="radio" name="cq3" value="finAn"> Finance Analyst</label>
+            <label><input type="radio" name="cq3" value="admin"> Admin</label>
+            <label><input type="radio" name="cq3" value="employee"> Employee</label>
+        </div>
+        <div class="cq">
+            <p><strong>Q4.</strong> A partner agency in Nairobi will read reports for monthly reviews but NEVER edit campaigns or billing.</p>
+            <label><input type="radio" name="cq4" value="finAn"> Finance Analyst</label>
+            <label><input type="radio" name="cq4" value="admin"> Admin</label>
+            <label><input type="radio" name="cq4" value="dev"> Developer</label>
+            <label><input type="radio" name="cq4" value="finEd"> Finance Editor</label>
+        </div>
+        <button class="challenge-btn" onclick="markChallenge()">Score my picks</button>
+        <div class="verdict" id="chVerdict"></div>
+    </div>
+</section>
+
+<footer>
+    <p>Lesson 11.1 — Meta Business Manager · Masomotele Technical Training Institute · Handbook Part 11, §11.1</p>
+    <p>Next: <strong>Lesson 11.2 — Meta Pixel &amp; Conversions API</strong></p>
+</footer>
+
+</div>
+
+<script>
+function showPanel(name, btn) {
+    document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+    document.querySelectorAll('.bm-menu').forEach(b => b.classList.remove('active'));
+    const target = document.getElementById('p-' + name);
+    if (target) target.classList.add('active');
+    btn.classList.add('active');
+}
+
+function toggleAddFlow() {
+    const f = document.getElementById('addFlow');
+    f.classList.toggle('show');
+}
+
+function sendInvite() {
+    const email = document.getElementById('newEmail').value.trim();
+    const toast = document.getElementById('inviteToast');
+    if (!email) { toast.textContent = 'Enter an email first.'; toast.style.background = '#fee2e2'; toast.style.color = '#991b1b'; toast.style.borderLeftColor = '#dc2626'; toast.classList.add('show'); return; }
+    toast.textContent = '✓ Invitation sent to ' + email + '. Pending until they accept.';
+    toast.style.background = '#dcfce7'; toast.style.color = '#14532d'; toast.style.borderLeftColor = '#059669';
+    toast.classList.add('show');
+}
+
+function handleInvite(btn, action) {
+    const row = btn.closest('.invite-row');
+    const status = row.querySelector('.status');
+    if (action === 'approve') { status.textContent = 'Resent'; status.className = 'status status-active'; }
+    else { status.textContent = 'Revoked'; status.className = 'status status-pending'; status.style.background = '#fee2e2'; status.style.color = '#991b1b'; }
+    row.querySelector('.invite-actions').innerHTML = '<em style="color:#64748b;font-size:12px;">Done</em>';
+}
+
+const roleData = {
+    admin: {
+        name: 'Admin',
+        desc: 'Full control. Can add/remove people, spend money, change any setting. Only the owner and one deputy should ever be Admin.',
+        perms: [
+            ['Add or remove people', true],
+            ['Create ad accounts', true],
+            ['Manage payment methods', true],
+            ['Access invoices', true],
+            ['Create Pages, Pixels, catalogues', true],
+            ['Install code / Pixels via API', true],
+            ['Rights (IP) management', true],
+        ]
+    },
+    employee: {
+        name: 'Employee',
+        desc: 'Day-to-day worker with access only to whatever specific assets you assign. Cannot add new people or new accounts.',
+        perms: [
+            ['Add or remove people', false],
+            ['Create ad accounts', false],
+            ['Manage payment methods', false],
+            ['Access invoices', false],
+            ['Work on assigned Pages / campaigns', true],
+            ['Install code / Pixels via API', false],
+            ['Rights (IP) management', false],
+        ]
+    },
+    finEd: {
+        name: 'Finance Editor',
+        desc: 'Handles all billing. Adds credit cards / M-Pesa, updates spending caps, downloads invoices. Cannot run campaigns or add people.',
+        perms: [
+            ['Add or remove people', false],
+            ['Create ad accounts', false],
+            ['Manage payment methods', true],
+            ['Access invoices', true],
+            ['Work on assigned Pages / campaigns', false],
+            ['Install code / Pixels via API', false],
+            ['Rights (IP) management', false],
+        ]
+    },
+    finAn: {
+        name: 'Finance Analyst',
+        desc: 'Read-only view of billing. Sees invoices and spend but cannot change payment methods. Perfect for external accountants and partner agencies.',
+        perms: [
+            ['Add or remove people', false],
+            ['Create ad accounts', false],
+            ['Manage payment methods', false],
+            ['Access invoices', true],
+            ['Work on assigned Pages / campaigns', false],
+            ['Install code / Pixels via API', false],
+            ['Rights (IP) management', false],
+        ]
+    },
+    ipMgr: {
+        name: 'IP Manager',
+        desc: 'Manages Rights Manager — copyright claims and match rules for video and images. Rare in Kenya; used by media houses and record labels.',
+        perms: [
+            ['Add or remove people', false],
+            ['Create ad accounts', false],
+            ['Manage payment methods', false],
+            ['Access invoices', false],
+            ['Work on assigned Pages / campaigns', false],
+            ['Install code / Pixels via API', false],
+            ['Rights (IP) management', true],
+        ]
+    },
+    dev: {
+        name: 'Developer',
+        desc: 'Installs Pixel code, configures the Conversions API, connects Zapier or Make. Technical access without billing or people management.',
+        perms: [
+            ['Add or remove people', false],
+            ['Create ad accounts', false],
+            ['Manage payment methods', false],
+            ['Access invoices', false],
+            ['Work on assigned Pages / campaigns', false],
+            ['Install code / Pixels via API', true],
+            ['Rights (IP) management', false],
+        ]
+    }
+};
+
+function showRole(key, btn) {
+    document.querySelectorAll('.role-tabs button').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    const r = roleData[key];
+    const html = '<h5>' + r.name + '</h5><div class="role-desc">' + r.desc + '</div>' +
+        '<ul class="perm-list">' +
+        r.perms.map(p => '<li>' + (p[1] ? '<span class="yes">✓</span>' : '<span class="no">✗</span>') + ' ' + p[0] + '</li>').join('') +
+        '</ul>';
+    document.getElementById('roleDetail').innerHTML = html;
+}
+showRole('admin', document.querySelector('.role-tabs button.active'));
+
+const correctChallenge = { cq1: 'employee', cq2: 'dev', cq3: 'finEd', cq4: 'finAn' };
+function markChallenge() {
+    let score = 0;
+    const notes = [];
+    for (const q in correctChallenge) {
+        const picked = document.querySelector('input[name="' + q + '"]:checked');
+        if (picked && picked.value === correctChallenge[q]) score++;
+    }
+    const v = document.getElementById('chVerdict');
+    v.classList.add('show');
+    let msg;
+    if (score === 4) { v.className = 'verdict show good'; msg = 'Perfect ' + score + '/4 — you understand least-privilege. Move on to Lesson 11.2.'; }
+    else if (score >= 2) { v.className = 'verdict show mid'; msg = 'Halfway: ' + score + '/4. Review the role permission explorer and try again.'; }
+    else { v.className = 'verdict show bad'; msg = 'Only ' + score + '/4 — re-read the 6 roles above. Wrong roles are how businesses get hacked.'; }
+    v.textContent = msg;
+}
+</script>
+</body>
+</html>

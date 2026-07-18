@@ -1,0 +1,346 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Your First HTML Page | MTTI Web Design</title>
+    <link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Fredoka:wght@500;600&display=swap" rel="stylesheet">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Space Mono', monospace;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh; padding: 20px; color: #fff;
+        }
+        .container { max-width: 900px; margin: 0 auto; }
+        .header { text-align: center; margin-bottom: 30px; animation: slideDown 0.6s ease-out; }
+        .header .lesson-tag {
+            display: inline-block; background: rgba(255,255,255,0.2);
+            padding: 6px 16px; border-radius: 999px;
+            font-size: 0.85em; margin-bottom: 12px;
+        }
+        .header h1 {
+            font-family: 'Fredoka', sans-serif; font-size: 2.2em;
+            margin-bottom: 8px; text-shadow: 3px 3px 0 rgba(0,0,0,0.2);
+        }
+        .header p { opacity: 0.95; font-size: 0.95em; }
+        .score-board {
+            background: rgba(255,255,255,0.15); backdrop-filter: blur(10px);
+            border-radius: 20px; padding: 20px; margin-bottom: 20px;
+            display: flex; justify-content: space-around;
+            animation: fadeIn 0.8s ease-out 0.2s both;
+        }
+        .score-item { text-align: center; }
+        .score-item .label { font-size: 0.85em; opacity: 0.9; margin-bottom: 4px; }
+        .score-item .value {
+            font-size: 1.8em; font-weight: bold; font-family: 'Fredoka', sans-serif;
+        }
+        .progress-bar {
+            width: 100%; height: 8px; background: rgba(255,255,255,0.3);
+            border-radius: 10px; margin-bottom: 25px; overflow: hidden;
+        }
+        .progress-fill {
+            height: 100%; background: linear-gradient(90deg, #f093fb 0%, #f5576c 100%);
+            border-radius: 10px; transition: width 0.5s ease; width: 0%;
+        }
+        .exercise-card {
+            background: white; color: #333; border-radius: 25px;
+            padding: 35px; margin-bottom: 20px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            animation: fadeIn 0.6s ease-out both;
+        }
+        .scenario {
+            background: linear-gradient(135deg, #fff8e1 0%, #ffecb3 100%);
+            border-left: 5px solid #ffc107;
+            padding: 20px 24px; border-radius: 12px;
+            margin-bottom: 24px;
+            font-size: 0.98em; line-height: 1.55;
+        }
+        .scenario strong { color: #7a5a00; font-family: 'Fredoka', sans-serif; }
+        .question {
+            font-size: 1.15em; margin-bottom: 20px;
+            font-weight: 700; line-height: 1.4;
+        }
+        .options { display: flex; flex-direction: column; gap: 12px; }
+        .option {
+            background: #f5f7fb; border: 2px solid transparent;
+            padding: 16px 20px; border-radius: 12px;
+            cursor: pointer; transition: all 0.2s ease;
+            font-family: 'Space Mono', monospace; font-size: 0.98em; text-align: left;
+        }
+        .option:hover:not(.disabled) {
+            background: #eef1fb; border-color: #667eea; transform: translateX(4px);
+        }
+        .option.correct { background: #d4edda; border-color: #28a745; color: #155724; }
+        .option.wrong { background: #f8d7da; border-color: #dc3545; color: #721c24; animation: shake 0.4s; }
+        .option.disabled { cursor: not-allowed; opacity: 0.85; }
+        .feedback {
+            margin-top: 22px; padding: 18px 22px; border-radius: 12px;
+            animation: slideUp 0.4s ease-out;
+            font-size: 0.98em; line-height: 1.5;
+        }
+        .feedback.correct { background: #d4edda; color: #155724; border-left: 4px solid #28a745; }
+        .feedback.wrong { background: #f8d7da; color: #721c24; border-left: 4px solid #dc3545; }
+        .feedback strong { font-family: 'Fredoka', sans-serif; }
+        .next-btn, .restart-btn {
+            margin-top: 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white; border: none;
+            padding: 14px 32px; border-radius: 12px;
+            font-size: 1em; cursor: pointer;
+            font-family: 'Fredoka', sans-serif;
+            box-shadow: 0 6px 18px rgba(0,0,0,0.2);
+            transition: transform 0.2s ease;
+        }
+        .next-btn:hover, .restart-btn:hover { transform: scale(1.04); }
+        .results {
+            text-align: center; padding: 25px 15px;
+            animation: bounceIn 0.6s ease-out;
+        }
+        .results h2 {
+            font-family: 'Fredoka', sans-serif; font-size: 2em;
+            margin-bottom: 12px; color: #333;
+        }
+        .results .final-score {
+            font-size: 3em; font-family: 'Fredoka', sans-serif;
+            color: #667eea; margin: 20px 0;
+        }
+        .results p { color: #555; margin-bottom: 12px; }
+        .badge { display: inline-block; font-size: 3.5em; margin: 8px 0; }
+        @keyframes slideDown { from { opacity: 0; transform: translateY(-30px); } to { opacity: 1; transform: translateY(0); } }
+        @keyframes fadeIn { from { opacity: 0; transform: scale(0.96); } to { opacity: 1; transform: scale(1); } }
+        @keyframes slideUp { from { opacity: 0; transform: translateY(15px); } to { opacity: 1; transform: translateY(0); } }
+        @keyframes shake { 0%,100% { transform: translateX(0); } 25% { transform: translateX(-8px); } 75% { transform: translateX(8px); } }
+        @keyframes bounceIn { 0% { opacity: 0; transform: scale(0.4); } 60% { transform: scale(1.05); } 100% { opacity: 1; transform: scale(1); } }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <div class="lesson-tag">Module 1 · Lesson 1.2 · Quiz</div>
+            <h1>Your First HTML Page</h1>
+            <p></p>
+        </div>
+
+        <div class="score-board">
+            <div class="score-item"><div class="label">Score</div><div class="value" id="score">0</div></div>
+            <div class="score-item"><div class="label">Question</div><div class="value"><span id="current">1</span>/<span id="total">10</span></div></div>
+            <div class="score-item"><div class="label">Streak</div><div class="value" id="streak">0</div></div>
+        </div>
+
+        <div class="progress-bar"><div class="progress-fill" id="progress"></div></div>
+
+        <div class="exercise-card" id="exerciseCard"></div>
+    </div>
+
+    <script>
+        const exercises = [
+  {
+    "id": "q1",
+    "text": "James creates his first HTML file. What is the FIRST line every HTML5 document must have?",
+    "options": [
+      "<html lang=\"en\">",
+      "<!DOCTYPE html>",
+      "<meta charset=\"UTF-8\">",
+      "<head>"
+    ],
+    "answer": 1,
+    "explanation": "<!DOCTYPE html> tells the browser this is an HTML5 document and must appear before everything else. Without it, browsers enter 'quirks mode' and may render the page incorrectly."
+  },
+  {
+    "id": "q2",
+    "text": "Where should the <title>Nakuru Hardware Hub</title> tag be placed?",
+    "options": [
+      "Inside the <body> as the first visible element",
+      "Inside the <head> section",
+      "After the closing </html> tag",
+      "Inside any <div> at the top of the page"
+    ],
+    "answer": 1,
+    "explanation": "The <title> belongs in the <head> section. It is not displayed on the page — it appears in the browser tab, bookmarks, and search engine results (as the clickable headline)."
+  },
+  {
+    "id": "q3",
+    "text": "What does <meta charset=\"UTF-8\"> do for James's page?",
+    "options": [
+      "Tells the browser to load fonts from Google",
+      "Sets the character encoding so letters like é, ñ, and Swahili characters display correctly",
+      "Defines the page width for mobile devices",
+      "Sets the default language to English"
+    ],
+    "answer": 1,
+    "explanation": "UTF-8 is a character encoding that covers almost every character in every language. Without it, special characters may appear as gibberish (â€™ instead of '). It should be the first tag inside <head>."
+  },
+  {
+    "id": "q4",
+    "text": "James writes <h1>Welcome to Nakuru Hardware Hub</h1>. What does the h1 tag represent?",
+    "options": [
+      "The first heading — the main title of the page, appearing only once per page",
+      "Any bold text on the page",
+      "The HTML version number",
+      "A highlighted paragraph"
+    ],
+    "answer": 0,
+    "explanation": "h1 is the top-level heading — the single most important heading on the page. There should only be one h1 per page. It is read first by screen readers and is the most important heading for SEO."
+  },
+  {
+    "id": "q5",
+    "text": "What is the correct structure of a basic HTML5 boilerplate?",
+    "options": [
+      "<!DOCTYPE> → <body> → <head> → <html>",
+      "<!DOCTYPE html> → <html> → <head> → <body>",
+      "<head> → <html> → <body> → <!DOCTYPE html>",
+      "<html> → <!DOCTYPE html> → <body> → <head>"
+    ],
+    "answer": 1,
+    "explanation": "The correct order is: <!DOCTYPE html> declaration, then <html> (root), then <head> (metadata), then <body> (visible content). Head always comes before body inside the html element."
+  },
+  {
+    "id": "q6",
+    "text": "Which attribute on the <html> tag helps screen readers and search engines understand the page is in English?",
+    "options": [
+      "charset=\"en\"",
+      "lang=\"en\"",
+      "locale=\"en-KE\"",
+      "dir=\"ltr\""
+    ],
+    "answer": 1,
+    "explanation": "The lang attribute on <html> declares the primary language of the document. lang=\"en\" helps screen readers use the correct pronunciation and helps search engines serve the page to the right audience."
+  },
+  {
+    "id": "q7",
+    "text": "James saves his HTML file. What must the filename be for a web server to serve it automatically when someone visits the root URL?",
+    "options": [
+      "homepage.html",
+      "main.html",
+      "index.html",
+      "default.html"
+    ],
+    "answer": 2,
+    "explanation": "Web servers (Apache, Nginx) look for index.html by default when no specific file is requested. Naming the main file index.html means nakuruhardwarehub.co.ke/ serves it automatically."
+  },
+  {
+    "id": "q8",
+    "text": "What is the difference between the <head> and <body> sections of an HTML page?",
+    "options": [
+      "<head> holds layout, <body> holds styles",
+      "<head> holds metadata not shown on the page, <body> holds the visible content",
+      "<head> is required, <body> is optional",
+      "<head> runs server-side, <body> runs client-side"
+    ],
+    "answer": 1,
+    "explanation": "<head> contains metadata: title, charset, viewport settings, CSS links, and scripts. None of it is directly visible in the browser window. <body> contains everything the user sees and interacts with."
+  },
+  {
+    "id": "q9",
+    "text": "James wants his page to display correctly on mobile phones. Which meta tag should he add to <head>?",
+    "options": [
+      "<meta name=\"mobile\" content=\"responsive\">",
+      "<meta name=\"viewport\" content=\"width=device-width, initial-scale=1\">",
+      "<meta charset=\"mobile\">",
+      "<meta http-equiv=\"mobile-optimised\" content=\"true\">"
+    ],
+    "answer": 1,
+    "explanation": "The viewport meta tag tells mobile browsers to match the screen's actual width and not zoom out to show a desktop-width page. Without it, the text on James's page will appear tiny on phones."
+  },
+  {
+    "id": "q10",
+    "text": "Which of the following is an example of a correctly NESTED HTML structure?",
+    "options": [
+      "<p>Price: <strong>KES 850</p></strong>",
+      "<p>Price: <strong>KES 850</strong></p>",
+      "<strong><p>Price: KES 850</strong></p>",
+      "<p>Price: KES 850<strong></strong></p>"
+    ],
+    "answer": 1,
+    "explanation": "HTML elements must be properly nested — the last opened tag must be the first closed. <strong> was opened inside <p>, so it must be closed before </p>. Incorrect nesting causes unpredictable browser rendering."
+  }
+];
+
+        let currentQuestion = 0, score = 0, streak = 0, answered = false;
+
+        function updateScoreboard() {
+            document.getElementById('score').textContent = score;
+            document.getElementById('current').textContent = Math.min(currentQuestion + 1, exercises.length);
+            document.getElementById('total').textContent = exercises.length;
+            document.getElementById('streak').textContent = streak;
+            document.getElementById('progress').style.width = ((currentQuestion) / exercises.length) * 100 + '%';
+        }
+
+        function escapeHtml(s) {
+            return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+        }
+
+        function renderQuestion() {
+            answered = false;
+            const q = exercises[currentQuestion];
+            let html = '';
+            if (q.scenario) {
+                html += `<div class="scenario"><strong>Scenario.</strong> ${escapeHtml(q.scenario)}</div>`;
+            }
+            html += `<div class="question">${escapeHtml(q.text)}</div>`;
+            html += '<div class="options">';
+            q.options.forEach((o, i) => {
+                html += `<button class="option" onclick="selectAnswer(${i})">${escapeHtml(o)}</button>`;
+            });
+            html += '</div>';
+            document.getElementById('exerciseCard').innerHTML = html;
+            updateScoreboard();
+        }
+
+        function selectAnswer(i) {
+            if (answered) return;
+            answered = true;
+            const q = exercises[currentQuestion];
+            const btns = document.querySelectorAll('.option');
+            btns.forEach(b => b.classList.add('disabled'));
+            btns[q.answer].classList.add('correct');
+            const right = i === q.answer;
+            if (!right) btns[i].classList.add('wrong');
+            if (right) { score += 10; streak += 1; } else { streak = 0; }
+            const fb = document.createElement('div');
+            fb.className = 'feedback ' + (right ? 'correct' : 'wrong');
+            fb.innerHTML = `<strong>${right ? '✅ Correct.' : '❌ Not quite.'}</strong><br>${escapeHtml(q.explanation)}`;
+            document.getElementById('exerciseCard').appendChild(fb);
+            const nb = document.createElement('button');
+            nb.className = 'next-btn';
+            nb.textContent = currentQuestion === exercises.length - 1 ? 'See results →' : 'Next scenario →';
+            nb.onclick = nextQuestion;
+            document.getElementById('exerciseCard').appendChild(nb);
+            updateScoreboard();
+        }
+
+        function nextQuestion() {
+            currentQuestion++;
+            if (currentQuestion >= exercises.length) return showResults();
+            renderQuestion();
+        }
+
+        function showResults() {
+            document.getElementById('progress').style.width = '100%';
+            const total = exercises.length * 10;
+            const pct = Math.round(score / total * 100);
+            if (window.parent) { window.parent.postMessage({type:"mtti_quiz_score", score: score, total: total, percent: pct}, "*"); }
+            let badge = '🌟', msg = 'Excellent work. You have a professional grasp of this lesson.';
+            if (pct < 50) { badge = '🌱'; msg = 'Good first attempt. Re-watch the lesson video and try again.'; }
+            else if (pct < 80) { badge = '📚'; msg = 'Solid progress. Review the scenarios you missed and retry.'; }
+            document.getElementById('exerciseCard').innerHTML = `
+                <div class="results">
+                    <span class="badge">${badge}</span>
+                    <h2>Quiz Complete</h2>
+                    <div class="final-score">${score} / ${total}</div>
+                    <p><strong>${pct}%</strong> · Longest streak: ${streak}</p>
+                    <p>${msg}</p>
+                    <button class="restart-btn" onclick="restart()">Try again 🔁</button>
+                </div>`;
+        }
+
+        function restart() {
+            currentQuestion = 0; score = 0; streak = 0;
+            renderQuestion();
+        }
+
+        renderQuestion();
+    </script>
+</body>
+</html>

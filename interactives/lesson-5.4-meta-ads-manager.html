@@ -1,0 +1,844 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lesson 5.4 — Meta Ads Manager (Interactive)</title>
+<style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+        font-family: 'Segoe UI', -apple-system, sans-serif;
+        line-height: 1.6;
+        color: #1e293b;
+        background: #f1f5f9;
+        min-height: 100vh;
+    }
+    .container { max-width: 1150px; margin: 0 auto; padding: 20px; }
+    header {
+        background: linear-gradient(135deg, #2E7D32, #1B5E20);
+        color: #fff;
+        padding: 40px 30px;
+        border-radius: 12px;
+        margin-bottom: 24px;
+        box-shadow: 0 10px 30px rgba(24,119,242,0.25);
+    }
+    header .badge {
+        display: inline-block;
+        background: rgba(255,255,255,0.2);
+        padding: 4px 14px;
+        border-radius: 16px;
+        font-size: 12px;
+        font-weight: bold;
+        letter-spacing: 1px;
+        margin-bottom: 14px;
+    }
+    header h1 { font-size: 34px; margin-bottom: 8px; }
+    header .subtitle { font-size: 17px; opacity: 0.95; margin-bottom: 20px; }
+    .meta-strip { display: flex; flex-wrap: wrap; gap: 12px; }
+    .meta-strip span {
+        background: rgba(255,255,255,0.18);
+        padding: 6px 14px;
+        border-radius: 20px;
+        font-size: 13px;
+    }
+    .toc {
+        background: #fff;
+        border: 1px solid #e2e8f0;
+        border-radius: 10px;
+        padding: 22px 26px;
+        margin-bottom: 22px;
+    }
+    .toc h3 { color: #1877f2; margin-bottom: 10px; }
+    .toc ol { padding-left: 20px; }
+    .toc a { color: #1877f2; text-decoration: none; font-weight: 600; }
+    .toc a:hover { text-decoration: underline; }
+    section {
+        background: #fff;
+        border: 1px solid #e2e8f0;
+        border-radius: 10px;
+        padding: 26px 30px;
+        margin-bottom: 22px;
+    }
+    section h2 {
+        color: #1877f2;
+        font-size: 22px;
+        margin-bottom: 12px;
+        padding-bottom: 8px;
+        border-bottom: 3px solid #1877f2;
+    }
+    section h3 { color: #0f172a; font-size: 17px; margin: 18px 0 8px; }
+    section p { margin-bottom: 12px; }
+    section ul, section ol { padding-left: 22px; margin-bottom: 12px; }
+    section li { margin-bottom: 4px; }
+    .callout {
+        border-left: 5px solid #1877f2;
+        background: #eff6ff;
+        padding: 14px 18px;
+        margin: 14px 0;
+        border-radius: 4px;
+    }
+    .callout.warn { border-left-color: #dc2626; background: #fef2f2; }
+    .callout.tip { border-left-color: #059669; background: #ecfdf5; }
+    .callout strong { color: #1877f2; }
+    .callout.warn strong { color: #dc2626; }
+    .callout.tip strong { color: #059669; }
+
+    /* Three-tier hierarchy */
+    .hierarchy {
+        margin: 20px 0;
+    }
+    .tier-row {
+        display: flex;
+        align-items: center;
+        gap: 14px;
+        margin-bottom: 10px;
+    }
+    .tier-label {
+        background: #1877f2;
+        color: #fff;
+        padding: 8px 14px;
+        border-radius: 6px;
+        font-weight: bold;
+        font-size: 13px;
+        min-width: 100px;
+        text-align: center;
+    }
+    .tier-body {
+        flex: 1;
+        background: #f8fafc;
+        border: 2px solid #cbd5e1;
+        border-radius: 8px;
+        padding: 14px 18px;
+    }
+    .tier-body h4 { color: #1e293b; font-size: 16px; margin-bottom: 4px; }
+    .tier-body p { font-size: 14px; color: #475569; margin: 0; }
+    .tier-body .chip {
+        display: inline-block;
+        background: #dbeafe;
+        color: #1e40af;
+        padding: 3px 10px;
+        border-radius: 12px;
+        font-size: 12px;
+        margin: 4px 4px 0 0;
+    }
+    .arrow {
+        text-align: center;
+        color: #94a3b8;
+        font-size: 22px;
+        margin: -4px 0;
+    }
+
+    /* ODAX cards */
+    .obj-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+        gap: 12px;
+        margin: 14px 0;
+    }
+    .obj-card {
+        background: #f8fafc;
+        border: 2px solid #cbd5e1;
+        border-radius: 8px;
+        padding: 14px;
+        cursor: pointer;
+        transition: all 0.2s;
+    }
+    .obj-card:hover { background: #eff6ff; border-color: #1877f2; transform: translateY(-2px); }
+    .obj-card .icon {
+        display: inline-block;
+        width: 40px; height: 40px;
+        background: #1877f2;
+        color: #fff;
+        border-radius: 50%;
+        line-height: 40px;
+        text-align: center;
+        font-weight: bold;
+        font-size: 18px;
+        margin-bottom: 8px;
+    }
+    .obj-card h4 { font-size: 15px; color: #1e293b; margin-bottom: 4px; }
+    .obj-card p { font-size: 12.5px; color: #64748b; margin: 0; }
+
+    /* Tabs for audiences */
+    .tabs {
+        display: flex;
+        border-bottom: 2px solid #e2e8f0;
+        margin: 18px 0 0;
+        flex-wrap: wrap;
+    }
+    .tabs button {
+        background: none;
+        border: none;
+        padding: 12px 18px;
+        cursor: pointer;
+        font-size: 15px;
+        font-weight: 600;
+        color: #64748b;
+        border-bottom: 3px solid transparent;
+        margin-bottom: -2px;
+        transition: all 0.2s;
+    }
+    .tabs button.active { color: #1877f2; border-bottom-color: #1877f2; }
+    .tabs button:hover { color: #1877f2; }
+    .tab-panel { display: none; padding: 18px 0; }
+    .tab-panel.active { display: block; }
+
+    /* Tables */
+    table {
+        width: 100%;
+        border-collapse: collapse;
+        margin: 14px 0;
+        font-size: 14px;
+    }
+    th, td { padding: 10px 12px; text-align: left; border: 1px solid #e2e8f0; }
+    th { background: #1877f2; color: #fff; font-weight: 600; }
+    tr:nth-child(even) { background: #f8fafc; }
+
+    /* Campaign builder */
+    .builder {
+        background: #eff6ff;
+        border: 2px solid #1877f2;
+        border-radius: 10px;
+        padding: 20px;
+        margin: 18px 0;
+    }
+    .builder h4 { color: #1877f2; margin-bottom: 12px; }
+    .builder-step { margin-bottom: 18px; }
+    .builder-step label {
+        display: block;
+        font-weight: 600;
+        color: #1e293b;
+        margin-bottom: 6px;
+        font-size: 14px;
+    }
+    .builder-step select, .builder-step input {
+        width: 100%;
+        padding: 10px 12px;
+        border: 1.5px solid #cbd5e1;
+        border-radius: 6px;
+        font-size: 14px;
+        background: #fff;
+    }
+    .builder-result {
+        background: #fff;
+        border: 1.5px solid #cbd5e1;
+        border-radius: 8px;
+        padding: 16px;
+        margin-top: 14px;
+        font-size: 14px;
+    }
+    .builder-result strong { color: #1877f2; }
+    .builder-verdict { padding: 12px 14px; border-radius: 6px; margin-top: 10px; font-weight: 600; }
+    .builder-verdict.good { background: #d1fae5; color: #065f46; }
+    .builder-verdict.bad { background: #fee2e2; color: #991b1b; }
+    .builder-verdict.meh { background: #fef3c7; color: #78350f; }
+
+    /* Learning phase visual */
+    .lp-bar {
+        display: flex;
+        height: 40px;
+        border-radius: 6px;
+        overflow: hidden;
+        margin: 12px 0;
+        border: 1px solid #cbd5e1;
+    }
+    .lp-bar .learning { background: #fbbf24; flex: 0 0 50%; color: #78350f; }
+    .lp-bar .exited { background: #10b981; flex: 1; color: #fff; }
+    .lp-bar > div {
+        display: flex; align-items: center; justify-content: center;
+        font-size: 13px; font-weight: 600;
+    }
+
+    /* Quiz */
+    .quiz-question {
+        background: #fff;
+        border: 2px solid #cbd5e1;
+        border-radius: 10px;
+        padding: 18px;
+        margin: 14px 0;
+        transition: border-color 0.3s;
+    }
+    .quiz-question.correct { border-color: #059669; background: #ecfdf5; }
+    .quiz-question.wrong { border-color: #dc2626; background: #fef2f2; }
+    .quiz-question h4 { margin-bottom: 12px; font-size: 15px; color: #1e293b; }
+    .quiz-question .options label {
+        display: block;
+        padding: 10px 14px;
+        margin-bottom: 6px;
+        background: #f8fafc;
+        border: 1px solid #e2e8f0;
+        border-radius: 6px;
+        cursor: pointer;
+        font-size: 14px;
+    }
+    .quiz-question .options label:hover { background: #eff6ff; }
+    .quiz-question .options input[type="radio"] { margin-right: 10px; }
+    .quiz-question .explanation {
+        display: none;
+        margin-top: 12px;
+        padding: 10px 14px;
+        border-radius: 6px;
+        font-size: 14px;
+    }
+    .quiz-question.correct .explanation {
+        display: block;
+        background: #d1fae5;
+        color: #065f46;
+        border-left: 4px solid #059669;
+    }
+    .quiz-question.wrong .explanation {
+        display: block;
+        background: #fee2e2;
+        color: #991b1b;
+        border-left: 4px solid #dc2626;
+    }
+    .quiz-summary {
+        text-align: center;
+        padding: 30px;
+        background: linear-gradient(135deg, #eff6ff 0%, #dbeafe 100%);
+        border-radius: 10px;
+        margin: 20px 0;
+        display: none;
+    }
+    .quiz-summary.show { display: block; }
+    .quiz-summary .score {
+        font-size: 48px;
+        font-weight: bold;
+        color: #1877f2;
+        margin-bottom: 8px;
+    }
+    button.btn {
+        background: #1877f2;
+        color: #fff;
+        border: none;
+        padding: 10px 20px;
+        border-radius: 6px;
+        font-size: 15px;
+        font-weight: 600;
+        cursor: pointer;
+    }
+    button.btn:hover { background: #0866ff; }
+    button.btn.reset { background: #64748b; margin-left: 8px; }
+    button.btn.reset:hover { background: #475569; }
+    footer {
+        text-align: center;
+        color: #64748b;
+        padding: 24px;
+        font-size: 13px;
+    }
+    @media (max-width: 768px) {
+        .tier-row { flex-direction: column; align-items: stretch; }
+        header h1 { font-size: 26px; }
+    }
+
+    /* MTTI logo stamp */
+    .mtti-logo-stamp {
+        position: fixed; top: 14px; right: 18px; z-index: 999;
+        opacity: 0.88; transition: opacity 0.2s;
+    }
+    .mtti-logo-stamp:hover { opacity: 1; }
+    .mtti-logo-stamp img { width: 56px; height: 56px; border-radius: 50%; box-shadow: 0 2px 8px rgba(0,0,0,0.18); }
+</style>
+</head>
+<body>
+<div class="mtti-logo-stamp">
+    <img src="../../Resources/Logo.jpeg" alt="MTTI" title="Masomotele Technical Training Institute — Start learning, Start earning">
+</div>
+
+<div class="container">
+
+<header>
+    <div class="badge">LESSON 5.4  ·  PAID ADVERTISING  ·  INTERACTIVE</div>
+    <h1>Meta Ads Manager</h1>
+    <div class="subtitle">Facebook + Instagram advertising in one dashboard — the single most important paid platform on the internet</div>
+    <div class="meta-strip">
+        <span><strong>Duration:</strong> ~40 min interactive</span>
+        <span><strong>Level:</strong> Intermediate</span>
+        <span><strong>Prerequisite:</strong> Lessons 3.1–3.2 (Social Media)</span>
+        <span><strong>Handbook:</strong> Part 5, §5.4</span>
+    </div>
+</header>
+
+<div class="toc">
+    <h3>What you'll do in this lesson</h3>
+    <ol>
+        <li><a href="#s1">The 3-level campaign hierarchy</a></li>
+        <li><a href="#s2">The 6 ODAX objectives</a></li>
+        <li><a href="#s3">The 3 audience types (tabbed)</a></li>
+        <li><a href="#s4">Placements — where your ad appears</a></li>
+        <li><a href="#s5">The 6 ad formats</a></li>
+        <li><a href="#s6">Budget and the Learning Phase</a></li>
+        <li><a href="#s7">Build Sarah's first campaign (simulator)</a></li>
+        <li><a href="#s8">Self-check quiz (10 questions)</a></li>
+    </ol>
+</div>
+
+<section id="s1">
+    <h2>1. The 3-level campaign hierarchy</h2>
+    <p>Every Meta advertising campaign is built at three levels. Getting this wrong is the #1 beginner mistake — objectives at the wrong level break the whole campaign.</p>
+    <div class="hierarchy">
+        <div class="tier-row">
+            <div class="tier-label">LEVEL 1</div>
+            <div class="tier-body">
+                <h4>Campaign — WHAT you want</h4>
+                <p>Set your <strong>objective</strong> (Sales, Traffic, Leads, etc.) and optionally the campaign-wide budget.</p>
+                <span class="chip">Objective</span>
+                <span class="chip">Campaign budget (Advantage)</span>
+            </div>
+        </div>
+        <div class="arrow">▼</div>
+        <div class="tier-row">
+            <div class="tier-label">LEVEL 2</div>
+            <div class="tier-body">
+                <h4>Ad Set — WHO, WHERE, WHEN, HOW MUCH</h4>
+                <p>Audience targeting, placements, schedule, and bid strategy live here. One campaign can have many ad sets.</p>
+                <span class="chip">Audience</span>
+                <span class="chip">Placements</span>
+                <span class="chip">Schedule</span>
+                <span class="chip">Budget & bid</span>
+            </div>
+        </div>
+        <div class="arrow">▼</div>
+        <div class="tier-row">
+            <div class="tier-label">LEVEL 3</div>
+            <div class="tier-body">
+                <h4>Ad — THE CREATIVE</h4>
+                <p>The image or video, headline, primary text, and call-to-action button that the user actually sees.</p>
+                <span class="chip">Image / video</span>
+                <span class="chip">Headline</span>
+                <span class="chip">CTA button</span>
+                <span class="chip">Destination URL</span>
+            </div>
+        </div>
+    </div>
+    <div class="callout warn">
+        <strong>Common mistake:</strong> Putting the audience on the Campaign level (there is no such setting) or duplicating campaigns instead of adding a second Ad Set. If you want to A/B test two audiences, keep ONE campaign, create TWO ad sets.
+    </div>
+</section>
+
+<section id="s2">
+    <h2>2. The 6 ODAX objectives</h2>
+    <p>In 2022 Meta consolidated 11 legacy objectives into <strong>six</strong> under Outcome-Driven Ad Experiences (ODAX). Pick the objective that matches your business outcome — not the one that "sounds impressive".</p>
+    <div class="obj-grid">
+        <div class="obj-card">
+            <div class="icon">A</div>
+            <h4>Awareness</h4>
+            <p>Impressions, reach, ad recall. For brand launches and top-of-funnel visibility.</p>
+        </div>
+        <div class="obj-card">
+            <div class="icon">T</div>
+            <h4>Traffic</h4>
+            <p>Link clicks or landing-page views. For driving people to a website or WhatsApp.</p>
+        </div>
+        <div class="obj-card">
+            <div class="icon">E</div>
+            <h4>Engagement</h4>
+            <p>Likes, comments, shares, video views. For community building.</p>
+        </div>
+        <div class="obj-card">
+            <div class="icon">L</div>
+            <h4>Leads</h4>
+            <p>Instant Forms on Meta or website form fills. For B2B and service leads.</p>
+        </div>
+        <div class="obj-card">
+            <div class="icon">P</div>
+            <h4>App Promotion</h4>
+            <p>App installs and in-app events. For mobile app growth only.</p>
+        </div>
+        <div class="obj-card">
+            <div class="icon">S</div>
+            <h4>Sales</h4>
+            <p>Purchases and conversions. Requires Pixel + CAPI. The workhorse for e-commerce.</p>
+        </div>
+    </div>
+    <div class="callout warn">
+        <strong>Watch out:</strong> Pick Traffic when you actually want Sales and Meta will optimise for CLICKERS — not BUYERS. You'll pay for lots of curious visitors and few purchases.
+    </div>
+</section>
+
+<section id="s3">
+    <h2>3. The 3 audience types</h2>
+    <p>Click each tab to explore.</p>
+    <div class="tabs">
+        <button class="active" onclick="showTab('core', this)">Core Audiences</button>
+        <button onclick="showTab('custom', this)">Custom Audiences</button>
+        <button onclick="showTab('lookalike', this)">Lookalike Audiences</button>
+    </div>
+    <div id="tab-core" class="tab-panel active">
+        <h3>Built from Meta's own data</h3>
+        <p>Layer up to five signals to describe who you want to reach:</p>
+        <ul>
+            <li><strong>Location</strong> — country, city, or a radius pin.</li>
+            <li><strong>Age</strong> — 13 to 65+.</li>
+            <li><strong>Gender</strong> — all, women, men.</li>
+            <li><strong>Detailed targeting</strong> — interests, behaviours, demographics.</li>
+            <li><strong>Language</strong> — for reaching a specific language community.</li>
+        </ul>
+        <div class="callout tip">
+            <strong>Sarah's Core Audience:</strong> Women 25–50, 5 km radius around Kapsoya, Elgon View, and Racecourse, interests: food + family + cooking.
+        </div>
+    </div>
+    <div id="tab-custom" class="tab-panel">
+        <h3>Built from data YOU provide</h3>
+        <p>Six ways to build a Custom Audience:</p>
+        <ol>
+            <li><strong>Customer list</strong> — hashed CSV of emails/phones from your CRM.</li>
+            <li><strong>Website</strong> — Meta Pixel-tracked visitors.</li>
+            <li><strong>App activity</strong> — installs or events (needs Meta SDK).</li>
+            <li><strong>Engagement</strong> — people who liked your Page, watched a video, opened a form.</li>
+            <li><strong>Offline events</strong> — matched purchases from a POS.</li>
+            <li><strong>Catalogue</strong> — people who interacted with your product catalogue.</li>
+        </ol>
+        <div class="callout tip">
+            <strong>Sarah's Custom Audience:</strong> Upload the CSV of her 30 Mailchimp subscribers. Meta matches them to Facebook profiles.
+        </div>
+    </div>
+    <div id="tab-lookalike" class="tab-panel">
+        <h3>New people who resemble your best ones</h3>
+        <p>Meta finds users who share signals with a <em>source audience</em> — usually a Custom Audience of your best buyers.</p>
+        <table>
+            <tr><th>Similarity</th><th>Reach (Kenya)</th><th>Match quality</th></tr>
+            <tr><td>1%</td><td>~180,000</td><td>Closest match to source</td></tr>
+            <tr><td>3%</td><td>~550,000</td><td>Good balance — recommended start</td></tr>
+            <tr><td>5%</td><td>~900,000</td><td>Wider net; lower similarity</td></tr>
+            <tr><td>10%</td><td>~1.8 million</td><td>Loosest match; biggest reach</td></tr>
+        </table>
+        <div class="callout tip">
+            <strong>Sarah's Lookalike:</strong> 1–3% lookalike of her 30 subscribers → Meta returns thousands of similar profiles in Eldoret she can advertise to.
+        </div>
+    </div>
+</section>
+
+<section id="s4">
+    <h2>4. Placements — where your ad appears</h2>
+    <p>A single Meta ad can run across many surfaces:</p>
+    <table>
+        <tr><th>Placement</th><th>Format</th><th>Best for</th></tr>
+        <tr><td>Facebook Feed</td><td>Image, video, carousel</td><td>Broad reach, all ages</td></tr>
+        <tr><td>Facebook Reels</td><td>Vertical video</td><td>Discovery, entertainment</td></tr>
+        <tr><td>Facebook Stories</td><td>Vertical, 9:16</td><td>Time-limited offers</td></tr>
+        <tr><td>Instagram Feed</td><td>Square, portrait image/video</td><td>Lifestyle, food, fashion</td></tr>
+        <tr><td>Instagram Reels</td><td>Vertical video</td><td>Gen Z, discovery</td></tr>
+        <tr><td>Instagram Stories</td><td>Vertical, 9:16</td><td>Poll, question stickers</td></tr>
+        <tr><td>Messenger inbox</td><td>Image, video</td><td>Re-engagement</td></tr>
+        <tr><td>Audience Network</td><td>Various</td><td>Third-party apps</td></tr>
+    </table>
+    <div class="callout tip">
+        <strong>Beginners:</strong> use "Advantage+ Placements". Meta will spread the budget automatically and shift spend to the placements that perform best. For Sarah, ~70% of budget will move to Instagram Feed + Facebook Reels within two weeks — no manual work.
+    </div>
+</section>
+
+<section id="s5">
+    <h2>5. The 6 ad formats</h2>
+    <table>
+        <tr><th>Format</th><th>What it is</th><th>Best for</th></tr>
+        <tr><td>Single Image / Video</td><td>One image or video + headline + text.</td><td>The workhorse. Easy A/B testing.</td></tr>
+        <tr><td>Carousel</td><td>2–10 swipeable cards.</td><td>Multiple menu items or story steps.</td></tr>
+        <tr><td>Collection</td><td>Hero + grid of product tiles.</td><td>E-commerce catalogues on mobile.</td></tr>
+        <tr><td>Instant Experience</td><td>Full-screen mobile microsite.</td><td>Immersive brand launches.</td></tr>
+        <tr><td>Reels</td><td>Vertical 9:16 video.</td><td>Discovery, Gen Z reach.</td></tr>
+        <tr><td>Stories</td><td>Vertical 9:16 ephemeral.</td><td>Urgency-driven offers.</td></tr>
+    </table>
+</section>
+
+<section id="s6">
+    <h2>6. Budget and the Learning Phase</h2>
+    <p>Meta budgets are either <strong>daily</strong> (simpler for beginners) or <strong>lifetime</strong>. For Sarah: KES 400/day × 14 days = KES 5,600 — well inside her KES 9,000 Meta allocation.</p>
+    <h3>The Learning Phase</h3>
+    <p>New ad sets need about <strong>50 conversion events per week</strong> for Meta's algorithm to figure out who converts. Below 50, results are inconsistent. Above 50, they stabilise.</p>
+    <div class="lp-bar">
+        <div class="learning">0–50 events → Learning</div>
+        <div class="exited">50+ events → Exited Learning (stable)</div>
+    </div>
+    <div class="callout warn">
+        <strong>Do NOT judge a new campaign until it exits the Learning Phase.</strong> Kill it too early and you kill a campaign that would have worked. Wait 5–7 days minimum before making changes.
+    </div>
+</section>
+
+<section id="s7">
+    <h2>7. Build Sarah's first campaign (simulator)</h2>
+    <p>Pick a setting at each of the three levels. The simulator will tell you whether Sarah's campaign will succeed — or waste her budget.</p>
+    <div class="builder">
+        <h4>Campaign level</h4>
+        <div class="builder-step">
+            <label for="objSel">Objective</label>
+            <select id="objSel">
+                <option value="">— pick one —</option>
+                <option value="awareness">Awareness</option>
+                <option value="traffic">Traffic</option>
+                <option value="engagement">Engagement</option>
+                <option value="leads">Leads</option>
+                <option value="sales">Sales</option>
+            </select>
+        </div>
+
+        <h4>Ad Set level</h4>
+        <div class="builder-step">
+            <label for="locSel">Location</label>
+            <select id="locSel">
+                <option value="">— pick one —</option>
+                <option value="kenya">All of Kenya</option>
+                <option value="eldoret">Eldoret (whole town)</option>
+                <option value="pinned">5 km radius pin on Kapsoya + Elgon View + Racecourse</option>
+                <option value="nairobi">Nairobi CBD</option>
+            </select>
+        </div>
+        <div class="builder-step">
+            <label for="audSel">Audience type</label>
+            <select id="audSel">
+                <option value="">— pick one —</option>
+                <option value="core">Core (women 25–50, food/family interests)</option>
+                <option value="broad">Very broad (all adults, no interests)</option>
+                <option value="lookalike">1% Lookalike of her 30 subscribers</option>
+            </select>
+        </div>
+        <div class="builder-step">
+            <label for="budSel">Daily budget</label>
+            <select id="budSel">
+                <option value="">— pick one —</option>
+                <option value="low">KES 50/day</option>
+                <option value="mid">KES 400/day</option>
+                <option value="high">KES 2,000/day</option>
+            </select>
+        </div>
+
+        <h4>Ad level</h4>
+        <div class="builder-step">
+            <label for="crtSel">Creative</label>
+            <select id="crtSel">
+                <option value="">— pick one —</option>
+                <option value="stock">Generic stock food photo + "Great food"</option>
+                <option value="real">Real photo of today's plate + "Lunch delivered in 30 min — WhatsApp to order"</option>
+                <option value="text">All-text image saying "WE ARE OPEN"</option>
+            </select>
+        </div>
+
+        <button class="btn" onclick="evaluateCampaign()">Evaluate campaign</button>
+        <div class="builder-result" id="builderResult" style="display:none;"></div>
+    </div>
+</section>
+
+<section id="s8">
+    <h2>8. Self-check quiz</h2>
+    <p>Ten questions. Pick and lock — you'll see instant feedback when you mark.</p>
+
+    <div class="quiz-question" data-correct="B">
+        <h4>1. What are the three levels of a Meta campaign, in order?</h4>
+        <div class="options">
+            <label><input type="radio" name="q1" value="A"> A) Audience → Ad → Objective</label>
+            <label><input type="radio" name="q1" value="B"> B) Campaign → Ad Set → Ad</label>
+            <label><input type="radio" name="q1" value="C"> C) Objective → Placement → Creative</label>
+            <label><input type="radio" name="q1" value="D"> D) Ad → Ad Set → Campaign</label>
+        </div>
+        <div class="explanation">Correct — Campaign holds the objective, Ad Set holds audience/placement/budget, Ad holds the creative.</div>
+    </div>
+
+    <div class="quiz-question" data-correct="D">
+        <h4>2. Where do you set the audience?</h4>
+        <div class="options">
+            <label><input type="radio" name="q2" value="A"> A) At the Campaign level</label>
+            <label><input type="radio" name="q2" value="B"> B) At the Ad level</label>
+            <label><input type="radio" name="q2" value="C"> C) In Business Manager settings</label>
+            <label><input type="radio" name="q2" value="D"> D) At the Ad Set level</label>
+        </div>
+        <div class="explanation">Correct — audience, placement, schedule, and budget all live at Ad Set.</div>
+    </div>
+
+    <div class="quiz-question" data-correct="A">
+        <h4>3. Which objective should Sarah pick to sell dinners tonight?</h4>
+        <div class="options">
+            <label><input type="radio" name="q3" value="A"> A) Sales</label>
+            <label><input type="radio" name="q3" value="B"> B) Traffic</label>
+            <label><input type="radio" name="q3" value="C"> C) Engagement</label>
+            <label><input type="radio" name="q3" value="D"> D) Awareness</label>
+        </div>
+        <div class="explanation">Correct — Sales optimises for Purchase events. Traffic only optimises for CLICKS.</div>
+    </div>
+
+    <div class="quiz-question" data-correct="C">
+        <h4>4. Which is a Custom Audience source?</h4>
+        <div class="options">
+            <label><input type="radio" name="q4" value="A"> A) A Google Analytics report</label>
+            <label><input type="radio" name="q4" value="B"> B) A random Facebook page</label>
+            <label><input type="radio" name="q4" value="C"> C) Meta Pixel data from your website</label>
+            <label><input type="radio" name="q4" value="D"> D) A YouTube playlist</label>
+        </div>
+        <div class="explanation">Correct — Pixel-tracked website visitors are a common Custom Audience source.</div>
+    </div>
+
+    <div class="quiz-question" data-correct="B">
+        <h4>5. What is a Lookalike Audience?</h4>
+        <div class="options">
+            <label><input type="radio" name="q5" value="A"> A) A copy of a competitor's audience</label>
+            <label><input type="radio" name="q5" value="B"> B) New users who resemble a source audience of your best customers</label>
+            <label><input type="radio" name="q5" value="C"> C) Everyone who liked your Page</label>
+            <label><input type="radio" name="q5" value="D"> D) People with the same name as your subscribers</label>
+        </div>
+        <div class="explanation">Correct — Meta finds new users who share signals with your source audience.</div>
+    </div>
+
+    <div class="quiz-question" data-correct="A">
+        <h4>6. What triggers "Exited Learning Phase"?</h4>
+        <div class="options">
+            <label><input type="radio" name="q6" value="A"> A) ~50 conversion events per week</label>
+            <label><input type="radio" name="q6" value="B"> B) 24 hours running</label>
+            <label><input type="radio" name="q6" value="C"> C) 100,000 impressions</label>
+            <label><input type="radio" name="q6" value="D"> D) Manual approval by Meta</label>
+        </div>
+        <div class="explanation">Correct — ~50 events/week is the threshold Meta gives publicly.</div>
+    </div>
+
+    <div class="quiz-question" data-correct="D">
+        <h4>7. Which placement setting is safest for a beginner?</h4>
+        <div class="options">
+            <label><input type="radio" name="q7" value="A"> A) Facebook Feed only</label>
+            <label><input type="radio" name="q7" value="B"> B) Instagram Stories only</label>
+            <label><input type="radio" name="q7" value="C"> C) Audience Network only</label>
+            <label><input type="radio" name="q7" value="D"> D) Advantage+ Placements (Meta chooses automatically)</label>
+        </div>
+        <div class="explanation">Correct — Advantage+ lets Meta shift budget to the best-performing placements automatically.</div>
+    </div>
+
+    <div class="quiz-question" data-correct="C">
+        <h4>8. Best ad format to show a 4-item menu?</h4>
+        <div class="options">
+            <label><input type="radio" name="q8" value="A"> A) Single Image</label>
+            <label><input type="radio" name="q8" value="B"> B) Stories</label>
+            <label><input type="radio" name="q8" value="C"> C) Carousel</label>
+            <label><input type="radio" name="q8" value="D"> D) Reels</label>
+        </div>
+        <div class="explanation">Correct — Carousel supports 2–10 swipeable cards, one per menu item.</div>
+    </div>
+
+    <div class="quiz-question" data-correct="B">
+        <h4>9. Sarah has KES 400/day. When can she judge results?</h4>
+        <div class="options">
+            <label><input type="radio" name="q9" value="A"> A) After 24 hours</label>
+            <label><input type="radio" name="q9" value="B"> B) After the ad set exits the Learning Phase (5–7 days minimum)</label>
+            <label><input type="radio" name="q9" value="C"> C) After 30 days only</label>
+            <label><input type="radio" name="q9" value="D"> D) Never — Meta is a black box</label>
+        </div>
+        <div class="explanation">Correct — judging too early is the #1 waste of budget on Meta.</div>
+    </div>
+
+    <div class="quiz-question" data-correct="C">
+        <h4>10. For a local business in Eldoret, best location setting is…</h4>
+        <div class="options">
+            <label><input type="radio" name="q10" value="A"> A) "Kenya"</label>
+            <label><input type="radio" name="q10" value="B"> B) "East Africa"</label>
+            <label><input type="radio" name="q10" value="C"> C) A tight radius pin on the delivery neighbourhoods</label>
+            <label><input type="radio" name="q10" value="D"> D) "Eldoret" alone</label>
+        </div>
+        <div class="explanation">Correct — a radius pin around each delivery neighbourhood focuses spend on people who can actually order.</div>
+    </div>
+
+    <div style="margin-top: 20px;">
+        <button class="btn" onclick="markQuiz()">Mark my quiz</button>
+        <button class="btn reset" onclick="resetQuiz()">Reset</button>
+    </div>
+
+    <div class="quiz-summary" id="quizSummary">
+        <div class="score" id="scoreDisplay">0 / 10</div>
+        <p id="scoreMessage">Great work.</p>
+    </div>
+</section>
+
+<footer>
+    <p>Lesson 5.4 — Meta Ads Manager · Masomotele Technical Training Institute · Handbook Part 5, §5.4</p>
+    <p>Next: <strong>Lesson 5.5 — LinkedIn Campaign Manager</strong></p>
+</footer>
+
+</div>
+
+<script>
+function showTab(name, btn) {
+    document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+    document.querySelectorAll('.tabs button').forEach(b => b.classList.remove('active'));
+    document.getElementById('tab-' + name).classList.add('active');
+    btn.classList.add('active');
+}
+
+function evaluateCampaign() {
+    const obj = document.getElementById('objSel').value;
+    const loc = document.getElementById('locSel').value;
+    const aud = document.getElementById('audSel').value;
+    const bud = document.getElementById('budSel').value;
+    const crt = document.getElementById('crtSel').value;
+    const box = document.getElementById('builderResult');
+
+    if (!obj || !loc || !aud || !bud || !crt) {
+        box.style.display = 'block';
+        box.innerHTML = '<div class="builder-verdict meh">Pick every setting before evaluating.</div>';
+        return;
+    }
+
+    let score = 0;
+    let notes = [];
+
+    // Objective
+    if (obj === 'sales') { score += 2; notes.push('<strong>✓ Objective:</strong> Sales — perfect for driving orders.'); }
+    else if (obj === 'traffic') { score += 0; notes.push('<strong>✗ Objective:</strong> Traffic gets CLICKERS not BUYERS. Wasted budget.'); }
+    else if (obj === 'awareness') { score += 0; notes.push('<strong>✗ Objective:</strong> Awareness is for launches — Sarah needs orders now.'); }
+    else if (obj === 'leads') { score += 1; notes.push('<strong>~ Objective:</strong> Leads works if she wants form-fills — but Sales is stronger for direct orders.'); }
+    else { score += 0; notes.push('<strong>✗ Objective:</strong> Engagement gets likes, not orders.'); }
+
+    // Location
+    if (loc === 'pinned') { score += 2; notes.push('<strong>✓ Location:</strong> Pinned radii — spend goes to people who can actually order.'); }
+    else if (loc === 'eldoret') { score += 1; notes.push('<strong>~ Location:</strong> Eldoret works but includes areas outside her delivery zone.'); }
+    else if (loc === 'kenya') { score += 0; notes.push('<strong>✗ Location:</strong> "Kenya" wastes 99% of budget on people who cannot order.'); }
+    else { score += 0; notes.push('<strong>✗ Location:</strong> Nairobi is the wrong town.'); }
+
+    // Audience
+    if (aud === 'core' || aud === 'lookalike') { score += 2; notes.push('<strong>✓ Audience:</strong> Well-targeted — Meta can learn who buys.'); }
+    else { score += 0; notes.push('<strong>✗ Audience:</strong> "Very broad" with no interests spreads Sarah\'s KES 400 too thin.'); }
+
+    // Budget
+    if (bud === 'mid') { score += 2; notes.push('<strong>✓ Budget:</strong> KES 400/day fits her KES 9,000/mo Meta allocation with room to learn.'); }
+    else if (bud === 'low') { score += 0; notes.push('<strong>✗ Budget:</strong> KES 50/day is below the Learning Phase floor — Meta cannot optimise.'); }
+    else { score += 1; notes.push('<strong>~ Budget:</strong> KES 2,000/day blows through her monthly budget in 5 days.'); }
+
+    // Creative
+    if (crt === 'real') { score += 2; notes.push('<strong>✓ Creative:</strong> Real food photo + clear CTA to WhatsApp — this is what wins.'); }
+    else if (crt === 'stock') { score += 0; notes.push('<strong>✗ Creative:</strong> Generic stock photos underperform every time. Use real photos.'); }
+    else { score += 0; notes.push('<strong>✗ Creative:</strong> All-text ads look like spam and get low CTR.'); }
+
+    // Verdict
+    let verdict, cls;
+    if (score >= 9) { verdict = 'Excellent. Sarah\'s first campaign will launch strong and likely exit Learning Phase within a week.'; cls = 'good'; }
+    else if (score >= 6) { verdict = 'Decent — fix the marked issues and this campaign will work.'; cls = 'meh'; }
+    else { verdict = 'This campaign will burn Sarah\'s budget without results. Rework the marked settings.'; cls = 'bad'; }
+
+    box.style.display = 'block';
+    box.innerHTML = notes.map(n => '<div style="margin-bottom:6px;">' + n + '</div>').join('') + `<div class="builder-verdict ${cls}">Score: ${score} / 10 — ${verdict}</div>`;
+}
+
+function markQuiz() {
+    const questions = document.querySelectorAll('.quiz-question');
+    let score = 0;
+    questions.forEach((q, i) => {
+        const correct = q.dataset.correct;
+        const picked = q.querySelector(`input[name="q${i+1}"]:checked`);
+        q.classList.remove('correct', 'wrong');
+        if (picked && picked.value === correct) { q.classList.add('correct'); score++; }
+        else if (picked) q.classList.add('wrong');
+    });
+    const summary = document.getElementById('quizSummary');
+    summary.classList.add('show');
+    document.getElementById('scoreDisplay').textContent = `${score} / 10`;
+    const msg = document.getElementById('scoreMessage');
+    if (score === 10) msg.textContent = 'Perfect. Ready to run your first real Meta campaign.';
+    else if (score >= 7) msg.textContent = 'Strong. Review the missed questions and continue to Lesson 5.5.';
+    else if (score >= 5) msg.textContent = 'Halfway. Re-do the campaign builder and revisit the hierarchy diagram.';
+    else msg.textContent = 'Rewatch the video and try again. The hierarchy and objectives are non-negotiable foundations.';
+    summary.scrollIntoView({ behavior: 'smooth', block: 'center' });
+}
+function resetQuiz() {
+    document.querySelectorAll('.quiz-question').forEach(q => {
+        q.classList.remove('correct', 'wrong');
+        q.querySelectorAll('input[type=radio]').forEach(r => r.checked = false);
+    });
+    document.getElementById('quizSummary').classList.remove('show');
+}
+</script>
+</body>
+</html>

@@ -1,0 +1,321 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="Full unit-by-unit course outline for CAREGIVING (CAG-01) at Masomotele Technical Training Institute — TVET CDACC Level 4 aligned.">
+<title>CAREGIVING (CAG-01) — Course Outline | MTTI</title>
+<style>
+  :root {
+    --paper: #faf9f4;
+    --paper-raised: #ffffff;
+    --ink: #16241c;
+    --ink-soft: #4a564c;
+    --ink-faint: #7c8880;
+    --line: #dfe0d4;
+    --line-soft: #ebece2;
+    --green: #2e7d32;
+    --green-deep: #1b5e20;
+    --green-wash: #eaf3ea;
+    --blue: #1976d2;
+    --blue-wash: #e9f1fb;
+    --amber: #f9a825;
+    --amber-wash: #fdf3de;
+    --radius: 10px;
+    --shadow: 0 1px 2px rgba(22,36,28,0.06), 0 8px 24px -12px rgba(22,36,28,0.12);
+    --font-display: ui-rounded, "SF Pro Rounded", "Segoe UI", system-ui, -apple-system, sans-serif;
+    --font-body: -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    --font-ui: ui-monospace, "SF Mono", "Cascadia Code", "Segoe UI Mono", Menlo, Consolas, monospace;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --paper: #10160f; --paper-raised: #182018; --ink: #e8ede6; --ink-soft: #aab5a4; --ink-faint: #74806e;
+      --line: #2a332a; --line-soft: #202920; --green: #57ab5c; --green-deep: #4CAF50; --green-wash: #16261a;
+      --blue: #6fb1f0; --blue-wash: #16212e; --amber: #f6c05e; --amber-wash: #2a2313;
+      --shadow: 0 1px 2px rgba(0,0,0,0.3), 0 8px 24px -12px rgba(0,0,0,0.5);
+    }
+  }
+  :root[data-theme="dark"] {
+    --paper: #10160f; --paper-raised: #182018; --ink: #e8ede6; --ink-soft: #aab5a4; --ink-faint: #74806e;
+    --line: #2a332a; --line-soft: #202920; --green: #57ab5c; --green-deep: #4CAF50; --green-wash: #16261a;
+    --blue: #6fb1f0; --blue-wash: #16212e; --amber: #f6c05e; --amber-wash: #2a2313;
+    --shadow: 0 1px 2px rgba(0,0,0,0.3), 0 8px 24px -12px rgba(0,0,0,0.5);
+  }
+  :root[data-theme="light"] {
+    --paper: #faf9f4; --paper-raised: #ffffff; --ink: #16241c; --ink-soft: #4a564c; --ink-faint: #7c8880;
+    --line: #dfe0d4; --line-soft: #ebece2; --green: #2e7d32; --green-deep: #1b5e20; --green-wash: #eaf3ea;
+    --blue: #1976d2; --blue-wash: #e9f1fb; --amber: #f9a825; --amber-wash: #fdf3de;
+    --shadow: 0 1px 2px rgba(22,36,28,0.06), 0 8px 24px -12px rgba(22,36,28,0.12);
+  }
+
+  * { box-sizing: border-box; }
+  html { background: var(--paper); }
+  body {
+    margin: 0;
+    background: var(--paper);
+    color: var(--ink);
+    font-family: var(--font-body);
+    font-size: 16px;
+    line-height: 1.65;
+    -webkit-font-smoothing: antialiased;
+  }
+  a { color: var(--blue); }
+
+  .masthead {
+    background: linear-gradient(135deg, var(--green) 0%, var(--green-deep) 100%);
+    color: #fff;
+    padding: 40px 24px 30px;
+  }
+  .masthead-inner { max-width: 880px; margin: 0 auto; }
+  .masthead-eyebrow {
+    font-family: var(--font-ui); font-size: 12px; letter-spacing: 0.14em; text-transform: uppercase;
+    opacity: 0.85; margin: 0 0 10px;
+  }
+  .masthead h1 {
+    font-family: var(--font-display); font-size: clamp(26px, 4.2vw, 38px); font-weight: 800;
+    letter-spacing: -0.01em; margin: 0 0 6px; text-wrap: balance;
+  }
+  .masthead-sub { color: #ffe082; margin: 0 0 16px; font-size: 15px; }
+  .masthead-badges { display: flex; flex-wrap: wrap; gap: 8px; }
+  .badge {
+    font-family: var(--font-ui); font-size: 11px; letter-spacing: 0.04em;
+    background: rgba(255,255,255,0.16); border: 1px solid rgba(255,255,255,0.3);
+    padding: 4px 10px; border-radius: 999px;
+  }
+
+  .wrap { max-width: 880px; margin: 0 auto; padding: 40px 24px 80px; }
+
+  .lede { font-size: 17.5px; color: var(--ink-soft); max-width: 68ch; margin: 0 0 34px; }
+
+  .stat-row {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 1px;
+    background: var(--line);
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+    overflow: hidden;
+    margin: 0 0 40px;
+  }
+  .stat { background: var(--paper-raised); padding: 16px 14px; text-align: center; }
+  .stat .n { font-family: var(--font-display); font-weight: 800; font-size: 24px; color: var(--green); display: block; }
+  .stat .l { font-size: 11.5px; color: var(--ink-faint); margin-top: 2px; }
+  @media (max-width: 600px) { .stat-row { grid-template-columns: repeat(2, 1fr); } }
+
+  h2 {
+    font-family: var(--font-display); font-size: 21px; font-weight: 700; letter-spacing: -0.01em;
+    margin: 44px 0 14px; text-wrap: balance;
+    border-top: 1px solid var(--line-soft); padding-top: 34px;
+  }
+  h2:first-of-type { border-top: none; padding-top: 0; margin-top: 0; }
+  p { margin: 0 0 14px; max-width: 68ch; }
+  ul.plain { margin: 0 0 14px; padding-left: 22px; max-width: 68ch; }
+  ul.plain li { margin-bottom: 5px; }
+
+  .table-wrap { overflow-x: auto; }
+  table.summary { width: 100%; border-collapse: collapse; font-size: 14px; margin: 10px 0 6px; }
+  table.summary th, table.summary td { text-align: left; padding: 9px 10px; border-bottom: 1px solid var(--line-soft); vertical-align: top; }
+  table.summary th { font-family: var(--font-ui); font-size: 10.5px; text-transform: uppercase; letter-spacing: 0.06em; color: var(--ink-faint); font-weight: 600; }
+  table.summary td.num { font-variant-numeric: tabular-nums; text-align: right; white-space: nowrap; }
+  table.summary tr.total td { border-top: 2px solid var(--line); border-bottom: none; font-weight: 700; }
+
+  .tag {
+    display: inline-block; font-family: var(--font-ui); font-size: 10px; letter-spacing: 0.03em;
+    padding: 2px 7px; border-radius: 5px; white-space: nowrap;
+  }
+  .tag.core { background: var(--green-wash); color: var(--green-deep); }
+  .tag.supp { background: var(--amber-wash); color: color-mix(in srgb, var(--amber) 65%, var(--ink)); }
+
+  /* unit cards */
+  .unit {
+    background: var(--paper-raised);
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+    box-shadow: var(--shadow);
+    margin: 18px 0;
+    overflow: hidden;
+  }
+  .unit-head {
+    display: flex; align-items: flex-start; gap: 14px;
+    padding: 16px 20px;
+    border-bottom: 1px solid var(--line-soft);
+    background: var(--green-wash);
+  }
+  .unit-num {
+    flex: none; width: 34px; height: 34px; border-radius: 50%;
+    background: var(--green); color: #fff;
+    font-family: var(--font-display); font-weight: 800; font-size: 14px;
+    display: flex; align-items: center; justify-content: center;
+  }
+  .unit-titles { flex: 1; min-width: 0; }
+  .unit-code { font-family: var(--font-ui); font-size: 11px; color: var(--ink-faint); }
+  .unit-name { font-family: var(--font-display); font-weight: 700; font-size: 17px; margin: 2px 0 0; }
+  .unit-meta { flex: none; text-align: right; font-size: 12px; color: var(--ink-soft); white-space: nowrap; }
+  .unit-meta .hrs { font-variant-numeric: tabular-nums; font-weight: 700; color: var(--ink); }
+  .unit-body { padding: 16px 20px 18px; }
+  .unit-desc { font-size: 14px; color: var(--ink-soft); margin: 0 0 12px; }
+  .unit-topics { margin: 0; padding: 0; list-style: none; display: grid; gap: 4px; }
+  .unit-topics li {
+    font-size: 14px; padding: 5px 0 5px 18px; position: relative; color: var(--ink);
+  }
+  .unit-topics li::before {
+    content: "";
+    position: absolute; left: 2px; top: 13px;
+    width: 6px; height: 6px; border-radius: 50%;
+    background: var(--green);
+  }
+  .unit-topics .count { font-size: 12px; color: var(--ink-faint); margin: 10px 0 0; }
+
+  .box {
+    border-radius: var(--radius); padding: 14px 18px; margin: 16px 0; font-size: 14.5px; border: 1px solid var(--line);
+    background: var(--blue-wash); border-color: color-mix(in srgb, var(--blue) 30%, var(--line));
+    max-width: 68ch;
+  }
+  .box .box-title { font-weight: 700; color: var(--blue); display: block; margin-bottom: 3px; }
+
+  footer {
+    max-width: 880px; margin: 0 auto; padding: 30px 24px 50px; border-top: 1px solid var(--line-soft);
+    color: var(--ink-faint); font-size: 13px; display: flex; justify-content: space-between; flex-wrap: wrap; gap: 10px;
+  }
+
+  @media print {
+    .masthead { background: var(--green) !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+    .unit { break-inside: avoid; }
+  }
+</style>
+</head>
+<body>
+
+<div class="masthead">
+  <div class="masthead-inner">
+    <p class="masthead-eyebrow">Masomotele Technical Training Institute</p>
+    <h1>CAREGIVING — CAG-01</h1>
+    <p class="masthead-sub">Course Outline · TVET CDACC Level 4 aligned · "Start Learning, Start Earning"</p>
+    <div class="masthead-badges">
+      <span class="badge">11 units</span>
+      <span class="badge">292 lessons</span>
+      <span class="badge">590 curriculum hours</span>
+      <span class="badge">59 credits</span>
+    </div>
+  </div>
+</div>
+
+<div class="wrap">
+  <p class="lede">CAREGIVING prepares learners to provide competent, professional care in homes, hospices and healthcare facilities — from housekeeping and dietary support through first aid, catering, and specialised care for geriatric, terminally ill, mentally ill, disabled, and special-needs clients. The course is built on the TVET CDACC Caregiving Level 4 curriculum, with a short orientation unit up front and three supplementary units layered in for practical, workplace-facing skills.</p>
+
+  <div class="stat-row">
+    <div class="stat"><span class="n">11</span><span class="l">Units total</span></div>
+    <div class="stat"><span class="n">7</span><span class="l">Official curriculum units</span></div>
+    <div class="stat"><span class="n">4</span><span class="l">Orientation &amp; supplementary units</span></div>
+    <div class="stat"><span class="n">292</span><span class="l">Total lessons</span></div>
+  </div>
+
+  <h2>Entry requirements</h2>
+  <ul class="plain">
+    <li>Kenya Certificate of Secondary Education (KCSE); <em>or</em></li>
+    <li>National TVET Certificate in Home-Based Care Level 3, or a related trade area; <em>or</em></li>
+    <li>Equivalent qualifications as determined by TVETA</li>
+  </ul>
+  <p>An individual pursuing the full qualification is also required to complete a minimum of 480 hours of industrial (workplace) training in the health care sector, arranged separately from the units below.</p>
+
+  <h2>Structure at a glance</h2>
+  <div class="table-wrap">
+    <table class="summary">
+      <thead><tr><th>#</th><th>Unit</th><th>Type</th><th class="num">Hours</th><th class="num">Credits</th></tr></thead>
+      <tbody id="summary-body"></tbody>
+      <tfoot></tfoot>
+    </table>
+  </div>
+  <p style="font-size:13px;color:var(--ink-faint);margin-top:0;">Hours and credits shown for the 7 official units total 590 hours / 59 credits, matching the TVET CDACC Caregiving Level 4 pack exactly. The full qualification separately requires 480 hours of industrial (workplace) training, arranged outside this portal and not counted in the totals above. The 4 orientation/supplementary units add practical depth beyond the official pack and carry no separate credit weighting.</p>
+
+  <div class="box">
+    <span class="box-title">How assessment works</span>
+    Every topic ends in a scored quiz (50% pass mark). A unit is graded — and earns its own official transcript — once every quiz inside it is passed. The full course certificate is issued once all 11 units are passed and fees are fully cleared.
+  </div>
+
+  <h2>Unit-by-unit outline</h2>
+  <div id="units"></div>
+</div>
+
+<footer>
+  <span>Masomotele Technical Training Institute · Course Outline — CAG-01</span>
+  <span>Start Learning, Start Earning</span>
+</footer>
+
+<script>
+const UNITS = [
+  { code: "CAG-01-001", name: "Introduction to Caregiving", type: "supp", hours: null, credits: null, lessons: 5,
+    desc: "Orientation unit placed first so a learner understands what the caregiver role involves and why it matters before the formal units begin.",
+    topics: ["Understanding the Caregiver Role"] },
+  { code: "CAG-01-002", name: "House Keeping Services", type: "core", hours: 60, credits: 6, lessons: 30,
+    desc: "TVET CDACC Module I, Unit 1 (HW/CU/HBC/CR/01/3/MA · ISCED 1011 251 01A). Cleaning services, bed making, and laundering articles and fabrics.",
+    topics: ["Cleaning and Hygiene Standards","Laundry and Linen Care","Kitchen Hygiene and Food Safety","Household Safety and Hazard Prevention","Time Management for Daily Care Routines","Bed Making"] },
+  { code: "CAG-01-003", name: "Client's Dietary Interventions", type: "core", hours: 50, credits: 5, lessons: 20,
+    desc: "TVET CDACC Module I, Unit 2 (HW/CU/HBC/CR/02/3/MA · ISCED 0915 251 02A). Establishing dietary needs, individualized feeding plans, feeding interventions, and continuous dietary monitoring.",
+    topics: ["Establishing Patient Dietary Needs","Drawing an Individualized Feeding Care Plan","Carrying Out Feeding Care Plan Interventions","Conducting Continuous Dietary Monitoring"] },
+  { code: "CAG-01-004", name: "Psychosocial Support", type: "core", hours: 70, credits: 7, lessons: 30,
+    desc: "TVET CDACC Module I, Unit 3 (HW/CU/HBC/CR/03/3/MA · ISCED 0915 251 03A). Assessing emotional and social needs, providing support, and caregiver self-care.",
+    topics: ["Active Listening and Empathy","Supporting Clients with Dementia","Grief, Loss and End-of-Life Support","Cultural Sensitivity in Care","Recognising and Responding to Abuse or Neglect","Caregiver Self-Care"] },
+  { code: "CAG-01-005", name: "Pre-Departure Process", type: "core", hours: 50, credits: 5, lessons: 30,
+    desc: "TVET CDACC Module I, Unit 4 (HW/CU/HBC/CR/04/3/MA · ISCED 1015 251 04A). Researching the destination country, travel documents, the travel process, and work ethics/legal aspects.",
+    topics: ["Understanding Your Employment Contract","Visa, Documentation and Travel Requirements","Know Your Rights as a Migrant Caregiver","Cultural Orientation for the Destination Country","Managing Money and Staying Connected Home","Understanding the Travel Process"] },
+  { code: "CAG-01-006", name: "First Aid Services", type: "core", hours: 60, credits: 6, lessons: 35,
+    desc: "TVET CDACC Module II, Unit 1 (HW/CU/CG/CC/01/4/MA · ISCED 0913 351 06A). Assessing injury/illness, first aid intervention, evaluation, and winding up.",
+    topics: ["Scene Safety and Primary Assessment","Choking Response","CPR Basics and the Recovery Position","Wound Care and Bleeding Control","Burns and Poisoning: Immediate Response","Evaluating First Aid Response","Winding Up After First Aid"] },
+  { code: "CAG-01-007", name: "Caregiving Catering Services", type: "core", hours: 180, credits: 18, lessons: 40,
+    desc: "TVET CDACC Module II, Unit 2 (HW/CU/CG/CR/01/4/MA · ISCED 0915 351 07A). Previous preparation, preparing and presenting meals, and post-production tasks.",
+    topics: ["Nutrition Basics for Different Client Needs","Meal Planning for Special Diets","Food Safety and Hygiene in Meal Preparation","Cooking Techniques for Client Meals","Feeding Assistance and Mealtime Support","Previous Preparation in the Kitchen","Presenting the Main Meal","Post-Production Kitchen Tasks"] },
+  { code: "CAG-01-008", name: "Special Needs Care Support", type: "core", hours: 120, credits: 12, lessons: 50,
+    desc: "TVET CDACC Module II, Unit 3 (HW/CU/CG/CR/02/4/MA · ISCED 0913 351 08A). Care for geriatric, terminally ill, mentally ill, and disabled clients, children with special needs, and psychosocial support.",
+    topics: ["Understanding Different Types of Disability","Communicating with Special Needs Clients","Safe Lifting, Transfers and Mobility Assistance","Assistive Devices and Equipment","Feeding and Personal Care Techniques","Providing Care for Geriatric Clients","Providing Care for Terminally Ill Clients","Providing Care for Mentally Ill Clients","Providing Care for Children with Special Needs","Conducting Psychosocial Support for Special Needs Clients"] },
+  { code: "CAG-01-009", name: "Health Facility Procedures", type: "supp", hours: null, credits: null, lessons: 30,
+    desc: "Supplementary unit covering facility orientation, infection prevention, admissions documentation, handling medical supplies, reporting, and recording vital signs.",
+    topics: ["Understanding the Health Facility Environment","Infection Prevention and Control Basics","Client Admission and Documentation","Handling and Storing Medical Supplies","Reporting and Escalating Concerns","Recording Vital Signs and Care Notes"] },
+  { code: "CAG-01-010", name: "AI for Caregivers", type: "supp", hours: null, credits: null, lessons: 20,
+    desc: "Supplementary unit on practical AI tool use, translation apps, health monitoring apps, and verifying AI-sourced health information.",
+    topics: ["What AI Tools Can Help Caregivers With","Using Translation and Communication Apps Safely","Health Monitoring Apps and Wearables","Verifying AI Health Information Before Acting On It"] },
+  { code: "CAG-01-011", name: "Final Assessment", type: "supp", hours: null, credits: null, lessons: 2,
+    desc: "Course-wide final assessment covering all preceding units.",
+    topics: ["Final Assessment"] },
+];
+
+const summaryBody = document.getElementById("summary-body");
+let totalHours = 0, totalCredits = 0;
+UNITS.forEach((u, i) => {
+  const tr = document.createElement("tr");
+  tr.innerHTML = `<td>${i + 1}</td><td>${u.name}<br><span style="font-family:var(--font-ui);font-size:10.5px;color:var(--ink-faint);">${u.code}</span></td>` +
+    `<td><span class="tag ${u.type}">${u.type === "core" ? "Curriculum" : "Supplementary"}</span></td>` +
+    `<td class="num">${u.hours ?? "—"}</td><td class="num">${u.credits ?? "—"}</td>`;
+  summaryBody.appendChild(tr);
+  if (u.hours) totalHours += u.hours;
+  if (u.credits) totalCredits += u.credits;
+});
+const totalRow = document.createElement("tr");
+totalRow.className = "total";
+totalRow.innerHTML = `<td></td><td>Total (curriculum units)</td><td></td><td class="num">${totalHours}</td><td class="num">${totalCredits}</td>`;
+summaryBody.appendChild(totalRow);
+
+const unitsEl = document.getElementById("units");
+UNITS.forEach((u, i) => {
+  const div = document.createElement("div");
+  div.className = "unit";
+  const metaText = u.hours ? `<span class="hrs">${u.hours} hrs</span><br>${u.credits} credits` : "supplementary";
+  div.innerHTML = `
+    <div class="unit-head">
+      <div class="unit-num">${i + 1}</div>
+      <div class="unit-titles">
+        <div class="unit-code">${u.code} · <span class="tag ${u.type}">${u.type === "core" ? "Curriculum" : "Supplementary"}</span></div>
+        <div class="unit-name">${u.name}</div>
+      </div>
+      <div class="unit-meta">${metaText}</div>
+    </div>
+    <div class="unit-body">
+      <p class="unit-desc">${u.desc}</p>
+      <ul class="unit-topics">${u.topics.map(t => `<li>${t}</li>`).join("")}</ul>
+      <p class="count">${u.topics.length} topic${u.topics.length !== 1 ? "s" : ""} · ${u.lessons} lessons</p>
+    </div>`;
+  unitsEl.appendChild(div);
+});
+</script>
+</body>
+</html>

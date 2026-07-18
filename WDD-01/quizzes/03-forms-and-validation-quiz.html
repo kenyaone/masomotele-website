@@ -1,0 +1,346 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Forms and Validation | MTTI Web Design</title>
+    <link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Fredoka:wght@500;600&display=swap" rel="stylesheet">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Space Mono', monospace;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh; padding: 20px; color: #fff;
+        }
+        .container { max-width: 900px; margin: 0 auto; }
+        .header { text-align: center; margin-bottom: 30px; animation: slideDown 0.6s ease-out; }
+        .header .lesson-tag {
+            display: inline-block; background: rgba(255,255,255,0.2);
+            padding: 6px 16px; border-radius: 999px;
+            font-size: 0.85em; margin-bottom: 12px;
+        }
+        .header h1 {
+            font-family: 'Fredoka', sans-serif; font-size: 2.2em;
+            margin-bottom: 8px; text-shadow: 3px 3px 0 rgba(0,0,0,0.2);
+        }
+        .header p { opacity: 0.95; font-size: 0.95em; }
+        .score-board {
+            background: rgba(255,255,255,0.15); backdrop-filter: blur(10px);
+            border-radius: 20px; padding: 20px; margin-bottom: 20px;
+            display: flex; justify-content: space-around;
+            animation: fadeIn 0.8s ease-out 0.2s both;
+        }
+        .score-item { text-align: center; }
+        .score-item .label { font-size: 0.85em; opacity: 0.9; margin-bottom: 4px; }
+        .score-item .value {
+            font-size: 1.8em; font-weight: bold; font-family: 'Fredoka', sans-serif;
+        }
+        .progress-bar {
+            width: 100%; height: 8px; background: rgba(255,255,255,0.3);
+            border-radius: 10px; margin-bottom: 25px; overflow: hidden;
+        }
+        .progress-fill {
+            height: 100%; background: linear-gradient(90deg, #f093fb 0%, #f5576c 100%);
+            border-radius: 10px; transition: width 0.5s ease; width: 0%;
+        }
+        .exercise-card {
+            background: white; color: #333; border-radius: 25px;
+            padding: 35px; margin-bottom: 20px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            animation: fadeIn 0.6s ease-out both;
+        }
+        .scenario {
+            background: linear-gradient(135deg, #fff8e1 0%, #ffecb3 100%);
+            border-left: 5px solid #ffc107;
+            padding: 20px 24px; border-radius: 12px;
+            margin-bottom: 24px;
+            font-size: 0.98em; line-height: 1.55;
+        }
+        .scenario strong { color: #7a5a00; font-family: 'Fredoka', sans-serif; }
+        .question {
+            font-size: 1.15em; margin-bottom: 20px;
+            font-weight: 700; line-height: 1.4;
+        }
+        .options { display: flex; flex-direction: column; gap: 12px; }
+        .option {
+            background: #f5f7fb; border: 2px solid transparent;
+            padding: 16px 20px; border-radius: 12px;
+            cursor: pointer; transition: all 0.2s ease;
+            font-family: 'Space Mono', monospace; font-size: 0.98em; text-align: left;
+        }
+        .option:hover:not(.disabled) {
+            background: #eef1fb; border-color: #667eea; transform: translateX(4px);
+        }
+        .option.correct { background: #d4edda; border-color: #28a745; color: #155724; }
+        .option.wrong { background: #f8d7da; border-color: #dc3545; color: #721c24; animation: shake 0.4s; }
+        .option.disabled { cursor: not-allowed; opacity: 0.85; }
+        .feedback {
+            margin-top: 22px; padding: 18px 22px; border-radius: 12px;
+            animation: slideUp 0.4s ease-out;
+            font-size: 0.98em; line-height: 1.5;
+        }
+        .feedback.correct { background: #d4edda; color: #155724; border-left: 4px solid #28a745; }
+        .feedback.wrong { background: #f8d7da; color: #721c24; border-left: 4px solid #dc3545; }
+        .feedback strong { font-family: 'Fredoka', sans-serif; }
+        .next-btn, .restart-btn {
+            margin-top: 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white; border: none;
+            padding: 14px 32px; border-radius: 12px;
+            font-size: 1em; cursor: pointer;
+            font-family: 'Fredoka', sans-serif;
+            box-shadow: 0 6px 18px rgba(0,0,0,0.2);
+            transition: transform 0.2s ease;
+        }
+        .next-btn:hover, .restart-btn:hover { transform: scale(1.04); }
+        .results {
+            text-align: center; padding: 25px 15px;
+            animation: bounceIn 0.6s ease-out;
+        }
+        .results h2 {
+            font-family: 'Fredoka', sans-serif; font-size: 2em;
+            margin-bottom: 12px; color: #333;
+        }
+        .results .final-score {
+            font-size: 3em; font-family: 'Fredoka', sans-serif;
+            color: #667eea; margin: 20px 0;
+        }
+        .results p { color: #555; margin-bottom: 12px; }
+        .badge { display: inline-block; font-size: 3.5em; margin: 8px 0; }
+        @keyframes slideDown { from { opacity: 0; transform: translateY(-30px); } to { opacity: 1; transform: translateY(0); } }
+        @keyframes fadeIn { from { opacity: 0; transform: scale(0.96); } to { opacity: 1; transform: scale(1); } }
+        @keyframes slideUp { from { opacity: 0; transform: translateY(15px); } to { opacity: 1; transform: translateY(0); } }
+        @keyframes shake { 0%,100% { transform: translateX(0); } 25% { transform: translateX(-8px); } 75% { transform: translateX(8px); } }
+        @keyframes bounceIn { 0% { opacity: 0; transform: scale(0.4); } 60% { transform: scale(1.05); } 100% { opacity: 1; transform: scale(1); } }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <div class="lesson-tag">Module 3 · Lesson 3.8 · Quiz</div>
+            <h1>Forms and Validation</h1>
+            <p></p>
+        </div>
+
+        <div class="score-board">
+            <div class="score-item"><div class="label">Score</div><div class="value" id="score">0</div></div>
+            <div class="score-item"><div class="label">Question</div><div class="value"><span id="current">1</span>/<span id="total">10</span></div></div>
+            <div class="score-item"><div class="label">Streak</div><div class="value" id="streak">0</div></div>
+        </div>
+
+        <div class="progress-bar"><div class="progress-fill" id="progress"></div></div>
+
+        <div class="exercise-card" id="exerciseCard"></div>
+    </div>
+
+    <script>
+        const exercises = [
+  {
+    "id": "q1",
+    "text": "James attaches a submit event listener to his form. The FIRST line inside the handler should be:",
+    "options": [
+      "form.submit()",
+      "event.stopPropagation()",
+      "event.preventDefault()",
+      "const name = document.getElementById('name').value"
+    ],
+    "answer": 2,
+    "explanation": "event.preventDefault() must be called first to stop the browser from submitting the form and reloading the page. If called after validation, the page may reload before your validation code has a chance to run."
+  },
+  {
+    "id": "q2",
+    "text": "James validates a name field: if (name.trim() === ''). What does .trim() do?",
+    "options": [
+      "Removes the first character of the string",
+      "Removes whitespace from both ends of the string — catches fields filled with spaces only",
+      "Trims the string to a maximum of 50 characters",
+      "Converts the string to lowercase"
+    ],
+    "answer": 1,
+    "explanation": ".trim() removes leading and trailing whitespace. Without it, a field containing only spaces ('   ') would pass an empty check (it's not === '') but clearly has no valid content. Trimming before validation is essential."
+  },
+  {
+    "id": "q3",
+    "text": "James uses this regex to validate a Kenyan phone number: /^(07|\\+2547)\\d{8}$/. What does the ^ and $ mean?",
+    "options": [
+      "^ is start-of-line, $ is end-of-line — the regex must match the ENTIRE string",
+      "^ means 'not' — exclude these patterns; $ means 'dollar sign present'",
+      "^ anchors the start, $ is an optional end marker",
+      "They are escape characters for digits"
+    ],
+    "answer": 0,
+    "explanation": "^ anchors the match to the START of the string; $ anchors to the END. Together they ensure the entire input matches the pattern — without them, '07xxxxxxxxSPAM' would pass because the regex finds a match anywhere in the string."
+  },
+  {
+    "id": "q4",
+    "text": "James sets the error message using: errorDiv.innerHTML = userInput. Why is this a security risk?",
+    "options": [
+      "innerHTML is slower than textContent for error messages",
+      "If userInput contains HTML like <script>, it will be executed — this is an XSS (Cross-Site Scripting) vulnerability",
+      "innerHTML does not update the DOM immediately",
+      "Browsers block innerHTML on error elements"
+    ],
+    "answer": 1,
+    "explanation": "Setting innerHTML with unsanitised user input is an XSS vulnerability. A malicious user could type <img src=x onerror=\"alert(document.cookie)\"> and their JavaScript would execute. Always use textContent to display user-provided values."
+  },
+  {
+    "id": "q5",
+    "text": "James validates the form with only HTML attributes (required, type='email'). Why is JavaScript validation still needed?",
+    "options": [
+      "HTML validation is slower than JavaScript validation",
+      "HTML validation can be bypassed by disabling JavaScript or using browser DevTools to submit the form programmatically",
+      "required and type='email' don't work on mobile browsers",
+      "HTML validation prevents HTTPS connections"
+    ],
+    "answer": 1,
+    "explanation": "HTML attributes provide UX-level validation only. They can be bypassed: disable JavaScript in the browser, use curl or Postman to submit, or modify the DOM. JavaScript validation is also bypassable — only server-side validation is truly reliable for security."
+  },
+  {
+    "id": "q6",
+    "text": "James clears previous error messages at the top of each validation run. Why is this important?",
+    "options": [
+      "Clearing errors reduces file size",
+      "Without clearing, old error messages persist even after the user has fixed the problem — confusing and misleading",
+      "Error divs must be empty before event.preventDefault() works",
+      "It speeds up the regex validation check"
+    ],
+    "answer": 1,
+    "explanation": "If you don't clear errors first, fixing the name field still shows the old phone error. Clearing at the start of each validation run ensures the UI always reflects the current state of the form, not a mix of old and new errors."
+  },
+  {
+    "id": "q7",
+    "text": "Which regex correctly matches both '0712345678' (Safaricom) and '+254712345678' (international Kenyan format)?",
+    "options": [
+      "/07\\d{8}/",
+      "/^\\+254\\d{9}$/",
+      "/^(07|\\+2547)\\d{8}$/",
+      "/^0|254[0-9]{9}$/"
+    ],
+    "answer": 2,
+    "explanation": "/^(07|\\+2547)\\d{8}$/ matches: 07 OR +2547, followed by exactly 8 digits. 07xxxxxxxx = 10 digits total. +2547xxxxxxxx = 12 chars total (consistent with international Safaricom format). \\+ is an escaped literal plus sign."
+  },
+  {
+    "id": "q8",
+    "text": "James wants inline validation — show the error next to the phone field as the user types, not only on submit. Which event should he listen to?",
+    "options": [
+      "submit",
+      "change",
+      "input",
+      "blur"
+    ],
+    "answer": 2,
+    "explanation": "The input event fires on every character change — ideal for live validation that gives instant feedback. blur fires when focus leaves the field — good for 'validate when done'. change fires on value change after focus leaves. submit fires only when the form is submitted."
+  },
+  {
+    "id": "q9",
+    "text": "After all checks pass, what should happen at the end of James's submit handler?",
+    "options": [
+      "Call event.preventDefault() again to confirm the block",
+      "Allow the form to submit (remove preventDefault or call form.submit() or fetch POST)",
+      "Clear the form fields and return false",
+      "Redirect the user to the homepage"
+    ],
+    "answer": 1,
+    "explanation": "When validation passes, the form data should be sent to the server. Either remove the event.preventDefault() (allow native submit), call form.submit() programmatically, or send the data with fetch (AJAX). Returning false is a jQuery pattern — don't use it in vanilla JS."
+  },
+  {
+    "id": "q10",
+    "text": "Why is server-side validation mandatory even when James has perfect client-side validation?",
+    "options": [
+      "Server-side validation is faster than client-side",
+      "Client-side validation can always be bypassed with developer tools or HTTP clients — server validation is the only trusted layer",
+      "Kenya's DPA 2019 bans client-side validation",
+      "Server-side validation catches spelling errors that regex misses"
+    ],
+    "answer": 1,
+    "explanation": "Any code running in the browser can be bypassed — DevTools, curl, Postman, or a custom script can send any data directly to the server. Server-side validation is the security layer that actually protects your database and users. Client-side is UX; server-side is security."
+  }
+];
+
+        let currentQuestion = 0, score = 0, streak = 0, answered = false;
+
+        function updateScoreboard() {
+            document.getElementById('score').textContent = score;
+            document.getElementById('current').textContent = Math.min(currentQuestion + 1, exercises.length);
+            document.getElementById('total').textContent = exercises.length;
+            document.getElementById('streak').textContent = streak;
+            document.getElementById('progress').style.width = ((currentQuestion) / exercises.length) * 100 + '%';
+        }
+
+        function escapeHtml(s) {
+            return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+        }
+
+        function renderQuestion() {
+            answered = false;
+            const q = exercises[currentQuestion];
+            let html = '';
+            if (q.scenario) {
+                html += `<div class="scenario"><strong>Scenario.</strong> ${escapeHtml(q.scenario)}</div>`;
+            }
+            html += `<div class="question">${escapeHtml(q.text)}</div>`;
+            html += '<div class="options">';
+            q.options.forEach((o, i) => {
+                html += `<button class="option" onclick="selectAnswer(${i})">${escapeHtml(o)}</button>`;
+            });
+            html += '</div>';
+            document.getElementById('exerciseCard').innerHTML = html;
+            updateScoreboard();
+        }
+
+        function selectAnswer(i) {
+            if (answered) return;
+            answered = true;
+            const q = exercises[currentQuestion];
+            const btns = document.querySelectorAll('.option');
+            btns.forEach(b => b.classList.add('disabled'));
+            btns[q.answer].classList.add('correct');
+            const right = i === q.answer;
+            if (!right) btns[i].classList.add('wrong');
+            if (right) { score += 10; streak += 1; } else { streak = 0; }
+            const fb = document.createElement('div');
+            fb.className = 'feedback ' + (right ? 'correct' : 'wrong');
+            fb.innerHTML = `<strong>${right ? '✅ Correct.' : '❌ Not quite.'}</strong><br>${escapeHtml(q.explanation)}`;
+            document.getElementById('exerciseCard').appendChild(fb);
+            const nb = document.createElement('button');
+            nb.className = 'next-btn';
+            nb.textContent = currentQuestion === exercises.length - 1 ? 'See results →' : 'Next scenario →';
+            nb.onclick = nextQuestion;
+            document.getElementById('exerciseCard').appendChild(nb);
+            updateScoreboard();
+        }
+
+        function nextQuestion() {
+            currentQuestion++;
+            if (currentQuestion >= exercises.length) return showResults();
+            renderQuestion();
+        }
+
+        function showResults() {
+            document.getElementById('progress').style.width = '100%';
+            const total = exercises.length * 10;
+            const pct = Math.round(score / total * 100);
+            if (window.parent) { window.parent.postMessage({type:"mtti_quiz_score", score: score, total: total, percent: pct}, "*"); }
+            let badge = '🌟', msg = 'Excellent work. You have a professional grasp of this lesson.';
+            if (pct < 50) { badge = '🌱'; msg = 'Good first attempt. Re-watch the lesson video and try again.'; }
+            else if (pct < 80) { badge = '📚'; msg = 'Solid progress. Review the scenarios you missed and retry.'; }
+            document.getElementById('exerciseCard').innerHTML = `
+                <div class="results">
+                    <span class="badge">${badge}</span>
+                    <h2>Quiz Complete</h2>
+                    <div class="final-score">${score} / ${total}</div>
+                    <p><strong>${pct}%</strong> · Longest streak: ${streak}</p>
+                    <p>${msg}</p>
+                    <button class="restart-btn" onclick="restart()">Try again 🔁</button>
+                </div>`;
+        }
+
+        function restart() {
+            currentQuestion = 0; score = 0; streak = 0;
+            renderQuestion();
+        }
+
+        renderQuestion();
+    </script>
+</body>
+</html>

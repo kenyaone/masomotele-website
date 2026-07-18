@@ -76,6 +76,24 @@
         }
     </style>
 <meta name="description" content="Professional training courses at MTTI Eldoret. TVETA-accredited programs in IT, healthcare, and creative fields. Enroll today.">
+<!-- Google tag (gtag.js) - Google Ads Conversion Tracking -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=AW-17161883901"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+  gtag('config', 'AW-17161883901');
+</script>
+
+<!-- Google Analytics -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-8ZEH42CBVL"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+  gtag('config', 'G-8ZEH42CBVL');
+</script>
+
 <script type="text/javascript">(function(c,l,a,r,i,t,y){c[a]=c[a]||function(){(c[a].q=c[a].q||[]).push(arguments)};t=l.createElement(r);t.async=1;t.src="https://www.clarity.ms/tag/"+i;y=l.getElementsByTagName(r)[0];y.parentNode.insertBefore(t,y);})(window,document,"clarity","script","wg31zlwbt9");</script>\n</head>
 <body>
     <div class="container">
@@ -334,6 +352,14 @@ ${formData.message ? '💬 ' + formData.message : ''}
             
             const whatsappLink = `https://wa.me/254712464936?text=${encodeURIComponent(whatsappMessage)}`;
             window.open(whatsappLink, '_blank');
+
+            // Track conversion in Google Analytics
+            gtag('event', 'form_submission', {
+                'event_category': 'conversion',
+                'event_label': 'admission_form',
+                'course': formData.course,
+                'email': formData.email
+            });
 
             // Show success message
             showAlert('Application submitted successfully! We will contact you shortly.', 'success');

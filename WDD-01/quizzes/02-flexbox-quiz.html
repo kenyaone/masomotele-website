@@ -1,0 +1,346 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Flexbox | MTTI Web Design</title>
+    <link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Fredoka:wght@500;600&display=swap" rel="stylesheet">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Space Mono', monospace;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh; padding: 20px; color: #fff;
+        }
+        .container { max-width: 900px; margin: 0 auto; }
+        .header { text-align: center; margin-bottom: 30px; animation: slideDown 0.6s ease-out; }
+        .header .lesson-tag {
+            display: inline-block; background: rgba(255,255,255,0.2);
+            padding: 6px 16px; border-radius: 999px;
+            font-size: 0.85em; margin-bottom: 12px;
+        }
+        .header h1 {
+            font-family: 'Fredoka', sans-serif; font-size: 2.2em;
+            margin-bottom: 8px; text-shadow: 3px 3px 0 rgba(0,0,0,0.2);
+        }
+        .header p { opacity: 0.95; font-size: 0.95em; }
+        .score-board {
+            background: rgba(255,255,255,0.15); backdrop-filter: blur(10px);
+            border-radius: 20px; padding: 20px; margin-bottom: 20px;
+            display: flex; justify-content: space-around;
+            animation: fadeIn 0.8s ease-out 0.2s both;
+        }
+        .score-item { text-align: center; }
+        .score-item .label { font-size: 0.85em; opacity: 0.9; margin-bottom: 4px; }
+        .score-item .value {
+            font-size: 1.8em; font-weight: bold; font-family: 'Fredoka', sans-serif;
+        }
+        .progress-bar {
+            width: 100%; height: 8px; background: rgba(255,255,255,0.3);
+            border-radius: 10px; margin-bottom: 25px; overflow: hidden;
+        }
+        .progress-fill {
+            height: 100%; background: linear-gradient(90deg, #f093fb 0%, #f5576c 100%);
+            border-radius: 10px; transition: width 0.5s ease; width: 0%;
+        }
+        .exercise-card {
+            background: white; color: #333; border-radius: 25px;
+            padding: 35px; margin-bottom: 20px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            animation: fadeIn 0.6s ease-out both;
+        }
+        .scenario {
+            background: linear-gradient(135deg, #fff8e1 0%, #ffecb3 100%);
+            border-left: 5px solid #ffc107;
+            padding: 20px 24px; border-radius: 12px;
+            margin-bottom: 24px;
+            font-size: 0.98em; line-height: 1.55;
+        }
+        .scenario strong { color: #7a5a00; font-family: 'Fredoka', sans-serif; }
+        .question {
+            font-size: 1.15em; margin-bottom: 20px;
+            font-weight: 700; line-height: 1.4;
+        }
+        .options { display: flex; flex-direction: column; gap: 12px; }
+        .option {
+            background: #f5f7fb; border: 2px solid transparent;
+            padding: 16px 20px; border-radius: 12px;
+            cursor: pointer; transition: all 0.2s ease;
+            font-family: 'Space Mono', monospace; font-size: 0.98em; text-align: left;
+        }
+        .option:hover:not(.disabled) {
+            background: #eef1fb; border-color: #667eea; transform: translateX(4px);
+        }
+        .option.correct { background: #d4edda; border-color: #28a745; color: #155724; }
+        .option.wrong { background: #f8d7da; border-color: #dc3545; color: #721c24; animation: shake 0.4s; }
+        .option.disabled { cursor: not-allowed; opacity: 0.85; }
+        .feedback {
+            margin-top: 22px; padding: 18px 22px; border-radius: 12px;
+            animation: slideUp 0.4s ease-out;
+            font-size: 0.98em; line-height: 1.5;
+        }
+        .feedback.correct { background: #d4edda; color: #155724; border-left: 4px solid #28a745; }
+        .feedback.wrong { background: #f8d7da; color: #721c24; border-left: 4px solid #dc3545; }
+        .feedback strong { font-family: 'Fredoka', sans-serif; }
+        .next-btn, .restart-btn {
+            margin-top: 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white; border: none;
+            padding: 14px 32px; border-radius: 12px;
+            font-size: 1em; cursor: pointer;
+            font-family: 'Fredoka', sans-serif;
+            box-shadow: 0 6px 18px rgba(0,0,0,0.2);
+            transition: transform 0.2s ease;
+        }
+        .next-btn:hover, .restart-btn:hover { transform: scale(1.04); }
+        .results {
+            text-align: center; padding: 25px 15px;
+            animation: bounceIn 0.6s ease-out;
+        }
+        .results h2 {
+            font-family: 'Fredoka', sans-serif; font-size: 2em;
+            margin-bottom: 12px; color: #333;
+        }
+        .results .final-score {
+            font-size: 3em; font-family: 'Fredoka', sans-serif;
+            color: #667eea; margin: 20px 0;
+        }
+        .results p { color: #555; margin-bottom: 12px; }
+        .badge { display: inline-block; font-size: 3.5em; margin: 8px 0; }
+        @keyframes slideDown { from { opacity: 0; transform: translateY(-30px); } to { opacity: 1; transform: translateY(0); } }
+        @keyframes fadeIn { from { opacity: 0; transform: scale(0.96); } to { opacity: 1; transform: scale(1); } }
+        @keyframes slideUp { from { opacity: 0; transform: translateY(15px); } to { opacity: 1; transform: translateY(0); } }
+        @keyframes shake { 0%,100% { transform: translateX(0); } 25% { transform: translateX(-8px); } 75% { transform: translateX(8px); } }
+        @keyframes bounceIn { 0% { opacity: 0; transform: scale(0.4); } 60% { transform: scale(1.05); } 100% { opacity: 1; transform: scale(1); } }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <div class="lesson-tag">Module 2 · Lesson 2.4 · Quiz</div>
+            <h1>Flexbox</h1>
+            <p></p>
+        </div>
+
+        <div class="score-board">
+            <div class="score-item"><div class="label">Score</div><div class="value" id="score">0</div></div>
+            <div class="score-item"><div class="label">Question</div><div class="value"><span id="current">1</span>/<span id="total">10</span></div></div>
+            <div class="score-item"><div class="label">Streak</div><div class="value" id="streak">0</div></div>
+        </div>
+
+        <div class="progress-bar"><div class="progress-fill" id="progress"></div></div>
+
+        <div class="exercise-card" id="exerciseCard"></div>
+    </div>
+
+    <script>
+        const exercises = [
+  {
+    "id": "q1",
+    "text": "James writes display: flex on his .nav element. Which elements become flex items?",
+    "options": [
+      "All elements on the page",
+      "Only the .nav element itself",
+      "The direct children of .nav",
+      "All descendants of .nav at every nesting level"
+    ],
+    "answer": 2,
+    "explanation": "display: flex makes an element a flex container. Only its direct children become flex items and are controlled by flexbox layout rules. Nested grandchildren are not direct flex items unless their parent also has display: flex."
+  },
+  {
+    "id": "q2",
+    "text": "James wants flex items to wrap to the next line instead of shrinking when the container is too narrow. Which property achieves this?",
+    "options": [
+      "flex-direction: wrap",
+      "flex-wrap: wrap",
+      "flex-flow: nowrap",
+      "overflow: wrap"
+    ],
+    "answer": 1,
+    "explanation": "flex-wrap: wrap allows flex items to wrap to the next line when they run out of horizontal space. The default is nowrap — items shrink to fit in one row. flex-direction and overflow don't control wrapping."
+  },
+  {
+    "id": "q3",
+    "text": "James has a horizontal nav bar and wants to push the 'Cart' link to the far right. Which style on that link achieves this?",
+    "options": [
+      "position: right",
+      "float: right",
+      "margin-left: auto",
+      "align-self: flex-end"
+    ],
+    "answer": 2,
+    "explanation": "margin-left: auto on a flex item consumes all remaining space on the left, pushing the item to the right of the container. This is the clean flexbox pattern for pushing one item to the opposite end."
+  },
+  {
+    "id": "q4",
+    "text": "What does justify-content: space-between do to flex items?",
+    "options": [
+      "Centres all items in the middle of the container",
+      "Distributes items so the first is at the start, last at the end, and remaining space is split equally between items",
+      "Adds equal space around every item, including the edges",
+      "Stretches items to fill the container width"
+    ],
+    "answer": 1,
+    "explanation": "space-between: first item is at the start edge, last item at the end edge, and gaps between items are equal. space-around adds half-size gaps at the edges. space-evenly gives equal gaps everywhere including edges."
+  },
+  {
+    "id": "q5",
+    "text": "James wants to vertically centre text inside a card that has a fixed height. Which two properties on the flex container achieve this?",
+    "options": [
+      "vertical-align: middle and text-align: center",
+      "display: flex and align-items: center",
+      "margin: auto and padding: auto",
+      "position: relative and top: 50%"
+    ],
+    "answer": 1,
+    "explanation": "display: flex turns the container into a flex container. align-items: center aligns all flex children along the cross axis (vertically for a horizontal flex row). This is the simplest, most reliable vertical centring technique in CSS."
+  },
+  {
+    "id": "q6",
+    "text": "Which flexbox property controls the ORDER in which items appear visually without changing the HTML source order?",
+    "options": [
+      "z-index",
+      "flex-grow",
+      "order",
+      "flex-direction"
+    ],
+    "answer": 2,
+    "explanation": "The order property on a flex item sets its visual position in the container. Lower values appear first. Default is 0. Useful for responsive layouts where sidebar-before-content on desktop becomes content-before-sidebar on mobile."
+  },
+  {
+    "id": "q7",
+    "text": "James sets flex: 1 on all product cards. What does this mean?",
+    "options": [
+      "Each card has a fixed width of 1px",
+      "Each card grows equally to fill available space — all cards are the same width",
+      "The first card takes all available space",
+      "Cards are given 1% of the container width each"
+    ],
+    "answer": 1,
+    "explanation": "flex: 1 is shorthand for flex-grow: 1, flex-shrink: 1, flex-basis: 0. All cards grow equally to share available space. This creates equal-width columns regardless of content length — perfect for product grids."
+  },
+  {
+    "id": "q8",
+    "text": "What is the difference between align-items and align-content in flexbox?",
+    "options": [
+      "They are identical — both align items on the cross axis",
+      "align-items aligns items within a single line; align-content aligns multiple lines when flex-wrap is used",
+      "align-items works on flex containers; align-content works on flex items",
+      "align-content is the modern name for align-items"
+    ],
+    "answer": 1,
+    "explanation": "align-items controls alignment within each row (cross-axis alignment per line). align-content distributes multiple flex lines within the container — only relevant when flex-wrap: wrap is used and there are multiple rows."
+  },
+  {
+    "id": "q9",
+    "text": "James writes flex-direction: column on his .sidebar. What changes?",
+    "options": [
+      "Items are laid out horizontally, left to right",
+      "Items stack vertically — the main axis becomes vertical instead of horizontal",
+      "Items are arranged in a grid",
+      "Items are sorted alphabetically"
+    ],
+    "answer": 1,
+    "explanation": "flex-direction sets the main axis. The default is row (horizontal). column makes items stack top to bottom. With column, justify-content controls vertical distribution and align-items controls horizontal alignment."
+  },
+  {
+    "id": "q10",
+    "text": "James wants one specific card in a flex row to NOT shrink when space is tight. Which property should he set on that card?",
+    "options": [
+      "flex-grow: 0",
+      "flex-shrink: 0",
+      "flex-basis: auto",
+      "min-width: inherit"
+    ],
+    "answer": 1,
+    "explanation": "flex-shrink: 0 prevents a flex item from shrinking below its natural or declared size. By default flex-shrink is 1, meaning all items can shrink proportionally. Setting it to 0 locks the item's size — useful for logos, icons, or fixed-width elements."
+  }
+];
+
+        let currentQuestion = 0, score = 0, streak = 0, answered = false;
+
+        function updateScoreboard() {
+            document.getElementById('score').textContent = score;
+            document.getElementById('current').textContent = Math.min(currentQuestion + 1, exercises.length);
+            document.getElementById('total').textContent = exercises.length;
+            document.getElementById('streak').textContent = streak;
+            document.getElementById('progress').style.width = ((currentQuestion) / exercises.length) * 100 + '%';
+        }
+
+        function escapeHtml(s) {
+            return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+        }
+
+        function renderQuestion() {
+            answered = false;
+            const q = exercises[currentQuestion];
+            let html = '';
+            if (q.scenario) {
+                html += `<div class="scenario"><strong>Scenario.</strong> ${escapeHtml(q.scenario)}</div>`;
+            }
+            html += `<div class="question">${escapeHtml(q.text)}</div>`;
+            html += '<div class="options">';
+            q.options.forEach((o, i) => {
+                html += `<button class="option" onclick="selectAnswer(${i})">${escapeHtml(o)}</button>`;
+            });
+            html += '</div>';
+            document.getElementById('exerciseCard').innerHTML = html;
+            updateScoreboard();
+        }
+
+        function selectAnswer(i) {
+            if (answered) return;
+            answered = true;
+            const q = exercises[currentQuestion];
+            const btns = document.querySelectorAll('.option');
+            btns.forEach(b => b.classList.add('disabled'));
+            btns[q.answer].classList.add('correct');
+            const right = i === q.answer;
+            if (!right) btns[i].classList.add('wrong');
+            if (right) { score += 10; streak += 1; } else { streak = 0; }
+            const fb = document.createElement('div');
+            fb.className = 'feedback ' + (right ? 'correct' : 'wrong');
+            fb.innerHTML = `<strong>${right ? '✅ Correct.' : '❌ Not quite.'}</strong><br>${escapeHtml(q.explanation)}`;
+            document.getElementById('exerciseCard').appendChild(fb);
+            const nb = document.createElement('button');
+            nb.className = 'next-btn';
+            nb.textContent = currentQuestion === exercises.length - 1 ? 'See results →' : 'Next scenario →';
+            nb.onclick = nextQuestion;
+            document.getElementById('exerciseCard').appendChild(nb);
+            updateScoreboard();
+        }
+
+        function nextQuestion() {
+            currentQuestion++;
+            if (currentQuestion >= exercises.length) return showResults();
+            renderQuestion();
+        }
+
+        function showResults() {
+            document.getElementById('progress').style.width = '100%';
+            const total = exercises.length * 10;
+            const pct = Math.round(score / total * 100);
+            if (window.parent) { window.parent.postMessage({type:"mtti_quiz_score", score: score, total: total, percent: pct}, "*"); }
+            let badge = '🌟', msg = 'Excellent work. You have a professional grasp of this lesson.';
+            if (pct < 50) { badge = '🌱'; msg = 'Good first attempt. Re-watch the lesson video and try again.'; }
+            else if (pct < 80) { badge = '📚'; msg = 'Solid progress. Review the scenarios you missed and retry.'; }
+            document.getElementById('exerciseCard').innerHTML = `
+                <div class="results">
+                    <span class="badge">${badge}</span>
+                    <h2>Quiz Complete</h2>
+                    <div class="final-score">${score} / ${total}</div>
+                    <p><strong>${pct}%</strong> · Longest streak: ${streak}</p>
+                    <p>${msg}</p>
+                    <button class="restart-btn" onclick="restart()">Try again 🔁</button>
+                </div>`;
+        }
+
+        function restart() {
+            currentQuestion = 0; score = 0; streak = 0;
+            renderQuestion();
+        }
+
+        renderQuestion();
+    </script>
+</body>
+</html>

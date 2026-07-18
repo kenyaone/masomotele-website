@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Domain Names and cPanel Hosting (Lesson) | MTTI Computer Applications</title>
+<link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Fredoka:wght@500;600&display=swap" rel="stylesheet">
+<style>
+* { margin:0; padding:0; box-sizing:border-box; }
+body { font-family:'Space Mono', monospace; background:linear-gradient(135deg,#2E7D32 0%,#1565C0 100%); min-height:100vh; padding:20px; color:#fff; }
+.container { max-width:820px; margin:0 auto; }
+.header { text-align:center; margin-bottom:24px; }
+.lesson-tag { display:inline-block; background:rgba(255,255,255,0.2); padding:6px 16px; border-radius:999px; font-size:0.85em; margin-bottom:12px; }
+.header h1 { font-family:'Fredoka', sans-serif; font-size:2em; margin-bottom:6px; text-shadow:3px 3px 0 rgba(0,0,0,0.2); }
+.card { background:#fff; color:#333; border-radius:22px; padding:32px; margin-bottom:20px; box-shadow:0 20px 60px rgba(0,0,0,0.3); }
+.section { margin-bottom:26px; }
+.section:last-child { margin-bottom:0; }
+.section h2 { font-family:'Fredoka', sans-serif; font-size:1.2em; margin-bottom:10px; color:#1565C0; }
+.section .body { line-height:1.65; font-size:0.98em; }
+.section .body p { margin-bottom:10px; }
+.section .body code { background:#f5f7fb; padding:2px 6px; border-radius:4px; font-size:0.92em; }
+.keypoint { background:#fff8e1; border-left:4px solid #ffc107; padding:12px 16px; border-radius:8px; margin-top:12px; font-size:0.92em; }
+</style>
+</head>
+<body>
+<div class="container">
+<div class="header"><div class="lesson-tag">Module 4 · Lesson 4.4</div><h1>Domain Names and cPanel Hosting</h1></div>
+<div style="background:#fff;color:#333;border-radius:16px;padding:16px;margin-bottom:20px;box-shadow:0 8px 24px rgba(0,0,0,0.12);text-align:center;"><svg viewBox="0 0 460 100" style="width:100%;max-width:560px;height:130px;" xmlns="http://www.w3.org/2000/svg">
+<rect x="20" y="45" width="90" height="40" rx="4" fill="#1e293b"/><text x="65" y="69" font-size="9" text-anchor="middle" fill="#fff">Browser</text>
+<path d="M115,65 h60" stroke="#999" stroke-width="2" marker-end="url(#arrD1)"/>
+<text x="145" y="55" font-size="8" text-anchor="middle">nakuruhardware</text><text x="145" y="45" font-size="8" text-anchor="middle">hub.co.ke</text>
+<rect x="180" y="45" width="90" height="40" rx="4" fill="#E8942E"/><text x="225" y="63" font-size="8" text-anchor="middle" fill="#fff">DNS Server</text><text x="225" y="76" font-size="7" text-anchor="middle" fill="#fff">"what IP is this?"</text>
+<path d="M275,65 h60" stroke="#387633" stroke-width="2" marker-end="url(#arrD2)"/>
+<text x="305" y="55" font-size="8" text-anchor="middle" fill="#387633">102.68.x.x</text>
+<rect x="340" y="45" width="100" height="40" rx="4" fill="#259BD7"/><text x="390" y="63" font-size="8" text-anchor="middle" fill="#fff">Hosting Server</text><text x="390" y="76" font-size="7" text-anchor="middle" fill="#fff">(cPanel)</text>
+<defs>
+<marker id="arrD1" markerWidth="8" markerHeight="8" refX="6" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8 Z" fill="#999"/></marker>
+<marker id="arrD2" markerWidth="8" markerHeight="8" refX="6" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8 Z" fill="#387633"/></marker>
+</defs>
+</svg></div><div class="card"><div class="section"><h2>Domain Names</h2><div class="body"><p>A <strong>domain name</strong> (like nakuruhardwarehub.co.ke) is registered separately from where a site is actually hosted — owning the domain does not automatically mean a site is live there until it is pointed at hosting.</p></div></div><div class="section"><h2>DNS: Connecting Domain to Host</h2><div class="body"><p><strong>DNS</strong> records (particularly an "A" record) tell the internet which server's IP address a domain name should resolve to — updating these records is what actually connects a purchased domain to a hosting account.</p></div></div><div class="section"><h2>cPanel Hosting</h2><div class="body"><p><strong>cPanel</strong> is a widely-used web hosting control panel offering a graphical way to upload files, manage databases, and configure email for a domain — unlike GitHub Pages, this kind of hosting supports server-side languages like PHP and real databases.</p></div><div class="keypoint"><strong>Key Point.</strong> Files are typically uploaded to the public_html folder in cPanel — that folder&#039;s contents are what visitors actually see when they visit the domain.</div></div></div>
+</div>
+</body>
+</html>

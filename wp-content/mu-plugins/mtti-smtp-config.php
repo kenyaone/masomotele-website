@@ -12,6 +12,7 @@ add_action('phpmailer_init', function($phpmailer) {
     // You have two options:
 
     // OPTION 1: Use Gmail (Recommended for your account)
+    $phpmailer->isSMTP();
     $phpmailer->Host = 'smtp.gmail.com';
     $phpmailer->Port = 587;
     $phpmailer->SMTPAuth = true;
@@ -24,7 +25,7 @@ add_action('phpmailer_init', function($phpmailer) {
     // 3. Copy the 16-character password
     // 4. Replace the password below
     $phpmailer->Username = 'musilwabonface@gmail.com';
-    $phpmailer->Password = 'YOUR_GMAIL_APP_PASSWORD_HERE'; // Replace with your app password
+    $phpmailer->Password = 'stztyygyvhgjavaq';
 
     // Set from address
     $phpmailer->From = 'musilwabonface@gmail.com';

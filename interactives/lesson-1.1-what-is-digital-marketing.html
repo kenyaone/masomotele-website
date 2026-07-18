@@ -1,0 +1,1197 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lesson 1.1 — What is Digital Marketing? (Interactive)</title>
+<style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+        font-family: 'Segoe UI', -apple-system, sans-serif;
+        line-height: 1.6;
+        color: #1e293b;
+        background: #f8fafc;
+        min-height: 100vh;
+    }
+    .container { max-width: 1100px; margin: 0 auto; padding: 20px; }
+    header {
+        background: linear-gradient(135deg, #2E7D32, #1B5E20);
+        color: #fff;
+        padding: 40px 30px;
+        border-radius: 12px;
+        margin-bottom: 24px;
+        box-shadow: 0 10px 30px rgba(46,125,50,0.25);
+    }
+    header .badge {
+        display: inline-block;
+        background: rgba(255,255,255,0.2);
+        padding: 4px 14px;
+        border-radius: 16px;
+        font-size: 12px;
+        font-weight: bold;
+        letter-spacing: 1px;
+        margin-bottom: 14px;
+    }
+    header h1 { font-size: 34px; margin-bottom: 8px; }
+    header .subtitle { font-size: 17px; opacity: 0.95; margin-bottom: 20px; }
+    .meta-strip { display: flex; flex-wrap: wrap; gap: 12px; }
+    .meta-strip span {
+        background: rgba(255,255,255,0.18);
+        padding: 6px 14px;
+        border-radius: 20px;
+        font-size: 13px;
+    }
+    .toc {
+        background: #fff;
+        border: 1px solid #e2e8f0;
+        border-radius: 10px;
+        padding: 22px 26px;
+        margin-bottom: 22px;
+    }
+    .toc h3 { color: #2E7D32; margin-bottom: 10px; }
+    .toc ol { padding-left: 20px; }
+    .toc a { color: #2E7D32; text-decoration: none; font-weight: 600; }
+    .toc a:hover { text-decoration: underline; }
+    section {
+        background: #fff;
+        border: 1px solid #e2e8f0;
+        border-radius: 10px;
+        padding: 26px 30px;
+        margin-bottom: 22px;
+    }
+    section h2 {
+        color: #2E7D32;
+        font-size: 22px;
+        margin-bottom: 12px;
+        padding-bottom: 8px;
+        border-bottom: 3px solid #2E7D32;
+    }
+    section h3 { color: #0f172a; font-size: 17px; margin: 18px 0 8px; }
+    section p { margin-bottom: 12px; }
+    section ul, section ol { padding-left: 22px; margin-bottom: 12px; }
+    section li { margin-bottom: 4px; }
+    .callout {
+        border-left: 5px solid #2E7D32;
+        background: #e8f5e9;
+        padding: 14px 18px;
+        margin: 14px 0;
+        border-radius: 4px;
+    }
+    .callout.warn {
+        border-left-color: #dc2626;
+        background: #fef2f2;
+    }
+    .callout.tip {
+        border-left-color: #059669;
+        background: #ecfdf5;
+    }
+    .callout strong { color: #1B5E20; }
+    .callout.warn strong { color: #dc2626; }
+    .callout.tip strong { color: #059669; }
+
+    /* Sarah scenario */
+    .sarah-card {
+        background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%);
+        border-radius: 10px;
+        padding: 18px 22px;
+        display: flex;
+        gap: 16px;
+        align-items: flex-start;
+        margin: 14px 0;
+    }
+    .sarah-avatar {
+        width: 64px; height: 64px; border-radius: 50%;
+        background: #d97706; color: #fff;
+        display: flex; align-items: center; justify-content: center;
+        font-size: 28px; font-weight: bold; flex-shrink: 0;
+    }
+    .sarah-card h4 { color: #78350f; margin-bottom: 4px; }
+    .sarah-card p { color: #78350f; margin: 0; font-size: 15px; }
+
+    /* 9 elements grid */
+    .elements-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+        gap: 12px;
+        margin: 18px 0;
+    }
+    .element-card {
+        background: #f8fafc;
+        border: 2px solid #e2e8f0;
+        border-radius: 10px;
+        padding: 16px;
+        cursor: pointer;
+        transition: all 0.2s;
+        position: relative;
+    }
+    .element-card:hover { border-color: #2E7D32; background: #e8f5e9; transform: translateY(-2px); box-shadow: 0 4px 12px rgba(46,125,50,0.15); }
+    .element-card .num {
+        position: absolute;
+        top: -10px; left: 14px;
+        background: #2E7D32; color: #fff;
+        width: 26px; height: 26px; border-radius: 50%;
+        font-size: 13px; font-weight: bold;
+        display: flex; align-items: center; justify-content: center;
+    }
+    .element-card h4 { color: #1e293b; margin: 8px 0 6px; font-size: 15px; }
+    .element-card .desc { display: none; font-size: 13px; color: #475569; margin-top: 8px; padding-top: 8px; border-top: 1px solid #cbd5e1; }
+    .element-card.open .desc { display: block; }
+    .element-card .short { font-size: 12.5px; color: #64748b; }
+
+    /* Goal picker */
+    .goals-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+        gap: 10px;
+        margin: 14px 0;
+    }
+    .goal-card {
+        background: #fff;
+        border: 2px solid #cbd5e1;
+        border-radius: 8px;
+        padding: 12px;
+        text-align: center;
+        cursor: pointer;
+        transition: all 0.2s;
+        font-size: 14px;
+        font-weight: 600;
+        color: #475569;
+    }
+    .goal-card:hover { border-color: #2E7D32; color: #2E7D32; }
+    .goal-card.selected { background: #2E7D32; color: #fff; border-color: #2E7D32; }
+    .goal-card.selected::before { content: '✓ '; }
+    #goalOutput {
+        margin-top: 14px;
+        padding: 14px;
+        background: #ecfdf5;
+        border-left: 4px solid #059669;
+        border-radius: 4px;
+        min-height: 20px;
+        font-size: 14px;
+        color: #065f46;
+    }
+
+    /* Comparison table */
+    .compare {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 14px;
+        margin: 14px 0;
+    }
+    .compare > div {
+        background: #f8fafc;
+        border-radius: 8px;
+        padding: 16px;
+    }
+    .compare .adv { border-left: 4px solid #059669; }
+    .compare .adv h4 { color: #059669; margin-bottom: 8px; }
+    .compare .lim { border-left: 4px solid #dc2626; }
+    .compare .lim h4 { color: #dc2626; margin-bottom: 8px; }
+    .compare li { font-size: 14px; }
+
+    /* Legal cards */
+    .legal-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+        gap: 12px;
+        margin: 14px 0;
+    }
+    .legal-card {
+        background: #fef2f2;
+        border: 1px solid #fecaca;
+        border-radius: 8px;
+        padding: 14px;
+    }
+    .legal-card h4 { color: #dc2626; font-size: 15px; margin-bottom: 6px; }
+    .legal-card p { font-size: 13px; margin: 0; color: #7f1d1d; }
+
+    /* Quiz */
+    .quiz-question {
+        background: #fff;
+        border: 2px solid #cbd5e1;
+        border-radius: 10px;
+        padding: 18px;
+        margin: 14px 0;
+        transition: border-color 0.3s;
+    }
+    .quiz-question.correct { border-color: #059669; background: #ecfdf5; }
+    .quiz-question.wrong { border-color: #dc2626; background: #fef2f2; }
+    .quiz-question h4 { margin-bottom: 12px; font-size: 15px; color: #1e293b; }
+    .quiz-question .options label {
+        display: block;
+        padding: 10px 14px;
+        margin-bottom: 6px;
+        background: #f8fafc;
+        border: 1px solid #e2e8f0;
+        border-radius: 6px;
+        cursor: pointer;
+        transition: background 0.2s;
+        font-size: 14px;
+    }
+    .quiz-question .options label:hover { background: #e8f5e9; }
+    .quiz-question .options input[type="radio"] { margin-right: 10px; }
+    .quiz-question .explanation {
+        display: none;
+        margin-top: 12px;
+        padding: 10px 14px;
+        border-radius: 6px;
+        font-size: 14px;
+    }
+    .quiz-question.correct .explanation {
+        display: block;
+        background: #d1fae5;
+        color: #065f46;
+        border-left: 4px solid #059669;
+    }
+    .quiz-question.wrong .explanation {
+        display: block;
+        background: #fee2e2;
+        color: #991b1b;
+        border-left: 4px solid #dc2626;
+    }
+    .quiz-summary {
+        text-align: center;
+        padding: 30px;
+        background: linear-gradient(135deg, #e8f5e9 0%, #ddd6fe 100%);
+        border-radius: 10px;
+        margin: 20px 0;
+        display: none;
+    }
+    .quiz-summary.show { display: block; }
+    .quiz-summary .score {
+        font-size: 48px;
+        font-weight: bold;
+        color: #2E7D32;
+        margin-bottom: 8px;
+    }
+    button.btn {
+        background: #2E7D32;
+        color: #fff;
+        border: none;
+        padding: 10px 20px;
+        border-radius: 6px;
+        font-size: 15px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: background 0.2s;
+    }
+    button.btn:hover { background: #2E7D32; }
+    button.btn.reset { background: #64748b; margin-left: 8px; }
+    button.btn.reset:hover { background: #475569; }
+
+    /* Sarah answer scenario */
+    .scenario-sim {
+        background: #e8f5e9;
+        border: 2px solid #2E7D32;
+        border-radius: 10px;
+        padding: 20px;
+        margin: 18px 0;
+    }
+    .scenario-sim h4 { color: #1B5E20; margin-bottom: 10px; }
+    .sim-choice {
+        display: block;
+        width: 100%;
+        text-align: left;
+        padding: 12px 16px;
+        margin: 6px 0;
+        background: #fff;
+        border: 1.5px solid #cbd5e1;
+        border-radius: 8px;
+        cursor: pointer;
+        font-size: 14px;
+        transition: all 0.2s;
+    }
+    .sim-choice:hover { border-color: #2E7D32; background: #e8f5e9; }
+    .sim-feedback {
+        display: none;
+        margin-top: 12px;
+        padding: 12px 16px;
+        border-radius: 6px;
+        font-size: 14px;
+    }
+    .sim-feedback.correct { display: block; background: #d1fae5; color: #065f46; border-left: 4px solid #059669; }
+    .sim-feedback.wrong { display: block; background: #fee2e2; color: #991b1b; border-left: 4px solid #dc2626; }
+    footer {
+        text-align: center;
+        color: #64748b;
+        padding: 24px;
+        font-size: 13px;
+    }
+    /* ── MTTI Logo watermark ── */
+    .mtti-logo-stamp {
+        position: fixed; top: 14px; right: 18px; z-index: 999;
+        opacity: 0.88; transition: opacity 0.2s;
+    }
+    .mtti-logo-stamp:hover { opacity: 1; }
+    .mtti-logo-stamp img { width: 56px; height: 56px; border-radius: 50%; box-shadow: 0 2px 8px rgba(0,0,0,0.18); }
+
+    /* ── Course orientation section ── */
+    .orient-header {
+        background: linear-gradient(135deg, #1b5e20 0%, #2e7d32 60%, #1976d2 100%);
+        color: #fff; padding: 32px 30px 24px; border-radius: 12px;
+        margin-bottom: 22px; box-shadow: 0 8px 24px rgba(30,94,32,0.25);
+    }
+    .orient-header h2 { font-size: 24px; margin-bottom: 6px; }
+    .orient-header p { opacity: 0.92; font-size: 15px; margin-bottom: 0; }
+    .orient-tagline {
+        display: inline-block; background: #F57C00; color: #fff;
+        padding: 4px 14px; border-radius: 16px; font-size: 12px;
+        font-weight: bold; letter-spacing: 1px; margin-bottom: 14px;
+    }
+
+    /* Curriculum map */
+    .curriculum-map { margin: 14px 0; }
+    .module-row {
+        border: 1px solid #e2e8f0; border-radius: 8px;
+        margin-bottom: 8px; overflow: hidden;
+    }
+    .module-toggle {
+        width: 100%; text-align: left; padding: 12px 16px;
+        background: #f8fafc; border: none; cursor: pointer;
+        font-size: 14px; font-weight: 700; color: #1e293b;
+        display: flex; align-items: center; gap: 10px;
+        transition: background 0.15s;
+    }
+    .module-toggle:hover { background: #e8f5e9; }
+    .module-toggle .mod-num {
+        background: #2e7d32; color: #fff; border-radius: 50%;
+        width: 26px; height: 26px; display: flex; align-items: center;
+        justify-content: center; font-size: 12px; flex-shrink: 0;
+    }
+    .module-toggle .mod-count { margin-left: auto; color: #64748b; font-size: 12px; font-weight: 400; }
+    .module-toggle .chevron { color: #94a3b8; font-size: 12px; transition: transform 0.2s; }
+    .module-toggle.open .chevron { transform: rotate(90deg); }
+    .module-lessons { display: none; padding: 8px 16px 12px 52px; background: #fff; }
+    .module-lessons.open { display: block; }
+    .lesson-item { font-size: 13px; color: #475569; padding: 4px 0; border-bottom: 1px solid #f1f5f9; display: flex; gap: 8px; }
+    .lesson-item:last-child { border-bottom: none; }
+    .lesson-item .lnum { color: #2e7d32; font-weight: 700; min-width: 52px; }
+    .lesson-item .ltype { font-size: 11px; color: #94a3b8; margin-left: auto; white-space: nowrap; }
+
+    /* How-to boxes */
+    .how-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 12px; margin: 14px 0; }
+    .how-card { border-radius: 10px; padding: 18px; border: 2px solid transparent; }
+    .how-card.video { background: #fef3c7; border-color: #fbbf24; }
+    .how-card.interactive { background: #ecfdf5; border-color: #059669; }
+    .how-card.quiz { background: #eff6ff; border-color: #3b82f6; }
+    .how-card h4 { font-size: 15px; margin-bottom: 8px; }
+    .how-card.video h4 { color: #92400e; }
+    .how-card.interactive h4 { color: #065f46; }
+    .how-card.quiz h4 { color: #1e40af; }
+    .how-card .how-icon { font-size: 28px; margin-bottom: 8px; }
+    .how-card p, .how-card li { font-size: 13px; color: #374151; }
+    .how-card ul { padding-left: 16px; margin-top: 6px; }
+
+    /* Platform tabs */
+    .platform-tabs { display: flex; gap: 8px; margin-bottom: 0; }
+    .ptab { padding: 9px 18px; border-radius: 6px 6px 0 0; border: 2px solid #e2e8f0; border-bottom: none; cursor: pointer; font-size: 13px; font-weight: 700; background: #f8fafc; color: #64748b; }
+    .ptab.active { background: #fff; border-color: #2E7D32; color: #2E7D32; border-bottom: 2px solid #fff; }
+    .ptab-content { display: none; background: #fff; border: 2px solid #e2e8f0; border-radius: 0 8px 8px 8px; padding: 20px; }
+    .ptab-content.active { display: block; }
+
+    /* YouTube enroll CTA */
+    .yt-cta { background: linear-gradient(135deg, #b91c1c, #dc2626); color: #fff; border-radius: 10px; padding: 20px 24px; margin: 14px 0; }
+    .yt-cta h4 { font-size: 17px; margin-bottom: 8px; }
+    .yt-cta p { font-size: 13px; opacity: 0.92; margin-bottom: 12px; }
+    .yt-cta .enroll-btn { display: inline-block; background: #fff; color: #b91c1c; font-weight: 800; padding: 10px 22px; border-radius: 6px; font-size: 14px; text-decoration: none; }
+
+    @media (max-width: 768px) {
+        .compare { grid-template-columns: 1fr; }
+        header h1 { font-size: 26px; }
+        .how-grid { grid-template-columns: 1fr; }
+        .mtti-logo-stamp img { width: 44px; height: 44px; }
+    }
+</style>
+</head>
+<body>
+<div class="mtti-logo-stamp">
+    <img src="../../Resources/Logo.jpeg" alt="MTTI Logo" title="Masomotele Technical Training Institute">
+</div>
+
+<div class="container">
+
+<header>
+    <div class="badge">LESSON 1.1  ·  FOUNDATIONS  ·  INTERACTIVE</div>
+    <h1>What is Digital Marketing?</h1>
+    <div class="subtitle">Definitions, the 9 elements, the 7 goals — and why Sarah's Karibu Kitchen needs to understand all of them</div>
+    <div class="meta-strip">
+        <span><strong>Duration:</strong> ~30 min interactive</span>
+        <span><strong>Level:</strong> Foundation</span>
+        <span><strong>Handbook:</strong> Part 1, §1.1</span>
+        <span><strong>Institute:</strong> Masomotele Technical Training Institute</span>
+    </div>
+</header>
+
+<!-- ══════════════════════════════════════════
+     COURSE ORIENTATION — appears only in 1.1
+     ══════════════════════════════════════════ -->
+<section id="orientation" style="border-color:#2e7d32;">
+
+<div class="orient-header">
+    <div class="orient-tagline">MTTI · START LEARNING, START EARNING</div>
+    <h2>Welcome to the Digital Marketing Course</h2>
+    <p>Before you start Lesson 1.1, spend 5 minutes here. This page explains what you will study, how every lesson works, and how to get the most out of the course — whether you are watching on YouTube or studying through the MTTI LMS.</p>
+</div>
+
+<!-- ── MODULE MAP ── -->
+<h2 style="color:#2e7d32; border-bottom-color:#2e7d32;">Course Curriculum — All 67 Lessons</h2>
+<p>This course has <strong>15 modules and 67 lessons</strong>. Click any module below to see its lessons.</p>
+
+<div class="curriculum-map">
+
+    <!-- M1 -->
+    <div class="module-row">
+        <button class="module-toggle" onclick="toggleMod(this)">
+            <span class="mod-num">1</span> Foundations of Digital Marketing
+            <span class="mod-count">2 lessons</span> <span class="chevron">▶</span>
+        </button>
+        <div class="module-lessons">
+            <div class="lesson-item"><span class="lnum">1.1</span> What is Digital Marketing? <span class="ltype">You are here</span></div>
+            <div class="lesson-item"><span class="lnum">1.2</span> Planning a Digital Marketing Strategy <span class="ltype">Video + Interactive + Quiz</span></div>
+        </div>
+    </div>
+
+    <!-- M2 -->
+    <div class="module-row">
+        <button class="module-toggle" onclick="toggleMod(this)">
+            <span class="mod-num">2</span> Web Presence
+            <span class="mod-count">3 lessons</span> <span class="chevron">▶</span>
+        </button>
+        <div class="module-lessons">
+            <div class="lesson-item"><span class="lnum">2.1</span> Web Presence Options <span class="ltype">Video + Interactive + Quiz</span></div>
+            <div class="lesson-item"><span class="lnum">2.2</span> Website Considerations <span class="ltype">Video + Interactive + Quiz</span></div>
+            <div class="lesson-item"><span class="lnum">2.3</span> SEO Theory <span class="ltype">Video + Interactive + Quiz</span></div>
+        </div>
+    </div>
+
+    <!-- M3 -->
+    <div class="module-row">
+        <button class="module-toggle" onclick="toggleMod(this)">
+            <span class="mod-num">3</span> Social Media Platforms
+            <span class="mod-count">2 lessons</span> <span class="chevron">▶</span>
+        </button>
+        <div class="module-lessons">
+            <div class="lesson-item"><span class="lnum">3.1</span> Social Media Platforms Overview <span class="ltype">Video + Interactive + Quiz</span></div>
+            <div class="lesson-item"><span class="lnum">3.2</span> Setting Up Social Media Accounts <span class="ltype">Video + Interactive + Quiz</span></div>
+        </div>
+    </div>
+
+    <!-- M4 -->
+    <div class="module-row">
+        <button class="module-toggle" onclick="toggleMod(this)">
+            <span class="mod-num">4</span> Social Media Management
+            <span class="mod-count">3 lessons</span> <span class="chevron">▶</span>
+        </button>
+        <div class="module-lessons">
+            <div class="lesson-item"><span class="lnum">4.1</span> Social Media Management Services <span class="ltype">Video + Interactive + Quiz</span></div>
+            <div class="lesson-item"><span class="lnum">4.2</span> Marketing &amp; Promotion <span class="ltype">Video + Interactive + Quiz</span></div>
+            <div class="lesson-item"><span class="lnum">4.3</span> Lead-to-Sale Funnel <span class="ltype">Video + Interactive + Quiz</span></div>
+        </div>
+    </div>
+
+    <!-- M5 -->
+    <div class="module-row">
+        <button class="module-toggle" onclick="toggleMod(this)">
+            <span class="mod-num">5</span> Online Advertising &amp; Paid Platforms
+            <span class="mod-count">7 lessons</span> <span class="chevron">▶</span>
+        </button>
+        <div class="module-lessons">
+            <div class="lesson-item"><span class="lnum">5.1</span> Online Advertising Overview <span class="ltype">Video + Interactive + Quiz</span></div>
+            <div class="lesson-item"><span class="lnum">5.2</span> Email Marketing <span class="ltype">Video + Interactive + Quiz</span></div>
+            <div class="lesson-item"><span class="lnum">5.3</span> Mobile Marketing <span class="ltype">Video + Interactive + Quiz</span></div>
+            <div class="lesson-item"><span class="lnum">5.4</span> Meta Ads Manager — Practical Lab <span class="ltype">Video + Interactive Lab + Quiz</span></div>
+            <div class="lesson-item"><span class="lnum">5.5</span> LinkedIn Campaign Manager <span class="ltype">Video + Interactive + Quiz</span></div>
+            <div class="lesson-item"><span class="lnum">5.6</span> TikTok Ads Manager <span class="ltype">Video + Interactive + Quiz</span></div>
+            <div class="lesson-item"><span class="lnum">5.7</span> Cross-Platform Quick Reference <span class="ltype">Video + Interactive + Quiz</span></div>
+        </div>
+    </div>
+
+    <!-- M6 -->
+    <div class="module-row">
+        <button class="module-toggle" onclick="toggleMod(this)">
+            <span class="mod-num">6</span> Analytics &amp; Measurement
+            <span class="mod-count">4 lessons</span> <span class="chevron">▶</span>
+        </button>
+        <div class="module-lessons">
+            <div class="lesson-item"><span class="lnum">6.1</span> Analytics: Getting Started <span class="ltype">Video + Interactive + Quiz</span></div>
+            <div class="lesson-item"><span class="lnum">6.2</span> Web Analytics with GA4 <span class="ltype">Video + Interactive + Quiz</span></div>
+            <div class="lesson-item"><span class="lnum">6.3</span> Social Media Insights <span class="ltype">Video + Interactive + Quiz</span></div>
+            <div class="lesson-item"><span class="lnum">6.4</span> Email &amp; Advertising Analytics <span class="ltype">Video + Interactive + Quiz</span></div>
+        </div>
+    </div>
+
+    <!-- M7 -->
+    <div class="module-row">
+        <button class="module-toggle" onclick="toggleMod(this)">
+            <span class="mod-num">7</span> Visual Content Creation
+            <span class="mod-count">8 lessons</span> <span class="chevron">▶</span>
+        </button>
+        <div class="module-lessons">
+            <div class="lesson-item"><span class="lnum">7.1</span> Why Visual Content Matters <span class="ltype">Video + Interactive + Quiz</span></div>
+            <div class="lesson-item"><span class="lnum">7.2</span> Content Creation Tools / Canva <span class="ltype">Video + Interactive Lab + Quiz</span></div>
+            <div class="lesson-item"><span class="lnum">7.3</span> Design Principles <span class="ltype">Video + Interactive + Quiz</span></div>
+            <div class="lesson-item"><span class="lnum">7.4</span> Canvas Comparator <span class="ltype">Video + Interactive Lab + Quiz</span></div>
+            <div class="lesson-item"><span class="lnum">7.5</span> Content Calendar Planning <span class="ltype">Video + Interactive + Quiz</span></div>
+            <div class="lesson-item"><span class="lnum">7.6</span> Accessibility in Digital Content <span class="ltype">Video + Interactive + Quiz</span></div>
+            <div class="lesson-item"><span class="lnum">7.7</span> Video Creation Basics <span class="ltype">Video + Interactive + Quiz</span></div>
+            <div class="lesson-item"><span class="lnum">7.8</span> User-Generated Content <span class="ltype">Video + Interactive + Quiz</span></div>
+        </div>
+    </div>
+
+    <!-- M8 -->
+    <div class="module-row">
+        <button class="module-toggle" onclick="toggleMod(this)">
+            <span class="mod-num">8</span> WordPress Website Building
+            <span class="mod-count">7 lessons</span> <span class="chevron">▶</span>
+        </button>
+        <div class="module-lessons">
+            <div class="lesson-item"><span class="lnum">8.1</span> WordPress Fast Start <span class="ltype">Video + Interactive Lab + Quiz</span></div>
+            <div class="lesson-item"><span class="lnum">8.2</span> Introducing WordPress Studio <span class="ltype">Video + Interactive + Quiz</span></div>
+            <div class="lesson-item"><span class="lnum">8.3</span> Install WordPress Studio <span class="ltype">Video + Interactive Lab + Quiz</span></div>
+            <div class="lesson-item"><span class="lnum">8.4</span> WordPress Dashboard Tour <span class="ltype">Video + Interactive + Quiz</span></div>
+            <div class="lesson-item"><span class="lnum">8.5</span> Create the 5 Essential Pages <span class="ltype">Video + Interactive Lab + Quiz</span></div>
+            <div class="lesson-item"><span class="lnum">8.6</span> Install and Customise a Theme <span class="ltype">Video + Interactive + Quiz</span></div>
+            <div class="lesson-item"><span class="lnum">8.7</span> Install Essential Plugins <span class="ltype">Video + Interactive + Quiz</span></div>
+        </div>
+    </div>
+
+    <!-- M9 -->
+    <div class="module-row">
+        <button class="module-toggle" onclick="toggleMod(this)">
+            <span class="mod-num">9</span> Search Engine Optimisation (SEO)
+            <span class="mod-count">6 lessons</span> <span class="chevron">▶</span>
+        </button>
+        <div class="module-lessons">
+            <div class="lesson-item"><span class="lnum">9.2</span> Keyword Research <span class="ltype">Video + Interactive Lab + Quiz</span></div>
+            <div class="lesson-item"><span class="lnum">9.3</span> On-Page SEO with Yoast <span class="ltype">Video + Interactive + Quiz</span></div>
+            <div class="lesson-item"><span class="lnum">9.4</span> Technical SEO / Core Web Vitals <span class="ltype">Video + Interactive + Quiz</span></div>
+            <div class="lesson-item"><span class="lnum">9.5</span> Off-Page SEO / Backlinks <span class="ltype">Video + Interactive + Quiz</span></div>
+            <div class="lesson-item"><span class="lnum">9.6</span> Setting Up Google Search Console <span class="ltype">Video + Interactive Lab + Quiz</span></div>
+            <div class="lesson-item"><span class="lnum">9.7</span> Setting Up Google Analytics 4 <span class="ltype">Video + Interactive Lab + Quiz</span></div>
+        </div>
+    </div>
+
+    <!-- M10 -->
+    <div class="module-row">
+        <button class="module-toggle" onclick="toggleMod(this)">
+            <span class="mod-num">10</span> Google Ads
+            <span class="mod-count">1 lesson</span> <span class="chevron">▶</span>
+        </button>
+        <div class="module-lessons">
+            <div class="lesson-item"><span class="lnum">10.1</span> Google Ads Simulator Lab <span class="ltype">Video + Interactive Lab + Quiz</span></div>
+        </div>
+    </div>
+
+    <!-- M11 -->
+    <div class="module-row">
+        <button class="module-toggle" onclick="toggleMod(this)">
+            <span class="mod-num">11</span> Meta Ads — Advanced
+            <span class="mod-count">5 lessons</span> <span class="chevron">▶</span>
+        </button>
+        <div class="module-lessons">
+            <div class="lesson-item"><span class="lnum">11.1</span> Meta Business Manager <span class="ltype">Video + Interactive + Quiz</span></div>
+            <div class="lesson-item"><span class="lnum">11.2</span> Events Manager: Pixel + CAPI <span class="ltype">Video + Interactive + Quiz</span></div>
+            <div class="lesson-item"><span class="lnum">11.3</span> Audiences Dashboard <span class="ltype">Video + Interactive + Quiz</span></div>
+            <div class="lesson-item"><span class="lnum">11.4</span> Creative Formats &amp; Ad Preview <span class="ltype">Video + Interactive + Quiz</span></div>
+            <div class="lesson-item"><span class="lnum">11.5</span> Budgets, Advantage+, Learning Phase <span class="ltype">Video + Interactive + Quiz</span></div>
+        </div>
+    </div>
+
+    <!-- M12 -->
+    <div class="module-row">
+        <button class="module-toggle" onclick="toggleMod(this)">
+            <span class="mod-num">12</span> TikTok Advertising
+            <span class="mod-count">5 lessons</span> <span class="chevron">▶</span>
+        </button>
+        <div class="module-lessons">
+            <div class="lesson-item"><span class="lnum">12.1</span> TikTok Ads Manager Deep Tour <span class="ltype">Video + Interactive + Quiz</span></div>
+            <div class="lesson-item"><span class="lnum">12.2</span> TikTok Pixel + Events API <span class="ltype">Video + Interactive + Quiz</span></div>
+            <div class="lesson-item"><span class="lnum">12.3</span> Spark Ads + Creator Marketplace <span class="ltype">Video + Interactive + Quiz</span></div>
+            <div class="lesson-item"><span class="lnum">12.4</span> Trend-jacking + Creative Center <span class="ltype">Video + Interactive + Quiz</span></div>
+            <div class="lesson-item"><span class="lnum">12.5</span> Ads Manager Analytics + Optimisation <span class="ltype">Video + Interactive + Quiz</span></div>
+        </div>
+    </div>
+
+    <!-- M13 -->
+    <div class="module-row">
+        <button class="module-toggle" onclick="toggleMod(this)">
+            <span class="mod-num">13</span> YouTube Marketing
+            <span class="mod-count">5 lessons</span> <span class="chevron">▶</span>
+        </button>
+        <div class="module-lessons">
+            <div class="lesson-item"><span class="lnum">13.1</span> YouTube Search &amp; the Algorithm <span class="ltype">Video + Interactive + Quiz</span></div>
+            <div class="lesson-item"><span class="lnum">13.2</span> Channel Setup &amp; Branding <span class="ltype">Video + Interactive + Quiz</span></div>
+            <div class="lesson-item"><span class="lnum">13.3</span> YouTube SEO in Studio Upload <span class="ltype">Video + Interactive + Quiz</span></div>
+            <div class="lesson-item"><span class="lnum">13.4</span> Long-form vs Shorts Strategy <span class="ltype">Video + Interactive + Quiz</span></div>
+            <div class="lesson-item"><span class="lnum">13.5</span> YouTube Ads via Google Ads <span class="ltype">Video + Interactive + Quiz</span></div>
+        </div>
+    </div>
+
+    <!-- M14 -->
+    <div class="module-row">
+        <button class="module-toggle" onclick="toggleMod(this)">
+            <span class="mod-num">14</span> Google Business Profile
+            <span class="mod-count">5 lessons</span> <span class="chevron">▶</span>
+        </button>
+        <div class="module-lessons">
+            <div class="lesson-item"><span class="lnum">14.1</span> Local Pack + Why GBP Wins <span class="ltype">Video + Interactive + Quiz</span></div>
+            <div class="lesson-item"><span class="lnum">14.2</span> Setup + Verification <span class="ltype">Video + Interactive Lab + Quiz</span></div>
+            <div class="lesson-item"><span class="lnum">14.3</span> Optimising the Listing <span class="ltype">Video + Interactive + Quiz</span></div>
+            <div class="lesson-item"><span class="lnum">14.4</span> Reviews + Q&amp;A + Google Posts <span class="ltype">Video + Interactive + Quiz</span></div>
+            <div class="lesson-item"><span class="lnum">14.5</span> GBP Insights + Local-Pack Ranking <span class="ltype">Video + Interactive + Quiz</span></div>
+        </div>
+    </div>
+
+    <!-- M15 -->
+    <div class="module-row">
+        <button class="module-toggle" onclick="toggleMod(this)">
+            <span class="mod-num">15</span> AI for Digital Marketers
+            <span class="mod-count">2 lessons</span> <span class="chevron">▶</span>
+        </button>
+        <div class="module-lessons">
+            <div class="lesson-item"><span class="lnum">15.1</span> AI for Copy &amp; Content <span class="ltype">Video + Interactive Lab + Quiz</span></div>
+            <div class="lesson-item"><span class="lnum">15.2</span> AI for Visuals &amp; Automation <span class="ltype">Video + Interactive Lab + Quiz</span></div>
+        </div>
+    </div>
+
+</div><!-- end curriculum-map -->
+
+<!-- ── HOW TO USE THIS COURSE ── -->
+<h2 style="color:#2e7d32; border-bottom-color:#2e7d32; margin-top:28px;">How to Use Each Lesson</h2>
+<p>Every lesson in this course has up to three components working together. Use all three — learners who skip any one of them learn significantly less.</p>
+
+<div class="how-grid">
+    <div class="how-card video">
+        <div class="how-icon">🎬</div>
+        <h4>1. Video Lesson</h4>
+        <ul>
+            <li>Watch the lesson video <strong>first</strong>, before opening the interactive</li>
+            <li>Videos are 5–10 minutes each — short and focused</li>
+            <li>Sarah's Karibu Kitchen is the running case study in every video</li>
+            <li>Available on the MTTI LMS and on the MTTI YouTube channel</li>
+            <li>You can pause, rewind, or replay any section</li>
+        </ul>
+        <p style="margin-top:8px; font-size:12px; color:#92400e;"><strong>Tip:</strong> Watch once without pausing, then rewatch difficult sections.</p>
+    </div>
+    <div class="how-card interactive">
+        <div class="how-icon">💻</div>
+        <h4>2. Interactive File</h4>
+        <ul>
+            <li>This is the page you are reading right now</li>
+            <li>Opens in your browser — works offline, no internet needed</li>
+            <li>Click cards, drag sliders, build campaigns, answer scenarios</li>
+            <li>Deepens understanding through <strong>doing</strong>, not just reading</li>
+            <li>Some lessons have full simulator labs — e.g. build a real Meta ad campaign</li>
+        </ul>
+        <p style="margin-top:8px; font-size:12px; color:#065f46;"><strong>Why it matters:</strong> Reading about Meta Ads is different from actually setting one up — even in a simulator. The interactive builds the muscle memory you need for real work.</p>
+    </div>
+    <div class="how-card quiz">
+        <div class="how-icon">✅</div>
+        <h4>3. Quiz / Self-check</h4>
+        <ul>
+            <li>Found at the bottom of every interactive file</li>
+            <li>Usually 5–10 questions per lesson</li>
+            <li>Instant feedback — you see the explanation for every answer</li>
+            <li>Graded quizzes on the LMS count toward your certificate score</li>
+            <li>Score below 70%? Re-read the relevant section, then retry</li>
+        </ul>
+        <p style="margin-top:8px; font-size:12px; color:#1e40af;"><strong>Important:</strong> On the LMS, your quiz scores are recorded. The final certificate requires a minimum of 70% across all module quizzes.</p>
+    </div>
+</div>
+
+<!-- ── PLATFORM GUIDES ── -->
+<h2 style="color:#2e7d32; border-bottom-color:#2e7d32; margin-top:28px;">Your Learning Platform</h2>
+<p>Choose your platform below to see how your specific experience works.</p>
+
+<div class="platform-tabs">
+    <button class="ptab active" onclick="switchTab(this,'lms')">📚 LMS Learner</button>
+    <button class="ptab" onclick="switchTab(this,'yt')">▶ YouTube Viewer</button>
+</div>
+
+<div id="tab-lms" class="ptab-content active">
+    <h4 style="color:#2e7d32; margin-bottom:12px;">You are enrolled in the MTTI Digital Marketing Course</h4>
+    <p><strong>How your LMS works:</strong></p>
+    <ol style="padding-left:20px; margin:10px 0; line-height:2;">
+        <li>Log in at <strong>masomoteletraining.co.ke</strong> and go to <em>My Courses → Digital Marketing</em></li>
+        <li>Each lesson appears as: <strong>Video → Interactive → Quiz</strong> in sequence</li>
+        <li>Watch the video, then open the interactive (this file), then complete the quiz on the LMS</li>
+        <li>The LMS records your quiz scores and tracks your progress automatically</li>
+        <li>A green tick appears on each lesson when you complete the quiz at ≥70%</li>
+        <li>When all 15 modules are complete, your <strong>Certificate of Completion</strong> is generated automatically</li>
+        <li>Your certificate is TVETA-registered and can be downloaded and printed</li>
+    </ol>
+    <div class="callout tip" style="margin-top:12px;">
+        <strong>Need help on the LMS?</strong> Contact MTTI support via WhatsApp on the number at the bottom of masomoteletraining.co.ke. Response within 24 hours on weekdays.
+    </div>
+</div>
+
+<div id="tab-yt" class="ptab-content">
+    <h4 style="color:#b91c1c; margin-bottom:12px;">You are watching MTTI lessons on YouTube</h4>
+    <p>Welcome! You can watch all the video lessons on the MTTI YouTube channel for free. Here is what you get — and what you are missing.</p>
+    <table style="width:100%; border-collapse:collapse; margin:12px 0; font-size:13px;">
+        <tr style="background:#f8fafc;">
+            <th style="padding:8px; text-align:left; border:1px solid #e2e8f0;">Feature</th>
+            <th style="padding:8px; text-align:center; border:1px solid #e2e8f0;">YouTube (Free)</th>
+            <th style="padding:8px; text-align:center; border:1px solid #e2e8f0;">MTTI LMS (Enrolled)</th>
+        </tr>
+        <tr>
+            <td style="padding:8px; border:1px solid #e2e8f0;">Video lessons</td>
+            <td style="padding:8px; text-align:center; border:1px solid #e2e8f0;">✅ All videos</td>
+            <td style="padding:8px; text-align:center; border:1px solid #e2e8f0;">✅ All videos</td>
+        </tr>
+        <tr style="background:#f8fafc;">
+            <td style="padding:8px; border:1px solid #e2e8f0;">Interactive files (labs)</td>
+            <td style="padding:8px; text-align:center; border:1px solid #e2e8f0;">❌ Not included</td>
+            <td style="padding:8px; text-align:center; border:1px solid #e2e8f0;">✅ All 67 labs</td>
+        </tr>
+        <tr>
+            <td style="padding:8px; border:1px solid #e2e8f0;">Graded quizzes</td>
+            <td style="padding:8px; text-align:center; border:1px solid #e2e8f0;">❌ Not included</td>
+            <td style="padding:8px; text-align:center; border:1px solid #e2e8f0;">✅ All quizzes recorded</td>
+        </tr>
+        <tr style="background:#f8fafc;">
+            <td style="padding:8px; border:1px solid #e2e8f0;">Progress tracking</td>
+            <td style="padding:8px; text-align:center; border:1px solid #e2e8f0;">❌</td>
+            <td style="padding:8px; text-align:center; border:1px solid #e2e8f0;">✅ Automatic</td>
+        </tr>
+        <tr>
+            <td style="padding:8px; border:1px solid #e2e8f0;">Instructor support</td>
+            <td style="padding:8px; text-align:center; border:1px solid #e2e8f0;">❌</td>
+            <td style="padding:8px; text-align:center; border:1px solid #e2e8f0;">✅ WhatsApp + LMS forum</td>
+        </tr>
+        <tr style="background:#f8fafc;">
+            <td style="padding:8px; border:1px solid #e2e8f0; font-weight:bold;">TVETA Certificate</td>
+            <td style="padding:8px; text-align:center; border:1px solid #e2e8f0; color:#dc2626; font-weight:bold;">❌ Not available</td>
+            <td style="padding:8px; text-align:center; border:1px solid #e2e8f0; color:#059669; font-weight:bold;">✅ Auto-generated</td>
+        </tr>
+    </table>
+    <div class="yt-cta">
+        <h4>Get your MTTI Certificate — Enroll Today</h4>
+        <p>You are watching the free YouTube version. To access all 67 interactive labs, graded quizzes, instructor support, and your official TVETA-recognised Digital Marketing Certificate — enroll through the MTTI website.</p>
+        <a class="enroll-btn" href="https://masomoteletraining.co.ke" target="_blank">Enroll at masomoteletraining.co.ke →</a>
+    </div>
+</div>
+
+</section>
+<!-- ══ END ORIENTATION ══ -->
+
+<div class="toc">
+    <h3>What you'll do in this lesson</h3>
+    <ol>
+        <li><a href="#orientation">Course orientation — curriculum map &amp; how to use your lessons</a></li>
+        <li><a href="#s1">Meet Sarah — the question we'll answer</a></li>
+        <li><a href="#s2">The definition — what digital marketing actually is</a></li>
+        <li><a href="#s3">The 9 core elements (click each to reveal)</a></li>
+        <li><a href="#s4">The 7 goals — pick Sarah's top 2</a></li>
+        <li><a href="#s5">Advantages vs limitations — the honest picture</a></li>
+        <li><a href="#s6">Kenya legal considerations — the DPA 2019</a></li>
+        <li><a href="#s7">Answer Sarah's question (scenario)</a></li>
+        <li><a href="#s8">Self-check quiz (8 questions)</a></li>
+    </ol>
+</div>
+
+<section id="s1">
+    <h2>1. Meet Sarah — the question we'll answer</h2>
+    <div class="sarah-card">
+        <div class="sarah-avatar">S</div>
+        <div>
+            <h4>Sarah Chebet — Karibu Kitchen, Eldoret</h4>
+            <p>Sarah runs a small restaurant serving lunch to office workers in Eldoret CBD and dinner delivery to Kapsoya, Elgon View, and Racecourse. Her budget is <strong>KES 15,000/month</strong>. She's been told her business needs "digital marketing" but she isn't sure what that phrase actually means. Is it just paying for Facebook adverts?</p>
+        </div>
+    </div>
+    <div class="callout">
+        <strong>By the end of this lesson</strong> you'll be able to answer Sarah's question in one clear paragraph — and know which of the 9 elements and 7 goals matter for her specifically.
+    </div>
+</section>
+
+<section id="s2">
+    <h2>2. The definition</h2>
+    <p><strong>Digital marketing</strong> is every marketing activity that uses electronic devices or the internet to reach customers. It promotes brands, products, or services through digital channels — search engines, social media, email, video, websites — and it meets customers exactly where they already spend their time online.</p>
+    <div class="callout tip">
+        <strong>Two things to notice in that definition:</strong>
+        <ol style="margin-top: 6px;">
+            <li>Digital marketing is <strong>not one thing</strong> — it is many activities working together.</li>
+            <li>It <strong>meets customers where they already are</strong> — you don't force them to come to you.</li>
+        </ol>
+    </div>
+</section>
+
+<section id="s3">
+    <h2>3. The 9 core elements</h2>
+    <p>Every trainee must know these nine. Click each card to reveal what it means and how Sarah might use it.</p>
+    <div class="elements-grid" id="elementsGrid">
+        <div class="element-card" onclick="this.classList.toggle('open')">
+            <span class="num">1</span>
+            <h4>Content Marketing</h4>
+            <div class="short">Attract with valuable content.</div>
+            <div class="desc">Creating articles, videos, recipes, or posts that help your audience — without a direct sales pitch. <strong>Sarah:</strong> a weekly "Lunch of the Week" post with the recipe.</div>
+        </div>
+        <div class="element-card" onclick="this.classList.toggle('open')">
+            <span class="num">2</span>
+            <h4>Social Media Marketing</h4>
+            <div class="short">Facebook, Instagram, TikTok, X.</div>
+            <div class="desc">Regular organic posts, stories, reels, community engagement on the platforms your customers already use. <strong>Sarah:</strong> daily lunch photos on Instagram and Facebook.</div>
+        </div>
+        <div class="element-card" onclick="this.classList.toggle('open')">
+            <span class="num">3</span>
+            <h4>Email Marketing</h4>
+            <div class="short">Targeted messages to subscribers.</div>
+            <div class="desc">Newsletter, weekly menu, promotions, birthday offers — sent to people who consented to hear from you. <strong>Sarah:</strong> a Sunday menu email to her 30 subscribers.</div>
+        </div>
+        <div class="element-card" onclick="this.classList.toggle('open')">
+            <span class="num">4</span>
+            <h4>Mobile Marketing</h4>
+            <div class="short">SMS, WhatsApp, mobile apps.</div>
+            <div class="desc">Over 80% of Kenyan internet traffic is on phones — this includes WhatsApp Business, SMS bulk campaigns, and push notifications. <strong>Sarah:</strong> WhatsApp broadcast to today's regulars.</div>
+        </div>
+        <div class="element-card" onclick="this.classList.toggle('open')">
+            <span class="num">5</span>
+            <h4>Affiliate Marketing</h4>
+            <div class="short">Partners paid on results.</div>
+            <div class="desc">You pay a commission when a partner brings you a sale. <strong>Sarah:</strong> pay a KES 100 commission to a Kapsoya boda-boda rider for every new dinner customer he refers.</div>
+        </div>
+        <div class="element-card" onclick="this.classList.toggle('open')">
+            <span class="num">6</span>
+            <h4>Search Engine Marketing (SEM)</h4>
+            <div class="short">Paid Google adverts.</div>
+            <div class="desc">Google Ads that show at the top of search results for chosen keywords — you pay per click. <strong>Sarah:</strong> paid ads for "lunch delivery Eldoret CBD" during weekdays 11am–1pm.</div>
+        </div>
+        <div class="element-card" onclick="this.classList.toggle('open')">
+            <span class="num">7</span>
+            <h4>Search Engine Optimisation (SEO)</h4>
+            <div class="short">Free ranking in Google.</div>
+            <div class="desc">Improving your website so it appears in unpaid Google results — takes weeks to months but keeps working for free. <strong>Sarah:</strong> ranking her website for "vegetarian lunch Elgon View".</div>
+        </div>
+        <div class="element-card" onclick="this.classList.toggle('open')">
+            <span class="num">8</span>
+            <h4>Display Advertising</h4>
+            <div class="short">Banners on other websites.</div>
+            <div class="desc">Image or video ads that appear on other sites via the Google Display Network or Meta Audience Network. <strong>Sarah:</strong> banner on the Nation website targeted at Eldoret readers.</div>
+        </div>
+        <div class="element-card" onclick="this.classList.toggle('open')">
+            <span class="num">9</span>
+            <h4>Analytics</h4>
+            <div class="short">Measure what's working.</div>
+            <div class="desc">Google Analytics 4, Meta Insights, and platform dashboards — the numbers that tell you what to keep doing and what to stop. <strong>Sarah:</strong> weekly review of which post drove the most WhatsApp orders.</div>
+        </div>
+    </div>
+    <div class="callout tip">
+        <strong>Do this now:</strong> Click every card. If you finish the lesson without clicking all nine, you haven't done the lesson.
+    </div>
+</section>
+
+<section id="s4">
+    <h2>4. The 7 goals — pick Sarah's top 2</h2>
+    <p>Every digital marketing activity should serve at least one of these seven goals. Click the two you think matter most for Sarah's dinner delivery business.</p>
+    <div class="goals-grid" id="goalsGrid">
+        <div class="goal-card" data-goal="awareness" onclick="pickGoal(this)">Brand awareness</div>
+        <div class="goal-card" data-goal="leads" onclick="pickGoal(this)">Lead generation</div>
+        <div class="goal-card" data-goal="sales" onclick="pickGoal(this)">Sales generation</div>
+        <div class="goal-card" data-goal="info" onclick="pickGoal(this)">Customer information</div>
+        <div class="goal-card" data-goal="service" onclick="pickGoal(this)">Customer service</div>
+        <div class="goal-card" data-goal="engage" onclick="pickGoal(this)">Direct engagement</div>
+        <div class="goal-card" data-goal="traffic" onclick="pickGoal(this)">Traffic generation</div>
+    </div>
+    <div id="goalOutput">Pick two goals above to see the recommendation.</div>
+</section>
+
+<section id="s5">
+    <h2>5. Advantages vs limitations — the honest picture</h2>
+    <p>Digital marketing is not magic. Every good marketer sees both sides.</p>
+    <div class="compare">
+        <div class="adv">
+            <h4>✓ Advantages</h4>
+            <ul>
+                <li><strong>Cost-effective</strong> — reach thousands for a few hundred shillings.</li>
+                <li><strong>Trackable</strong> — you see exact clicks, views, orders.</li>
+                <li><strong>Larger demographic reach</strong> — beyond your town.</li>
+                <li><strong>Higher engagement</strong> — likes, comments, shares, DMs.</li>
+                <li><strong>Mobile-friendly</strong> — critical in Kenya (80%+ mobile).</li>
+            </ul>
+        </div>
+        <div class="lim">
+            <h4>✗ Limitations</h4>
+            <ul>
+                <li><strong>Fewer face-to-face moments</strong> — relationships feel less personal.</li>
+                <li><strong>Can feel obtrusive</strong> — nobody enjoys a pop-up.</li>
+                <li><strong>Needs constant management</strong> — one post is not a strategy.</li>
+                <li><strong>Not for every product</strong> — a rural elder without a phone won't see it.</li>
+                <li><strong>Ad fatigue</strong> — audiences tune out repetitive creative.</li>
+            </ul>
+        </div>
+    </div>
+</section>
+
+<section id="s6">
+    <h2>6. Kenya legal considerations — the DPA 2019</h2>
+    <p>Digital marketing in Kenya is <strong>regulated</strong>. The <strong>Kenya Data Protection Act, 2019</strong> gives every customer rights over how their personal data is collected and used. Get this wrong and you face fines of up to <strong>KES 5 million</strong> — plus the loss of your customers' trust.</p>
+    <div class="legal-grid">
+        <div class="legal-card">
+            <h4>1. Consent</h4>
+            <p>You must obtain consent before sending marketing messages (email, SMS, WhatsApp).</p>
+        </div>
+        <div class="legal-card">
+            <h4>2. Privacy</h4>
+            <p>Customer data must be stored securely. Only collect what you actually need.</p>
+        </div>
+        <div class="legal-card">
+            <h4>3. No spam</h4>
+            <p>Every marketing message must have a clear way to opt out.</p>
+        </div>
+        <div class="legal-card">
+            <h4>4. Copyright</h4>
+            <p>You cannot use other people's images or music without a licence.</p>
+        </div>
+        <div class="legal-card">
+            <h4>5. Truth in advertising</h4>
+            <p>Claims about a product must be accurate. No fake reviews.</p>
+        </div>
+        <div class="legal-card">
+            <h4>6. Data breach reporting</h4>
+            <p>If customer data leaks, you must report within 72 hours to the ODPC.</p>
+        </div>
+    </div>
+    <div class="callout warn">
+        <strong>Regulator to know:</strong> the Office of the Data Protection Commissioner (ODPC) — the body that enforces the DPA 2019 and imposes fines.
+    </div>
+</section>
+
+<section id="s7">
+    <h2>7. Answer Sarah's question</h2>
+    <p>Sarah asked: <em>"Is digital marketing just paying for Facebook adverts?"</em> Which is the best answer?</p>
+    <div class="scenario-sim">
+        <button class="sim-choice" onclick="simFeedback(this, false, 'Too narrow. Facebook Ads is ONE of nine elements — Sarah would miss SEO, email, WhatsApp, analytics, and more.')">A) Yes — Facebook adverts are digital marketing.</button>
+        <button class="sim-choice" onclick="simFeedback(this, false, 'Wrong direction. Facebook Ads IS digital marketing — but it is just one part.')">B) No — Facebook adverts are traditional marketing.</button>
+        <button class="sim-choice" onclick="simFeedback(this, true, 'Correct. Digital marketing is 9 connected activities aimed at 7 possible goals. Facebook Ads is one important piece — but Sarah needs a strategy that combines several elements to fit her KES 15,000/month budget, her customers, and Kenyan law.')">C) No — Facebook adverts are ONE element of nine. Digital marketing combines several to serve business goals.</button>
+        <button class="sim-choice" onclick="simFeedback(this, false, 'Not quite. Facebook Ads is definitely digital marketing — but calling it "the same thing" ignores the other 8 elements.')">D) Yes — Facebook Ads and digital marketing are the same thing.</button>
+        <div id="sim-fb-1" class="sim-feedback"></div>
+    </div>
+</section>
+
+<section id="s8">
+    <h2>8. Self-check quiz</h2>
+    <p>Eight questions. Pick an answer and it locks in — you'll see instant feedback.</p>
+
+    <div class="quiz-question" data-correct="B">
+        <h4>1. Which is NOT one of the 9 elements of digital marketing?</h4>
+        <div class="options">
+            <label><input type="radio" name="q1" value="A"> A) Email Marketing</label>
+            <label><input type="radio" name="q1" value="B"> B) Print Newspaper Adverts</label>
+            <label><input type="radio" name="q1" value="C"> C) Search Engine Optimisation</label>
+            <label><input type="radio" name="q1" value="D"> D) Affiliate Marketing</label>
+        </div>
+        <div class="explanation">Correct — print is a traditional (offline) channel. Digital marketing runs on electronic devices and the internet.</div>
+    </div>
+
+    <div class="quiz-question" data-correct="C">
+        <h4>2. What percentage of Kenyan internet traffic is on mobile?</h4>
+        <div class="options">
+            <label><input type="radio" name="q2" value="A"> A) Around 30%</label>
+            <label><input type="radio" name="q2" value="B"> B) Around 50%</label>
+            <label><input type="radio" name="q2" value="C"> C) Over 80%</label>
+            <label><input type="radio" name="q2" value="D"> D) Around 10%</label>
+        </div>
+        <div class="explanation">Correct — over 80%. That's why mobile-friendly design is not optional for Kenyan businesses.</div>
+    </div>
+
+    <div class="quiz-question" data-correct="A">
+        <h4>3. What is the maximum fine under the Kenya DPA 2019?</h4>
+        <div class="options">
+            <label><input type="radio" name="q3" value="A"> A) KES 5 million</label>
+            <label><input type="radio" name="q3" value="B"> B) KES 100,000</label>
+            <label><input type="radio" name="q3" value="C"> C) KES 50 million</label>
+            <label><input type="radio" name="q3" value="D"> D) There is no fine</label>
+        </div>
+        <div class="explanation">Correct — up to KES 5 million per breach. Plus reputational damage.</div>
+    </div>
+
+    <div class="quiz-question" data-correct="D">
+        <h4>4. Which is a goal — not an element — of digital marketing?</h4>
+        <div class="options">
+            <label><input type="radio" name="q4" value="A"> A) SEO</label>
+            <label><input type="radio" name="q4" value="B"> B) Email Marketing</label>
+            <label><input type="radio" name="q4" value="C"> C) Content Marketing</label>
+            <label><input type="radio" name="q4" value="D"> D) Lead Generation</label>
+        </div>
+        <div class="explanation">Correct — lead generation is what you're trying to ACHIEVE. SEO, email, and content are HOW you achieve it.</div>
+    </div>
+
+    <div class="quiz-question" data-correct="B">
+        <h4>5. Sarah wants dinner deliveries this month. Which two goals matter most?</h4>
+        <div class="options">
+            <label><input type="radio" name="q5" value="A"> A) Customer information + Traffic generation</label>
+            <label><input type="radio" name="q5" value="B"> B) Sales generation + Brand awareness in her three neighbourhoods</label>
+            <label><input type="radio" name="q5" value="C"> C) Customer service + Direct engagement</label>
+            <label><input type="radio" name="q5" value="D"> D) Lead generation + Customer service</label>
+        </div>
+        <div class="explanation">Correct — dinner delivery is a direct-response product; sales is the immediate goal, and awareness in her three delivery neighbourhoods drives repeat orders.</div>
+    </div>
+
+    <div class="quiz-question" data-correct="C">
+        <h4>6. What's the difference between SEM and SEO?</h4>
+        <div class="options">
+            <label><input type="radio" name="q6" value="A"> A) SEM is for mobile, SEO is for desktop.</label>
+            <label><input type="radio" name="q6" value="B"> B) They are the same thing.</label>
+            <label><input type="radio" name="q6" value="C"> C) SEM is PAID Google adverts; SEO is FREE ranking through content and technical improvements.</label>
+            <label><input type="radio" name="q6" value="D"> D) SEM is for social media; SEO is for search engines.</label>
+        </div>
+        <div class="explanation">Correct — Search Engine Marketing = paid. Search Engine Optimisation = organic/unpaid.</div>
+    </div>
+
+    <div class="quiz-question" data-correct="A">
+        <h4>7. Which advantage matters MOST for a Kenyan small business?</h4>
+        <div class="options">
+            <label><input type="radio" name="q7" value="A"> A) Cost-effective and mobile-friendly — reach thousands for a few hundred shillings on the device 80%+ of customers use.</label>
+            <label><input type="radio" name="q7" value="B"> B) It looks impressive.</label>
+            <label><input type="radio" name="q7" value="C"> C) You never need to do it again once it's set up.</label>
+            <label><input type="radio" name="q7" value="D"> D) It replaces the need for a physical business.</label>
+        </div>
+        <div class="explanation">Correct — the cost + mobile combination is why digital marketing is transformative for Kenyan SMEs.</div>
+    </div>
+
+    <div class="quiz-question" data-correct="D">
+        <h4>8. Before Sarah sends her first WhatsApp marketing broadcast, what MUST she do?</h4>
+        <div class="options">
+            <label><input type="radio" name="q8" value="A"> A) Send at 6am for maximum reach.</label>
+            <label><input type="radio" name="q8" value="B"> B) Use ALL CAPS to catch attention.</label>
+            <label><input type="radio" name="q8" value="C"> C) Nothing — WhatsApp is not regulated.</label>
+            <label><input type="radio" name="q8" value="D"> D) Get consent from each recipient and include a clear opt-out.</label>
+        </div>
+        <div class="explanation">Correct — the DPA 2019 requires consent and an easy way to opt out for any marketing message.</div>
+    </div>
+
+    <div style="margin-top: 20px;">
+        <button class="btn" onclick="markQuiz()">Mark my quiz</button>
+        <button class="btn reset" onclick="resetQuiz()">Reset</button>
+    </div>
+
+    <div class="quiz-summary" id="quizSummary">
+        <div class="score" id="scoreDisplay">0 / 8</div>
+        <p id="scoreMessage">Great work.</p>
+    </div>
+</section>
+
+<footer>
+    <p>Lesson 1.1 — What is Digital Marketing? · Masomotele Technical Training Institute · Handbook Part 1, §1.1</p>
+    <p>Next: <strong>Lesson 1.2 — Planning a Digital Marketing Strategy</strong></p>
+</footer>
+
+</div>
+
+<script>
+// Module map toggles
+function toggleMod(btn) {
+    btn.classList.toggle('open');
+    const lessons = btn.nextElementSibling;
+    lessons.classList.toggle('open');
+}
+
+// Platform tabs
+function switchTab(btn, id) {
+    document.querySelectorAll('.ptab').forEach(t => t.classList.remove('active'));
+    document.querySelectorAll('.ptab-content').forEach(c => c.classList.remove('active'));
+    btn.classList.add('active');
+    document.getElementById('tab-' + id).classList.add('active');
+}
+
+// Goal picker
+const selectedGoals = new Set();
+function pickGoal(el) {
+    const goal = el.dataset.goal;
+    if (selectedGoals.has(goal)) {
+        selectedGoals.delete(goal);
+        el.classList.remove('selected');
+    } else {
+        if (selectedGoals.size >= 2) {
+            // remove the first one
+            const first = selectedGoals.values().next().value;
+            selectedGoals.delete(first);
+            document.querySelector(`.goal-card[data-goal="${first}"]`).classList.remove('selected');
+        }
+        selectedGoals.add(goal);
+        el.classList.add('selected');
+    }
+    updateGoalOutput();
+}
+function updateGoalOutput() {
+    const out = document.getElementById('goalOutput');
+    if (selectedGoals.size === 0) {
+        out.textContent = 'Pick two goals above to see the recommendation.';
+        out.style.background = '#f1f5f9';
+        out.style.borderLeftColor = '#94a3b8';
+        out.style.color = '#475569';
+        return;
+    }
+    const best = new Set(['sales', 'awareness']);
+    const picked = Array.from(selectedGoals);
+    if (selectedGoals.size < 2) {
+        out.textContent = `You picked "${picked[0]}". Pick one more.`;
+        out.style.background = '#fef3c7';
+        out.style.borderLeftColor = '#d97706';
+        out.style.color = '#78350f';
+        return;
+    }
+    const match = picked.filter(g => best.has(g)).length;
+    if (match === 2) {
+        out.innerHTML = '<strong>Excellent choice.</strong> Sales generation drives Sarah\'s revenue this month; brand awareness in Kapsoya, Elgon View and Racecourse builds repeat orders next month. These are the two goals every dinner-delivery campaign should prioritise.';
+        out.style.background = '#d1fae5';
+        out.style.borderLeftColor = '#059669';
+        out.style.color = '#065f46';
+    } else if (match === 1) {
+        out.innerHTML = '<strong>Partly right.</strong> One of your picks is a top priority — but the other is a "nice to have" for Sarah right now. She needs to <em>sell dinners this month</em> AND <em>build awareness in her three delivery neighbourhoods</em>.';
+        out.style.background = '#fef3c7';
+        out.style.borderLeftColor = '#d97706';
+        out.style.color = '#78350f';
+    } else {
+        out.innerHTML = '<strong>Rethink.</strong> Customer service, engagement, information, and traffic all matter — but they don\'t pay next month\'s rent. Sarah needs Sales + Awareness as her top two.';
+        out.style.background = '#fee2e2';
+        out.style.borderLeftColor = '#dc2626';
+        out.style.color = '#991b1b';
+    }
+}
+
+// Scenario simulator
+function simFeedback(btn, correct, msg) {
+    const box = document.getElementById('sim-fb-1');
+    box.className = 'sim-feedback ' + (correct ? 'correct' : 'wrong');
+    box.textContent = msg;
+    // reset button styles
+    btn.parentElement.querySelectorAll('.sim-choice').forEach(b => b.style.background = '#fff');
+    btn.style.background = correct ? '#d1fae5' : '#fee2e2';
+}
+
+// Quiz marking
+function markQuiz() {
+    const questions = document.querySelectorAll('.quiz-question');
+    let score = 0;
+    questions.forEach((q, i) => {
+        const correct = q.dataset.correct;
+        const picked = q.querySelector(`input[name="q${i+1}"]:checked`);
+        q.classList.remove('correct', 'wrong');
+        if (picked && picked.value === correct) {
+            q.classList.add('correct');
+            score++;
+        } else if (picked) {
+            q.classList.add('wrong');
+        }
+    });
+    const summary = document.getElementById('quizSummary');
+    summary.classList.add('show');
+    document.getElementById('scoreDisplay').textContent = `${score} / 8`;
+    const msg = document.getElementById('scoreMessage');
+    if (score === 8) msg.textContent = 'Perfect. You have the foundations. Move on to Lesson 1.2.';
+    else if (score >= 6) msg.textContent = 'Strong. Review the missed questions and continue.';
+    else if (score >= 4) msg.textContent = 'Halfway there. Re-read sections 3 and 6 before Lesson 1.2.';
+    else msg.textContent = 'Rewatch the video and try again. The 9 elements and the DPA are essential foundations.';
+    summary.scrollIntoView({ behavior: 'smooth', block: 'center' });
+}
+function resetQuiz() {
+    document.querySelectorAll('.quiz-question').forEach(q => {
+        q.classList.remove('correct', 'wrong');
+        q.querySelectorAll('input[type=radio]').forEach(r => r.checked = false);
+    });
+    document.getElementById('quizSummary').classList.remove('show');
+}
+</script>
+</body>
+</html>

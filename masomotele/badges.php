@@ -5,8 +5,8 @@ $auth = new Auth(); $auth->requireLogin();
 $db = Database::getInstance();
 $userId = $auth->getUserId();
 
-$allBadges = $db->fetchAll("SELECT b.*, (SELECT COUNT(*) FROM user_badges WHERE badge_id=b.id) as total_earned FROM badges b ORDER BY b.id");
-$myBadgeIds = array_column($db->fetchAll("SELECT badge_id FROM user_badges WHERE user_id=?", [$userId]), 'badge_id');
+$allBadges = $db->fetchAll("SELECT b.*, (SELECT COUNT(*) FROM lms_user_badges WHERE badge_id=b.id) as total_earned FROM lms_badges b ORDER BY b.id");
+$myBadgeIds = array_column($db->fetchAll("SELECT badge_id FROM lms_user_badges WHERE user_id=?", [$userId]), 'badge_id');
 
 require_once __DIR__ . '/templates/header.php';
 ?>

@@ -8,7 +8,7 @@ $userId = $auth->getUserId();
 // Generate certificate if requesting
 if (isset($_GET['generate'])) {
     $classId = (int)$_GET['generate'];
-    $class = $db->fetchOne("SELECT * FROM classes WHERE id=?", [$classId]);
+    $class = $db->fetchOne("SELECT * FROM lms_classes WHERE id=?", [$classId]);
     if ($class) {
         // Calculate average grade for this class
         $avg = $db->fetchColumn("SELECT AVG(percentage) FROM quiz_attempts WHERE quiz_id IN (SELECT id FROM quizzes WHERE class_id=?) AND user_id=? AND passed=1", [$classId, $userId]);
@@ -20,10 +20,10 @@ if (isset($_GET['generate'])) {
                 // Badge check
                 $certCount = (int)$db->fetchColumn("SELECT COUNT(*) FROM certificates WHERE user_id=?", [$userId]);
                 if ($certCount === 1) {
-                    $badge = $db->fetchOne("SELECT id FROM badges WHERE trigger_type='course_complete'");
+                    $badge = $db->fetchOne("SELECT id FROM lms_badges WHERE trigger_type='course_complete'");
                     if ($badge) {
-                        $has = $db->fetchOne("SELECT id FROM user_badges WHERE user_id=? AND badge_id=?", [$userId, $badge['id']]);
-                        if (!$has) $db->insert('user_badges', ['user_id'=>$userId,'badge_id'=>$badge['id'],'earned_at'=>date('Y-m-d H:i:s')]);
+                        $has = $db->fetchOne("SELECT id FROM lms_user_badges WHERE user_id=? AND badge_id=?", [$userId, $badge['id']]);
+                        if (!$has) $db->insert('lms_user_badges', ['user_id'=>$userId,'badge_id'=>$badge['id'],'earned_at'=>date('Y-m-d H:i:s')]);
                     }
                 }
             }
@@ -34,7 +34,7 @@ if (isset($_GET['generate'])) {
 
 // View/print certificate
 if (isset($_GET['view'])) {
-    $cert = $db->fetchOne("SELECT c.*, u.name as student_name, cl.title as class_title FROM certificates c JOIN users u ON c.user_id=u.id JOIN classes cl ON c.class_id=cl.id WHERE c.id=? AND c.user_id=?", [(int)$_GET['view'], $userId]);
+    $cert = $db->fetchOne("SELECT c.*, u.name as student_name, cl.title as class_title FROM certificates c JOIN users u ON c.user_id=u.id JOIN lms_classes cl ON c.class_id=cl.id WHERE c.id=? AND c.user_id=?", [(int)$_GET['view'], $userId]);
     if ($cert):
 ?>
 <!DOCTYPE html>
@@ -79,10 +79,10 @@ if (isset($_GET['view'])) {
 }
 
 // My certificates
-$certs = $db->fetchAll("SELECT c.*, cl.title as class_title FROM certificates c JOIN classes cl ON c.class_id=cl.id WHERE c.user_id=? ORDER BY c.issued_at DESC", [$userId]);
+$certs = $db->fetchAll("SELECT c.*, cl.title as class_title FROM certificates c JOIN lms_classes cl ON c.class_id=cl.id WHERE c.user_id=? ORDER BY c.issued_at DESC", [$userId]);
 
-// Eligible classes (passed with 70%+ but no cert yet)
-$eligible = $db->fetchAll("SELECT cl.id, cl.title, ROUND(AVG(qa.percentage),1) as avg_grade FROM quiz_attempts qa JOIN quizzes q ON qa.quiz_id=q.id JOIN classes cl ON q.class_id=cl.id WHERE qa.user_id=? AND qa.passed=1 GROUP BY cl.id HAVING avg_grade >= 70 AND cl.id NOT IN (SELECT class_id FROM certificates WHERE user_id=?)", [$userId, $userId]);
+// Eligible lms_classes (passed with 70%+ but no cert yet)
+$eligible = $db->fetchAll("SELECT cl.id, cl.title, ROUND(AVG(qa.percentage),1) as avg_grade FROM quiz_attempts qa JOIN quizzes q ON qa.quiz_id=q.id JOIN lms_classes cl ON q.class_id=cl.id WHERE qa.user_id=? AND qa.passed=1 GROUP BY cl.id HAVING avg_grade >= 70 AND cl.id NOT IN (SELECT class_id FROM certificates WHERE user_id=?)", [$userId, $userId]);
 
 require_once __DIR__ . '/templates/header.php';
 ?>

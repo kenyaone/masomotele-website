@@ -7,29 +7,41 @@ $userId = $auth->getUserId();
 $role = $auth->getRole();
 
 // Stats
-$totalClasses = (int)$db->fetchColumn("SELECT COUNT(*) FROM classes WHERE status='active'");
-$myEnrolments = (int)$db->fetchColumn("SELECT COUNT(*) FROM enrolments WHERE user_id = ?", [$userId]);
-$totalUsers = ($role === 'admin') ? (int)$db->fetchColumn("SELECT COUNT(*) FROM users") : 0;
+$totalClasses = (int)$db->fetchColumn("SELECT COUNT(*) FROM lms_classes WHERE status='active'");
+$myEnrolments = (int)$db->fetchColumn("SELECT COUNT(*) FROM lms_enrolments WHERE user_id = ?", [$userId]);
+$totalUsers = ($role === 'admin') ? (int)$db->fetchColumn("SELECT COUNT(*) FROM lms_users") : 0;
 
 // My classes
-$myClasses = $db->fetchAll("SELECT c.*, (SELECT COUNT(*) FROM lessons WHERE class_id=c.id) as lesson_count,
-    (SELECT COUNT(*) FROM completions WHERE class_id=c.id AND user_id=?) as completed
-    FROM classes c JOIN enrolments e ON c.id=e.class_id WHERE e.user_id=? AND c.status='active' ORDER BY e.enrolled_at DESC LIMIT 6", [$userId, $userId]);
+$myClasses = $db->fetchAll("SELECT c.*, (SELECT COUNT(*) FROM lms_lessons WHERE class_id=c.id) as lesson_count,
+    (SELECT COUNT(*) FROM lms_completions WHERE class_id=c.id AND user_id=?) as completed
+    FROM lms_classes c JOIN lms_enrolments e ON c.id=e.class_id WHERE e.user_id=? AND c.status='active' ORDER BY e.enrolled_at DESC LIMIT 6", [$userId, $userId]);
 
 // My badges
-$myBadges = $db->fetchAll("SELECT b.* FROM badges b JOIN user_badges ub ON b.id=ub.badge_id WHERE ub.user_id=? ORDER BY ub.earned_at DESC LIMIT 4", [$userId]);
+$myBadges = $db->fetchAll("SELECT b.* FROM lms_badges b JOIN lms_user_badges ub ON b.id=ub.badge_id WHERE ub.user_id=? ORDER BY ub.earned_at DESC LIMIT 4", [$userId]);
 
 // Recent forum posts
-$recentPosts = $db->fetchAll("SELECT fp.*, u.name as author, ft.title as topic_title FROM forum_posts fp JOIN users u ON fp.user_id=u.id JOIN forum_topics ft ON fp.topic_id=ft.id ORDER BY fp.created_at DESC LIMIT 5");
+$recentPosts = $db->fetchAll("SELECT fp.*, u.name as author, ft.title as topic_title FROM lms_forum_posts fp JOIN lms_users u ON fp.user_id=u.id JOIN lms_forum_topics ft ON fp.topic_id=ft.id ORDER BY fp.created_at DESC LIMIT 5");
 
 // Recent announcements
-$announcements = $db->fetchAll("SELECT a.*, u.name as teacher FROM announcements a JOIN users u ON a.teacher_id=u.id ORDER BY a.created_at DESC LIMIT 3");
+$announcements = $db->fetchAll("SELECT a.*, u.name as teacher FROM lms_announcements a JOIN lms_users u ON a.teacher_id=u.id ORDER BY a.created_at DESC LIMIT 3");
+
+// Upcoming live sessions (for enrolled classes if student, all if admin/teacher)
+if (in_array($role, ['admin','teacher'])) {
+    $upcomingLive = $db->fetchAll(
+        "SELECT ls.*, c.title as class_title FROM lms_live_sessions ls JOIN lms_classes c ON ls.class_id=c.id WHERE ls.status IN ('scheduled','live') ORDER BY ls.scheduled_at ASC LIMIT 5"
+    );
+} else {
+    $upcomingLive = $db->fetchAll(
+        "SELECT ls.*, c.title as class_title FROM lms_live_sessions ls JOIN lms_classes c ON ls.class_id=c.id JOIN lms_enrolments e ON e.class_id=ls.class_id AND e.user_id=? WHERE ls.status IN ('scheduled','live') ORDER BY ls.scheduled_at ASC LIMIT 5",
+        [$userId]
+    );
+}
 
 require_once __DIR__ . '/templates/header.php';
 ?>
 <div class="container-fluid">
     <div class="d-flex justify-content-between align-items-center mb-4">
-        <h4><i class="bi bi-house me-2 text-primary"></i>Welcome, <?= htmlspecialchars($_SESSION['user_name']) ?>!</h4>
+        <h4><i class="bi bi-house me-2 text-primary"></i>Welcome, <?= htmlspecialchars($_SESSION['lms_user_name'] ?? '') ?>!</h4>
         <span class="badge bg-primary fs-6"><?= ucfirst($role) ?></span>
     </div>
 
@@ -72,7 +84,7 @@ require_once __DIR__ . '/templates/header.php';
                 <div class="card-header d-flex justify-content-between"><h5 class="mb-0"><i class="bi bi-book me-2"></i>My Classes</h5><a href="<?= SITE_URL ?>/classes.php" class="btn btn-sm btn-primary">Browse All</a></div>
                 <div class="card-body">
                     <?php if (empty($myClasses)): ?>
-                        <p class="text-muted">You haven't enrolled in any classes yet. <a href="<?= SITE_URL ?>/classes.php">Browse classes</a></p>
+                        <p class="text-muted">You haven't enrolled in any lms_classes yet. <a href="<?= SITE_URL ?>/classes.php">Browse classes</a></p>
                     <?php else: ?>
                     <div class="row g-3">
                         <?php foreach ($myClasses as $c): $pct = $c['lesson_count'] > 0 ? round(($c['completed']/$c['lesson_count'])*100) : 0; ?>
@@ -112,6 +124,45 @@ require_once __DIR__ . '/templates/header.php';
         <!-- Sidebar -->
         <div class="col-lg-4">
             </div>
+            <!-- Live Classes -->
+            <div class="card mb-4 border-success">
+                <div class="card-header bg-success bg-opacity-10 d-flex align-items-center justify-content-between">
+                    <h6 class="mb-0 fw-bold text-success"><i class="bi bi-camera-video-fill me-2"></i>Live Classes</h6>
+                    <a href="<?= SITE_URL ?>/live-sessions.php" class="btn btn-sm btn-success">View All</a>
+                </div>
+                <div class="card-body p-0">
+                    <?php if (empty($upcomingLive)): ?>
+                    <p class="text-muted p-3 mb-0 small">No upcoming live sessions.</p>
+                    <?php else: ?>
+                    <?php foreach ($upcomingLive as $ls):
+                        $isLive = ($ls['status'] === 'live');
+                        $lsTs   = strtotime($ls['scheduled_at']);
+                    ?>
+                    <a href="<?= SITE_URL ?>/live-class.php?id=<?= $ls['id'] ?>" class="d-flex align-items-center gap-2 p-3 border-bottom text-decoration-none text-dark" style="transition:.1s" onmouseover="this.style.background='#f0fdf4'" onmouseout="this.style.background=''">
+                        <div class="rounded-circle d-flex align-items-center justify-content-center flex-shrink-0"
+                             style="width:36px;height:36px;background:<?= $isLive ? '#dcfce7' : '#dbeafe' ?>">
+                            <i class="bi bi-camera-video-fill" style="color:<?= $isLive ? '#16a34a' : '#2563eb' ?>;font-size:.85rem"></i>
+                        </div>
+                        <div style="min-width:0">
+                            <div class="fw-semibold text-truncate" style="font-size:.82rem"><?= htmlspecialchars($ls['title']) ?></div>
+                            <div class="text-muted" style="font-size:.72rem">
+                                <?php if ($isLive): ?>
+                                <span class="text-success fw-bold">&#11044; Live now</span>
+                                <?php else: ?>
+                                <?= date('d M, g:i A', $lsTs) ?>
+                                <?php endif; ?>
+                                &mdash; <?= htmlspecialchars($ls['class_title']) ?>
+                            </div>
+                        </div>
+                        <?php if ($isLive): ?>
+                        <span class="badge bg-success ms-auto flex-shrink-0" style="font-size:.65rem">Join</span>
+                        <?php endif; ?>
+                    </a>
+                    <?php endforeach; ?>
+                    <?php endif; ?>
+                </div>
+            </div>
+
             <!-- Interactive Library -->
             <div class="card mb-4 border-info">
                 <div class="card-body text-center py-4">

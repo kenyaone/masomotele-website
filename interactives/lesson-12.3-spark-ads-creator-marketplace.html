@@ -1,0 +1,449 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lesson 12.3 — Spark Ads + Creator Marketplace (Interactive)</title>
+<style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: 'Segoe UI', -apple-system, sans-serif; line-height: 1.55; color: #1e293b; background: #f1f5f9; min-height: 100vh; }
+    .container { max-width: 1200px; margin: 0 auto; padding: 20px; }
+    header {
+        background: linear-gradient(135deg, #2E7D32, #1B5E20);
+        color: #fff; padding: 40px 30px; border-radius: 12px; margin-bottom: 24px;
+        box-shadow: 0 10px 30px rgba(254,44,85,0.25);
+        position: relative; overflow: hidden;
+    }
+    header::after { content: ''; position: absolute; top: -30px; right: -30px; width: 200px; height: 200px; background: rgba(0,0,0,0.15); border-radius: 50%; }
+    header .badge { display: inline-block; background: rgba(0,0,0,0.35); padding: 4px 14px; border-radius: 16px; font-size: 12px; font-weight: bold; letter-spacing: 1px; margin-bottom: 14px; position: relative; z-index: 1; }
+    header h1 { font-size: 34px; margin-bottom: 8px; position: relative; z-index: 1; text-shadow: 0 2px 8px rgba(0,0,0,0.25); }
+    header .subtitle { font-size: 17px; opacity: 0.95; margin-bottom: 20px; position: relative; z-index: 1; }
+    .meta-strip { display: flex; flex-wrap: wrap; gap: 12px; position: relative; z-index: 1; }
+    .meta-strip span { background: rgba(0,0,0,0.35); padding: 6px 14px; border-radius: 20px; font-size: 13px; }
+    .toc { background: #fff; border: 1px solid #e2e8f0; border-radius: 10px; padding: 22px 26px; margin-bottom: 22px; }
+    .toc h3 { color: #fe2c55; margin-bottom: 10px; }
+    .toc ol { padding-left: 20px; }
+    .toc a { color: #fe2c55; text-decoration: none; font-weight: 600; }
+    section { background: #fff; border: 1px solid #e2e8f0; border-radius: 10px; padding: 26px 30px; margin-bottom: 22px; }
+    section h2 { color: #161823; font-size: 22px; margin-bottom: 12px; padding-bottom: 8px; border-bottom: 3px solid; border-image: linear-gradient(90deg, #25f4ee, #fe2c55) 1; }
+    section h3 { color: #0f172a; font-size: 17px; margin: 18px 0 8px; }
+    section p { margin-bottom: 12px; }
+    section ul, section ol { padding-left: 22px; margin-bottom: 12px; }
+    .callout { border-left: 5px solid #25f4ee; background: #ecfeff; padding: 14px 18px; margin: 14px 0; border-radius: 4px; }
+    .callout.warn { border-left-color: #fe2c55; background: #fef2f4; }
+    .callout.tip { border-left-color: #059669; background: #ecfdf5; }
+    .callout strong { color: #0891b2; }
+    .callout.warn strong { color: #fe2c55; }
+    .callout.tip strong { color: #059669; }
+
+    /* Marketplace mock */
+    .cm { background: #161823; border-radius: 10px; overflow: hidden; margin: 14px 0; border: 1px solid #262837; }
+    .cm-top { background: #000; padding: 10px 18px; display: flex; align-items: center; gap: 14px; }
+    .cm-top .brand { color: #fff; font-weight: 700; font-size: 15px; }
+    .cm-top .brand .a { color: #25f4ee; }
+    .cm-top .brand .b { color: #fe2c55; }
+    .cm-top .url { margin-left: auto; color: #9ca3af; font-size: 12.5px; }
+    .cm-body { display: grid; grid-template-columns: 260px 1fr; }
+    @media (max-width: 800px) { .cm-body { grid-template-columns: 1fr; } .cm-filters { border-right: none; border-bottom: 1px solid #262837; } }
+    .cm-filters { background: #0d0e15; padding: 18px; color: #e5e7eb; border-right: 1px solid #262837; }
+    .cm-filters h4 { color: #25f4ee; font-size: 13px; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 12px; }
+    .cm-filter { margin-bottom: 14px; }
+    .cm-filter label { display: block; color: #9ca3af; font-size: 12px; margin-bottom: 4px; }
+    .cm-filter select, .cm-filter input { width: 100%; padding: 8px 10px; background: #161823; color: #fff; border: 1px solid #262837; border-radius: 6px; font-size: 13px; }
+    .cm-filter input[type="range"] { padding: 0; }
+    .cm-rangeout { color: #25f4ee; font-size: 12px; font-weight: 700; margin-top: 4px; }
+    .cm-results { padding: 18px; background: #0d0e15; overflow-x: auto; }
+    .cm-count { color: #9ca3af; font-size: 13px; margin-bottom: 12px; }
+    .cm-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 12px; }
+    .creator {
+        background: #161823; border: 1px solid #262837; border-radius: 10px; padding: 14px;
+        cursor: pointer; transition: all 0.2s;
+    }
+    .creator:hover { border-color: #25f4ee; transform: translateY(-2px); }
+    .creator.selected { border-color: #fe2c55; box-shadow: 0 6px 16px rgba(254,44,85,0.25); }
+    .creator .avatar { width: 48px; height: 48px; border-radius: 50%; background: linear-gradient(45deg,#25f4ee,#fe2c55); color: #000; font-weight: 800; display: flex; align-items: center; justify-content: center; font-size: 18px; margin-bottom: 10px; }
+    .creator .name { color: #fff; font-weight: 700; font-size: 14px; }
+    .creator .handle { color: #9ca3af; font-size: 12px; margin-bottom: 8px; }
+    .creator .stat { color: #e5e7eb; font-size: 12px; display: flex; justify-content: space-between; margin-bottom: 2px; }
+    .creator .stat span:first-child { color: #6b7280; }
+    .creator .fee { margin-top: 8px; padding-top: 8px; border-top: 1px solid #262837; color: #25f4ee; font-weight: 700; font-size: 13px; }
+
+    /* Creator detail modal */
+    .cd-detail {
+        background: #fff; border: 2px solid #fe2c55; border-radius: 10px; padding: 20px; margin-top: 14px;
+        display: none;
+    }
+    .cd-detail.active { display: block; }
+    .cd-detail h4 { color: #fe2c55; margin-bottom: 6px; }
+    .cd-detail .rows { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 10px; margin: 12px 0; }
+    .cd-detail .kv { background: #f8fafc; padding: 10px; border-radius: 6px; }
+    .cd-detail .kv small { display: block; color: #64748b; font-size: 11px; text-transform: uppercase; letter-spacing: 1px; }
+    .cd-detail .kv strong { color: #161823; font-size: 15px; }
+
+    /* Spark flow */
+    .spark-flow { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; margin: 14px 0; }
+    @media (max-width: 700px) { .spark-flow { grid-template-columns: 1fr 1fr; } }
+    .sf-step { background: #f8fafc; border: 1.5px solid #cbd5e1; border-radius: 8px; padding: 12px; text-align: center; position: relative; }
+    .sf-step .n { display: inline-block; width: 24px; height: 24px; border-radius: 50%; background: linear-gradient(90deg,#25f4ee,#fe2c55); color: #000; line-height: 24px; font-weight: 700; font-size: 12px; margin-bottom: 6px; }
+    .sf-step h5 { font-size: 13px; color: #161823; margin-bottom: 4px; }
+    .sf-step p { font-size: 11.5px; color: #64748b; margin: 0; }
+    .sf-step::after { content: '→'; position: absolute; right: -10px; top: 40%; color: #fe2c55; font-weight: 700; font-size: 18px; }
+    .sf-step:last-child::after { display: none; }
+    @media (max-width: 700px) { .sf-step::after { display: none; } }
+
+    /* Auth code demo */
+    .auth-demo { background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 10px; padding: 16px; margin: 14px 0; }
+    .auth-demo .code {
+        display: inline-block; background: #161823; color: #25f4ee; padding: 8px 14px;
+        border-radius: 6px; font-family: 'Menlo', monospace; font-size: 15px; font-weight: 700;
+        letter-spacing: 2px; margin: 6px 0;
+    }
+    .auth-demo button { background: linear-gradient(90deg,#25f4ee,#fe2c55); color: #fff; border: 0; padding: 8px 16px; border-radius: 6px; cursor: pointer; font-weight: 700; font-size: 13px; margin-left: 8px; }
+
+    /* Whitelist compare */
+    .wl-compare { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin: 14px 0; }
+    @media (max-width: 700px) { .wl-compare { grid-template-columns: 1fr; } }
+    .wl-col { background: #f8fafc; border: 2px solid #e2e8f0; border-radius: 10px; padding: 14px; }
+    .wl-col.spark { border-color: #25f4ee; }
+    .wl-col.white { border-color: #fe2c55; }
+    .wl-col h4 { margin-bottom: 8px; }
+    .wl-col.spark h4 { color: #0891b2; }
+    .wl-col.white h4 { color: #fe2c55; }
+    .wl-col ul { padding-left: 20px; font-size: 13px; }
+    .wl-col ul li { margin-bottom: 4px; }
+
+    /* Quiz */
+    .quiz-question { background: #fff; border: 2px solid #cbd5e1; border-radius: 10px; padding: 18px; margin: 14px 0; }
+    .quiz-question.correct { border-color: #059669; background: #ecfdf5; }
+    .quiz-question.wrong { border-color: #dc2626; background: #fef2f2; }
+    .quiz-question h4 { margin-bottom: 12px; font-size: 15px; color: #1e293b; }
+    .quiz-question .options label { display: block; padding: 10px 14px; margin-bottom: 6px; background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 6px; cursor: pointer; font-size: 14px; }
+    .quiz-question .options label:hover { background: #ecfeff; }
+    .quiz-question .options input[type="radio"] { margin-right: 10px; }
+    .quiz-question .explanation { display: none; margin-top: 12px; padding: 10px 14px; border-radius: 6px; font-size: 14px; }
+    .quiz-question.correct .explanation { display: block; background: #d1fae5; color: #065f46; border-left: 4px solid #059669; }
+    .quiz-question.wrong .explanation { display: block; background: #fee2e2; color: #991b1b; border-left: 4px solid #dc2626; }
+    .quiz-summary { text-align: center; padding: 30px; background: linear-gradient(135deg, #ecfeff 0%, #fef2f4 100%); border-radius: 10px; margin: 20px 0; display: none; }
+    .quiz-summary.show { display: block; }
+    .quiz-summary .score { font-size: 48px; font-weight: bold; background: linear-gradient(90deg,#25f4ee,#fe2c55); -webkit-background-clip: text; -webkit-text-fill-color: transparent; margin-bottom: 8px; }
+    button.btn { background: linear-gradient(90deg,#25f4ee,#fe2c55); color: #fff; border: none; padding: 10px 20px; border-radius: 6px; font-size: 15px; font-weight: 700; cursor: pointer; }
+    button.btn:hover { box-shadow: 0 6px 16px rgba(254,44,85,0.35); }
+    button.btn.reset { background: #64748b; margin-left: 8px; }
+    footer { text-align: center; color: #64748b; padding: 24px; font-size: 13px; }
+
+    /* MTTI logo stamp */
+    .mtti-logo-stamp {
+        position: fixed; top: 14px; right: 18px; z-index: 999;
+        opacity: 0.88; transition: opacity 0.2s;
+    }
+    .mtti-logo-stamp:hover { opacity: 1; }
+    .mtti-logo-stamp img { width: 56px; height: 56px; border-radius: 50%; box-shadow: 0 2px 8px rgba(0,0,0,0.18); }
+</style>
+</head>
+<body>
+<div class="mtti-logo-stamp">
+    <img src="../../Resources/Logo.jpeg" alt="MTTI" title="Masomotele Technical Training Institute — Start learning, Start earning">
+</div>
+
+<div class="container">
+
+<header>
+    <div class="badge">LESSON 12.3  ·  TIKTOK ADS DEEP DIVE  ·  INTERACTIVE</div>
+    <h1>Spark Ads + Creator Marketplace</h1>
+    <div class="subtitle">Promote organic videos as ads with all engagement intact. Find, filter, and brief Nairobi fitness creators through creators.tiktok.com/marketplace.</div>
+    <div class="meta-strip">
+        <span><strong>Duration:</strong> ~40 min interactive</span>
+        <span><strong>Level:</strong> Intermediate</span>
+        <span><strong>Prerequisite:</strong> Lessons 12.1 + 12.2</span>
+        <span><strong>Handbook:</strong> Part 12, §12.3</span>
+    </div>
+</header>
+
+<div class="toc">
+    <h3>What you'll do in this lesson</h3>
+    <ol>
+        <li><a href="#s1">What Spark Ads are — deep view</a></li>
+        <li><a href="#s2">Mock Creator Marketplace — filter Nairobi fitness creators</a></li>
+        <li><a href="#s3">Authorisation code flow — creator's video &rarr; Brian's Spark Ad</a></li>
+        <li><a href="#s4">Brian's 3-creator plan (KES 90k budget)</a></li>
+        <li><a href="#s5">The 6-field creator brief</a></li>
+        <li><a href="#s6">Whitelisting vs Spark Ads — when to use each</a></li>
+        <li><a href="#s7">Self-check quiz (8 questions)</a></li>
+    </ol>
+</div>
+
+<section id="s1">
+    <h2>1. What Spark Ads are — deep view</h2>
+    <p>A Spark Ad takes an existing organic TikTok video and promotes it as a paid ad. It keeps the original video URL, likes, comments, shares, and every profile visit routes back to the poster.</p>
+    <div class="callout tip">
+        <strong>TikTok's own data:</strong> Spark Ads deliver <strong>+130% CTR</strong> and <strong>+134% completion rate</strong> vs traditional produced ads. Because they don't look like ads — they ARE organic content, just paid to reach more people.
+    </div>
+    <p><strong>Two source options:</strong></p>
+    <ul>
+        <li><strong>Brian's own Chapa Fitness videos.</strong> No authorisation code needed — the account is already a Business Centre asset from 12.1.</li>
+        <li><strong>A creator's video.</strong> Requires the creator's explicit authorisation via a Video Code.</li>
+    </ul>
+</section>
+
+<section id="s2">
+    <h2>2. Mock Creator Marketplace — filter Nairobi fitness creators</h2>
+    <p>Adjust the filters. The results below re-rank. Click a creator card to open their profile detail.</p>
+    <div class="cm">
+        <div class="cm-top">
+            <span class="brand"><span class="a">Tik</span><span class="b">Tok</span> · Creator Marketplace</span>
+            <span class="url">creators.tiktok.com/marketplace</span>
+        </div>
+        <div class="cm-body">
+            <div class="cm-filters">
+                <h4>Filters</h4>
+                <div class="cm-filter">
+                    <label>Region</label>
+                    <select id="fRegion" onchange="renderCreators()">
+                        <option value="nairobi">Nairobi</option>
+                        <option value="kenya">All of Kenya</option>
+                        <option value="ea">East Africa</option>
+                    </select>
+                </div>
+                <div class="cm-filter">
+                    <label>Industry</label>
+                    <select id="fIndustry" onchange="renderCreators()">
+                        <option value="fitness">Fitness / Wellness</option>
+                        <option value="food">Food</option>
+                        <option value="fashion">Fashion / Streetwear</option>
+                    </select>
+                </div>
+                <div class="cm-filter">
+                    <label>Follower minimum: <span id="fFollowersOut" class="cm-rangeout">10k</span></label>
+                    <input type="range" id="fFollowers" min="0" max="150" value="10" oninput="renderCreators()">
+                </div>
+                <div class="cm-filter">
+                    <label>Engagement rate minimum: <span id="fEngageOut" class="cm-rangeout">3%</span></label>
+                    <input type="range" id="fEngage" min="0" max="15" value="3" oninput="renderCreators()">
+                </div>
+                <div class="cm-filter">
+                    <label>Max fee (KES)</label>
+                    <select id="fFee" onchange="renderCreators()">
+                        <option value="100000">KES 100,000</option>
+                        <option value="50000">KES 50,000</option>
+                        <option value="25000">KES 25,000</option>
+                    </select>
+                </div>
+            </div>
+            <div class="cm-results">
+                <div class="cm-count" id="cmCount">6 creators match</div>
+                <div class="cm-grid" id="cmGrid"></div>
+                <div class="cd-detail" id="cdDetail"></div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<section id="s3">
+    <h2>3. Authorisation code flow</h2>
+    <p>To turn a creator's video into a Spark Ad, TikTok requires the creator's explicit permission via a <strong>Video Code</strong> — a short alphanumeric string valid for 7 or 60 days.</p>
+    <div class="spark-flow">
+        <div class="sf-step"><span class="n">1</span><h5>Wanjiku posts organic video</h5><p>Chapa Fitness shorts review, 32 seconds.</p></div>
+        <div class="sf-step"><span class="n">2</span><h5>Ad settings ON</h5><p>Wanjiku taps "Allow others to use your post in their ads".</p></div>
+        <div class="sf-step"><span class="n">3</span><h5>Video Code generated</h5><p>60-day validity code appears.</p></div>
+        <div class="sf-step"><span class="n">4</span><h5>Brian pastes into Ads Manager</h5><p>The video becomes a promotable Spark Ad.</p></div>
+    </div>
+    <div class="auth-demo">
+        <p><strong>Live demo:</strong> Wanjiku hits "Generate code" — a 60-day authorisation appears. Brian pastes it into Ads Manager &rarr; Ad &rarr; Identity &rarr; Use TikTok post &rarr; Enter code.</p>
+        <p>Wanjiku's authorisation code: <span class="code" id="authCode">— tap generate —</span>
+        <button onclick="genCode()">Generate code</button></p>
+        <p style="font-size:13px; color:#64748b;">The video keeps her handle, her likes, her comments, and every profile-click routes back to Wanjiku. Brian pays only for reach.</p>
+    </div>
+    <div class="callout warn">
+        <strong>Codes expire.</strong> 7-day is common for one-off tests. 60-day is standard for Spark rights inside a creator brief. Renew before it lapses or the ad stops delivering.
+    </div>
+</section>
+
+<section id="s4">
+    <h2>4. Brian's 3-creator plan — KES 90,000 total</h2>
+    <p>Three creators. Different tiers. Different jobs. Two months of paid Spark reach.</p>
+    <table style="width:100%; border-collapse:collapse; font-size:14px;">
+        <tr><th style="background:#161823;color:#25f4ee;padding:10px;text-align:left;">Creator</th><th style="background:#161823;color:#25f4ee;padding:10px;text-align:left;">Followers</th><th style="background:#161823;color:#25f4ee;padding:10px;text-align:left;">Deliverable</th><th style="background:#161823;color:#25f4ee;padding:10px;text-align:left;">Fee</th></tr>
+        <tr><td style="padding:10px;border:1px solid #e2e8f0;">Wanjiku · product-review specialist</td><td style="padding:10px;border:1px solid #e2e8f0;">52k</td><td style="padding:10px;border:1px solid #e2e8f0;">1× Spark-eligible review video, 30–45s</td><td style="padding:10px;border:1px solid #e2e8f0; font-weight:700; color:#fe2c55;">KES 35,000</td></tr>
+        <tr><td style="padding:10px;border:1px solid #e2e8f0;">Otieno · gym trainer, high retention</td><td style="padding:10px;border:1px solid #e2e8f0;">12k</td><td style="padding:10px;border:1px solid #e2e8f0;">1× workout video wearing Chapa</td><td style="padding:10px;border:1px solid #e2e8f0; font-weight:700; color:#fe2c55;">KES 15,000</td></tr>
+        <tr><td style="padding:10px;border:1px solid #e2e8f0;">Amina · streetwear stylist</td><td style="padding:10px;border:1px solid #e2e8f0;">80k</td><td style="padding:10px;border:1px solid #e2e8f0;">1× style-transition video</td><td style="padding:10px;border:1px solid #e2e8f0; font-weight:700; color:#fe2c55;">KES 40,000</td></tr>
+        <tr><td style="padding:10px;background:#f1f5f9;font-weight:700;" colspan="3">Total</td><td style="padding:10px;background:#f1f5f9;font-weight:700; color:#fe2c55;">KES 90,000</td></tr>
+    </table>
+    <p style="font-size:13.5px; color:#64748b; margin-top:8px;">All three deals include 60-day Spark Ads rights. Three tested creatives that can be paid-boosted for two full months — a portfolio, not a one-shot.</p>
+</section>
+
+<section id="s5">
+    <h2>5. The 6-field professional creator brief</h2>
+    <p>Every deal starts with a brief. Six fields. No exceptions.</p>
+    <table style="width:100%; border-collapse:collapse; font-size:14px;">
+        <tr><th style="background:#161823;color:#25f4ee;padding:10px;text-align:left;">Field</th><th style="background:#161823;color:#25f4ee;padding:10px;text-align:left;">Chapa Fitness example</th></tr>
+        <tr><td style="padding:10px;border:1px solid #e2e8f0;"><strong>1. The ask</strong></td><td style="padding:10px;border:1px solid #e2e8f0;">"One TikTok video, 30–45 seconds, review of Chapa Fitness training shorts."</td></tr>
+        <tr><td style="padding:10px;border:1px solid #e2e8f0;"><strong>2. Deliverable count</strong></td><td style="padding:10px;border:1px solid #e2e8f0;">One draft plus one round of revisions.</td></tr>
+        <tr><td style="padding:10px;border:1px solid #e2e8f0;"><strong>3. Hook requirement</strong></td><td style="padding:10px;border:1px solid #e2e8f0;">First 3 seconds must show the product physically.</td></tr>
+        <tr><td style="padding:10px;border:1px solid #e2e8f0;"><strong>4. Usage rights</strong></td><td style="padding:10px;border:1px solid #e2e8f0;">60-day Spark Ads authorisation via Video Code.</td></tr>
+        <tr><td style="padding:10px;border:1px solid #e2e8f0;"><strong>5. Budget in KES</strong></td><td style="padding:10px;border:1px solid #e2e8f0;">"KES 35,000 plus Spark rights."</td></tr>
+        <tr><td style="padding:10px;border:1px solid #e2e8f0;"><strong>6. Legal</strong></td><td style="padding:10px;border:1px solid #e2e8f0;">Kenyan tax invoice with KRA PIN.</td></tr>
+    </table>
+    <div class="callout"><strong>Ambiguous briefs kill deals.</strong> Creators overpromise, quality drops, Spark rights get forgotten. A tight brief is the professional's protection — and the creator's too.</div>
+</section>
+
+<section id="s6">
+    <h2>6. Whitelisting vs Spark Ads — when to use each</h2>
+    <p>Both let brands run ads under a creator's identity. They are NOT the same.</p>
+    <div class="wl-compare">
+        <div class="wl-col spark">
+            <h4>Spark Ads (start here)</h4>
+            <ul>
+                <li>Promotes a <strong>specific existing video</strong> the creator posted</li>
+                <li>Setup: creator generates Video Code &rarr; brand pastes into Ads Manager</li>
+                <li>Keeps original likes, comments, engagement</li>
+                <li>Time-boxed: 7 or 60 days</li>
+                <li>Lightweight legally — one video, one code</li>
+                <li>All three of Brian's Nov 2026 deals are Spark Ads</li>
+            </ul>
+        </div>
+        <div class="wl-col white">
+            <h4>Whitelisting (heavier)</h4>
+            <ul>
+                <li>Creator gives the brand right to run ads from the creator's own handle for <strong>any</strong> video, including videos the creator has not personally posted</li>
+                <li>Setup: TikTok Ads Manager &rarr; Identity settings &rarr; Creator Handle</li>
+                <li>Powerful for scale but heavier legally — the creator lends their identity to campaigns they may not have posted</li>
+                <li>Ongoing arrangement, usually 3–6 months minimum</li>
+                <li>Reserve for creators you have worked with 6+ months</li>
+            </ul>
+        </div>
+    </div>
+    <div class="callout warn"><strong>The rule:</strong> Spark Ads first. Whitelisting only after a creator has already delivered three successful Spark videos and you trust their brand voice enough to speak for you.</div>
+</section>
+
+<section id="s7">
+    <h2>7. Self-check quiz</h2>
+
+    <div class="quiz-question" data-correct="B"><h4>1. What does a Spark Ad keep from the original organic post?</h4><div class="options"><label><input type="radio" name="q1" value="A"> A) Only the video file</label><label><input type="radio" name="q1" value="B"> B) The URL, likes, comments, shares, and profile-click routing</label><label><input type="radio" name="q1" value="C"> C) Nothing — Spark Ads are re-uploaded</label><label><input type="radio" name="q1" value="D"> D) Only the sound</label></div><div class="explanation">Correct — Spark Ads preserve every piece of organic engagement. That is why they outperform traditional ads.</div></div>
+
+    <div class="quiz-question" data-correct="D"><h4>2. To promote Wanjiku's video, Brian needs…</h4><div class="options"><label><input type="radio" name="q2" value="A"> A) Her password</label><label><input type="radio" name="q2" value="B"> B) A signed contract only</label><label><input type="radio" name="q2" value="C"> C) TikTok Premium subscription</label><label><input type="radio" name="q2" value="D"> D) A Video Code from her Ad settings (7 or 60 day)</label></div><div class="explanation">Correct — the Video Code is the mechanism for explicit creator authorisation.</div></div>
+
+    <div class="quiz-question" data-correct="A"><h4>3. What is the TikTok Creator Marketplace URL?</h4><div class="options"><label><input type="radio" name="q3" value="A"> A) creators.tiktok.com/marketplace</label><label><input type="radio" name="q3" value="B"> B) tiktok.com/creators</label><label><input type="radio" name="q3" value="C"> C) marketplace.tiktok.com</label><label><input type="radio" name="q3" value="D"> D) business.tiktok.com/creators</label></div><div class="explanation">Correct — a paid-partnership platform inside Business Centre.</div></div>
+
+    <div class="quiz-question" data-correct="C"><h4>4. Which of Brian's own videos need an authorisation code?</h4><div class="options"><label><input type="radio" name="q4" value="A"> A) All of them</label><label><input type="radio" name="q4" value="B"> B) Only videos over 60 seconds</label><label><input type="radio" name="q4" value="C"> C) None — his TikTok account is already a Business Centre asset</label><label><input type="radio" name="q4" value="D"> D) Only videos with music</label></div><div class="explanation">Correct — because the account is linked as a Business Centre asset in 12.1, no code is needed for his own posts.</div></div>
+
+    <div class="quiz-question" data-correct="B"><h4>5. How many fields does a professional creator brief have?</h4><div class="options"><label><input type="radio" name="q5" value="A"> A) 3</label><label><input type="radio" name="q5" value="B"> B) 6 — ask, deliverable count, hook, usage rights, budget, legal</label><label><input type="radio" name="q5" value="C"> C) 10</label><label><input type="radio" name="q5" value="D"> D) Depends on the creator</label></div><div class="explanation">Correct — six fields. Non-negotiable. Ambiguous briefs kill deals.</div></div>
+
+    <div class="quiz-question" data-correct="D"><h4>6. Brian's KES 90,000 total covers…</h4><div class="options"><label><input type="radio" name="q6" value="A"> A) One video</label><label><input type="radio" name="q6" value="B"> B) Three months of ad spend</label><label><input type="radio" name="q6" value="C"> C) Only Wanjiku's fee</label><label><input type="radio" name="q6" value="D"> D) Three creators + 60-day Spark rights on each</label></div><div class="explanation">Correct — three tested creatives, two months of paid Spark reach each.</div></div>
+
+    <div class="quiz-question" data-correct="A"><h4>7. When is Whitelisting the right choice?</h4><div class="options"><label><input type="radio" name="q7" value="A"> A) Only with creators you have worked with successfully for 6+ months</label><label><input type="radio" name="q7" value="B"> B) On the first collaboration to save cost</label><label><input type="radio" name="q7" value="C"> C) Never — Spark Ads always win</label><label><input type="radio" name="q7" value="D"> D) When the creator has fewer than 10k followers</label></div><div class="explanation">Correct — Whitelisting is heavier legally. Reserve for proven, high-trust relationships.</div></div>
+
+    <div class="quiz-question" data-correct="B"><h4>8. What does the Creator Marketplace let Brian filter by?</h4><div class="options"><label><input type="radio" name="q8" value="A"> A) Only country</label><label><input type="radio" name="q8" value="B"> B) Country, follower range, engagement rate, industry, average views</label><label><input type="radio" name="q8" value="C"> C) Just fee range</label><label><input type="radio" name="q8" value="D"> D) Nothing — it is a random list</label></div><div class="explanation">Correct — the Marketplace supports multi-signal filtering, and every deal is logged and contracted through TikTok.</div></div>
+
+    <div style="margin-top: 20px;">
+        <button class="btn" onclick="markQuiz()">Mark my quiz</button>
+        <button class="btn reset" onclick="resetQuiz()">Reset</button>
+    </div>
+    <div class="quiz-summary" id="quizSummary"><div class="score" id="scoreDisplay">0 / 8</div><p id="scoreMessage"></p></div>
+</section>
+
+<footer>
+    <p>Lesson 12.3 — Spark Ads + Creator Marketplace · Masomotele Technical Training Institute · Handbook Part 12, §12.3</p>
+    <p>Next: <strong>Lesson 12.4 — Trend-jacking + the Three-Second Hook</strong></p>
+</footer>
+</div>
+
+<script>
+const allCreators = [
+    { name: 'Wanjiku Njeri', handle: '@wanjiku.fit', initials: 'WN', followers: 52, views: 18, engage: 6.4, fee: 35000, region: 'nairobi', industry: 'fitness', bio: 'Product-review specialist. Nairobi. Known for honest before/after breakdowns of gym wear.', posts: 214, video: 'Chapa Fitness shorts — 30-day honest review' },
+    { name: 'Otieno Kariuki', handle: '@otieno.trains', initials: 'OK', followers: 12, views: 8, engage: 8.1, fee: 15000, region: 'nairobi', industry: 'fitness', bio: 'Gym trainer at Fitness Bay Kilimani. High retention on 30-second workout tips.', posts: 168, video: 'Chapa hoodie workout — leg day' },
+    { name: 'Amina Wanjala', handle: '@amina.style.ke', initials: 'AW', followers: 80, views: 32, engage: 5.2, fee: 40000, region: 'nairobi', industry: 'fashion', bio: 'Streetwear stylist. Nairobi. Trend-heavy transitions with strong first-3-second hooks.', posts: 402, video: 'Street to gym — Chapa transition' },
+    { name: 'Mercy Cheruiyot', handle: '@mercy.moves', initials: 'MC', followers: 24, views: 11, engage: 7.0, fee: 22000, region: 'nairobi', industry: 'fitness', bio: 'Yoga instructor. Nairobi CBD. Calmer feed, strong female audience 24–35.', posts: 91, video: 'Chapa tights for hot yoga' },
+    { name: 'Kevin Mwangi', handle: '@kev.streetfit', initials: 'KM', followers: 68, views: 22, engage: 4.6, fee: 30000, region: 'nairobi', industry: 'fitness', bio: 'Street workout / calisthenics. Uhuru Park sessions. Male audience 18–29.', posts: 275, video: 'Calisthenics kit review' },
+    { name: 'Faith Muthoni', handle: '@faith.eats', initials: 'FM', followers: 105, views: 44, engage: 5.8, fee: 45000, region: 'nairobi', industry: 'food', bio: 'Food creator. Karen. Not a fit for Chapa but shows up when industry filter is Food.', posts: 611, video: 'Post-workout meal prep' }
+];
+
+function renderCreators() {
+    const region = document.getElementById('fRegion').value;
+    const industry = document.getElementById('fIndustry').value;
+    const fmin = +document.getElementById('fFollowers').value;
+    const emin = +document.getElementById('fEngage').value;
+    const feeMax = +document.getElementById('fFee').value;
+    document.getElementById('fFollowersOut').textContent = fmin + 'k';
+    document.getElementById('fEngageOut').textContent = emin + '%';
+
+    const filtered = allCreators.filter(c =>
+        (region === 'kenya' || region === 'ea' || c.region === region) &&
+        c.industry === industry &&
+        c.followers >= fmin &&
+        c.engage >= emin &&
+        c.fee <= feeMax
+    );
+
+    document.getElementById('cmCount').textContent = filtered.length + ' creator' + (filtered.length === 1 ? '' : 's') + ' match';
+    const grid = document.getElementById('cmGrid');
+    if (filtered.length === 0) {
+        grid.innerHTML = '<div style="grid-column:1/-1; padding:24px; text-align:center; color:#9ca3af; background:#161823; border-radius:8px;">No creators match. Loosen a filter.</div>';
+        return;
+    }
+    grid.innerHTML = filtered.map(c => `
+        <div class="creator" onclick="showCreator('${c.handle}')">
+            <div class="avatar">${c.initials}</div>
+            <div class="name">${c.name}</div>
+            <div class="handle">${c.handle}</div>
+            <div class="stat"><span>Followers</span><span>${c.followers}k</span></div>
+            <div class="stat"><span>Avg views</span><span>${c.views}k</span></div>
+            <div class="stat"><span>Engagement</span><span>${c.engage}%</span></div>
+            <div class="fee">KES ${c.fee.toLocaleString()}</div>
+        </div>
+    `).join('');
+}
+function showCreator(handle) {
+    const c = allCreators.find(x => x.handle === handle);
+    if (!c) return;
+    document.querySelectorAll('.creator').forEach(el => el.classList.remove('selected'));
+    document.getElementById('cdDetail').classList.add('active');
+    document.getElementById('cdDetail').innerHTML = `
+        <h4>${c.name} · ${c.handle}</h4>
+        <p style="color:#64748b; font-size:14px;">${c.bio}</p>
+        <div class="rows">
+            <div class="kv"><small>Followers</small><strong>${c.followers}k</strong></div>
+            <div class="kv"><small>Avg views</small><strong>${c.views}k</strong></div>
+            <div class="kv"><small>Engagement</small><strong>${c.engage}%</strong></div>
+            <div class="kv"><small>Posts (30d)</small><strong>${c.posts}</strong></div>
+            <div class="kv"><small>Spark fee</small><strong style="color:#fe2c55;">KES ${c.fee.toLocaleString()}</strong></div>
+        </div>
+        <p style="font-size:13.5px; color:#161823;"><strong>Proposed video:</strong> ${c.video}</p>
+        <p style="font-size:12.5px; color:#64748b; margin-top:6px;">Message via Marketplace &rarr; brief attached &rarr; contract auto-generated.</p>
+    `;
+    document.getElementById('cdDetail').scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+}
+renderCreators();
+
+function genCode() {
+    const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
+    let code = '';
+    for (let i = 0; i < 8; i++) code += chars[Math.floor(Math.random() * chars.length)];
+    document.getElementById('authCode').textContent = code;
+}
+
+function markQuiz() {
+    const questions = document.querySelectorAll('.quiz-question');
+    let score = 0;
+    questions.forEach((q, i) => {
+        const correct = q.dataset.correct;
+        const picked = q.querySelector(`input[name="q${i+1}"]:checked`);
+        q.classList.remove('correct', 'wrong');
+        if (picked && picked.value === correct) { q.classList.add('correct'); score++; }
+        else if (picked) q.classList.add('wrong');
+    });
+    const summary = document.getElementById('quizSummary');
+    summary.classList.add('show');
+    document.getElementById('scoreDisplay').textContent = `${score} / 8`;
+    const msg = document.getElementById('scoreMessage');
+    if (score === 8) msg.textContent = 'Perfect. Brian is ready to run Spark Ads. Move to 12.4.';
+    else if (score >= 6) msg.textContent = 'Strong. Review the missed answers.';
+    else msg.textContent = 'Return to the Marketplace filter and code-flow section, then retake.';
+    summary.scrollIntoView({ behavior: 'smooth', block: 'center' });
+}
+function resetQuiz() {
+    document.querySelectorAll('.quiz-question').forEach(q => { q.classList.remove('correct', 'wrong'); q.querySelectorAll('input[type=radio]').forEach(r => r.checked = false); });
+    document.getElementById('quizSummary').classList.remove('show');
+}
+</script>
+</body>
+</html>

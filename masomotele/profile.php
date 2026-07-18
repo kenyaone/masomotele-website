@@ -15,7 +15,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     if (!empty($_POST['new_password']) && strlen($_POST['new_password']) >= 6) {
         $data['password'] = password_hash($_POST['new_password'], PASSWORD_DEFAULT);
     }
-    $db->update('users', $data, 'id = ?', [$user['id']]);
+    $db->update('lms_users', $data, 'id = ?', [$user['id']]);
     $_SESSION['user_name'] = $data['name'];
     $msg = 'Profile updated!';
     $user = $auth->getCurrentUser();

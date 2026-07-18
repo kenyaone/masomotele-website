@@ -1,0 +1,1065 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Domain Names and cPanel Hosting | MTTI Web Design</title>
+    <link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Fredoka:wght@500;600&display=swap" rel="stylesheet">
+    <style>/* MTTI Practical Exercise Engine — shared styles */
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body {
+    font-family: 'Space Mono', monospace;
+    background: linear-gradient(135deg, #2E7D32 0%, #1565C0 100%);
+    min-height: 100vh; padding: 20px; color: #fff;
+}
+.container { max-width: 1000px; margin: 0 auto; }
+.header { text-align: center; margin-bottom: 26px; animation: slideDown 0.6s ease-out; }
+.lesson-tag {
+    display: inline-block; background: rgba(255,255,255,0.2);
+    padding: 6px 16px; border-radius: 999px;
+    font-size: 0.85em; margin-bottom: 12px;
+}
+.header h1 { font-family: 'Fredoka', sans-serif; font-size: 2.2em; margin-bottom: 8px; text-shadow: 3px 3px 0 rgba(0,0,0,0.2); }
+.header p { opacity: 0.95; font-size: 0.95em; }
+.brief {
+    background: rgba(255,255,255,0.12); backdrop-filter: blur(10px);
+    border-radius: 18px; padding: 18px 22px; margin-bottom: 20px;
+    border-left: 5px solid #ffd54f;
+    animation: fadeIn 0.8s ease-out 0.2s both;
+}
+.brief h3 { font-family: 'Fredoka', sans-serif; font-size: 1.05em; margin-bottom: 8px; color: #ffd54f; }
+.brief p { font-size: 0.92em; line-height: 1.55; }
+.task {
+    background: white; color: #333; border-radius: 22px;
+    padding: 26px; margin-bottom: 20px;
+    box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+    animation: fadeIn 0.6s ease-out both;
+}
+.task-num {
+    display: inline-block; width: 30px; height: 30px;
+    background: linear-gradient(135deg, #2E7D32 0%, #1565C0 100%);
+    color: white; border-radius: 50%; text-align: center; line-height: 30px;
+    font-family: 'Fredoka', sans-serif; font-weight: 600; margin-right: 8px;
+}
+.task h2 { font-family: 'Fredoka', sans-serif; font-size: 1.3em; margin-bottom: 6px; display: flex; align-items: center; }
+.task .instruction { color: #555; font-size: 0.92em; margin-bottom: 18px; line-height: 1.5; }
+
+/* pick-n */
+.wg-elements { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin-bottom: 14px; }
+.wg-element {
+    background: #f5f7fb; border: 2px solid transparent;
+    padding: 12px 14px; border-radius: 12px;
+    cursor: pointer; transition: all 0.2s ease;
+    font-family: 'Space Mono', monospace; font-size: 0.88em;
+    display: flex; flex-direction: column; gap: 4px; user-select: none;
+}
+.wg-element:hover { background: #e8f5e9; transform: translateY(-2px); }
+.wg-element.selected { background: linear-gradient(135deg, #2E7D32 0%, #1565C0 100%); color: white; border-color: #1565C0; }
+.wg-el-name { font-weight: 700; font-family: 'Fredoka', sans-serif; }
+.wg-el-why { font-size: 0.78em; opacity: 0.75; }
+.wg-element.selected .wg-el-why { opacity: 0.9; }
+.wg-status { background: #fff8e1; border-left: 4px solid #ffc107; padding: 10px 14px; border-radius: 8px; font-size: 0.9em; }
+.wg-status.ok { background: #d4edda; border-color: #28a745; color: #155724; }
+.wg-status.warn { background: #f8d7da; border-color: #dc3545; color: #721c24; }
+
+/* smart-builder */
+.wg-smart-grid { display: grid; grid-template-columns: 130px 1fr 40px; gap: 8px 12px; align-items: center; }
+.wg-smart-label {
+    background: linear-gradient(135deg, #2E7D32 0%, #1565C0 100%);
+    color: white; padding: 8px 12px; border-radius: 8px;
+    font-family: 'Fredoka', sans-serif; font-size: 0.85em; text-align: center;
+}
+.wg-smart-input {
+    width: 100%; padding: 10px 14px;
+    font-family: 'Space Mono', monospace; font-size: 0.92em;
+    border: 2px solid #e5e7f0; border-radius: 10px;
+    background: #f5f7fb; transition: all 0.2s ease;
+}
+.wg-smart-input:focus { outline: none; border-color: #2E7D32; background: white; }
+.wg-smart-check { font-size: 1.4em; text-align: center; transition: transform 0.2s ease; }
+.wg-smart-check.ok { color: #28a745; transform: scale(1.15); }
+.wg-smart-check.no { color: #cbd0e0; }
+.wg-smart-hint { grid-column: 2 / 4; font-size: 0.78em; color: #6a7080; margin-top: -4px; margin-bottom: 4px; }
+.wg-preview { margin-top: 16px; padding: 14px 16px; background: #e8f5e9; border-radius: 10px; font-size: 0.92em; line-height: 1.5; }
+.wg-preview strong { color: #2E7D32; font-family: 'Fredoka', sans-serif; }
+
+/* allocate */
+.wg-budget-item { margin-bottom: 14px; }
+.wg-budget-item .wg-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px; font-size: 0.92em; }
+.wg-budget-item .wg-name { font-family: 'Fredoka', sans-serif; font-weight: 600; }
+.wg-budget-item .wg-value { font-family: 'Space Mono', monospace; font-weight: 700; color: #2E7D32; }
+.wg-budget-item input[type=range] { width: 100%; height: 8px; -webkit-appearance: none; background: #e5e7f0; border-radius: 10px; }
+.wg-budget-item input[type=range]::-webkit-slider-thumb { -webkit-appearance: none; width: 22px; height: 22px; background: linear-gradient(135deg, #2E7D32 0%, #1565C0 100%); border-radius: 50%; cursor: pointer; box-shadow: 0 3px 8px rgba(0,0,0,0.2); }
+.wg-budget-item input[type=range]::-moz-range-thumb { width: 22px; height: 22px; background: linear-gradient(135deg, #2E7D32 0%, #1565C0 100%); border-radius: 50%; cursor: pointer; border: none; box-shadow: 0 3px 8px rgba(0,0,0,0.2); }
+.wg-totals { display: flex; justify-content: space-between; padding: 12px 16px; background: #f5f7fb; border-radius: 10px; font-family: 'Fredoka', sans-serif; margin-top: 12px; }
+.wg-big { font-size: 1.3em; color: #2E7D32; }
+
+/* fill-checks */
+.wg-fill { display: flex; flex-direction: column; gap: 10px; }
+.wg-fill-row { display: grid; grid-template-columns: 140px 1fr 40px; gap: 8px 12px; align-items: center; row-gap: 4px; }
+.wg-fill-label { background: linear-gradient(135deg, #2E7D32 0%, #1565C0 100%); color: white; padding: 8px 10px; border-radius: 8px; font-family: 'Fredoka', sans-serif; font-size: 0.82em; text-align: center; }
+.wg-fill-input { width: 100%; padding: 10px 14px; font-family: 'Space Mono', monospace; font-size: 0.92em; border: 2px solid #e5e7f0; border-radius: 10px; background: #f5f7fb; }
+.wg-fill-multi { resize: vertical; min-height: 68px; }
+.wg-fill-input:focus { outline: none; border-color: #2E7D32; background: white; }
+.wg-fill-check { font-size: 1.4em; text-align: center; }
+.wg-fill-check.ok { color: #28a745; }
+.wg-fill-check.no { color: #cbd0e0; }
+.wg-fill-hint { grid-column: 2 / 4; font-size: 0.78em; color: #6a7080; }
+.wg-fill-counter { grid-column: 3; font-size: 0.75em; color: #888; text-align: center; }
+
+/* sort-buckets */
+.wg-buckets { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 12px; margin-bottom: 14px; }
+.wg-bucket { background: #f5f7fb; border-radius: 12px; padding: 12px; }
+.wg-bucket-title { font-family: 'Fredoka', sans-serif; font-weight: 600; margin-bottom: 8px; color: #1565C0; text-align: center; font-size: 0.92em; }
+.wg-bucket-zone { min-height: 80px; background: white; border: 2px dashed #cbd0e0; border-radius: 10px; padding: 8px; display: flex; flex-wrap: wrap; gap: 6px; align-content: flex-start; }
+.wg-bucket-zone.over { border-color: #2E7D32; background: #e8f5e9; }
+.wg-pool-label { font-size: 0.85em; color: #6a7080; margin-bottom: 6px; }
+.wg-pool { display: flex; flex-wrap: wrap; gap: 6px; padding: 10px; background: #f5f7fb; border-radius: 10px; min-height: 50px; }
+.wg-chip { background: white; border: 2px solid #e5e7f0; padding: 8px 12px; border-radius: 8px; font-size: 0.85em; cursor: grab; user-select: none; }
+.wg-chip:hover { border-color: #2E7D32; }
+
+/* order-steps */
+.wg-steps { list-style: none; padding: 0; counter-reset: step; }
+.wg-step { display: flex; align-items: center; gap: 8px; background: #f5f7fb; padding: 12px 14px; border-radius: 10px; margin-bottom: 8px; counter-increment: step; }
+.wg-step::before { content: counter(step); font-family: 'Fredoka', sans-serif; font-weight: 600; width: 28px; height: 28px; background: linear-gradient(135deg, #2E7D32 0%, #1565C0 100%); color: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 0.9em; flex-shrink: 0; }
+.wg-step-text { flex: 1; font-size: 0.92em; }
+.wg-step-btn { background: white; border: 2px solid #e5e7f0; width: 32px; height: 32px; border-radius: 8px; cursor: pointer; font-size: 0.9em; }
+.wg-step-btn:hover { border-color: #2E7D32; background: #e8f5e9; }
+
+/* binary-audit */
+.wg-audit { display: flex; flex-direction: column; gap: 8px; }
+.wg-audit-row { display: grid; grid-template-columns: 1fr auto; gap: 12px; align-items: center; background: #f5f7fb; padding: 12px 14px; border-radius: 10px; }
+.wg-audit-text { font-size: 0.92em; line-height: 1.4; }
+.wg-audit-btns { display: flex; gap: 6px; }
+.wg-audit-btn { background: white; border: 2px solid #e5e7f0; padding: 6px 12px; border-radius: 8px; cursor: pointer; font-size: 0.85em; font-family: 'Space Mono', monospace; }
+.wg-audit-btn:hover { border-color: #2E7D32; }
+.wg-audit-btn.active-good { background: #d4edda; border-color: #28a745; color: #155724; }
+.wg-audit-btn.active-bad { background: #f8d7da; border-color: #dc3545; color: #721c24; }
+
+/* match-pairs */
+.wg-match { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+.wg-match-col { display: flex; flex-direction: column; gap: 8px; }
+.wg-match-btn { background: #f5f7fb; border: 2px solid #e5e7f0; padding: 10px 14px; border-radius: 10px; cursor: pointer; text-align: left; font-family: 'Space Mono', monospace; font-size: 0.88em; line-height: 1.4; }
+.wg-match-btn:hover { border-color: #2E7D32; background: #e8f5e9; }
+.wg-match-btn.picked { border-color: #1565C0; background: #e8f5e9; }
+.wg-match-btn.paired { cursor: default; opacity: 0.75; }
+.wg-match-btn.correct { background: #d4edda; border-color: #28a745; color: #155724; }
+.wg-match-btn.wrong { background: #f8d7da; border-color: #dc3545; color: #721c24; }
+
+/* submit + verdict */
+.submit-btn { display: block; margin: 22px auto 0; background: linear-gradient(135deg, #2E7D32 0%, #1565C0 100%); color: white; border: none; padding: 14px 40px; border-radius: 12px; font-size: 1.05em; cursor: pointer; font-family: 'Fredoka', sans-serif; box-shadow: 0 6px 18px rgba(0,0,0,0.25); transition: transform 0.2s ease; }
+.submit-btn:hover:not(:disabled) { transform: scale(1.04); }
+.submit-btn:disabled { opacity: 0.4; cursor: not-allowed; }
+.verdict { display: none; margin-top: 20px; padding: 20px 24px; border-radius: 16px; color: #fff; }
+.verdict.show { display: block; animation: slideUp 0.5s ease-out; }
+.verdict.win { background: linear-gradient(135deg, #4caf50 0%, #388e3c 100%); border-left: 5px solid #a7dfb0; }
+.verdict.lose { background: linear-gradient(135deg, #e53935 0%, #b71c1c 100%); border-left: 5px solid #f5aab0; }
+.verdict h3 { font-family: 'Fredoka', sans-serif; font-size: 1.4em; margin-bottom: 6px; }
+.verdict-breakdown { margin-top: 12px; background: rgba(255,255,255,0.15); border-radius: 12px; padding: 14px 18px; }
+.v-task { margin-bottom: 12px; }
+.v-task h4 { font-family: 'Fredoka', sans-serif; font-size: 1em; margin-bottom: 6px; }
+.v-task ul { list-style: none; padding-left: 4px; font-size: 0.9em; }
+.v-ok { opacity: 1; }
+.v-no { opacity: 0.9; }
+.download-btn { margin-top: 14px; background: white; color: #333; border: none; padding: 10px 20px; border-radius: 10px; cursor: pointer; font-family: 'Fredoka', sans-serif; font-size: 0.9em; }
+.download-btn:hover { background: #f5f7fb; }
+
+@keyframes slideDown { from { opacity: 0; transform: translateY(-30px); } to { opacity: 1; transform: translateY(0); } }
+@keyframes fadeIn { from { opacity: 0; transform: scale(0.96); } to { opacity: 1; transform: scale(1); } }
+@keyframes slideUp { from { opacity: 0; transform: translateY(15px); } to { opacity: 1; transform: translateY(0); } }
+@media (max-width: 720px) {
+    .wg-elements { grid-template-columns: 1fr 1fr; }
+    .wg-smart-grid, .wg-fill-row { grid-template-columns: 90px 1fr 32px; }
+    .wg-match { grid-template-columns: 1fr; }
+}
+
+/* live-code */
+.wg-code-split { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin: 10px 0 16px; }
+.wg-code-editor-wrap, .wg-code-preview-wrap { display: flex; flex-direction: column; gap: 6px; }
+.wg-code-lang-badge, .wg-code-preview-label { font-size: 0.75em; font-weight: 700; color: #888; text-transform: uppercase; letter-spacing: 1px; }
+.wg-code-editor { font-family: 'Courier New', monospace; font-size: 0.85em; line-height: 1.6; min-height: 280px; resize: vertical; border: 2px solid #e0e0e0; border-radius: 8px; padding: 12px; background: #1e1e2e; color: #cdd6f4; outline: none; tab-size: 4; }
+.wg-code-editor:focus { border-color: #2E7D32; box-shadow: 0 0 0 3px rgba(46,125,50,0.15); }
+.wg-code-preview { border: 2px solid #e0e0e0; border-radius: 8px; min-height: 280px; background: white; width: 100%; }
+.wg-code-checks { list-style: none; padding: 0; margin: 4px 0 0; display: flex; flex-direction: column; gap: 6px; }
+.wg-code-check { display: flex; align-items: center; gap: 8px; padding: 8px 14px; border-radius: 8px; font-size: 0.88em; background: #f5f7fb; border: 1.5px solid #e0e0e0; transition: all 0.2s; }
+.wg-code-check.ok { background: #d4edda; border-color: #28a745; color: #155724; }
+.wg-code-check.no { color: #555; }
+.wg-code-check-icon { font-weight: bold; min-width: 16px; }
+@media (max-width: 640px) { .wg-code-split { grid-template-columns: 1fr; } }
+</style>
+</head>
+<body>
+<div class="container" id="root"></div>
+<script>/**
+ * MTTI Digital Marketing — Practical Exercise Engine
+ *
+ * A single-file client-side widget library so every lesson's practical
+ * has consistent UX, auto-marking with per-criterion breakdown, and a
+ * downloadable HTML transcript.
+ *
+ * A practical is defined by a JSON config:
+ *
+ *     {
+ *         "lesson_tag": "Module 1 · Lesson 1.1 · Practical",
+ *         "title": "Sarah's Strategy Workshop",
+ *         "subtitle": "…",
+ *         "slug": "1.1-sarah-strategy-workshop",
+ *         "brief": "Sarah runs Karibu Kitchen…",
+ *         "tasks": [
+ *             { "widget": "pick-n", "n": 3, "heading": "…", "instruction": "…", "options": [...] },
+ *             { "widget": "smart-builder", "heading": "…", "instruction": "…" },
+ *             { "widget": "allocate", "total": 15000, "heading": "…", "instruction": "…", "channels": [...] },
+ *             …
+ *         ]
+ *     }
+ *
+ * Each widget class exposes: render(container), score(), transcript().
+ */
+
+/* ---------- helpers ---------- */
+function el(tag, attrs = {}, children = []) {
+    const e = document.createElement(tag);
+    for (const [k, v] of Object.entries(attrs)) {
+        if (k === 'class') e.className = v;
+        else if (k === 'html') e.innerHTML = v;
+        else if (k.startsWith('on') && typeof v === 'function') e.addEventListener(k.slice(2), v);
+        else e.setAttribute(k, v);
+    }
+    for (const c of children) e.appendChild(typeof c === 'string' ? document.createTextNode(c) : c);
+    return e;
+}
+function esc(s) { return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+function money(n) { return 'KES ' + (+n).toLocaleString(); }
+
+/* ---------- widget: pick-n ---------- */
+class PickN {
+    constructor(cfg) {
+        this.cfg = cfg;
+        this.picks = new Set();
+    }
+    render(container) {
+        this.container = container;
+        const grid = el('div', {class: 'wg-elements'});
+        this.cfg.options.forEach((o, i) => {
+            const div = el('div', {class: 'wg-element', 'data-i': i});
+            div.appendChild(el('span', {class: 'wg-el-name', html: esc(o.label)}));
+            if (o.note) div.appendChild(el('span', {class: 'wg-el-why', html: esc(o.note)}));
+            div.addEventListener('click', () => this.toggle(i, div));
+            grid.appendChild(div);
+        });
+        container.appendChild(grid);
+        this.status = el('div', {class: 'wg-status', html: `Pick ${this.cfg.n} to see feedback.`});
+        container.appendChild(this.status);
+    }
+    toggle(i, div) {
+        if (this.picks.has(i)) { this.picks.delete(i); div.classList.remove('selected'); }
+        else {
+            if (this.picks.size >= this.cfg.n) return;
+            this.picks.add(i); div.classList.add('selected');
+        }
+        this.updateStatus();
+        if (this.onChange) this.onChange();
+    }
+    updateStatus() {
+        if (this.picks.size < this.cfg.n) {
+            this.status.className = 'wg-status';
+            this.status.textContent = `Pick ${this.cfg.n - this.picks.size} more.`;
+            return;
+        }
+        const chosen = [...this.picks].map(i => this.cfg.options[i]);
+        const good = chosen.filter(o => o.good).length;
+        if (good === this.cfg.n) {
+            this.status.className = 'wg-status ok';
+            this.status.textContent = this.cfg.feedback_good || '✓ Strong shortlist.';
+        } else if (good >= this.cfg.n - 1) {
+            this.status.className = 'wg-status';
+            this.status.textContent = this.cfg.feedback_close || 'Close — one pick is weaker than the others.';
+        } else {
+            this.status.className = 'wg-status warn';
+            this.status.textContent = this.cfg.feedback_weak || 'Reconsider — several picks assume budgets or timelines that are not realistic here.';
+        }
+    }
+    score() {
+        const chosen = [...this.picks].map(i => this.cfg.options[i]);
+        const goodCount = chosen.filter(o => o.good).length;
+        const breakdown = this.cfg.options
+            .filter(o => o.good)
+            .map(o => ({
+                label: o.label,
+                ok: this.picks.has(this.cfg.options.indexOf(o)),
+                note: this.picks.has(this.cfg.options.indexOf(o)) ? 'picked' : 'not picked'
+            }));
+        // penalise wrong picks
+        chosen.filter(o => !o.good).forEach(o => breakdown.push({label: o.label, ok: false, note: 'picked but weak for this brief'}));
+        return { score: goodCount, max: this.cfg.n, breakdown };
+    }
+    transcript() {
+        return {
+            widget: 'pick-n',
+            picks: [...this.picks].map(i => this.cfg.options[i].label),
+        };
+    }
+    isComplete() { return this.picks.size === this.cfg.n; }
+}
+
+/* ---------- widget: smart-builder (SMART goal) ---------- */
+class SmartBuilder {
+    constructor(cfg) { this.cfg = cfg; this.values = {spec:'',meas:'',ach:'',rel:'',time:''}; }
+    render(container) {
+        const criteria = this.cfg.criteria || [
+            { key: 'spec', label: 'Specific',    placeholder: 'e.g. Grow weekly lunch delivery orders in Kapsoya…', hint: 'Name what you sell + who buys it + where.' },
+            { key: 'meas', label: 'Measurable',  placeholder: 'e.g. from 40 orders/week to 55', hint: 'Include real numbers — a start value and an end value.' },
+            { key: 'ach',  label: 'Achievable',  placeholder: 'e.g. 38% growth, given KES 15,000 and current traffic', hint: 'Reference the budget or baseline to prove it is realistic.' },
+            { key: 'rel',  label: 'Relevant',    placeholder: 'e.g. lunch delivery is the highest-margin channel', hint: 'Link to the business — product, margin, or key channel.' },
+            { key: 'time', label: 'Time-bound',  placeholder: 'e.g. within 90 days', hint: 'Include a deadline — days, weeks, months, or a date.' },
+        ];
+        this.criteria = criteria;
+        const grid = el('div', {class: 'wg-smart-grid'});
+        criteria.forEach(c => {
+            grid.appendChild(el('div', {class: 'wg-smart-label', html: esc(c.label)}));
+            const input = el('input', {class: 'wg-smart-input', placeholder: c.placeholder});
+            input.dataset.key = c.key;
+            input.addEventListener('input', () => this.onInput(c.key, input.value));
+            grid.appendChild(input);
+            grid.appendChild(el('div', {class: 'wg-smart-check no', 'data-key': c.key, html: '○'}));
+            grid.appendChild(el('div', {class: 'wg-smart-hint', html: esc(c.hint)}));
+        });
+        container.appendChild(grid);
+        this.preview = el('div', {class: 'wg-preview', html: '<strong>Your goal will appear here as you type.</strong>'});
+        container.appendChild(this.preview);
+    }
+    onInput(key, val) {
+        this.values[key] = val;
+        this.checks = {
+            spec: this.values.spec.length > 15 && /[a-z]{4,}/i.test(this.values.spec) && this.values.spec.split(/\s+/).length >= 4,
+            meas: (this.values.meas.match(/\d+/g) || []).length >= 1 && /\d/.test(this.values.meas),
+            ach:  /\d/.test(this.values.ach) && this.values.ach.length > 15,
+            rel:  this.values.rel.length > 10 && /[a-z]{4,}/i.test(this.values.rel),
+            time: /(day|days|week|weeks|month|months|quarter|q[1-4]|202[6-9]|\d+\s*(?:d|w|m|day|week|month))/i.test(this.values.time),
+        };
+        // Apply topic-specific extra checks if provided
+        if (this.cfg.spec_keywords) {
+            const re = new RegExp(this.cfg.spec_keywords.join('|'), 'i');
+            this.checks.spec = this.checks.spec && re.test(this.values.spec);
+        }
+        if (this.cfg.rel_keywords) {
+            const re = new RegExp(this.cfg.rel_keywords.join('|'), 'i');
+            this.checks.rel = this.checks.rel && re.test(this.values.rel);
+        }
+        Object.entries(this.checks).forEach(([k, ok]) => {
+            const c = this.preview.parentNode.querySelector(`.wg-smart-check[data-key="${k}"]`);
+            c.textContent = ok ? '✓' : '○';
+            c.className = 'wg-smart-check ' + (ok ? 'ok' : 'no');
+        });
+        const parts = Object.values(this.values).filter(v => v.length).join(' · ');
+        this.preview.innerHTML = parts
+            ? `<strong>Your SMART goal:</strong><br>${esc(parts)}`
+            : '<strong>Your goal will appear here as you type.</strong>';
+        if (this.onChange) this.onChange();
+    }
+    score() {
+        const c = this.checks || {};
+        const labels = { spec: 'Specific', meas: 'Measurable', ach: 'Achievable', rel: 'Relevant', time: 'Time-bound' };
+        const breakdown = Object.entries(labels).map(([k, l]) => ({
+            label: l, ok: !!c[k],
+            note: c[k] ? 'criterion met' : this.criteria.find(x => x.key === k)?.hint || 'not yet met'
+        }));
+        return { score: breakdown.filter(b => b.ok).length, max: 5, breakdown };
+    }
+    transcript() { return { widget: 'smart-builder', values: this.values }; }
+    isComplete() { return Object.values(this.values).every(v => v.length > 3); }
+}
+
+/* ---------- widget: allocate ---------- */
+class Allocate {
+    constructor(cfg) { this.cfg = cfg; this.values = {}; this.cfg.channels.forEach(c => this.values[c.name] = Math.round(this.cfg.total / this.cfg.channels.length / 500) * 500); }
+    render(container) {
+        this.container = container;
+        this.wrap = el('div', {class: 'wg-budget'});
+        this.cfg.channels.forEach((c, i) => {
+            const item = el('div', {class: 'wg-budget-item'});
+            const row = el('div', {class: 'wg-row'});
+            row.appendChild(el('span', {class: 'wg-name', html: esc(c.name)}));
+            const valSpan = el('span', {class: 'wg-value', 'data-name': c.name, html: money(this.values[c.name])});
+            row.appendChild(valSpan);
+            item.appendChild(row);
+            const slider = el('input', {type: 'range', min: '0', max: String(this.cfg.total), step: String(this.cfg.step || 500)});
+            slider.value = this.values[c.name];
+            slider.dataset.name = c.name;
+            slider.addEventListener('input', () => {
+                this.values[c.name] = +slider.value;
+                valSpan.textContent = money(slider.value);
+                this.updateTotals();
+                if (this.onChange) this.onChange();
+            });
+            item.appendChild(slider);
+            this.wrap.appendChild(item);
+        });
+        container.appendChild(this.wrap);
+        this.totals = el('div', {class: 'wg-totals'});
+        this.totals.innerHTML = `<span>Total allocated</span><span class="wg-big" data-role="total">${money(0)}</span><span data-role="rem">${money(this.cfg.total)} left</span>`;
+        container.appendChild(this.totals);
+        this.updateTotals();
+    }
+    updateTotals() {
+        const total = Object.values(this.values).reduce((a, b) => a + b, 0);
+        this.totals.querySelector('[data-role=total]').textContent = money(total);
+        const rem = this.cfg.total - total;
+        const remEl = this.totals.querySelector('[data-role=rem]');
+        if (total === this.cfg.total) { remEl.textContent = '✓ Balanced'; remEl.style.color = '#28a745'; }
+        else if (total > this.cfg.total) { remEl.textContent = money(Math.abs(rem)) + ' over'; remEl.style.color = '#dc3545'; }
+        else { remEl.textContent = money(rem) + ' left'; remEl.style.color = '#888'; }
+    }
+    score() {
+        const total = Object.values(this.values).reduce((a, b) => a + b, 0);
+        const breakdown = [];
+        const balanced = total === this.cfg.total;
+        breakdown.push({ label: `Balanced budget (sum = ${money(this.cfg.total)})`, ok: balanced, note: balanced ? 'exact' : `off by ${money(Math.abs(total - this.cfg.total))}` });
+        let goodChannels = 0;
+        this.cfg.channels.forEach(c => {
+            const v = this.values[c.name];
+            const [lo, hi] = c.realistic || [0, this.cfg.total];
+            const ok = v >= lo && v <= hi;
+            if (ok) goodChannels++;
+            breakdown.push({
+                label: c.name,
+                ok,
+                note: ok ? `KES ${v.toLocaleString()} · in realistic range` :
+                      v < lo ? `KES ${v.toLocaleString()} · thin — under-testing this channel` :
+                              `KES ${v.toLocaleString()} · over — this channel rarely needs that much here`
+            });
+        });
+        return { score: (balanced ? 1 : 0) + goodChannels, max: 1 + this.cfg.channels.length, breakdown };
+    }
+    transcript() { return { widget: 'allocate', total_target: this.cfg.total, allocations: this.values }; }
+    isComplete() { return Object.values(this.values).reduce((a, b) => a + b, 0) === this.cfg.total; }
+}
+
+/* ---------- widget: fill-checks (generic text answers with regex checks) ---------- */
+class FillChecks {
+    constructor(cfg) { this.cfg = cfg; this.values = {}; cfg.fields.forEach(f => this.values[f.key] = ''); }
+    render(container) {
+        this.container = container;
+        const wrap = el('div', {class: 'wg-fill'});
+        this.cfg.fields.forEach(f => {
+            const row = el('div', {class: 'wg-fill-row'});
+            row.appendChild(el('div', {class: 'wg-fill-label', html: esc(f.label)}));
+            const input = f.multiline
+                ? el('textarea', {class: 'wg-fill-input wg-fill-multi', placeholder: f.placeholder || '', rows: '3'})
+                : el('input', {class: 'wg-fill-input', placeholder: f.placeholder || ''});
+            input.addEventListener('input', () => { this.values[f.key] = input.value; this.updateChecks(); if (this.onChange) this.onChange(); });
+            row.appendChild(input);
+            const chk = el('div', {class: 'wg-fill-check no', 'data-key': f.key, html: '○'});
+            row.appendChild(chk);
+            if (f.hint) row.appendChild(el('div', {class: 'wg-fill-hint', html: esc(f.hint)}));
+            if (f.counter) {
+                const ctr = el('div', {class: 'wg-fill-counter', 'data-key': f.key, html: `0 / ${f.counter}`});
+                row.appendChild(ctr);
+                input.addEventListener('input', () => {
+                    const len = input.value.length;
+                    ctr.textContent = `${len} / ${f.counter}`;
+                    ctr.style.color = len > f.counter ? '#dc3545' : (len >= (f.counter_min || 1) ? '#28a745' : '#888');
+                });
+            }
+            wrap.appendChild(row);
+        });
+        container.appendChild(wrap);
+        this.updateChecks();
+    }
+    fieldOK(f) {
+        const v = this.values[f.key];
+        if (!v || v.length === 0) return false;
+        if (f.min_length && v.length < f.min_length) return false;
+        if (f.max_length && v.length > f.max_length) return false;
+        if (f.contains) { for (const k of f.contains) if (!new RegExp(k, 'i').test(v)) return false; }
+        if (f.matches) { if (!new RegExp(f.matches, 'i').test(v)) return false; }
+        if (f.excludes) { for (const k of f.excludes) if (new RegExp(k, 'i').test(v)) return false; }
+        if (f.min_words) { if (v.trim().split(/\s+/).length < f.min_words) return false; }
+        if (f.digits_at_least) { if ((v.match(/\d/g) || []).length < f.digits_at_least) return false; }
+        return true;
+    }
+    updateChecks() {
+        this.checks = {};
+        this.cfg.fields.forEach(f => {
+            this.checks[f.key] = this.fieldOK(f);
+            const c = this.container.querySelector(`.wg-fill-check[data-key="${f.key}"]`);
+            if (c) { c.textContent = this.checks[f.key] ? '✓' : '○'; c.className = 'wg-fill-check ' + (this.checks[f.key] ? 'ok' : 'no'); }
+        });
+    }
+    score() {
+        const breakdown = this.cfg.fields.map(f => ({
+            label: f.label, ok: !!this.checks[f.key],
+            note: this.checks[f.key] ? 'accepted' : (f.hint || 'not accepted — check requirements')
+        }));
+        return { score: breakdown.filter(b => b.ok).length, max: this.cfg.fields.length, breakdown };
+    }
+    transcript() { return { widget: 'fill-checks', values: this.values }; }
+    isComplete() { return this.cfg.fields.every(f => (this.values[f.key] || '').length > 0); }
+}
+
+/* ---------- widget: sort-buckets (drag items into named categories) ---------- */
+class SortBuckets {
+    constructor(cfg) { this.cfg = cfg; this.placed = {}; }
+    render(container) {
+        this.container = container;
+        const bucketsEl = el('div', {class: 'wg-buckets'});
+        this.cfg.buckets.forEach(b => {
+            const bd = el('div', {class: 'wg-bucket', 'data-bucket': b.key});
+            bd.appendChild(el('div', {class: 'wg-bucket-title', html: esc(b.label)}));
+            const zone = el('div', {class: 'wg-bucket-zone', 'data-bucket': b.key});
+            zone.addEventListener('dragover', e => { e.preventDefault(); zone.classList.add('over'); });
+            zone.addEventListener('dragleave', () => zone.classList.remove('over'));
+            zone.addEventListener('drop', e => {
+                e.preventDefault(); zone.classList.remove('over');
+                const id = e.dataTransfer.getData('text/plain');
+                this.place(id, b.key);
+            });
+            bd.appendChild(zone);
+            bucketsEl.appendChild(bd);
+        });
+        container.appendChild(bucketsEl);
+        this.pool = el('div', {class: 'wg-pool'});
+        this.cfg.items.forEach(it => {
+            const chip = el('div', {class: 'wg-chip', 'data-id': it.id, draggable: 'true', html: esc(it.label)});
+            chip.addEventListener('dragstart', e => e.dataTransfer.setData('text/plain', it.id));
+            chip.addEventListener('click', () => this.cycleClick(it.id, chip));
+            this.pool.appendChild(chip);
+        });
+        container.appendChild(el('div', {class: 'wg-pool-label', html: 'Drag or tap to sort:'}));
+        container.appendChild(this.pool);
+    }
+    cycleClick(id, chip) {
+        // Mobile fallback: click chip → cycle through buckets
+        const buckets = this.cfg.buckets.map(b => b.key);
+        const cur = this.placed[id];
+        const nextIdx = cur ? (buckets.indexOf(cur) + 1) % (buckets.length + 1) : 0;
+        this.place(id, nextIdx >= buckets.length ? null : buckets[nextIdx]);
+    }
+    place(id, bucketKey) {
+        const chip = this.pool.querySelector(`.wg-chip[data-id="${id}"]`) || this.container.querySelector(`.wg-chip[data-id="${id}"]`);
+        if (bucketKey === null) {
+            this.pool.appendChild(chip); delete this.placed[id];
+        } else {
+            const zone = this.container.querySelector(`.wg-bucket-zone[data-bucket="${bucketKey}"]`);
+            zone.appendChild(chip); this.placed[id] = bucketKey;
+        }
+        chip.classList.remove('correct','wrong');
+        if (this.onChange) this.onChange();
+    }
+    score() {
+        const breakdown = this.cfg.items.map(it => {
+            const in_ = this.placed[it.id];
+            const ok = in_ === it.correct;
+            return { label: it.label, ok, note: ok ? `correctly in "${this.bucketLabel(it.correct)}"` : (in_ ? `placed in "${this.bucketLabel(in_)}" — should be "${this.bucketLabel(it.correct)}"` : 'not placed') };
+        });
+        return { score: breakdown.filter(b => b.ok).length, max: this.cfg.items.length, breakdown };
+    }
+    bucketLabel(k) { return (this.cfg.buckets.find(b => b.key === k) || {}).label || k; }
+    transcript() { return { widget: 'sort-buckets', placements: this.placed }; }
+    isComplete() { return Object.keys(this.placed).length === this.cfg.items.length; }
+}
+
+/* ---------- widget: order-steps (put steps in the right sequence) ---------- */
+class OrderSteps {
+    constructor(cfg) { this.cfg = cfg; this.order = cfg.steps.map(s => s.id); this.shuffle(); }
+    shuffle() { for (let i = this.order.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [this.order[i], this.order[j]] = [this.order[j], this.order[i]]; } }
+    render(container) {
+        this.container = container;
+        this.list = el('ol', {class: 'wg-steps'});
+        this.rebuild();
+        container.appendChild(this.list);
+    }
+    rebuild() {
+        this.list.innerHTML = '';
+        this.order.forEach((id, idx) => {
+            const step = this.cfg.steps.find(s => s.id === id);
+            const li = el('li', {class: 'wg-step', 'data-id': id});
+            li.appendChild(el('span', {class: 'wg-step-text', html: esc(step.label)}));
+            const up = el('button', {class: 'wg-step-btn', html: '▲'});
+            up.addEventListener('click', () => this.move(idx, -1));
+            const dn = el('button', {class: 'wg-step-btn', html: '▼'});
+            dn.addEventListener('click', () => this.move(idx, 1));
+            li.appendChild(up); li.appendChild(dn);
+            this.list.appendChild(li);
+        });
+    }
+    move(idx, dir) {
+        const j = idx + dir;
+        if (j < 0 || j >= this.order.length) return;
+        [this.order[idx], this.order[j]] = [this.order[j], this.order[idx]];
+        this.rebuild();
+        if (this.onChange) this.onChange();
+    }
+    score() {
+        const correct = this.cfg.steps.map(s => s.id);
+        const breakdown = this.order.map((id, i) => {
+            const step = this.cfg.steps.find(s => s.id === id);
+            const ok = correct[i] === id;
+            return { label: `Position ${i + 1}: ${step.label}`, ok, note: ok ? 'correct position' : `should be at position ${correct.indexOf(id) + 1}` };
+        });
+        return { score: breakdown.filter(b => b.ok).length, max: this.cfg.steps.length, breakdown };
+    }
+    transcript() { return { widget: 'order-steps', order: this.order }; }
+    isComplete() { return true; }
+}
+
+/* ---------- widget: binary-audit (mark each item as good or bad) ---------- */
+class BinaryAudit {
+    constructor(cfg) { this.cfg = cfg; this.marks = {}; }
+    render(container) {
+        this.container = container;
+        const list = el('div', {class: 'wg-audit'});
+        this.cfg.items.forEach((it, i) => {
+            const row = el('div', {class: 'wg-audit-row', 'data-i': i});
+            row.appendChild(el('div', {class: 'wg-audit-text', html: esc(it.label)}));
+            const btns = el('div', {class: 'wg-audit-btns'});
+            const good = el('button', {class: 'wg-audit-btn', html: this.cfg.good_label || '✓ Good'});
+            const bad = el('button', {class: 'wg-audit-btn', html: this.cfg.bad_label || '✗ Bad'});
+            good.addEventListener('click', () => this.mark(i, true, good, bad));
+            bad.addEventListener('click', () => this.mark(i, false, good, bad));
+            btns.appendChild(good); btns.appendChild(bad);
+            row.appendChild(btns);
+            list.appendChild(row);
+        });
+        container.appendChild(list);
+    }
+    mark(i, good, gEl, bEl) {
+        this.marks[i] = good;
+        gEl.classList.toggle('active-good', good);
+        bEl.classList.toggle('active-bad', !good);
+        if (this.onChange) this.onChange();
+    }
+    score() {
+        const breakdown = this.cfg.items.map((it, i) => {
+            const m = this.marks[i];
+            const ok = m === it.good;
+            return { label: it.label, ok, note: m === undefined ? 'not judged' : (ok ? 'correct call' : `should be ${it.good ? 'GOOD' : 'BAD'} — ${it.reason || ''}`) };
+        });
+        return { score: breakdown.filter(b => b.ok).length, max: this.cfg.items.length, breakdown };
+    }
+    transcript() { return { widget: 'binary-audit', marks: this.marks }; }
+    isComplete() { return Object.keys(this.marks).length === this.cfg.items.length; }
+}
+
+/* ---------- widget: match-pairs (click term then its match) ---------- */
+class MatchPairs {
+    constructor(cfg) { this.cfg = cfg; this.pairs = {}; this.selected = null; }
+    render(container) {
+        this.container = container;
+        const grid = el('div', {class: 'wg-match'});
+        const left = el('div', {class: 'wg-match-col'});
+        const right = el('div', {class: 'wg-match-col'});
+        const shuffled = [...this.cfg.pairs].sort(() => Math.random() - 0.5);
+        this.cfg.pairs.forEach(p => {
+            const l = el('button', {class: 'wg-match-btn wg-match-left', 'data-side': 'L', 'data-id': p.id, html: esc(p.term)});
+            l.addEventListener('click', () => this.pick('L', p.id, l));
+            left.appendChild(l);
+        });
+        shuffled.forEach(p => {
+            const r = el('button', {class: 'wg-match-btn wg-match-right', 'data-side': 'R', 'data-id': p.id, html: esc(p.definition)});
+            r.addEventListener('click', () => this.pick('R', p.id, r));
+            right.appendChild(r);
+        });
+        grid.appendChild(left); grid.appendChild(right);
+        container.appendChild(grid);
+    }
+    pick(side, id, btn) {
+        if (btn.classList.contains('paired')) return;
+        if (!this.selected) { this.selected = { side, id, btn }; btn.classList.add('picked'); return; }
+        if (this.selected.side === side) {
+            this.selected.btn.classList.remove('picked');
+            this.selected = { side, id, btn }; btn.classList.add('picked'); return;
+        }
+        const l = side === 'L' ? id : this.selected.id;
+        const r = side === 'R' ? id : this.selected.id;
+        this.pairs[l] = r;
+        btn.classList.add('paired'); this.selected.btn.classList.remove('picked'); this.selected.btn.classList.add('paired');
+        const ok = l === r;
+        btn.classList.add(ok ? 'correct' : 'wrong'); this.selected.btn.classList.add(ok ? 'correct' : 'wrong');
+        this.selected = null;
+        if (this.onChange) this.onChange();
+    }
+    score() {
+        const breakdown = this.cfg.pairs.map(p => {
+            const ok = this.pairs[p.id] === p.id;
+            return { label: p.term, ok, note: ok ? `matched to correct definition` : 'not correctly matched' };
+        });
+        return { score: breakdown.filter(b => b.ok).length, max: this.cfg.pairs.length, breakdown };
+    }
+    transcript() { return { widget: 'match-pairs', pairs: this.pairs }; }
+    isComplete() { return Object.keys(this.pairs).length === this.cfg.pairs.length; }
+}
+
+/* ---------- widget: live-code (write code, see it live, auto-checked) ---------- */
+class LiveCode {
+    constructor(cfg) {
+        this.cfg = cfg;
+        this.code = cfg.starter || '';
+        this.checkResults = [];
+    }
+    render(container) {
+        this.container = container;
+        const split = el('div', {class: 'wg-code-split'});
+
+        // Editor side
+        const editorWrap = el('div', {class: 'wg-code-editor-wrap'});
+        editorWrap.appendChild(el('div', {class: 'wg-code-lang-badge', html: (this.cfg.language || 'html').toUpperCase()}));
+        this.editor = el('textarea', {class: 'wg-code-editor', spellcheck: 'false', placeholder: 'Write your code here…'});
+        this.editor.value = this.code;
+        this.editor.addEventListener('input', () => {
+            this.code = this.editor.value;
+            this.updatePreview();
+        });
+        this.editor.addEventListener('keydown', e => {
+            if (e.key === 'Tab') {
+                e.preventDefault();
+                const s = this.editor.selectionStart;
+                const v = this.editor.value;
+                this.editor.value = v.slice(0, s) + '    ' + v.slice(this.editor.selectionEnd);
+                this.editor.selectionStart = this.editor.selectionEnd = s + 4;
+                this.code = this.editor.value;
+                this.updatePreview();
+            }
+        });
+        editorWrap.appendChild(this.editor);
+        split.appendChild(editorWrap);
+
+        // Preview side
+        const previewWrap = el('div', {class: 'wg-code-preview-wrap'});
+        previewWrap.appendChild(el('div', {class: 'wg-code-preview-label', html: 'Live preview'}));
+        this.preview = el('iframe', {class: 'wg-code-preview', sandbox: 'allow-scripts'});
+        previewWrap.appendChild(this.preview);
+        split.appendChild(previewWrap);
+        container.appendChild(split);
+
+        // Checks list
+        this.checkList = el('ul', {class: 'wg-code-checks'});
+        (this.cfg.checks || []).forEach((c, i) => {
+            const li = el('li', {class: 'wg-code-check no', 'data-i': String(i)});
+            li.innerHTML = `<span class="wg-code-check-icon">○</span> ${esc(c.label)}`;
+            this.checkList.appendChild(li);
+        });
+        container.appendChild(this.checkList);
+
+        this.updatePreview();
+    }
+    updatePreview() {
+        const lang = (this.cfg.language || 'html').toLowerCase();
+        let src;
+        if (lang === 'css') {
+            src = `<!DOCTYPE html><html><head><style>${this.code}</style></head><body>${this.cfg.preview_html || '<h1>Preview</h1><p>Sample paragraph.</p><ul><li>Item 1</li><li>Item 2</li></ul>'}</body></html>`;
+        } else if (lang === 'js') {
+            src = `<!DOCTYPE html><html><body>${this.cfg.preview_html || '<div id="app"></div>'}<script>${this.code}<\/script></body></html>`;
+        } else {
+            src = this.code;
+        }
+        this.preview.srcdoc = src;
+        this.preview.onload = () => this.runAndUpdateChecks();
+        setTimeout(() => this.runAndUpdateChecks(), 150);
+    }
+    runAndUpdateChecks() {
+        try {
+            const doc = this.preview.contentDocument;
+            if (!doc || !doc.body) return;
+            this.checkResults = (this.cfg.checks || []).map(c => {
+                const parts = c.test.split(':');
+                const type = parts[0];
+                const args = parts.slice(1);
+                try {
+                    if (type === 'tag') return !!doc.querySelector(args[0]);
+                    if (type === 'text') return doc.body.textContent.toLowerCase().includes(args.join(':').toLowerCase());
+                    if (type === 'count') return doc.querySelectorAll(args[0]).length >= parseInt(args[1] || '1', 10);
+                    if (type === 'attr') { const node = doc.querySelector(args[0]); return node && (!args[2] || node.getAttribute(args[1]) === args[2]); }
+                    if (type === 'contains') return this.code.toLowerCase().includes(args.join(':').toLowerCase());
+                    if (type === 'regex') return new RegExp(args.join(':'), 'i').test(this.code);
+                } catch { return false; }
+                return false;
+            });
+            (this.cfg.checks || []).forEach((c, i) => {
+                const li = this.checkList.children[i];
+                if (!li) return;
+                const ok = !!this.checkResults[i];
+                li.className = 'wg-code-check ' + (ok ? 'ok' : 'no');
+                li.querySelector('.wg-code-check-icon').textContent = ok ? '✓' : '○';
+            });
+            if (this.onChange) this.onChange();
+        } catch { /* cross-origin guard */ }
+    }
+    score() {
+        const breakdown = (this.cfg.checks || []).map((c, i) => ({
+            label: c.label, ok: !!this.checkResults[i],
+            note: this.checkResults[i] ? 'check passed' : 'check not yet passing'
+        }));
+        return { score: breakdown.filter(b => b.ok).length, max: (this.cfg.checks || []).length, breakdown };
+    }
+    transcript() { return { widget: 'live-code', language: this.cfg.language || 'html', code: this.code }; }
+    isComplete() { return this.code.trim().length > 10; }
+}
+
+/* ---------- widget registry ---------- */
+const WIDGETS = {
+    'pick-n': PickN,
+    'smart-builder': SmartBuilder,
+    'allocate': Allocate,
+    'fill-checks': FillChecks,
+    'sort-buckets': SortBuckets,
+    'order-steps': OrderSteps,
+    'binary-audit': BinaryAudit,
+    'match-pairs': MatchPairs,
+    'live-code': LiveCode,
+};
+
+/* ---------- practical orchestrator ---------- */
+class Practical {
+    constructor(cfg) {
+        this.cfg = cfg;
+        this.widgets = cfg.tasks.map(t => {
+            const W = WIDGETS[t.widget];
+            if (!W) throw new Error('Unknown widget: ' + t.widget);
+            const w = new W(t);
+            w._task = t;
+            return w;
+        });
+    }
+    render(root) {
+        root.appendChild(el('div', {class: 'header'}, [
+            el('div', {class: 'lesson-tag', html: esc(this.cfg.lesson_tag)}),
+            el('h1', {html: esc(this.cfg.title)}),
+            el('p', {html: esc(this.cfg.subtitle || '')}),
+        ]));
+        root.appendChild(el('div', {class: 'brief', html: `<h3>The brief</h3><p>${this.cfg.brief}</p>`}));
+        this.widgets.forEach((w, i) => {
+            const task = el('div', {class: 'task'});
+            task.appendChild(el('h2', {}, [
+                el('span', {class: 'task-num', html: String(i + 1)}),
+                document.createTextNode(w._task.heading || `Task ${i + 1}`),
+            ]));
+            if (w._task.instruction) task.appendChild(el('p', {class: 'instruction', html: esc(w._task.instruction)}));
+            const inner = el('div');
+            task.appendChild(inner);
+            w.onChange = () => this.updateSubmit();
+            w.render(inner);
+            root.appendChild(task);
+        });
+        this.submitBtn = el('button', {class: 'submit-btn', html: 'Show verdict'});
+        this.submitBtn.disabled = true;
+        this.submitBtn.addEventListener('click', () => this.submit());
+        root.appendChild(this.submitBtn);
+        this.verdict = el('div', {class: 'verdict'});
+        root.appendChild(this.verdict);
+        this.updateSubmit();
+    }
+    updateSubmit() { this.submitBtn.disabled = !this.widgets.every(w => w.isComplete()); }
+    submit() {
+        const scores = this.widgets.map(w => w.score());
+        const totalScore = scores.reduce((a, s) => a + s.score, 0);
+        const totalMax = scores.reduce((a, s) => a + s.max, 0);
+        const pct = Math.round(totalScore / totalMax * 100);
+        const pass = pct >= 70;
+        this.verdict.className = 'verdict show ' + (pass ? 'win' : 'lose');
+        let html = pass
+            ? `<h3>✅ Pass · ${totalScore}/${totalMax} (${pct}%)</h3><p>${esc(this.cfg.pass_message || 'Well done — you can move on to the next lesson.')}</p>`
+            : `<h3>Needs revision · ${totalScore}/${totalMax} (${pct}%)</h3><p>${esc(this.cfg.fail_message || 'Revisit the items below and try again.')}</p>`;
+        html += '<div class="verdict-breakdown">';
+        this.widgets.forEach((w, i) => {
+            const s = scores[i];
+            html += `<div class="v-task"><h4>Task ${i+1}: ${esc(w._task.heading || '')} — ${s.score}/${s.max}</h4><ul>`;
+            s.breakdown.forEach(b => html += `<li class="${b.ok ? 'v-ok' : 'v-no'}">${b.ok ? '✓' : '✗'} <strong>${esc(b.label)}</strong> — ${esc(b.note)}</li>`);
+            html += '</ul></div>';
+        });
+        html += '</div>';
+        html += '<button class="download-btn" id="dlBtn">⬇ Download transcript (.html)</button>';
+        this.verdict.innerHTML = html;
+        this.verdict.querySelector('#dlBtn').addEventListener('click', () => this.downloadTranscript(scores, totalScore, totalMax, pct, pass));
+        this.verdict.scrollIntoView({behavior: 'smooth'});
+    }
+    downloadTranscript(scores, totalScore, totalMax, pct, pass) {
+        const name = prompt('Your name (for the trainer\'s record):', '') || 'Anonymous student';
+        const now = new Date();
+        const stamp = now.toISOString().slice(0, 19).replace('T', ' ');
+        const bodyRows = this.widgets.map((w, i) => {
+            const s = scores[i];
+            const t = w.transcript();
+            const brk = s.breakdown.map(b => `<li style="color:${b.ok ? '#155724' : '#721c24'}">${b.ok ? '✓' : '✗'} <strong>${esc(b.label)}</strong> — ${esc(b.note)}</li>`).join('');
+            return `<section><h3>Task ${i+1}: ${esc(w._task.heading || '')} — ${s.score}/${s.max}</h3><p><em>Widget: ${t.widget}</em></p><ul>${brk}</ul><pre style="background:#f5f7fb;padding:10px;border-radius:6px;font-size:0.85em;overflow:auto">${esc(JSON.stringify(t, null, 2))}</pre></section>`;
+        }).join('');
+        const html = `<!DOCTYPE html><html><head><meta charset="UTF-8"><title>Transcript · ${esc(this.cfg.title)}</title>
+<style>body{font-family:sans-serif;max-width:800px;margin:30px auto;padding:0 20px;color:#333;line-height:1.5}
+h1{color:#2E7D32;border-bottom:3px solid #1565C0;padding-bottom:8px}
+h3{color:#1565C0;margin-top:24px}.badge{display:inline-block;padding:6px 16px;border-radius:20px;color:white;font-weight:bold;background:${pass ? '#28a745' : '#dc3545'}}
+ul{padding-left:22px}li{margin:4px 0}
+.meta{background:#f5f7fb;padding:12px 16px;border-radius:8px;margin-bottom:20px;font-size:0.92em}</style></head>
+<body><h1>${esc(this.cfg.title)}</h1>
+<div class="meta"><strong>Student:</strong> ${esc(name)}<br><strong>Lesson:</strong> ${esc(this.cfg.lesson_tag)}<br><strong>Submitted:</strong> ${stamp}<br><strong>Score:</strong> <span class="badge">${totalScore}/${totalMax} · ${pct}% · ${pass ? 'PASS' : 'REVISE'}</span></div>
+${bodyRows}
+<p style="margin-top:40px;color:#888;font-size:0.85em">MTTI Digital Marketing · Practical transcript · Edition 2026</p>
+</body></html>`;
+        const blob = new Blob([html], {type: 'text/html'});
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `${this.cfg.slug}-${name.replace(/\s+/g, '_')}-${now.toISOString().slice(0,10)}.html`;
+        document.body.appendChild(a); a.click(); a.remove();
+        URL.revokeObjectURL(url);
+    }
+}
+
+/* Boot */
+window.MTTI_Practical = Practical;
+</script>
+<script>
+const CONFIG = {
+  "lesson_tag": "Module 4 · Lesson 4.4 · Practical",
+  "title": "Domain Names and cPanel Hosting — Practical",
+  "subtitle": "Four tasks. Prove you can pick DNS records, use cPanel, and deploy to a Kenyan host.",
+  "slug": "4.4-domain-names-and-cpanel-hosting",
+  "brief": "James is moving nakuruhardwarehub.co.ke to Truehost cPanel. You will (1) order the go-live workflow, (2) match each DNS record, (3) audit hosting choices, and (4) live-code a DNS zone.",
+  "pass_message": "James's domain is registered and pointing to his host. Move on to Lesson 4.5 — Performance.",
+  "fail_message": "Some DNS/hosting essentials are still shaky. Fix the flagged items before continuing.",
+  "tasks": [
+    {
+      "widget": "order-steps",
+      "heading": "Order the .co.ke go-live workflow",
+      "instruction": "Drag the steps to take James live on nakuruhardwarehub.co.ke.",
+      "steps": [
+        {
+          "id": "s1",
+          "label": "Register nakuruhardwarehub.co.ke at Truehost/Sasahost (M-Pesa)"
+        },
+        {
+          "id": "s2",
+          "label": "Purchase shared hosting plan with cPanel"
+        },
+        {
+          "id": "s3",
+          "label": "Update DNS: A record → hosting server IP; CNAME www → nakuruhardwarehub.co.ke"
+        },
+        {
+          "id": "s4",
+          "label": "Wait for DNS to propagate (15 min–4 hours typically)"
+        },
+        {
+          "id": "s5",
+          "label": "Upload site files to public_html via File Manager or FTP"
+        },
+        {
+          "id": "s6",
+          "label": "Enable Let's Encrypt SSL in cPanel — HTTPS live, auto-renewing"
+        }
+      ]
+    },
+    {
+      "widget": "match-pairs",
+      "heading": "Match each DNS record to what it does",
+      "instruction": "Pair each record with its role.",
+      "pairs": [
+        {
+          "id": "p1",
+          "term": "A record",
+          "definition": "Points root domain to an IPv4 server address"
+        },
+        {
+          "id": "p2",
+          "term": "AAAA record",
+          "definition": "Same as A but for IPv6 addresses"
+        },
+        {
+          "id": "p3",
+          "term": "CNAME record",
+          "definition": "Alias one domain to another — e.g. www → root domain"
+        },
+        {
+          "id": "p4",
+          "term": "MX record",
+          "definition": "Email routing — where mail for the domain should be delivered"
+        },
+        {
+          "id": "p5",
+          "term": "TXT record",
+          "definition": "Arbitrary text — SPF/DKIM for email auth, domain verification"
+        },
+        {
+          "id": "p6",
+          "term": "TTL",
+          "definition": "Time-to-live — how long resolvers cache the record before re-fetching"
+        }
+      ]
+    },
+    {
+      "widget": "binary-audit",
+      "heading": "Audit James's hosting decisions",
+      "instruction": "Mark each choice.",
+      "good_label": "✓ Good practice",
+      "bad_label": "✗ Mistake",
+      "items": [
+        {
+          "label": "Registering .co.ke through KeNIC-accredited Kenyan registrar (Truehost/Sasahost) — pays in M-Pesa",
+          "good": true,
+          "reason": "Local support, local billing. Same underlying registry (KeNIC) whichever registrar you pick."
+        },
+        {
+          "label": "Skipping Let's Encrypt because 'HTTPS isn't necessary for a small site'",
+          "good": false,
+          "reason": "Chrome flags HTTP sites as 'Not Secure'. Google demotes them in search. DPA 2019 requires encryption for personal data. Free — no reason to skip."
+        },
+        {
+          "label": "Uploading a 2 GB ZIP of the entire dev folder including node_modules to public_html",
+          "good": false,
+          "reason": "Wastes disk quota. Only static files (HTML/CSS/JS/images) belong in public_html — no source code, no dependencies."
+        },
+        {
+          "label": "Storing MySQL credentials in a config.php OUTSIDE public_html (or password-protected)",
+          "good": true,
+          "reason": "Credentials should never be served over HTTP. Store outside document root or block via .htaccess."
+        },
+        {
+          "label": "Setting DNS TTL to 24 hours right before a planned server migration",
+          "good": false,
+          "reason": "24-hour cache means the migration takes 24 hours to fully propagate. Lower TTL to 5 minutes BEFORE the migration, migrate, then raise back."
+        },
+        {
+          "label": "Enabling automatic backups in cPanel (or paying a small monthly fee for daily backups)",
+          "good": true,
+          "reason": "Shared hosts sometimes lose data. Automated backups are cheap insurance against accidents and host failures."
+        }
+      ]
+    },
+    {
+      "widget": "live-code",
+      "heading": "Write James's DNS zone",
+      "instruction": "In a <pre>, list the DNS records James needs. Include: A record for the root domain (use example IP 102.130.117.42), CNAME for www, MX record for Google Workspace, and a TXT record for SPF. All six checks must pass.",
+      "language": "html",
+      "starter": "<!DOCTYPE html>\n<html lang=\"en\">\n<head>\n    <meta charset=\"UTF-8\">\n    <title>DNS zone</title>\n</head>\n<body>\n<pre id=\"zone\">\n; DNS zone for nakuruhardwarehub.co.ke\n\n</pre>\n</body>\n</html>\n",
+      "checks": [
+        {
+          "label": "Has an A record",
+          "test": "regex:\\bA\\b"
+        },
+        {
+          "label": "Points to 102.130.117.42 (example IP)",
+          "test": "regex:102\\.130\\.117\\.42"
+        },
+        {
+          "label": "Has a CNAME record",
+          "test": "regex:CNAME"
+        },
+        {
+          "label": "Mentions www",
+          "test": "regex:\\bwww\\b"
+        },
+        {
+          "label": "Has an MX record",
+          "test": "regex:\\bMX\\b"
+        },
+        {
+          "label": "Has a TXT record with SPF (v=spf1)",
+          "test": "regex:v=spf1"
+        }
+      ]
+    }
+  ]
+};
+new MTTI_Practical(CONFIG).render(document.getElementById('root'));
+</script>
+</body>
+</html>

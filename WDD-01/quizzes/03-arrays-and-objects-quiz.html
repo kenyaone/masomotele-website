@@ -1,0 +1,346 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Arrays and Objects | MTTI Web Design</title>
+    <link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Fredoka:wght@500;600&display=swap" rel="stylesheet">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Space Mono', monospace;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh; padding: 20px; color: #fff;
+        }
+        .container { max-width: 900px; margin: 0 auto; }
+        .header { text-align: center; margin-bottom: 30px; animation: slideDown 0.6s ease-out; }
+        .header .lesson-tag {
+            display: inline-block; background: rgba(255,255,255,0.2);
+            padding: 6px 16px; border-radius: 999px;
+            font-size: 0.85em; margin-bottom: 12px;
+        }
+        .header h1 {
+            font-family: 'Fredoka', sans-serif; font-size: 2.2em;
+            margin-bottom: 8px; text-shadow: 3px 3px 0 rgba(0,0,0,0.2);
+        }
+        .header p { opacity: 0.95; font-size: 0.95em; }
+        .score-board {
+            background: rgba(255,255,255,0.15); backdrop-filter: blur(10px);
+            border-radius: 20px; padding: 20px; margin-bottom: 20px;
+            display: flex; justify-content: space-around;
+            animation: fadeIn 0.8s ease-out 0.2s both;
+        }
+        .score-item { text-align: center; }
+        .score-item .label { font-size: 0.85em; opacity: 0.9; margin-bottom: 4px; }
+        .score-item .value {
+            font-size: 1.8em; font-weight: bold; font-family: 'Fredoka', sans-serif;
+        }
+        .progress-bar {
+            width: 100%; height: 8px; background: rgba(255,255,255,0.3);
+            border-radius: 10px; margin-bottom: 25px; overflow: hidden;
+        }
+        .progress-fill {
+            height: 100%; background: linear-gradient(90deg, #f093fb 0%, #f5576c 100%);
+            border-radius: 10px; transition: width 0.5s ease; width: 0%;
+        }
+        .exercise-card {
+            background: white; color: #333; border-radius: 25px;
+            padding: 35px; margin-bottom: 20px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            animation: fadeIn 0.6s ease-out both;
+        }
+        .scenario {
+            background: linear-gradient(135deg, #fff8e1 0%, #ffecb3 100%);
+            border-left: 5px solid #ffc107;
+            padding: 20px 24px; border-radius: 12px;
+            margin-bottom: 24px;
+            font-size: 0.98em; line-height: 1.55;
+        }
+        .scenario strong { color: #7a5a00; font-family: 'Fredoka', sans-serif; }
+        .question {
+            font-size: 1.15em; margin-bottom: 20px;
+            font-weight: 700; line-height: 1.4;
+        }
+        .options { display: flex; flex-direction: column; gap: 12px; }
+        .option {
+            background: #f5f7fb; border: 2px solid transparent;
+            padding: 16px 20px; border-radius: 12px;
+            cursor: pointer; transition: all 0.2s ease;
+            font-family: 'Space Mono', monospace; font-size: 0.98em; text-align: left;
+        }
+        .option:hover:not(.disabled) {
+            background: #eef1fb; border-color: #667eea; transform: translateX(4px);
+        }
+        .option.correct { background: #d4edda; border-color: #28a745; color: #155724; }
+        .option.wrong { background: #f8d7da; border-color: #dc3545; color: #721c24; animation: shake 0.4s; }
+        .option.disabled { cursor: not-allowed; opacity: 0.85; }
+        .feedback {
+            margin-top: 22px; padding: 18px 22px; border-radius: 12px;
+            animation: slideUp 0.4s ease-out;
+            font-size: 0.98em; line-height: 1.5;
+        }
+        .feedback.correct { background: #d4edda; color: #155724; border-left: 4px solid #28a745; }
+        .feedback.wrong { background: #f8d7da; color: #721c24; border-left: 4px solid #dc3545; }
+        .feedback strong { font-family: 'Fredoka', sans-serif; }
+        .next-btn, .restart-btn {
+            margin-top: 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white; border: none;
+            padding: 14px 32px; border-radius: 12px;
+            font-size: 1em; cursor: pointer;
+            font-family: 'Fredoka', sans-serif;
+            box-shadow: 0 6px 18px rgba(0,0,0,0.2);
+            transition: transform 0.2s ease;
+        }
+        .next-btn:hover, .restart-btn:hover { transform: scale(1.04); }
+        .results {
+            text-align: center; padding: 25px 15px;
+            animation: bounceIn 0.6s ease-out;
+        }
+        .results h2 {
+            font-family: 'Fredoka', sans-serif; font-size: 2em;
+            margin-bottom: 12px; color: #333;
+        }
+        .results .final-score {
+            font-size: 3em; font-family: 'Fredoka', sans-serif;
+            color: #667eea; margin: 20px 0;
+        }
+        .results p { color: #555; margin-bottom: 12px; }
+        .badge { display: inline-block; font-size: 3.5em; margin: 8px 0; }
+        @keyframes slideDown { from { opacity: 0; transform: translateY(-30px); } to { opacity: 1; transform: translateY(0); } }
+        @keyframes fadeIn { from { opacity: 0; transform: scale(0.96); } to { opacity: 1; transform: scale(1); } }
+        @keyframes slideUp { from { opacity: 0; transform: translateY(15px); } to { opacity: 1; transform: translateY(0); } }
+        @keyframes shake { 0%,100% { transform: translateX(0); } 25% { transform: translateX(-8px); } 75% { transform: translateX(8px); } }
+        @keyframes bounceIn { 0% { opacity: 0; transform: scale(0.4); } 60% { transform: scale(1.05); } 100% { opacity: 1; transform: scale(1); } }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <div class="lesson-tag">Module 3 · Lesson 3.6 · Quiz</div>
+            <h1>Arrays and Objects</h1>
+            <p></p>
+        </div>
+
+        <div class="score-board">
+            <div class="score-item"><div class="label">Score</div><div class="value" id="score">0</div></div>
+            <div class="score-item"><div class="label">Question</div><div class="value"><span id="current">1</span>/<span id="total">10</span></div></div>
+            <div class="score-item"><div class="label">Streak</div><div class="value" id="streak">0</div></div>
+        </div>
+
+        <div class="progress-bar"><div class="progress-fill" id="progress"></div></div>
+
+        <div class="exercise-card" id="exerciseCard"></div>
+    </div>
+
+    <script>
+        const exercises = [
+  {
+    "id": "q1",
+    "text": "James writes: const products = [{name:'Cement',price:850}, {name:'Nails',price:120}]. What is products[1].name?",
+    "options": [
+      "'Cement'",
+      "'Nails'",
+      "120",
+      "undefined"
+    ],
+    "answer": 1,
+    "explanation": "Array indices start at 0. products[0] = {name:'Cement',price:850}, products[1] = {name:'Nails',price:120}. products[1].name accesses the name property of the second element = 'Nails'."
+  },
+  {
+    "id": "q2",
+    "text": "James uses products.filter(p => p.price < 500). What does this return?",
+    "options": [
+      "The first product with price under 500",
+      "A new array containing only products with price < 500",
+      "true if any product is under 500",
+      "The total count of products under 500"
+    ],
+    "answer": 1,
+    "explanation": "filter() returns a new array of all elements where the callback returns true. It does not mutate the original array. find() returns the first match. some() returns a boolean. The count would require .filter().length."
+  },
+  {
+    "id": "q3",
+    "text": "James wants to extract just the names from all products. Which method returns ['Cement','Nails','Iron sheets']?",
+    "options": [
+      "products.filter(p => p.name)",
+      "products.find(p => p.name)",
+      "products.map(p => p.name)",
+      "products.forEach(p => p.name)"
+    ],
+    "answer": 2,
+    "explanation": "map() transforms every element and returns a new array of the same length with transformed values. p => p.name extracts the name from each product object. forEach() also iterates but returns undefined — it's for side effects, not transformations."
+  },
+  {
+    "id": "q4",
+    "text": "James uses products.reduce((total, p) => total + p.price, 0). What does this return?",
+    "options": [
+      "An array of all prices",
+      "The first product's price",
+      "The sum of all product prices (a single number)",
+      "The product with the highest price"
+    ],
+    "answer": 2,
+    "explanation": "reduce() collapses an array into a single value. The callback receives an accumulator (total) and current element. Starting at 0, it adds each product's price: 850 + 120 + ... = total sum. The second argument (0) is the initial accumulator value."
+  },
+  {
+    "id": "q5",
+    "text": "James writes products.push({name:'Bolts',price:45}). What does push() do?",
+    "options": [
+      "Returns a new array with the item added",
+      "Adds the item to the beginning of the array",
+      "Adds the item to the END of the array and returns the new length",
+      "Replaces the last item in the array"
+    ],
+    "answer": 2,
+    "explanation": "push() adds one or more elements to the END of an array and returns the new array length. It mutates the original array. To add to the beginning: unshift(). To create a new array without mutation: [...products, newItem] (spread syntax)."
+  },
+  {
+    "id": "q6",
+    "text": "James uses products.some(p => p.inStock). What does this return?",
+    "options": [
+      "An array of in-stock products",
+      "The first in-stock product",
+      "true if AT LEAST ONE product has inStock = true; false if none do",
+      "The count of in-stock products"
+    ],
+    "answer": 2,
+    "explanation": "some() returns true as soon as one element passes the test and stops checking. It returns false only if no elements pass. For 'are ALL in stock?' use every(). For 'how many?' use filter().length."
+  },
+  {
+    "id": "q7",
+    "text": "What is the difference between products.find() and products.filter()?",
+    "options": [
+      "find() returns the first matching element; filter() returns all matching elements in a new array",
+      "find() searches by index; filter() searches by value",
+      "They are identical — both return arrays",
+      "filter() is faster than find() for large arrays"
+    ],
+    "answer": 0,
+    "explanation": "find() returns the first element that passes the test (or undefined if none pass) — a single element, not an array. filter() returns a new array of ALL matching elements. Use find() when you want one result; filter() when you want all matches."
+  },
+  {
+    "id": "q8",
+    "text": "James wants to add a new property 'category' to an existing product object: const product = {name:'Cement'}. How?",
+    "options": [
+      "product.push({category:'building'})",
+      "product.category = 'building'",
+      "product.add('category','building')",
+      "product['add']('category','building')"
+    ],
+    "answer": 1,
+    "explanation": "You can add new properties to an object at any time using dot notation (product.category = 'building') or bracket notation (product['category'] = 'building'). push() is for arrays. .add() is not a standard object method."
+  },
+  {
+    "id": "q9",
+    "text": "James wants to loop through products and add a <li> to the DOM for each one. Which array method is most appropriate?",
+    "options": [
+      "products.map()",
+      "products.filter()",
+      "products.forEach()",
+      "products.reduce()"
+    ],
+    "answer": 2,
+    "explanation": "forEach() is designed for side effects — operations that don't return a new value. Appending DOM elements is a side effect. map() would be correct if you wanted a new array of elements to insert, but forEach() communicates intent clearly: 'do this for each item'."
+  },
+  {
+    "id": "q10",
+    "text": "James uses destructuring: const {name, price} = product. What does this do?",
+    "options": [
+      "Creates a copy of the product object",
+      "Extracts the name and price properties into separate variables",
+      "Deletes name and price from the product object",
+      "Merges product with another object"
+    ],
+    "answer": 1,
+    "explanation": "Object destructuring creates variables with the same names as the object's properties and assigns their values. const {name, price} = product is equivalent to: const name = product.name; const price = product.price. Cleaner for repeated property access."
+  }
+];
+
+        let currentQuestion = 0, score = 0, streak = 0, answered = false;
+
+        function updateScoreboard() {
+            document.getElementById('score').textContent = score;
+            document.getElementById('current').textContent = Math.min(currentQuestion + 1, exercises.length);
+            document.getElementById('total').textContent = exercises.length;
+            document.getElementById('streak').textContent = streak;
+            document.getElementById('progress').style.width = ((currentQuestion) / exercises.length) * 100 + '%';
+        }
+
+        function escapeHtml(s) {
+            return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+        }
+
+        function renderQuestion() {
+            answered = false;
+            const q = exercises[currentQuestion];
+            let html = '';
+            if (q.scenario) {
+                html += `<div class="scenario"><strong>Scenario.</strong> ${escapeHtml(q.scenario)}</div>`;
+            }
+            html += `<div class="question">${escapeHtml(q.text)}</div>`;
+            html += '<div class="options">';
+            q.options.forEach((o, i) => {
+                html += `<button class="option" onclick="selectAnswer(${i})">${escapeHtml(o)}</button>`;
+            });
+            html += '</div>';
+            document.getElementById('exerciseCard').innerHTML = html;
+            updateScoreboard();
+        }
+
+        function selectAnswer(i) {
+            if (answered) return;
+            answered = true;
+            const q = exercises[currentQuestion];
+            const btns = document.querySelectorAll('.option');
+            btns.forEach(b => b.classList.add('disabled'));
+            btns[q.answer].classList.add('correct');
+            const right = i === q.answer;
+            if (!right) btns[i].classList.add('wrong');
+            if (right) { score += 10; streak += 1; } else { streak = 0; }
+            const fb = document.createElement('div');
+            fb.className = 'feedback ' + (right ? 'correct' : 'wrong');
+            fb.innerHTML = `<strong>${right ? '✅ Correct.' : '❌ Not quite.'}</strong><br>${escapeHtml(q.explanation)}`;
+            document.getElementById('exerciseCard').appendChild(fb);
+            const nb = document.createElement('button');
+            nb.className = 'next-btn';
+            nb.textContent = currentQuestion === exercises.length - 1 ? 'See results →' : 'Next scenario →';
+            nb.onclick = nextQuestion;
+            document.getElementById('exerciseCard').appendChild(nb);
+            updateScoreboard();
+        }
+
+        function nextQuestion() {
+            currentQuestion++;
+            if (currentQuestion >= exercises.length) return showResults();
+            renderQuestion();
+        }
+
+        function showResults() {
+            document.getElementById('progress').style.width = '100%';
+            const total = exercises.length * 10;
+            const pct = Math.round(score / total * 100);
+            if (window.parent) { window.parent.postMessage({type:"mtti_quiz_score", score: score, total: total, percent: pct}, "*"); }
+            let badge = '🌟', msg = 'Excellent work. You have a professional grasp of this lesson.';
+            if (pct < 50) { badge = '🌱'; msg = 'Good first attempt. Re-watch the lesson video and try again.'; }
+            else if (pct < 80) { badge = '📚'; msg = 'Solid progress. Review the scenarios you missed and retry.'; }
+            document.getElementById('exerciseCard').innerHTML = `
+                <div class="results">
+                    <span class="badge">${badge}</span>
+                    <h2>Quiz Complete</h2>
+                    <div class="final-score">${score} / ${total}</div>
+                    <p><strong>${pct}%</strong> · Longest streak: ${streak}</p>
+                    <p>${msg}</p>
+                    <button class="restart-btn" onclick="restart()">Try again 🔁</button>
+                </div>`;
+        }
+
+        function restart() {
+            currentQuestion = 0; score = 0; streak = 0;
+            renderQuestion();
+        }
+
+        renderQuestion();
+    </script>
+</body>
+</html>

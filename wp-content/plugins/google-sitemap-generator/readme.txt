@@ -2,8 +2,8 @@
 Contributors: auctollo
 Tags: SEO, xml sitemap, video sitemap, news sitemap, html sitemap
 Requires at least: 4.6
-Tested up to: 6.9
-Stable tag: 4.1.23
+Tested up to: 7.0
+Stable tag: 4.1.24
 Requires PHP: 5.0
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
@@ -101,7 +101,11 @@ Please post your question at the [WordPress support forum](https://wordpress.org
 
 == Changelog ==
 
-= 4.1.22 (2026-02-09) =
+= 4.1.24 (2026-05-22) =
+* Security: mitigated CVE-2026-42945 (NGINX Rift, CVSS 9.2) in the dashboard's suggested Nginx rewrite rules. The rules now use named PCRE captures (?&lt;slug&gt;...) instead of unnamed $1/$2, which avoids the heap-overflow trigger in ngx_http_rewrite_module. If you previously copied the Nginx rules from Settings &rarr; XML-Sitemap into your nginx config, please re-copy the updated block.
+* Compatibility: marked as tested with WordPress 7.0.
+
+= 4.1.23 (2026-02-09) =
 * Improved security further for unauthenticated users from modifying plugin settings by enforcing proper permission and security‑token checks. CVE-2025-64632
 
 = 4.1.22 (2025-12-23) =
@@ -631,6 +635,9 @@ Good news, this plugin is free for everyone! Since it's released under the GPL, 
 The plugin comes with various translations, please refer to the [WordPress Codex](http://codex.wordpress.org/Installing_WordPress_in_Your_Language "Installing WordPress in Your Language") for more information about activating the translation. If you want to help to translate the plugin to your language, please have a look at the sitemap.pot file which contains all definitions and may be used with a [gettext](http://www.gnu.org/software/gettext/) editor like [Poedit](http://www.poedit.net/) (Windows).
 
 == Upgrade Notice ==
+
+= 4.1.24 =
+Security: Mitigates CVE-2026-42945 in the suggested Nginx rewrite rules. If you previously copied the Nginx config from Settings &rarr; XML-Sitemap, please re-copy the updated rules from the dashboard.
 
 = 4.1.23 =
 Critical Security Fix: Resolved a flaw where certain actions could be triggered without verifying the requester’s identity, privileges, or a valid security token. CVE-2025-64632

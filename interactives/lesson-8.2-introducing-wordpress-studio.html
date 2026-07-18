@@ -1,0 +1,475 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lesson 8.2 — Introducing WordPress Studio (Interactive)</title>
+<style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: 'Segoe UI', -apple-system, sans-serif; line-height: 1.55; color: #1e293b; background: #f8fafc; min-height: 100vh; }
+    .container { max-width: 1150px; margin: 0 auto; padding: 20px; }
+    header {
+        background: linear-gradient(135deg, #2E7D32, #1B5E20);
+        color: #fff; padding: 40px 30px; border-radius: 12px; margin-bottom: 24px;
+        box-shadow: 0 10px 30px rgba(0,0,0,0.35);
+        border: 1px solid #0073aa;
+    }
+    header .badge { display: inline-block; background: #0073aa; padding: 4px 14px; border-radius: 16px; font-size: 12px; font-weight: bold; letter-spacing: 1px; margin-bottom: 14px; }
+    header h1 { font-size: 34px; margin-bottom: 8px; color: #fff; }
+    header .subtitle { font-size: 17px; opacity: 0.95; margin-bottom: 20px; color: #d1d5db; }
+    .meta-strip { display: flex; flex-wrap: wrap; gap: 12px; }
+    .meta-strip span { background: rgba(0,115,170,0.35); padding: 6px 14px; border-radius: 20px; font-size: 13px; color: #fff; border: 1px solid #0073aa; }
+    .toc { background: #fff; border: 1px solid #e2e8f0; border-radius: 10px; padding: 22px 26px; margin-bottom: 22px; }
+    .toc h3 { color: #0073aa; margin-bottom: 10px; }
+    .toc ol { padding-left: 20px; }
+    .toc a { color: #0073aa; text-decoration: none; font-weight: 600; }
+    section { background: #fff; border: 1px solid #e2e8f0; border-radius: 10px; padding: 26px 30px; margin-bottom: 22px; }
+    section h2 { color: #0073aa; font-size: 22px; margin-bottom: 12px; padding-bottom: 8px; border-bottom: 3px solid #0073aa; }
+    section h3 { color: #1e293b; font-size: 17px; margin: 18px 0 8px; }
+    section p { margin-bottom: 12px; }
+    section ul, section ol { padding-left: 22px; margin-bottom: 12px; }
+    section li { margin-bottom: 4px; }
+    .callout { border-left: 5px solid #0073aa; background: #eaf3fb; padding: 14px 18px; margin: 14px 0; border-radius: 4px; }
+    .callout.warn { border-left-color: #dc2626; background: #fef2f2; }
+    .callout.tip { border-left-color: #059669; background: #ecfdf5; }
+    .callout strong { color: #0073aa; }
+
+    /* Studio app mock */
+    .studio-window {
+        background: #1e1e1e; border-radius: 10px; overflow: hidden;
+        border: 1px solid #444; margin: 16px 0;
+        box-shadow: 0 10px 30px rgba(0,0,0,0.35);
+    }
+    .studio-titlebar {
+        background: linear-gradient(180deg, #3b3b3b, #2a2a2a);
+        padding: 8px 14px; display: flex; align-items: center; gap: 8px;
+        border-bottom: 1px solid #444;
+    }
+    .traffic { display: flex; gap: 6px; }
+    .traffic span { width: 12px; height: 12px; border-radius: 50%; display: inline-block; }
+    .traffic .r { background: #ff5f57; }
+    .traffic .y { background: #febc2e; }
+    .traffic .g { background: #28c840; }
+    .studio-title { color: #d1d5db; font-size: 12px; margin: 0 auto; font-weight: 500; }
+    .studio-body { display: grid; grid-template-columns: 260px 1fr; min-height: 400px; }
+    @media (max-width: 800px) { .studio-body { grid-template-columns: 1fr; } .studio-sidebar { display: none; } }
+    .studio-sidebar {
+        background: #2a2a2a; padding: 14px; border-right: 1px solid #444;
+        color: #d1d5db;
+    }
+    .studio-sidebar h5 { color: #9ca3af; font-size: 10px; text-transform: uppercase; letter-spacing: 1.5px; margin: 6px 0 10px; }
+    .site-item {
+        padding: 10px 12px; border-radius: 6px; margin-bottom: 6px;
+        cursor: pointer; display: flex; align-items: center; justify-content: space-between;
+        font-size: 13px;
+    }
+    .site-item:hover { background: #383838; }
+    .site-item.active { background: #0073aa; color: #fff; }
+    .site-item .pill { font-size: 10px; padding: 2px 8px; border-radius: 10px; font-weight: 700; }
+    .pill.running { background: #16a34a; color: #fff; }
+    .pill.stopped { background: #52525b; color: #d1d5db; }
+    .sidebar-btn {
+        background: #0073aa; color: #fff; border: 0; padding: 8px; width: 100%;
+        border-radius: 6px; font-size: 13px; cursor: pointer; margin-top: 8px; font-weight: 600;
+    }
+
+    .studio-main { background: #1e1e1e; padding: 20px; color: #e5e7eb; }
+    .site-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; padding-bottom: 12px; border-bottom: 1px solid #333; }
+    .site-header h3 { color: #fff; font-size: 20px; margin: 0; }
+    .site-status { display: inline-flex; align-items: center; gap: 6px; font-size: 12px; color: #16a34a; }
+    .status-dot { width: 8px; height: 8px; border-radius: 50%; background: #16a34a; box-shadow: 0 0 6px rgba(22,163,74,0.6); }
+    .site-detail-row { display: grid; grid-template-columns: 140px 1fr; gap: 12px; padding: 10px 0; border-bottom: 1px solid #2f2f2f; font-size: 13px; }
+    .site-detail-row .lbl { color: #9ca3af; }
+    .site-detail-row .val { color: #e5e7eb; }
+    .site-detail-row a { color: #0073aa; text-decoration: none; }
+    .php-select { background: #2a2a2a; color: #e5e7eb; border: 1px solid #444; padding: 4px 8px; border-radius: 4px; font-size: 12px; }
+    .toggle-sw { display: inline-flex; align-items: center; gap: 8px; }
+    .switch { position: relative; width: 34px; height: 18px; background: #52525b; border-radius: 10px; cursor: pointer; }
+    .switch::after { content: ''; position: absolute; top: 2px; left: 2px; width: 14px; height: 14px; background: #fff; border-radius: 50%; transition: 0.2s; }
+    .switch.on { background: #0073aa; }
+    .switch.on::after { left: 18px; }
+    .action-row { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 16px; }
+    .action-btn {
+        background: #2a2a2a; color: #e5e7eb; border: 1px solid #444;
+        padding: 8px 14px; border-radius: 6px; font-size: 13px; cursor: pointer;
+        font-weight: 500;
+    }
+    .action-btn:hover { background: #383838; border-color: #0073aa; }
+    .action-btn.primary { background: #0073aa; border-color: #0073aa; }
+    .action-btn.primary:hover { background: #005a8a; }
+    .action-btn.warn { background: #b91c1c; border-color: #b91c1c; }
+
+    /* Scenarios */
+    .scenario { background: #f8fafc; border: 2px solid #cbd5e1; border-radius: 10px; padding: 14px 16px; margin: 12px 0; }
+    .scenario h4 { color: #0073aa; font-size: 15px; margin-bottom: 8px; }
+    .scenario .choices { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 8px; }
+    .scenario .choices button {
+        border: 1.5px solid #cbd5e1; background: #fff; color: #1e293b;
+        padding: 8px 16px; border-radius: 6px; font-size: 13px; cursor: pointer; font-weight: 600;
+    }
+    .scenario .choices button.picked { background: #0073aa; color: #fff; border-color: #0073aa; }
+    .scenario.correct { border-color: #059669; background: #ecfdf5; }
+    .scenario.wrong { border-color: #dc2626; background: #fef2f2; }
+    .scenario .expl { margin-top: 10px; font-size: 13px; display: none; padding: 10px 12px; border-radius: 6px; }
+    .scenario.correct .expl { display: block; background: #d1fae5; color: #065f46; }
+    .scenario.wrong .expl { display: block; background: #fee2e2; color: #991b1b; }
+
+    /* Feature match quiz */
+    .quiz-question { background: #fff; border: 2px solid #cbd5e1; border-radius: 10px; padding: 18px; margin: 14px 0; }
+    .quiz-question.correct { border-color: #059669; background: #ecfdf5; }
+    .quiz-question.wrong { border-color: #dc2626; background: #fef2f2; }
+    .quiz-question h4 { margin-bottom: 12px; font-size: 15px; color: #1e293b; }
+    .quiz-question .options label { display: block; padding: 10px 14px; margin-bottom: 6px; background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 6px; cursor: pointer; font-size: 14px; }
+    .quiz-question .options label:hover { background: #eaf3fb; }
+    .quiz-question .options input[type="radio"] { margin-right: 10px; }
+    .quiz-question .explanation { display: none; margin-top: 12px; padding: 10px 14px; border-radius: 6px; font-size: 14px; }
+    .quiz-question.correct .explanation { display: block; background: #d1fae5; color: #065f46; border-left: 4px solid #059669; }
+    .quiz-question.wrong .explanation { display: block; background: #fee2e2; color: #991b1b; border-left: 4px solid #dc2626; }
+    .quiz-summary { text-align: center; padding: 30px; background: linear-gradient(135deg, #1e1e1e 0%, #3b3b3b 100%); color: #fff; border-radius: 10px; margin: 20px 0; display: none; border: 1px solid #0073aa; }
+    .quiz-summary.show { display: block; }
+    .quiz-summary .score { font-size: 48px; font-weight: bold; color: #0073aa; margin-bottom: 8px; }
+    button.btn { background: #0073aa; color: #fff; border: none; padding: 10px 20px; border-radius: 6px; font-size: 15px; font-weight: 600; cursor: pointer; }
+    button.btn:hover { background: #005a8a; }
+    button.btn.reset { background: #52525b; margin-left: 8px; }
+    footer { text-align: center; color: #64748b; padding: 24px; font-size: 13px; }
+
+    @media (max-width: 800px) {
+        header h1 { font-size: 26px; }
+        .container { padding: 12px; }
+        section { padding: 18px; }
+        .site-detail-row { grid-template-columns: 1fr; gap: 4px; }
+        .site-detail-row .lbl { font-size: 11px; }
+    }
+
+    /* MTTI logo stamp */
+    .mtti-logo-stamp {
+        position: fixed; top: 14px; right: 18px; z-index: 999;
+        opacity: 0.88; transition: opacity 0.2s;
+    }
+    .mtti-logo-stamp:hover { opacity: 1; }
+    .mtti-logo-stamp img { width: 56px; height: 56px; border-radius: 50%; box-shadow: 0 2px 8px rgba(0,0,0,0.18); }
+</style>
+</head>
+<body>
+<div class="mtti-logo-stamp">
+    <img src="../../Resources/Logo.jpeg" alt="MTTI" title="Masomotele Technical Training Institute — Start learning, Start earning">
+</div>
+
+<div class="container">
+
+<header>
+    <div class="badge">LESSON 8.2  ·  WORDPRESS STUDIO  ·  INTERACTIVE</div>
+    <h1>Introducing WordPress Studio</h1>
+    <div class="subtitle">Studio (by Automattic) is the free local WordPress lab. Sarah builds Karibu Kitchen here before it ever touches the internet.</div>
+    <div class="meta-strip">
+        <span><strong>Duration:</strong> ~30 min interactive</span>
+        <span><strong>Level:</strong> Beginner</span>
+        <span><strong>Tool:</strong> WordPress Studio (Automattic)</span>
+        <span><strong>Handbook:</strong> Part 8, §8.2</span>
+    </div>
+</header>
+
+<div class="toc">
+    <h3>What you'll do in this lesson</h3>
+    <ol>
+        <li><a href="#s1">Tour the Studio app main window</a></li>
+        <li><a href="#s2">Switch between Sarah's two Karibu Kitchen sites</a></li>
+        <li><a href="#s3">3 decision scenarios — Studio vs live (auto-scored)</a></li>
+        <li><a href="#s4">Studio vs LocalWP feature match quiz</a></li>
+    </ol>
+</div>
+
+<section id="s1">
+    <h2>1. The Studio app main window</h2>
+    <p>Everything you need lives in three places: the sidebar (list of sites), the main pane (details of the selected site), and the action row (open, admin, terminal, push to live).</p>
+    <div class="studio-window">
+        <div class="studio-titlebar">
+            <div class="traffic"><span class="r"></span><span class="y"></span><span class="g"></span></div>
+            <div class="studio-title">WordPress Studio · Karibu Kitchen (dev)</div>
+        </div>
+        <div class="studio-body">
+            <div class="studio-sidebar">
+                <h5>My Sites</h5>
+                <div class="site-item active" data-site="dev" onclick="pickSite('dev', this)">
+                    <span>Karibu Kitchen (dev)</span>
+                    <span class="pill running">Running</span>
+                </div>
+                <div class="site-item" data-site="staging" onclick="pickSite('staging', this)">
+                    <span>Karibu Kitchen (staging)</span>
+                    <span class="pill stopped">Stopped</span>
+                </div>
+                <button class="sidebar-btn">+ Add site</button>
+                <h5 style="margin-top: 20px;">Menu</h5>
+                <div class="site-item"><span>Import site</span></div>
+                <div class="site-item"><span>Settings</span></div>
+                <div class="site-item"><span>Help</span></div>
+            </div>
+            <div class="studio-main">
+                <div class="site-header">
+                    <div>
+                        <h3 id="siteName">Karibu Kitchen (dev)</h3>
+                        <div style="font-size: 12px; color: #9ca3af; margin-top: 2px;">Local WordPress · Studio 1.4</div>
+                    </div>
+                    <div class="site-status" id="siteStatus"><span class="status-dot"></span> <span id="statusText">Running</span></div>
+                </div>
+
+                <div class="site-detail-row">
+                    <div class="lbl">Local URL</div>
+                    <div class="val"><a href="#" id="siteUrl">karibukitchen.wpstudio.dev</a></div>
+                </div>
+                <div class="site-detail-row">
+                    <div class="lbl">PHP version</div>
+                    <div class="val">
+                        <select class="php-select">
+                            <option>PHP 8.3 (recommended)</option>
+                            <option>PHP 8.2</option>
+                            <option>PHP 8.1</option>
+                            <option>PHP 7.4</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="site-detail-row">
+                    <div class="lbl">WordPress</div>
+                    <div class="val">6.7.2 · Latest</div>
+                </div>
+                <div class="site-detail-row">
+                    <div class="lbl">Sync with WordPress.com</div>
+                    <div class="val">
+                        <div class="toggle-sw">
+                            <div class="switch" id="syncSwitch" onclick="this.classList.toggle('on')"></div>
+                            <span style="font-size: 12px; color: #9ca3af;">Two-way sync when enabled</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="site-detail-row">
+                    <div class="lbl">Location</div>
+                    <div class="val">~/Studio/karibu-kitchen-dev</div>
+                </div>
+
+                <div class="action-row">
+                    <button class="action-btn primary">Open site</button>
+                    <button class="action-btn">WP Admin</button>
+                    <button class="action-btn">Terminal</button>
+                    <button class="action-btn">Share Demo Site</button>
+                    <button class="action-btn warn">Push to live</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="callout tip">
+        <strong>Try it:</strong> click Karibu Kitchen (staging) in the sidebar — the main pane updates. Click the sync switch to toggle it on/off.
+    </div>
+</section>
+
+<section id="s2">
+    <h2>2. Why two Karibu Kitchen sites?</h2>
+    <p>Sarah runs a <strong>dev</strong> site (for experiments) and a <strong>staging</strong> site (a clone of live, for final testing before push). Neither is her live customer-facing site — that lives on HostPinnacle.</p>
+    <ul>
+        <li><strong>dev</strong> — Sarah breaks things here. Tries new plugins. Reconfigures menus. If she nukes it, no customer notices.</li>
+        <li><strong>staging</strong> — A copy of the live site. Used to verify a change works before it goes live.</li>
+        <li><strong>live</strong> — Only touched with Push-to-Live from Studio, or via WP-Admin on the production server.</li>
+    </ul>
+    <div class="callout warn">
+        <strong>Never edit the live site directly for anything bigger than a typo.</strong> Every real business change flows dev &rarr; staging &rarr; live.
+    </div>
+</section>
+
+<section id="s3">
+    <h2>3. Studio vs live — 3 decision scenarios</h2>
+    <p>For each situation, tap where Sarah should do the work.</p>
+
+    <div class="scenario" data-correct="studio">
+        <h4>A. Sarah wants to try a new "menu ordering" plugin she read about on Reddit. She has no idea if it will break the checkout.</h4>
+        <div class="choices">
+            <button data-v="studio">Studio (dev site)</button>
+            <button data-v="live">Live site directly</button>
+        </div>
+        <div class="expl">Studio — untested plugins go in dev first. If it wipes the checkout, no customer notices.</div>
+    </div>
+
+    <div class="scenario" data-correct="studio">
+        <h4>B. Sarah is redesigning the whole About page copy and layout. She wants to A/B test two versions before deciding.</h4>
+        <div class="choices">
+            <button data-v="studio">Studio (dev site)</button>
+            <button data-v="live">Live site directly</button>
+        </div>
+        <div class="expl">Studio — big design changes get built and reviewed locally, then pushed. Live is not a scratchpad.</div>
+    </div>
+
+    <div class="scenario" data-correct="live">
+        <h4>C. Sarah spots a typo on the live homepage — "Karibi Kitchen" instead of "Karibu Kitchen". She wants it fixed in 30 seconds.</h4>
+        <div class="choices">
+            <button data-v="studio">Studio (dev site)</button>
+            <button data-v="live">Live site directly</button>
+        </div>
+        <div class="expl">Live — one-character typo fixes are the exception. Fix in wp-admin, save, done. Any bigger change: back to dev.</div>
+    </div>
+
+    <div style="margin-top: 12px;">
+        <button class="btn" onclick="markScenarios()">Mark my decisions</button>
+        <button class="btn reset" onclick="resetScenarios()">Reset</button>
+    </div>
+</section>
+
+<section id="s4">
+    <h2>4. Studio vs LocalWP — feature match quiz</h2>
+
+    <div class="quiz-question" data-correct="B">
+        <h4>1. Who built WordPress Studio?</h4>
+        <div class="options">
+            <label><input type="radio" name="q1" value="A"> A) WP Engine</label>
+            <label><input type="radio" name="q1" value="B"> B) Automattic (makers of WordPress.com)</label>
+            <label><input type="radio" name="q1" value="C"> C) Elementor</label>
+            <label><input type="radio" name="q1" value="D"> D) Bluehost</label>
+        </div>
+        <div class="explanation">Correct — Automattic. Same company as WordPress.com and Jetpack.</div>
+    </div>
+
+    <div class="quiz-question" data-correct="A">
+        <h4>2. Studio's killer feature that LocalWP never had?</h4>
+        <div class="options">
+            <label><input type="radio" name="q2" value="A"> A) One-click Demo Sites — publish a temp public URL from local</label>
+            <label><input type="radio" name="q2" value="B"> B) MySQL support</label>
+            <label><input type="radio" name="q2" value="C"> C) A dark theme</label>
+            <label><input type="radio" name="q2" value="D"> D) Ability to install WordPress</label>
+        </div>
+        <div class="explanation">Correct — Demo Sites let Sarah share her build with a client from her laptop with no hosting.</div>
+    </div>
+
+    <div class="quiz-question" data-correct="C">
+        <h4>3. Studio runs WordPress...</h4>
+        <div class="options">
+            <label><input type="radio" name="q3" value="A"> A) In a browser tab only</label>
+            <label><input type="radio" name="q3" value="B"> B) On WordPress.com's cloud</label>
+            <label><input type="radio" name="q3" value="C"> C) As a real, complete install on your local laptop</label>
+            <label><input type="radio" name="q3" value="D"> D) As a static export</label>
+        </div>
+        <div class="explanation">Correct — a full-featured WordPress running on your machine, offline-capable.</div>
+    </div>
+
+    <div class="quiz-question" data-correct="B">
+        <h4>4. LocalWP's status in 2026?</h4>
+        <div class="options">
+            <label><input type="radio" name="q4" value="A"> A) Still the market leader</label>
+            <label><input type="radio" name="q4" value="B"> B) Discontinued in 2024 — do not install</label>
+            <label><input type="radio" name="q4" value="C"> C) Renamed to Studio</label>
+            <label><input type="radio" name="q4" value="D"> D) Free but unsafe</label>
+        </div>
+        <div class="explanation">Correct — LocalWP is no longer actively maintained. Studio replaced it.</div>
+    </div>
+
+    <div class="quiz-question" data-correct="D">
+        <h4>5. WordPress powers what % of the internet in 2026?</h4>
+        <div class="options">
+            <label><input type="radio" name="q5" value="A"> A) About 5%</label>
+            <label><input type="radio" name="q5" value="B"> B) About 15%</label>
+            <label><input type="radio" name="q5" value="C"> C) About 25%</label>
+            <label><input type="radio" name="q5" value="D"> D) About 43%</label>
+        </div>
+        <div class="explanation">Correct — 43% and growing. It's the industry standard.</div>
+    </div>
+
+    <div class="quiz-question" data-correct="A">
+        <h4>6. Reasons to build locally first?</h4>
+        <div class="options">
+            <label><input type="radio" name="q6" value="A"> A) Cost, safety, speed, offline</label>
+            <label><input type="radio" name="q6" value="B"> B) Marketing</label>
+            <label><input type="radio" name="q6" value="C"> C) SEO</label>
+            <label><input type="radio" name="q6" value="D"> D) Compliance only</label>
+        </div>
+        <div class="explanation">Correct — the four practical reasons. Free, private, fast, resilient to Kenyan internet outages.</div>
+    </div>
+
+    <div style="margin-top: 20px;">
+        <button class="btn" onclick="markQuiz()">Mark my quiz</button>
+        <button class="btn reset" onclick="resetQuiz()">Reset</button>
+    </div>
+    <div class="quiz-summary" id="quizSummary">
+        <div class="score" id="scoreDisplay">0 / 6</div>
+        <p id="scoreMessage"></p>
+    </div>
+</section>
+
+<footer>
+    <p>Lesson 8.2 — Introducing WordPress Studio · Masomotele Technical Training Institute · Handbook Part 8, §8.2</p>
+    <p>Next: <strong>Lesson 8.3 — Install WordPress Studio</strong></p>
+</footer>
+</div>
+
+<script>
+const siteData = {
+    dev: { name: 'Karibu Kitchen (dev)', status: 'Running', url: 'karibukitchen.wpstudio.dev', running: true },
+    staging: { name: 'Karibu Kitchen (staging)', status: 'Stopped', url: 'karibukitchen-staging.wpstudio.dev', running: false }
+};
+function pickSite(key, el) {
+    document.querySelectorAll('.site-item').forEach(i => i.classList.remove('active'));
+    el.classList.add('active');
+    const d = siteData[key];
+    document.getElementById('siteName').textContent = d.name;
+    document.getElementById('siteUrl').textContent = d.url;
+    document.getElementById('statusText').textContent = d.status;
+    const dot = document.querySelector('#siteStatus .status-dot');
+    const stat = document.getElementById('siteStatus');
+    if (d.running) {
+        dot.style.background = '#16a34a';
+        dot.style.boxShadow = '0 0 6px rgba(22,163,74,0.6)';
+        stat.style.color = '#16a34a';
+    } else {
+        dot.style.background = '#52525b';
+        dot.style.boxShadow = 'none';
+        stat.style.color = '#9ca3af';
+    }
+    document.querySelector('.studio-title').textContent = 'WordPress Studio · ' + d.name;
+}
+
+document.querySelectorAll('.scenario .choices button').forEach(btn => {
+    btn.addEventListener('click', () => {
+        const p = btn.closest('.scenario');
+        p.querySelectorAll('button').forEach(b => b.classList.remove('picked'));
+        btn.classList.add('picked');
+    });
+});
+function markScenarios() {
+    document.querySelectorAll('.scenario').forEach(sc => {
+        sc.classList.remove('correct', 'wrong');
+        const picked = sc.querySelector('button.picked');
+        if (picked && picked.dataset.v === sc.dataset.correct) sc.classList.add('correct');
+        else if (picked) sc.classList.add('wrong');
+    });
+}
+function resetScenarios() {
+    document.querySelectorAll('.scenario').forEach(sc => {
+        sc.classList.remove('correct', 'wrong');
+        sc.querySelectorAll('button').forEach(b => b.classList.remove('picked'));
+    });
+}
+
+function markQuiz() {
+    const questions = document.querySelectorAll('.quiz-question');
+    let score = 0;
+    questions.forEach((q, i) => {
+        const correct = q.dataset.correct;
+        const picked = q.querySelector(`input[name="q${i+1}"]:checked`);
+        q.classList.remove('correct', 'wrong');
+        if (picked && picked.value === correct) { q.classList.add('correct'); score++; }
+        else if (picked) q.classList.add('wrong');
+    });
+    const summary = document.getElementById('quizSummary');
+    summary.classList.add('show');
+    document.getElementById('scoreDisplay').textContent = `${score} / 6`;
+    const msg = document.getElementById('scoreMessage');
+    if (score === 6) msg.textContent = 'Perfect. Move to 8.3 — Install Studio.';
+    else if (score >= 4) msg.textContent = 'Solid. Review the missed answers.';
+    else msg.textContent = 'Rewatch the intro slides and try again.';
+    summary.scrollIntoView({ behavior: 'smooth', block: 'center' });
+}
+function resetQuiz() {
+    document.querySelectorAll('.quiz-question').forEach(q => {
+        q.classList.remove('correct', 'wrong');
+        q.querySelectorAll('input[type=radio]').forEach(r => r.checked = false);
+    });
+    document.getElementById('quizSummary').classList.remove('show');
+}
+</script>
+</body>
+</html>

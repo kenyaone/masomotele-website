@@ -12,12 +12,12 @@ $userId = $auth->getUserId();
 $role = $auth->getRole();
 $classId = (int)($_GET['id'] ?? 0);
 $lessonId = (int)($_GET['lesson'] ?? 0);
-$class = $db->fetchOne("SELECT * FROM classes WHERE id=? AND status='active'", [$classId]);
+$class = $db->fetchOne("SELECT * FROM lms_classes WHERE id=? AND status='active'", [$classId]);
 if (!$class) { header('Location: ' . SITE_URL . '/dashboard.php'); exit; }
 $pageTitle = htmlspecialchars($class['title']) . ' - ' . SITE_NAME;
 
 if ($role === 'student') {
-    $enrolled = $db->fetchOne("SELECT id FROM enrolments WHERE user_id=? AND class_id=?", [$userId, $classId]);
+    $enrolled = $db->fetchOne("SELECT id FROM lms_enrolments WHERE user_id=? AND class_id=?", [$userId, $classId]);
     if (!$enrolled) { header('Location: ' . SITE_URL . '/dashboard.php'); exit; }
 }
 
@@ -28,11 +28,11 @@ $allLessons = $db->fetchAll(
             p.id as pid, p.title as parent_name, p.parent_id as gparent, p.sort_order as psort,
             gp.id as gpid, gp.title as grandparent_name, gp.sort_order as gpsort,
             lf.filetype as primary_filetype
-     FROM lessons l 
-     LEFT JOIN subjects s ON l.subject_id = s.id
-     LEFT JOIN subjects p ON s.parent_id = p.id
-     LEFT JOIN subjects gp ON p.parent_id = gp.id
-     LEFT JOIN lesson_files lf ON lf.lesson_id = l.id AND lf.id = (SELECT MIN(id) FROM lesson_files WHERE lesson_id = l.id)
+     FROM lms_lessons l 
+     LEFT JOIN lms_subjects s ON l.subject_id = s.id
+     LEFT JOIN lms_subjects p ON s.parent_id = p.id
+     LEFT JOIN lms_subjects gp ON p.parent_id = gp.id
+     LEFT JOIN lms_lesson_files lf ON lf.lesson_id = l.id AND lf.id = (SELECT MIN(id) FROM lms_lesson_files WHERE lesson_id = l.id)
      WHERE l.class_id = ? AND l.status = 'published'
      ORDER BY COALESCE(gp.sort_order, p.sort_order, s.sort_order, 0),
               COALESCE(p.sort_order, s.sort_order, 0),
@@ -40,7 +40,7 @@ $allLessons = $db->fetchAll(
     [$classId]
 );
 
-$completions = $db->fetchAll("SELECT lesson_id FROM completions WHERE user_id=? AND class_id=?", [$userId, $classId]);
+$completions = $db->fetchAll("SELECT lesson_id FROM lms_completions WHERE user_id=? AND class_id=?", [$userId, $classId]);
 $completedIds = array_column($completions, 'lesson_id');
 
 // All lessons in one unified list
@@ -58,11 +58,11 @@ function buildTree($lessons) {
         }
         if (!isset($tree[$topKey])) $tree[$topKey] = ['strands' => [], 'sort' => $l['gpsort'] ?? $l['psort'] ?? $l['ssort'] ?? 999];
         if ($midKey) {
-            if (!isset($tree[$topKey]['strands'][$midKey])) $tree[$topKey]['strands'][$midKey] = ['lessons' => [], 'sort' => $l['psort'] ?? $l['ssort'] ?? 0];
-            $tree[$topKey]['strands'][$midKey]['lessons'][] = $l;
+            if (!isset($tree[$topKey]['strands'][$midKey])) $tree[$topKey]['strands'][$midKey] = ['lms_lessons' => [], 'sort' => $l['psort'] ?? $l['ssort'] ?? 0];
+            $tree[$topKey]['strands'][$midKey]['lms_lessons'][] = $l;
         } else {
-            if (!isset($tree[$topKey]['strands']['_direct'])) $tree[$topKey]['strands']['_direct'] = ['lessons' => [], 'sort' => -1];
-            $tree[$topKey]['strands']['_direct']['lessons'][] = $l;
+            if (!isset($tree[$topKey]['strands']['_direct'])) $tree[$topKey]['strands']['_direct'] = ['lms_lessons' => [], 'sort' => -1];
+            $tree[$topKey]['strands']['_direct']['lms_lessons'][] = $l;
         }
     }
     uasort($tree, fn($a, $b) => ($a['sort'] ?? 999) <=> ($b['sort'] ?? 999));
@@ -85,9 +85,9 @@ $doneAll = 0; foreach ($allLessons as $al) { if (in_array($al['id'], $completedI
 $pctAll = $totalAll > 0 ? round(($doneAll / $totalAll) * 100) : 0;
 
 $currentLesson = null;
-if ($lessonId) $currentLesson = $db->fetchOne("SELECT * FROM lessons WHERE id=? AND class_id=?", [$lessonId, $classId]);
+if ($lessonId) $currentLesson = $db->fetchOne("SELECT * FROM lms_lessons WHERE id=? AND class_id=?", [$lessonId, $classId]);
 if (!$currentLesson && !empty($allLessons)) { $currentLesson = $allLessons[0]; $lessonId = $currentLesson['id']; }
-$files = $lessonId ? $db->fetchAll("SELECT * FROM lesson_files WHERE lesson_id=? ORDER BY id", [$lessonId]) : [];
+$files = $lessonId ? $db->fetchAll("SELECT * FROM lms_lesson_files WHERE lesson_id=? ORDER BY id", [$lessonId]) : [];
 
 $currentIdx = false;
 foreach ($flatCurrent as $i => $fl) { if ($fl['id'] == $lessonId) { $currentIdx = $i; break; } }
@@ -101,6 +101,12 @@ $isHtml = in_array($ext, ['html', 'htm']);
 $isPdf = ($ext === 'pdf');
 $isVideo = in_array($ext, ['mp4', 'webm', 'ogg']);
 $isImage = in_array($ext, ['jpg', 'jpeg', 'png', 'gif', 'webp']);
+
+// Upcoming live sessions for this class
+$liveSessions = $db->fetchAll(
+    "SELECT * FROM lms_live_sessions WHERE class_id=? AND status IN ('scheduled','live') ORDER BY scheduled_at ASC LIMIT 3",
+    [$classId]
+);
 
 require_once __DIR__ . '/templates/header.php';
 ?>
@@ -202,6 +208,35 @@ require_once __DIR__ . '/templates/header.php';
             <div class="pb-t"><?= $doneAll ?>/<?= $totalAll ?> overall (<?= $pctAll ?>%)</div>
         </div>
 
+        <!-- LIVE SESSIONS PANEL -->
+        <?php if (!empty($liveSessions)): ?>
+        <div style="padding:8px 14px;border-bottom:1px solid var(--brd)">
+            <?php foreach ($liveSessions as $ls):
+                $isLive = ($ls['status'] === 'live');
+                $lsTs   = strtotime($ls['scheduled_at']);
+            ?>
+            <a href="<?= SITE_URL ?>/live-class.php?id=<?= $ls['id'] ?>"
+               style="display:flex;align-items:center;gap:8px;padding:7px 0;text-decoration:none;color:var(--txt)">
+                <div style="width:32px;height:32px;border-radius:50%;background:<?= $isLive ? '#dcfce7' : '#dbeafe' ?>;display:flex;align-items:center;justify-content:center;flex-shrink:0">
+                    <i class="bi bi-camera-video-fill" style="font-size:.8rem;color:<?= $isLive ? '#16a34a' : '#2563eb' ?>"></i>
+                </div>
+                <div style="min-width:0">
+                    <div style="font-size:.75rem;font-weight:700;color:<?= $isLive ? '#16a34a' : '#2563eb' ?>">
+                        <?= $isLive ? '&#11044; LIVE NOW' : date('d M, g:i A', $lsTs) ?>
+                    </div>
+                    <div style="font-size:.72rem;color:var(--mut);overflow:hidden;text-overflow:ellipsis;white-space:nowrap">
+                        <?= htmlspecialchars($ls['title']) ?>
+                    </div>
+                </div>
+                <i class="bi bi-arrow-right" style="font-size:.65rem;color:var(--mut);margin-left:auto;flex-shrink:0"></i>
+            </a>
+            <?php endforeach; ?>
+            <a href="<?= SITE_URL ?>/live-sessions.php" style="font-size:.7rem;color:var(--mut);text-decoration:none;display:block;padding-top:4px">
+                View all live sessions →
+            </a>
+        </div>
+        <?php endif; ?>
+
         <!-- LESSONS HEADER -->
         <div style="padding:8px 14px;border-bottom:1px solid var(--brd);display:flex;align-items:center;gap:6px;font-size:.8rem;font-weight:700;color:var(--pri);">
             <i class="bi bi-journals"></i> Lessons <span style="font-size:.65rem;padding:1px 6px;border-radius:8px;background:var(--pri-l);color:var(--ok);font-weight:600;"><?= count($allLessons) ?></span>
@@ -227,7 +262,7 @@ require_once __DIR__ . '/templates/header.php';
         <?php
         $bc = '';
         if ($currentLesson['subject_id']) {
-            $sr = $db->fetchOne("SELECT s.title as t1,p.title as t2,gp.title as t3 FROM subjects s LEFT JOIN subjects p ON s.parent_id=p.id LEFT JOIN subjects gp ON p.parent_id=gp.id WHERE s.id=?",[$currentLesson['subject_id']]);
+            $sr = $db->fetchOne("SELECT s.title as t1,p.title as t2,gp.title as t3 FROM lms_subjects s LEFT JOIN lms_subjects p ON s.parent_id=p.id LEFT JOIN lms_subjects gp ON p.parent_id=gp.id WHERE s.id=?",[$currentLesson['subject_id']]);
             if ($sr) { $parts = array_filter([$sr['t3'],$sr['t2'],$sr['t1']]); $bc = implode(' → ', $parts); }
         }
         ?>
@@ -326,7 +361,7 @@ function renderTree($tree, $classId, $lessonId, $completedIds, $mode) {
     $html = '';
     foreach ($tree as $subjectName => $subjectData) {
         $sjLessons = []; $sjDone = 0;
-        foreach ($subjectData['strands'] as $sd) { foreach ($sd['lessons'] as $sl) { $sjLessons[] = $sl; if (in_array($sl['id'], $completedIds)) $sjDone++; } }
+        foreach ($subjectData['strands'] as $sd) { foreach ($sd['lms_lessons'] as $sl) { $sjLessons[] = $sl; if (in_array($sl['id'], $completedIds)) $sjDone++; } }
         $sjTotal = count($sjLessons); $sjAllDone = ($sjDone===$sjTotal && $sjTotal>0);
         $sjHasActive = false; foreach ($sjLessons as $sl) { if ($sl['id']==$lessonId) $sjHasActive = true; }
         $fold = !$sjHasActive;
@@ -336,17 +371,17 @@ function renderTree($tree, $classId, $lessonId, $completedIds, $mode) {
         
         foreach ($subjectData['strands'] as $strandName => $strandData) {
             if ($strandName === '_direct') {
-                foreach ($strandData['lessons'] as $sl) {
+                foreach ($strandData['lms_lessons'] as $sl) {
                     $d = in_array($sl['id'], $completedIds);
                     $html .= '<a href="?id='.$classId.'&lesson='.$sl['id'].'" class="li '.($sl['id']==$lessonId?$acClass:'').'"><i class="bi bi-'.($d?'check-circle-fill ok':'circle').' ck"></i><span class="tt">'.htmlspecialchars($sl['title']).'</span></a>';
                 }
             } else {
                 $stHasActive = false;
-                foreach ($strandData['lessons'] as $sl) { if ($sl['id']==$lessonId) $stHasActive = true; }
+                foreach ($strandData['lms_lessons'] as $sl) { if ($sl['id']==$lessonId) $stHasActive = true; }
                 $stFold = !$stHasActive;
                 $html .= '<div class="st-h '.($stFold?'fold':'').'" onclick="tog(this)"><i class="bi bi-chevron-down ar"></i>'.htmlspecialchars($strandName).'</div>';
                 $html .= '<div class="coll '.($stFold?'fold':'').'" '.($stFold?'style="max-height:0"':'').'>';
-                foreach ($strandData['lessons'] as $sl) {
+                foreach ($strandData['lms_lessons'] as $sl) {
                     $d = in_array($sl['id'], $completedIds);
                     $html .= '<a href="?id='.$classId.'&lesson='.$sl['id'].'" class="li '.($sl['id']==$lessonId?$acClass:'').'"><i class="bi bi-'.($d?'check-circle-fill ok':'circle').' ck"></i><span class="tt">'.htmlspecialchars($sl['title']).'</span></a>';
                 }

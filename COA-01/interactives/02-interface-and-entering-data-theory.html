@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Interface and Entering Data (Lesson) | MTTI Computer Applications</title>
+<link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Fredoka:wght@500;600&display=swap" rel="stylesheet">
+<style>
+* { margin:0; padding:0; box-sizing:border-box; }
+body { font-family:'Space Mono', monospace; background:linear-gradient(135deg,#2E7D32 0%,#1565C0 100%); min-height:100vh; padding:20px; color:#fff; }
+.container { max-width:820px; margin:0 auto; }
+.header { text-align:center; margin-bottom:24px; }
+.lesson-tag { display:inline-block; background:rgba(255,255,255,0.2); padding:6px 16px; border-radius:999px; font-size:0.85em; margin-bottom:12px; }
+.header h1 { font-family:'Fredoka', sans-serif; font-size:2em; margin-bottom:6px; text-shadow:3px 3px 0 rgba(0,0,0,0.2); }
+.card { background:#fff; color:#333; border-radius:22px; padding:32px; margin-bottom:20px; box-shadow:0 20px 60px rgba(0,0,0,0.3); }
+.section { margin-bottom:26px; }
+.section:last-child { margin-bottom:0; }
+.section h2 { font-family:'Fredoka', sans-serif; font-size:1.2em; margin-bottom:10px; color:#1565C0; }
+.section .body { line-height:1.65; font-size:0.98em; }
+.section .body p { margin-bottom:10px; }
+.section .body code { background:#f5f7fb; padding:2px 6px; border-radius:4px; font-size:0.92em; }
+.keypoint { background:#fff8e1; border-left:4px solid #ffc107; padding:12px 16px; border-radius:8px; margin-top:12px; font-size:0.92em; }
+</style>
+</head>
+<body>
+<div class="container">
+<div class="header"><div class="lesson-tag">Module 2 · Lesson 2.1</div><h1>Interface and Entering Data</h1></div>
+<div style="background:#fff;color:#333;border-radius:16px;padding:16px;margin-bottom:20px;box-shadow:0 8px 24px rgba(0,0,0,0.12);text-align:center;"><svg viewBox="0 0 520 200" style="width:100%;max-width:560px;height:200px;" xmlns="http://www.w3.org/2000/svg">
+<rect x="10" y="10" width="500" height="180" fill="#fff" stroke="#ccc"/>
+<rect x="10" y="10" width="500" height="26" fill="#217346"/>
+<text x="260" y="27" font-size="11" text-anchor="middle" fill="#fff">Book1 - Excel</text>
+<rect x="10" y="36" width="500" height="20" fill="#f3f2f1"/>
+<text x="20" y="50" font-size="10" font-weight="bold">B2</text>
+<line x1="55" y1="36" x2="55" y2="56" stroke="#999"/>
+<text x="65" y="50" font-size="10" fill="#333">=SUM(B2:B8)</text>
+<rect x="10" y="56" width="30" height="18" fill="#e7e6e6"/>
+<rect x="40" y="56" width="94" height="18" fill="#e7e6e6"/><text x="87" y="69" font-size="9" text-anchor="middle">A</text>
+<rect x="134" y="56" width="94" height="18" fill="#dbeafe"/><text x="181" y="69" font-size="9" text-anchor="middle" font-weight="bold">B</text>
+<rect x="228" y="56" width="94" height="18" fill="#e7e6e6"/><text x="275" y="69" font-size="9" text-anchor="middle">C</text>
+<rect x="10" y="74" width="30" height="18" fill="#e7e6e6"/><text x="25" y="87" font-size="9" text-anchor="middle">1</text><rect x="40" y="74" width="94" height="18" fill="#fff" stroke="#ddd"/><rect x="134" y="74" width="94" height="18" fill="#fff" stroke="#ddd"/><rect x="228" y="74" width="94" height="18" fill="#fff" stroke="#ddd"/><rect x="10" y="92" width="30" height="18" fill="#e7e6e6"/><text x="25" y="105" font-size="9" text-anchor="middle">2</text><rect x="40" y="92" width="94" height="18" fill="#fff" stroke="#ddd"/><rect x="134" y="92" width="94" height="18" fill="#dbeafe" stroke="#217346" stroke-width="2"/><rect x="228" y="92" width="94" height="18" fill="#fff" stroke="#ddd"/><rect x="10" y="110" width="30" height="18" fill="#e7e6e6"/><text x="25" y="123" font-size="9" text-anchor="middle">3</text><rect x="40" y="110" width="94" height="18" fill="#fff" stroke="#ddd"/><rect x="134" y="110" width="94" height="18" fill="#fff" stroke="#ddd"/><rect x="228" y="110" width="94" height="18" fill="#fff" stroke="#ddd"/><rect x="10" y="128" width="30" height="18" fill="#e7e6e6"/><text x="25" y="141" font-size="9" text-anchor="middle">4</text><rect x="40" y="128" width="94" height="18" fill="#fff" stroke="#ddd"/><rect x="134" y="128" width="94" height="18" fill="#fff" stroke="#ddd"/><rect x="228" y="128" width="94" height="18" fill="#fff" stroke="#ddd"/><rect x="10" y="146" width="30" height="18" fill="#e7e6e6"/><text x="25" y="159" font-size="9" text-anchor="middle">5</text><rect x="40" y="146" width="94" height="18" fill="#fff" stroke="#ddd"/><rect x="134" y="146" width="94" height="18" fill="#fff" stroke="#ddd"/><rect x="228" y="146" width="94" height="18" fill="#fff" stroke="#ddd"/><rect x="10" y="164" width="30" height="18" fill="#e7e6e6"/><text x="25" y="177" font-size="9" text-anchor="middle">6</text><rect x="40" y="164" width="94" height="18" fill="#fff" stroke="#ddd"/><rect x="134" y="164" width="94" height="18" fill="#fff" stroke="#ddd"/><rect x="228" y="164" width="94" height="18" fill="#fff" stroke="#ddd"/>
+<text x="181" y="66" font-size="8" fill="#217346" font-weight="bold">selected cell</text>
+</svg></div><div class="card"><div class="section"><h2>The Grid and Cell References</h2><div class="body"><p>A <strong>workbook</strong> is the whole file; each tab inside it is a <strong>worksheet</strong>. Every worksheet is a grid of <strong>cells</strong>, each named by its column letter and row number — <code>B3</code> means column B, row 3. This reference is how formulas point at data.</p></div><div class="keypoint"><strong>Key Point.</strong> Always know the cell reference of what you are editing — formulas are built entirely from these references.</div></div><div class="section"><h2>Entering Data Correctly</h2><div class="body"><p>Excel guesses what you type: pure digits become numbers (right-aligned), text becomes a label (left-aligned), and recognisable date formats become real dates you can calculate with. Typing <code>0501</code> for a phone number can silently become the number <code>501</code> — losing the leading zero — unless the cell is formatted as text first.</p></div><div class="keypoint"><strong>Key Point.</strong> Phone numbers and reference codes with leading zeros should be entered as Text format, not left as General/Number.</div></div><div class="section"><h2>Selecting Ranges and AutoFill</h2><div class="body"><p>Click-drag selects a range like <code>A1:A10</code>. <strong>AutoFill</strong> (drag the small square at a selection's bottom-right corner) can continue a pattern — typing "Monday" and dragging fills "Tuesday", "Wednesday", etc.; typing "1" and "2" then dragging continues "3, 4, 5...".</p></div></div></div>
+</div>
+</body>
+</html>

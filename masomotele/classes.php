@@ -9,27 +9,27 @@ $search = trim($_GET['q'] ?? '');
 // Handle enrol
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['enrol_class_id'])) {
     $classId = (int)$_POST['enrol_class_id'];
-    $exists = $db->fetchOne("SELECT id FROM enrolments WHERE user_id=? AND class_id=?", [$userId, $classId]);
+    $exists = $db->fetchOne("SELECT id FROM lms_enrolments WHERE user_id=? AND class_id=?", [$userId, $classId]);
     if (!$exists) {
-        $db->insert('enrolments', ['user_id' => $userId, 'class_id' => $classId, 'status' => 'active']);
+        $db->insert('lms_enrolments', ['user_id' => $userId, 'class_id' => $classId, 'status' => 'active']);
         // Check for first enrolment badge
-        $enrolCount = (int)$db->fetchColumn("SELECT COUNT(*) FROM enrolments WHERE user_id=?", [$userId]);
+        $enrolCount = (int)$db->fetchColumn("SELECT COUNT(*) FROM lms_enrolments WHERE user_id=?", [$userId]);
         if ($enrolCount === 1) {
-            $badge = $db->fetchOne("SELECT id FROM badges WHERE trigger_type='first_enrolment'");
-            if ($badge) { $db->insert('user_badges', ['user_id' => $userId, 'badge_id' => $badge['id'], 'earned_at' => date('Y-m-d H:i:s')]); }
+            $badge = $db->fetchOne("SELECT id FROM lms_badges WHERE trigger_type='first_enrolment'");
+            if ($badge) { $db->insert('lms_user_badges', ['user_id' => $userId, 'badge_id' => $badge['id'], 'earned_at' => date('Y-m-d H:i:s')]); }
         }
     }
     header('Location: ' . SITE_URL . '/class.php?id=' . $classId); exit;
 }
 
-$sql = "SELECT c.*, u.name as instructor, (SELECT COUNT(*) FROM lessons WHERE class_id=c.id) as lessons,
-    (SELECT COUNT(*) FROM enrolments WHERE class_id=c.id) as students
-    FROM classes c LEFT JOIN users u ON c.instructor_id=u.id WHERE c.status='active'";
+$sql = "SELECT c.*, u.name as instructor, (SELECT COUNT(*) FROM lms_lessons WHERE class_id=c.id) as lessons,
+    (SELECT COUNT(*) FROM lms_enrolments WHERE class_id=c.id) as students
+    FROM lms_classes c LEFT JOIN lms_users u ON c.instructor_id=u.id WHERE c.status='active'";
 $params = [];
 if ($search) { $sql .= " AND (c.title LIKE ? OR c.description LIKE ?)"; $params = ["%$search%", "%$search%"]; }
 $sql .= " ORDER BY c.created_at DESC";
 $classes = $db->fetchAll($sql, $params);
-$enrolled = $db->fetchAll("SELECT class_id FROM enrolments WHERE user_id=?", [$userId]);
+$enrolled = $db->fetchAll("SELECT class_id FROM lms_enrolments WHERE user_id=?", [$userId]);
 $enrolledIds = array_column($enrolled, 'class_id');
 require_once __DIR__ . '/templates/header.php';
 ?>
@@ -46,7 +46,7 @@ require_once __DIR__ . '/templates/header.php';
                     <h5><?= htmlspecialchars($c['title']) ?></h5>
                     <p class="text-muted small"><?= htmlspecialchars(substr($c['description'] ?? '', 0, 120)) ?></p>
                     <div class="d-flex gap-3 text-muted small mb-3">
-                        <span><i class="bi bi-journal me-1"></i><?= $c['lessons'] ?> lessons</span>
+                        <span><i class="bi bi-journal me-1"></i><?= $c['lms_lessons'] ?> lessons</span>
                         <span><i class="bi bi-people me-1"></i><?= $c['students'] ?> students</span>
                     </div>
                     <?php if ($isEnrolled): ?>
@@ -58,7 +58,7 @@ require_once __DIR__ . '/templates/header.php';
             </div>
         </div>
         <?php endforeach; ?>
-        <?php if (empty($classes)): ?><div class="col-12"><p class="text-muted">No classes available yet.</p></div><?php endif; ?>
+        <?php if (empty($classes)): ?><div class="col-12"><p class="text-muted">No lms_classes available yet.</p></div><?php endif; ?>
     </div>
 </div>
 <?php require_once __DIR__ . '/templates/footer.php'; ?>

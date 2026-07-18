@@ -18,6 +18,12 @@ class MTTI_MIS_Shortcodes {
             $form = new MTTI_MIS_Public_Admission_Form();
             add_shortcode('mtti_admission_form', array($form, 'render_shortcode'));
         }
+
+        // Online-only self-checkout (pick a course, pay, get auto-enrolled)
+        if (class_exists('MTTI_MIS_Public_Course_Checkout')) {
+            $checkout = new MTTI_MIS_Public_Course_Checkout();
+            add_shortcode('mtti_course_checkout', array($checkout, 'render_shortcode'));
+        }
     }
     
     /**

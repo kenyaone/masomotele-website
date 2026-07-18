@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Time Management for Daily Care Routines | MTTI Computer Applications</title>
+<link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Fredoka:wght@500;600&display=swap" rel="stylesheet">
+<style>
+* { margin:0; padding:0; box-sizing:border-box; }
+body { font-family:'Space Mono', monospace; background:linear-gradient(135deg,#387633 0%,#259BD7 100%); min-height:100vh; padding:20px; color:#fff; }
+.container { max-width:900px; margin:0 auto; }
+.header { text-align:center; margin-bottom:24px; }
+.lesson-tag { display:inline-block; background:rgba(255,255,255,0.2); padding:6px 16px; border-radius:999px; font-size:0.85em; margin-bottom:12px; }
+.header h1 { font-family:'Fredoka', sans-serif; font-size:2em; margin-bottom:6px; text-shadow:3px 3px 0 rgba(0,0,0,0.2); }
+.scenario { background:rgba(255,255,255,0.14); backdrop-filter:blur(10px); border-radius:16px; padding:16px 22px; margin-bottom:20px; border-left:5px solid #ffd54f; font-size:0.95em; line-height:1.55; }
+.task { background:#fff; color:#333; border-radius:20px; padding:24px; margin-bottom:16px; box-shadow:0 14px 40px rgba(0,0,0,0.25); }
+.task-num { display:inline-block; width:28px; height:28px; background:linear-gradient(135deg,#387633 0%,#259BD7 100%); color:#fff; border-radius:50%; text-align:center; line-height:28px; font-family:'Fredoka', sans-serif; font-weight:600; margin-right:8px; }
+.task h3 { font-family:'Fredoka', sans-serif; font-size:1.05em; display:inline; }
+.options { margin-top:14px; display:flex; flex-direction:column; gap:10px; }
+.option { background:#f5f7fb; border:2px solid transparent; padding:12px 16px; border-radius:10px; cursor:pointer; transition:all 0.2s; font-family:'Space Mono', monospace; font-size:0.92em; text-align:left; }
+.option:hover:not(.disabled) { background:#e8f5e9; border-color:#387633; }
+.option.correct { background:#d4edda; border-color:#28a745; color:#155724; }
+.option.wrong { background:#f8d7da; border-color:#dc3545; color:#721c24; }
+.option.disabled { cursor:not-allowed; }
+.feedback { margin-top:14px; padding:12px 16px; border-radius:10px; font-size:0.9em; line-height:1.5; }
+.feedback.correct { background:#d4edda; color:#155724; border-left:4px solid #28a745; }
+.feedback.wrong { background:#f8d7da; color:#721c24; border-left:4px solid #dc3545; }
+.done-banner { text-align:center; padding:20px; color:#fff; font-family:'Fredoka', sans-serif; font-size:1.1em; }
+</style>
+</head>
+<body>
+<div class="container">
+<div class="header"><div class="lesson-tag">Module 2 · Lesson 2.5 · Practical</div><h1>Time Management for Daily Care Routines</h1></div>
+<div class="scenario">Njeri has a full list of housekeeping tasks for the day, but her client is having a difficult, anxious morning and needs extra support. A supervised competency check is recommended to confirm technique — this online lesson builds correct procedure and judgement, not hands-on proficiency itself.</div>
+<div id="tasks"></div>
+<div class="done-banner" id="doneBanner" style="display:none;">✅ Practical complete — you can move to the quiz.</div>
+</div>
+<script>
+const tasks = [{"prompt":"Njeri's client is having an anxious, difficult morning and needs more time and attention than usual. What should happen to the housekeeping schedule?","options":["Housekeeping and client care should always take identical, fixed time regardless of circumstances","The client should be rushed through so the housekeeping schedule stays exactly on track","The housekeeping tasks should flex around the client's actual need in the moment \u2014 wellbeing comes first","Njeri should skip supporting the client entirely to finish chores"],"correct":2,"explanation":"Client wellbeing takes priority over completing every housekeeping task on a rigid schedule."},{"prompt":"Njeri notices a spill on the kitchen floor that could cause a fall, alongside a pile of laundry waiting to be folded. Which is more urgent?","options":["The laundry, since it has been waiting longer","The spill, since it creates an immediate fall hazard, while folding laundry can reasonably wait","Neither needs immediate attention","Both are equally urgent and should be done in whatever order is convenient"],"correct":1,"explanation":"A fall hazard is genuinely urgent and should be addressed immediately, while folding laundry can typically wait without real risk."},{"prompt":"Njeri finds that the family's housekeeping expectations genuinely cannot be met alongside proper client care in the time available. What should she do?","options":["Silently try to do everything anyway, even if it means rushing client care","Ignore the housekeeping expectations entirely without any communication","Communicate clearly with the family or supervisor about the realistic mismatch, rather than silently overextending or cutting corners on care","Quietly do a poor job on both to save time"],"correct":2,"explanation":"Honest communication about realistic capacity is the sustainable, professional approach, rather than silent overextension or corner-cutting."}];
+function escapeHtml(s){return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
+function render(){
+  const c = document.getElementById('tasks');
+  c.innerHTML = tasks.map((t,i)=>`
+    <div class="task" id="task-${i}">
+      <div><span class="task-num">${i+1}</span><h3>${escapeHtml(t.prompt)}</h3></div>
+      <div class="options">
+        ${t.options.map((o,j)=>`<button class="option" onclick="answer(${i},${j})">${escapeHtml(o)}</button>`).join('')}
+      </div>
+    </div>`).join('');
+}
+function answer(i,j){
+  const task = tasks[i];
+  const el = document.getElementById('task-'+i);
+  const btns = el.querySelectorAll('.option');
+  if (btns[0].classList.contains('disabled')) return;
+  btns.forEach(b=>b.classList.add('disabled'));
+  btns[task.correct].classList.add('correct');
+  const right = j === task.correct;
+  if (!right) btns[j].classList.add('wrong');
+  const fb = document.createElement('div');
+  fb.className = 'feedback ' + (right?'correct':'wrong');
+  fb.innerHTML = '<strong>' + (right?'✅ Correct.':'❌ Not quite.') + '</strong><br>' + escapeHtml(task.explanation);
+  el.appendChild(fb);
+  if (i === tasks.length-1) document.getElementById('doneBanner').style.display='block';
+}
+render();
+</script>
+</body>
+</html>

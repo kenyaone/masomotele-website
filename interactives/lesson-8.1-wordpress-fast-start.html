@@ -1,0 +1,329 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lesson 8.1 — WordPress Fast Start (Interactive)</title>
+<style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: 'Segoe UI', -apple-system, sans-serif; line-height: 1.55; color: #1e293b; background: #f8fafc; min-height: 100vh; }
+    .container { max-width: 1150px; margin: 0 auto; padding: 20px; }
+    header { background: linear-gradient(135deg, #2E7D32, #1B5E20); color: #fff; padding: 40px 30px; border-radius: 12px; margin-bottom: 24px; box-shadow: 0 10px 30px rgba(33,117,155,0.25); }
+    header .badge { display: inline-block; background: rgba(255,255,255,0.2); padding: 4px 14px; border-radius: 16px; font-size: 12px; font-weight: bold; letter-spacing: 1px; margin-bottom: 14px; }
+    header h1 { font-size: 34px; margin-bottom: 8px; }
+    header .subtitle { font-size: 17px; opacity: 0.95; margin-bottom: 20px; }
+    .meta-strip { display: flex; flex-wrap: wrap; gap: 12px; }
+    .meta-strip span { background: rgba(255,255,255,0.18); padding: 6px 14px; border-radius: 20px; font-size: 13px; }
+    .toc { background: #fff; border: 1px solid #e2e8f0; border-radius: 10px; padding: 22px 26px; margin-bottom: 22px; }
+    .toc h3 { color: #21759b; margin-bottom: 10px; }
+    .toc ol { padding-left: 20px; }
+    .toc a { color: #21759b; text-decoration: none; font-weight: 600; }
+    section { background: #fff; border: 1px solid #e2e8f0; border-radius: 10px; padding: 26px 30px; margin-bottom: 22px; }
+    section h2 { color: #21759b; font-size: 22px; margin-bottom: 12px; padding-bottom: 8px; border-bottom: 3px solid #21759b; }
+    section p { margin-bottom: 12px; }
+    section ul, section ol { padding-left: 22px; margin-bottom: 12px; }
+    .callout { border-left: 5px solid #21759b; background: #ecfeff; padding: 14px 18px; margin: 14px 0; border-radius: 4px; }
+    .callout.warn { border-left-color: #dc2626; background: #fef2f2; }
+    .callout.tip { border-left-color: #059669; background: #ecfdf5; }
+    .callout strong { color: #21759b; }
+
+    .note { background: #fef3c7; border: 2px solid #f59e0b; border-radius: 10px; padding: 14px 18px; margin: 14px 0; }
+    .note h4 { color: #78350f; margin-bottom: 6px; }
+    .note p { color: #92400e; margin: 0; font-size: 13px; }
+
+    /* Path timeline — flagship */
+    .path { background: #ecfeff; border: 2px solid #21759b; border-radius: 10px; padding: 18px; margin: 14px 0; }
+    .path h4 { color: #0f4b6f; margin-bottom: 14px; }
+    .path-step { display: grid; grid-template-columns: 60px 1fr 140px; gap: 12px; align-items: center; padding: 14px; background: #fff; border-radius: 8px; margin-bottom: 8px; cursor: pointer; transition: all 0.2s; border: 2px solid transparent; }
+    .path-step:hover { border-color: #21759b; }
+    .path-step.active { border-color: #21759b; background: #dbeafe; }
+    .path-step.done { background: #ecfdf5; }
+    .path-step .num { background: #21759b; color: #fff; width: 40px; height: 40px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: bold; }
+    .path-step.done .num { background: #16a34a; }
+    .path-step h5 { color: #1e293b; margin-bottom: 2px; }
+    .path-step p { font-size: 12px; margin: 0; color: #64748b; }
+    .path-step .time { text-align: center; background: #f1f5f9; padding: 4px 10px; border-radius: 12px; font-size: 12px; color: #475569; font-weight: bold; }
+
+    /* Detail panel */
+    .detail {
+        background: #fff; border: 2px solid #cbd5e1; border-radius: 10px; padding: 20px;
+        margin: 14px 0; display: none;
+    }
+    .detail.show { display: block; }
+    .detail h4 { color: #0f4b6f; margin-bottom: 10px; }
+    .detail .steps { display: grid; gap: 8px; }
+    .detail .step-item { display: flex; gap: 12px; padding: 10px; background: #f8fafc; border-radius: 6px; }
+    .detail .step-item .no { background: #21759b; color: #fff; width: 22px; height: 22px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: bold; flex-shrink: 0; }
+
+    /* Studio + wp-admin combined mock */
+    .lab-mock {
+        background: #f0f0f1; border-radius: 10px; padding: 14px; margin: 14px 0;
+    }
+    .lab-top {
+        background: #1d2327; color: #fff; padding: 10px 14px; border-radius: 6px 6px 0 0;
+        display: flex; align-items: center; gap: 12px; font-size: 13px;
+    }
+    .lab-top .dot { color: #16a34a; }
+    .lab-body { background: #fff; border-radius: 0 0 6px 6px; padding: 20px; text-align: center; }
+    .lab-body .msg { color: #21759b; font-weight: bold; margin-bottom: 8px; }
+
+    /* Page preview */
+    .page-preview {
+        background: #fff; border: 1px solid #e2e8f0; border-radius: 10px; padding: 20px;
+        margin: 14px 0; box-shadow: 0 4px 12px rgba(0,0,0,0.06);
+    }
+    .page-preview h3 { color: #0f4b6f; margin-bottom: 10px; }
+    .page-preview .content { padding: 20px; background: linear-gradient(135deg, #fef3c7, #fbbf24); border-radius: 8px; color: #78350f; }
+    .page-preview .content h4 { font-size: 24px; margin-bottom: 6px; }
+    .page-preview .content p { font-size: 14px; margin-bottom: 12px; }
+    .page-preview .content .cta { display: inline-block; background: #7c2d12; color: #fef3c7; padding: 8px 20px; border-radius: 4px; font-weight: bold; }
+
+    table { width: 100%; border-collapse: collapse; margin: 14px 0; font-size: 14px; }
+    th, td { padding: 10px 12px; text-align: left; border: 1px solid #e2e8f0; }
+    th { background: #21759b; color: #fff; }
+    tr:nth-child(even) { background: #f8fafc; }
+
+    .quiz-question { background: #fff; border: 2px solid #cbd5e1; border-radius: 10px; padding: 18px; margin: 14px 0; }
+    .quiz-question.correct { border-color: #059669; background: #ecfdf5; }
+    .quiz-question.wrong { border-color: #dc2626; background: #fef2f2; }
+    .quiz-question h4 { margin-bottom: 12px; font-size: 15px; color: #1e293b; }
+    .quiz-question .options label { display: block; padding: 10px 14px; margin-bottom: 6px; background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 6px; cursor: pointer; font-size: 14px; }
+    .quiz-question .options label:hover { background: #ecfeff; }
+    .quiz-question .options input[type="radio"] { margin-right: 10px; }
+    .quiz-question .explanation { display: none; margin-top: 12px; padding: 10px 14px; border-radius: 6px; font-size: 14px; }
+    .quiz-question.correct .explanation { display: block; background: #d1fae5; color: #065f46; border-left: 4px solid #059669; }
+    .quiz-question.wrong .explanation { display: block; background: #fee2e2; color: #991b1b; border-left: 4px solid #dc2626; }
+    .quiz-summary { text-align: center; padding: 30px; background: linear-gradient(135deg, #ecfeff, #a5f3fc); border-radius: 10px; margin: 20px 0; display: none; }
+    .quiz-summary.show { display: block; }
+    .quiz-summary .score { font-size: 48px; font-weight: bold; color: #21759b; margin-bottom: 8px; }
+    button.btn { background: #21759b; color: #fff; border: none; padding: 10px 20px; border-radius: 6px; font-size: 15px; font-weight: 600; cursor: pointer; }
+    button.btn:hover { background: #0f4b6f; }
+    button.btn.reset { background: #64748b; margin-left: 8px; }
+    footer { text-align: center; color: #64748b; padding: 24px; font-size: 13px; }
+
+    /* MTTI logo stamp */
+    .mtti-logo-stamp {
+        position: fixed; top: 14px; right: 18px; z-index: 999;
+        opacity: 0.88; transition: opacity 0.2s;
+    }
+    .mtti-logo-stamp:hover { opacity: 1; }
+    .mtti-logo-stamp img { width: 56px; height: 56px; border-radius: 50%; box-shadow: 0 2px 8px rgba(0,0,0,0.18); }
+</style>
+</head>
+<body>
+<div class="mtti-logo-stamp">
+    <img src="../../Resources/Logo.jpeg" alt="MTTI" title="Masomotele Technical Training Institute — Start learning, Start earning">
+</div>
+
+<div class="container">
+<header>
+    <div class="badge">LESSON 8.1  ·  WORDPRESS  ·  CONSOLIDATED CORE</div>
+    <h1>WordPress Fast Start</h1>
+    <div class="subtitle">Install Studio · Log in to wp-admin · Publish your first page. All in 30 minutes.</div>
+    <div class="meta-strip"><span><strong>Duration:</strong> ~35 min</span><span><strong>Consolidates:</strong> 8.2 + 8.3 + 8.4</span></div>
+</header>
+
+<div class="note">
+    <h4>📌 Curriculum note</h4>
+    <p>This lesson consolidates the essentials from old lessons 8.2 (WordPress Studio intro), 8.3 (Install Studio), and 8.4 (Dashboard tour). The original three remain as optional deep-dives in this folder for students who want more detail.</p>
+</div>
+
+<div class="toc">
+    <h3>What you'll do</h3>
+    <ol>
+        <li><a href="#s1">Why WordPress + Studio (60-second version)</a></li>
+        <li><a href="#s2"><strong>The 5-step path: from nothing to a live page</strong></a></li>
+        <li><a href="#s3">wp-admin — the 3 menus you'll use daily</a></li>
+        <li><a href="#s4">Publish your first page (Home)</a></li>
+        <li><a href="#s5">Self-check quiz</a></li>
+    </ol>
+</div>
+
+<section id="s1">
+    <h2>1. Why WordPress + Studio (60-second version)</h2>
+    <ul>
+        <li><strong>WordPress</strong> = 43% of all websites. 60% of Kenyan digital marketing jobs expect it.</li>
+        <li><strong>Studio</strong> = free WordPress on your laptop (by Automattic). No hosting bills. Works offline.</li>
+        <li><strong>Killer feature</strong> = one-click Demo Site — a temporary public URL to show your work.</li>
+    </ul>
+    <div class="callout"><strong>Alternatives to skip:</strong> Local WP (discontinued 2024) · XAMPP/MAMP (painful config) · Docker (advanced only).</div>
+</section>
+
+<section id="s2">
+    <h2>2. The 5-step path — from nothing to a live page</h2>
+    <p>Click each step below to expand the detail.</p>
+    <div class="path">
+        <h4>Karibu Kitchen — WordPress from zero in 35 min</h4>
+        <div class="path-step" onclick="showStep(1)"><div class="num">1</div><div><h5>Download Studio</h5><p>developer.wordpress.com/studio → click Download for your OS</p></div><div class="time">2 min</div></div>
+        <div class="path-step" onclick="showStep(2)"><div class="num">2</div><div><h5>Install</h5><p>Run the installer → accept license → done</p></div><div class="time">3 min</div></div>
+        <div class="path-step" onclick="showStep(3)"><div class="num">3</div><div><h5>Create your first site</h5><p>Name it "Karibu Kitchen" · save credentials on paper</p></div><div class="time">2 min</div></div>
+        <div class="path-step" onclick="showStep(4)"><div class="num">4</div><div><h5>Log into wp-admin</h5><p>Click WP Admin from Studio → use saved credentials</p></div><div class="time">1 min</div></div>
+        <div class="path-step" onclick="showStep(5)"><div class="num">5</div><div><h5>Publish your Home page</h5><p>Pages → Add New → block editor → title + content → Publish</p></div><div class="time">10 min</div></div>
+    </div>
+
+    <div class="detail" id="detail1">
+        <h4>Step 1 — Download Studio</h4>
+        <div class="steps">
+            <div class="step-item"><div class="no">1</div><div><strong>Open browser</strong> → go to <strong>developer.wordpress.com/studio</strong></div></div>
+            <div class="step-item"><div class="no">2</div><div>Click the blue <strong>Download</strong> button (Windows / Mac / Linux)</div></div>
+            <div class="step-item"><div class="no">3</div><div>Wait ~60 seconds. File is ~60 MB.</div></div>
+        </div>
+        <div class="callout warn"><strong>Only download from developer.wordpress.com.</strong> Fake sites push malware.</div>
+    </div>
+
+    <div class="detail" id="detail2">
+        <h4>Step 2 — Install</h4>
+        <div class="steps">
+            <div class="step-item"><div class="no">1</div><div><strong>Windows:</strong> double-click the .exe → accept license → install</div></div>
+            <div class="step-item"><div class="no">2</div><div><strong>Mac:</strong> open the .dmg → drag Studio to Applications folder</div></div>
+            <div class="step-item"><div class="no">3</div><div><strong>Linux:</strong> install the .deb or .rpm via your package manager</div></div>
+            <div class="step-item"><div class="no">4</div><div>Studio appears in Start Menu / Applications</div></div>
+        </div>
+    </div>
+
+    <div class="detail" id="detail3">
+        <h4>Step 3 — Create your first site</h4>
+        <div class="steps">
+            <div class="step-item"><div class="no">1</div><div>Launch Studio → click the big "+ Add site" card</div></div>
+            <div class="step-item"><div class="no">2</div><div>Set 4 fields: <strong>Site name</strong> "Karibu Kitchen" · PHP 8.3 · WP Latest · admin auto-generated</div></div>
+            <div class="step-item"><div class="no">3</div><div><strong>Write credentials on paper NOW</strong> — losing them means starting over</div></div>
+            <div class="step-item"><div class="no">4</div><div>Click Add site (10 seconds) — green dot appears when running</div></div>
+        </div>
+    </div>
+
+    <div class="detail" id="detail4">
+        <h4>Step 4 — Log in to wp-admin</h4>
+        <div class="steps">
+            <div class="step-item"><div class="no">1</div><div>In Studio, click <strong>WP Admin</strong> on your site card</div></div>
+            <div class="step-item"><div class="no">2</div><div>Login page opens in your browser</div></div>
+            <div class="step-item"><div class="no">3</div><div>Enter admin username + password → Log In</div></div>
+            <div class="step-item"><div class="no">4</div><div>You see the WordPress dashboard — home for the next 5 lessons</div></div>
+        </div>
+        <div class="callout tip"><strong>URL format:</strong> <code>karibu-kitchen.wpstudio.local/wp-admin</code></div>
+    </div>
+
+    <div class="detail" id="detail5">
+        <h4>Step 5 — Publish your Home page</h4>
+        <div class="steps">
+            <div class="step-item"><div class="no">1</div><div>In wp-admin sidebar: <strong>Pages → Add New Page</strong></div></div>
+            <div class="step-item"><div class="no">2</div><div>Type title: <strong>Home</strong></div></div>
+            <div class="step-item"><div class="no">3</div><div>Add a Cover block: search "Cover" in block picker → pick a placeholder image</div></div>
+            <div class="step-item"><div class="no">4</div><div>Add H1 heading: <strong>Fresh lunch, delivered to your desk</strong></div></div>
+            <div class="step-item"><div class="no">5</div><div>Add a paragraph: <strong>Karibu Kitchen · Eldoret CBD · WhatsApp 0782 XXX XXX</strong></div></div>
+            <div class="step-item"><div class="no">6</div><div>Add a Buttons block → "Order via WhatsApp" → link to <code>https://wa.me/254782000000</code></div></div>
+            <div class="step-item"><div class="no">7</div><div>Click <strong>Publish</strong> — top right, blue button</div></div>
+            <div class="step-item"><div class="no">8</div><div>Click <strong>View Page</strong> → your first WordPress page is live</div></div>
+        </div>
+    </div>
+</section>
+
+<section id="s3">
+    <h2>3. wp-admin — the 3 menus you'll use daily</h2>
+    <p>WordPress has 10 sidebar menus. As a marketer you'll spend 90% of your time in these three:</p>
+    <table>
+        <tr><th>Menu</th><th>What you do here</th><th>How often</th></tr>
+        <tr><td><strong>📄 Pages</strong></td><td>Home, About, Menu, Delivery, Contact — the static pages of your site</td><td>Daily during build</td></tr>
+        <tr><td><strong>🎨 Appearance</strong></td><td>Theme, colours, menus (navigation), widgets (footer)</td><td>Weekly</td></tr>
+        <tr><td><strong>🔌 Plugins</strong></td><td>Install Yoast SEO, Contact Form 7, MonsterInsights (Lesson 8.7)</td><td>Weekly</td></tr>
+    </table>
+    <div class="callout">
+        <strong>Ignore for now (until you need them):</strong>
+        <ul style="margin-top:6px;">
+            <li>Posts — for blog articles (come later)</li>
+            <li>Media — auto-managed when you upload images</li>
+            <li>Users, Tools, Settings — set once and forget</li>
+        </ul>
+    </div>
+</section>
+
+<section id="s4">
+    <h2>4. Pages vs Posts (the one critical concept)</h2>
+    <p>Beginners confuse these constantly. Get it right on day one.</p>
+    <table>
+        <tr><th>Pages</th><th>Posts</th></tr>
+        <tr><td>Static content</td><td>Dated entries</td></tr>
+        <tr><td>Fixed URL (/about)</td><td>URL by date (/2026/03/…)</td></tr>
+        <tr><td>NOT in chronological feed</td><td>Chronological blog feed</td></tr>
+        <tr><td>Home · About · Menu · Delivery · Contact</td><td>"3 recipes to try this week"</td></tr>
+        <tr><td>Sarah's 5 essentials in Lesson 8.5</td><td>Blog articles Sarah adds later</td></tr>
+    </table>
+    <div class="callout warn"><strong>Sarah's 5 essential pages are ALL Pages, not Posts.</strong> Build them as Posts and Google + WordPress mistreat them.</div>
+</section>
+
+<section id="s5">
+    <h2>Sample of the Home page you'll build</h2>
+    <div class="page-preview">
+        <h3>Preview — Home page after Step 5</h3>
+        <div class="content">
+            <h4>Fresh lunch, delivered to your desk</h4>
+            <p>Karibu Kitchen · Eldoret CBD · Delivery in 30 minutes</p>
+            <a class="cta">Order via WhatsApp</a>
+        </div>
+    </div>
+    <div class="callout tip"><strong>What's next (Lesson 8.5):</strong> the full 5-page site — Home, About, Menu, Delivery, Contact — with plugins and a proper theme.</div>
+</section>
+
+<section>
+    <h2>Self-check quiz</h2>
+
+    <div class="quiz-question" data-correct="C"><h4>1. Studio's killer feature?</h4><div class="options"><label><input type="radio" name="q1" value="A"> A) FTP</label><label><input type="radio" name="q1" value="B"> B) Blog editing</label><label><input type="radio" name="q1" value="C"> C) Demo Sites — one-click public URL</label><label><input type="radio" name="q1" value="D"> D) Podcasts</label></div><div class="explanation">Correct — no alternative matches.</div></div>
+
+    <div class="quiz-question" data-correct="B"><h4>2. When do you write down admin credentials?</h4><div class="options"><label><input type="radio" name="q2" value="A"> A) Never</label><label><input type="radio" name="q2" value="B"> B) BEFORE closing the Create Site dialog</label><label><input type="radio" name="q2" value="C"> C) A week later</label><label><input type="radio" name="q2" value="D"> D) In email</label></div><div class="explanation">Correct — lose them = start over.</div></div>
+
+    <div class="quiz-question" data-correct="D"><h4>3. Pages vs Posts?</h4><div class="options"><label><input type="radio" name="q3" value="A"> A) Same thing</label><label><input type="radio" name="q3" value="B"> B) Pages are dated, Posts are static</label><label><input type="radio" name="q3" value="C"> C) Pages have images, Posts have text</label><label><input type="radio" name="q3" value="D"> D) Pages = static (Home, About). Posts = dated blog entries.</label></div><div class="explanation">Correct — fundamental distinction.</div></div>
+
+    <div class="quiz-question" data-correct="A"><h4>4. Sarah's 5 essential pages should be created as…</h4><div class="options"><label><input type="radio" name="q4" value="A"> A) Pages</label><label><input type="radio" name="q4" value="B"> B) Posts</label><label><input type="radio" name="q4" value="C"> C) Comments</label><label><input type="radio" name="q4" value="D"> D) Media</label></div><div class="explanation">Correct — static content = Pages.</div></div>
+
+    <div class="quiz-question" data-correct="C"><h4>5. Which 3 menus do you use 90% of the time?</h4><div class="options"><label><input type="radio" name="q5" value="A"> A) Dashboard · Users · Tools</label><label><input type="radio" name="q5" value="B"> B) Settings · Comments · Media</label><label><input type="radio" name="q5" value="C"> C) Pages · Appearance · Plugins</label><label><input type="radio" name="q5" value="D"> D) None</label></div><div class="explanation">Correct — the working triangle.</div></div>
+
+    <div class="quiz-question" data-correct="B"><h4>6. Where do you install Yoast SEO?</h4><div class="options"><label><input type="radio" name="q6" value="A"> A) Appearance</label><label><input type="radio" name="q6" value="B"> B) Plugins → Add New</label><label><input type="radio" name="q6" value="C"> C) Tools</label><label><input type="radio" name="q6" value="D"> D) Settings</label></div><div class="explanation">Correct — Plugins for add-ons.</div></div>
+
+    <div class="quiz-question" data-correct="D"><h4>7. Total install time end-to-end?</h4><div class="options"><label><input type="radio" name="q7" value="A"> A) A week</label><label><input type="radio" name="q7" value="B"> B) A day</label><label><input type="radio" name="q7" value="C"> C) An hour</label><label><input type="radio" name="q7" value="D"> D) ~15 min install + 20 min first page = ~35 min</label></div><div class="explanation">Correct — the whole lesson.</div></div>
+
+    <div class="quiz-question" data-correct="A"><h4>8. Only download Studio from…</h4><div class="options"><label><input type="radio" name="q8" value="A"> A) developer.wordpress.com/studio (official)</label><label><input type="radio" name="q8" value="B"> B) Any site</label><label><input type="radio" name="q8" value="C"> C) Torrents</label><label><input type="radio" name="q8" value="D"> D) Facebook</label></div><div class="explanation">Correct — fake downloads carry malware.</div></div>
+
+    <div class="quiz-question" data-correct="C"><h4>9. Alternative to skip?</h4><div class="options"><label><input type="radio" name="q9" value="A"> A) Studio</label><label><input type="radio" name="q9" value="B"> B) Yoast SEO</label><label><input type="radio" name="q9" value="C"> C) Local WP (discontinued 2024)</label><label><input type="radio" name="q9" value="D"> D) WordPress itself</label></div><div class="explanation">Correct — deprecated.</div></div>
+
+    <div class="quiz-question" data-correct="B"><h4>10. To publish a page you click…</h4><div class="options"><label><input type="radio" name="q10" value="A"> A) Delete</label><label><input type="radio" name="q10" value="B"> B) The blue Publish button (top right)</label><label><input type="radio" name="q10" value="C"> C) Nothing</label><label><input type="radio" name="q10" value="D"> D) Log out</label></div><div class="explanation">Correct — top-right Publish button.</div></div>
+
+    <div style="margin-top:20px;">
+        <button class="btn" onclick="markQuiz()">Mark my quiz</button>
+        <button class="btn reset" onclick="resetQuiz()">Reset</button>
+    </div>
+    <div class="quiz-summary" id="quizSummary"><div class="score" id="scoreDisplay">0 / 10</div><p id="scoreMessage"></p></div>
+</section>
+
+<footer><p>Lesson 8.1 — WordPress Fast Start · MTTI · Handbook Part 8, Consolidated</p><p>Next: <strong>Lesson 8.5 — Create the 5 Essential Pages</strong> (the second WordPress core lesson)</p></footer>
+</div>
+
+<script>
+let openStep = null;
+function showStep(n) {
+    if (openStep === n) {
+        document.getElementById('detail' + n).classList.remove('show');
+        openStep = null;
+        return;
+    }
+    document.querySelectorAll('.detail').forEach(d => d.classList.remove('show'));
+    document.querySelectorAll('.path-step').forEach(s => s.classList.remove('active'));
+    document.getElementById('detail' + n).classList.add('show');
+    document.querySelectorAll('.path-step')[n-1].classList.add('active');
+    openStep = n;
+    // Mark earlier steps as "done"
+    document.querySelectorAll('.path-step').forEach((s, i) => {
+        if (i < n - 1) s.classList.add('done');
+    });
+    document.getElementById('detail' + n).scrollIntoView({ behavior: 'smooth', block: 'center' });
+}
+
+function markQuiz() {
+    const qs = document.querySelectorAll('.quiz-question'); let s = 0;
+    qs.forEach((q, i) => { const c = q.dataset.correct; const p = q.querySelector(`input[name="q${i+1}"]:checked`); q.classList.remove('correct','wrong'); if (p && p.value === c) { q.classList.add('correct'); s++; } else if (p) q.classList.add('wrong'); });
+    const su = document.getElementById('quizSummary'); su.classList.add('show');
+    document.getElementById('scoreDisplay').textContent = `${s} / 10`;
+    document.getElementById('scoreMessage').textContent = s === 10 ? 'Perfect. Move to 8.5 — the 5 essential pages.' : s >= 7 ? 'Strong.' : 'Rewatch and try again.';
+    su.scrollIntoView({behavior:'smooth',block:'center'});
+}
+function resetQuiz() { document.querySelectorAll('.quiz-question').forEach(q => { q.classList.remove('correct','wrong'); q.querySelectorAll('input[type=radio]').forEach(r => r.checked = false); }); document.getElementById('quizSummary').classList.remove('show'); }
+</script>
+</body></html>

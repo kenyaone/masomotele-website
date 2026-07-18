@@ -1,0 +1,275 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lesson 4.1 — Social Media Management Services (Interactive)</title>
+<style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: 'Segoe UI', -apple-system, sans-serif; line-height: 1.55; color: #1e293b; background: #f8fafc; min-height: 100vh; }
+    .container { max-width: 1100px; margin: 0 auto; padding: 20px; }
+    header { background: linear-gradient(135deg, #2E7D32, #1B5E20); color: #fff; padding: 40px 30px; border-radius: 12px; margin-bottom: 24px; box-shadow: 0 10px 30px rgba(20,184,166,0.25); }
+    header .badge { display: inline-block; background: rgba(255,255,255,0.2); padding: 4px 14px; border-radius: 16px; font-size: 12px; font-weight: bold; letter-spacing: 1px; margin-bottom: 14px; }
+    header h1 { font-size: 34px; margin-bottom: 8px; }
+    header .subtitle { font-size: 17px; opacity: 0.95; margin-bottom: 20px; }
+    .meta-strip { display: flex; flex-wrap: wrap; gap: 12px; }
+    .meta-strip span { background: rgba(255,255,255,0.18); padding: 6px 14px; border-radius: 20px; font-size: 13px; }
+    .toc { background: #fff; border: 1px solid #e2e8f0; border-radius: 10px; padding: 22px 26px; margin-bottom: 22px; }
+    .toc h3 { color: #0f766e; margin-bottom: 10px; }
+    .toc ol { padding-left: 20px; }
+    .toc a { color: #0f766e; text-decoration: none; font-weight: 600; }
+    section { background: #fff; border: 1px solid #e2e8f0; border-radius: 10px; padding: 26px 30px; margin-bottom: 22px; }
+    section h2 { color: #0f766e; font-size: 22px; margin-bottom: 12px; padding-bottom: 8px; border-bottom: 3px solid #0f766e; }
+    section p { margin-bottom: 12px; }
+    .callout { border-left: 5px solid #0f766e; background: #f0fdfa; padding: 14px 18px; margin: 14px 0; border-radius: 4px; }
+    .callout.warn { border-left-color: #dc2626; background: #fef2f2; }
+    .callout.tip { border-left-color: #059669; background: #ecfdf5; }
+    .callout strong { color: #0f766e; }
+
+    /* Service picker */
+    .picker { background: #f0fdfa; border: 2px solid #14b8a6; border-radius: 10px; padding: 18px; margin: 14px 0; }
+    .picker h4 { color: #134e4a; margin-bottom: 10px; }
+    .picker-controls { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 12px; }
+    @media (max-width: 500px) { .picker-controls { grid-template-columns: 1fr; } }
+    .picker-controls label { display: block; font-size: 12px; font-weight: 600; margin-bottom: 4px; }
+    .picker-controls select { width: 100%; padding: 8px 10px; border: 1.5px solid #cbd5e1; border-radius: 6px; font-size: 13px; }
+    .services-grid { display: grid; gap: 8px; }
+    .service { background: #fff; padding: 12px 14px; border-radius: 8px; border: 1.5px solid #cbd5e1; display: grid; grid-template-columns: 1fr 100px 80px; gap: 12px; align-items: center; }
+    @media (max-width: 600px) { .service { grid-template-columns: 1fr; } }
+    .service.pick { border-color: #059669; background: #ecfdf5; }
+    .service h5 { color: #1e293b; margin-bottom: 2px; }
+    .service p { font-size: 12px; color: #64748b; margin: 0; }
+    .service .cost { font-family: 'Courier New', monospace; text-align: right; font-size: 13px; }
+    .service .fit { text-align: center; padding: 4px 8px; border-radius: 4px; font-size: 11px; font-weight: bold; }
+    .service.pick .fit { background: #059669; color: #fff; }
+    .service:not(.pick) .fit { background: #f1f5f9; color: #64748b; }
+
+    /* Weekly schedule visual — flagship */
+    .schedule { background: #fff; border: 2px solid #14b8a6; border-radius: 10px; padding: 16px; margin: 14px 0; }
+    .schedule h4 { color: #134e4a; margin-bottom: 10px; }
+    .week-grid { display: grid; grid-template-columns: 60px repeat(7, 1fr); gap: 4px; font-size: 11px; }
+    .wg-head { background: #14b8a6; color: #fff; padding: 6px 4px; text-align: center; font-weight: bold; border-radius: 4px; }
+    .wg-time { padding: 6px 4px; color: #64748b; font-family: 'Courier New', monospace; font-size: 10px; }
+    .wg-cell { background: #f8fafc; padding: 6px 4px; border-radius: 4px; text-align: center; min-height: 30px; }
+    .wg-cell.peak { background: #d1fae5; color: #065f46; font-weight: bold; }
+    .wg-cell.mid { background: #fef3c7; color: #78350f; }
+
+    /* Batch vs realtime */
+    .compare { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin: 14px 0; }
+    @media (max-width: 700px) { .compare { grid-template-columns: 1fr; } }
+    .compare > div { padding: 16px; border-radius: 10px; }
+    .compare .amateur { background: #fee2e2; border-left: 4px solid #dc2626; }
+    .compare .pro { background: #d1fae5; border-left: 4px solid #059669; }
+    .compare h4 { margin-bottom: 8px; }
+
+    .quiz-question { background: #fff; border: 2px solid #cbd5e1; border-radius: 10px; padding: 18px; margin: 14px 0; }
+    .quiz-question.correct { border-color: #059669; background: #ecfdf5; }
+    .quiz-question.wrong { border-color: #dc2626; background: #fef2f2; }
+    .quiz-question h4 { margin-bottom: 12px; font-size: 15px; color: #1e293b; }
+    .quiz-question .options label { display: block; padding: 10px 14px; margin-bottom: 6px; background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 6px; cursor: pointer; font-size: 14px; }
+    .quiz-question .options label:hover { background: #f0fdfa; }
+    .quiz-question .options input[type="radio"] { margin-right: 10px; }
+    .quiz-question .explanation { display: none; margin-top: 12px; padding: 10px 14px; border-radius: 6px; font-size: 14px; }
+    .quiz-question.correct .explanation { display: block; background: #d1fae5; color: #065f46; border-left: 4px solid #059669; }
+    .quiz-question.wrong .explanation { display: block; background: #fee2e2; color: #991b1b; border-left: 4px solid #dc2626; }
+    .quiz-summary { text-align: center; padding: 30px; background: linear-gradient(135deg, #f0fdfa, #99f6e4); border-radius: 10px; margin: 20px 0; display: none; }
+    .quiz-summary.show { display: block; }
+    .quiz-summary .score { font-size: 48px; font-weight: bold; color: #0f766e; margin-bottom: 8px; }
+    button.btn { background: #0f766e; color: #fff; border: none; padding: 10px 20px; border-radius: 6px; font-size: 15px; font-weight: 600; cursor: pointer; }
+    button.btn:hover { background: #134e4a; }
+    button.btn.reset { background: #64748b; margin-left: 8px; }
+    footer { text-align: center; color: #64748b; padding: 24px; font-size: 13px; }
+
+    /* MTTI logo stamp */
+    .mtti-logo-stamp {
+        position: fixed; top: 14px; right: 18px; z-index: 999;
+        opacity: 0.88; transition: opacity 0.2s;
+    }
+    .mtti-logo-stamp:hover { opacity: 1; }
+    .mtti-logo-stamp img { width: 56px; height: 56px; border-radius: 50%; box-shadow: 0 2px 8px rgba(0,0,0,0.18); }
+</style>
+</head>
+<body>
+<div class="mtti-logo-stamp">
+    <img src="../../Resources/Logo.jpeg" alt="MTTI" title="Masomotele Technical Training Institute — Start learning, Start earning">
+</div>
+
+<div class="container">
+<header>
+    <div class="badge">LESSON 4.1  ·  SOCIAL MEDIA  ·  INTERACTIVE</div>
+    <h1>Social Media Management Services</h1>
+    <div class="subtitle">One dashboard for all channels. Batch on Monday. Schedule the week. Get your life back.</div>
+    <div class="meta-strip"><span><strong>Duration:</strong> ~25 min</span><span><strong>Handbook:</strong> Part 4, §4.1</span></div>
+</header>
+
+<div class="toc">
+    <h3>What you'll do</h3>
+    <ol>
+        <li><a href="#s1">Sarah's app-switching problem</a></li>
+        <li><a href="#s2"><strong>Service picker — recommend for any business</strong></a></li>
+        <li><a href="#s3">Meta Business Suite — 6 things it does</a></li>
+        <li><a href="#s4">Batch vs realtime posting</a></li>
+        <li><a href="#s5"><strong>Best posting times in Kenya (heatmap)</strong></a></li>
+        <li><a href="#s6">Sarah's Monday hour</a></li>
+        <li><a href="#s7">Self-check quiz</a></li>
+    </ol>
+</div>
+
+<section id="s1">
+    <h2>1. Sarah's app-switching problem</h2>
+    <p>3 posts/week × 3 platforms = 9 app openings weekly · 90 min of copy-pasting · forgetting what she posted where · rhythm falling apart when kitchen is busy.</p>
+    <div class="callout warn"><strong>She needs one dashboard. Not three.</strong></div>
+</section>
+
+<section id="s2">
+    <h2>2. Service picker</h2>
+    <div class="picker">
+        <div class="picker-controls">
+            <div><label>Platforms to manage</label><select id="pPlats"><option value="meta">Facebook + Instagram only</option><option value="all">All 5+ platforms</option><option value="ig">Instagram-heavy</option></select></div>
+            <div><label>Budget</label><select id="pBudget"><option value="free">Free only</option><option value="low">Under KES 5k/mo</option><option value="pro">KES 5k+/mo</option></select></div>
+        </div>
+        <div class="services-grid" id="serviceList"></div>
+    </div>
+</section>
+
+<section id="s3">
+    <h2>3. Meta Business Suite — 6 things</h2>
+    <ol>
+        <li><strong>Schedule posts</strong> to Facebook AND Instagram — write once, publish twice</li>
+        <li><strong>Unified inbox</strong> — all comments &amp; DMs from both platforms</li>
+        <li><strong>Analytics</strong> — reach, engagement, clicks</li>
+        <li><strong>Ads Manager</strong> — full ads platform built in</li>
+        <li><strong>Team &amp; permissions</strong></li>
+        <li><strong>Free forever</strong> — no trial, no credit card</li>
+    </ol>
+    <div class="callout tip"><strong>Sarah's action:</strong> install Meta Business Suite before the end of the day. Costs KES 0.</div>
+</section>
+
+<section id="s4">
+    <h2>4. Batch vs realtime</h2>
+    <div class="compare">
+        <div class="amateur">
+            <h4>✗ Amateur — realtime posting</h4>
+            <ul style="padding-left:16px; margin:0; font-size:14px;">
+                <li>Open 3 apps × 3 times/week</li>
+                <li>90 min/week of app-switching</li>
+                <li>Skip a day → skip 2 → rhythm gone</li>
+                <li>Nyakinyua Kitchen's approach</li>
+            </ul>
+        </div>
+        <div class="pro">
+            <h4>✓ Professional — batch scheduling</h4>
+            <ul style="padding-left:16px; margin:0; font-size:14px;">
+                <li>1 hour on Monday morning</li>
+                <li>Write whole week's content once</li>
+                <li>Schedule + close the app</li>
+                <li>Posts publish while she's at a wedding</li>
+            </ul>
+        </div>
+    </div>
+</section>
+
+<section id="s5">
+    <h2>5. Best posting times in Kenya (heatmap)</h2>
+    <p>For B2C consumer audiences. Green = peak. Amber = OK. Blank = off-peak.</p>
+    <div class="schedule">
+        <div class="week-grid" id="heatmap"></div>
+    </div>
+    <div class="callout"><strong>Peak windows:</strong> Weekday evenings 7–9 PM (post-dinner scrolling) &amp; weekend late mornings 10 AM – 1 PM (pre-lunch catching up). Sarah schedules her <em>best</em> content here.</div>
+</section>
+
+<section id="s6">
+    <h2>6. Sarah's Monday hour</h2>
+    <ul>
+        <li><strong>Monday 07:00</strong> — before the kitchen opens</li>
+        <li>Take fresh photos of Sunday's ugali &amp; beef stew</li>
+        <li>Write 6 posts — 3 FB, 3 IG</li>
+        <li>Schedule to the 6 peak windows across the week</li>
+        <li>Close the app</li>
+        <li>Only check inbox during the week for orders</li>
+    </ul>
+    <div class="callout tip">60 min on Monday · full-week presence · time freed for cooking, family, actual business growth.</div>
+</section>
+
+<section id="s7">
+    <h2>7. Self-check quiz</h2>
+
+    <div class="quiz-question" data-correct="C"><h4>1. Sarah's answer for FB + IG?</h4><div class="options"><label><input type="radio" name="q1" value="A"> A) Hootsuite</label><label><input type="radio" name="q1" value="B"> B) Sprout Social</label><label><input type="radio" name="q1" value="C"> C) Meta Business Suite</label><label><input type="radio" name="q1" value="D"> D) HubSpot</label></div><div class="explanation">Correct — free, official, covers both.</div></div>
+
+    <div class="quiz-question" data-correct="B"><h4>2. Meta Business Suite costs…</h4><div class="options"><label><input type="radio" name="q2" value="A"> A) KES 5,000/mo</label><label><input type="radio" name="q2" value="B"> B) KES 0</label><label><input type="radio" name="q2" value="C"> C) USD 200/mo</label><label><input type="radio" name="q2" value="D"> D) Depends on volume</label></div><div class="explanation">Correct — free forever.</div></div>
+
+    <div class="quiz-question" data-correct="D"><h4>3. Peak posting time for Kenyan B2C?</h4><div class="options"><label><input type="radio" name="q3" value="A"> A) 3 AM Sunday</label><label><input type="radio" name="q3" value="B"> B) 5 AM Monday</label><label><input type="radio" name="q3" value="C"> C) 2 PM Tuesday</label><label><input type="radio" name="q3" value="D"> D) 7–9 PM weekday evenings</label></div><div class="explanation">Correct — post-dinner scrolling.</div></div>
+
+    <div class="quiz-question" data-correct="A"><h4>4. Sarah's Monday hour produces…</h4><div class="options"><label><input type="radio" name="q4" value="A"> A) A full week's scheduled content</label><label><input type="radio" name="q4" value="B"> B) One post</label><label><input type="radio" name="q4" value="C"> C) Nothing</label><label><input type="radio" name="q4" value="D"> D) An ad campaign only</label></div><div class="explanation">Correct — batch efficiency.</div></div>
+
+    <div class="quiz-question" data-correct="C"><h4>5. Batch scheduling separates…</h4><div class="options"><label><input type="radio" name="q5" value="A"> A) Small from large businesses</label><label><input type="radio" name="q5" value="B"> B) Rural from urban</label><label><input type="radio" name="q5" value="C"> C) Professionals from amateurs</label><label><input type="radio" name="q5" value="D"> D) Male from female owners</label></div><div class="explanation">Correct — Nyakinyua does not do this.</div></div>
+
+    <div class="quiz-question" data-correct="B"><h4>6. Which is the paid industry-veteran tool?</h4><div class="options"><label><input type="radio" name="q6" value="A"> A) Meta Business Suite</label><label><input type="radio" name="q6" value="B"> B) Hootsuite</label><label><input type="radio" name="q6" value="C"> C) Instagram</label><label><input type="radio" name="q6" value="D"> D) Canva</label></div><div class="explanation">Correct — Hootsuite is the veteran.</div></div>
+
+    <div class="quiz-question" data-correct="D"><h4>7. Buffer's free tier supports…</h4><div class="options"><label><input type="radio" name="q7" value="A"> A) 100 accounts</label><label><input type="radio" name="q7" value="B"> B) 20 accounts</label><label><input type="radio" name="q7" value="C"> C) 10 accounts</label><label><input type="radio" name="q7" value="D"> D) 3 social accounts</label></div><div class="explanation">Correct — 3 in the free tier.</div></div>
+
+    <div class="quiz-question" data-correct="A"><h4>8. Sarah checks apps during the week for…</h4><div class="options"><label><input type="radio" name="q8" value="A"> A) Inbox / orders only</label><label><input type="radio" name="q8" value="B"> B) Endless scrolling</label><label><input type="radio" name="q8" value="C"> C) New posts</label><label><input type="radio" name="q8" value="D"> D) Never</label></div><div class="explanation">Correct — scheduled content publishes itself.</div></div>
+
+    <div class="quiz-question" data-correct="C"><h4>9. Which is Instagram-focused?</h4><div class="options"><label><input type="radio" name="q9" value="A"> A) Hootsuite</label><label><input type="radio" name="q9" value="B"> B) HubSpot</label><label><input type="radio" name="q9" value="C"> C) Later</label><label><input type="radio" name="q9" value="D"> D) Buffer</label></div><div class="explanation">Correct — Later specialises in Instagram.</div></div>
+
+    <div class="quiz-question" data-correct="B"><h4>10. Weekend peak window?</h4><div class="options"><label><input type="radio" name="q10" value="A"> A) 6 AM</label><label><input type="radio" name="q10" value="B"> B) 10 AM – 1 PM (families catching up)</label><label><input type="radio" name="q10" value="C"> C) 11 PM</label><label><input type="radio" name="q10" value="D"> D) 3 AM</label></div><div class="explanation">Correct — pre-lunch social time.</div></div>
+
+    <div style="margin-top:20px;">
+        <button class="btn" onclick="markQuiz()">Mark my quiz</button>
+        <button class="btn reset" onclick="resetQuiz()">Reset</button>
+    </div>
+    <div class="quiz-summary" id="quizSummary"><div class="score" id="scoreDisplay">0 / 10</div><p id="scoreMessage"></p></div>
+</section>
+
+<footer><p>Lesson 4.1 — Social Media Management · MTTI · Handbook Part 4, §4.1</p><p>Next: <strong>Lesson 4.2 — Marketing &amp; Promotion Activities</strong></p></footer>
+</div>
+
+<script>
+const SERVICES = [
+    { name: 'Meta Business Suite', plats: 'FB + IG', cost: 'Free', tags: ['meta','all','free','low','pro'] },
+    { name: 'Buffer (free)', plats: '3 social accounts', cost: 'Free', tags: ['meta','ig','free','low','pro'] },
+    { name: 'Hootsuite', plats: 'All platforms', cost: 'KES 15k+/mo', tags: ['all','pro'] },
+    { name: 'Sprout Social', plats: 'All platforms', cost: 'KES 30k+/mo', tags: ['all','pro'] },
+    { name: 'Later', plats: 'Instagram-focused', cost: 'Free tier', tags: ['ig','free','low','pro'] },
+    { name: 'HubSpot Marketing', plats: 'All + CRM', cost: 'KES 50k+/mo', tags: ['all','pro'] }
+];
+function updateServices() {
+    const plats = document.getElementById('pPlats').value;
+    const budget = document.getElementById('pBudget').value;
+    const list = document.getElementById('serviceList');
+    // Rank by fit
+    const ranked = SERVICES.map(s => ({ ...s, matches: (s.tags.includes(plats) ? 1 : 0) + (s.tags.includes(budget) ? 1 : 0) })).sort((a,b) => b.matches - a.matches);
+    list.innerHTML = ranked.map(s => `<div class="service ${s.matches === 2 ? 'pick' : ''}"><div><h5>${s.name}</h5><p>${s.plats}</p></div><div class="cost">${s.cost}</div><div class="fit">${s.matches === 2 ? '★ PICK' : s.matches === 1 ? 'PARTIAL' : 'SKIP'}</div></div>`).join('');
+}
+document.querySelectorAll('.picker select').forEach(el => el.addEventListener('change', updateServices));
+updateServices();
+
+const DAYS = ['Mon','Tue','Wed','Thu','Fri','Sat','Sun'];
+const HOURS = ['6 AM','9 AM','12 PM','3 PM','7 PM','9 PM'];
+const PEAK = { '7 PM': ['Mon','Tue','Wed','Thu','Fri'], '9 PM': ['Mon','Tue','Wed','Thu','Fri'], '12 PM': ['Sat','Sun'], '9 AM': ['Sat','Sun'] };
+function renderHeatmap() {
+    const hm = document.getElementById('heatmap');
+    let html = '<div class="wg-head">Time</div>';
+    DAYS.forEach(d => html += `<div class="wg-head">${d}</div>`);
+    HOURS.forEach(h => {
+        html += `<div class="wg-time">${h}</div>`;
+        DAYS.forEach(d => {
+            const cls = PEAK[h]?.includes(d) ? 'peak' : (h === '12 PM' || h === '9 PM' ? 'mid' : '');
+            html += `<div class="wg-cell ${cls}">${cls === 'peak' ? '★' : cls === 'mid' ? '·' : ''}</div>`;
+        });
+    });
+    hm.innerHTML = html;
+}
+renderHeatmap();
+
+function markQuiz() {
+    const qs = document.querySelectorAll('.quiz-question'); let s = 0;
+    qs.forEach((q, i) => { const c = q.dataset.correct; const p = q.querySelector(`input[name="q${i+1}"]:checked`); q.classList.remove('correct','wrong'); if (p && p.value === c) { q.classList.add('correct'); s++; } else if (p) q.classList.add('wrong'); });
+    const su = document.getElementById('quizSummary'); su.classList.add('show');
+    document.getElementById('scoreDisplay').textContent = `${s} / 10`;
+    document.getElementById('scoreMessage').textContent = s === 10 ? 'Perfect. Move to 4.2.' : s >= 7 ? 'Strong.' : 'Redo the picker.';
+    su.scrollIntoView({behavior:'smooth',block:'center'});
+}
+function resetQuiz() { document.querySelectorAll('.quiz-question').forEach(q => { q.classList.remove('correct','wrong'); q.querySelectorAll('input[type=radio]').forEach(r => r.checked = false); }); document.getElementById('quizSummary').classList.remove('show'); }
+</script>
+</body></html>

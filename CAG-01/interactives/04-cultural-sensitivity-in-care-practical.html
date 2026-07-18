@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Cultural Sensitivity in Care | MTTI Caregiving</title>
+<link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Fredoka:wght@500;600&display=swap" rel="stylesheet">
+<style>
+* { margin:0; padding:0; box-sizing:border-box; }
+body { font-family:'Space Mono', monospace; background:linear-gradient(135deg,#387633 0%,#259BD7 100%); min-height:100vh; padding:20px; color:#fff; }
+.container { max-width:720px; margin:0 auto; }
+.header { text-align:center; margin-bottom:16px; }
+.lesson-tag { display:inline-block; background:rgba(255,255,255,0.2); padding:6px 16px; border-radius:999px; font-size:0.85em; margin-bottom:10px; }
+.header h1 { font-family:'Fredoka', sans-serif; font-size:1.7em; margin-bottom:4px; text-shadow:2px 2px 0 rgba(0,0,0,0.2); }
+.progress { text-align:center; margin-bottom:14px; font-size:0.9em; opacity:0.9; }
+.card { background:#fff; color:#333; border-radius:20px; padding:26px; box-shadow:0 16px 40px rgba(0,0,0,0.25); }
+.scenario { background:linear-gradient(135deg,#fff8e1 0%,#ffecb3 100%); border-left:5px solid #ffc107; padding:16px 20px; border-radius:12px; margin-bottom:18px; font-size:0.95em; line-height:1.55; }
+.category-options { display:flex; gap:10px; margin:14px 0; flex-wrap:wrap; }
+.cat-btn { flex:1; min-width:150px; padding:12px; border-radius:10px; border:2px solid #e5e7f0; background:#f5f7fb; cursor:pointer; font-family:'Space Mono', monospace; font-size:0.85em; text-align:center; }
+.cat-btn:hover:not(.disabled) { background:#e8f5e9; }
+.cat-btn.correct { background:#d4edda; border-color:#28a745; }
+.cat-btn.wrong { background:#f8d7da; border-color:#dc3545; }
+.cat-btn.disabled { cursor:not-allowed; }
+.feedback { margin-top:10px; padding:14px 18px; border-radius:10px; font-size:0.9em; line-height:1.5; }
+.feedback.correct { background:#d4edda; color:#155724; border-left:4px solid #28a745; }
+.feedback.wrong { background:#f8d7da; color:#721c24; border-left:4px solid #dc3545; }
+h3.step { font-family:'Fredoka', sans-serif; font-size:1em; margin:16px 0 8px; color:#387633; }
+textarea { width:100%; min-height:90px; padding:12px; border:2px solid #e5e7f0; border-radius:10px; font-family:'Space Mono', monospace; font-size:0.9em; resize:vertical; }
+.btn { background:linear-gradient(135deg,#387633 0%,#259BD7 100%); color:#fff; border:none; padding:12px 26px; border-radius:10px; font-size:0.95em; cursor:pointer; font-family:'Fredoka', sans-serif; box-shadow:0 6px 16px rgba(0,0,0,0.15); margin-top:4px; }
+.model-note { background:#eef6ff; border-left:4px solid #259BD7; padding:14px 18px; border-radius:10px; margin-top:14px; font-size:0.88em; line-height:1.55; }
+.model-note h4 { font-family:'Fredoka', sans-serif; margin-bottom:8px; color:#1565C0; }
+.checklist { margin-top:10px; padding-left:18px; }
+.checklist li { margin-bottom:4px; }
+.hidden { display:none; }
+.done-banner { text-align:center; padding:20px; font-family:'Fredoka', sans-serif; font-size:1.1em; }
+</style>
+</head>
+<body>
+<div class="container">
+<div class="header">
+  <div class="lesson-tag">Module 4 · Practical</div>
+  <h1>Cultural Sensitivity in Care</h1>
+</div>
+<div class="progress">Case <span id="caseNum">1</span> of <span id="caseTotal">3</span></div>
+<div class="card" id="caseCard"></div>
+<div class="done-banner hidden" id="doneBanner">All three cases complete - you have practised choosing to ask rather than assume, and writing a respectful question, three times over.</div>
+</div>
+
+<script>
+const cases = [
+  {
+    scenario: "You are meeting a new client for the first time today. You are not sure what name or title they would like you to use.",
+    pitfallLabel: "Assume based on their file or appearance",
+    modelNote: "Good morning - before we start, how would you like me to address you?"
+  },
+  {
+    scenario: "A new client has specific meal timing requests that seem to shift depending on the day, and you suspect it may be related to a religious practice you are not familiar with.",
+    pitfallLabel: "Guess at the reason and adjust meals without asking",
+    modelNote: "I want to make sure I get your mealtimes right - is there a particular schedule or practice I should know about, so I can plan around it properly?"
+  },
+  {
+    scenario: "A client's family seems to prefer discussing health updates only with the eldest son, rather than directly with the client, which is different from how you have worked with other families.",
+    pitfallLabel: "Assume this is disrespectful to the client and insist on speaking to them directly",
+    modelNote: "I want to make sure everyone who should be kept informed is included - who would you like me to update about how things are going, and how often?"
+  }
+];
+
+let current = 0;
+let choiceMade = false;
+
+function escapeHtml(s) { return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+
+function render() {
+  choiceMade = false;
+  const c = cases[current];
+  document.getElementById('caseNum').textContent = current + 1;
+  document.getElementById('caseCard').innerHTML = `
+    <div class="scenario"><strong>Scenario.</strong> ${escapeHtml(c.scenario)}</div>
+    <h3 class="step">Step 1 - What is the better approach?</h3>
+    <div class="category-options">
+      <button class="cat-btn" onclick="chooseApproach('ask')">Ask directly and respectfully</button>
+      <button class="cat-btn" onclick="chooseApproach('assume')">${escapeHtml(c.pitfallLabel)}</button>
+    </div>
+    <div id="approachFeedback"></div>
+    <div id="noteSection" class="hidden">
+      <h3 class="step">Step 2 - Write what you would actually say</h3>
+      <textarea id="noteText" placeholder="Write the actual question you would ask the client or family..."></textarea>
+      <button class="btn" onclick="revealModel()" style="margin-top:10px;">Compare to a model question</button>
+      <div id="modelSection"></div>
+    </div>
+    <div id="nextSection" class="hidden" style="text-align:center;margin-top:18px;">
+      <button class="btn" onclick="nextCase()">${current === cases.length - 1 ? 'Finish' : 'Next case &rarr;'}</button>
+    </div>
+  `;
+}
+
+function chooseApproach(choice) {
+  if (choiceMade) return;
+  choiceMade = true;
+  const btns = document.querySelectorAll('.cat-btn');
+  btns.forEach(b => b.classList.add('disabled'));
+  btns[0].classList.add('correct');
+  const right = choice === 'ask';
+  if (!right) btns[1].classList.add('wrong');
+
+  document.getElementById('approachFeedback').innerHTML = `<div class="feedback ${right ? 'correct' : 'wrong'}">
+    <strong>${right ? 'Correct.' : 'Not quite - correct answer highlighted above.'}</strong><br>
+    Asking directly and respectfully is more accurate and more respectful than assuming based on stereotype or guesswork, even when the assumption feels reasonable in the moment.
+  </div>`;
+  document.getElementById('noteSection').classList.remove('hidden');
+}
+
+function revealModel() {
+  const c = cases[current];
+  document.getElementById('modelSection').innerHTML = `
+    <div class="model-note">
+      <h4>A model respectful question</h4>
+      <p>"${escapeHtml(c.modelNote)}"</p>
+      <p style="margin-top:10px;"><strong>Self-check your own question against this checklist:</strong></p>
+      <ul class="checklist">
+        <li>Does it ask directly, rather than hint or guess?</li>
+        <li>Does it sound genuinely curious, not judgmental?</li>
+        <li>Would you be comfortable asking this out loud, in person?</li>
+        <li>Does it leave room for whatever answer the client or family actually gives, without assuming it in advance?</li>
+      </ul>
+    </div>`;
+  document.getElementById('nextSection').classList.remove('hidden');
+}
+
+function nextCase() {
+  current++;
+  if (current >= cases.length) {
+    document.getElementById('caseCard').classList.add('hidden');
+    document.querySelector('.progress').classList.add('hidden');
+    document.getElementById('doneBanner').classList.remove('hidden');
+    return;
+  }
+  render();
+}
+
+render();
+</script>
+</body>
+</html>

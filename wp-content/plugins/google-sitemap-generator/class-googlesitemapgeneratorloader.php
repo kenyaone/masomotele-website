@@ -176,21 +176,26 @@ class GoogleSitemapGeneratorLoader {
 	}
 
 	/**
-	 * Returns the rules required for Nginx permalinks
+	 * Returns the rules required for Nginx permalinks.
+	 *
+	 * Uses named PCRE captures (?<slug>...) instead of unnamed $1/$2
+	 * to avoid CVE-2026-42945 (heap overflow in ngx_http_rewrite_module
+	 * when an unnamed capture is combined with `?` in the replacement and
+	 * followed by another rewrite/if/set in the same scope).
 	 *
 	 * @return string[]
 	 */
 	public static function get_ngin_x_rules() {
 		return array(
-			'rewrite ^/.*-misc?\.xml$ "/index.php?xml_sitemap=params=$2" last;',
-			'rewrite ^/.*-misc?\.xml\.gz$ "/index.php?xml_sitemap=params=$2;zip=true" last;',
-			'rewrite ^/.*-misc?\.html$ "/index.php?xml_sitemap=params=$2;html=true" last;',
-			'rewrite ^/.*-misc?\.html\.gz$ "/index.php?xml_sitemap=params=$2;html=true;zip=true" last;',
+			'rewrite "^/(?<slug>.*-misc)\.xml$" "/index.php?xml_sitemap=params=$slug" last;',
+			'rewrite "^/(?<slug>.*-misc)\.xml\.gz$" "/index.php?xml_sitemap=params=$slug;zip=true" last;',
+			'rewrite "^/(?<slug>.*-misc)\.html$" "/index.php?xml_sitemap=params=$slug;html=true" last;',
+			'rewrite "^/(?<slug>.*-misc)\.html\.gz$" "/index.php?xml_sitemap=params=$slug;html=true;zip=true" last;',
 
-			'rewrite ^/.*-sitemap.*(?:\d\{1,4\}(?!-misc)|-misc)?\.xml$ "/index.php?xml_sitemap=params=$2" last;',
-			'rewrite ^/.*-sitemap.*(?:\d\{1,4\}(?!-misc)|-misc)?\.xml\.gz$ "/index.php?xml_sitemap=params=$2;zip=true" last;',
-			'rewrite ^/.*-sitemap.*(?:\d\{1,4\}(?!-misc)|-misc)?\.html$ "/index.php?xml_sitemap=params=$2;html=true" last;',
-			'rewrite ^/.*-sitemap.*(?:\d\{1,4\}(?!-misc)|-misc)?\.html\.gz$ "/index.php?xml_sitemap=params=$2;html=true;zip=true" last;',
+			'rewrite "^/(?<slug>.*-sitemap(?:\d{1,4}|-misc)?)\.xml$" "/index.php?xml_sitemap=params=$slug" last;',
+			'rewrite "^/(?<slug>.*-sitemap(?:\d{1,4}|-misc)?)\.xml\.gz$" "/index.php?xml_sitemap=params=$slug;zip=true" last;',
+			'rewrite "^/(?<slug>.*-sitemap(?:\d{1,4}|-misc)?)\.html$" "/index.php?xml_sitemap=params=$slug;html=true" last;',
+			'rewrite "^/(?<slug>.*-sitemap(?:\d{1,4}|-misc)?)\.html\.gz$" "/index.php?xml_sitemap=params=$slug;html=true;zip=true" last;',
 		);
 
 	}

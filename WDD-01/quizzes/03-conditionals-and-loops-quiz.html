@@ -1,0 +1,346 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Conditionals and Loops | MTTI Web Design</title>
+    <link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Fredoka:wght@500;600&display=swap" rel="stylesheet">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Space Mono', monospace;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh; padding: 20px; color: #fff;
+        }
+        .container { max-width: 900px; margin: 0 auto; }
+        .header { text-align: center; margin-bottom: 30px; animation: slideDown 0.6s ease-out; }
+        .header .lesson-tag {
+            display: inline-block; background: rgba(255,255,255,0.2);
+            padding: 6px 16px; border-radius: 999px;
+            font-size: 0.85em; margin-bottom: 12px;
+        }
+        .header h1 {
+            font-family: 'Fredoka', sans-serif; font-size: 2.2em;
+            margin-bottom: 8px; text-shadow: 3px 3px 0 rgba(0,0,0,0.2);
+        }
+        .header p { opacity: 0.95; font-size: 0.95em; }
+        .score-board {
+            background: rgba(255,255,255,0.15); backdrop-filter: blur(10px);
+            border-radius: 20px; padding: 20px; margin-bottom: 20px;
+            display: flex; justify-content: space-around;
+            animation: fadeIn 0.8s ease-out 0.2s both;
+        }
+        .score-item { text-align: center; }
+        .score-item .label { font-size: 0.85em; opacity: 0.9; margin-bottom: 4px; }
+        .score-item .value {
+            font-size: 1.8em; font-weight: bold; font-family: 'Fredoka', sans-serif;
+        }
+        .progress-bar {
+            width: 100%; height: 8px; background: rgba(255,255,255,0.3);
+            border-radius: 10px; margin-bottom: 25px; overflow: hidden;
+        }
+        .progress-fill {
+            height: 100%; background: linear-gradient(90deg, #f093fb 0%, #f5576c 100%);
+            border-radius: 10px; transition: width 0.5s ease; width: 0%;
+        }
+        .exercise-card {
+            background: white; color: #333; border-radius: 25px;
+            padding: 35px; margin-bottom: 20px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            animation: fadeIn 0.6s ease-out both;
+        }
+        .scenario {
+            background: linear-gradient(135deg, #fff8e1 0%, #ffecb3 100%);
+            border-left: 5px solid #ffc107;
+            padding: 20px 24px; border-radius: 12px;
+            margin-bottom: 24px;
+            font-size: 0.98em; line-height: 1.55;
+        }
+        .scenario strong { color: #7a5a00; font-family: 'Fredoka', sans-serif; }
+        .question {
+            font-size: 1.15em; margin-bottom: 20px;
+            font-weight: 700; line-height: 1.4;
+        }
+        .options { display: flex; flex-direction: column; gap: 12px; }
+        .option {
+            background: #f5f7fb; border: 2px solid transparent;
+            padding: 16px 20px; border-radius: 12px;
+            cursor: pointer; transition: all 0.2s ease;
+            font-family: 'Space Mono', monospace; font-size: 0.98em; text-align: left;
+        }
+        .option:hover:not(.disabled) {
+            background: #eef1fb; border-color: #667eea; transform: translateX(4px);
+        }
+        .option.correct { background: #d4edda; border-color: #28a745; color: #155724; }
+        .option.wrong { background: #f8d7da; border-color: #dc3545; color: #721c24; animation: shake 0.4s; }
+        .option.disabled { cursor: not-allowed; opacity: 0.85; }
+        .feedback {
+            margin-top: 22px; padding: 18px 22px; border-radius: 12px;
+            animation: slideUp 0.4s ease-out;
+            font-size: 0.98em; line-height: 1.5;
+        }
+        .feedback.correct { background: #d4edda; color: #155724; border-left: 4px solid #28a745; }
+        .feedback.wrong { background: #f8d7da; color: #721c24; border-left: 4px solid #dc3545; }
+        .feedback strong { font-family: 'Fredoka', sans-serif; }
+        .next-btn, .restart-btn {
+            margin-top: 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white; border: none;
+            padding: 14px 32px; border-radius: 12px;
+            font-size: 1em; cursor: pointer;
+            font-family: 'Fredoka', sans-serif;
+            box-shadow: 0 6px 18px rgba(0,0,0,0.2);
+            transition: transform 0.2s ease;
+        }
+        .next-btn:hover, .restart-btn:hover { transform: scale(1.04); }
+        .results {
+            text-align: center; padding: 25px 15px;
+            animation: bounceIn 0.6s ease-out;
+        }
+        .results h2 {
+            font-family: 'Fredoka', sans-serif; font-size: 2em;
+            margin-bottom: 12px; color: #333;
+        }
+        .results .final-score {
+            font-size: 3em; font-family: 'Fredoka', sans-serif;
+            color: #667eea; margin: 20px 0;
+        }
+        .results p { color: #555; margin-bottom: 12px; }
+        .badge { display: inline-block; font-size: 3.5em; margin: 8px 0; }
+        @keyframes slideDown { from { opacity: 0; transform: translateY(-30px); } to { opacity: 1; transform: translateY(0); } }
+        @keyframes fadeIn { from { opacity: 0; transform: scale(0.96); } to { opacity: 1; transform: scale(1); } }
+        @keyframes slideUp { from { opacity: 0; transform: translateY(15px); } to { opacity: 1; transform: translateY(0); } }
+        @keyframes shake { 0%,100% { transform: translateX(0); } 25% { transform: translateX(-8px); } 75% { transform: translateX(8px); } }
+        @keyframes bounceIn { 0% { opacity: 0; transform: scale(0.4); } 60% { transform: scale(1.05); } 100% { opacity: 1; transform: scale(1); } }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <div class="lesson-tag">Module 3 · Lesson 3.5 · Quiz</div>
+            <h1>Conditionals and Loops</h1>
+            <p></p>
+        </div>
+
+        <div class="score-board">
+            <div class="score-item"><div class="label">Score</div><div class="value" id="score">0</div></div>
+            <div class="score-item"><div class="label">Question</div><div class="value"><span id="current">1</span>/<span id="total">10</span></div></div>
+            <div class="score-item"><div class="label">Streak</div><div class="value" id="streak">0</div></div>
+        </div>
+
+        <div class="progress-bar"><div class="progress-fill" id="progress"></div></div>
+
+        <div class="exercise-card" id="exerciseCard"></div>
+    </div>
+
+    <script>
+        const exercises = [
+  {
+    "id": "q1",
+    "text": "James writes if (price < 1000). When is this condition true?",
+    "options": [
+      "When price equals exactly 1000",
+      "When price is less than 1000 (e.g. 750, 320, 999)",
+      "When price is greater than 1000",
+      "When price is any number"
+    ],
+    "answer": 1,
+    "explanation": "The < operator (less than) returns true when the left operand is strictly less than the right. price = 750 → true; price = 1000 → false (not strictly less); price = 1200 → false."
+  },
+  {
+    "id": "q2",
+    "text": "James uses for...in to iterate over his prices array. Why might this be a problem?",
+    "options": [
+      "for...in only works on objects, not arrays",
+      "for...in iterates over enumerable property keys, which for arrays are string indices ('0', '1', '2') — and can include custom prototype properties",
+      "for...in does not support the break statement",
+      "for...in runs backwards through the array"
+    ],
+    "answer": 1,
+    "explanation": "for...in is designed for objects. On arrays it gives string keys ('0', '1', '2') and can include any extra properties added to Array.prototype. Use for...of or forEach for arrays — they iterate over values directly."
+  },
+  {
+    "id": "q3",
+    "text": "James needs to show 'Budget' for prices under KES 500 and 'Standard' for everything else. Which is the most concise way?",
+    "options": [
+      "An if/else statement across 4 lines",
+      "if (price < 500) { label = 'Budget' } else { label = 'Standard' }",
+      "const label = price < 500 ? 'Budget' : 'Standard'",
+      "switch(price) with cases for each value"
+    ],
+    "answer": 2,
+    "explanation": "The ternary operator (condition ? value_if_true : value_if_false) is the most concise for a simple two-branch assignment. It is semantically identical to the if/else but in one expression — suitable when there are exactly two outcomes."
+  },
+  {
+    "id": "q4",
+    "text": "James writes while (price > 0) { price -= 100; }. What is the risk of this pattern?",
+    "options": [
+      "while loops don't support arithmetic operations",
+      "If price starts as a negative number or never reaches 0, the loop runs forever (infinite loop)",
+      "while loops can only count upward",
+      "The -= operator is not valid in while conditions"
+    ],
+    "answer": 1,
+    "explanation": "while loops require a condition that eventually becomes false. If the initial condition is already false, the loop never runs. If the condition never becomes false, it runs forever (infinite loop), freezing the browser. Always ensure the loop has a clear exit condition."
+  },
+  {
+    "id": "q5",
+    "text": "James uses break inside a for loop. What does break do?",
+    "options": [
+      "Skips the current iteration and continues to the next",
+      "Exits the loop immediately, regardless of how many iterations remain",
+      "Pauses the loop for 1 second",
+      "Breaks the array into two halves"
+    ],
+    "answer": 1,
+    "explanation": "break immediately exits the enclosing loop (or switch). No further iterations run. Useful for early exit when a result is found. continue is different — it skips the rest of the current iteration and starts the next one."
+  },
+  {
+    "id": "q6",
+    "text": "James writes: if (price = 1000) instead of if (price === 1000). What actually happens?",
+    "options": [
+      "The condition checks if price equals 1000",
+      "price is assigned 1000, and the condition is truthy (because 1000 is truthy) — the if block always runs",
+      "JavaScript throws a SyntaxError",
+      "price is compared to 1000 using loose equality"
+    ],
+    "answer": 1,
+    "explanation": "= is the assignment operator, not comparison. if (price = 1000) assigns 1000 to price and evaluates the expression's value (1000) as the condition — which is truthy. The if block runs regardless of the original value of price. Always use === for comparison."
+  },
+  {
+    "id": "q7",
+    "text": "James loops through 8 prices using for...of. What does each iteration give him?",
+    "options": [
+      "The array index (0, 1, 2, ...)",
+      "The actual price value at each position",
+      "A key-value pair [index, value]",
+      "The length of the remaining array"
+    ],
+    "answer": 1,
+    "explanation": "for...of iterates over the values of any iterable (arrays, strings, Sets, etc.). Each iteration gives the value directly — 750, 1200, 320 — not the index. To get both, use .entries(): for (const [i, price] of prices.entries())."
+  },
+  {
+    "id": "q8",
+    "text": "James uses Array.filter() instead of a manual for loop with an if block. What does filter() return?",
+    "options": [
+      "The first matching element",
+      "true or false",
+      "A new array containing only elements that passed the test",
+      "The original array with non-matching elements set to null"
+    ],
+    "answer": 2,
+    "explanation": "filter() returns a new array of all elements for which the callback returns true. The original array is not modified. It is declarative and readable: prices.filter(p => p < 1000) vs a loop with push()."
+  },
+  {
+    "id": "q9",
+    "text": "James needs to exit a loop early once he finds the first product under KES 500. Which approach is most appropriate?",
+    "options": [
+      "continue to skip other products",
+      "A for loop with a break statement when the condition is met",
+      "Array.filter() and then take element [0]",
+      "A while(true) loop that throws an error to exit"
+    ],
+    "answer": 1,
+    "explanation": "A for loop with break exits immediately upon finding the match — no unnecessary iterations. Array.find() is even more idiomatic for this: prices.find(p => p < 500) returns the first match without a manual loop."
+  },
+  {
+    "id": "q10",
+    "text": "James writes a switch statement: switch(category) { case 'cement': ...; break; case 'roofing': ...; break; default: ... }. What happens if he omits the break after 'cement'?",
+    "options": [
+      "The switch statement skips to the default case",
+      "Execution falls through into the 'roofing' case and runs its code too",
+      "JavaScript throws a SyntaxError",
+      "The switch exits after the first matching case regardless"
+    ],
+    "answer": 1,
+    "explanation": "Without break, switch fall-through occurs — execution continues into the next case regardless of whether it matches. This is occasionally intentional (grouping cases) but usually a bug. Always include break (or return) at the end of each case."
+  }
+];
+
+        let currentQuestion = 0, score = 0, streak = 0, answered = false;
+
+        function updateScoreboard() {
+            document.getElementById('score').textContent = score;
+            document.getElementById('current').textContent = Math.min(currentQuestion + 1, exercises.length);
+            document.getElementById('total').textContent = exercises.length;
+            document.getElementById('streak').textContent = streak;
+            document.getElementById('progress').style.width = ((currentQuestion) / exercises.length) * 100 + '%';
+        }
+
+        function escapeHtml(s) {
+            return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+        }
+
+        function renderQuestion() {
+            answered = false;
+            const q = exercises[currentQuestion];
+            let html = '';
+            if (q.scenario) {
+                html += `<div class="scenario"><strong>Scenario.</strong> ${escapeHtml(q.scenario)}</div>`;
+            }
+            html += `<div class="question">${escapeHtml(q.text)}</div>`;
+            html += '<div class="options">';
+            q.options.forEach((o, i) => {
+                html += `<button class="option" onclick="selectAnswer(${i})">${escapeHtml(o)}</button>`;
+            });
+            html += '</div>';
+            document.getElementById('exerciseCard').innerHTML = html;
+            updateScoreboard();
+        }
+
+        function selectAnswer(i) {
+            if (answered) return;
+            answered = true;
+            const q = exercises[currentQuestion];
+            const btns = document.querySelectorAll('.option');
+            btns.forEach(b => b.classList.add('disabled'));
+            btns[q.answer].classList.add('correct');
+            const right = i === q.answer;
+            if (!right) btns[i].classList.add('wrong');
+            if (right) { score += 10; streak += 1; } else { streak = 0; }
+            const fb = document.createElement('div');
+            fb.className = 'feedback ' + (right ? 'correct' : 'wrong');
+            fb.innerHTML = `<strong>${right ? '✅ Correct.' : '❌ Not quite.'}</strong><br>${escapeHtml(q.explanation)}`;
+            document.getElementById('exerciseCard').appendChild(fb);
+            const nb = document.createElement('button');
+            nb.className = 'next-btn';
+            nb.textContent = currentQuestion === exercises.length - 1 ? 'See results →' : 'Next scenario →';
+            nb.onclick = nextQuestion;
+            document.getElementById('exerciseCard').appendChild(nb);
+            updateScoreboard();
+        }
+
+        function nextQuestion() {
+            currentQuestion++;
+            if (currentQuestion >= exercises.length) return showResults();
+            renderQuestion();
+        }
+
+        function showResults() {
+            document.getElementById('progress').style.width = '100%';
+            const total = exercises.length * 10;
+            const pct = Math.round(score / total * 100);
+            if (window.parent) { window.parent.postMessage({type:"mtti_quiz_score", score: score, total: total, percent: pct}, "*"); }
+            let badge = '🌟', msg = 'Excellent work. You have a professional grasp of this lesson.';
+            if (pct < 50) { badge = '🌱'; msg = 'Good first attempt. Re-watch the lesson video and try again.'; }
+            else if (pct < 80) { badge = '📚'; msg = 'Solid progress. Review the scenarios you missed and retry.'; }
+            document.getElementById('exerciseCard').innerHTML = `
+                <div class="results">
+                    <span class="badge">${badge}</span>
+                    <h2>Quiz Complete</h2>
+                    <div class="final-score">${score} / ${total}</div>
+                    <p><strong>${pct}%</strong> · Longest streak: ${streak}</p>
+                    <p>${msg}</p>
+                    <button class="restart-btn" onclick="restart()">Try again 🔁</button>
+                </div>`;
+        }
+
+        function restart() {
+            currentQuestion = 0; score = 0; streak = 0;
+            renderQuestion();
+        }
+
+        renderQuestion();
+    </script>
+</body>
+</html>

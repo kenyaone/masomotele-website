@@ -1,0 +1,346 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Performance Optimisation | MTTI Web Design</title>
+    <link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Fredoka:wght@500;600&display=swap" rel="stylesheet">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Space Mono', monospace;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh; padding: 20px; color: #fff;
+        }
+        .container { max-width: 900px; margin: 0 auto; }
+        .header { text-align: center; margin-bottom: 30px; animation: slideDown 0.6s ease-out; }
+        .header .lesson-tag {
+            display: inline-block; background: rgba(255,255,255,0.2);
+            padding: 6px 16px; border-radius: 999px;
+            font-size: 0.85em; margin-bottom: 12px;
+        }
+        .header h1 {
+            font-family: 'Fredoka', sans-serif; font-size: 2.2em;
+            margin-bottom: 8px; text-shadow: 3px 3px 0 rgba(0,0,0,0.2);
+        }
+        .header p { opacity: 0.95; font-size: 0.95em; }
+        .score-board {
+            background: rgba(255,255,255,0.15); backdrop-filter: blur(10px);
+            border-radius: 20px; padding: 20px; margin-bottom: 20px;
+            display: flex; justify-content: space-around;
+            animation: fadeIn 0.8s ease-out 0.2s both;
+        }
+        .score-item { text-align: center; }
+        .score-item .label { font-size: 0.85em; opacity: 0.9; margin-bottom: 4px; }
+        .score-item .value {
+            font-size: 1.8em; font-weight: bold; font-family: 'Fredoka', sans-serif;
+        }
+        .progress-bar {
+            width: 100%; height: 8px; background: rgba(255,255,255,0.3);
+            border-radius: 10px; margin-bottom: 25px; overflow: hidden;
+        }
+        .progress-fill {
+            height: 100%; background: linear-gradient(90deg, #f093fb 0%, #f5576c 100%);
+            border-radius: 10px; transition: width 0.5s ease; width: 0%;
+        }
+        .exercise-card {
+            background: white; color: #333; border-radius: 25px;
+            padding: 35px; margin-bottom: 20px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            animation: fadeIn 0.6s ease-out both;
+        }
+        .scenario {
+            background: linear-gradient(135deg, #fff8e1 0%, #ffecb3 100%);
+            border-left: 5px solid #ffc107;
+            padding: 20px 24px; border-radius: 12px;
+            margin-bottom: 24px;
+            font-size: 0.98em; line-height: 1.55;
+        }
+        .scenario strong { color: #7a5a00; font-family: 'Fredoka', sans-serif; }
+        .question {
+            font-size: 1.15em; margin-bottom: 20px;
+            font-weight: 700; line-height: 1.4;
+        }
+        .options { display: flex; flex-direction: column; gap: 12px; }
+        .option {
+            background: #f5f7fb; border: 2px solid transparent;
+            padding: 16px 20px; border-radius: 12px;
+            cursor: pointer; transition: all 0.2s ease;
+            font-family: 'Space Mono', monospace; font-size: 0.98em; text-align: left;
+        }
+        .option:hover:not(.disabled) {
+            background: #eef1fb; border-color: #667eea; transform: translateX(4px);
+        }
+        .option.correct { background: #d4edda; border-color: #28a745; color: #155724; }
+        .option.wrong { background: #f8d7da; border-color: #dc3545; color: #721c24; animation: shake 0.4s; }
+        .option.disabled { cursor: not-allowed; opacity: 0.85; }
+        .feedback {
+            margin-top: 22px; padding: 18px 22px; border-radius: 12px;
+            animation: slideUp 0.4s ease-out;
+            font-size: 0.98em; line-height: 1.5;
+        }
+        .feedback.correct { background: #d4edda; color: #155724; border-left: 4px solid #28a745; }
+        .feedback.wrong { background: #f8d7da; color: #721c24; border-left: 4px solid #dc3545; }
+        .feedback strong { font-family: 'Fredoka', sans-serif; }
+        .next-btn, .restart-btn {
+            margin-top: 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white; border: none;
+            padding: 14px 32px; border-radius: 12px;
+            font-size: 1em; cursor: pointer;
+            font-family: 'Fredoka', sans-serif;
+            box-shadow: 0 6px 18px rgba(0,0,0,0.2);
+            transition: transform 0.2s ease;
+        }
+        .next-btn:hover, .restart-btn:hover { transform: scale(1.04); }
+        .results {
+            text-align: center; padding: 25px 15px;
+            animation: bounceIn 0.6s ease-out;
+        }
+        .results h2 {
+            font-family: 'Fredoka', sans-serif; font-size: 2em;
+            margin-bottom: 12px; color: #333;
+        }
+        .results .final-score {
+            font-size: 3em; font-family: 'Fredoka', sans-serif;
+            color: #667eea; margin: 20px 0;
+        }
+        .results p { color: #555; margin-bottom: 12px; }
+        .badge { display: inline-block; font-size: 3.5em; margin: 8px 0; }
+        @keyframes slideDown { from { opacity: 0; transform: translateY(-30px); } to { opacity: 1; transform: translateY(0); } }
+        @keyframes fadeIn { from { opacity: 0; transform: scale(0.96); } to { opacity: 1; transform: scale(1); } }
+        @keyframes slideUp { from { opacity: 0; transform: translateY(15px); } to { opacity: 1; transform: translateY(0); } }
+        @keyframes shake { 0%,100% { transform: translateX(0); } 25% { transform: translateX(-8px); } 75% { transform: translateX(8px); } }
+        @keyframes bounceIn { 0% { opacity: 0; transform: scale(0.4); } 60% { transform: scale(1.05); } 100% { opacity: 1; transform: scale(1); } }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <div class="lesson-tag">Module 4 · Lesson 4.5 · Quiz</div>
+            <h1>Performance Optimisation</h1>
+            <p></p>
+        </div>
+
+        <div class="score-board">
+            <div class="score-item"><div class="label">Score</div><div class="value" id="score">0</div></div>
+            <div class="score-item"><div class="label">Question</div><div class="value"><span id="current">1</span>/<span id="total">10</span></div></div>
+            <div class="score-item"><div class="label">Streak</div><div class="value" id="streak">0</div></div>
+        </div>
+
+        <div class="progress-bar"><div class="progress-fill" id="progress"></div></div>
+
+        <div class="exercise-card" id="exerciseCard"></div>
+    </div>
+
+    <script>
+        const exercises = [
+  {
+    "id": "q1",
+    "text": "James runs a Lighthouse audit on his site and gets a Performance score of 42. What is the recommended minimum score for a good user experience?",
+    "options": [
+      "50",
+      "70",
+      "90",
+      "100"
+    ],
+    "answer": 2,
+    "explanation": "Lighthouse rates performance 0–100: 0–49 (poor, red), 50–89 (needs improvement, orange), 90–100 (good, green). A score of 90+ is the target. For a Kenyan mobile audience on 3G/4G, performance is directly linked to bounce rate and conversion."
+  },
+  {
+    "id": "q2",
+    "text": "James's hero image is 3.8MB. A Safaricom customer on 4G (average ~10Mbps) downloads it. How long does this take?",
+    "options": [
+      "0.3 seconds",
+      "~3 seconds",
+      "About 10 seconds",
+      "Under 1 second"
+    ],
+    "answer": 1,
+    "explanation": "3.8MB × 8 bits/byte = 30.4 megabits. At 10Mbps: 30.4 / 10 ≈ 3 seconds — just for this one image. Plus DNS, HTML, CSS, and other images. Compress to under 150KB WebP: 1.2 / 10 ≈ 0.12 seconds. Image compression is the single biggest performance win."
+  },
+  {
+    "id": "q3",
+    "text": "Which image format provides the best compression for James's product photos at equivalent visual quality?",
+    "options": [
+      "JPEG — the web standard for photographs",
+      "PNG — lossless compression for all image types",
+      "WebP — typically 25–35% smaller than JPEG at the same quality",
+      "SVG — scales without quality loss"
+    ],
+    "answer": 2,
+    "explanation": "WebP is a modern format developed by Google providing superior lossy and lossless compression for photographs. A 200KB JPEG can often be reduced to 140KB WebP at identical visual quality. It's supported in all modern browsers (Chrome, Firefox, Safari, Edge)."
+  },
+  {
+    "id": "q4",
+    "text": "James adds loading=\"lazy\" to product images below the fold. What does this do?",
+    "options": [
+      "Loads images at lower resolution and upgrades them as the user scrolls",
+      "Defers downloading images until they are near the viewport — saving bandwidth for customers who don't scroll to every product",
+      "Loads all images in a background thread without blocking rendering",
+      "Lazy loads CSS after JavaScript is done executing"
+    ],
+    "answer": 1,
+    "explanation": "loading=\"lazy\" is a native browser attribute that delays image loading until the image is within a threshold distance from the viewport. Only images the customer actually sees are downloaded — significant data savings for a long product catalogue."
+  },
+  {
+    "id": "q5",
+    "text": "James places all <script src=\"app.js\"> tags in <head> without any attributes. What is the performance problem?",
+    "options": [
+      "Scripts in <head> run before the CSS is applied",
+      "Scripts in <head> block HTML parsing — the browser stops building the page until each script is downloaded and executed",
+      "Scripts must always be in <body> to work correctly",
+      "Scripts in <head> are executed twice"
+    ],
+    "answer": 1,
+    "explanation": "Without defer or async, <script> in <head> blocks the HTML parser — the browser downloads and runs the script before continuing to parse the rest of the HTML. This delays the First Contentful Paint. Fix: add defer (runs after HTML parsing) or move scripts before </body>."
+  },
+  {
+    "id": "q6",
+    "text": "What does minification do to James's CSS and JavaScript files?",
+    "options": [
+      "Splits large files into smaller chunks loaded on demand",
+      "Removes whitespace, comments, and shortens variable names to reduce file size without changing functionality",
+      "Compresses files into a .zip archive for faster transfer",
+      "Merges all CSS files into one file"
+    ],
+    "answer": 1,
+    "explanation": "Minification removes all non-essential characters (spaces, newlines, comments) and can rename variables to single characters. A 50KB CSS file might minify to 35KB. Tools: CSS Nano, Terser (JS), UglifyJS. Many build tools (Vite, webpack) minify automatically."
+  },
+  {
+    "id": "q7",
+    "text": "Lighthouse flags 'Cumulative Layout Shift (CLS)' on James's page. What causes CLS?",
+    "options": [
+      "JavaScript files loading too slowly",
+      "Elements moving or appearing after the initial render — e.g. images without width/height causing content to jump down",
+      "CSS animations running at less than 60fps",
+      "Third-party ads blocking the main thread"
+    ],
+    "answer": 1,
+    "explanation": "CLS measures unexpected layout shifts — when images without dimensions load and push content down, or ads appear and shift the text. Fix: always set explicit width and height on images. This lets the browser reserve space before the image loads."
+  },
+  {
+    "id": "q8",
+    "text": "James sets Cache-Control: max-age=2592000 on his product images (2592000 seconds = 30 days). What is the benefit?",
+    "options": [
+      "Google indexes the images 30 times faster",
+      "Repeat visitors load cached images from their device instead of re-downloading — near-instant load and zero bandwidth cost for returning customers",
+      "Images are compressed for 30 days then reverted to originals",
+      "The server only sends images to browsers that support WebP"
+    ],
+    "answer": 1,
+    "explanation": "Browser caching stores assets locally. A returning customer who viewed the product page yesterday loads all cached images instantly — no network request. For a customer on a Safaricom bundle, this saves significant data on every return visit."
+  },
+  {
+    "id": "q9",
+    "text": "James uses a large icon font library (Font Awesome, 300KB) for 3 icons on his site. What is a better approach?",
+    "options": [
+      "Load Font Awesome asynchronously so it doesn't block rendering",
+      "Use inline SVG for just the 3 icons — each is a few hundred bytes",
+      "Host Font Awesome locally instead of from a CDN",
+      "Remove the icons and use emoji instead"
+    ],
+    "answer": 1,
+    "explanation": "Loading 300KB for 3 icons is extreme over-engineering. SVG icons are 200–500 bytes each inline. Inline SVG also renders immediately (no additional HTTP request) and can be styled with CSS. If you need many icons, use an icon sprite or subset the font."
+  },
+  {
+    "id": "q10",
+    "text": "James adds width=\"400\" height=\"300\" to all his product images. Besides preventing layout shift, what other benefit does this provide?",
+    "options": [
+      "The browser renders the image at exactly 400×300 pixels regardless of CSS",
+      "The browser can calculate the image's aspect ratio and reserve space before the image loads — enabling smarter responsive sizing",
+      "It pre-loads the image at 400×300 from the server before CSS runs",
+      "It creates a placeholder with those exact dimensions in the DOM immediately"
+    ],
+    "answer": 1,
+    "explanation": "Width and height attributes allow the browser to calculate the intrinsic aspect ratio (400/300 = 4:3) even before the image loads. This enables CSS like width: 100%; height: auto to work correctly and reserving exact space, eliminating layout shift."
+  }
+];
+
+        let currentQuestion = 0, score = 0, streak = 0, answered = false;
+
+        function updateScoreboard() {
+            document.getElementById('score').textContent = score;
+            document.getElementById('current').textContent = Math.min(currentQuestion + 1, exercises.length);
+            document.getElementById('total').textContent = exercises.length;
+            document.getElementById('streak').textContent = streak;
+            document.getElementById('progress').style.width = ((currentQuestion) / exercises.length) * 100 + '%';
+        }
+
+        function escapeHtml(s) {
+            return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+        }
+
+        function renderQuestion() {
+            answered = false;
+            const q = exercises[currentQuestion];
+            let html = '';
+            if (q.scenario) {
+                html += `<div class="scenario"><strong>Scenario.</strong> ${escapeHtml(q.scenario)}</div>`;
+            }
+            html += `<div class="question">${escapeHtml(q.text)}</div>`;
+            html += '<div class="options">';
+            q.options.forEach((o, i) => {
+                html += `<button class="option" onclick="selectAnswer(${i})">${escapeHtml(o)}</button>`;
+            });
+            html += '</div>';
+            document.getElementById('exerciseCard').innerHTML = html;
+            updateScoreboard();
+        }
+
+        function selectAnswer(i) {
+            if (answered) return;
+            answered = true;
+            const q = exercises[currentQuestion];
+            const btns = document.querySelectorAll('.option');
+            btns.forEach(b => b.classList.add('disabled'));
+            btns[q.answer].classList.add('correct');
+            const right = i === q.answer;
+            if (!right) btns[i].classList.add('wrong');
+            if (right) { score += 10; streak += 1; } else { streak = 0; }
+            const fb = document.createElement('div');
+            fb.className = 'feedback ' + (right ? 'correct' : 'wrong');
+            fb.innerHTML = `<strong>${right ? '✅ Correct.' : '❌ Not quite.'}</strong><br>${escapeHtml(q.explanation)}`;
+            document.getElementById('exerciseCard').appendChild(fb);
+            const nb = document.createElement('button');
+            nb.className = 'next-btn';
+            nb.textContent = currentQuestion === exercises.length - 1 ? 'See results →' : 'Next scenario →';
+            nb.onclick = nextQuestion;
+            document.getElementById('exerciseCard').appendChild(nb);
+            updateScoreboard();
+        }
+
+        function nextQuestion() {
+            currentQuestion++;
+            if (currentQuestion >= exercises.length) return showResults();
+            renderQuestion();
+        }
+
+        function showResults() {
+            document.getElementById('progress').style.width = '100%';
+            const total = exercises.length * 10;
+            const pct = Math.round(score / total * 100);
+            if (window.parent) { window.parent.postMessage({type:"mtti_quiz_score", score: score, total: total, percent: pct}, "*"); }
+            let badge = '🌟', msg = 'Excellent work. You have a professional grasp of this lesson.';
+            if (pct < 50) { badge = '🌱'; msg = 'Good first attempt. Re-watch the lesson video and try again.'; }
+            else if (pct < 80) { badge = '📚'; msg = 'Solid progress. Review the scenarios you missed and retry.'; }
+            document.getElementById('exerciseCard').innerHTML = `
+                <div class="results">
+                    <span class="badge">${badge}</span>
+                    <h2>Quiz Complete</h2>
+                    <div class="final-score">${score} / ${total}</div>
+                    <p><strong>${pct}%</strong> · Longest streak: ${streak}</p>
+                    <p>${msg}</p>
+                    <button class="restart-btn" onclick="restart()">Try again 🔁</button>
+                </div>`;
+        }
+
+        function restart() {
+            currentQuestion = 0; score = 0; streak = 0;
+            renderQuestion();
+        }
+
+        renderQuestion();
+    </script>
+</body>
+</html>

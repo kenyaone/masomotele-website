@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Hashing and Data Integrity | MTTI Computer Applications</title>
+<link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Fredoka:wght@500;600&display=swap" rel="stylesheet">
+<style>
+* { margin:0; padding:0; box-sizing:border-box; }
+body { font-family:'Space Mono', monospace; background:linear-gradient(135deg,#387633 0%,#259BD7 100%); min-height:100vh; padding:20px; color:#fff; }
+.container { max-width:900px; margin:0 auto; }
+.header { text-align:center; margin-bottom:24px; }
+.lesson-tag { display:inline-block; background:rgba(255,255,255,0.2); padding:6px 16px; border-radius:999px; font-size:0.85em; margin-bottom:12px; }
+.header h1 { font-family:'Fredoka', sans-serif; font-size:2em; margin-bottom:6px; text-shadow:3px 3px 0 rgba(0,0,0,0.2); }
+.scenario { background:rgba(255,255,255,0.14); backdrop-filter:blur(10px); border-radius:16px; padding:16px 22px; margin-bottom:20px; border-left:5px solid #ffd54f; font-size:0.95em; line-height:1.55; }
+.task { background:#fff; color:#333; border-radius:20px; padding:24px; margin-bottom:16px; box-shadow:0 14px 40px rgba(0,0,0,0.25); }
+.task-num { display:inline-block; width:28px; height:28px; background:linear-gradient(135deg,#387633 0%,#259BD7 100%); color:#fff; border-radius:50%; text-align:center; line-height:28px; font-family:'Fredoka', sans-serif; font-weight:600; margin-right:8px; }
+.task h3 { font-family:'Fredoka', sans-serif; font-size:1.05em; display:inline; }
+.options { margin-top:14px; display:flex; flex-direction:column; gap:10px; }
+.option { background:#f5f7fb; border:2px solid transparent; padding:12px 16px; border-radius:10px; cursor:pointer; transition:all 0.2s; font-family:'Space Mono', monospace; font-size:0.92em; text-align:left; }
+.option:hover:not(.disabled) { background:#e8f5e9; border-color:#387633; }
+.option.correct { background:#d4edda; border-color:#28a745; color:#155724; }
+.option.wrong { background:#f8d7da; border-color:#dc3545; color:#721c24; }
+.option.disabled { cursor:not-allowed; }
+.feedback { margin-top:14px; padding:12px 16px; border-radius:10px; font-size:0.9em; line-height:1.5; }
+.feedback.correct { background:#d4edda; color:#155724; border-left:4px solid #28a745; }
+.feedback.wrong { background:#f8d7da; color:#721c24; border-left:4px solid #dc3545; }
+.done-banner { text-align:center; padding:20px; color:#fff; font-family:'Fredoka', sans-serif; font-size:1.1em; }
+</style>
+</head>
+<body>
+<div class="container">
+<div class="header"><div class="lesson-tag">Module 4 · Lesson 4.2 · Practical</div><h1>Hashing and Data Integrity</h1></div>
+<div class="scenario">Grace is reviewing how SafariPay currently stores customer passwords in its database.</div>
+<div id="tasks"></div>
+<div class="done-banner" id="doneBanner" style="display:none;">✅ Practical complete — you can move to the quiz.</div>
+</div>
+<script>
+const tasks = [{"prompt":"Grace wants to verify a downloaded software update file has not been tampered with in transit. What tool is designed exactly for this?","options":["Asymmetric encryption","Comparing a hash of the downloaded file against the publisher's published hash","A VPN","A firewall rule"],"correct":1,"explanation":"Hashing is specifically designed to detect any alteration \u2014 even a tiny change produces a completely different hash, revealing tampering."},{"prompt":"Grace discovers SafariPay currently stores customer passwords in plain, readable text in the database. What is the concern?","options":["No concern, as long as the database itself is otherwise secure","If the database is ever breached, attackers get immediately usable plaintext passwords instead of unusable hashes","Plain text storage is actually the industry-recommended approach","This only matters for administrator passwords, not customer ones"],"correct":1,"explanation":"Storing plaintext passwords means any database breach directly exposes usable passwords, unlike storing hashes which are not directly usable."},{"prompt":"Two SafariPay customers happen to use the identical password. Without salting, what would their stored password hashes look like?","options":["Completely different from each other, due to randomness","Identical to each other, since the identical input produces the identical hash without salting","They would not be hashed at all","This scenario cannot occur with hashing"],"correct":1,"explanation":"Without a unique salt added per password, identical inputs (identical passwords) always produce identical hashes \u2014 a real risk if not salted."}];
+function escapeHtml(s){return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
+function render(){
+  const c = document.getElementById('tasks');
+  c.innerHTML = tasks.map((t,i)=>`
+    <div class="task" id="task-${i}">
+      <div><span class="task-num">${i+1}</span><h3>${escapeHtml(t.prompt)}</h3></div>
+      <div class="options">
+        ${t.options.map((o,j)=>`<button class="option" onclick="answer(${i},${j})">${escapeHtml(o)}</button>`).join('')}
+      </div>
+    </div>`).join('');
+}
+function answer(i,j){
+  const task = tasks[i];
+  const el = document.getElementById('task-'+i);
+  const btns = el.querySelectorAll('.option');
+  if (btns[0].classList.contains('disabled')) return;
+  btns.forEach(b=>b.classList.add('disabled'));
+  btns[task.correct].classList.add('correct');
+  const right = j === task.correct;
+  if (!right) btns[j].classList.add('wrong');
+  const fb = document.createElement('div');
+  fb.className = 'feedback ' + (right?'correct':'wrong');
+  fb.innerHTML = '<strong>' + (right?'✅ Correct.':'❌ Not quite.') + '</strong><br>' + escapeHtml(task.explanation);
+  el.appendChild(fb);
+  if (i === tasks.length-1) document.getElementById('doneBanner').style.display='block';
+}
+render();
+</script>
+</body>
+</html>

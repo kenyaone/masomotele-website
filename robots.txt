@@ -1,24 +1,13 @@
+# Allow all robots to crawl everything
 User-agent: *
 Allow: /
-Allow: /wp-content/
 
-# Disallow private/admin pages
+# Disallow only admin areas
 Disallow: /wp-admin/
-Disallow: /wp-login.php
 Disallow: /wp-includes/
-Disallow: /cgi-bin/
-Disallow: /*.php$
-
-# Allow public PHP files
-Allow: /index.php
-Allow: /check-exam.php
-Allow: /verify-certificate-custom.php
-Allow: /send-inquiry.php
-
-# Crawl delay (optional, in seconds)
-Crawl-delay: 1
+Disallow: /wp-content/uploads/backup/
+Disallow: /wp-content/cache/
+Disallow: /admin/
 
 # Sitemaps
 Sitemap: https://masomoteletraining.co.ke/sitemap.xml
-Sitemap: https://masomoteletraining.co.ke/sitemap-courses.xml
-Sitemap: https://masomoteletraining.co.ke/sitemap-units.xml

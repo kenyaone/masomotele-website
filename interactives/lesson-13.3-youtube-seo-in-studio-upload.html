@@ -1,0 +1,513 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lesson 13.3 — YouTube SEO in Studio Upload (Interactive)</title>
+<style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: 'Roboto', 'Segoe UI', -apple-system, sans-serif; line-height: 1.55; color: #0f0f0f; background: #f9f9f9; min-height: 100vh; }
+    .container { max-width: 1200px; margin: 0 auto; padding: 20px; }
+    header {
+        background: linear-gradient(135deg, #2E7D32, #1B5E20);
+        color: #fff; padding: 40px 30px; border-radius: 12px; margin-bottom: 24px;
+        box-shadow: 0 10px 30px rgba(255,0,0,0.25);
+    }
+    header .badge { display: inline-block; background: rgba(255,255,255,0.2); padding: 4px 14px; border-radius: 16px; font-size: 12px; font-weight: bold; letter-spacing: 1px; margin-bottom: 14px; }
+    header h1 { font-size: 34px; margin-bottom: 8px; }
+    header .subtitle { font-size: 17px; opacity: 0.95; margin-bottom: 20px; }
+    .meta-strip { display: flex; flex-wrap: wrap; gap: 12px; }
+    .meta-strip span { background: rgba(255,255,255,0.18); padding: 6px 14px; border-radius: 20px; font-size: 13px; }
+    .toc { background: #fff; border: 1px solid #e5e5e5; border-radius: 10px; padding: 22px 26px; margin-bottom: 22px; }
+    .toc h3 { color: #ff0000; margin-bottom: 10px; }
+    .toc ol { padding-left: 20px; }
+    .toc a { color: #cc0000; text-decoration: none; font-weight: 600; }
+    section { background: #fff; border: 1px solid #e5e5e5; border-radius: 10px; padding: 26px 30px; margin-bottom: 22px; }
+    section h2 { color: #ff0000; font-size: 22px; margin-bottom: 12px; padding-bottom: 8px; border-bottom: 3px solid #ff0000; }
+    section h3 { color: #0f0f0f; font-size: 17px; margin: 18px 0 8px; }
+    section p { margin-bottom: 12px; }
+    section ul, section ol { padding-left: 22px; margin-bottom: 12px; }
+    section li { margin-bottom: 4px; }
+    .callout { border-left: 5px solid #ff0000; background: #fff1f1; padding: 14px 18px; margin: 14px 0; border-radius: 4px; }
+    .callout.warn { border-left-color: #d97706; background: #fef3c7; }
+    .callout.tip { border-left-color: #059669; background: #ecfdf5; }
+    .callout strong { color: #cc0000; }
+    .callout.warn strong { color: #92400e; }
+    .callout.tip strong { color: #065f46; }
+
+    /* Studio upload mock */
+    .upload-shell { background: #fff; border: 1px solid #e5e5e5; border-radius: 10px; overflow: hidden; margin: 14px 0; }
+    .upload-top { background: #0f0f0f; color: #fff; padding: 12px 20px; display: flex; justify-content: space-between; align-items: center; }
+    .upload-top .title { font-weight: 600; }
+    .upload-top .steps { font-size: 12.5px; color: #aaa; }
+    .upload-grid { display: grid; grid-template-columns: 1.4fr 1fr; gap: 0; min-height: 500px; }
+    @media (max-width: 800px) { .upload-grid { grid-template-columns: 1fr; } }
+    .upload-form { padding: 22px 24px; border-right: 1px solid #e5e5e5; background: #fff; }
+    .upload-side { padding: 22px 24px; background: #fafafa; }
+
+    .u-field { margin-bottom: 18px; }
+    .u-field .lbl { font-size: 13px; font-weight: 600; color: #0f0f0f; margin-bottom: 4px; display: flex; justify-content: space-between; }
+    .u-field .lbl .req { color: #dc2626; font-size: 11px; }
+    .u-field .counter { font-size: 11px; color: #606060; font-weight: 400; }
+    .u-field input[type="text"], .u-field textarea, .u-field select { width: 100%; padding: 10px 12px; border: 1px solid #ccc; border-radius: 6px; font-size: 14px; font-family: inherit; background: #fff; }
+    .u-field textarea { min-height: 130px; resize: vertical; font-family: 'Roboto', sans-serif; }
+    .u-field .hint { font-size: 12px; color: #606060; margin-top: 4px; }
+    .u-field.warn-badge .lbl::after { content: 'DEPRECATED'; color: #d97706; font-size: 10px; background: #fef3c7; padding: 2px 6px; border-radius: 3px; font-weight: 700; margin-left: 6px; }
+
+    .desc-highlight { position: relative; }
+    .desc-highlight .first150 { display: none; }
+
+    /* Thumbnail options */
+    .thumb-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; margin-top: 6px; }
+    @media (max-width: 500px) { .thumb-grid { grid-template-columns: 1fr; } }
+    .thumb-opt { border: 2px solid #e5e5e5; border-radius: 8px; padding: 6px; cursor: pointer; background: #fff; transition: all 0.15s; }
+    .thumb-opt:hover { border-color: #ff0000; }
+    .thumb-opt.active { border-color: #ff0000; background: #fff1f1; }
+    .thumb-opt .t-img { aspect-ratio: 16/9; border-radius: 5px; display: flex; align-items: center; justify-content: center; color: #fff; font-weight: 700; font-size: 12px; text-align: center; padding: 6px; }
+    .thumb-opt.a .t-img { background: linear-gradient(135deg, #8b1e1e, #d4a34a); }
+    .thumb-opt.b .t-img { background: linear-gradient(135deg, #d97706, #7c2d12); }
+    .thumb-opt.c .t-img { background: linear-gradient(135deg, #059669, #0f172a); }
+    .thumb-opt .t-label { font-size: 11px; color: #0f0f0f; margin-top: 4px; text-align: center; font-weight: 600; }
+    .thumb-opt .ctr { font-size: 11px; color: #059669; font-weight: 700; margin-top: 2px; text-align: center; }
+
+    /* Chapters */
+    .chapter-list { border: 1px solid #e5e5e5; border-radius: 6px; overflow: hidden; }
+    .chapter-row { display: grid; grid-template-columns: 80px 1fr; padding: 8px 12px; border-bottom: 1px solid #f2f2f2; font-size: 13px; background: #fff; }
+    .chapter-row:last-child { border-bottom: 0; }
+    .chapter-row .ts { color: #cc0000; font-family: 'Courier New', monospace; font-weight: 700; }
+    .chapter-row.warn-ts { background: #fef3c7; }
+
+    /* SEO Score panel */
+    .seo-panel { background: #fff; border: 2px solid #e5e5e5; border-radius: 10px; padding: 18px; margin-top: 4px; }
+    .seo-panel h4 { font-size: 15px; color: #0f0f0f; margin-bottom: 10px; display: flex; align-items: center; justify-content: space-between; }
+    .seo-score { display: flex; align-items: center; gap: 12px; margin-bottom: 14px; }
+    .score-circle { width: 72px; height: 72px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 22px; font-weight: 700; color: #fff; flex-shrink: 0; transition: background 0.3s; background: #606060; }
+    .score-circle.red { background: #dc2626; }
+    .score-circle.yellow { background: #d97706; }
+    .score-circle.green { background: #059669; }
+    .score-label { font-size: 14px; color: #0f0f0f; }
+    .score-label .band { font-weight: 700; }
+    .seo-checklist { list-style: none; padding: 0; margin: 0; font-size: 13px; }
+    .seo-checklist li { display: flex; align-items: flex-start; gap: 8px; padding: 6px 0; border-bottom: 1px solid #f2f2f2; }
+    .seo-checklist li:last-child { border-bottom: 0; }
+    .seo-checklist .marker { flex-shrink: 0; width: 18px; height: 18px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 700; color: #fff; }
+    .seo-checklist .marker.red { background: #dc2626; }
+    .seo-checklist .marker.yellow { background: #d97706; }
+    .seo-checklist .marker.green { background: #059669; }
+    .seo-checklist .marker.grey { background: #606060; }
+
+    /* Preview card */
+    .serp-preview { background: #fff; border: 1px solid #e5e5e5; border-radius: 8px; padding: 12px; margin-top: 12px; }
+    .serp-preview h5 { font-size: 12px; color: #606060; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 8px; }
+    .serp-card { display: grid; grid-template-columns: 168px 1fr; gap: 12px; align-items: start; }
+    @media (max-width: 500px) { .serp-card { grid-template-columns: 1fr; } }
+    .serp-card .serp-thumb { aspect-ratio: 16/9; background: linear-gradient(135deg, #8b1e1e, #d4a34a); border-radius: 8px; color: #fff; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 12px; padding: 8px; text-align: center; }
+    .serp-card .serp-title { font-size: 15px; color: #0f0f0f; font-weight: 600; line-height: 1.3; margin-bottom: 3px; }
+    .serp-card .serp-meta { font-size: 12.5px; color: #606060; margin-bottom: 4px; }
+    .serp-card .serp-desc { font-size: 12.5px; color: #606060; line-height: 1.35; }
+
+    /* Auto-mark challenge */
+    .challenge { background: #f2f2f2; border: 1.5px solid #e5e5e5; border-radius: 10px; padding: 18px; margin: 14px 0; }
+    .challenge h4 { color: #0f0f0f; font-size: 16px; margin-bottom: 8px; }
+    .challenge .goal { background: #fff; border-left: 4px solid #ff0000; padding: 10px 14px; font-size: 13.5px; margin-bottom: 12px; }
+    .challenge .actions { margin-top: 12px; }
+    .challenge .result { display: none; margin-top: 12px; padding: 14px; border-radius: 8px; font-size: 14px; }
+    .challenge .result.show { display: block; }
+    .challenge .result.good { background: #d1fae5; color: #065f46; border-left: 4px solid #059669; }
+    .challenge .result.mid { background: #fef3c7; color: #92400e; border-left: 4px solid #d97706; }
+    .challenge .result.bad { background: #fee2e2; color: #991b1b; border-left: 4px solid #dc2626; }
+
+    button.btn { background: #ff0000; color: #fff; border: none; padding: 10px 20px; border-radius: 6px; font-size: 14px; font-weight: 600; cursor: pointer; }
+    button.btn:hover { background: #cc0000; }
+    button.btn.reset { background: #606060; margin-left: 8px; }
+
+    footer { text-align: center; color: #606060; padding: 24px; font-size: 13px; }
+
+    /* MTTI logo stamp */
+    .mtti-logo-stamp {
+        position: fixed; top: 14px; right: 18px; z-index: 999;
+        opacity: 0.88; transition: opacity 0.2s;
+    }
+    .mtti-logo-stamp:hover { opacity: 1; }
+    .mtti-logo-stamp img { width: 56px; height: 56px; border-radius: 50%; box-shadow: 0 2px 8px rgba(0,0,0,0.18); }
+</style>
+</head>
+<body>
+<div class="mtti-logo-stamp">
+    <img src="../../Resources/Logo.jpeg" alt="MTTI" title="Masomotele Technical Training Institute — Start learning, Start earning">
+</div>
+
+<div class="container">
+
+<header>
+    <div class="badge">LESSON 13.3  ·  YOUTUBE MARKETING  ·  INTERACTIVE</div>
+    <h1>YouTube SEO — Studio Upload Panel</h1>
+    <div class="subtitle">Fill Sarah's Video Details for "How to order lunch delivery in Eldoret". Watch the live SEO score climb from red to green as each field is polished.</div>
+    <div class="meta-strip">
+        <span><strong>Duration:</strong> ~40 min interactive</span>
+        <span><strong>Level:</strong> Intermediate</span>
+        <span><strong>Tool:</strong> studio.youtube.com</span>
+        <span><strong>Handbook:</strong> Module 13, §13.3</span>
+    </div>
+</header>
+
+<div class="toc">
+    <h3>What you'll do in this lesson</h3>
+    <ol>
+        <li><a href="#s1">The full Video Details panel — mock Studio</a></li>
+        <li><a href="#s2">Thumbnail CTR estimator (3 options)</a></li>
+        <li><a href="#s3">Chapters — why the first must be 0:00</a></li>
+        <li><a href="#s4"><strong>Real-time SEO Score (Yoast-style)</strong></a></li>
+        <li><a href="#s5"><strong>Auto-mark challenge — publish or rewrite?</strong></a></li>
+    </ol>
+</div>
+
+<section id="s1">
+    <h2>1. Studio &rarr; Video Details</h2>
+    <p>This is roughly what Sarah sees after she uploads her raw video. Every field influences ranking. Edit any input on the left — the SEO score on the right updates live.</p>
+
+    <div class="upload-shell">
+        <div class="upload-top">
+            <div class="title">Video details</div>
+            <div class="steps">Step 1 of 4 &nbsp;·&nbsp; Details / Video elements / Checks / Visibility</div>
+        </div>
+        <div class="upload-grid">
+            <div class="upload-form">
+                <div class="u-field">
+                    <div class="lbl"><span>Title (required) <span class="req">REQ</span></span><span class="counter"><span id="tCount">0</span> / 100</span></div>
+                    <input type="text" id="fTitle" value="How to order lunch delivery in Eldoret — under 30 min" oninput="scoreSEO()">
+                    <div class="hint">Front-load the primary keyword. YouTube truncates after ~70 characters on mobile.</div>
+                </div>
+
+                <div class="u-field">
+                    <div class="lbl"><span>Description</span><span class="counter"><span id="dCount">0</span> chars &nbsp;·&nbsp; first <span id="dFirst150">0</span>/150 shown in SERP</span></div>
+                    <textarea id="fDesc" oninput="scoreSEO()">Order fresh Kenyan lunch delivery in Eldoret from Karibu Kitchen — hot ugali, mbuzi, kuku, veg delivered in under 30 minutes across Kapsoya, Elgon View, and the CBD. WhatsApp us to order.
+
+In this video I walk you through the whole flow — how our menu updates each morning, how you place an order via WhatsApp, and how the rider brings hot food to your desk.
+
+Chapters:
+0:00 Intro — who we are
+0:45 Today's menu
+1:30 How to WhatsApp your order
+2:15 The 30-minute delivery promise
+2:45 Elgon View, Kapsoya, CBD map
+
+Website: https://karibukitchen.co.ke
+WhatsApp: +254 700 000 000
+Instagram: @karibukitchen
+
+#EldoretLunch #KaribuKitchen #LunchDelivery</textarea>
+                    <div class="hint">First 150 characters appear in Search results and Suggested. Write them like a Google meta description.</div>
+                </div>
+
+                <div class="u-field">
+                    <div class="lbl">Thumbnail (choose one — CTR estimate shown)</div>
+                    <div class="thumb-grid">
+                        <div class="thumb-opt a active" onclick="pickThumb('a', this)"><div class="t-img">LUNCH IN 30 MIN<br>&larr; Sarah smiling</div><div class="t-label">Face + text</div><div class="ctr">Est. CTR 8.4%</div></div>
+                        <div class="thumb-opt b" onclick="pickThumb('b', this)"><div class="t-img">plated ugali<br>+ beef stew</div><div class="t-label">Food only</div><div class="ctr" style="color:#d97706;">Est. CTR 4.1%</div></div>
+                        <div class="thumb-opt c" onclick="pickThumb('c', this)"><div class="t-img">Karibu Kitchen<br>logo</div><div class="t-label">Logo only</div><div class="ctr" style="color:#dc2626;">Est. CTR 1.9%</div></div>
+                    </div>
+                    <div class="hint">Face + bold text beats food-only beats logo-only. YouTube's own research.</div>
+                </div>
+
+                <div class="u-field">
+                    <div class="lbl">Playlist</div>
+                    <select id="fPlaylist" onchange="scoreSEO()">
+                        <option>-- Select playlist --</option>
+                        <option selected>Delivery Diaries</option>
+                        <option>Fresh Recipes</option>
+                        <option>Behind the Kitchen</option>
+                    </select>
+                    <div class="hint">Every video should join a playlist. Playlists rank in Search on their own.</div>
+                </div>
+
+                <div class="u-field warn-badge">
+                    <div class="lbl"><span>Tags</span></div>
+                    <input type="text" id="fTags" value="lunch delivery Eldoret, Karibu Kitchen, Kenyan lunch, food delivery Kenya, Eldoret restaurants, ugali delivery, WhatsApp lunch order, Kapsoya food delivery, Elgon View lunch, office lunch Eldoret" oninput="scoreSEO()">
+                    <div class="hint">Officially deprecated as a strong signal — still helps the classifier place your video in the Suggested queue. 10–15 honest tags.</div>
+                </div>
+
+                <div class="u-field">
+                    <div class="lbl">Chapters (min 3, first at 0:00)</div>
+                    <div class="chapter-list">
+                        <div class="chapter-row"><span class="ts">0:00</span><span>Intro — who we are</span></div>
+                        <div class="chapter-row"><span class="ts">0:45</span><span>Today's menu</span></div>
+                        <div class="chapter-row"><span class="ts">1:30</span><span>How to WhatsApp your order</span></div>
+                        <div class="chapter-row"><span class="ts">2:15</span><span>The 30-minute delivery promise</span></div>
+                        <div class="chapter-row"><span class="ts">2:45</span><span>Elgon View, Kapsoya, CBD map</span></div>
+                    </div>
+                    <div class="hint">YouTube auto-parses chapter timestamps from the description. Must start at 0:00.</div>
+                </div>
+            </div>
+
+            <div class="upload-side">
+                <div class="seo-panel">
+                    <h4>SEO Score <span id="scoreBadge" style="font-size:12px; background:#f2f2f2; padding:3px 8px; border-radius:12px;">live</span></h4>
+                    <div class="seo-score">
+                        <div class="score-circle" id="scoreCircle">--</div>
+                        <div class="score-label">
+                            <div class="band" id="scoreBand">Fill the fields</div>
+                            <div style="font-size:12.5px; color:#606060; margin-top:2px;" id="scoreSub">Every field influences ranking.</div>
+                        </div>
+                    </div>
+                    <ul class="seo-checklist" id="seoList"></ul>
+                </div>
+
+                <div class="serp-preview">
+                    <h5>Search preview</h5>
+                    <div class="serp-card">
+                        <div class="serp-thumb" id="previewThumb">LUNCH IN 30 MIN</div>
+                        <div>
+                            <div class="serp-title" id="previewTitle">How to order lunch delivery in Eldoret</div>
+                            <div class="serp-meta">Karibu Kitchen &nbsp;·&nbsp; 3:12 &nbsp;·&nbsp; 1.2K views</div>
+                            <div class="serp-desc" id="previewDesc">Order fresh Kenyan lunch delivery in Eldoret from Karibu Kitchen...</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<section id="s2">
+    <h2>2. Thumbnail — the biggest lever after title</h2>
+    <p>Thumbnails carry more ranking weight than tags, description, or chapters. Only the title matters more.</p>
+    <ol>
+        <li>Upload at <strong>1280 &times; 720</strong>, 16:9, under 2 MB.</li>
+        <li><strong>High-contrast face or hero object.</strong> Face-forward thumbnails beat text-only on average.</li>
+        <li>On-screen text no more than 4-5 words. Legible on a phone in bright sunlight.</li>
+        <li><strong>Brand colour consistency</strong> across every thumbnail in the channel. Sarah's is maroon + cream.</li>
+    </ol>
+    <div class="callout tip">
+        <strong>The sunlight test:</strong> If Sarah cannot read the thumbnail text on her phone stepping outside her Eldoret kitchen at noon, she rewrites it.
+    </div>
+</section>
+
+<section id="s3">
+    <h2>3. Chapters — first must be 0:00</h2>
+    <p>YouTube auto-parses chapter markers from the description. It requires three rules or it silently ignores them:</p>
+    <ul>
+        <li>First timestamp must be exactly <code>0:00</code></li>
+        <li>Minimum three chapters</li>
+        <li>Each chapter at least 10 seconds long</li>
+    </ul>
+    <div class="callout warn">
+        <strong>Common bug:</strong> creators start chapters at <code>0:05</code> or <code>0:12</code>. YouTube then drops chapter parsing entirely. Sarah's video starts at 0:00 &#10003;.
+    </div>
+</section>
+
+<section id="s4">
+    <h2>4. Real-time SEO Score panel</h2>
+    <p>The SEO Score in the top-right of the Studio mock updates as you edit fields on the left. Scroll back up and try:</p>
+    <ul>
+        <li>Delete the title &rarr; watch the score drop to red.</li>
+        <li>Change the title to <em>My video</em> (no keyword) &rarr; still red, different reason.</li>
+        <li>Delete tags &rarr; yellow.</li>
+        <li>Restore the description &rarr; green.</li>
+    </ul>
+    <div class="callout">
+        <strong>Green does not mean best.</strong> It means every checklist item is present. Great SEO on YouTube also needs a strong hook in the first 8 seconds and a thumbnail that stops the scroll.
+    </div>
+</section>
+
+<section id="s5">
+    <h2>5. Auto-mark challenge — publish or rewrite?</h2>
+    <p>Look at the current SEO score above. Answer the two questions below then click <em>Auto-mark my decision</em>.</p>
+
+    <div class="challenge">
+        <h4>Scenario</h4>
+        <div class="goal">Sarah's target: rank top 3 in Kenya for "lunch delivery Eldoret" within 8 weeks. Video length 3:12. Publish date: Wednesday 12:00 EAT.</div>
+
+        <div style="margin-bottom:14px;">
+            <div style="font-weight:600; margin-bottom:6px; font-size:14px;">Q1. Based on the current SEO score above, should Sarah publish?</div>
+            <label style="display:block; padding:6px 0;"><input type="radio" name="q1" value="publish"> Publish now — score is green.</label>
+            <label style="display:block; padding:6px 0;"><input type="radio" name="q1" value="rewrite"> Rewrite the title to drop the primary keyword — it's too long.</label>
+            <label style="display:block; padding:6px 0;"><input type="radio" name="q1" value="delay"> Delay publish, upload a face-forward thumbnail (option A) if not already chosen.</label>
+        </div>
+
+        <div style="margin-bottom:14px;">
+            <div style="font-weight:600; margin-bottom:6px; font-size:14px;">Q2. Which single field, if left blank, would drop the score furthest?</div>
+            <label style="display:block; padding:6px 0;"><input type="radio" name="q2" value="tags"> Tags — deprecated.</label>
+            <label style="display:block; padding:6px 0;"><input type="radio" name="q2" value="title"> Title — the primary ranking signal.</label>
+            <label style="display:block; padding:6px 0;"><input type="radio" name="q2" value="playlist"> Playlist — optional metadata.</label>
+        </div>
+
+        <div class="actions">
+            <button class="btn" onclick="markChallenge()">Auto-mark my decision</button>
+            <button class="btn reset" onclick="resetChallenge()">Reset</button>
+        </div>
+        <div class="result" id="challengeResult"></div>
+    </div>
+</section>
+
+<footer>
+    <p>Lesson 13.3 — YouTube SEO · Masomotele Technical Training Institute · Module 13, §13.3</p>
+    <p>Next: <strong>Lesson 13.4 — Long-form vs Shorts Strategy</strong></p>
+</footer>
+</div>
+
+<script>
+let currentThumb = 'a';
+const thumbData = {
+    a: { text: 'LUNCH IN 30 MIN', bg: 'linear-gradient(135deg, #8b1e1e, #d4a34a)', ctr: 8.4 },
+    b: { text: 'PLATED FOOD', bg: 'linear-gradient(135deg, #d97706, #7c2d12)', ctr: 4.1 },
+    c: { text: 'KARIBU KITCHEN LOGO', bg: 'linear-gradient(135deg, #059669, #0f172a)', ctr: 1.9 }
+};
+
+function pickThumb(t, el) {
+    currentThumb = t;
+    document.querySelectorAll('.thumb-opt').forEach(o => o.classList.remove('active'));
+    el.classList.add('active');
+    const p = document.getElementById('previewThumb');
+    p.textContent = thumbData[t].text;
+    p.style.background = thumbData[t].bg;
+    scoreSEO();
+}
+
+function scoreSEO() {
+    const title = document.getElementById('fTitle').value;
+    const desc = document.getElementById('fDesc').value;
+    const tags = document.getElementById('fTags').value;
+    const playlist = document.getElementById('fPlaylist').value;
+
+    document.getElementById('tCount').textContent = title.length;
+    document.getElementById('dCount').textContent = desc.length;
+    document.getElementById('dFirst150').textContent = Math.min(desc.length, 150);
+
+    const primaryKw = 'lunch delivery';
+    const secondaryKw = 'eldoret';
+    const brand = 'karibu kitchen';
+
+    // Checks
+    const checks = [];
+
+    // 1. Title present + keyword at start + under 70 chars
+    if (!title) checks.push({ label: 'Title is present', state: 'red' });
+    else if (title.length > 100) checks.push({ label: 'Title fits 100-char limit', state: 'red' });
+    else {
+        const front = title.slice(0, 40).toLowerCase();
+        if (front.includes(primaryKw)) checks.push({ label: 'Primary keyword "lunch delivery" appears in first 40 chars', state: 'green' });
+        else if (title.toLowerCase().includes(primaryKw)) checks.push({ label: 'Primary keyword present but not front-loaded', state: 'yellow' });
+        else checks.push({ label: 'Primary keyword "lunch delivery" missing from title', state: 'red' });
+    }
+
+    // 2. Title length sweet spot (40-70)
+    if (title.length >= 40 && title.length <= 70) checks.push({ label: 'Title length 40–70 chars — mobile-safe', state: 'green' });
+    else if (title.length > 0 && title.length < 40) checks.push({ label: 'Title short (<40 chars) — add emotional hook', state: 'yellow' });
+    else if (title.length > 70) checks.push({ label: 'Title >70 chars — will truncate on mobile', state: 'yellow' });
+    else checks.push({ label: 'Title length', state: 'grey' });
+
+    // 3. Description length
+    if (desc.length >= 250) checks.push({ label: 'Description is 250+ chars — enough for classifier', state: 'green' });
+    else if (desc.length >= 150) checks.push({ label: 'Description present but under 250 chars', state: 'yellow' });
+    else if (desc.length > 0) checks.push({ label: 'Description too short — add chapters, links, hashtags', state: 'red' });
+    else checks.push({ label: 'Description missing', state: 'red' });
+
+    // 4. First 150 chars of description contain keyword
+    const first150 = desc.slice(0, 150).toLowerCase();
+    if (first150.includes(primaryKw) && first150.includes(secondaryKw)) checks.push({ label: 'First 150 chars contain primary keyword + Eldoret', state: 'green' });
+    else if (first150.includes(primaryKw)) checks.push({ label: 'First 150 chars have keyword — add "Eldoret" too', state: 'yellow' });
+    else checks.push({ label: 'First 150 chars missing keyword — visible in SERP!', state: 'red' });
+
+    // 5. Chapters
+    if (desc.includes('0:00')) checks.push({ label: 'Chapters start at 0:00', state: 'green' });
+    else checks.push({ label: 'Chapters missing or not starting at 0:00', state: 'red' });
+
+    // 6. Links in description
+    const linkCount = (desc.match(/https?:\/\//g) || []).length;
+    if (linkCount >= 2) checks.push({ label: 'At least 2 links in description', state: 'green' });
+    else if (linkCount === 1) checks.push({ label: 'Only 1 link — add website + WhatsApp + socials', state: 'yellow' });
+    else checks.push({ label: 'No links in description', state: 'red' });
+
+    // 7. Hashtags
+    const hashtags = (desc.match(/#\w+/g) || []).length;
+    if (hashtags >= 3) checks.push({ label: 'Hashtags present (' + hashtags + ')', state: 'green' });
+    else if (hashtags > 0) checks.push({ label: 'Only ' + hashtags + ' hashtag — target 3', state: 'yellow' });
+    else checks.push({ label: 'No hashtags', state: 'yellow' });
+
+    // 8. Tags
+    const tagList = tags.split(',').map(t => t.trim()).filter(Boolean);
+    if (tagList.length >= 10 && tagList.length <= 15) checks.push({ label: 'Tags 10–15 (' + tagList.length + ')', state: 'green' });
+    else if (tagList.length > 0) checks.push({ label: 'Tags: ' + tagList.length + ' — target 10–15', state: 'yellow' });
+    else checks.push({ label: 'No tags filled', state: 'yellow' });
+
+    // 9. Playlist
+    if (playlist && !playlist.startsWith('--')) checks.push({ label: 'Playlist assigned', state: 'green' });
+    else checks.push({ label: 'No playlist selected', state: 'yellow' });
+
+    // 10. Thumbnail CTR
+    if (currentThumb === 'a') checks.push({ label: 'Face-forward thumbnail (est CTR 8.4%)', state: 'green' });
+    else if (currentThumb === 'b') checks.push({ label: 'Food-only thumbnail (CTR 4.1%) — try face', state: 'yellow' });
+    else checks.push({ label: 'Logo-only thumbnail (CTR 1.9%) — huge miss', state: 'red' });
+
+    // Score: green=10, yellow=5, red=0
+    let score = 0;
+    checks.forEach(c => {
+        if (c.state === 'green') score += 10;
+        else if (c.state === 'yellow') score += 5;
+    });
+    const maxScore = checks.length * 10;
+    const pct = Math.round((score / maxScore) * 100);
+
+    // Render checklist
+    const list = document.getElementById('seoList');
+    list.innerHTML = checks.map(c => {
+        const icon = c.state === 'green' ? '&#10003;' : c.state === 'red' ? '&#10007;' : c.state === 'yellow' ? '!' : '?';
+        return '<li><span class="marker ' + c.state + '">' + icon + '</span><span>' + c.label + '</span></li>';
+    }).join('');
+
+    const circle = document.getElementById('scoreCircle');
+    const band = document.getElementById('scoreBand');
+    const sub = document.getElementById('scoreSub');
+    circle.className = 'score-circle';
+    circle.textContent = pct;
+    if (pct >= 80) { circle.classList.add('green'); band.textContent = 'GREEN — publish-ready'; sub.textContent = 'Score: ' + score + ' / ' + maxScore + '. Every ranking signal is present.'; }
+    else if (pct >= 55) { circle.classList.add('yellow'); band.textContent = 'YELLOW — polish first'; sub.textContent = 'Score: ' + score + ' / ' + maxScore + '. Fix yellow items before publish.'; }
+    else { circle.classList.add('red'); band.textContent = 'RED — do not publish'; sub.textContent = 'Score: ' + score + ' / ' + maxScore + '. Critical fields missing.'; }
+
+    // Preview
+    document.getElementById('previewTitle').textContent = title || '(title missing)';
+    document.getElementById('previewDesc').textContent = desc.slice(0, 150).replace(/\n/g, ' ') + (desc.length > 150 ? '...' : '');
+}
+
+function markChallenge() {
+    const q1 = document.querySelector('input[name="q1"]:checked');
+    const q2 = document.querySelector('input[name="q2"]:checked');
+    const box = document.getElementById('challengeResult');
+    box.classList.remove('good','mid','bad','show');
+
+    if (!q1 || !q2) {
+        box.classList.add('bad','show');
+        box.innerHTML = '<strong>Answer both questions first.</strong>';
+        return;
+    }
+
+    let correct = 0;
+    let feedback = '';
+    if (q1.value === 'publish') { correct++; feedback += '<p><strong>Q1 &#10003;</strong> Correct. With the SEO score green and thumbnail A picked, publish. Every extra day of delay is lost watch-time compounding.</p>'; }
+    else if (q1.value === 'rewrite') { feedback += '<p><strong>Q1 &#10007;</strong> Wrong. Title is 55 chars — well under the 70-char mobile cutoff. Do not drop the keyword.</p>'; }
+    else { feedback += '<p><strong>Q1 &#10007;</strong> Partially right for a red score, but thumbnail A was already chosen by default. No delay needed.</p>'; }
+
+    if (q2.value === 'title') { correct++; feedback += '<p><strong>Q2 &#10003;</strong> Correct. Title is the single biggest ranking signal. Missing keyword in title = missing from Search entirely.</p>'; }
+    else if (q2.value === 'tags') { feedback += '<p><strong>Q2 &#10007;</strong> Wrong. Tags are deprecated as a strong signal — they help placement, not ranking.</p>'; }
+    else { feedback += '<p><strong>Q2 &#10007;</strong> Wrong. Playlist affects discoverability, not the SERP score.</p>'; }
+
+    let cls, headline;
+    if (correct === 2) { cls = 'good'; headline = 'Perfect. 2/2. Sarah publishes today.'; }
+    else if (correct === 1) { cls = 'mid'; headline = '1/2. Half right — re-read the SEO panel and try again.'; }
+    else { cls = 'bad'; headline = '0/2. Return to §1 and watch the SEO score behaviour.'; }
+
+    box.classList.add(cls, 'show');
+    box.innerHTML = '<strong>' + headline + '</strong>' + feedback;
+    box.scrollIntoView({ behavior: 'smooth', block: 'center' });
+}
+
+function resetChallenge() {
+    document.querySelectorAll('.challenge input[type="radio"]').forEach(r => r.checked = false);
+    document.getElementById('challengeResult').classList.remove('show','good','mid','bad');
+}
+
+scoreSEO();
+</script>
+</body>
+</html>

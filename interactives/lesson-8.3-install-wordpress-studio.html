@@ -1,0 +1,455 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lesson 8.3 — Install WordPress Studio (Interactive)</title>
+<style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: 'Segoe UI', -apple-system, sans-serif; line-height: 1.55; color: #1e293b; background: #f8fafc; min-height: 100vh; }
+    .container { max-width: 1150px; margin: 0 auto; padding: 20px; }
+    header {
+        background: linear-gradient(135deg, #2E7D32, #1B5E20);
+        color: #fff; padding: 40px 30px; border-radius: 12px; margin-bottom: 24px;
+        box-shadow: 0 10px 30px rgba(0,0,0,0.35);
+        border: 1px solid #0073aa;
+    }
+    header .badge { display: inline-block; background: #0073aa; padding: 4px 14px; border-radius: 16px; font-size: 12px; font-weight: bold; letter-spacing: 1px; margin-bottom: 14px; }
+    header h1 { font-size: 34px; margin-bottom: 8px; color: #fff; }
+    header .subtitle { font-size: 17px; opacity: 0.95; margin-bottom: 20px; color: #d1d5db; }
+    .meta-strip { display: flex; flex-wrap: wrap; gap: 12px; }
+    .meta-strip span { background: rgba(0,115,170,0.35); padding: 6px 14px; border-radius: 20px; font-size: 13px; color: #fff; border: 1px solid #0073aa; }
+    .toc { background: #fff; border: 1px solid #e2e8f0; border-radius: 10px; padding: 22px 26px; margin-bottom: 22px; }
+    .toc h3 { color: #0073aa; margin-bottom: 10px; }
+    .toc ol { padding-left: 20px; }
+    .toc a { color: #0073aa; text-decoration: none; font-weight: 600; }
+    section { background: #fff; border: 1px solid #e2e8f0; border-radius: 10px; padding: 26px 30px; margin-bottom: 22px; }
+    section h2 { color: #0073aa; font-size: 22px; margin-bottom: 12px; padding-bottom: 8px; border-bottom: 3px solid #0073aa; }
+    section h3 { color: #1e293b; font-size: 17px; margin: 18px 0 8px; }
+    section p { margin-bottom: 12px; }
+    section ul, section ol { padding-left: 22px; margin-bottom: 12px; }
+    section li { margin-bottom: 4px; }
+    .callout { border-left: 5px solid #0073aa; background: #eaf3fb; padding: 14px 18px; margin: 14px 0; border-radius: 4px; }
+    .callout.warn { border-left-color: #dc2626; background: #fef2f2; }
+    .callout.tip { border-left-color: #059669; background: #ecfdf5; }
+    .callout strong { color: #0073aa; }
+
+    /* Wizard */
+    .wizard {
+        background: linear-gradient(180deg, #1e1e1e 0%, #2a2a2a 100%);
+        border-radius: 12px; border: 1px solid #444;
+        padding: 30px; margin: 16px 0; color: #e5e7eb;
+        box-shadow: 0 10px 30px rgba(0,0,0,0.35);
+    }
+    .wizard-steps { display: flex; justify-content: space-between; margin-bottom: 24px; }
+    .wstep { flex: 1; text-align: center; color: #6b7280; font-size: 12px; }
+    .wstep .num {
+        width: 32px; height: 32px; border-radius: 50%;
+        background: #3b3b3b; border: 2px solid #52525b;
+        display: flex; align-items: center; justify-content: center;
+        margin: 0 auto 6px; font-weight: 700; color: #9ca3af;
+    }
+    .wstep.active .num { background: #0073aa; border-color: #0073aa; color: #fff; }
+    .wstep.done .num { background: #16a34a; border-color: #16a34a; color: #fff; }
+    .wstep.active { color: #fff; font-weight: 600; }
+
+    /* OS picker */
+    .os-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 12px; margin: 14px 0; }
+    @media (max-width: 800px) { .os-grid { grid-template-columns: 1fr; } }
+    .os-btn {
+        background: #2a2a2a; border: 2px solid #444; color: #e5e7eb;
+        padding: 20px; border-radius: 10px; cursor: pointer;
+        text-align: center; transition: 0.15s;
+    }
+    .os-btn:hover { border-color: #0073aa; background: #383838; }
+    .os-btn.selected { border-color: #0073aa; background: rgba(0,115,170,0.15); }
+    .os-btn .logo { font-size: 42px; margin-bottom: 8px; }
+    .os-btn h4 { color: #fff; font-size: 18px; margin-bottom: 4px; }
+    .os-btn .file { font-family: 'Courier New', monospace; font-size: 12px; color: #0073aa; }
+    .os-btn .size { font-size: 11px; color: #9ca3af; margin-top: 4px; }
+
+    /* Verification card */
+    .verify-card {
+        background: #2a2a2a; border: 1px solid #444; border-radius: 10px;
+        padding: 18px; color: #e5e7eb; margin: 14px 0;
+    }
+    .verify-card h4 { color: #fff; margin-bottom: 12px; font-size: 16px; display: flex; align-items: center; gap: 8px; }
+    .verify-row { display: grid; grid-template-columns: 140px 1fr; gap: 10px; padding: 8px 0; border-bottom: 1px solid #3b3b3b; font-size: 13px; }
+    .verify-row .k { color: #9ca3af; }
+    .verify-row .v { color: #e5e7eb; font-family: 'Courier New', monospace; word-break: break-all; }
+    .verified { color: #16a34a; font-weight: 700; }
+
+    /* Timeline */
+    .timeline { position: relative; padding: 0 0 0 30px; margin: 14px 0; }
+    .timeline::before {
+        content: ''; position: absolute; left: 8px; top: 8px; bottom: 8px;
+        width: 2px; background: #0073aa;
+    }
+    .ti { position: relative; padding: 10px 0 10px 20px; }
+    .ti::before {
+        content: ''; position: absolute; left: -30px; top: 14px;
+        width: 18px; height: 18px; border-radius: 50%;
+        background: #0073aa; border: 3px solid #1e1e1e;
+    }
+    .ti h5 { color: #fff; font-size: 14px; margin-bottom: 4px; }
+    .ti p { color: #9ca3af; font-size: 13px; margin: 0; }
+
+    /* Reorder challenge */
+    .reorder-area { background: #f8fafc; border: 2px solid #cbd5e1; border-radius: 10px; padding: 16px; margin: 14px 0; }
+    .step-card {
+        background: #fff; border: 2px solid #cbd5e1; border-radius: 8px;
+        padding: 12px 14px; margin: 6px 0; cursor: move;
+        display: flex; align-items: center; gap: 12px; font-size: 14px;
+        user-select: none;
+    }
+    .step-card:hover { border-color: #0073aa; background: #eaf3fb; }
+    .step-card.dragging { opacity: 0.4; }
+    .step-card .grip { color: #9ca3af; font-size: 18px; cursor: grab; }
+    .step-card .up-down { margin-left: auto; display: flex; gap: 4px; }
+    .step-card button {
+        background: #eaf3fb; border: 1px solid #0073aa; color: #0073aa;
+        width: 28px; height: 28px; border-radius: 4px; cursor: pointer; font-size: 14px; font-weight: 700;
+    }
+    .step-card.correct { border-color: #059669; background: #ecfdf5; }
+    .step-card.wrong { border-color: #dc2626; background: #fef2f2; }
+    .quiz-summary { text-align: center; padding: 30px; background: linear-gradient(135deg, #1e1e1e 0%, #3b3b3b 100%); color: #fff; border-radius: 10px; margin: 20px 0; display: none; border: 1px solid #0073aa; }
+    .quiz-summary.show { display: block; }
+    .quiz-summary .score { font-size: 48px; font-weight: bold; color: #0073aa; margin-bottom: 8px; }
+    button.btn { background: #0073aa; color: #fff; border: none; padding: 10px 20px; border-radius: 6px; font-size: 15px; font-weight: 600; cursor: pointer; }
+    button.btn:hover { background: #005a8a; }
+    button.btn.reset { background: #52525b; margin-left: 8px; }
+    footer { text-align: center; color: #64748b; padding: 24px; font-size: 13px; }
+
+    @media (max-width: 800px) {
+        header h1 { font-size: 26px; }
+        .container { padding: 12px; }
+        section { padding: 18px; }
+        .wizard { padding: 18px; }
+        .verify-row { grid-template-columns: 1fr; gap: 4px; }
+    }
+
+    /* MTTI logo stamp */
+    .mtti-logo-stamp {
+        position: fixed; top: 14px; right: 18px; z-index: 999;
+        opacity: 0.88; transition: opacity 0.2s;
+    }
+    .mtti-logo-stamp:hover { opacity: 1; }
+    .mtti-logo-stamp img { width: 56px; height: 56px; border-radius: 50%; box-shadow: 0 2px 8px rgba(0,0,0,0.18); }
+</style>
+</head>
+<body>
+<div class="mtti-logo-stamp">
+    <img src="../../Resources/Logo.jpeg" alt="MTTI" title="Masomotele Technical Training Institute — Start learning, Start earning">
+</div>
+
+<div class="container">
+
+<header>
+    <div class="badge">LESSON 8.3  ·  INSTALL STUDIO  ·  INTERACTIVE</div>
+    <h1>Install WordPress Studio</h1>
+    <div class="subtitle">Three steps: pick OS, verify the download, run the installer. Sarah is on Windows 11 — follow along.</div>
+    <div class="meta-strip">
+        <span><strong>Duration:</strong> ~20 min interactive</span>
+        <span><strong>Level:</strong> Beginner</span>
+        <span><strong>Tool:</strong> WordPress Studio installer</span>
+        <span><strong>Handbook:</strong> Part 8, §8.3</span>
+    </div>
+</header>
+
+<div class="toc">
+    <h3>What you'll do in this lesson</h3>
+    <ol>
+        <li><a href="#s1">The 3-step install wizard (pick your OS)</a></li>
+        <li><a href="#s2">Verify the download is real (SHA-256 + publisher)</a></li>
+        <li><a href="#s3">Follow the OS-specific install timeline</a></li>
+        <li><a href="#s4_prereq">Prerequisites checklist</a></li>
+        <li><a href="#s4_trouble">Common install problems &amp; fixes</a></li>
+        <li><a href="#s4">Re-order the 6 install steps (auto-marked)</a></li>
+        <li><a href="#s7">What a successful install looks like</a></li>
+    </ol>
+</div>
+
+<div class="callout tip" style="margin-bottom: 22px;">
+    <strong>Follow along, don't just watch.</strong> Studio is free, 148 MB, and installs in under 5 minutes. Have Sarah's laptop open. Have a pen and paper ready to write down the auto-generated admin credentials. When Studio finishes installing, keep going straight into Lesson 8.4.
+</div>
+
+<section id="s1">
+    <h2>1. The 3-step install wizard</h2>
+    <p>Studio makes install easy but you must follow the three-step wizard in order. Tap your OS.</p>
+    <div class="wizard">
+        <div class="wizard-steps">
+            <div class="wstep active" id="ws1"><div class="num">1</div>Pick OS</div>
+            <div class="wstep" id="ws2"><div class="num">2</div>Verify download</div>
+            <div class="wstep" id="ws3"><div class="num">3</div>Install</div>
+        </div>
+
+        <div id="wizPane1">
+            <h3 style="color: #fff; margin-bottom: 14px;">Step 1: Pick your OS</h3>
+            <div class="os-grid">
+                <div class="os-btn" data-os="windows" onclick="pickOS('windows')">
+                    <div class="logo">&#x2756;</div>
+                    <h4>Windows</h4>
+                    <div class="file">WordPressStudio-Setup-x64.exe</div>
+                    <div class="size">~148 MB</div>
+                </div>
+                <div class="os-btn" data-os="mac" onclick="pickOS('mac')">
+                    <div class="logo">&#x2318;</div>
+                    <h4>macOS</h4>
+                    <div class="file">WordPressStudio.dmg</div>
+                    <div class="size">~162 MB (Universal / Apple Silicon)</div>
+                </div>
+                <div class="os-btn" data-os="linux" onclick="pickOS('linux')">
+                    <div class="logo">&#x25EF;</div>
+                    <h4>Linux</h4>
+                    <div class="file">wordpress-studio_amd64.deb</div>
+                    <div class="size">~140 MB (deb / rpm available)</div>
+                </div>
+            </div>
+            <p style="color: #9ca3af; font-size: 13px; margin-top: 14px;">Only download from <code>developer.wordpress.com/studio</code>. Fake mirrors carry malware.</p>
+        </div>
+    </div>
+</section>
+
+<section id="s2">
+    <h2>2. Step 2 · Verify the download</h2>
+    <p>Every real Automattic release is signed. On Windows, right-click the .exe &rarr; Properties &rarr; Digital Signatures. Confirm the publisher line.</p>
+    <div class="verify-card">
+        <h4>Download verification &mdash; <span id="verifyOs" style="color: #0073aa;">(pick an OS above)</span></h4>
+        <div class="verify-row"><div class="k">File name</div><div class="v" id="vFile">—</div></div>
+        <div class="verify-row"><div class="k">Publisher</div><div class="v verified">&#10004; Automattic Inc.</div></div>
+        <div class="verify-row"><div class="k">SHA-256 hint</div><div class="v" id="vHash">3f a1 c2 &hellip; e8 09 · (match against developer.wordpress.com/studio release page)</div></div>
+        <div class="verify-row"><div class="k">Code-signing cert</div><div class="v verified">&#10004; Valid · issued by DigiCert</div></div>
+        <div class="verify-row"><div class="k">Antivirus scan</div><div class="v verified">&#10004; Clean (VirusTotal shows 0/72 detections)</div></div>
+    </div>
+    <div class="callout warn">
+        <strong>If the publisher is not "Automattic Inc." — stop.</strong> Delete the file. Re-download from the official page. Fake Studio installers have been spotted on unofficial download aggregators.
+    </div>
+</section>
+
+<section id="s3">
+    <h2>3. Step 3 · Install (OS-specific timeline)</h2>
+    <p>Pick an OS above — the timeline below updates for your platform.</p>
+    <div class="wizard">
+        <div class="timeline" id="installTimeline">
+            <div class="ti"><h5>&larr; Pick an OS in Step 1</h5><p>Timeline appears here once you tap Windows, macOS or Linux.</p></div>
+        </div>
+    </div>
+    <div class="callout tip">
+        <strong>Whole install:</strong> download 60-120 seconds, run installer 30 seconds, first launch 10 seconds. Under 5 minutes on typical Kenyan broadband.
+    </div>
+    <div class="callout warn">
+        <strong>On Safaricom Home Fibre?</strong> Download completes in ~30 seconds. On a mobile Wi-Fi hotspot the same download takes 2-3 minutes. If your bundle is metered, connect to Wi-Fi first &mdash; the 148 MB installer would eat noticeable data on a 4G plan.
+    </div>
+</section>
+
+<section id="s4_prereq">
+    <h2>4. Prerequisites &mdash; check before you download</h2>
+    <p>Studio is lean by modern standards, but if your machine is under-spec Studio will crash mid-install. Confirm all four before Step 1.</p>
+    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 12px; margin: 14px 0;">
+        <div style="background: #eaf3fb; border: 1px solid #0073aa; border-radius: 8px; padding: 14px;">
+            <h4 style="color: #0073aa; margin-bottom: 6px;">&#128187; OS version</h4>
+            <p style="font-size: 13px; margin: 0;">Windows 10+, macOS 12+, or Ubuntu 22.04+. Older versions unsupported.</p>
+        </div>
+        <div style="background: #eaf3fb; border: 1px solid #0073aa; border-radius: 8px; padding: 14px;">
+            <h4 style="color: #0073aa; margin-bottom: 6px;">&#128190; Free disk space</h4>
+            <p style="font-size: 13px; margin: 0;">4 GB minimum. Each Studio site takes ~200 MB.</p>
+        </div>
+        <div style="background: #eaf3fb; border: 1px solid #0073aa; border-radius: 8px; padding: 14px;">
+            <h4 style="color: #0073aa; margin-bottom: 6px;">&#127760; Internet</h4>
+            <p style="font-size: 13px; margin: 0;">Needed for the initial download. After install Studio runs 100% offline.</p>
+        </div>
+        <div style="background: #eaf3fb; border: 1px solid #0073aa; border-radius: 8px; padding: 14px;">
+            <h4 style="color: #0073aa; margin-bottom: 6px;">&#128274; Admin rights</h4>
+            <p style="font-size: 13px; margin: 0;">Installer needs to add to Program Files or /Applications.</p>
+        </div>
+    </div>
+    <div class="callout warn">
+        <strong>Antivirus warning:</strong> Some Kenyan corporate laptops have Sophos or Kaspersky that flag the Studio installer as unknown. Ask IT to whitelist Automattic before you download.
+    </div>
+</section>
+
+<section id="s4_trouble">
+    <h2>5. Common install problems &mdash; and their fixes</h2>
+    <div style="display: grid; grid-template-columns: 1fr; gap: 10px; margin: 14px 0;">
+        <div style="background: #fef2f2; border-left: 4px solid #dc2626; padding: 12px 14px; border-radius: 4px;">
+            <h4 style="color: #dc2626; margin-bottom: 4px;">Problem 1: Antivirus blocks the installer</h4>
+            <p style="font-size: 13px; margin: 0;"><strong>Fix:</strong> Temporarily disable your antivirus during install, then turn it back on. Studio is genuinely safe.</p>
+        </div>
+        <div style="background: #fef2f2; border-left: 4px solid #dc2626; padding: 12px 14px; border-radius: 4px;">
+            <h4 style="color: #dc2626; margin-bottom: 4px;">Problem 2: Studio installs but a site won't start</h4>
+            <p style="font-size: 13px; margin: 0;"><strong>Fix:</strong> Ports 80 and 443 are in use by another program. Open Task Manager and end any Apache, MAMP, or XAMPP processes.</p>
+        </div>
+        <div style="background: #fef2f2; border-left: 4px solid #dc2626; padding: 12px 14px; border-radius: 4px;">
+            <h4 style="color: #dc2626; margin-bottom: 4px;">Problem 3: The local URL won't open in the browser</h4>
+            <p style="font-size: 13px; margin: 0;"><strong>Fix:</strong> Your hosts file may be blocking it. Restart the computer once. If it still fails, run Studio as Administrator on Windows.</p>
+        </div>
+        <div style="background: #fef2f2; border-left: 4px solid #dc2626; padding: 12px 14px; border-radius: 4px;">
+            <h4 style="color: #dc2626; margin-bottom: 4px;">Problem 4: "Signature verification failed" on macOS</h4>
+            <p style="font-size: 13px; margin: 0;"><strong>Fix:</strong> System Settings &rarr; Privacy &amp; Security &rarr; scroll to the blocked-app notice &rarr; click "Open Anyway". macOS Gatekeeper needs one-time approval.</p>
+        </div>
+    </div>
+</section>
+
+<section id="s4">
+    <h2>6. Re-order the 6 install steps (auto-marked)</h2>
+    <p>These 6 install-day steps are shuffled. Drag or use the arrows to put them in the correct order, then hit "Mark my order".</p>
+    <div class="reorder-area">
+        <div id="stepList"></div>
+    </div>
+    <div style="margin-top: 12px;">
+        <button class="btn" onclick="markOrder()">Mark my order</button>
+        <button class="btn reset" onclick="shuffleSteps()">Shuffle again</button>
+    </div>
+    <div class="quiz-summary" id="orderSummary">
+        <div class="score" id="orderScore">0 / 6</div>
+        <p id="orderMsg"></p>
+    </div>
+</section>
+
+<section id="s7">
+    <h2>7. What you should see after a successful install</h2>
+    <p>Sanity-check screen. If your first launch of Studio matches this, you're done. If anything is missing, restart from Step 1.</p>
+    <div style="background: #eaf3fb; border: 1px solid #0073aa; border-radius: 8px; padding: 16px; margin: 14px 0;">
+        <ol style="padding-left: 22px;">
+            <li style="margin: 6px 0;"><strong>Sidebar shows 4 items</strong> &mdash; My Sites, Import Site, Settings, Help.</li>
+            <li style="margin: 6px 0;"><strong>Main pane shows an empty state</strong> &mdash; a big "+ Add site" card in the centre.</li>
+            <li style="margin: 6px 0;"><strong>Title bar reads "WordPress Studio"</strong> &mdash; not "Local by Flywheel" or anything else.</li>
+            <li style="margin: 6px 0;"><strong>Settings &rarr; About shows version 1.4 or higher</strong> &mdash; older builds are missing the Demo Sites feature.</li>
+            <li style="margin: 6px 0;"><strong>No sign-in required</strong> &mdash; Studio works fully without a WordPress.com account (sign-in is optional, only needed for Demo Sites sharing).</li>
+        </ol>
+    </div>
+    <div class="callout tip">
+        <strong>Next tap:</strong> click the big "+ Add site" card. Name it <em>Karibu Kitchen</em>. Accept the default PHP 8.3. Studio spins up a full WordPress in about 10 seconds. Log in with the auto-generated credentials Studio shows on the site card &mdash; and you are ready for Lesson 8.4.
+    </div>
+</section>
+
+<footer>
+    <p>Lesson 8.3 — Install WordPress Studio · Masomotele Technical Training Institute · Handbook Part 8, §8.3</p>
+    <p>Next: <strong>Lesson 8.4 — WordPress Dashboard Tour</strong></p>
+</footer>
+</div>
+
+<script>
+const OS_DATA = {
+    windows: {
+        name: 'Windows 11',
+        file: 'WordPressStudio-Setup-x64.exe',
+        hash: '3f a1 c2 &hellip; e8 09',
+        steps: [
+            ['Double-click WordPressStudio-Setup-x64.exe', 'Windows may show a SmartScreen warning — click "More info" then "Run anyway".'],
+            ['Accept the licence agreement', 'The MIT-style Automattic licence. Read it, tick the box, click Next.'],
+            ['Choose install location', 'Default is C:\\Users\\Sarah\\AppData\\Local\\Programs\\wp-studio — accept it.'],
+            ['Click Install', 'Installer copies files. 30-60 seconds. Progress bar shows.'],
+            ['Tick "Launch WordPress Studio"', 'Then click Finish. Studio opens with an empty My Sites screen.'],
+            ['Studio adds itself to Start Menu', 'Pin to taskbar if you like — you\'ll open it daily.']
+        ]
+    },
+    mac: {
+        name: 'macOS 14 (Sonoma or later)',
+        file: 'WordPressStudio.dmg',
+        hash: '4b 22 e0 &hellip; d4 11',
+        steps: [
+            ['Double-click WordPressStudio.dmg', 'The disk image mounts and a Finder window opens.'],
+            ['Drag Studio into Applications', 'The classic Mac drag-to-Applications shortcut appears.'],
+            ['Eject the DMG', 'Right-click the mounted disk in Finder &rarr; Eject.'],
+            ['Open Applications &rarr; WordPress Studio', 'First launch — macOS asks "Are you sure?" — click Open.'],
+            ['Allow local network access', 'macOS prompts for network permissions — allow.'],
+            ['Studio adds itself to Launchpad', 'Ready to build. Sarah\'s next tap is + Add site.']
+        ]
+    },
+    linux: {
+        name: 'Ubuntu 22.04 LTS',
+        file: 'wordpress-studio_amd64.deb',
+        hash: '9c 07 f8 &hellip; a1 32',
+        steps: [
+            ['Open a terminal in the download folder', 'cd ~/Downloads'],
+            ['Install via apt', 'sudo apt install ./wordpress-studio_amd64.deb'],
+            ['Enter your sudo password', 'Ubuntu prompts. Type it (you won\'t see the characters).'],
+            ['Wait for dependencies to install', 'apt pulls PHP, MySQL client libs. 20-40 seconds.'],
+            ['Launch from Activities &rarr; WordPress Studio', 'Or run "wp-studio" from any terminal.'],
+            ['Studio adds a .desktop entry', 'Pin to favourites in the sidebar.']
+        ]
+    }
+};
+
+function pickOS(os) {
+    document.querySelectorAll('.os-btn').forEach(b => b.classList.remove('selected'));
+    document.querySelector('.os-btn[data-os="' + os + '"]').classList.add('selected');
+    document.getElementById('ws1').classList.add('done');
+    document.getElementById('ws2').classList.add('active');
+    document.getElementById('ws3').classList.add('active');
+
+    const d = OS_DATA[os];
+    document.getElementById('verifyOs').textContent = d.name;
+    document.getElementById('vFile').textContent = d.file;
+    document.getElementById('vHash').innerHTML = d.hash + ' &nbsp;·&nbsp; match against developer.wordpress.com/studio release page';
+
+    const tl = document.getElementById('installTimeline');
+    tl.innerHTML = '';
+    d.steps.forEach((s, i) => {
+        tl.innerHTML += '<div class="ti"><h5>Step ' + (i+1) + ' &mdash; ' + s[0] + '</h5><p>' + s[1] + '</p></div>';
+    });
+}
+
+// Reorder challenge
+const CORRECT_STEPS = [
+    'Open browser &rarr; developer.wordpress.com/studio',
+    'Download the installer for your OS',
+    'Verify the publisher is "Automattic Inc."',
+    'Run the installer &rarr; accept licence &rarr; click Install',
+    'Launch Studio for the first time',
+    'Click + Add Site &rarr; name it "Karibu Kitchen"'
+];
+let currentOrder = [];
+
+function shuffleSteps() {
+    currentOrder = [...CORRECT_STEPS.map((_, i) => i)];
+    for (let i = currentOrder.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [currentOrder[i], currentOrder[j]] = [currentOrder[j], currentOrder[i]];
+    }
+    renderSteps();
+    document.getElementById('orderSummary').classList.remove('show');
+}
+function renderSteps() {
+    const list = document.getElementById('stepList');
+    list.innerHTML = '';
+    currentOrder.forEach((idx, pos) => {
+        const div = document.createElement('div');
+        div.className = 'step-card';
+        div.dataset.idx = idx;
+        div.innerHTML = '<span class="grip">&#x2630;</span>' +
+            '<div><strong>' + (pos + 1) + '.</strong> ' + CORRECT_STEPS[idx] + '</div>' +
+            '<div class="up-down">' +
+                '<button onclick="moveStep(' + pos + ', -1)">&#8593;</button>' +
+                '<button onclick="moveStep(' + pos + ', 1)">&#8595;</button>' +
+            '</div>';
+        list.appendChild(div);
+    });
+}
+function moveStep(pos, dir) {
+    const target = pos + dir;
+    if (target < 0 || target >= currentOrder.length) return;
+    [currentOrder[pos], currentOrder[target]] = [currentOrder[target], currentOrder[pos]];
+    renderSteps();
+}
+function markOrder() {
+    let score = 0;
+    document.querySelectorAll('#stepList .step-card').forEach((el, pos) => {
+        el.classList.remove('correct', 'wrong');
+        if (parseInt(el.dataset.idx) === pos) { el.classList.add('correct'); score++; }
+        else el.classList.add('wrong');
+    });
+    const s = document.getElementById('orderSummary');
+    s.classList.add('show');
+    document.getElementById('orderScore').textContent = score + ' / 6';
+    const m = document.getElementById('orderMsg');
+    if (score === 6) m.textContent = 'Perfect order. Move to lesson 8.4.';
+    else if (score >= 4) m.textContent = 'Close — check the wrong-marked cards.';
+    else m.textContent = 'Rewatch and reshuffle.';
+    s.scrollIntoView({ behavior: 'smooth', block: 'center' });
+}
+shuffleSteps();
+</script>
+</body>
+</html>

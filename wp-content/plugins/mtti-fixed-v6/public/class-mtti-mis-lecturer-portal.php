@@ -32,6 +32,8 @@ class MTTI_MIS_Lecturer_Portal {
         add_action('wp_ajax_mtti_lecturer_upload_material', array($this, 'ajax_upload_material'));
         add_action('wp_ajax_mtti_lecturer_save_quiz',       array($this, 'ajax_save_quiz'));
         add_action('wp_ajax_mtti_lecturer_toggle_lesson',   array($this, 'ajax_toggle_lesson_status'));
+        add_action('wp_ajax_mtti_lecturer_go_live',          array($this, 'ajax_go_live'));
+        add_action('wp_ajax_mtti_lecturer_update_lesson_dates', array($this, 'ajax_update_lesson_dates'));
     }
 
     public function enqueue_assets() {
@@ -132,17 +134,35 @@ class MTTI_MIS_Lecturer_Portal {
             }
         }
 
-        // Allow admins even if not in staff table — create a virtual staff object
-        if (!$staff && $is_admin) {
+        // Allow admins and mtti_teacher users even if not yet in staff table
+        $has_teacher_role = in_array('mtti_teacher', $current_user->roles ?? []);
+        if (!$staff && ($is_admin || $has_teacher_role)) {
+            // Auto-create a real staff record so sessions are properly attributed
+            $staff_number = 'STAFF-' . $user_id;
+            $wpdb->insert(
+                $wpdb->prefix . 'mtti_staff',
+                array(
+                    'user_id'     => $user_id,
+                    'staff_number'=> $staff_number,
+                    'department'  => $is_admin ? 'Administration' : 'Lecturer',
+                    'position'    => $is_admin ? 'Administrator' : 'Lecturer',
+                    'hire_date'   => current_time('Y-m-d'),
+                    'status'      => 'Active',
+                    'created_at'  => current_time('mysql'),
+                    'updated_at'  => current_time('mysql'),
+                ),
+                array('%d','%s','%s','%s','%s','%s','%s','%s')
+            );
+            $new_id = $wpdb->insert_id;
             $staff = new stdClass();
-            $staff->staff_id     = 0;
+            $staff->staff_id     = $new_id ?: 0;
             $staff->user_id      = $user_id;
             $staff->display_name = $current_user->display_name;
             $staff->user_email   = $current_user->user_email;
             $staff->first_name   = $current_user->display_name;
             $staff->last_name    = '';
-            $staff->department   = 'Administration';
-            $staff->role         = 'Administrator';
+            $staff->department   = $is_admin ? 'Administration' : 'Lecturer';
+            $staff->status       = 'Active';
         }
 
         if (!$staff) {
@@ -185,9 +205,11 @@ class MTTI_MIS_Lecturer_Portal {
             case 'sessions':   $this->render_sessions($staff);   break;
             case 'students':   $this->render_students($staff);   break;
             case 'reports':    $this->render_reports($staff);    break;
-            case 'create':     $this->render_content_creator($staff); break;
-            case 'quiz':       $this->render_quiz_generator($staff);  break;
-            default:           $this->render_dashboard($staff);  break;
+            case 'create':       $this->render_content_creator($staff); break;
+            case 'lessons':      $this->render_lessons_audit($staff);   break;
+            case 'quiz':         $this->render_quiz_generator($staff);  break;
+            case 'live_classes': $this->render_live_classes($staff);    break;
+            default:             $this->render_dashboard($staff);      break;
         }
 
         echo '</main></div></div>';
@@ -267,8 +289,10 @@ class MTTI_MIS_Lecturer_Portal {
             'sessions'   => array('icon'=>'⏱️', 'label'=>'Session Timer'),
             'students'   => array('icon'=>'👥', 'label'=>'My Students'),
             'reports'    => array('icon'=>'📈', 'label'=>'Reports'),
-            'create'     => array('icon'=>'⚡', 'label'=>'Content Creator'),
-            'quiz'       => array('icon'=>'🧠', 'label'=>'Quiz Builder'),
+            'create'       => array('icon'=>'⚡', 'label'=>'Content Creator'),
+            'lessons'      => array('icon'=>'📖', 'label'=>'Lessons Audit'),
+            'quiz'         => array('icon'=>'🧠', 'label'=>'Quiz Builder'),
+            'live_classes' => array('icon'=>'🎥', 'label'=>'Live Classes'),
         );
         echo '<nav class="mtti-portal-sidebar"><ul class="mtti-portal-menu">';
         foreach ($menu as $tab => $item) {
@@ -1209,11 +1233,25 @@ function mttiRevokeCode(nonce, courseId, date) {
                   <?php endforeach; ?>
                 </select>
               </div>
-              <div style="margin-bottom:16px;">
+              <div style="margin-bottom:12px;">
                 <label style="display:block;font-size:11px;color:var(--text-muted);margin-bottom:4px;">Description</label>
-                <textarea id="lc-desc" rows="3"
+                <textarea id="lc-desc" rows="2"
                   style="width:100%;padding:9px;border:1px solid var(--border);border-radius:var(--radius-sm);background:var(--bg-subtle);color:var(--text-primary);font-size:13px;resize:vertical;box-sizing:border-box;"
                   placeholder="Brief description (optional)"></textarea>
+              </div>
+              <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:16px;">
+                <div>
+                  <label style="display:block;font-size:11px;color:var(--text-muted);margin-bottom:4px;">Available From</label>
+                  <input type="datetime-local" id="lc-scheduled"
+                    style="width:100%;padding:8px;border:1px solid var(--border);border-radius:var(--radius-sm);background:var(--bg-subtle);color:var(--text-primary);font-size:12px;box-sizing:border-box;">
+                  <div style="font-size:10px;color:var(--text-muted);margin-top:2px;">Leave blank = visible immediately</div>
+                </div>
+                <div>
+                  <label style="display:block;font-size:11px;color:var(--text-muted);margin-bottom:4px;">Due Date</label>
+                  <input type="datetime-local" id="lc-due"
+                    style="width:100%;padding:8px;border:1px solid var(--border);border-radius:var(--radius-sm);background:var(--bg-subtle);color:var(--text-primary);font-size:12px;box-sizing:border-box;">
+                  <div style="font-size:10px;color:var(--text-muted);margin-top:2px;">Leave blank = no deadline</div>
+                </div>
               </div>
 
               <div id="lc-error" style="display:none;background:rgba(198,40,40,.1);border:1px solid #C62828;border-radius:var(--radius-sm);padding:10px;margin-bottom:12px;color:#EF9A9A;font-size:13px;"></div>
@@ -1281,11 +1319,13 @@ function mttiRevokeCode(nonce, courseId, date) {
             document.getElementById('lc-status').textContent = 'Uploading...';
 
             var fd = new FormData();
-            fd.append('action',    'mtti_lecturer_upload_html');
-            fd.append('nonce',     lcUplNonce);
-            fd.append('course_id', cid);
-            fd.append('title',     title);
-            fd.append('desc',      document.getElementById('lc-desc').value);
+            fd.append('action',         'mtti_lecturer_upload_html');
+            fd.append('nonce',          lcUplNonce);
+            fd.append('course_id',      cid);
+            fd.append('title',          title);
+            fd.append('desc',           document.getElementById('lc-desc').value);
+            fd.append('scheduled_date', document.getElementById('lc-scheduled').value);
+            fd.append('due_date',       document.getElementById('lc-due').value);
             fd.append('html_file', new Blob([lcHTML], {type:'text/html'}), 'interactive.html');
 
             jQuery.ajax({
@@ -1303,6 +1343,8 @@ function mttiRevokeCode(nonce, courseId, date) {
                         document.getElementById('lc-title').value = '';
                         document.getElementById('lc-desc').value = '';
                         document.getElementById('lc-course').value = '';
+                        document.getElementById('lc-scheduled').value = '';
+                        document.getElementById('lc-due').value = '';
                     } else {
                         lcErr(res.data || 'Upload failed.');
                         document.getElementById('lc-status').textContent = '';
@@ -1637,6 +1679,10 @@ function mttiRevokeCode(nonce, courseId, date) {
         $cid   = intval($_POST['course_id'] ?? 0);
         $title = sanitize_text_field($_POST['title'] ?? '');
         $desc  = sanitize_textarea_field($_POST['desc'] ?? '');
+        $raw_sched = sanitize_text_field($_POST['scheduled_date'] ?? '');
+        $raw_due   = sanitize_text_field($_POST['due_date'] ?? '');
+        $scheduled_date = $raw_sched ? date('Y-m-d H:i:s', strtotime($raw_sched)) : null;
+        $due_date       = $raw_due   ? date('Y-m-d H:i:s', strtotime($raw_due))   : null;
 
         if (!$cid)   wp_send_json_error('Course required');
         if (!$title) wp_send_json_error('Title required');
@@ -1667,7 +1713,7 @@ function mttiRevokeCode(nonce, courseId, date) {
             wp_send_json_success(array('id'=>$existing, 'chars'=>number_format(strlen($html)), 'updated'=>true));
         }
 
-        $wpdb->insert($wpdb->prefix.'mtti_lessons', array(
+        $insert_data = array(
             'course_id'    => $cid,
             'title'        => $title,
             'description'  => $desc,
@@ -1675,7 +1721,10 @@ function mttiRevokeCode(nonce, courseId, date) {
             'content_type' => 'html_interactive',
             'status'       => 'Pending Review',
             'created_by'   => get_current_user_id(),
-        ));
+        );
+        if ($scheduled_date) $insert_data['scheduled_date'] = $scheduled_date;
+        if ($due_date)       $insert_data['due_date']       = $due_date;
+        $wpdb->insert($wpdb->prefix.'mtti_lessons', $insert_data);
 
         if ($wpdb->insert_id) {
             wp_send_json_success(array('id'=>$wpdb->insert_id, 'chars'=>number_format(strlen($html)), 'pending'=>true));
@@ -2304,6 +2353,605 @@ function mttiRevokeCode(nonce, courseId, date) {
                 ? 'Lesson is now live and visible to students.'
                 : 'Lesson has been unpublished and hidden from students.',
         ]);
+    }
+
+    /* ══════════════════════════════════════════════════
+     *  LESSONS AUDIT
+     * ══════════════════════════════════════════════════ */
+    private function render_lessons_audit($staff) {
+        global $wpdb;
+        $p    = $wpdb->prefix . 'mtti_';
+        $now  = current_time('mysql');
+        $nonce = wp_create_nonce('mtti_lecturer_nonce');
+
+        // All lessons for this staff's courses (or all courses for admin)
+        if ($staff->staff_id > 0) {
+            $lessons = $wpdb->get_results($wpdb->prepare(
+                "SELECT l.*, c.course_name, c.course_code, u.display_name AS creator_name
+                 FROM {$p}lessons l
+                 LEFT JOIN {$p}courses c ON l.course_id = c.course_id
+                 LEFT JOIN {$wpdb->users} u ON l.created_by = u.ID
+                 WHERE l.course_id IN (
+                     SELECT DISTINCT course_id FROM {$p}enrollments WHERE staff_id = %d
+                     UNION
+                     SELECT DISTINCT course_id FROM {$p}lessons WHERE created_by = %d
+                 )
+                 ORDER BY l.course_id, l.created_at DESC",
+                $staff->staff_id, $staff->user_id
+            ));
+        } else {
+            $lessons = $wpdb->get_results(
+                "SELECT l.*, c.course_name, c.course_code, u.display_name AS creator_name
+                 FROM {$p}lessons l
+                 LEFT JOIN {$p}courses c ON l.course_id = c.course_id
+                 LEFT JOIN {$wpdb->users} u ON l.created_by = u.ID
+                 ORDER BY l.course_id, l.created_at DESC"
+            );
+        }
+
+        // Summary counts
+        $total     = count($lessons);
+        $published = 0; $scheduled = 0; $overdue = 0; $pending = 0;
+        foreach ($lessons as $l) {
+            if ($l->status === 'Published') $published++;
+            elseif (in_array($l->status, ['Pending Review','Pending'])) $pending++;
+            if ($l->scheduled_date && $l->scheduled_date > $now) $scheduled++;
+            if ($l->due_date && $l->due_date < $now && $l->status !== 'Published') $overdue++;
+        }
+
+        echo '<div class="mtti-section-card">';
+        echo '<h2 class="mtti-section-title">📖 Lessons Audit</h2>';
+        echo '<p style="color:#666;margin-bottom:20px;">Review lesson schedules, set release and due dates, and track publish status.</p>';
+
+        // Summary cards
+        echo '<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));gap:12px;margin-bottom:24px;">';
+        foreach ([
+            ['Total',     $total,     '#1976D2', '📚'],
+            ['Published', $published, '#16a34a', '✅'],
+            ['Scheduled', $scheduled, '#f59e0b', '📅'],
+            ['Pending',   $pending,   '#94a3b8', '⏳'],
+            ['Overdue',   $overdue,   '#ef4444', '⚠️'],
+        ] as [$label, $count, $color, $icon]) {
+            echo '<div style="background:#fff;border:1px solid #e0e0e0;border-radius:10px;padding:14px;text-align:center;">';
+            echo '<div style="font-size:1.6rem;">' . $icon . '</div>';
+            echo '<div style="font-size:1.5rem;font-weight:800;color:' . $color . ';">' . $count . '</div>';
+            echo '<div style="font-size:11px;color:#888;text-transform:uppercase;letter-spacing:.5px;">' . $label . '</div>';
+            echo '</div>';
+        }
+        echo '</div>';
+
+        if (empty($lessons)) {
+            echo '<div style="text-align:center;padding:40px;color:#aaa;">';
+            echo '<div style="font-size:3rem;margin-bottom:12px;">📭</div>';
+            echo '<p>No lessons found. Upload lessons via the <strong>Content Creator</strong> tab.</p>';
+            echo '</div>';
+            echo '</div>';
+            return;
+        }
+
+        // Lessons table
+        echo '<div style="overflow-x:auto;">';
+        echo '<table style="width:100%;border-collapse:collapse;font-size:13px;">';
+        echo '<thead><tr style="background:#f8f9fa;border-bottom:2px solid #e0e0e0;">';
+        foreach (['Title', 'Course', 'Status', 'Available From', 'Due Date', 'Created', 'Actions'] as $h) {
+            echo '<th style="padding:10px 12px;text-align:left;font-size:11px;font-weight:700;color:#555;text-transform:uppercase;letter-spacing:.5px;white-space:nowrap;">' . $h . '</th>';
+        }
+        echo '</tr></thead><tbody>';
+
+        foreach ($lessons as $l) {
+            $sched_ts   = $l->scheduled_date ? strtotime($l->scheduled_date) : null;
+            $due_ts     = $l->due_date       ? strtotime($l->due_date)       : null;
+            $now_ts     = current_time('timestamp');
+            $is_future  = $sched_ts && $sched_ts > $now_ts;
+            $is_overdue = $due_ts   && $due_ts   < $now_ts && $l->status !== 'Published';
+
+            // Status badge
+            $badge_map = [
+                'Published'     => ['#16a34a', '✅ Published'],
+                'Active'        => ['#16a34a', '✅ Active'],
+                'Pending Review'=> ['#f59e0b', '⏳ Pending'],
+                'Pending'       => ['#f59e0b', '⏳ Pending'],
+                'Draft'         => ['#94a3b8', '📝 Draft'],
+                'Inactive'      => ['#94a3b8', '⏸ Inactive'],
+            ];
+            [$badge_color, $badge_label] = $badge_map[$l->status] ?? ['#94a3b8', esc_html($l->status)];
+
+            $row_bg = $is_overdue ? 'background:#fff5f5;' : ($is_future ? 'background:#fffbeb;' : '');
+
+            echo '<tr style="border-bottom:1px solid #f0f0f0;' . $row_bg . '">';
+
+            // Title
+            echo '<td style="padding:10px 12px;max-width:200px;">';
+            echo '<div style="font-weight:600;color:#333;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;" title="' . esc_attr($l->title) . '">' . esc_html(mb_strimwidth($l->title, 0, 45, '…')) . '</div>';
+            if ($l->description) echo '<div style="font-size:11px;color:#888;margin-top:2px;">' . esc_html(mb_strimwidth($l->description, 0, 50, '…')) . '</div>';
+            echo '</td>';
+
+            // Course
+            echo '<td style="padding:10px 12px;white-space:nowrap;color:#555;">' . esc_html($l->course_code ?: '—') . '</td>';
+
+            // Status
+            echo '<td style="padding:10px 12px;white-space:nowrap;">';
+            echo '<span style="background:' . $badge_color . '22;color:' . $badge_color . ';padding:2px 8px;border-radius:20px;font-size:11px;font-weight:600;">' . $badge_label . '</span>';
+            echo '</td>';
+
+            // Available From (editable)
+            echo '<td style="padding:10px 12px;white-space:nowrap;">';
+            if ($sched_ts) {
+                $color = $is_future ? '#f59e0b' : '#16a34a';
+                echo '<span style="color:' . $color . ';font-size:12px;">' . esc_html(date('d M Y H:i', $sched_ts)) . '</span>';
+                if ($is_future) echo '<br><span style="font-size:10px;color:#f59e0b;">🔒 Not yet visible</span>';
+            } else {
+                echo '<span style="color:#aaa;font-size:12px;">Immediately</span>';
+            }
+            echo '</td>';
+
+            // Due Date
+            echo '<td style="padding:10px 12px;white-space:nowrap;">';
+            if ($due_ts) {
+                $color = $is_overdue ? '#ef4444' : '#555';
+                echo '<span style="color:' . $color . ';font-size:12px;">' . esc_html(date('d M Y H:i', $due_ts)) . '</span>';
+                if ($is_overdue) echo '<br><span style="font-size:10px;color:#ef4444;">⚠ Overdue</span>';
+            } else {
+                echo '<span style="color:#aaa;font-size:12px;">No deadline</span>';
+            }
+            echo '</td>';
+
+            // Created
+            echo '<td style="padding:10px 12px;white-space:nowrap;font-size:12px;color:#888;">' . esc_html(date('d M Y', strtotime($l->created_at))) . '</td>';
+
+            // Actions — inline date editor
+            $sched_val = $l->scheduled_date ? date('Y-m-d\TH:i', strtotime($l->scheduled_date)) : '';
+            $due_val   = $l->due_date       ? date('Y-m-d\TH:i', strtotime($l->due_date))       : '';
+            echo '<td style="padding:10px 12px;">';
+            echo '<button onclick="mttiEditDates(' . intval($l->lesson_id) . ',\'' . esc_js($sched_val) . '\',\'' . esc_js($due_val) . '\')" style="padding:5px 10px;background:#1976D2;color:#fff;border:none;border-radius:5px;font-size:11px;cursor:pointer;white-space:nowrap;">✏ Dates</button>';
+            echo '</td>';
+
+            echo '</tr>';
+        }
+        echo '</tbody></table></div>';
+        echo '</div>'; // end mtti-section-card
+
+        // Edit dates modal
+        echo '
+        <div id="mtti-dates-modal" style="display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,.5);z-index:9999;align-items:center;justify-content:center;">
+            <div style="background:#fff;border-radius:12px;padding:28px;width:380px;max-width:95vw;box-shadow:0 8px 32px rgba(0,0,0,.2);">
+                <h3 style="margin:0 0 16px;font-size:16px;">✏ Edit Lesson Dates</h3>
+                <input type="hidden" id="mtti-dates-id">
+                <div style="margin-bottom:14px;">
+                    <label style="display:block;font-size:13px;font-weight:600;margin-bottom:4px;color:#333;">Available From (EAT)</label>
+                    <input type="datetime-local" id="mtti-dates-sched" style="width:100%;padding:9px;border:1px solid #ddd;border-radius:6px;font-size:13px;box-sizing:border-box;">
+                    <div style="font-size:11px;color:#888;margin-top:2px;">Clear = visible immediately</div>
+                </div>
+                <div style="margin-bottom:20px;">
+                    <label style="display:block;font-size:13px;font-weight:600;margin-bottom:4px;color:#333;">Due Date (EAT)</label>
+                    <input type="datetime-local" id="mtti-dates-due" style="width:100%;padding:9px;border:1px solid #ddd;border-radius:6px;font-size:13px;box-sizing:border-box;">
+                    <div style="font-size:11px;color:#888;margin-top:2px;">Clear = no deadline</div>
+                </div>
+                <div id="mtti-dates-msg" style="font-size:13px;color:#16a34a;margin-bottom:12px;display:none;"></div>
+                <div style="display:flex;gap:10px;">
+                    <button onclick="mttiSaveDates()" style="flex:1;padding:10px;background:#1976D2;color:#fff;border:none;border-radius:7px;font-size:14px;font-weight:700;cursor:pointer;">Save</button>
+                    <button onclick="document.getElementById(\'mtti-dates-modal\').style.display=\'none\'" style="flex:1;padding:10px;background:#f0f0f0;color:#333;border:none;border-radius:7px;font-size:14px;cursor:pointer;">Cancel</button>
+                </div>
+            </div>
+        </div>
+        <script>
+        function mttiEditDates(id, sched, due) {
+            document.getElementById("mtti-dates-id").value    = id;
+            document.getElementById("mtti-dates-sched").value = sched;
+            document.getElementById("mtti-dates-due").value   = due;
+            document.getElementById("mtti-dates-msg").style.display = "none";
+            document.getElementById("mtti-dates-modal").style.display = "flex";
+        }
+        function mttiSaveDates() {
+            var id    = document.getElementById("mtti-dates-id").value;
+            var sched = document.getElementById("mtti-dates-sched").value;
+            var due   = document.getElementById("mtti-dates-due").value;
+            jQuery.post(mttiLecturer.ajaxUrl, {
+                action:         "mtti_lecturer_update_lesson_dates",
+                nonce:          mttiLecturer.nonce,
+                lesson_id:      id,
+                scheduled_date: sched,
+                due_date:       due
+            }, function(res) {
+                if (res.success) {
+                    var msg = document.getElementById("mtti-dates-msg");
+                    msg.textContent = "✅ Saved!";
+                    msg.style.display = "block";
+                    setTimeout(function() {
+                        document.getElementById("mtti-dates-modal").style.display = "none";
+                        location.reload();
+                    }, 800);
+                } else {
+                    alert("Error: " + (res.data || "Could not save."));
+                }
+            });
+        }
+        </script>';
+    }
+
+    public function ajax_update_lesson_dates() {
+        check_ajax_referer('mtti_lecturer_nonce', 'nonce');
+        if (!is_user_logged_in()) wp_send_json_error('Not logged in');
+        global $wpdb;
+        $p         = $wpdb->prefix . 'mtti_';
+        $lesson_id = intval($_POST['lesson_id'] ?? 0);
+        if (!$lesson_id) wp_send_json_error('Invalid lesson');
+
+        $raw_sched = sanitize_text_field($_POST['scheduled_date'] ?? '');
+        $raw_due   = sanitize_text_field($_POST['due_date'] ?? '');
+        $sched     = $raw_sched ? date('Y-m-d H:i:s', strtotime($raw_sched)) : null;
+        $due       = $raw_due   ? date('Y-m-d H:i:s', strtotime($raw_due))   : null;
+
+        // Verify lesson belongs to this staff's course (or admin)
+        $is_admin = current_user_can('manage_options') || current_user_can('manage_mtti');
+        if (!$is_admin) {
+            $staff = $wpdb->get_row($wpdb->prepare(
+                "SELECT staff_id FROM {$p}staff WHERE user_id=%d AND status='Active'",
+                get_current_user_id()
+            ));
+            if (!$staff) wp_send_json_error('Not authorized');
+        }
+
+        $wpdb->update(
+            $wpdb->prefix . 'mtti_lessons',
+            array(
+                'scheduled_date' => $sched,
+                'due_date'       => $due,
+                'updated_at'     => current_time('mysql'),
+            ),
+            array('lesson_id' => $lesson_id),
+            array('%s', '%s', '%s'),
+            array('%d')
+        );
+        wp_send_json_success();
+    }
+
+    /* ══════════════════════════════════════════════════
+     *  LIVE CLASSES (Jitsi Meet)
+     * ══════════════════════════════════════════════════ */
+    private function render_live_classes($staff) {
+        global $wpdb;
+        $p   = $wpdb->prefix;
+        $now = current_time('timestamp');
+
+        // Handle POST actions
+        if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['mtti_live_action'])) {
+            if (check_admin_referer('mtti_live_action', 'mtti_live_nonce')) {
+                $this->handle_live_class_action(sanitize_key($_POST['mtti_live_action']), $staff);
+            }
+        }
+
+        // Courses this lecturer teaches (via enrollments); fall back to all active courses for admin
+        $courses = $wpdb->get_results($wpdb->prepare(
+            "SELECT DISTINCT c.course_id, c.course_name, c.course_code
+             FROM {$p}mtti_courses c
+             INNER JOIN {$p}mtti_enrollments e ON e.course_id = c.course_id
+             WHERE e.staff_id = %d AND c.status = 'Active'
+             ORDER BY c.course_name",
+            $staff->staff_id
+        ));
+        if (empty($courses)) {
+            $courses = $wpdb->get_results(
+                "SELECT course_id, course_name, course_code
+                 FROM {$p}mtti_courses WHERE status = 'Active' ORDER BY course_name"
+            );
+        }
+
+        // Upcoming/active sessions
+        $upcoming = $wpdb->get_results($wpdb->prepare(
+            "SELECT lc.*, c.course_name, c.course_code
+             FROM {$p}mtti_live_classes lc
+             LEFT JOIN {$p}mtti_courses c ON lc.course_id = c.course_id
+             WHERE lc.staff_id = %d AND lc.status NOT IN ('Ended','Cancelled')
+             ORDER BY lc.scheduled_date ASC",
+            $staff->staff_id
+        ));
+
+        // Past sessions (last 30 days)
+        $past = $wpdb->get_results($wpdb->prepare(
+            "SELECT lc.*, c.course_name, c.course_code
+             FROM {$p}mtti_live_classes lc
+             LEFT JOIN {$p}mtti_courses c ON lc.course_id = c.course_id
+             WHERE lc.staff_id = %d AND lc.status IN ('Ended','Completed','Cancelled')
+               AND lc.scheduled_date >= DATE_SUB(NOW(), INTERVAL 30 DAY)
+             ORDER BY lc.scheduled_date DESC
+             LIMIT 15",
+            $staff->staff_id
+        ));
+
+        $portal_url = get_permalink();
+
+        echo '<div class="mtti-section-card">';
+        echo '<h2 class="mtti-section-title">🎥 Live Classes</h2>';
+
+        // Schedule form
+        echo '<div style="background:#f8f9fa;border:1px solid #e0e0e0;border-radius:10px;padding:20px;margin-bottom:24px;">';
+        echo '<h3 style="font-size:15px;font-weight:700;margin-bottom:16px;color:#333;">📅 Schedule a New Live Class</h3>';
+        echo '<form method="post" action="' . esc_url(add_query_arg('ltab', 'live_classes', $portal_url)) . '">';
+        wp_nonce_field('mtti_live_action', 'mtti_live_nonce');
+        echo '<input type="hidden" name="mtti_live_action" value="schedule">';
+
+        echo '<div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:14px;">';
+
+        echo '<div style="grid-column:1/-1;">';
+        echo '<label style="display:block;font-size:13px;font-weight:600;margin-bottom:4px;color:#333;">Session Title *</label>';
+        echo '<input type="text" name="title" required placeholder="e.g. Introduction to Networking" style="width:100%;padding:9px 12px;border:1px solid #ddd;border-radius:6px;font-size:14px;box-sizing:border-box;">';
+        echo '</div>';
+
+        echo '<div>';
+        echo '<label style="display:block;font-size:13px;font-weight:600;margin-bottom:4px;color:#333;">Course *</label>';
+        echo '<select name="course_id" required style="width:100%;padding:9px 12px;border:1px solid #ddd;border-radius:6px;font-size:14px;box-sizing:border-box;">';
+        echo '<option value="">— Select Course —</option>';
+        foreach ($courses as $c) {
+            echo '<option value="' . intval($c->course_id) . '">' . esc_html($c->course_code . ' — ' . $c->course_name) . '</option>';
+        }
+        echo '</select></div>';
+
+        echo '<div>';
+        echo '<label style="display:block;font-size:13px;font-weight:600;margin-bottom:4px;color:#333;">Date &amp; Time (EAT) *</label>';
+        echo '<input type="datetime-local" name="scheduled_date" required style="width:100%;padding:9px 12px;border:1px solid #ddd;border-radius:6px;font-size:14px;box-sizing:border-box;">';
+        echo '</div>';
+
+        echo '</div>'; // end grid row 1
+
+        echo '<div style="display:grid;grid-template-columns:160px 1fr;gap:14px;margin-bottom:16px;">';
+
+        echo '<div>';
+        echo '<label style="display:block;font-size:13px;font-weight:600;margin-bottom:4px;color:#333;">Duration (min)</label>';
+        echo '<input type="number" name="duration_minutes" value="60" min="15" max="480" style="width:100%;padding:9px 12px;border:1px solid #ddd;border-radius:6px;font-size:14px;box-sizing:border-box;">';
+        echo '</div>';
+
+        echo '<div>';
+        echo '<label style="display:block;font-size:13px;font-weight:600;margin-bottom:4px;color:#333;">Description (optional)</label>';
+        echo '<input type="text" name="description" placeholder="Brief overview of what will be covered" style="width:100%;padding:9px 12px;border:1px solid #ddd;border-radius:6px;font-size:14px;box-sizing:border-box;">';
+        echo '</div>';
+
+        echo '</div>';
+
+        echo '<button type="submit" class="mtti-btn mtti-btn-primary">📅 Schedule Class</button>';
+        echo '</form>';
+        echo '</div>'; // end schedule form
+
+        // Upcoming sessions
+        if (!empty($upcoming)) {
+            echo '<h3 style="font-size:13px;font-weight:700;color:#777;text-transform:uppercase;letter-spacing:.6px;margin-bottom:12px;">Upcoming &amp; Active</h3>';
+            foreach ($upcoming as $cls) {
+                $this->render_lecturer_class_card($cls, $staff, $portal_url, $now);
+            }
+        } else {
+            echo '<p style="color:#aaa;text-align:center;padding:20px 0 4px;">No upcoming sessions yet — schedule one above!</p>';
+        }
+
+        // Past sessions
+        if (!empty($past)) {
+            echo '<h3 style="font-size:13px;font-weight:700;color:#777;text-transform:uppercase;letter-spacing:.6px;margin:24px 0 12px;">Past Sessions</h3>';
+            foreach ($past as $cls) {
+                $this->render_lecturer_class_card($cls, $staff, $portal_url, $now, true);
+            }
+        }
+
+        echo '</div>'; // end mtti-section-card
+
+        // Jitsi overlay modal
+        $wp_user  = get_user_by('ID', get_current_user_id());
+        $disp_name = esc_js($wp_user ? $wp_user->display_name : 'Lecturer');
+
+        echo '
+        <div id="mtti-jitsi-modal" style="display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,.92);z-index:99999;flex-direction:column;">
+            <div style="display:flex;align-items:center;justify-content:space-between;padding:10px 16px;background:#1e293b;color:#fff;flex-shrink:0;">
+                <div style="display:flex;align-items:center;gap:10px;">
+                    <strong id="mtti-jitsi-title" style="font-size:15px;"></strong>
+                    <span style="background:#16a34a;color:#fff;padding:2px 10px;border-radius:20px;font-size:11px;font-weight:700;">&#11044; LIVE</span>
+                </div>
+                <button onclick="mttiCloseJitsi()" style="background:rgba(255,255,255,.15);color:#fff;border:none;padding:7px 16px;border-radius:6px;cursor:pointer;font-size:13px;font-weight:600;">✕ End / Leave</button>
+            </div>
+            <iframe id="mtti-jitsi-frame" style="flex:1;width:100%;border:none;" src="" allow="camera; microphone; display-capture; fullscreen; autoplay" allowfullscreen></iframe>
+        </div>
+        <script>
+        function mttiGoLive(classId, room, title) {
+            var displayName = "' . $disp_name . '";
+            document.getElementById("mtti-jitsi-title").textContent = title;
+            document.getElementById("mtti-jitsi-modal").style.display = "flex";
+            document.getElementById("mtti-jitsi-frame").src =
+                "https://meet.jit.si/" + encodeURIComponent(room) +
+                "#userInfo.displayName=" + encodeURIComponent(displayName) +
+                "&config.startWithVideoMuted=false" +
+                "&config.startWithAudioMuted=false" +
+                "&config.prejoinPageEnabled=true" +
+                "&config.disableDeepLinking=true" +
+                "&interfaceConfig.SHOW_JITSI_WATERMARK=false";
+            document.body.style.overflow = "hidden";
+            // Mark session as Live
+            jQuery.post(mttiLecturer.ajaxUrl, {
+                action: "mtti_lecturer_go_live",
+                nonce: mttiLecturer.nonce,
+                class_id: classId
+            });
+        }
+        function mttiCloseJitsi() {
+            document.getElementById("mtti-jitsi-frame").src = "";
+            document.getElementById("mtti-jitsi-modal").style.display = "none";
+            document.body.style.overflow = "";
+        }
+        </script>';
+    }
+
+    private function render_lecturer_class_card($cls, $staff, $portal_url, $now, $is_past = false) {
+        $start_ts  = strtotime($cls->scheduled_date);
+        $is_live   = ($cls->status === 'Live');
+        $is_sched  = ($cls->status === 'Scheduled');
+        $room_name = 'mtti-live-' . intval($cls->class_id);
+        $room_url  = 'https://meet.jit.si/' . rawurlencode($room_name);
+
+        $border  = $is_live ? 'border-left:4px solid #16a34a;' : ($is_past ? 'border-left:4px solid #94a3b8;' : '');
+        $opacity = $is_past ? 'opacity:.8;' : '';
+
+        echo '<div style="border:1px solid #e0e0e0;border-radius:10px;padding:16px 20px;margin-bottom:12px;background:#fff;display:flex;align-items:flex-start;justify-content:space-between;flex-wrap:wrap;gap:12px;' . $border . $opacity . '">';
+
+        // Info column
+        echo '<div style="flex:1;min-width:220px;">';
+        echo '<div style="display:flex;align-items:center;gap:8px;margin-bottom:4px;">';
+        echo '<strong style="font-size:15px;">' . esc_html($cls->title) . '</strong>';
+        if ($is_live) {
+            echo '<span style="background:#16a34a;color:#fff;padding:2px 8px;border-radius:20px;font-size:11px;font-weight:700;animation:pulse 2s infinite">&#11044; LIVE</span>';
+        } elseif ($cls->status === 'Cancelled') {
+            echo '<span style="background:#ef4444;color:#fff;padding:2px 8px;border-radius:20px;font-size:11px;">Cancelled</span>';
+        } elseif ($is_past) {
+            echo '<span style="background:#94a3b8;color:#fff;padding:2px 8px;border-radius:20px;font-size:11px;">Ended</span>';
+        } elseif ($is_sched) {
+            echo '<span style="background:#2563eb;color:#fff;padding:2px 8px;border-radius:20px;font-size:11px;">Scheduled</span>';
+        }
+        echo '</div>';
+        echo '<div style="font-size:13px;color:#666;">' . esc_html($cls->course_name) . '</div>';
+        echo '<div style="font-size:12px;color:#888;margin-top:4px;">&#128197; ' . esc_html(date('D, d M Y g:i A', $start_ts)) . ' EAT &bull; ' . intval($cls->duration_minutes) . ' min</div>';
+        if ($cls->description) {
+            echo '<div style="font-size:13px;color:#555;margin-top:5px;">' . esc_html($cls->description) . '</div>';
+        }
+        echo '<div style="font-size:11px;color:#bbb;margin-top:5px;">Room: <a href="' . esc_url($room_url) . '" target="_blank" rel="noopener" style="color:#1976D2;">' . esc_html($room_name) . '</a></div>';
+        echo '</div>';
+
+        // Actions column
+        echo '<div style="flex-shrink:0;display:flex;flex-direction:column;gap:8px;align-items:flex-end;">';
+
+        if ($is_live) {
+            // Rejoin button
+            echo '<button onclick="mttiGoLive(' . intval($cls->class_id) . ',\'' . esc_js($room_name) . '\',\'' . esc_js($cls->title) . '\')" style="padding:10px 20px;background:#16a34a;color:#fff;border:none;border-radius:7px;font-size:13px;font-weight:700;cursor:pointer;display:flex;align-items:center;gap:6px;">📹 Rejoin</button>';
+            // End button
+            echo '<form method="post" action="' . esc_url(add_query_arg('ltab', 'live_classes', $portal_url)) . '" style="margin:0;">';
+            wp_nonce_field('mtti_live_action', 'mtti_live_nonce');
+            echo '<input type="hidden" name="mtti_live_action" value="end">';
+            echo '<input type="hidden" name="class_id" value="' . intval($cls->class_id) . '">';
+            echo '<button type="submit" onclick="return confirm(\'End this session for everyone?\')" style="padding:9px 18px;background:#ef4444;color:#fff;border:none;border-radius:7px;font-size:13px;font-weight:700;cursor:pointer;display:flex;align-items:center;gap:6px;">⏹ End Session</button>';
+            echo '</form>';
+
+        } elseif ($is_sched) {
+            // Start button — always visible regardless of scheduled time
+            echo '<button onclick="mttiGoLive(' . intval($cls->class_id) . ',\'' . esc_js($room_name) . '\',\'' . esc_js($cls->title) . '\')" style="padding:10px 20px;background:#16a34a;color:#fff;border:none;border-radius:7px;font-size:13px;font-weight:700;cursor:pointer;display:flex;align-items:center;gap:6px;">▶ Start</button>';
+            // Cancel button
+            echo '<form method="post" action="' . esc_url(add_query_arg('ltab', 'live_classes', $portal_url)) . '" style="margin:0;">';
+            wp_nonce_field('mtti_live_action', 'mtti_live_nonce');
+            echo '<input type="hidden" name="mtti_live_action" value="cancel">';
+            echo '<input type="hidden" name="class_id" value="' . intval($cls->class_id) . '">';
+            echo '<button type="submit" onclick="return confirm(\'Cancel this session?\')" style="padding:7px 14px;background:transparent;color:#ef4444;border:1px solid #ef4444;border-radius:6px;font-size:12px;cursor:pointer;">✕ Cancel</button>';
+            echo '</form>';
+
+        } elseif ($is_past && $cls->status === 'Ended') {
+            // Add/update recording link
+            echo '<form method="post" action="' . esc_url(add_query_arg('ltab', 'live_classes', $portal_url)) . '" style="display:flex;gap:6px;align-items:center;flex-wrap:wrap;">';
+            wp_nonce_field('mtti_live_action', 'mtti_live_nonce');
+            echo '<input type="hidden" name="mtti_live_action" value="add_recording">';
+            echo '<input type="hidden" name="class_id" value="' . intval($cls->class_id) . '">';
+            echo '<input type="url" name="recording_link" placeholder="Recording link (optional)" value="' . esc_attr($cls->recording_link ?? '') . '" style="padding:6px 10px;border:1px solid #ddd;border-radius:6px;font-size:12px;width:200px;">';
+            echo '<button type="submit" style="padding:6px 12px;background:#1976D2;color:#fff;border:none;border-radius:6px;font-size:12px;cursor:pointer;">Save</button>';
+            echo '</form>';
+        }
+
+        echo '</div>';
+        echo '</div>';
+    }
+
+    private function handle_live_class_action($action, $staff) {
+        global $wpdb;
+        $p = $wpdb->prefix;
+
+        switch ($action) {
+            case 'schedule':
+                $course_id  = intval($_POST['course_id'] ?? 0);
+                $title      = sanitize_text_field($_POST['title'] ?? '');
+                $desc       = sanitize_textarea_field($_POST['description'] ?? '');
+                $sched      = sanitize_text_field($_POST['scheduled_date'] ?? '');
+                $duration   = max(15, intval($_POST['duration_minutes'] ?? 60));
+
+                if (!$course_id || !$title || !$sched) break;
+                $dt = DateTime::createFromFormat('Y-m-d\TH:i', $sched);
+                if (!$dt) break;
+
+                $inserted = $wpdb->insert(
+                    $p . 'mtti_live_classes',
+                    array(
+                        'course_id'        => $course_id,
+                        'staff_id'         => $staff->staff_id,
+                        'title'            => $title,
+                        'description'      => $desc,
+                        'meeting_platform' => 'Jitsi',
+                        'scheduled_date'   => $dt->format('Y-m-d H:i:s'),
+                        'duration_minutes' => $duration,
+                        'status'           => 'Scheduled',
+                        'created_at'       => current_time('mysql'),
+                        'updated_at'       => current_time('mysql'),
+                    ),
+                    array('%d','%d','%s','%s','%s','%s','%d','%s','%s','%s')
+                );
+                if ($inserted) {
+                    $class_id = $wpdb->insert_id;
+                    $wpdb->update(
+                        $p . 'mtti_live_classes',
+                        array('meeting_link' => 'https://meet.jit.si/mtti-live-' . $class_id, 'meeting_id' => 'mtti-live-' . $class_id),
+                        array('class_id' => $class_id),
+                        array('%s','%s'), array('%d')
+                    );
+                }
+                break;
+
+            case 'end':
+                $class_id = intval($_POST['class_id'] ?? 0);
+                if (!$class_id) break;
+                $wpdb->update(
+                    $p . 'mtti_live_classes',
+                    array('status' => 'Ended', 'updated_at' => current_time('mysql')),
+                    array('class_id' => $class_id, 'staff_id' => $staff->staff_id),
+                    array('%s','%s'), array('%d','%d')
+                );
+                break;
+
+            case 'cancel':
+                $class_id = intval($_POST['class_id'] ?? 0);
+                if (!$class_id) break;
+                $wpdb->update(
+                    $p . 'mtti_live_classes',
+                    array('status' => 'Cancelled', 'updated_at' => current_time('mysql')),
+                    array('class_id' => $class_id, 'staff_id' => $staff->staff_id),
+                    array('%s','%s'), array('%d','%d')
+                );
+                break;
+
+            case 'add_recording':
+                $class_id = intval($_POST['class_id'] ?? 0);
+                $link     = esc_url_raw($_POST['recording_link'] ?? '');
+                if (!$class_id) break;
+                $wpdb->update(
+                    $p . 'mtti_live_classes',
+                    array('recording_link' => $link, 'updated_at' => current_time('mysql')),
+                    array('class_id' => $class_id, 'staff_id' => $staff->staff_id),
+                    array('%s','%s'), array('%d','%d')
+                );
+                break;
+        }
+    }
+
+    public function ajax_go_live() {
+        check_ajax_referer('mtti_lecturer_nonce', 'nonce');
+        if (!is_user_logged_in()) wp_send_json_error('Not logged in');
+        global $wpdb;
+        $p        = $wpdb->prefix . 'mtti_';
+        $class_id = intval($_POST['class_id'] ?? 0);
+        if (!$class_id) wp_send_json_error('Invalid class ID');
+
+        $staff = $wpdb->get_row($wpdb->prepare(
+            "SELECT staff_id FROM {$p}staff WHERE user_id=%d AND status='Active'",
+            get_current_user_id()
+        ));
+        if (!$staff && !current_user_can('manage_options')) wp_send_json_error('Not authorized');
+
+        $staff_id = $staff ? $staff->staff_id : 0;
+        $wpdb->update(
+            $p . 'live_classes',
+            array('status' => 'Live', 'updated_at' => current_time('mysql')),
+            $staff_id ? array('class_id' => $class_id, 'staff_id' => $staff_id) : array('class_id' => $class_id),
+            array('%s','%s'),
+            $staff_id ? array('%d','%d') : array('%d')
+        );
+        wp_send_json_success();
     }
 
 }

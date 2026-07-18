@@ -18,7 +18,7 @@ if (!defined('WPINC')) {
 }
 
 // Plugin version
-define('MTTI_MIS_VERSION', '7.5.9');
+define('MTTI_MIS_VERSION', '7.5.10');
 define('MTTI_MIS_PLUGIN_DIR', plugin_dir_path(__FILE__));
 define('MTTI_MIS_PLUGIN_URL', plugin_dir_url(__FILE__));
 define('MTTI_MIS_PLUGIN_BASENAME', plugin_basename(__FILE__));
@@ -28,6 +28,9 @@ require_once MTTI_MIS_PLUGIN_DIR . 'includes/class-mtti-mis-pwa.php';
 
 // Load Enrollment Date Fix (permanent system-wide fix for all courses/learners)
 require_once MTTI_MIS_PLUGIN_DIR . 'includes/class-mtti-enrollment-date-fix.php';
+
+// PesaPal payment gateway client
+require_once MTTI_MIS_PLUGIN_DIR . 'includes/class-mtti-mis-pesapal.php';
 
 // GA4 + Meta Pixel on all WordPress front-end pages
 add_action('wp_head', 'mtti_inject_analytics', 1);
@@ -254,6 +257,18 @@ function mtti_mis_handle_document_output() {
     if (!is_admin()) {
         return;
     }
+    // is_admin() only means "this URL is under /wp-admin/" — it does NOT
+    // check login state or capability. Every branch below outputs another
+    // student's PII (transcripts, certificates, admission letters) straight
+    // from a GET param with no other check, so without this the whole
+    // handler is reachable by anyone, logged in or not, just by hitting the
+    // URL. Gate it the same way the actual admin menu item is gated
+    // (admin/class-mtti-mis-admin.php: add_submenu_page(..., 'manage_mtti', 'mtti-mis-certificates', ...))
+    // so this matches who could already see the menu link, not a new
+    // restriction beyond that.
+    if (!current_user_can('manage_options') && !current_user_can('manage_mtti')) {
+        return;
+    }
     if (isset($_GET['page']) && $_GET['page'] === 'mtti-mis-lessons') {
         if (isset($_POST['mtti_lesson_submit']) && isset($_POST['mtti_lesson_nonce'])) {
             if (wp_verify_nonce($_POST['mtti_lesson_nonce'], 'mtti_lesson_action')) {
@@ -441,13 +456,16 @@ function mtti_mis_output_transcript($student_id) {
     </div></body></html><?php exit;
 }
 
-function mtti_mis_output_unit_transcript($unit_id, $student_id) {
+function mtti_mis_output_unit_transcript($unit_id, $student_id, $back_url = null) {
     global $wpdb;
     $students_table = $wpdb->prefix . 'mtti_students';
     $student = $wpdb->get_row($wpdb->prepare(
         "SELECT s.*, u.display_name, u.user_email FROM {$students_table} s LEFT JOIN {$wpdb->users} u ON s.user_id = u.ID WHERE s.student_id = %d", $student_id
     ));
     if (!$student) { wp_die('Student not found'); }
+    if (!$back_url) {
+        $back_url = admin_url('admin.php?page=mtti-mis-certificates&action=transcript&student_id=' . $student_id);
+    }
     $unit_results_table = $wpdb->prefix . 'mtti_unit_results';
     $units_table = $wpdb->prefix . 'mtti_course_units';
     $courses_table = $wpdb->prefix . 'mtti_courses';
@@ -458,6 +476,11 @@ function mtti_mis_output_unit_transcript($unit_id, $student_id) {
     ));
     if (!$result) { wp_die('Unit result not found'); }
     $logo_url = MTTI_MIS_PLUGIN_URL . 'assets/images/logo.jpeg';
+    // Same real signature/stamp already used on the admission-letter PDF
+    // (uploaded once via admin settings, stored as base64 in these two
+    // options) — not a generic placeholder image.
+    $sig_b64   = get_option('mtti_admission_signature_b64', '');
+    $stamp_b64 = get_option('mtti_admission_stamp_b64', '');
     $transcript_number = 'MTTI/TR/' . date('Y') . '/' . str_pad($unit_id, 4, '0', STR_PAD_LEFT) . '/' . str_pad($student_id, 4, '0', STR_PAD_LEFT);
     $pct = isset($result->percentage) ? floatval($result->percentage) : 0;
     $grade_category = 'REFER'; $category_color = '#D32F2F';
@@ -467,7 +490,7 @@ function mtti_mis_output_unit_transcript($unit_id, $student_id) {
     ?><!DOCTYPE html><html lang="en"><head><meta charset="UTF-8"><title>Unit Transcript - <?php echo esc_html($result->unit_name); ?></title>
     <style>* { margin:0;padding:0;box-sizing:border-box; } @page{size:A4 portrait;margin:0;} @media print{.no-print{display:none!important;}html,body{background:white;print-color-adjust:exact;-webkit-print-color-adjust:exact;margin:0;padding:0;}.transcript-container{box-shadow:none;border:none;margin:10mm;width:calc(210mm - 20mm);height:calc(297mm - 20mm);}} body{font-family:Arial,sans-serif;font-size:12px;line-height:1.4;color:#333;background:#f0f0f0;padding:20px;} .transcript-container{width:190mm;height:277mm;margin:0 auto;background:white;padding:10mm;box-shadow:0 2px 15px rgba(0,0,0,0.15);border:2px solid #2E7D32;position:relative;overflow:hidden;} .watermark{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%) rotate(-30deg);font-size:120px;color:rgba(46,125,50,0.04);font-weight:bold;pointer-events:none;z-index:0;} .content{position:relative;z-index:1;height:100%;display:flex;flex-direction:column;} .header{text-align:center;padding-bottom:10px;margin-bottom:10px;border-bottom:2px solid #2E7D32;} .logo{width:60px;margin-bottom:8px;} .header h1{color:#2E7D32;font-size:18px;} .header h2{color:#1976D2;font-size:15px;margin-top:8px;} .section{margin:8px 0;} .section-title{color:#2E7D32;font-size:11px;font-weight:bold;margin-bottom:5px;padding-bottom:3px;border-bottom:1px solid #ddd;text-transform:uppercase;} .info-row{display:flex;justify-content:space-between;padding:3px 0;font-size:11px;} .info-label{font-weight:bold;color:#555;} .unit-box{background:linear-gradient(135deg,#e8f5e9 0%,#c8e6c9 100%);border:1px solid #4CAF50;border-radius:6px;padding:12px;margin:12px 0;text-align:center;} .unit-name{font-size:18px;font-weight:bold;color:#1B5E20;margin:5px 0;} .grade-box{background:white;border:3px solid <?php echo $category_color; ?>;border-radius:8px;padding:18px 15px;margin:12px auto;max-width:240px;text-align:center;} .grade-category-main{font-size:28px;font-weight:bold;color:<?php echo $category_color; ?>;letter-spacing:3px;margin:6px 0;} .grade-score{font-size:15px;color:#555;margin:4px 0;} .status-badge{display:inline-block;padding:5px 15px;border-radius:15px;font-weight:bold;font-size:12px;margin-top:10px;} .status-passed{background:#e8f5e9;color:#2E7D32;border:1px solid #4CAF50;} .status-failed{background:#ffebee;color:#c62828;border:1px solid #ef5350;} .spacer{flex:1;} .signatures{display:flex;justify-content:space-around;margin-top:20px;} .signature{text-align:center;} .signature-line{border-top:1px solid #333;width:120px;margin:0 auto 5px auto;} .signature-title{font-size:10px;color:#666;} .motto{color:#FF9800;font-style:italic;text-align:center;margin-top:12px;font-weight:bold;font-size:12px;} .footer{margin-top:10px;padding-top:8px;border-top:1px solid #ddd;font-size:9px;color:#888;text-align:center;} .print-btn{position:fixed;top:20px;right:20px;padding:10px 20px;background:#2E7D32;color:white;border:none;border-radius:4px;cursor:pointer;font-size:14px;} .back-btn{position:fixed;top:20px;right:160px;padding:10px 20px;background:#1976D2;color:white;border:none;border-radius:4px;cursor:pointer;font-size:14px;text-decoration:none;}</style>
     </head><body>
-    <a href="<?php echo admin_url('admin.php?page=mtti-mis-certificates&action=transcript&student_id=' . $student_id); ?>" class="back-btn no-print">← Back</a>
+    <a href="<?php echo esc_url($back_url); ?>" class="back-btn no-print">← Back</a>
     <button class="print-btn no-print" onclick="window.print()">🖨️ Print</button>
     <div class="transcript-container"><div class="watermark">MTTI</div>
     <div class="content">
@@ -486,10 +509,414 @@ function mtti_mis_output_unit_transcript($unit_id, $student_id) {
             <?php if ($result->remarks) : ?><div class="info-row"><span class="info-label">Remarks:</span><span><?php echo esc_html($result->remarks); ?></span></div><?php endif; ?>
         </div>
         <div class="spacer"></div>
-        <div class="signatures"><div class="signature"><div class="signature-line"></div><p class="signature-title">Principal/Director</p></div><div class="signature"><div class="signature-line"></div><p class="signature-title">Registrar</p></div></div>
+        <div class="signatures">
+            <div class="signature">
+                <?php if ($sig_b64): ?>
+                <img src="<?php echo esc_attr($sig_b64); ?>" style="display:block;max-width:120px;max-height:45px;width:auto;height:auto;margin:0 auto 4px;" alt="Signature">
+                <?php else: ?>
+                <div class="signature-line"></div>
+                <?php endif; ?>
+                <p class="signature-title">Principal/Director</p>
+            </div>
+            <div class="signature"><div class="signature-line"></div><p class="signature-title">Registrar</p></div>
+            <div class="signature">
+                <?php if ($stamp_b64): ?>
+                <img src="<?php echo esc_attr($stamp_b64); ?>" style="display:block;max-width:70px;max-height:70px;width:auto;height:auto;margin:0 auto 4px;" alt="Official Stamp">
+                <p class="signature-title">Official Stamp</p>
+                <?php endif; ?>
+            </div>
+        </div>
         <p class="motto">"Start Learning, Start Earning"</p>
         <div class="footer"><p>Ref: <?php echo esc_html($transcript_number); ?> | Generated: <?php echo date('F j, Y'); ?></p></div>
     </div></div></body></html><?php exit;
+}
+
+/**
+ * Student-facing per-unit transcript. Deliberately does NOT trust a
+ * client-supplied student_id — resolves it from the logged-in WP user, the
+ * same way get_current_student() does in the learner portal, so a student
+ * can never view another student's transcript by editing the unit_id/URL.
+ * Renders through mtti_mis_output_unit_transcript(), which itself only
+ * returns a result if a mtti_unit_results row exists for that exact
+ * (unit_id, student_id) pair, so an unearned or someone-else's unit is
+ * rejected with "Unit result not found" rather than silently succeeding.
+ */
+add_action('wp_ajax_mtti_student_unit_transcript', 'mtti_mis_output_student_unit_transcript');
+function mtti_mis_output_student_unit_transcript() {
+    if (!is_user_logged_in()) { wp_die('Please log in to view your transcript.'); }
+    if (!wp_verify_nonce($_GET['nonce'] ?? '', 'mtti_portal_nonce')) { wp_die('Security check failed — please go back and try again.'); }
+
+    global $wpdb;
+    $student_id = (int) $wpdb->get_var($wpdb->prepare(
+        "SELECT student_id FROM {$wpdb->prefix}mtti_students WHERE user_id = %d LIMIT 1",
+        get_current_user_id()
+    ));
+    if (!$student_id) { wp_die('No student record found for your account.'); }
+
+    $unit_id = intval($_GET['unit_id'] ?? 0);
+    if (!$unit_id) { wp_die('Missing unit.'); }
+
+    $referer = wp_get_referer();
+    mtti_mis_output_unit_transcript($unit_id, $student_id, $referer ?: home_url());
+}
+
+/**
+ * Turns a paid mtti_course_purchases row into a real, fully-enrolled
+ * student — the "pay -> auto-enroll" step for the online self-checkout
+ * flow. Mirrors class-mtti-mis-public-admission-form.php's enroll_student()
+ * (same WP user + student + enrollment + balance + unit-enrollment
+ * sequence) but sources its data from the purchase record instead of
+ * $_POST, and always enrolls as delivery_mode='online' with the balance
+ * already cleared, since this only ever runs after payment is confirmed.
+ *
+ * Not yet wired to a live payment gateway — call this directly (e.g. from
+ * the admin "Course Purchases" screen) until the M-Pesa credentials are in
+ * place, at which point the payment webhook should call this in place of
+ * the manual admin action.
+ *
+ * Idempotent: calling it again on an already-enrolled purchase just
+ * returns the existing student_id rather than creating a duplicate.
+ */
+function mtti_mis_complete_course_purchase($purchase_id) {
+    global $wpdb;
+    $purchases_table = $wpdb->prefix . 'mtti_course_purchases';
+
+    $purchase = $wpdb->get_row($wpdb->prepare(
+        "SELECT * FROM {$purchases_table} WHERE purchase_id = %d", $purchase_id
+    ));
+    if (!$purchase) {
+        return new WP_Error('not_found', 'Purchase not found.');
+    }
+    if ($purchase->status === 'enrolled' && $purchase->student_id) {
+        return (int) $purchase->student_id; // already done — idempotent
+    }
+
+    $course = $wpdb->get_row($wpdb->prepare(
+        "SELECT * FROM {$wpdb->prefix}mtti_courses WHERE course_id = %d", $purchase->course_id
+    ));
+    if (!$course) {
+        return new WP_Error('bad_course', 'The course on this purchase no longer exists.');
+    }
+
+    // --- WP user -------------------------------------------------------
+    $email = $purchase->email;
+    if (empty($email)) {
+        $slug  = strtolower(preg_replace('/[^a-zA-Z0-9]/', '', $purchase->first_name . $purchase->last_name));
+        $email = $slug . '_' . time() . '@student.mtti.local';
+    }
+
+    // The email may already belong to a WP account — an existing student
+    // buying a second course, a staff/admin account, etc. Reuse it instead
+    // of failing the whole enrollment after payment has already gone through.
+    $existing_user_id = email_exists($email);
+    if ($existing_user_id) {
+        $user_id = $existing_user_id;
+        $existing_user = get_userdata($user_id);
+        if ($existing_user && !in_array('mtti_student', (array) $existing_user->roles, true)) {
+            $existing_user->add_role('mtti_student');
+        }
+        $generated_password = null;
+        $login_username = $existing_user ? $existing_user->user_login : $email;
+    } else {
+        $user_login = strpos($email, '@student.mtti.local') !== false
+            ? str_replace('@student.mtti.local', '', $email)
+            : strtolower(preg_replace('/[^a-zA-Z0-9._-]/', '', $email));
+        if (username_exists($user_login)) {
+            $user_login = $user_login . '_' . substr(uniqid(), -5);
+        }
+
+        $generated_password = wp_generate_password(20, true);
+
+        add_filter('wp_send_new_user_notification_to_user',  '__return_false');
+        add_filter('wp_send_new_user_notification_to_admin', '__return_false');
+        $user_id = wp_insert_user(array(
+            'user_login'   => $user_login,
+            'user_email'   => $email,
+            'first_name'   => $purchase->first_name,
+            'last_name'    => $purchase->last_name,
+            'display_name' => trim($purchase->first_name . ' ' . $purchase->last_name),
+            'user_pass'    => $generated_password,
+            'role'         => 'mtti_student',
+        ));
+        remove_filter('wp_send_new_user_notification_to_user',  '__return_false');
+        remove_filter('wp_send_new_user_notification_to_admin', '__return_false');
+
+        if (is_wp_error($user_id)) {
+            return $user_id;
+        }
+        $login_username = $user_login;
+    }
+    update_user_meta($user_id, 'phone', $purchase->phone);
+    $has_real_email = strpos($email, '@student.mtti.local') === false;
+
+    // --- Student record --------------------------------------------------
+    $db = MTTI_MIS_Database::get_instance();
+    $admission_number = $db->generate_admission_number($purchase->course_id);
+    $student_id = $db->create_student(array(
+        'user_id'          => $user_id,
+        'admission_number' => $admission_number,
+        'course_id'        => $purchase->course_id,
+        'gender'           => 'Not specified',
+        'phone'            => $purchase->phone,
+        'enrollment_date'  => current_time('mysql'),
+        'status'           => 'Active',
+    ));
+    if (!$student_id) {
+        wp_delete_user($user_id);
+        return new WP_Error('student_failed', 'Could not create the student record.');
+    }
+
+    // --- Enrollment, already-cleared balance, unit enrollments -----------
+    $wpdb->insert($wpdb->prefix . 'mtti_enrollments', array(
+        'student_id'      => $student_id,
+        'course_id'       => $purchase->course_id,
+        'enrollment_date' => current_time('Y-m-d'),
+        'status'          => 'Active',
+        'delivery_mode'   => 'online',
+        'discount_amount' => 0,
+    ));
+    $enrollment_id = (int) $wpdb->insert_id;
+
+    if ($enrollment_id) {
+        $wpdb->insert($wpdb->prefix . 'mtti_student_balances', array(
+            'student_id'      => $student_id,
+            'enrollment_id'   => $enrollment_id,
+            'total_fee'       => $purchase->amount,
+            'discount_amount' => 0,
+            'total_paid'      => $purchase->amount,
+            'balance'         => 0,
+            'updated_at'      => current_time('mysql'),
+        ), array('%d', '%d', '%f', '%f', '%f', '%f', '%s'));
+
+        $wpdb->insert($wpdb->prefix . 'mtti_payments', array(
+            'student_id'            => $student_id,
+            'enrollment_id'         => $enrollment_id,
+            'gross_amount'          => $purchase->amount,
+            'amount'                => $purchase->amount,
+            'payment_method'        => 'MPESA',
+            'transaction_reference' => $purchase->mpesa_receipt ?: $purchase->reference_code,
+            'payment_date'          => current_time('mysql'),
+            'payment_for'           => $course->course_name,
+            'receipt_number'        => 'PCH-' . $purchase->purchase_id . '-' . strtoupper(substr(md5($purchase->reference_code), 0, 6)),
+            'status'                => 'Completed',
+            'notes'                 => 'Self-checkout course purchase, ref ' . $purchase->reference_code,
+        ));
+
+        $units = $wpdb->get_results($wpdb->prepare(
+            "SELECT unit_id FROM {$wpdb->prefix}mtti_course_units WHERE course_id = %d AND status = 'Active'",
+            $purchase->course_id
+        ));
+        foreach ($units as $unit) {
+            $wpdb->insert($wpdb->prefix . 'mtti_unit_enrollments', array(
+                'unit_id'         => $unit->unit_id,
+                'student_id'      => $student_id,
+                'enrollment_date' => current_time('Y-m-d'),
+                'status'          => 'Active',
+            ));
+        }
+    }
+
+    $wpdb->update($purchases_table, array(
+        'status'     => 'enrolled',
+        'student_id' => $student_id,
+    ), array('purchase_id' => $purchase_id));
+
+    if ($has_real_email) {
+        mtti_mis_send_enrollment_email($email, $purchase->first_name, $admission_number, $course->course_name, $generated_password);
+    }
+
+    // Credentials for the payment-return page to display directly — the
+    // one channel guaranteed to reach every learner regardless of whether
+    // they have an email on file. Short-lived: shown once, then expires.
+    set_transient('mtti_pesapal_creds_' . $purchase_id, array(
+        'login_username' => $login_username,
+        'password'       => $generated_password,
+        'admission_number' => $admission_number,
+        'has_real_email'  => $has_real_email,
+    ), 30 * MINUTE_IN_SECONDS);
+
+    return $student_id;
+}
+
+/**
+ * Emails the newly-enrolled online student their access details. With a
+ * brand-new WP account this includes the generated password (sent once,
+ * never stored in plaintext or logged); for an existing account (e.g. a
+ * second course purchase) it's just a confirmation, since their password
+ * hasn't changed.
+ */
+function mtti_mis_send_enrollment_email($email, $first_name, $admission_number, $course_name, $password = null) {
+    if (!function_exists('wp_mail') || strpos($email, '@student.mtti.local') !== false) {
+        return false; // no real address to send to
+    }
+
+    $settings = get_option('mtti_mis_settings', array());
+    $institute_name = $settings['institute_name'] ?? 'Masomotele Technical Training Institute';
+    $login_url = wp_login_url();
+    $portal_url = home_url('/student-portal/');
+
+    $subject = 'Welcome to ' . $institute_name . ' — ' . $course_name . ' Enrollment Confirmed';
+
+    $message  = "Dear {$first_name},\n\n";
+    $message .= "Your payment was received and you're now enrolled in {$course_name}.\n\n";
+    $message .= "Admission Number: {$admission_number}\n";
+
+    if ($password) {
+        $message .= "Login Email: {$email}\n";
+        $message .= "Password: {$password}\n\n";
+        $message .= "IMPORTANT: Please change your password after your first login.\n\n";
+    } else {
+        $message .= "\nLog in with your existing {$institute_name} account to access this course — your password hasn't changed.\n\n";
+    }
+
+    $message .= "Student Portal: {$portal_url}\n";
+    $message .= "Login Page: {$login_url}\n\n";
+    $message .= "From the portal you can view your lessons, take quizzes, check your fee balance, and download your transcripts and certificates.\n\n";
+    $message .= "If you have any questions, please contact the administration office.\n\n";
+    $message .= "\"Start Learning, Start Earning\"\n\n";
+    $message .= "Best regards,\n{$institute_name}";
+
+    $headers = array('Content-Type: text/plain; charset=UTF-8');
+
+    try {
+        return @wp_mail($email, $subject, $message, $headers);
+    } catch (Exception $e) {
+        error_log('MTTI MIS: enrollment email failed — ' . $e->getMessage());
+        return false;
+    }
+}
+
+/**
+ * Confirms a PesaPal order against the live API (never trusts query params
+ * alone) and, if paid, marks the purchase paid + auto-enrolls. Shared by
+ * both the IPN (server-to-server) and the return (browser redirect) paths
+ * so payment gets confirmed even if one of the two never arrives.
+ */
+function mtti_mis_pesapal_confirm_and_complete($order_tracking_id) {
+    global $wpdb;
+    $purchases_table = $wpdb->prefix . 'mtti_course_purchases';
+
+    $purchase = $wpdb->get_row($wpdb->prepare(
+        "SELECT * FROM {$purchases_table} WHERE pesapal_tracking_id = %s", $order_tracking_id
+    ));
+    if (!$purchase) {
+        return new WP_Error('purchase_not_found', 'No purchase matches this PesaPal order.');
+    }
+    if ($purchase->status === 'enrolled' && $purchase->student_id) {
+        return (int) $purchase->student_id; // already done — idempotent
+    }
+
+    $status = MTTI_MIS_Pesapal::get_transaction_status($order_tracking_id);
+    if (is_wp_error($status)) {
+        return $status;
+    }
+
+    $status_code = isset($status['status_code']) ? (int) $status['status_code'] : -1;
+    if ($status_code !== 1) {
+        // Not completed yet (0=Invalid, 2=Failed, 3=Reversed, or still pending)
+        $wpdb->update($purchases_table, array(
+            'status' => ($status_code === 2 || $status_code === 0) ? 'cancelled' : 'awaiting_payment',
+        ), array('purchase_id' => $purchase->purchase_id));
+        return new WP_Error('not_paid', $status['payment_status_description'] ?? 'Payment not completed.');
+    }
+
+    $wpdb->update($purchases_table, array(
+        'status'        => 'paid',
+        'mpesa_receipt' => $status['confirmation_code'] ?? $purchase->mpesa_receipt,
+    ), array('purchase_id' => $purchase->purchase_id));
+
+    return mtti_mis_complete_course_purchase($purchase->purchase_id);
+}
+
+/**
+ * PesaPal IPN — server-to-server notification PesaPal calls when an
+ * order's status changes. Must respond with the exact JSON shape below or
+ * PesaPal will keep retrying.
+ */
+add_action('wp_ajax_mtti_pesapal_ipn',        'mtti_mis_pesapal_ipn_handler');
+add_action('wp_ajax_nopriv_mtti_pesapal_ipn', 'mtti_mis_pesapal_ipn_handler');
+function mtti_mis_pesapal_ipn_handler() {
+    $tracking_id = sanitize_text_field($_GET['OrderTrackingId'] ?? '');
+    $merchant_ref = sanitize_text_field($_GET['OrderMerchantReference'] ?? '');
+
+    if ($tracking_id) {
+        mtti_mis_pesapal_confirm_and_complete($tracking_id);
+    }
+
+    header('Content-Type: application/json');
+    echo wp_json_encode(array(
+        'orderNotificationType' => 'IPNCHANGE',
+        'orderTrackingId'       => $tracking_id,
+        'orderMerchantReference'=> $merchant_ref,
+        'status'                => 200,
+    ));
+    exit;
+}
+
+/**
+ * PesaPal return URL — the student's browser lands here after attempting
+ * payment. Confirms status directly (doesn't wait on the IPN) and shows a
+ * plain result page.
+ */
+add_action('wp_ajax_mtti_pesapal_return',        'mtti_mis_pesapal_return_handler');
+add_action('wp_ajax_nopriv_mtti_pesapal_return', 'mtti_mis_pesapal_return_handler');
+function mtti_mis_pesapal_return_handler() {
+    $tracking_id = sanitize_text_field($_GET['OrderTrackingId'] ?? '');
+    $result = $tracking_id ? mtti_mis_pesapal_confirm_and_complete($tracking_id) : new WP_Error('missing', 'Missing order reference.');
+
+    $checkout_url = home_url('/enroll-online/');
+    $home_url = home_url('/');
+
+    header('Content-Type: text/html; charset=UTF-8');
+    if (!is_wp_error($result)) {
+        global $wpdb;
+        $purchase_id = (int) $wpdb->get_var($wpdb->prepare(
+            "SELECT purchase_id FROM {$wpdb->prefix}mtti_course_purchases WHERE pesapal_tracking_id = %s", $tracking_id
+        ));
+        $creds = $purchase_id ? get_transient('mtti_pesapal_creds_' . $purchase_id) : false;
+        if ($purchase_id) {
+            delete_transient('mtti_pesapal_creds_' . $purchase_id); // shown once
+        }
+
+        $creds_html = '';
+        if ($creds) {
+            if ($creds['has_real_email'] && !$creds['password']) {
+                // Existing account reused — no new credentials, nothing new to show.
+                $creds_html = '<p>Log in with your existing account to access this course.</p>';
+            } else {
+                $login_line = $creds['password']
+                    ? '<div style="margin:4px 0;"><strong>Password:</strong> ' . esc_html($creds['password']) . '</div>'
+                    : '';
+                $creds_html = '<div style="background:#eaf3ea;border-radius:8px;padding:16px;margin:20px 0;text-align:left;font-size:14px;">'
+                    . '<div style="margin:4px 0;"><strong>Admission No:</strong> ' . esc_html($creds['admission_number']) . '</div>'
+                    . '<div style="margin:4px 0;"><strong>Login Username:</strong> ' . esc_html($creds['login_username']) . '</div>'
+                    . $login_line
+                    . '</div>'
+                    . '<p style="font-size:12.5px;color:#889;">Save these details now — write them down or take a screenshot' . ($creds['has_real_email'] ? ', they were also emailed to you' : ' (no email was provided, so this page is the only place they appear)') . '.</p>';
+            }
+        }
+
+        echo '<!DOCTYPE html><html><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Payment Successful</title>'
+            . '<style>body{font-family:-apple-system,"Segoe UI",Roboto,sans-serif;background:#f5f7fb;display:flex;align-items:center;justify-content:center;min-height:100vh;margin:0;padding:20px;}'
+            . '.card{background:#fff;border-radius:12px;padding:40px 32px;max-width:420px;text-align:center;box-shadow:0 4px 20px rgba(0,0,0,.08);}'
+            . '.card h1{color:#1B5E20;font-size:22px;margin:16px 0 8px;}.card p{color:#556;font-size:14px;line-height:1.6;}'
+            . '.btn{display:inline-block;margin-top:20px;background:#2E7D32;color:#fff;text-decoration:none;padding:12px 28px;border-radius:8px;font-weight:600;}</style></head>'
+            . '<body><div class="card"><div style="font-size:48px;">&#9989;</div><h1>Payment received!</h1>'
+            . '<p>Your enrollment is confirmed.</p>'
+            . $creds_html
+            . '<a class="btn" href="' . esc_url(home_url('/student-portal/')) . '">Go to Student Portal</a></div></body></html>';
+    } else {
+        $msg = $result->get_error_message();
+        echo '<!DOCTYPE html><html><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Payment Status</title>'
+            . '<style>body{font-family:-apple-system,"Segoe UI",Roboto,sans-serif;background:#f5f7fb;display:flex;align-items:center;justify-content:center;min-height:100vh;margin:0;padding:20px;}'
+            . '.card{background:#fff;border-radius:12px;padding:40px 32px;max-width:420px;text-align:center;box-shadow:0 4px 20px rgba(0,0,0,.08);}'
+            . '.card h1{color:#E65100;font-size:22px;margin:16px 0 8px;}.card p{color:#556;font-size:14px;line-height:1.6;}'
+            . '.btn{display:inline-block;margin-top:20px;background:#FF9800;color:#fff;text-decoration:none;padding:12px 28px;border-radius:8px;font-weight:600;}</style></head>'
+            . '<body><div class="card"><div style="font-size:48px;">&#8987;</div><h1>Payment pending</h1>'
+            . '<p>' . esc_html($msg) . ' If you completed payment, this page will update automatically once PesaPal confirms it — no need to pay again.</p>'
+            . '<a class="btn" href="' . esc_url($checkout_url) . '">Back to Enrollment</a></div></body></html>';
+    }
+    exit;
 }
 
 function mtti_mis_output_certificate() {
@@ -1306,6 +1733,21 @@ function mtti_mis_maybe_complete_unit($unit_id, $student_id) {
     ));
     if (empty($lessons)) return;
 
+    // Physical-class learners are graded exclusively through the manual
+    // marks form (admin/class-mtti-mis-admin-units.php) — a teacher-entered
+    // physical exam result must never be silently overwritten by this
+    // auto-completion path just because the student also opened an online
+    // quiz. Skip entirely for any student whose enrollment in this unit's
+    // course is flagged 'physical'.
+    $course_id_for_gate = $lessons[0]->course_id;
+    $delivery_mode = $wpdb->get_var($wpdb->prepare(
+        "SELECT delivery_mode FROM {$wpdb->prefix}mtti_enrollments
+         WHERE student_id = %d AND course_id = %d AND status IN ('Active','Enrolled','In Progress')
+         ORDER BY enrollment_date DESC LIMIT 1",
+        $student_id, $course_id_for_gate
+    ));
+    if ($delivery_mode === 'physical') return;
+
     $quiz_lessons = array_values(array_filter($lessons, function ($l) { return $l->interactive_role === 'quiz'; }));
 
     // The "no quiz content -> completes on view" branch below must only
@@ -1351,6 +1793,26 @@ function mtti_mis_maybe_complete_unit($unit_id, $student_id) {
     $grade = ($percentage >= 80) ? 'DISTINCTION' : (($percentage >= 60) ? 'CREDIT' : (($percentage >= 50) ? 'PASS' : 'REFER'));
     $passed = ($grade !== 'REFER') ? 1 : 0;
 
+    // Belt-and-suspenders: even for an 'online' enrollment, if a result
+    // already exists for this unit+student with an actual entered score and
+    // it wasn't written by this same auto-completion path, it was entered
+    // or corrected by a teacher/admin — never silently overwrite that,
+    // regardless of what the student's online quiz activity says.
+    // Deliberately keyed on `score IS NOT NULL`, not just row existence:
+    // admin/class-mtti-mis-admin-enrollments.php's auto_enroll_in_units()
+    // pre-creates an empty placeholder row (score/percentage/grade all
+    // NULL) for every unit the moment ANY enrollment is created, purely so
+    // it shows up in the marks-entry grid — that placeholder must not be
+    // mistaken for a real manual grade, or the auto path would be
+    // permanently blocked for every admin-created enrollment.
+    $existing = $wpdb->get_row($wpdb->prepare(
+        "SELECT score, remarks FROM {$wpdb->prefix}mtti_unit_results WHERE unit_id = %d AND student_id = %d",
+        $unit_id, $student_id
+    ));
+    if ($existing !== null && $existing->score !== null && $existing->remarks !== 'Auto-completed from online course activity') {
+        return;
+    }
+
     $wpdb->query($wpdb->prepare(
         "INSERT INTO {$wpdb->prefix}mtti_unit_results (unit_id, student_id, score, percentage, grade, passed, remarks, result_date)
          VALUES (%d, %d, %f, %f, %s, %d, %s, %s)
@@ -1385,7 +1847,10 @@ function mtti_mis_save_quiz_score() {
             get_current_user_id()
         ));
     }
-    // Guest / unlinked user — still record attempt with student_id=0
+    // Guest / unlinked user — still record attempt with student_id=0.
+    // Pass mark is 50%, consistent with the grading bands used elsewhere
+    // (mtti_mis_maybe_complete_unit(), the results/transcript grade tables).
+    $passed = ($percent >= 50) ? 1 : 0;
     $wpdb->insert(
         $wpdb->prefix . 'mtti_quiz_attempts',
         [
@@ -1394,9 +1859,10 @@ function mtti_mis_save_quiz_score() {
             'score'        => $score,
             'total'        => $total,
             'percent'      => $percent,
+            'passed'       => $passed,
             'attempted_at' => current_time('mysql'),
         ],
-        ['%d', '%d', '%f', '%f', '%f', '%s']
+        ['%d', '%d', '%f', '%f', '%f', '%d', '%s']
     );
 
     if ($student_id) {

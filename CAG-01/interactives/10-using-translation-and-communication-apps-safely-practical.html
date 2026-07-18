@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Using Translation and Communication Apps Safely | MTTI Computer Applications</title>
+<link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Fredoka:wght@500;600&display=swap" rel="stylesheet">
+<style>
+* { margin:0; padding:0; box-sizing:border-box; }
+body { font-family:'Space Mono', monospace; background:linear-gradient(135deg,#387633 0%,#259BD7 100%); min-height:100vh; padding:20px; color:#fff; }
+.container { max-width:900px; margin:0 auto; }
+.header { text-align:center; margin-bottom:24px; }
+.lesson-tag { display:inline-block; background:rgba(255,255,255,0.2); padding:6px 16px; border-radius:999px; font-size:0.85em; margin-bottom:12px; }
+.header h1 { font-family:'Fredoka', sans-serif; font-size:2em; margin-bottom:6px; text-shadow:3px 3px 0 rgba(0,0,0,0.2); }
+.scenario { background:rgba(255,255,255,0.14); backdrop-filter:blur(10px); border-radius:16px; padding:16px 22px; margin-bottom:20px; border-left:5px solid #ffd54f; font-size:0.95em; line-height:1.55; }
+.task { background:#fff; color:#333; border-radius:20px; padding:24px; margin-bottom:16px; box-shadow:0 14px 40px rgba(0,0,0,0.25); }
+.task-num { display:inline-block; width:28px; height:28px; background:linear-gradient(135deg,#387633 0%,#259BD7 100%); color:#fff; border-radius:50%; text-align:center; line-height:28px; font-family:'Fredoka', sans-serif; font-weight:600; margin-right:8px; }
+.task h3 { font-family:'Fredoka', sans-serif; font-size:1.05em; display:inline; }
+.options { margin-top:14px; display:flex; flex-direction:column; gap:10px; }
+.option { background:#f5f7fb; border:2px solid transparent; padding:12px 16px; border-radius:10px; cursor:pointer; transition:all 0.2s; font-family:'Space Mono', monospace; font-size:0.92em; text-align:left; }
+.option:hover:not(.disabled) { background:#e8f5e9; border-color:#387633; }
+.option.correct { background:#d4edda; border-color:#28a745; color:#155724; }
+.option.wrong { background:#f8d7da; border-color:#dc3545; color:#721c24; }
+.option.disabled { cursor:not-allowed; }
+.feedback { margin-top:14px; padding:12px 16px; border-radius:10px; font-size:0.9em; line-height:1.5; }
+.feedback.correct { background:#d4edda; color:#155724; border-left:4px solid #28a745; }
+.feedback.wrong { background:#f8d7da; color:#721c24; border-left:4px solid #dc3545; }
+.done-banner { text-align:center; padding:20px; color:#fff; font-family:'Fredoka', sans-serif; font-size:1.1em; }
+</style>
+</head>
+<body>
+<div class="container">
+<div class="header"><div class="lesson-tag">Module 10 · Lesson 10.2 · Practical</div><h1>Using Translation and Communication Apps Safely</h1></div>
+<div class="scenario">Njeri is caring for a client whose family speaks a language she does not share, and uses a translation app to communicate.</div>
+<div id="tasks"></div>
+<div class="done-banner" id="doneBanner" style="display:none;">✅ Practical complete — you can move to the quiz.</div>
+</div>
+<script>
+const tasks = [{"prompt":"Njeri wants to ask the client, in their own language, whether they would like some tea. Is a translation app reasonable here?","options":["Only a professional human interpreter can ever be used","This request is too complex for any translation tool","No, translation apps should never be used for anything","Yes, for everyday simple conversation like this, a translation app can genuinely help bridge the language gap"],"correct":3,"explanation":"For everyday, low-stakes conversation, a translation app is a genuinely reasonable and helpful tool."},{"prompt":"Njeri needs to explain important medication dosage instructions to a family member who does not speak her language. Should she rely solely on a translation app for this?","options":["Yes, translation apps are equally reliable for any type of content","This deserves extra caution \u2014 a human interpreter or the facility's own translated materials are safer for something this important, given the real risk of subtle mistranslation","Medical instructions never need to be translated at all","Translation apps are actually more accurate for medical content than everyday conversation"],"correct":1,"explanation":"Medical instructions carry real risk if subtly mistranslated \u2014 extra caution and more reliable translation sources are warranted."},{"prompt":"After translating something important, what should Njeri do to make sure it was understood correctly?","options":["Repeat the exact same translation again without any change","Check the person's response or ask a follow-up question to confirm actual understanding","Move on immediately without any confirmation","Assume the translation was perfect with no further check"],"correct":1,"explanation":"Confirming actual understanding through response or follow-up catches translation errors before they cause a real problem."}];
+function escapeHtml(s){return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
+function render(){
+  const c = document.getElementById('tasks');
+  c.innerHTML = tasks.map((t,i)=>`
+    <div class="task" id="task-${i}">
+      <div><span class="task-num">${i+1}</span><h3>${escapeHtml(t.prompt)}</h3></div>
+      <div class="options">
+        ${t.options.map((o,j)=>`<button class="option" onclick="answer(${i},${j})">${escapeHtml(o)}</button>`).join('')}
+      </div>
+    </div>`).join('');
+}
+function answer(i,j){
+  const task = tasks[i];
+  const el = document.getElementById('task-'+i);
+  const btns = el.querySelectorAll('.option');
+  if (btns[0].classList.contains('disabled')) return;
+  btns.forEach(b=>b.classList.add('disabled'));
+  btns[task.correct].classList.add('correct');
+  const right = j === task.correct;
+  if (!right) btns[j].classList.add('wrong');
+  const fb = document.createElement('div');
+  fb.className = 'feedback ' + (right?'correct':'wrong');
+  fb.innerHTML = '<strong>' + (right?'✅ Correct.':'❌ Not quite.') + '</strong><br>' + escapeHtml(task.explanation);
+  el.appendChild(fb);
+  if (i === tasks.length-1) document.getElementById('doneBanner').style.display='block';
+}
+render();
+</script>
+</body>
+</html>

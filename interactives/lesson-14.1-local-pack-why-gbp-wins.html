@@ -1,0 +1,510 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lesson 14.1 — Local Pack + Why GBP Wins (Interactive)</title>
+<style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: 'Segoe UI', -apple-system, Roboto, sans-serif; line-height: 1.55; color: #0f172a; background: #f8fafc; min-height: 100vh; }
+    .container { max-width: 1200px; margin: 0 auto; padding: 20px; }
+    header {
+        background: linear-gradient(135deg, #2E7D32, #1B5E20);
+        color: #fff; padding: 40px 30px; border-radius: 12px; margin-bottom: 24px;
+        box-shadow: 0 10px 30px rgba(26,115,232,0.25);
+    }
+    header .badge { display: inline-block; background: rgba(255,255,255,0.2); padding: 4px 14px; border-radius: 16px; font-size: 12px; font-weight: bold; letter-spacing: 1px; margin-bottom: 14px; }
+    header h1 { font-size: 32px; margin-bottom: 8px; }
+    header .subtitle { font-size: 17px; opacity: 0.95; margin-bottom: 20px; }
+    .meta-strip { display: flex; flex-wrap: wrap; gap: 12px; }
+    .meta-strip span { background: rgba(255,255,255,0.18); padding: 6px 14px; border-radius: 20px; font-size: 13px; }
+    .toc { background: #fff; border: 1px solid #e2e8f0; border-radius: 10px; padding: 22px 26px; margin-bottom: 22px; }
+    .toc h3 { color: #1a73e8; margin-bottom: 10px; }
+    .toc ol { padding-left: 20px; }
+    .toc a { color: #1a73e8; text-decoration: none; font-weight: 600; }
+    .toc a:hover { text-decoration: underline; }
+    section { background: #fff; border: 1px solid #e2e8f0; border-radius: 10px; padding: 26px 30px; margin-bottom: 22px; }
+    section h2 { color: #1a73e8; font-size: 22px; margin-bottom: 12px; padding-bottom: 8px; border-bottom: 3px solid #1a73e8; }
+    section h3 { color: #0f172a; font-size: 17px; margin: 18px 0 8px; }
+    section p { margin-bottom: 12px; }
+    section ul, section ol { padding-left: 22px; margin-bottom: 12px; }
+    section li { margin-bottom: 4px; }
+    .callout { border-left: 5px solid #1a73e8; background: #e8f0fe; padding: 14px 18px; margin: 14px 0; border-radius: 4px; }
+    .callout.warn { border-left-color: #ea4335; background: #fef2f2; }
+    .callout.tip { border-left-color: #34a853; background: #ecfdf5; }
+    .callout strong { color: #1a73e8; }
+    .callout.warn strong { color: #ea4335; }
+    .callout.tip strong { color: #34a853; }
+
+    /* Google Search mock */
+    .serp { background: #fff; border: 1px solid #dadce0; border-radius: 12px; overflow: hidden; margin: 16px 0; }
+    .serp-top { padding: 14px 20px; border-bottom: 1px solid #ebedf0; display: flex; align-items: center; gap: 14px; flex-wrap: wrap; }
+    .g-logo { font-size: 22px; font-weight: 500; letter-spacing: -1px; }
+    .g-logo .b { color: #4285f4; } .g-logo .r { color: #ea4335; } .g-logo .y { color: #fbbc04; } .g-logo .g { color: #34a853; }
+    .search-bar { flex: 1; min-width: 260px; display: flex; align-items: center; gap: 10px; border: 1px solid #dfe1e5; border-radius: 24px; padding: 8px 16px; background: #fff; }
+    .search-bar input { flex: 1; border: 0; outline: 0; font-size: 15px; color: #202124; background: transparent; }
+    .search-bar .mic { color: #4285f4; font-weight: bold; }
+    .tabs { display: flex; gap: 20px; padding: 0 20px; border-bottom: 1px solid #ebedf0; font-size: 13px; color: #5f6368; }
+    .tabs .tab { padding: 12px 0; cursor: pointer; }
+    .tabs .tab.active { color: #1a73e8; border-bottom: 3px solid #1a73e8; margin-bottom: -1px; font-weight: 500; }
+    .serp-body { display: grid; grid-template-columns: 1fr 380px; gap: 20px; padding: 20px; }
+    @media (max-width: 900px) { .serp-body { grid-template-columns: 1fr; } .map-panel { order: -1; } }
+
+    .ads-block { border: 1px solid #f4f4f4; border-radius: 8px; padding: 12px 14px; margin-bottom: 14px; background: #fafbfc; }
+    .ads-label { color: #202124; font-weight: 600; font-size: 12px; background: #fff; border: 1px solid #dadce0; border-radius: 3px; padding: 1px 5px; margin-right: 8px; }
+    .ads-title { color: #1a0dab; font-size: 16px; margin: 4px 0; }
+    .ads-url { color: #202124; font-size: 12px; }
+    .ads-desc { color: #4d5156; font-size: 13px; margin-top: 4px; }
+
+    .pack-header { display: flex; justify-content: space-between; align-items: center; padding: 6px 4px; margin-bottom: 8px; }
+    .pack-header h4 { font-size: 15px; color: #202124; font-weight: 500; }
+    .pack-header .see-more { color: #1a73e8; font-size: 13px; cursor: pointer; }
+    .pack { border: 1px solid #dadce0; border-radius: 12px; overflow: hidden; }
+    .pack-item { padding: 14px 16px; border-bottom: 1px solid #ebedf0; cursor: default; transition: background 0.15s; }
+    .pack-item:last-child { border-bottom: none; }
+    .pack-item:hover { background: #f8f9fa; }
+    .pack-item.top-result { background: linear-gradient(90deg, #e8f0fe 0%, #fff 50%); }
+    .pack-item .row1 { display: flex; justify-content: space-between; align-items: flex-start; gap: 10px; }
+    .pack-item .biz-name { font-size: 16px; color: #202124; font-weight: 500; }
+    .pack-item .rank-num { background: #1a73e8; color: #fff; width: 22px; height: 22px; border-radius: 50%; display: inline-flex; align-items: center; justify-content: center; font-size: 12px; font-weight: bold; margin-right: 6px; vertical-align: 1px; }
+    .pack-item .stars { color: #fbbc04; }
+    .pack-item .rev-count { color: #5f6368; font-size: 13px; }
+    .pack-item .addr { color: #5f6368; font-size: 13px; margin-top: 3px; }
+    .pack-item .badges { display: flex; gap: 6px; margin-top: 6px; flex-wrap: wrap; }
+    .badge-pill { background: #e8f0fe; color: #1a73e8; padding: 2px 8px; border-radius: 10px; font-size: 11px; font-weight: 500; }
+    .badge-pill.green { background: #e6f4ea; color: #137333; }
+    .badge-pill.yellow { background: #fef7e0; color: #b06000; }
+    .pack-item .dist { color: #5f6368; font-size: 12px; font-weight: 500; }
+    .pack-actions { display: flex; gap: 6px; margin-top: 10px; }
+    .p-btn { padding: 6px 12px; border-radius: 16px; border: 1px solid #dadce0; background: #fff; color: #1a73e8; font-size: 12px; cursor: pointer; font-weight: 500; }
+    .p-btn:hover { background: #f0f5ff; }
+
+    /* Mock Google Map */
+    .map-panel { background: #e5e3df; border-radius: 12px; height: 380px; position: relative; overflow: hidden; border: 1px solid #dadce0; }
+    .map-panel svg { width: 100%; height: 100%; display: block; }
+    .map-pin { position: absolute; transform: translate(-50%, -100%); cursor: pointer; }
+    .pin-body { background: #ea4335; color: #fff; width: 32px; height: 32px; border-radius: 50% 50% 50% 0; transform: rotate(-45deg); display: flex; align-items: center; justify-content: center; font-weight: bold; font-size: 14px; box-shadow: 0 2px 6px rgba(0,0,0,0.3); }
+    .pin-body span { transform: rotate(45deg); }
+    .map-pin.p1 .pin-body { background: #1a73e8; }
+    .map-pin.p2 .pin-body { background: #ea4335; }
+    .map-pin.p3 .pin-body { background: #fbbc04; color: #202124; }
+    .map-label { position: absolute; bottom: 10px; left: 10px; background: rgba(255,255,255,0.95); padding: 4px 10px; border-radius: 4px; font-size: 12px; color: #5f6368; }
+
+    /* Organic results */
+    .organic { margin-top: 20px; }
+    .org-result { padding: 14px 4px; border-bottom: 1px solid #f0f0f0; }
+    .org-result:last-child { border-bottom: none; }
+    .org-url { color: #202124; font-size: 12px; margin-bottom: 2px; }
+    .org-title { color: #1a0dab; font-size: 18px; font-weight: 400; margin-bottom: 4px; }
+    .org-desc { color: #4d5156; font-size: 13px; }
+
+    .ctr-note { background: #fef2f2; border-left: 4px solid #ea4335; padding: 12px 16px; margin-top: 12px; border-radius: 4px; font-size: 14px; color: #991b1b; }
+
+    /* Ranking Factor Weighter */
+    .weighter { background: #f1f5f9; border: 1.5px solid #cbd5e1; border-radius: 12px; padding: 20px; margin: 18px 0; }
+    .slider-row { margin-bottom: 14px; }
+    .slider-row label { display: flex; justify-content: space-between; align-items: center; font-weight: 600; color: #0f172a; margin-bottom: 6px; font-size: 14px; }
+    .slider-row .weight-val { background: #1a73e8; color: #fff; padding: 2px 10px; border-radius: 12px; font-size: 12px; }
+    .slider-row input[type=range] { width: 100%; accent-color: #1a73e8; }
+    .slider-row small { color: #5f6368; font-size: 12px; }
+
+    .reorder-mini { margin-top: 14px; background: #fff; border-radius: 8px; padding: 12px; border: 1px solid #dadce0; }
+    .reorder-mini h5 { color: #1a73e8; margin-bottom: 8px; font-size: 13px; text-transform: uppercase; letter-spacing: 0.5px; }
+    .mini-item { display: flex; align-items: center; gap: 10px; padding: 8px 10px; margin-bottom: 6px; background: #f8fafc; border-radius: 6px; transition: all 0.4s; }
+    .mini-item .mini-rank { background: #1a73e8; color: #fff; width: 22px; height: 22px; border-radius: 50%; display: inline-flex; align-items: center; justify-content: center; font-size: 12px; font-weight: bold; flex-shrink: 0; }
+    .mini-item .mini-name { flex: 1; font-weight: 500; font-size: 14px; }
+    .mini-item .mini-score { color: #5f6368; font-size: 12px; }
+
+    .check-btn { background: #1a73e8; color: #fff; border: 0; padding: 10px 20px; border-radius: 6px; cursor: pointer; font-weight: 600; font-size: 14px; margin-top: 12px; }
+    .check-btn:hover { background: #1557b0; }
+    .check-btn.reset { background: #5f6368; margin-left: 8px; }
+    .verdict { margin-top: 12px; padding: 12px 16px; border-radius: 8px; font-size: 14px; font-weight: 500; display: none; }
+    .verdict.show { display: block; }
+    .verdict.pass { background: #e6f4ea; color: #137333; border-left: 4px solid #34a853; }
+    .verdict.fail { background: #fef2f2; color: #991b1b; border-left: 4px solid #ea4335; }
+
+    /* Fact grid */
+    .fact-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 12px; margin: 16px 0; }
+    .fact-card { background: #f8fafc; border-left: 4px solid #1a73e8; padding: 14px; border-radius: 6px; }
+    .fact-card h5 { color: #1a73e8; font-size: 13px; letter-spacing: 0.5px; text-transform: uppercase; margin-bottom: 4px; }
+    .fact-card p { font-size: 14px; color: #0f172a; margin: 0; }
+
+    footer { text-align: center; color: #64748b; padding: 24px; font-size: 13px; }
+
+    /* MTTI logo stamp */
+    .mtti-logo-stamp {
+        position: fixed; top: 14px; right: 18px; z-index: 999;
+        opacity: 0.88; transition: opacity 0.2s;
+    }
+    .mtti-logo-stamp:hover { opacity: 1; }
+    .mtti-logo-stamp img { width: 56px; height: 56px; border-radius: 50%; box-shadow: 0 2px 8px rgba(0,0,0,0.18); }
+</style>
+</head>
+<body>
+<div class="mtti-logo-stamp">
+    <img src="../../Resources/Logo.jpeg" alt="MTTI" title="Masomotele Technical Training Institute — Start learning, Start earning">
+</div>
+
+<div class="container">
+
+<header>
+    <div class="badge">LESSON 14.1  ·  GOOGLE BUSINESS PROFILE  ·  INTERACTIVE</div>
+    <h1>Local Pack + Why GBP Wins Local Search</h1>
+    <div class="subtitle">The free listing that beats organic result #1 for any local query. See the local pack live, then weight the three ranking factors yourself.</div>
+    <div class="meta-strip">
+        <span><strong>Duration:</strong> ~30 min interactive</span>
+        <span><strong>Level:</strong> Foundation</span>
+        <span><strong>Tool:</strong> business.google.com</span>
+        <span><strong>Handbook:</strong> Module 14, §14.1</span>
+    </div>
+</header>
+
+<div class="toc">
+    <h3>What you'll do in this lesson</h3>
+    <ol>
+        <li><a href="#s1">What Google Business Profile is</a></li>
+        <li><a href="#s2">The three surfaces GBP appears on</a></li>
+        <li><a href="#s3"><strong>Live SERP mock — "lunch delivery Eldoret"</strong></a></li>
+        <li><a href="#s4">The three ranking factors — Relevance, Distance, Prominence</a></li>
+        <li><a href="#s5"><strong>Auto-marked challenge: weight the ranking factors</strong></a></li>
+    </ol>
+</div>
+
+<section id="s1">
+    <h2>1. What Google Business Profile is</h2>
+    <p><strong>Google Business Profile (GBP)</strong> — call it G-B-P — is the free listing that shows your business inside Google Search and Google Maps. It was called Google My Business until 2021 when Google renamed it and moved management into the Business Profile Manager.</p>
+    <p>Sarah Chebet's Karibu Kitchen listing appears with a photo, opening hours, phone number, directions button and reviews on the right-hand side of results — and inside the map results at the top.</p>
+    <div class="callout tip">
+        <strong>Completely free.</strong> No ads. No monthly fee. Just a properly filled-in profile.
+    </div>
+</section>
+
+<section id="s2">
+    <h2>2. The three surfaces a verified GBP listing appears on</h2>
+    <div class="fact-grid">
+        <div class="fact-card">
+            <h5>Surface 1 — Local Pack</h5>
+            <p>The top three business listings with a small map, shown for any search Google thinks is local.</p>
+        </div>
+        <div class="fact-card">
+            <h5>Surface 2 — Google Maps</h5>
+            <p>Both the mobile app and the desktop version. Fully searchable and filterable.</p>
+        </div>
+        <div class="fact-card">
+            <h5>Surface 3 — Knowledge Panel</h5>
+            <p>The side card on Search when a searcher looks up your brand name directly.</p>
+        </div>
+    </div>
+    <p><strong>One profile. Three surfaces. Zero cost.</strong> All three unlock the instant verification completes.</p>
+</section>
+
+<section id="s3">
+    <h2>3. Live SERP mock — "lunch delivery Eldoret"</h2>
+    <p>Here is what a Kapsoya searcher actually sees. Note where the local pack sits — <strong>above</strong> the first organic result.</p>
+
+    <div class="serp">
+        <div class="serp-top">
+            <span class="g-logo"><span class="b">G</span><span class="r">o</span><span class="y">o</span><span class="b">g</span><span class="g">l</span><span class="r">e</span></span>
+            <div class="search-bar">
+                <input value="lunch delivery Eldoret" readonly>
+                <span class="mic">&#x25CF;</span>
+            </div>
+        </div>
+        <div class="tabs">
+            <div class="tab active">All</div>
+            <div class="tab">Maps</div>
+            <div class="tab">Images</div>
+            <div class="tab">News</div>
+            <div class="tab">Videos</div>
+        </div>
+        <div class="serp-body">
+            <div>
+                <div class="ads-block">
+                    <div><span class="ads-label">Sponsored</span><span class="ads-url">bolt.eu/ke &nbsp;&rsaquo;&nbsp; food</span></div>
+                    <div class="ads-title">Bolt Food Eldoret — Fast Delivery to Kapsoya</div>
+                    <div class="ads-desc">Order lunch across Eldoret. 20% off first order with code ELD20. Pay with M-Pesa.</div>
+                </div>
+
+                <div class="pack-header">
+                    <h4>Places &nbsp;·&nbsp; Local results near you</h4>
+                    <span class="see-more">More places &rsaquo;</span>
+                </div>
+                <div class="pack" id="pack">
+                    <div class="pack-item top-result" data-key="karibu">
+                        <div class="row1">
+                            <div>
+                                <div class="biz-name"><span class="rank-num" id="rk-karibu">1</span>Karibu Kitchen</div>
+                                <div><span class="stars">&#9733;&#9733;&#9733;&#9733;&#9733;</span> 4.8 <span class="rev-count">(64) &nbsp;·&nbsp; Meal delivery service</span></div>
+                                <div class="addr">Kapsoya Road, Eldoret &nbsp;·&nbsp; Opens 10:00</div>
+                                <div class="badges">
+                                    <span class="badge-pill green">Delivery</span>
+                                    <span class="badge-pill">Takeaway</span>
+                                    <span class="badge-pill yellow">M-Pesa</span>
+                                </div>
+                            </div>
+                            <div class="dist">1.2 km</div>
+                        </div>
+                        <div class="pack-actions">
+                            <button class="p-btn">&#128222; Call</button>
+                            <button class="p-btn">&#9873; Directions</button>
+                            <button class="p-btn">&#127760; Website</button>
+                        </div>
+                    </div>
+
+                    <div class="pack-item" data-key="pango">
+                        <div class="row1">
+                            <div>
+                                <div class="biz-name"><span class="rank-num" id="rk-pango">2</span>Pango Bites</div>
+                                <div><span class="stars">&#9733;&#9733;&#9733;&#9733;&#9734;</span> 4.2 <span class="rev-count">(112) &nbsp;·&nbsp; Restaurant</span></div>
+                                <div class="addr">Elgon View, Eldoret &nbsp;·&nbsp; Opens 11:00</div>
+                                <div class="badges">
+                                    <span class="badge-pill green">Delivery</span>
+                                    <span class="badge-pill">Takeaway</span>
+                                    <span class="badge-pill">Dine-in</span>
+                                </div>
+                            </div>
+                            <div class="dist">2.8 km</div>
+                        </div>
+                        <div class="pack-actions">
+                            <button class="p-btn">&#128222; Call</button>
+                            <button class="p-btn">&#9873; Directions</button>
+                            <button class="p-btn">&#127760; Website</button>
+                        </div>
+                    </div>
+
+                    <div class="pack-item" data-key="uzuri">
+                        <div class="row1">
+                            <div>
+                                <div class="biz-name"><span class="rank-num" id="rk-uzuri">3</span>Uzuri Eats</div>
+                                <div><span class="stars">&#9733;&#9733;&#9733;&#9733;&#9734;</span> 4.5 <span class="rev-count">(28) &nbsp;·&nbsp; Fast food restaurant</span></div>
+                                <div class="addr">Pioneer, Eldoret &nbsp;·&nbsp; Opens 10:30</div>
+                                <div class="badges">
+                                    <span class="badge-pill green">Delivery</span>
+                                    <span class="badge-pill">Takeaway</span>
+                                </div>
+                            </div>
+                            <div class="dist">3.4 km</div>
+                        </div>
+                        <div class="pack-actions">
+                            <button class="p-btn">&#128222; Call</button>
+                            <button class="p-btn">&#9873; Directions</button>
+                            <button class="p-btn">&#127760; Website</button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="organic">
+                    <h4 style="font-size:13px;color:#5f6368;margin-bottom:8px;">Organic results (below the pack)</h4>
+                    <div class="org-result">
+                        <div class="org-url">jumia.food/ke &nbsp;&rsaquo;&nbsp; eldoret-lunch</div>
+                        <div class="org-title">Jumia Food Eldoret — Lunch Delivery Menu</div>
+                        <div class="org-desc">Browse restaurants delivering lunch in Eldoret. Order online and pay with M-Pesa on delivery.</div>
+                    </div>
+                    <div class="org-result">
+                        <div class="org-url">glovoapp.com &nbsp;&rsaquo;&nbsp; ke &nbsp;&rsaquo;&nbsp; eldoret</div>
+                        <div class="org-title">Glovo Eldoret — Lunch, Groceries, Anything</div>
+                        <div class="org-desc">Get lunch delivered in 30 minutes. Track your rider live. Available across Eldoret CBD.</div>
+                    </div>
+                    <div class="org-result">
+                        <div class="org-url">tripadvisor.com &nbsp;&rsaquo;&nbsp; eldoret</div>
+                        <div class="org-title">10 Best Lunch Delivery Restaurants in Eldoret (2026)</div>
+                        <div class="org-desc">Read reviews of the top lunch spots in Eldoret. Prices from KES 300. Includes menus and photos.</div>
+                    </div>
+                    <div class="org-result">
+                        <div class="org-url">the-star.co.ke &nbsp;&rsaquo;&nbsp; lifestyle</div>
+                        <div class="org-title">Where to Eat Lunch in Eldoret — A Local Guide</div>
+                        <div class="org-desc">A rundown of Eldoret's best kitchens delivering ugali, pilau, chapati and nyama choma.</div>
+                    </div>
+                    <div class="org-result">
+                        <div class="org-url">karibukitchen.co.ke &nbsp;&rsaquo;&nbsp; menu</div>
+                        <div class="org-title">Karibu Kitchen — Lunch Delivery Menu</div>
+                        <div class="org-desc">Fresh Kenyan meals delivered across Eldoret. Ugali sukuma KES 350. Pilau KES 500. Order on WhatsApp.</div>
+                    </div>
+                </div>
+
+                <div class="ctr-note">
+                    <strong>CTR reality:</strong> For queries like this the local pack captures roughly <strong>40% of clicks</strong>. Organic results 1–5 combined receive around 25%. Being in the pack is worth more than being organic #1.
+                </div>
+            </div>
+
+            <div>
+                <div class="map-panel">
+                    <svg viewBox="0 0 380 380" preserveAspectRatio="none">
+                        <rect width="380" height="380" fill="#e5e3df"/>
+                        <path d="M 0 120 L 380 100" stroke="#fff" stroke-width="12"/>
+                        <path d="M 80 0 L 100 380" stroke="#fff" stroke-width="10"/>
+                        <path d="M 220 0 L 240 380" stroke="#fff" stroke-width="7"/>
+                        <path d="M 0 260 L 380 240" stroke="#fff" stroke-width="8"/>
+                        <path d="M 0 200 L 380 180" stroke="#fff" stroke-width="4" opacity="0.7"/>
+                        <path d="M 150 0 L 170 380" stroke="#fff" stroke-width="4" opacity="0.7"/>
+                        <circle cx="120" cy="80" r="24" fill="#c1e1c1" opacity="0.6"/>
+                        <circle cx="300" cy="300" r="34" fill="#c1e1c1" opacity="0.6"/>
+                        <text x="12" y="24" fill="#5f6368" font-size="11" font-family="sans-serif">Kapsoya</text>
+                        <text x="250" y="164" fill="#5f6368" font-size="11" font-family="sans-serif">Elgon View</text>
+                        <text x="270" y="336" fill="#5f6368" font-size="11" font-family="sans-serif">Pioneer</text>
+                        <text x="12" y="248" fill="#5f6368" font-size="11" font-family="sans-serif">Eldoret CBD</text>
+                    </svg>
+                    <div class="map-pin p1" style="left: 30%; top: 25%;"><div class="pin-body"><span>1</span></div></div>
+                    <div class="map-pin p2" style="left: 65%; top: 45%;"><div class="pin-body"><span>2</span></div></div>
+                    <div class="map-pin p3" style="left: 75%; top: 75%;"><div class="pin-body"><span>3</span></div></div>
+                    <div class="map-label">Map data &copy; 2026 Google</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="callout warn">
+        <strong>Why the pack wins:</strong> The searcher does not need to open a website. They tap Call. They tap Directions. They tap Order Online. The pack is a decision engine, not a link list.
+    </div>
+</section>
+
+<section id="s4">
+    <h2>4. The three ranking factors</h2>
+    <p>Google decides who sits at position 1 of the pack using three factors. Together, and only together.</p>
+
+    <h3>Factor 1 — Relevance</h3>
+    <p>Does the listing MATCH the query? Google reads three fields: <strong>primary category</strong> (Meal delivery service, not Restaurant), <strong>additional categories</strong> (up to nine), and the <strong>business description</strong> (750 characters). Services and menu items also feed relevance.</p>
+
+    <h3>Factor 2 — Distance</h3>
+    <p>Google measures the physical distance between the searcher's location and your business address. The one factor you cannot control. Two responses: set a <strong>Service Area</strong> listing every estate you deliver to (Sarah lists Eldoret CBD, Kapsoya, Elgon View, Racecourse, Pioneer), and make relevance + prominence strong enough that Google shows you across a wider radius.</p>
+
+    <h3>Factor 3 — Prominence</h3>
+    <p>How well-known Google thinks your business is. Built from four things: <strong>review quantity + quality</strong>, <strong>review recency</strong>, <strong>links and mentions</strong> across the web, and Google's own confidence signals (age, NAP consistency).</p>
+
+    <div class="callout tip">
+        <strong>The compounding trick:</strong> Relevance is fast (edit fields today). Distance is fixed. Prominence takes months but keeps stacking. Move all three and you climb.
+    </div>
+</section>
+
+<section id="s5">
+    <h2>5. Challenge — weight the ranking factors</h2>
+    <p>Below is a live local-pack simulator. Move the three sliders and watch the three Eldoret listings reorder in real time.</p>
+    <p><strong>Your task:</strong> set the sliders so the pack lands in the correct real-world order (Karibu Kitchen #1, Pango Bites #2, Uzuri Eats #3), matching Google's actual factor weighting. Then click Check.</p>
+
+    <div class="weighter">
+        <div class="slider-row">
+            <label>Relevance <span class="weight-val" id="wRel">40%</span></label>
+            <input type="range" min="0" max="100" value="40" id="sRel">
+            <small>Category match, description keywords, services listed.</small>
+        </div>
+        <div class="slider-row">
+            <label>Distance <span class="weight-val" id="wDist">30%</span></label>
+            <input type="range" min="0" max="100" value="30" id="sDist">
+            <small>Km from searcher (Kapsoya location) to listing address.</small>
+        </div>
+        <div class="slider-row">
+            <label>Prominence <span class="weight-val" id="wProm">30%</span></label>
+            <input type="range" min="0" max="100" value="30" id="sProm">
+            <small>Review volume, recency, citations, brand mentions.</small>
+        </div>
+
+        <div class="reorder-mini">
+            <h5>Live pack order</h5>
+            <div id="miniList"></div>
+        </div>
+
+        <button class="check-btn" onclick="checkWeights()">Check my weights</button>
+        <button class="check-btn reset" onclick="resetWeights()">Reset</button>
+
+        <div class="verdict" id="verdict"></div>
+    </div>
+
+    <div class="callout">
+        <strong>Real-world weighting:</strong> Google publishes no exact numbers, but SEO tests and John Mueller's talks put Relevance highest (roughly 40%), then Distance and Prominence tied (roughly 30% each) — with prominence rising sharply on ties.
+    </div>
+</section>
+
+<footer>
+    <p>Lesson 14.1 &middot; Google Business Profile &middot; Masomotele Technical Training Institute &middot; Module 14, &sect;14.1</p>
+    <p>Next: <strong>Lesson 14.2 &mdash; Setup + Verification</strong></p>
+</footer>
+</div>
+
+<script>
+// Businesses with per-factor scores (0-100)
+const biz = [
+    { key: 'karibu', name: 'Karibu Kitchen', rel: 92, dist: 88, prom: 78, rankId: 'rk-karibu' },
+    { key: 'pango', name: 'Pango Bites',   rel: 62, dist: 68, prom: 90, rankId: 'rk-pango' },
+    { key: 'uzuri', name: 'Uzuri Eats',    rel: 74, dist: 60, prom: 55, rankId: 'rk-uzuri' }
+];
+
+function normalise() {
+    let r = +document.getElementById('sRel').value;
+    let d = +document.getElementById('sDist').value;
+    let p = +document.getElementById('sProm').value;
+    const t = r + d + p || 1;
+    return { r: r/t, d: d/t, p: p/t, rawR: r, rawD: d, rawP: p };
+}
+
+function updateWeights() {
+    const w = normalise();
+    document.getElementById('wRel').textContent = Math.round(w.r*100) + '%';
+    document.getElementById('wDist').textContent = Math.round(w.d*100) + '%';
+    document.getElementById('wProm').textContent = Math.round(w.p*100) + '%';
+
+    const scored = biz.map(b => ({
+        ...b,
+        score: b.rel*w.r + b.dist*w.d + b.prom*w.p
+    })).sort((a,b) => b.score - a.score);
+
+    // Update numbered chips inside the pack
+    scored.forEach((b, i) => {
+        const el = document.getElementById(b.rankId);
+        if (el) el.textContent = (i+1);
+    });
+
+    // Rebuild mini list
+    const list = document.getElementById('miniList');
+    list.innerHTML = '';
+    scored.forEach((b, i) => {
+        const row = document.createElement('div');
+        row.className = 'mini-item';
+        row.innerHTML = `<span class="mini-rank">${i+1}</span><span class="mini-name">${b.name}</span><span class="mini-score">score ${b.score.toFixed(1)}</span>`;
+        list.appendChild(row);
+    });
+}
+
+function checkWeights() {
+    const w = normalise();
+    const scored = biz.map(b => ({
+        ...b,
+        score: b.rel*w.r + b.dist*w.d + b.prom*w.p
+    })).sort((a,b) => b.score - a.score);
+
+    const correctOrder = ['karibu','pango','uzuri'];
+    const yourOrder = scored.map(b => b.key);
+    const orderMatch = correctOrder.every((k,i) => k === yourOrder[i]);
+
+    // Also want relevance to be highest weight (real-world signal)
+    const relHighest = w.r >= w.d && w.r >= w.p;
+
+    const verdict = document.getElementById('verdict');
+    verdict.classList.add('show');
+
+    if (orderMatch && relHighest) {
+        verdict.className = 'verdict show pass';
+        verdict.innerHTML = '<strong>Correct.</strong> Pack lands Karibu &rarr; Pango &rarr; Uzuri, and Relevance is your top weight. That matches Google\'s real-world signal ranking.';
+    } else if (orderMatch) {
+        verdict.className = 'verdict show pass';
+        verdict.innerHTML = '<strong>Order correct</strong> — but tune Relevance higher. In Google\'s real weighting, Relevance is the top factor, then Distance and Prominence.';
+    } else {
+        verdict.className = 'verdict show fail';
+        verdict.innerHTML = '<strong>Not quite.</strong> Correct order is Karibu Kitchen &rarr; Pango Bites &rarr; Uzuri Eats. Try Relevance around 40%, Distance around 30%, Prominence around 30%.';
+    }
+}
+
+function resetWeights() {
+    document.getElementById('sRel').value = 40;
+    document.getElementById('sDist').value = 30;
+    document.getElementById('sProm').value = 30;
+    document.getElementById('verdict').classList.remove('show');
+    updateWeights();
+}
+
+['sRel','sDist','sProm'].forEach(id => {
+    document.getElementById(id).addEventListener('input', updateWeights);
+});
+updateWeights();
+</script>
+</body>
+</html>

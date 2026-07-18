@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Git and Version Control (Lesson) | MTTI Computer Applications</title>
+<link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Fredoka:wght@500;600&display=swap" rel="stylesheet">
+<style>
+* { margin:0; padding:0; box-sizing:border-box; }
+body { font-family:'Space Mono', monospace; background:linear-gradient(135deg,#2E7D32 0%,#1565C0 100%); min-height:100vh; padding:20px; color:#fff; }
+.container { max-width:820px; margin:0 auto; }
+.header { text-align:center; margin-bottom:24px; }
+.lesson-tag { display:inline-block; background:rgba(255,255,255,0.2); padding:6px 16px; border-radius:999px; font-size:0.85em; margin-bottom:12px; }
+.header h1 { font-family:'Fredoka', sans-serif; font-size:2em; margin-bottom:6px; text-shadow:3px 3px 0 rgba(0,0,0,0.2); }
+.card { background:#fff; color:#333; border-radius:22px; padding:32px; margin-bottom:20px; box-shadow:0 20px 60px rgba(0,0,0,0.3); }
+.section { margin-bottom:26px; }
+.section:last-child { margin-bottom:0; }
+.section h2 { font-family:'Fredoka', sans-serif; font-size:1.2em; margin-bottom:10px; color:#1565C0; }
+.section .body { line-height:1.65; font-size:0.98em; }
+.section .body p { margin-bottom:10px; }
+.section .body code { background:#f5f7fb; padding:2px 6px; border-radius:4px; font-size:0.92em; }
+.keypoint { background:#fff8e1; border-left:4px solid #ffc107; padding:12px 16px; border-radius:8px; margin-top:12px; font-size:0.92em; }
+</style>
+</head>
+<body>
+<div class="container">
+<div class="header"><div class="lesson-tag">Module 4 · Lesson 4.1</div><h1>Git and Version Control</h1></div>
+<div style="background:#fff;color:#333;border-radius:16px;padding:16px;margin-bottom:20px;box-shadow:0 8px 24px rgba(0,0,0,0.12);text-align:center;"><svg viewBox="0 0 340 200" style="width:100%;max-width:560px;height:190px;" xmlns="http://www.w3.org/2000/svg">
+<circle cx="60" cy="80" r="22" fill="#387633"/><text x="60" y="84" font-size="9" text-anchor="middle" fill="#fff">c1</text>
+<line x1="82" y1="80" x2="138" y2="80" stroke="#999" stroke-width="2" marker-end="url(#arrG)"/>
+<circle cx="160" cy="80" r="22" fill="#387633"/><text x="160" y="84" font-size="9" text-anchor="middle" fill="#fff">c2</text>
+<line x1="182" y1="80" x2="238" y2="80" stroke="#999" stroke-width="2" marker-end="url(#arrG)"/>
+<circle cx="260" cy="80" r="22" fill="#387633"/><text x="260" y="84" font-size="9" text-anchor="middle" fill="#fff">c3</text>
+<text x="260" y="45" font-size="9" text-anchor="middle" fill="#555">main</text>
+<line x1="182" y1="90" x2="238" y2="140" stroke="#259BD7" stroke-width="2" marker-end="url(#arrG2)"/>
+<circle cx="260" cy="150" r="22" fill="#259BD7"/><text x="260" y="154" font-size="9" text-anchor="middle" fill="#fff">c4</text>
+<text x="260" y="185" font-size="9" text-anchor="middle" fill="#555">feature-branch</text>
+<defs>
+<marker id="arrG" markerWidth="8" markerHeight="8" refX="6" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8 Z" fill="#999"/></marker>
+<marker id="arrG2" markerWidth="8" markerHeight="8" refX="6" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8 Z" fill="#259BD7"/></marker>
+</defs>
+</svg></div><div class="card"><div class="section"><h2>What Version Control Solves</h2><div class="body"><p><strong>Git</strong> tracks every change made to a project's files over time, in a structured way that "final_v2_REALLY_final.html" filenames never could — every saved change (a <strong>commit</strong>) is recorded with what changed, when, and why.</p></div></div><div class="section"><h2>The Core Workflow</h2><div class="body"><p>The everyday cycle is: edit files, <code>git add</code> the ones you want to include, <code>git commit -m "message"</code> to save that snapshot with a description. A good commit message explains why a change was made, not just what changed.</p></div><div class="keypoint"><strong>Key Point.</strong> Small, frequent commits with clear messages create a much more useful project history than one giant commit at the end of a week&#039;s work.</div></div><div class="section"><h2>Undoing Mistakes Safely</h2><div class="body"><p>Because every commit is a saved snapshot, a mistake made today can be compared against, or reverted back to, an earlier working version — this safety net is one of Git's most practically valuable features for a working developer.</p></div></div></div>
+</div>
+</body>
+</html>

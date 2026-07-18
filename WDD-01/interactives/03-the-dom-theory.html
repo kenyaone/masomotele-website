@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>The DOM (Lesson) | MTTI Computer Applications</title>
+<link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Fredoka:wght@500;600&display=swap" rel="stylesheet">
+<style>
+* { margin:0; padding:0; box-sizing:border-box; }
+body { font-family:'Space Mono', monospace; background:linear-gradient(135deg,#2E7D32 0%,#1565C0 100%); min-height:100vh; padding:20px; color:#fff; }
+.container { max-width:820px; margin:0 auto; }
+.header { text-align:center; margin-bottom:24px; }
+.lesson-tag { display:inline-block; background:rgba(255,255,255,0.2); padding:6px 16px; border-radius:999px; font-size:0.85em; margin-bottom:12px; }
+.header h1 { font-family:'Fredoka', sans-serif; font-size:2em; margin-bottom:6px; text-shadow:3px 3px 0 rgba(0,0,0,0.2); }
+.card { background:#fff; color:#333; border-radius:22px; padding:32px; margin-bottom:20px; box-shadow:0 20px 60px rgba(0,0,0,0.3); }
+.section { margin-bottom:26px; }
+.section:last-child { margin-bottom:0; }
+.section h2 { font-family:'Fredoka', sans-serif; font-size:1.2em; margin-bottom:10px; color:#1565C0; }
+.section .body { line-height:1.65; font-size:0.98em; }
+.section .body p { margin-bottom:10px; }
+.section .body code { background:#f5f7fb; padding:2px 6px; border-radius:4px; font-size:0.92em; }
+.keypoint { background:#fff8e1; border-left:4px solid #ffc107; padding:12px 16px; border-radius:8px; margin-top:12px; font-size:0.92em; }
+</style>
+</head>
+<body>
+<div class="container">
+<div class="header"><div class="lesson-tag">Module 3 · Lesson 3.3</div><h1>The DOM</h1></div>
+<div style="background:#fff;color:#333;border-radius:16px;padding:16px;margin-bottom:20px;box-shadow:0 8px 24px rgba(0,0,0,0.12);text-align:center;"><svg viewBox="0 0 440 150" style="width:100%;max-width:560px;height:150px;" xmlns="http://www.w3.org/2000/svg">
+<rect x="180" y="10" width="70" height="26" rx="4" fill="#1e293b"/><text x="215" y="27" font-size="10" text-anchor="middle" fill="#fff">html</text>
+<line x1="215" y1="36" x2="130" y2="60" stroke="#999"/><line x1="215" y1="36" x2="300" y2="60" stroke="#999"/>
+<rect x="90" y="60" width="80" height="26" rx="4" fill="#259BD7"/><text x="130" y="77" font-size="10" text-anchor="middle" fill="#fff">head</text>
+<rect x="260" y="60" width="80" height="26" rx="4" fill="#387633"/><text x="300" y="77" font-size="10" text-anchor="middle" fill="#fff">body</text>
+<line x1="130" y1="86" x2="130" y2="110" stroke="#999"/>
+<rect x="90" y="110" width="80" height="26" rx="4" fill="#93c5fd"/><text x="130" y="127" font-size="9" text-anchor="middle">title</text>
+<line x1="300" y1="86" x2="240" y2="110" stroke="#999"/><line x1="300" y1="86" x2="360" y2="110" stroke="#999"/>
+<rect x="200" y="110" width="80" height="26" rx="4" fill="#86efac"/><text x="240" y="127" font-size="9" text-anchor="middle">h1</text>
+<rect x="320" y="110" width="80" height="26" rx="4" fill="#86efac"/><text x="360" y="127" font-size="9" text-anchor="middle">p</text>
+</svg></div><div class="card"><div class="section"><h2>What the DOM Is</h2><div class="body"><p>The <strong>DOM</strong> (Document Object Model) is the browser's live, in-memory representation of the page's HTML as a tree of objects — JavaScript can read and change this tree, and the visible page updates immediately to match.</p></div></div><div class="section"><h2>Selecting Elements</h2><div class="body"><p><code>document.querySelector(".price")</code> finds the first matching element; <code>document.querySelectorAll(".price")</code> finds all of them — using the same CSS-style selectors already familiar from styling.</p></div></div><div class="section"><h2>Changing Content</h2><div class="body"><p>Once an element is selected, its content or appearance can be changed directly in JavaScript — <code>element.textContent = "Sold Out"</code> updates the visible text instantly, without needing to reload the page.</p></div><div class="keypoint"><strong>Key Point.</strong> This is exactly what makes a page feel &quot;interactive&quot; rather than static — JavaScript modifying the DOM in response to something happening.</div></div></div>
+</div>
+</body>
+</html>

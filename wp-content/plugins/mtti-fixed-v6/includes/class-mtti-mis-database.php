@@ -238,10 +238,11 @@ class MTTI_MIS_Database {
         
         $wpdb->insert($table, $data);
         $enrollment_id = $wpdb->insert_id;
-        
+
         // Initialize balance with discount
-        $this->initialize_balance($enrollment_id, $data['student_id'], $data['course_id'], $discount);
-        
+        $delivery_mode = $data['delivery_mode'] ?? 'physical';
+        $this->initialize_balance($enrollment_id, $data['student_id'], $data['course_id'], $discount, $delivery_mode);
+
         return $enrollment_id;
     }
 
@@ -303,15 +304,17 @@ class MTTI_MIS_Database {
     }
 
     // Balances
-    private function initialize_balance($enrollment_id, $student_id, $course_id, $discount = 0) {
+    private function initialize_balance($enrollment_id, $student_id, $course_id, $discount = 0, $delivery_mode = 'physical') {
         global $wpdb;
         $balances_table = $this->get_table_name('student_balances');
         $courses_table = $this->get_table_name('courses');
-        
+
         // Get course fee
-        $course = $wpdb->get_row($wpdb->prepare("SELECT fee FROM {$courses_table} WHERE course_id = %d", $course_id));
-        
-        $total_fee = floatval($course->fee);
+        $course = $wpdb->get_row($wpdb->prepare("SELECT fee, online_fee FROM {$courses_table} WHERE course_id = %d", $course_id));
+
+        $total_fee = ($delivery_mode === 'online' && !is_null($course->online_fee) && $course->online_fee > 0)
+            ? floatval($course->online_fee)
+            : floatval($course->fee);
         $discount_amount = floatval($discount);
         $balance = $total_fee - $discount_amount;
         

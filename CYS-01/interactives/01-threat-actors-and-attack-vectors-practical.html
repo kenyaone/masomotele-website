@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Threat Actors and Attack Vectors | MTTI Computer Applications</title>
+<link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Fredoka:wght@500;600&display=swap" rel="stylesheet">
+<style>
+* { margin:0; padding:0; box-sizing:border-box; }
+body { font-family:'Space Mono', monospace; background:linear-gradient(135deg,#387633 0%,#259BD7 100%); min-height:100vh; padding:20px; color:#fff; }
+.container { max-width:900px; margin:0 auto; }
+.header { text-align:center; margin-bottom:24px; }
+.lesson-tag { display:inline-block; background:rgba(255,255,255,0.2); padding:6px 16px; border-radius:999px; font-size:0.85em; margin-bottom:12px; }
+.header h1 { font-family:'Fredoka', sans-serif; font-size:2em; margin-bottom:6px; text-shadow:3px 3px 0 rgba(0,0,0,0.2); }
+.scenario { background:rgba(255,255,255,0.14); backdrop-filter:blur(10px); border-radius:16px; padding:16px 22px; margin-bottom:20px; border-left:5px solid #ffd54f; font-size:0.95em; line-height:1.55; }
+.task { background:#fff; color:#333; border-radius:20px; padding:24px; margin-bottom:16px; box-shadow:0 14px 40px rgba(0,0,0,0.25); }
+.task-num { display:inline-block; width:28px; height:28px; background:linear-gradient(135deg,#387633 0%,#259BD7 100%); color:#fff; border-radius:50%; text-align:center; line-height:28px; font-family:'Fredoka', sans-serif; font-weight:600; margin-right:8px; }
+.task h3 { font-family:'Fredoka', sans-serif; font-size:1.05em; display:inline; }
+.options { margin-top:14px; display:flex; flex-direction:column; gap:10px; }
+.option { background:#f5f7fb; border:2px solid transparent; padding:12px 16px; border-radius:10px; cursor:pointer; transition:all 0.2s; font-family:'Space Mono', monospace; font-size:0.92em; text-align:left; }
+.option:hover:not(.disabled) { background:#e8f5e9; border-color:#387633; }
+.option.correct { background:#d4edda; border-color:#28a745; color:#155724; }
+.option.wrong { background:#f8d7da; border-color:#dc3545; color:#721c24; }
+.option.disabled { cursor:not-allowed; }
+.feedback { margin-top:14px; padding:12px 16px; border-radius:10px; font-size:0.9em; line-height:1.5; }
+.feedback.correct { background:#d4edda; color:#155724; border-left:4px solid #28a745; }
+.feedback.wrong { background:#f8d7da; color:#721c24; border-left:4px solid #dc3545; }
+.done-banner { text-align:center; padding:20px; color:#fff; font-family:'Fredoka', sans-serif; font-size:1.1em; }
+</style>
+</head>
+<body>
+<div class="container">
+<div class="header"><div class="lesson-tag">Module 1 · Lesson 1.2 · Practical</div><h1>Threat Actors and Attack Vectors</h1></div>
+<div class="scenario">Grace is presenting a threat briefing to SafariPay&#039;s leadership, who assumed the company was too small to be worth attacking.</div>
+<div id="tasks"></div>
+<div class="done-banner" id="doneBanner" style="display:none;">✅ Practical complete — you can move to the quiz.</div>
+</div>
+<script>
+const tasks = [{"prompt":"A SafariPay executive says \"we're too small for anyone to bother attacking us\". What is the accurate response?","options":["They are right, small companies are never targeted","A mobile-money fintech handling real customer funds is an attractive target for financially-motivated cybercriminals regardless of company size","Only nation-states attack any company","Size is the only factor that matters in targeting"],"correct":1,"explanation":"Financially-motivated criminals target based on the value of what can be stolen (real money, financial data), not company size alone."},{"prompt":"Grace is asked which threat actor type is most realistically relevant to SafariPay's day-to-day risk. What should she say?","options":["Nation-state actors, primarily","Organised, financially-motivated cybercriminals, since SafariPay handles real money and payment data","Only script kiddies, since they are the most common actor type overall","None, fintechs are not typically targeted"],"correct":1,"explanation":"Financially-motivated organised cybercriminals are the most realistic and relevant threat for a company directly handling money and payment data."},{"prompt":"A SafariPay employee plugs in an unknown USB drive found in the parking lot. What attack vector does this represent?","options":["Email-based vector","Removable media vector","Insider access vector","Web application vector"],"correct":1,"explanation":"An unknown USB drive is a classic removable media attack vector, sometimes deliberately left as bait (\"USB drop attack\")."}];
+function escapeHtml(s){return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
+function render(){
+  const c = document.getElementById('tasks');
+  c.innerHTML = tasks.map((t,i)=>`
+    <div class="task" id="task-${i}">
+      <div><span class="task-num">${i+1}</span><h3>${escapeHtml(t.prompt)}</h3></div>
+      <div class="options">
+        ${t.options.map((o,j)=>`<button class="option" onclick="answer(${i},${j})">${escapeHtml(o)}</button>`).join('')}
+      </div>
+    </div>`).join('');
+}
+function answer(i,j){
+  const task = tasks[i];
+  const el = document.getElementById('task-'+i);
+  const btns = el.querySelectorAll('.option');
+  if (btns[0].classList.contains('disabled')) return;
+  btns.forEach(b=>b.classList.add('disabled'));
+  btns[task.correct].classList.add('correct');
+  const right = j === task.correct;
+  if (!right) btns[j].classList.add('wrong');
+  const fb = document.createElement('div');
+  fb.className = 'feedback ' + (right?'correct':'wrong');
+  fb.innerHTML = '<strong>' + (right?'✅ Correct.':'❌ Not quite.') + '</strong><br>' + escapeHtml(task.explanation);
+  el.appendChild(fb);
+  if (i === tasks.length-1) document.getElementById('doneBanner').style.display='block';
+}
+render();
+</script>
+</body>
+</html>

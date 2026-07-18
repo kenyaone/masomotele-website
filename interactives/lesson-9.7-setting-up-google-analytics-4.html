@@ -1,0 +1,504 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lesson 9.7 — Setting Up Google Analytics 4 (Interactive)</title>
+<style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: 'Segoe UI', -apple-system, sans-serif; line-height: 1.55; color: #1e293b; background: #f8fafc; min-height: 100vh; }
+    .container { max-width: 1200px; margin: 0 auto; padding: 20px; }
+    header {
+        background: linear-gradient(135deg, #2E7D32, #1B5E20);
+        color: #fff; padding: 40px 30px; border-radius: 12px; margin-bottom: 24px;
+        box-shadow: 0 10px 30px rgba(227,116,0,0.25);
+    }
+    header .badge { display: inline-block; background: rgba(255,255,255,0.2); padding: 4px 14px; border-radius: 16px; font-size: 12px; font-weight: bold; letter-spacing: 1px; margin-bottom: 14px; }
+    header h1 { font-size: 34px; margin-bottom: 8px; }
+    header .subtitle { font-size: 17px; opacity: 0.95; margin-bottom: 20px; }
+    .meta-strip { display: flex; flex-wrap: wrap; gap: 12px; }
+    .meta-strip span { background: rgba(255,255,255,0.18); padding: 6px 14px; border-radius: 20px; font-size: 13px; }
+    .toc { background: #fff; border: 1px solid #e2e8f0; border-radius: 10px; padding: 22px 26px; margin-bottom: 22px; }
+    .toc h3 { color: #e37400; margin-bottom: 10px; }
+    .toc ol { padding-left: 20px; }
+    .toc a { color: #e37400; text-decoration: none; font-weight: 600; }
+    section { background: #fff; border: 1px solid #e2e8f0; border-radius: 10px; padding: 26px 30px; margin-bottom: 22px; }
+    section h2 { color: #e37400; font-size: 22px; margin-bottom: 12px; padding-bottom: 8px; border-bottom: 3px solid #e37400; }
+    section h3 { color: #0f172a; font-size: 17px; margin: 18px 0 8px; }
+    section p { margin-bottom: 12px; }
+    section ul, section ol { padding-left: 22px; margin-bottom: 12px; }
+    section li { margin-bottom: 4px; }
+    .callout { border-left: 5px solid #e37400; background: #fff7ed; padding: 14px 18px; margin: 14px 0; border-radius: 4px; }
+    .callout.warn { border-left-color: #dc2626; background: #fef2f2; }
+    .callout.tip { border-left-color: #059669; background: #ecfdf5; }
+    .callout strong { color: #e37400; }
+
+    /* Setup wizard (step-gated) */
+    .wizard {
+        background: #f1f5f9;
+        border: 1.5px solid #cbd5e1;
+        border-radius: 10px;
+        padding: 20px;
+        margin: 14px 0;
+    }
+    .wiz-progress {
+        display: flex; gap: 4px;
+        margin-bottom: 16px;
+    }
+    .wiz-progress .pip {
+        flex: 1;
+        height: 4px; background: #cbd5e1; border-radius: 2px;
+    }
+    .wiz-progress .pip.done { background: #16a34a; }
+    .wiz-progress .pip.active { background: #e37400; }
+
+    .wiz-step { display: none; }
+    .wiz-step.active { display: block; }
+    .wiz-step h4 { color: #b45309; font-size: 16px; margin-bottom: 10px; }
+    .wiz-field { margin-bottom: 14px; }
+    .wiz-field label { display: block; font-size: 13px; font-weight: 600; color: #475569; margin-bottom: 4px; }
+    .wiz-field input, .wiz-field select {
+        width: 100%; padding: 8px 10px; border: 1.5px solid #cbd5e1; border-radius: 6px;
+        font-size: 14px; background: #fff;
+    }
+    .wiz-checkbox { display: block; padding: 8px 12px; margin-bottom: 6px; background: #fff; border: 1px solid #e2e8f0; border-radius: 6px; cursor: pointer; font-size: 14px; }
+    .wiz-checkbox input { margin-right: 10px; }
+    .wiz-nav { display: flex; justify-content: space-between; margin-top: 14px; }
+    .wiz-nav button { background: #e37400; color: #fff; border: 0; padding: 10px 20px; border-radius: 6px; cursor: pointer; font-weight: 600; }
+    .wiz-nav button:disabled { background: #cbd5e1; cursor: not-allowed; }
+    .wiz-nav .back { background: #64748b; }
+    .wiz-summary {
+        background: #ecfdf5;
+        border: 2px solid #16a34a;
+        border-radius: 10px;
+        padding: 18px;
+        margin-top: 14px;
+        display: none;
+    }
+    .wiz-summary.show { display: block; }
+    .wiz-summary h4 { color: #14532d; margin-bottom: 10px; }
+    .wiz-summary .prop-id { font-family: 'Courier New', monospace; background: #fff; padding: 8px 12px; border-radius: 6px; color: #065f46; display: inline-block; }
+
+    /* MonsterInsights install flow */
+    .mi { background: #f1f5f9; border: 1.5px solid #cbd5e1; border-radius: 10px; padding: 16px; margin: 14px 0; }
+    .mi-step { display: flex; align-items: center; gap: 12px; padding: 10px 12px; border-radius: 6px; margin-bottom: 6px; background: #fff; border: 1px solid #e2e8f0; }
+    .mi-step.done { background: #ecfdf5; border-color: #16a34a; }
+    .mi-step .num { width: 26px; height: 26px; border-radius: 50%; background: #cbd5e1; color: #fff; display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: bold; flex-shrink: 0; }
+    .mi-step.done .num { background: #16a34a; }
+    .mi-step .txt { flex: 1; font-size: 14px; }
+    .mi-step button { background: #e37400; color: #fff; border: 0; padding: 6px 14px; border-radius: 6px; cursor: pointer; font-size: 12px; }
+    .mi-step button:disabled { background: #cbd5e1; cursor: not-allowed; }
+
+    /* Real-time preview */
+    .rt {
+        background: #202124;
+        color: #e8eaed;
+        border-radius: 10px;
+        padding: 18px;
+        margin: 14px 0;
+    }
+    .rt-top { display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px; }
+    .rt-top h4 { color: #fff; font-size: 15px; }
+    .rt-top .live { color: #34a853; font-size: 12px; display: flex; align-items: center; gap: 6px; }
+    .rt-top .live::before { content: '●'; animation: pulse 1.5s infinite; }
+    @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.3; } }
+    .rt-hero { background: #303134; border-radius: 8px; padding: 14px; text-align: center; margin-bottom: 12px; }
+    .rt-hero .n { font-size: 36px; font-weight: bold; color: #34a853; }
+    .rt-hero .l { font-size: 12px; color: #9aa0a6; text-transform: uppercase; }
+    .rt-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+    @media (max-width: 600px) { .rt-grid { grid-template-columns: 1fr; } }
+    .rt-widget { background: #303134; border-radius: 8px; padding: 12px; }
+    .rt-widget h5 { color: #fff; font-size: 12px; margin-bottom: 8px; text-transform: uppercase; letter-spacing: 0.5px; color: #9aa0a6; }
+    .rt-row { display: flex; justify-content: space-between; padding: 4px 0; font-size: 13px; border-bottom: 1px solid #3c4043; }
+    .rt-row:last-child { border-bottom: 0; }
+    .rt-row .name { color: #e8eaed; }
+    .rt-row .val { color: #8ab4f8; font-family: 'Courier New', monospace; }
+
+    /* Key events */
+    .events { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin: 14px 0; }
+    @media (max-width: 700px) { .events { grid-template-columns: 1fr; } }
+    .event-card { background: #fff7ed; border: 1.5px solid #f59e0b; border-radius: 10px; padding: 14px; }
+    .event-card h4 { color: #b45309; font-size: 15px; margin-bottom: 8px; }
+    .event-card .snippet { background: #1e293b; color: #a7f3d0; font-family: 'Courier New', monospace; font-size: 11px; padding: 10px; border-radius: 4px; margin-top: 8px; overflow-x: auto; }
+
+    /* Monthly report card */
+    .report-card { background: #f8fafc; border: 1.5px solid #cbd5e1; border-radius: 10px; padding: 16px; margin: 14px 0; }
+    .rc-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 10px; }
+    .rc-cell { background: #fff; padding: 12px; border-radius: 8px; border: 1px solid #e2e8f0; }
+    .rc-cell .l { font-size: 11px; color: #64748b; text-transform: uppercase; letter-spacing: 0.5px; }
+    .rc-cell .v { font-size: 20px; color: #b45309; font-weight: bold; margin-top: 2px; }
+
+    .quiz-question { background: #fff; border: 2px solid #cbd5e1; border-radius: 10px; padding: 18px; margin: 14px 0; }
+    .quiz-question.correct { border-color: #059669; background: #ecfdf5; }
+    .quiz-question.wrong { border-color: #dc2626; background: #fef2f2; }
+    .quiz-question h4 { margin-bottom: 12px; font-size: 15px; color: #1e293b; }
+    .quiz-question .options label { display: block; padding: 10px 14px; margin-bottom: 6px; background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 6px; cursor: pointer; font-size: 14px; }
+    .quiz-question .options label:hover { background: #fff7ed; }
+    .quiz-question .options input[type="radio"] { margin-right: 10px; }
+    .quiz-question .explanation { display: none; margin-top: 12px; padding: 10px 14px; border-radius: 6px; font-size: 14px; }
+    .quiz-question.correct .explanation { display: block; background: #d1fae5; color: #065f46; border-left: 4px solid #059669; }
+    .quiz-question.wrong .explanation { display: block; background: #fee2e2; color: #991b1b; border-left: 4px solid #dc2626; }
+    .quiz-summary { text-align: center; padding: 30px; background: linear-gradient(135deg, #fff7ed 0%, #fed7aa 100%); border-radius: 10px; margin: 20px 0; display: none; }
+    .quiz-summary.show { display: block; }
+    .quiz-summary .score { font-size: 48px; font-weight: bold; color: #e37400; margin-bottom: 8px; }
+    button.btn { background: #e37400; color: #fff; border: none; padding: 10px 20px; border-radius: 6px; font-size: 15px; font-weight: 600; cursor: pointer; }
+    button.btn:hover { background: #b45309; }
+    button.btn.reset { background: #64748b; margin-left: 8px; }
+    footer { text-align: center; color: #64748b; padding: 24px; font-size: 13px; }
+
+    /* MTTI logo stamp */
+    .mtti-logo-stamp {
+        position: fixed; top: 14px; right: 18px; z-index: 999;
+        opacity: 0.88; transition: opacity 0.2s;
+    }
+    .mtti-logo-stamp:hover { opacity: 1; }
+    .mtti-logo-stamp img { width: 56px; height: 56px; border-radius: 50%; box-shadow: 0 2px 8px rgba(0,0,0,0.18); }
+</style>
+</head>
+<body>
+<div class="mtti-logo-stamp">
+    <img src="../../Resources/Logo.jpeg" alt="MTTI" title="Masomotele Technical Training Institute — Start learning, Start earning">
+</div>
+
+<div class="container">
+
+<header>
+    <div class="badge">LESSON 9.7  ·  SEO IMPLEMENTATION LAB  ·  INTERACTIVE</div>
+    <h1>Setting Up Google Analytics 4</h1>
+    <div class="subtitle">The other half of the measurement stack. Create the property, install via MonsterInsights, verify with Real-time, track WhatsApp clicks and form submits.</div>
+    <div class="meta-strip">
+        <span><strong>Duration:</strong> ~40 min interactive</span>
+        <span><strong>Level:</strong> Intermediate</span>
+        <span><strong>Tool:</strong> analytics.google.com + MonsterInsights</span>
+        <span><strong>Handbook:</strong> Part 9, §9.7</span>
+    </div>
+</header>
+
+<div class="toc">
+    <h3>What you'll do in this lesson</h3>
+    <ol>
+        <li><a href="#s1">What GA4 measures (vs GSC)</a></li>
+        <li><a href="#s2"><strong>GA4 property setup wizard (step-gated)</strong></a></li>
+        <li><a href="#s3">Install via MonsterInsights (simulated flow)</a></li>
+        <li><a href="#s4">Verify with the Real-time report</a></li>
+        <li><a href="#s5">Two key events every business tracks</a></li>
+        <li><a href="#s6">The monthly report card</a></li>
+        <li><a href="#s7">Self-check quiz (10 questions)</a></li>
+    </ol>
+</div>
+
+<section id="s1">
+    <h2>1. What GA4 measures</h2>
+    <p>Search Console showed how <em>Google</em> sees Sarah's site. GA4 shows how <em>visitors</em> behave once they arrive.</p>
+    <ul>
+        <li><strong>Who</strong> — location, device, language, first-time vs returning</li>
+        <li><strong>Where they came from</strong> — Google, Facebook, direct, email, referral</li>
+        <li><strong>Which pages</strong> — most viewed, entry pages, exit pages</li>
+        <li><strong>How long</strong> — session duration, engagement time</li>
+        <li><strong>What they did</strong> — key events (WhatsApp click, form submit, reach checkout)</li>
+    </ul>
+    <div class="callout tip">
+        <strong>Together GSC + GA4 = complete picture:</strong> GSC tells you what got them to the site, GA4 tells you what they did there.
+    </div>
+</section>
+
+<section id="s2">
+    <h2>2. GA4 property setup wizard (step-gated)</h2>
+    <p>Open <strong>analytics.google.com</strong> and click Admin → Create Property. Walk through 5 steps below.</p>
+
+    <div class="wizard">
+        <div class="wiz-progress" id="wizProgress">
+            <div class="pip active"></div>
+            <div class="pip"></div>
+            <div class="pip"></div>
+            <div class="pip"></div>
+            <div class="pip"></div>
+        </div>
+
+        <div class="wiz-step active" data-step="1">
+            <h4>Step 1 of 5 — Account</h4>
+            <div class="wiz-field">
+                <label>Account name (top-level container)</label>
+                <input type="text" id="wAcc" value="Karibu Kitchen">
+            </div>
+            <div class="wiz-field">
+                <label>Data-sharing settings (recommended defaults)</label>
+                <label class="wiz-checkbox"><input type="checkbox" checked> Share data to improve Google products &amp; services</label>
+                <label class="wiz-checkbox"><input type="checkbox" checked> Enable Technical support and Account specialists</label>
+            </div>
+        </div>
+
+        <div class="wiz-step" data-step="2">
+            <h4>Step 2 of 5 — Property details</h4>
+            <div class="wiz-field">
+                <label>Property name</label>
+                <input type="text" id="wProp" value="Karibu Kitchen — karibukitchen.co.ke">
+            </div>
+            <div class="wiz-field">
+                <label>Reporting timezone</label>
+                <select id="wTz">
+                    <option>(GMT+03:00) Nairobi</option>
+                    <option>(GMT+00:00) London</option>
+                    <option>(GMT+02:00) Cairo</option>
+                </select>
+            </div>
+            <div class="wiz-field">
+                <label>Currency</label>
+                <select id="wCur">
+                    <option>Kenyan Shilling (KES)</option>
+                    <option>US Dollar (USD)</option>
+                    <option>Euro (EUR)</option>
+                </select>
+            </div>
+        </div>
+
+        <div class="wiz-step" data-step="3">
+            <h4>Step 3 of 5 — Business details</h4>
+            <div class="wiz-field">
+                <label>Industry</label>
+                <select id="wInd">
+                    <option>Food &amp; Drink</option>
+                    <option>Restaurants</option>
+                    <option>Retail</option>
+                    <option>Professional Services</option>
+                </select>
+            </div>
+            <div class="wiz-field">
+                <label>Business size</label>
+                <select id="wSize">
+                    <option>Small — 1 to 10 employees</option>
+                    <option>Medium — 11 to 100</option>
+                    <option>Large — 100+</option>
+                </select>
+            </div>
+        </div>
+
+        <div class="wiz-step" data-step="4">
+            <h4>Step 4 of 5 — Business objectives</h4>
+            <label class="wiz-checkbox"><input type="checkbox" checked> Generate leads (WhatsApp clicks, form submits)</label>
+            <label class="wiz-checkbox"><input type="checkbox" checked> Drive online sales</label>
+            <label class="wiz-checkbox"><input type="checkbox"> Raise brand awareness</label>
+            <label class="wiz-checkbox"><input type="checkbox"> Examine user behavior</label>
+        </div>
+
+        <div class="wiz-step" data-step="5">
+            <h4>Step 5 of 5 — Data stream</h4>
+            <div class="wiz-field">
+                <label>Platform</label>
+                <select><option>Web</option><option>Android app</option><option>iOS app</option></select>
+            </div>
+            <div class="wiz-field">
+                <label>Website URL</label>
+                <input type="text" value="https://karibukitchen.co.ke">
+            </div>
+            <div class="wiz-field">
+                <label>Stream name</label>
+                <input type="text" value="Karibu Kitchen Web">
+            </div>
+            <label class="wiz-checkbox"><input type="checkbox" checked> Enhanced measurement (auto-track scrolls, outbound clicks, file downloads)</label>
+        </div>
+
+        <div class="wiz-nav">
+            <button class="back" onclick="wizBack()" id="wizBack" disabled>← Back</button>
+            <button onclick="wizNext()" id="wizNext">Next →</button>
+        </div>
+
+        <div class="wiz-summary" id="wizSummary">
+            <h4>✓ Property created</h4>
+            <p>Sarah's GA4 property is live. Copy this Measurement ID — it's what MonsterInsights will connect to.</p>
+            <div class="prop-id">G-KARIBU2026A</div>
+        </div>
+    </div>
+</section>
+
+<section id="s3">
+    <h2>3. Install via MonsterInsights (simulated flow)</h2>
+    <p>Sarah installed MonsterInsights in Lesson 8.7. Now connect it to the GA4 property she just created — 4 clicks, no code.</p>
+    <div class="mi">
+        <div class="mi-step" id="mi1"><div class="num">1</div><div class="txt">wp-admin → Insights → Settings</div><button onclick="doMi(1)" id="mib1">Open</button></div>
+        <div class="mi-step" id="mi2"><div class="num">2</div><div class="txt">Click "Connect MonsterInsights"</div><button onclick="doMi(2)" id="mib2" disabled>Connect</button></div>
+        <div class="mi-step" id="mi3"><div class="num">3</div><div class="txt">Sign in with same Google account → Grant permission</div><button onclick="doMi(3)" id="mib3" disabled>Grant</button></div>
+        <div class="mi-step" id="mi4"><div class="num">4</div><div class="txt">Pick property "Karibu Kitchen — G-KARIBU2026A" → Save</div><button onclick="doMi(4)" id="mib4" disabled>Save</button></div>
+        <div id="miDone" style="display:none; margin-top:14px; padding:14px; background:#d1fae5; color:#065f46; border-radius:8px; font-weight:600;">✓ MonsterInsights connected. GA4 tracking code is now on every page of Sarah's site. No manual code paste needed.</div>
+    </div>
+</section>
+
+<section id="s4">
+    <h2>4. Verify with the Real-time report</h2>
+    <p>Never assume tracking works. Open two tabs: GA4 Real-time in one, Sarah's live site in the other. Refresh the site. Wait 10 s. You should appear.</p>
+
+    <div class="rt">
+        <div class="rt-top">
+            <h4>Real-time overview</h4>
+            <span class="live">LIVE · updated every second</span>
+        </div>
+        <div class="rt-hero">
+            <div class="n">1</div>
+            <div class="l">users in last 30 min</div>
+        </div>
+        <div class="rt-grid">
+            <div class="rt-widget">
+                <h5>Users by country</h5>
+                <div class="rt-row"><span class="name">🇰🇪 Kenya</span><span class="val">1</span></div>
+            </div>
+            <div class="rt-widget">
+                <h5>Top pages viewed</h5>
+                <div class="rt-row"><span class="name">/</span><span class="val">1</span></div>
+            </div>
+            <div class="rt-widget">
+                <h5>Event count</h5>
+                <div class="rt-row"><span class="name">page_view</span><span class="val">1</span></div>
+                <div class="rt-row"><span class="name">session_start</span><span class="val">1</span></div>
+                <div class="rt-row"><span class="name">first_visit</span><span class="val">1</span></div>
+            </div>
+            <div class="rt-widget">
+                <h5>Users by device</h5>
+                <div class="rt-row"><span class="name">📱 Mobile</span><span class="val">1</span></div>
+            </div>
+        </div>
+    </div>
+
+    <div class="callout warn">
+        <strong>If Users = 0 after 30 seconds:</strong> MonsterInsights is not connected. Sign back into Insights → Settings and re-authenticate. Never proceed if Real-time shows nothing.
+    </div>
+</section>
+
+<section id="s5">
+    <h2>5. Two key events every business tracks</h2>
+    <p>Beyond default page views, every professional setup marks at least TWO custom events as "Key Events" (formerly called Conversions).</p>
+    <div class="events">
+        <div class="event-card">
+            <h4>Event 1 — WhatsApp click</h4>
+            <p>Fires every time a visitor clicks the WhatsApp CTA button.</p>
+            <div class="snippet">gtag('event', 'whatsapp_click', {
+  button_location: 'hero'
+});</div>
+            <p style="margin-top:8px; font-size:13px;">MonsterInsights automates this — no manual code needed. Just tick "Track outbound clicks" in Enhanced Measurement.</p>
+        </div>
+        <div class="event-card">
+            <h4>Event 2 — form submit</h4>
+            <p>Fires every time the Contact Form 7 form is submitted.</p>
+            <div class="snippet">gtag('event', 'form_submit', {
+  form_id: 'contact-form-7'
+});</div>
+            <p style="margin-top:8px; font-size:13px;">Contact Form 7 has a built-in GA4 integration under the form settings. Tick "Send events to Google Analytics".</p>
+        </div>
+    </div>
+    <div class="callout tip">
+        <strong>Then in GA4:</strong> Admin → Events → toggle "Mark as key event" for both. From that moment, every WhatsApp click and every form submit is a countable lead.
+    </div>
+</section>
+
+<section id="s6">
+    <h2>6. The monthly report card</h2>
+    <p>Every month, Sarah pulls these 7 numbers from GA4. Combined with GSC, this is her complete performance picture.</p>
+    <div class="report-card">
+        <div class="rc-grid">
+            <div class="rc-cell"><div class="l">Total users</div><div class="v">1,247</div></div>
+            <div class="rc-cell"><div class="l">Total sessions</div><div class="v">1,983</div></div>
+            <div class="rc-cell"><div class="l">Avg session duration</div><div class="v">1:42</div></div>
+            <div class="rc-cell"><div class="l">Engagement rate</div><div class="v">62%</div></div>
+            <div class="rc-cell"><div class="l">Key events</div><div class="v">84</div></div>
+            <div class="rc-cell"><div class="l">Top source</div><div class="v" style="font-size:15px;">Google organic</div></div>
+            <div class="rc-cell"><div class="l">Top page</div><div class="v" style="font-size:15px;">/menu</div></div>
+        </div>
+    </div>
+</section>
+
+<section id="s7">
+    <h2>7. Self-check quiz</h2>
+
+    <div class="quiz-question" data-correct="C"><h4>1. What does GA4 measure that GSC doesn't?</h4><div class="options"><label><input type="radio" name="q1" value="A"> A) Impressions in Google search</label><label><input type="radio" name="q1" value="B"> B) Coverage errors</label><label><input type="radio" name="q1" value="C"> C) Visitor behaviour on the site itself</label><label><input type="radio" name="q1" value="D"> D) Keyword rankings</label></div><div class="explanation">Correct — GA4 tracks visitors ON the site; GSC tracks how Google surfaces the site.</div></div>
+
+    <div class="quiz-question" data-correct="A"><h4>2. What's the correct timezone for a Kenyan property?</h4><div class="options"><label><input type="radio" name="q2" value="A"> A) GMT+03:00 Nairobi</label><label><input type="radio" name="q2" value="B"> B) GMT+00:00 London</label><label><input type="radio" name="q2" value="C"> C) UTC only</label><label><input type="radio" name="q2" value="D"> D) It doesn't matter</label></div><div class="explanation">Correct — reports align to local time.</div></div>
+
+    <div class="quiz-question" data-correct="B"><h4>3. Which currency should Sarah pick?</h4><div class="options"><label><input type="radio" name="q3" value="A"> A) USD</label><label><input type="radio" name="q3" value="B"> B) KES</label><label><input type="radio" name="q3" value="C"> C) EUR</label><label><input type="radio" name="q3" value="D"> D) Bitcoin</label></div><div class="explanation">Correct — revenue reports use the property currency.</div></div>
+
+    <div class="quiz-question" data-correct="D"><h4>4. Which WordPress plugin makes GA4 install a no-code job?</h4><div class="options"><label><input type="radio" name="q4" value="A"> A) Yoast SEO</label><label><input type="radio" name="q4" value="B"> B) WooCommerce</label><label><input type="radio" name="q4" value="C"> C) Elementor</label><label><input type="radio" name="q4" value="D"> D) MonsterInsights</label></div><div class="explanation">Correct — MonsterInsights connects and installs the tracking code automatically.</div></div>
+
+    <div class="quiz-question" data-correct="C"><h4>5. How do you verify GA4 is actually tracking?</h4><div class="options"><label><input type="radio" name="q5" value="A"> A) Wait a month</label><label><input type="radio" name="q5" value="B"> B) Guess</label><label><input type="radio" name="q5" value="C"> C) Open Real-time report and refresh the site — see yourself appear</label><label><input type="radio" name="q5" value="D"> D) Ask Google</label></div><div class="explanation">Correct — Real-time is the fastest way to confirm tracking works.</div></div>
+
+    <div class="quiz-question" data-correct="A"><h4>6. What are Key Events (formerly)?</h4><div class="options"><label><input type="radio" name="q6" value="A"> A) Conversions — the actions that matter (WhatsApp click, form submit, purchase).</label><label><input type="radio" name="q6" value="B"> B) Page views.</label><label><input type="radio" name="q6" value="C"> C) Sessions.</label><label><input type="radio" name="q6" value="D"> D) Users.</label></div><div class="explanation">Correct — GA4 renamed Conversions to Key Events in 2024.</div></div>
+
+    <div class="quiz-question" data-correct="D"><h4>7. Which two events should Sarah track as Key Events?</h4><div class="options"><label><input type="radio" name="q7" value="A"> A) Page views + scrolls</label><label><input type="radio" name="q7" value="B"> B) File download + video play</label><label><input type="radio" name="q7" value="C"> C) Session start + session end</label><label><input type="radio" name="q7" value="D"> D) WhatsApp click + form submit</label></div><div class="explanation">Correct — these are the actions that turn a visitor into a lead.</div></div>
+
+    <div class="quiz-question" data-correct="B"><h4>8. Sarah's report shows 1,247 users but 84 key events. What's her conversion rate?</h4><div class="options"><label><input type="radio" name="q8" value="A"> A) About 0.5%</label><label><input type="radio" name="q8" value="B"> B) About 6.7%</label><label><input type="radio" name="q8" value="C"> C) About 30%</label><label><input type="radio" name="q8" value="D"> D) About 84%</label></div><div class="explanation">Correct — 84 ÷ 1,247 = 6.7%. Healthy for a Kenyan restaurant site.</div></div>
+
+    <div class="quiz-question" data-correct="C"><h4>9. If Real-time shows 0 users after 30 seconds while you're refreshing the site…</h4><div class="options"><label><input type="radio" name="q9" value="A"> A) That's normal.</label><label><input type="radio" name="q9" value="B"> B) The site is fast.</label><label><input type="radio" name="q9" value="C"> C) Tracking is broken — go re-authenticate MonsterInsights.</label><label><input type="radio" name="q9" value="D"> D) Reboot the router.</label></div><div class="explanation">Correct — Real-time seeing zero means the tracking code isn't firing.</div></div>
+
+    <div class="quiz-question" data-correct="A"><h4>10. What is Enhanced Measurement?</h4><div class="options"><label><input type="radio" name="q10" value="A"> A) Auto-tracks scrolls, outbound clicks, file downloads, and video engagement without extra code.</label><label><input type="radio" name="q10" value="B"> B) A paid GA4 upgrade.</label><label><input type="radio" name="q10" value="C"> C) An SEO plugin.</label><label><input type="radio" name="q10" value="D"> D) A form builder.</label></div><div class="explanation">Correct — tick the box in the data stream setup and GA4 tracks these for you.</div></div>
+
+    <div style="margin-top: 20px;">
+        <button class="btn" onclick="markQuiz()">Mark my quiz</button>
+        <button class="btn reset" onclick="resetQuiz()">Reset</button>
+    </div>
+    <div class="quiz-summary" id="quizSummary"><div class="score" id="scoreDisplay">0 / 10</div><p id="scoreMessage"></p></div>
+</section>
+
+<footer>
+    <p>Lesson 9.7 — Setting Up Google Analytics 4 · Masomotele Technical Training Institute · Handbook Part 9, §9.7</p>
+    <p>Module 9 complete. Next: <strong>Module 10 — Google Ads Simulator Lab (Lesson 10.1)</strong></p>
+</footer>
+</div>
+
+<script>
+// Wizard
+let wizStep = 1;
+const totalSteps = 5;
+function updateWiz() {
+    document.querySelectorAll('.wiz-step').forEach(s => s.classList.remove('active'));
+    document.querySelector(`.wiz-step[data-step="${wizStep}"]`).classList.add('active');
+    document.querySelectorAll('.wiz-progress .pip').forEach((p, i) => {
+        p.classList.remove('active', 'done');
+        if (i + 1 < wizStep) p.classList.add('done');
+        else if (i + 1 === wizStep) p.classList.add('active');
+    });
+    document.getElementById('wizBack').disabled = wizStep === 1;
+    document.getElementById('wizNext').textContent = wizStep === totalSteps ? 'Create property' : 'Next →';
+}
+function wizNext() {
+    if (wizStep < totalSteps) { wizStep++; updateWiz(); }
+    else {
+        document.getElementById('wizSummary').classList.add('show');
+        document.getElementById('wizNext').disabled = true;
+    }
+}
+function wizBack() {
+    if (wizStep > 1) { wizStep--; updateWiz(); }
+}
+
+// MonsterInsights flow
+function doMi(n) {
+    document.getElementById('mi' + n).classList.add('done');
+    document.getElementById('mib' + n).disabled = true;
+    document.getElementById('mib' + n).textContent = '✓';
+    if (n < 4) document.getElementById('mib' + (n+1)).disabled = false;
+    else document.getElementById('miDone').style.display = 'block';
+}
+
+function markQuiz() {
+    const questions = document.querySelectorAll('.quiz-question');
+    let score = 0;
+    questions.forEach((q, i) => {
+        const correct = q.dataset.correct;
+        const picked = q.querySelector(`input[name="q${i+1}"]:checked`);
+        q.classList.remove('correct', 'wrong');
+        if (picked && picked.value === correct) { q.classList.add('correct'); score++; }
+        else if (picked) q.classList.add('wrong');
+    });
+    const summary = document.getElementById('quizSummary');
+    summary.classList.add('show');
+    document.getElementById('scoreDisplay').textContent = `${score} / 10`;
+    const msg = document.getElementById('scoreMessage');
+    if (score === 10) msg.textContent = 'Perfect. Module 9 complete — jump to Lesson 10.1 (Google Ads Simulator Lab).';
+    else if (score >= 7) msg.textContent = 'Strong.';
+    else msg.textContent = 'Redo the setup wizard and Real-time verification before retaking.';
+    summary.scrollIntoView({ behavior: 'smooth', block: 'center' });
+}
+function resetQuiz() {
+    document.querySelectorAll('.quiz-question').forEach(q => { q.classList.remove('correct', 'wrong'); q.querySelectorAll('input[type=radio]').forEach(r => r.checked = false); });
+    document.getElementById('quizSummary').classList.remove('show');
+}
+</script>
+</body>
+</html>

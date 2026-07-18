@@ -67,6 +67,8 @@ class MTTI_MIS_Admin_Finance {
 
     /* ─── Handle POST ──────────────────────────────────────────────── */
     private function handle_actions() {
+        if ( ! current_user_can('manage_finance') ) return;
+
         global $wpdb;
         if ( empty($_POST['mtti_finance_nonce']) ||
              ! wp_verify_nonce($_POST['mtti_finance_nonce'], 'mtti_finance_action') ) return;
@@ -129,6 +131,10 @@ class MTTI_MIS_Admin_Finance {
 
     /* ─── Main display ─────────────────────────────────────────────── */
     public function display() {
+        if ( ! current_user_can('manage_finance') ) {
+            wp_die('❌ You do not have permission to access the Finance module.');
+        }
+
         self::create_tables();
         $this->handle_actions();
         global $wpdb;

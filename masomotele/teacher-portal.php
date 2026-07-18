@@ -11,7 +11,7 @@ $db = Database::getInstance();
 $userId = $auth->getUserId();
 $role = $auth->getRole();
 
-$view = $_GET['view'] ?? 'classes';
+$view = $_GET['view'] ?? 'lms_classes';
 $classId = intval($_GET['class_id'] ?? 0);
 $subjectId = intval($_GET['subject_id'] ?? 0);
 $topicId = intval($_GET['topic_id'] ?? 0);
@@ -26,9 +26,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $cid = intval($_POST['class_id']);
         $sid = intval($_POST['subject_id']) ?: null;
         $title = trim($_POST['lesson_title']);
-        $maxSort = (int)$db->fetchColumn("SELECT COALESCE(MAX(sort_order),0) FROM lessons WHERE class_id=?", [$cid]);
+        $maxSort = (int)$db->fetchColumn("SELECT COALESCE(MAX(sort_order),0) FROM lms_lessons WHERE class_id=?", [$cid]);
 
-        $lessonId = $db->insert('lessons', [
+        $lessonId = $db->insert('lms_lessons', [
             'class_id' => $cid, 'subject_id' => $sid, 'title' => $title,
             'content_html' => '', 'content_type' => $_POST['content_type'] ?? null, 'sort_order' => $maxSort + 1,
             'status' => 'published', 'created_at' => date('Y-m-d H:i:s')
@@ -44,7 +44,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $safeName = time() . '_' . preg_replace('/[^a-zA-Z0-9._-]/', '_', $origName);
             $destPath = $dir . $safeName;
             if (move_uploaded_file($_FILES['lesson_file']['tmp_name'], __DIR__ . '/' . $destPath)) {
-                $db->insert('lesson_files', [
+                $db->insert('lms_lesson_files', [
                     'lesson_id' => $lessonId, 'original_name' => $origName,
                     'filename' => $safeName, 'filepath' => $destPath,
                     'filetype' => $ext, 'filesize' => $_FILES['lesson_file']['size'],
@@ -57,7 +57,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 elseif ($ext === 'pdf') $html = "<iframe src='$url' width='100%' height='800px' style='border:none'></iframe>";
                 elseif (in_array($ext, ['html','htm'])) $html = "<iframe src='$url' width='100%' height='800px' style='border:none'></iframe>";
                 elseif (in_array($ext, ['jpg','jpeg','png','gif'])) $html = "<img src='$url' class='img-fluid'>";
-                if ($html) $db->query("UPDATE lessons SET content_html=? WHERE id=?", [$html, $lessonId]);
+                if ($html) $db->query("UPDATE lms_lessons SET content_html=? WHERE id=?", [$html, $lessonId]);
             }
         }
         $msg = 'Lesson added!';
@@ -66,10 +66,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     if ($action === 'delete_lesson') {
         $lid = intval($_POST['lesson_id']);
-        $files = $db->fetchAll("SELECT filepath FROM lesson_files WHERE lesson_id=?", [$lid]);
+        $files = $db->fetchAll("SELECT filepath FROM lms_lesson_files WHERE lesson_id=?", [$lid]);
         foreach ($files as $f) { @unlink(__DIR__ . '/' . $f['filepath']); }
-        $db->query("DELETE FROM lesson_files WHERE lesson_id=?", [$lid]);
-        $db->query("DELETE FROM lessons WHERE id=?", [$lid]);
+        $db->query("DELETE FROM lms_lesson_files WHERE lesson_id=?", [$lid]);
+        $db->query("DELETE FROM lms_lessons WHERE id=?", [$lid]);
         $msg = 'Lesson deleted';
         header('Location: ' . $redir . '&msg=' . urlencode($msg)); exit;
     }
@@ -78,8 +78,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $cid = intval($_POST['class_id']);
         $pid = intval($_POST['parent_id']) ?: null;
         $title = trim($_POST['title']);
-        $maxSort = (int)$db->fetchColumn("SELECT COALESCE(MAX(sort_order),0) FROM subjects WHERE class_id=? AND " . ($pid ? "parent_id=$pid" : "parent_id IS NULL"), [$cid]);
-        $db->insert('subjects', [
+        $maxSort = (int)$db->fetchColumn("SELECT COALESCE(MAX(sort_order),0) FROM lms_subjects WHERE class_id=? AND " . ($pid ? "parent_id=$pid" : "parent_id IS NULL"), [$cid]);
+        $db->insert('lms_subjects', [
             'class_id' => $cid, 'parent_id' => $pid, 'title' => $title,
             'level_type' => $pid ? 'topic' : 'subject',
             'sort_order' => $maxSort + 1, 'status' => 'active', 'created_at' => date('Y-m-d H:i:s')
@@ -90,11 +90,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     if ($action === 'delete_subject') {
         $sid = intval($_POST['subject_id']);
-        $db->query("UPDATE lessons SET subject_id=NULL WHERE subject_id=?", [$sid]);
-        $children = $db->fetchAll("SELECT id FROM subjects WHERE parent_id=?", [$sid]);
-        foreach ($children as $ch) { $db->query("UPDATE lessons SET subject_id=NULL WHERE subject_id=?", [$ch['id']]); }
-        $db->query("DELETE FROM subjects WHERE parent_id=?", [$sid]);
-        $db->query("DELETE FROM subjects WHERE id=?", [$sid]);
+        $db->query("UPDATE lms_lessons SET subject_id=NULL WHERE subject_id=?", [$sid]);
+        $children = $db->fetchAll("SELECT id FROM lms_subjects WHERE parent_id=?", [$sid]);
+        foreach ($children as $ch) { $db->query("UPDATE lms_lessons SET subject_id=NULL WHERE subject_id=?", [$ch['id']]); }
+        $db->query("DELETE FROM lms_subjects WHERE parent_id=?", [$sid]);
+        $db->query("DELETE FROM lms_subjects WHERE id=?", [$sid]);
         $msg = 'Deleted';
         header('Location: ' . $redir . '&msg=' . urlencode($msg)); exit;
     }
@@ -128,8 +128,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
 }
 
-$classes = $db->fetchAll("SELECT c.*, (SELECT COUNT(*) FROM enrolments WHERE class_id=c.id) as students, (SELECT COUNT(*) FROM lessons WHERE class_id=c.id AND status='published') as lessons FROM classes c WHERE c.status='active' ORDER BY c.title");
-$classInfo = $classId ? $db->fetchOne("SELECT * FROM classes WHERE id=?", [$classId]) : null;
+$classes = $db->fetchAll("SELECT c.*, (SELECT COUNT(*) FROM lms_enrolments WHERE class_id=c.id) as students, (SELECT COUNT(*) FROM lms_lessons WHERE class_id=c.id AND status='published') as lessons FROM lms_classes c WHERE c.status='active' ORDER BY c.title");
+$classInfo = $classId ? $db->fetchOne("SELECT * FROM lms_classes WHERE id=?", [$classId]) : null;
 
 $pageTitle = 'Teacher Portal - ' . SITE_NAME;
 require_once __DIR__ . '/templates/header.php';
@@ -187,7 +187,7 @@ body{background:var(--bg)}
 
 <?php if ($msg): ?><div class="alert alert-success alert-dismissible fade show py-2" style="font-size:.85rem;border-radius:10px"><?= htmlspecialchars($msg) ?><button type="button" class="btn-close" data-bs-dismiss="alert" style="font-size:.7rem"></button></div><?php endif; ?>
 
-<?php if ($view === 'classes'): ?>
+<?php if ($view === 'lms_classes'): ?>
 <!-- ═══ CLASSES ═══ -->
 <div class="tp-bc"><span style="font-weight:700">My Classes</span></div>
 <div class="tools-bar">
@@ -204,15 +204,15 @@ body{background:var(--bg)}
     <a href="?view=subjects&class_id=<?= $c['id'] ?>" class="s-card">
         <div class="icon" style="background:#eff6ff;color:#2563eb"><i class="bi bi-book"></i></div>
         <h6><?= htmlspecialchars($c['title']) ?></h6>
-        <div class="meta"><?= $c['students'] ?> students · <?= $c['lessons'] ?> lessons</div>
+        <div class="meta"><?= $c['students'] ?> students · <?= $c['lms_lessons'] ?> lessons</div>
     </a>
     <?php endforeach; ?>
 </div>
 
-<?php elseif ($view === 'subjects' && $classId): ?>
+<?php elseif ($view === 'lms_subjects' && $classId): ?>
 <!-- ═══ SUBJECTS ═══ -->
 <?php
-$subjects = $db->fetchAll("SELECT s.*, (SELECT COUNT(*) FROM subjects WHERE parent_id=s.id AND status='active') as topic_count FROM subjects s WHERE s.class_id=? AND (s.parent_id IS NULL OR s.parent_id=0) AND s.status='active' ORDER BY s.sort_order", [$classId]);
+$subjects = $db->fetchAll("SELECT s.*, (SELECT COUNT(*) FROM lms_subjects WHERE parent_id=s.id AND status='active') as topic_count FROM lms_subjects s WHERE s.class_id=? AND (s.parent_id IS NULL OR s.parent_id=0) AND s.status='active' ORDER BY s.sort_order", [$classId]);
 $colors = ['#2563eb','#dc2626','#16a34a','#7c3aed','#ea580c','#0891b2','#be185d','#4f46e5','#b45309','#0d9488','#6d28d9','#c2410c','#0369a1','#a21caf'];
 $icons = ['bi-calculator','bi-book','bi-chat-text','bi-bug','bi-droplet','bi-lightning','bi-globe','bi-geo-alt','bi-heart','bi-flower1','bi-pc-display','bi-house','bi-palette','bi-translate'];
 $redir = "?view=subjects&class_id=$classId";
@@ -226,7 +226,7 @@ $redir = "?view=subjects&class_id=$classId";
         $col = $colors[$si % count($colors)];
         $ic = $icons[$si % count($icons)];
         // Count all lessons under this subject + children
-        $lCount = (int)$db->fetchColumn("SELECT COUNT(*) FROM lessons WHERE status='published' AND (subject_id=? OR subject_id IN (SELECT id FROM subjects WHERE parent_id=?))", [$sub['id'], $sub['id']]);
+        $lCount = (int)$db->fetchColumn("SELECT COUNT(*) FROM lms_lessons WHERE status='published' AND (subject_id=? OR subject_id IN (SELECT id FROM lms_subjects WHERE parent_id=?))", [$sub['id'], $sub['id']]);
     ?>
     <a href="?view=topics&class_id=<?= $classId ?>&subject_id=<?= $sub['id'] ?>" class="s-card">
         <div class="icon" style="background:<?= $col ?>15;color:<?= $col ?>"><i class="bi <?= $ic ?>"></i></div>
@@ -250,9 +250,9 @@ $redir = "?view=subjects&class_id=$classId";
 <?php elseif ($view === 'topics' && $classId && $subjectId): ?>
 <!-- ═══ TOPICS + LESSONS ═══ -->
 <?php
-$subjectInfo = $db->fetchOne("SELECT * FROM subjects WHERE id=?", [$subjectId]);
-$topics = $db->fetchAll("SELECT s.*, (SELECT COUNT(*) FROM lessons WHERE subject_id=s.id AND status='published') as lesson_count FROM subjects s WHERE s.parent_id=? AND s.status='active' ORDER BY s.sort_order", [$subjectId]);
-$directLessons = $db->fetchAll("SELECT l.*, f.filetype, f.original_name FROM lessons l LEFT JOIN lesson_files f ON f.lesson_id=l.id WHERE l.subject_id=? AND l.class_id=? AND l.status='published' ORDER BY l.sort_order", [$subjectId, $classId]);
+$subjectInfo = $db->fetchOne("SELECT * FROM lms_subjects WHERE id=?", [$subjectId]);
+$topics = $db->fetchAll("SELECT s.*, (SELECT COUNT(*) FROM lms_lessons WHERE subject_id=s.id AND status='published') as lesson_count FROM lms_subjects s WHERE s.parent_id=? AND s.status='active' ORDER BY s.sort_order", [$subjectId]);
+$directLessons = $db->fetchAll("SELECT l.*, f.filetype, f.original_name FROM lms_lessons l LEFT JOIN lms_lesson_files f ON f.lesson_id=l.id WHERE l.subject_id=? AND l.class_id=? AND l.status='published' ORDER BY l.sort_order", [$subjectId, $classId]);
 $quizzes = $db->fetchAll("SELECT * FROM quizzes WHERE class_id=? AND status='active'", [$classId]);
 $redir = "?view=topics&class_id=$classId&subject_id=$subjectId";
 ?>
@@ -315,11 +315,11 @@ $redir = "?view=topics&class_id=$classId&subject_id=$subjectId";
 <?php elseif ($view === 'topic_lessons' && $classId && $subjectId && $topicId): ?>
 <!-- ═══ LESSONS IN A TOPIC ═══ -->
 <?php
-$subjectInfo = $db->fetchOne("SELECT * FROM subjects WHERE id=?", [$subjectId]);
-$topicInfo = $db->fetchOne("SELECT * FROM subjects WHERE id=?", [$topicId]);
-$lessons = $db->fetchAll("SELECT l.*, f.filetype, f.original_name FROM lessons l LEFT JOIN lesson_files f ON f.lesson_id=l.id WHERE l.subject_id=? AND l.class_id=? AND l.status='published' ORDER BY l.sort_order", [$topicId, $classId]);
+$subjectInfo = $db->fetchOne("SELECT * FROM lms_subjects WHERE id=?", [$subjectId]);
+$topicInfo = $db->fetchOne("SELECT * FROM lms_subjects WHERE id=?", [$topicId]);
+$lessons = $db->fetchAll("SELECT l.*, f.filetype, f.original_name FROM lms_lessons l LEFT JOIN lms_lesson_files f ON f.lesson_id=l.id WHERE l.subject_id=? AND l.class_id=? AND l.status='published' ORDER BY l.sort_order", [$topicId, $classId]);
 // Also check sub-topics
-$subTopics = $db->fetchAll("SELECT * FROM subjects WHERE parent_id=? AND status='active' ORDER BY sort_order", [$topicId]);
+$subTopics = $db->fetchAll("SELECT * FROM lms_subjects WHERE parent_id=? AND status='active' ORDER BY sort_order", [$topicId]);
 $redir = "?view=topic_lessons&class_id=$classId&subject_id=$subjectId&topic_id=$topicId";
 ?>
 <div class="tp-bc">
@@ -333,7 +333,7 @@ $redir = "?view=topic_lessons&class_id=$classId&subject_id=$subjectId&topic_id=$
 <div class="cat-label">Sub-topics</div>
 <div class="card-grid" style="grid-template-columns:repeat(auto-fill,minmax(180px,1fr))">
     <?php foreach ($subTopics as $st):
-        $stCount = (int)$db->fetchColumn("SELECT COUNT(*) FROM lessons WHERE subject_id=? AND status='published'", [$st['id']]);
+        $stCount = (int)$db->fetchColumn("SELECT COUNT(*) FROM lms_lessons WHERE subject_id=? AND status='published'", [$st['id']]);
     ?>
     <a href="?view=topic_lessons&class_id=<?= $classId ?>&subject_id=<?= $subjectId ?>&topic_id=<?= $st['id'] ?>" class="s-card" style="padding:12px">
         <h6 style="font-size:.85rem"><?= htmlspecialchars($st['title']) ?></h6>

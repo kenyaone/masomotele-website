@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Business Continuity and Disaster Recovery (Lesson) | MTTI Computer Applications</title>
+<link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Fredoka:wght@500;600&display=swap" rel="stylesheet">
+<style>
+* { margin:0; padding:0; box-sizing:border-box; }
+body { font-family:'Space Mono', monospace; background:linear-gradient(135deg,#2E7D32 0%,#1565C0 100%); min-height:100vh; padding:20px; color:#fff; }
+.container { max-width:820px; margin:0 auto; }
+.header { text-align:center; margin-bottom:24px; }
+.lesson-tag { display:inline-block; background:rgba(255,255,255,0.2); padding:6px 16px; border-radius:999px; font-size:0.85em; margin-bottom:12px; }
+.header h1 { font-family:'Fredoka', sans-serif; font-size:2em; margin-bottom:6px; text-shadow:3px 3px 0 rgba(0,0,0,0.2); }
+.card { background:#fff; color:#333; border-radius:22px; padding:32px; margin-bottom:20px; box-shadow:0 20px 60px rgba(0,0,0,0.3); }
+.section { margin-bottom:26px; }
+.section:last-child { margin-bottom:0; }
+.section h2 { font-family:'Fredoka', sans-serif; font-size:1.2em; margin-bottom:10px; color:#1565C0; }
+.section .body { line-height:1.65; font-size:0.98em; }
+.section .body p { margin-bottom:10px; }
+.section .body code { background:#f5f7fb; padding:2px 6px; border-radius:4px; font-size:0.92em; }
+.keypoint { background:#fff8e1; border-left:4px solid #ffc107; padding:12px 16px; border-radius:8px; margin-top:12px; font-size:0.92em; }
+</style>
+</head>
+<body>
+<div class="container">
+<div class="header"><div class="lesson-tag">Module 7 · Lesson 7.5</div><h1>Business Continuity and Disaster Recovery</h1></div>
+<div class="card"><div class="section"><h2>BCP vs DRP</h2><div class="body"><p>A <strong>Business Continuity Plan (BCP)</strong> covers keeping critical business functions running during a disruption (e.g. a manual fallback process for processing urgent transactions). A <strong>Disaster Recovery Plan (DRP)</strong> focuses specifically on restoring IT systems and data after a disruption. They overlap and work together, but address distinct aspects of resilience.</p></div></div><div class="section"><h2>RTO and RPO</h2><div class="body"><p><strong>RTO (Recovery Time Objective)</strong> is the target maximum time a system should be down before being restored. <strong>RPO (Recovery Point Objective)</strong> is the maximum acceptable amount of data loss, measured in time (e.g. "we can tolerate losing up to 1 hour of transaction data"). Both numbers directly shape what backup frequency and recovery infrastructure are actually needed.</p></div><div class="keypoint"><strong>Key Point.</strong> An RPO of &quot;1 hour&quot; is meaningless without backups actually happening at least that often — the target and the actual backup frequency must match, or the objective is not really achievable.</div></div><div class="section"><h2>The 3-2-1 Backup Rule</h2><div class="body"><p>A widely used guideline: keep at least <strong>3</strong> copies of data, on <strong>2</strong> different types of media, with <strong>1</strong> copy stored offsite (or otherwise isolated from the primary systems) — protecting against a single point of failure taking out every copy at once.</p></div></div><div class="section"><h2>Testing Recovery Plans</h2><div class="body"><p>A backup that has never actually been tested by restoring it is not truly verified — backups can silently fail, or a written recovery plan may skip a step nobody noticed until attempting a real restore. Regularly testing actual recovery, not just writing the plan, is what proves it will work when genuinely needed.</p></div></div></div>
+</div>
+</body>
+</html>

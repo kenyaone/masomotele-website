@@ -69,6 +69,7 @@ class MTTI_MIS_Admin_Enrollments {
                         <th>Start Date</th>
                         <th>Expected End</th>
                         <th>Status</th>
+                        <th>Attendance</th>
                         <th>Grade</th>
                         <th>Actions</th>
                     </tr>
@@ -84,6 +85,7 @@ class MTTI_MIS_Admin_Enrollments {
                         <td><span class="mtti-status mtti-status-<?php echo strtolower(str_replace(' ', '', $enrollment->status)); ?>">
                             <?php echo esc_html($enrollment->status); ?>
                         </span></td>
+                        <td><?php echo $enrollment->delivery_mode === 'physical' ? '🏫 Physical' : '💻 Online'; ?></td>
                         <td><?php echo $enrollment->final_grade ? '<strong>' . esc_html($enrollment->final_grade) . '</strong>' : '-'; ?></td>
                         <td>
                             <a href="<?php echo admin_url('admin.php?page=mtti-mis-enrollments&action=view&id=' . $enrollment->enrollment_id); ?>">View</a> |
@@ -92,7 +94,7 @@ class MTTI_MIS_Admin_Enrollments {
                     </tr>
                     <?php endforeach; else : ?>
                     <tr>
-                        <td colspan="8">No enrollments found. <a href="<?php echo admin_url('admin.php?page=mtti-mis-enrollments&action=add'); ?>">Create first enrollment</a></td>
+                        <td colspan="9">No enrollments found. <a href="<?php echo admin_url('admin.php?page=mtti-mis-enrollments&action=add'); ?>">Create first enrollment</a></td>
                     </tr>
                     <?php endif; ?>
                 </tbody>
@@ -132,7 +134,8 @@ class MTTI_MIS_Admin_Enrollments {
                             <select name="course_id" id="course_id" class="regular-text" required>
                                 <option value="">Select Course</option>
                                 <?php foreach ($courses as $course) : ?>
-                                <option value="<?php echo $course->course_id; ?>" data-duration="<?php echo $course->duration_weeks; ?>" data-fee="<?php echo $course->fee; ?>">
+                                <?php $course_online_fee = (!is_null($course->online_fee) && $course->online_fee > 0) ? $course->online_fee : $course->fee; ?>
+                                <option value="<?php echo $course->course_id; ?>" data-duration="<?php echo $course->duration_weeks; ?>" data-fee="<?php echo $course->fee; ?>" data-online-fee="<?php echo $course_online_fee; ?>">
                                     <?php echo esc_html($course->course_name . ' - KES ' . number_format($course->fee, 2) . ' (' . $course->duration_weeks . ' weeks)'); ?>
                                 </option>
                                 <?php endforeach; ?>
@@ -203,41 +206,57 @@ class MTTI_MIS_Admin_Enrollments {
                             </select>
                         </td>
                     </tr>
+                    <tr>
+                        <th scope="row"><label for="delivery_mode">Attendance *</label></th>
+                        <td>
+                            <select name="delivery_mode" id="delivery_mode" class="regular-text" required>
+                                <option value="online">Online — learns and quizzes through the portal</option>
+                                <option value="physical">Physical — attends in person, marks entered manually by a teacher</option>
+                            </select>
+                            <p class="description">Physical students can still use the portal for practice, but their official unit results only ever come from the marks entered on the Course Units page — the portal's automatic quiz grading is switched off for them.</p>
+                        </td>
+                    </tr>
                 </table>
-                
+
                 <div class="mtti-notice info">
                     <p><strong>Note:</strong> When enrollment is created, student balance will be automatically initialized with the course fee.</p>
                 </div>
-                
+
                 <p class="submit">
                     <input type="submit" name="mtti_enrollment_submit" class="button button-primary" value="Create Enrollment">
                     <a href="<?php echo admin_url('admin.php?page=mtti-mis-enrollments'); ?>" class="button">Cancel</a>
                 </p>
             </form>
         </div>
-        
+
         <script>
         jQuery(document).ready(function($) {
             var courseFee = 0;
             
             // Calculate end date based on start date and course duration
-            $('#start_date, #course_id').on('change', function() {
+            $('#start_date, #course_id, #delivery_mode').on('change', function() {
                 var startDate = $('#start_date').val();
                 var duration = $('#course_id option:selected').data('duration');
-                courseFee = parseFloat($('#course_id option:selected').data('fee')) || 0;
-                
-                if (startDate && duration) {
+                var mode = $('#delivery_mode').val() || 'online';
+                var opt = $('#course_id option:selected');
+                courseFee = parseFloat(mode === 'online' ? opt.data('online-fee') : opt.data('fee')) || 0;
+
+                // Online pace depends on the learner, so we only project a fixed
+                // end date for physical classes, which run on the campus schedule.
+                if (startDate && duration && mode !== 'online') {
                     var start = new Date(startDate);
                     start.setDate(start.getDate() + (duration * 7)); // weeks to days
-                    
+
                     var end = start.toISOString().split('T')[0];
                     $('#expected_end_date').val(end);
+                } else if (mode === 'online') {
+                    $('#expected_end_date').val('');
                 }
-                
+
                 // Update fee calculation display
                 updateFeeCalculation();
             });
-            
+
             // Calculate net fee when discount changes
             $('#discount_amount').on('input', function() {
                 updateFeeCalculation();
@@ -357,6 +376,16 @@ class MTTI_MIS_Admin_Enrollments {
                                 <option value="Suspended" <?php selected($enrollment->status, 'Suspended'); ?>>Suspended</option>
                                 <option value="Cancelled" <?php selected($enrollment->status, 'Cancelled'); ?>>Cancelled</option>
                             </select>
+                        </td>
+                    </tr>
+                    <tr>
+                        <th scope="row"><label for="delivery_mode">Attendance</label></th>
+                        <td>
+                            <select name="delivery_mode" id="delivery_mode" class="regular-text">
+                                <option value="online" <?php selected($enrollment->delivery_mode, 'online'); ?>>Online — learns and quizzes through the portal</option>
+                                <option value="physical" <?php selected($enrollment->delivery_mode, 'physical'); ?>>Physical — attends in person, marks entered manually by a teacher</option>
+                            </select>
+                            <p class="description">Physical students can still use the portal for practice, but their official unit results only ever come from the marks entered on the Course Units page — the portal's automatic quiz grading is switched off for them.</p>
                         </td>
                     </tr>
                     <tr>
@@ -535,6 +564,7 @@ class MTTI_MIS_Admin_Enrollments {
                 'start_date' => sanitize_text_field($_POST['start_date']),
                 'expected_end_date' => sanitize_text_field($_POST['expected_end_date']),
                 'status' => sanitize_text_field($_POST['status']),
+                'delivery_mode' => (isset($_POST['delivery_mode']) && $_POST['delivery_mode'] === 'physical') ? 'physical' : 'online',
                 'discount_amount' => $discount  // Add discount to enrollment data
             );
             
@@ -556,6 +586,7 @@ class MTTI_MIS_Admin_Enrollments {
                 'expected_end_date' => sanitize_text_field($_POST['expected_end_date']),
                 'actual_end_date' => !empty($_POST['actual_end_date']) ? sanitize_text_field($_POST['actual_end_date']) : null,
                 'status' => sanitize_text_field($_POST['status']),
+                'delivery_mode' => (isset($_POST['delivery_mode']) && $_POST['delivery_mode'] === 'physical') ? 'physical' : 'online',
                 'final_grade' => sanitize_text_field($_POST['final_grade'])
             );
             

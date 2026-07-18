@@ -29,6 +29,7 @@ class MTTI_MIS {
         require_once MTTI_MIS_PLUGIN_DIR . 'admin/class-mtti-mis-admin-payments.php';
         require_once MTTI_MIS_PLUGIN_DIR . 'admin/class-mtti-mis-admin-enrollments.php';
         require_once MTTI_MIS_PLUGIN_DIR . 'admin/class-mtti-mis-admin-assignments.php';
+        require_once MTTI_MIS_PLUGIN_DIR . 'admin/class-mtti-mis-admin-quizzes.php';
         require_once MTTI_MIS_PLUGIN_DIR . 'admin/class-mtti-mis-admin-live-classes.php';
         require_once MTTI_MIS_PLUGIN_DIR . 'admin/class-mtti-mis-admin-certificates.php';
         require_once MTTI_MIS_PLUGIN_DIR . 'admin/class-mtti-mis-admin-units.php';
@@ -38,6 +39,8 @@ class MTTI_MIS {
         // Public classes
         require_once MTTI_MIS_PLUGIN_DIR . 'public/class-mtti-mis-public.php';
         require_once MTTI_MIS_PLUGIN_DIR . 'public/class-mtti-mis-public-admission-form.php';
+        require_once MTTI_MIS_PLUGIN_DIR . 'public/class-mtti-mis-public-course-checkout.php';
+        require_once MTTI_MIS_PLUGIN_DIR . 'public/class-mtti-mis-public-popup.php';
         require_once MTTI_MIS_PLUGIN_DIR . 'public/class-mtti-mis-shortcodes.php';
         if (!class_exists('MTTI_MIS_Learner_Portal')) {
             require_once MTTI_MIS_PLUGIN_DIR . 'public/class-mtti-mis-learner-portal.php';

@@ -1,0 +1,470 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lesson 8.4 — WordPress Dashboard Tour (Interactive)</title>
+<style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: 'Segoe UI', -apple-system, sans-serif; line-height: 1.55; color: #1e293b; background: #f8fafc; min-height: 100vh; }
+    .container { max-width: 1150px; margin: 0 auto; padding: 20px; }
+    header {
+        background: linear-gradient(135deg, #2E7D32, #1B5E20);
+        color: #fff; padding: 40px 30px; border-radius: 12px; margin-bottom: 24px;
+        box-shadow: 0 10px 30px rgba(29,35,39,0.35);
+        border: 1px solid #0073aa;
+    }
+    header .badge { display: inline-block; background: #0073aa; padding: 4px 14px; border-radius: 16px; font-size: 12px; font-weight: bold; letter-spacing: 1px; margin-bottom: 14px; }
+    header h1 { font-size: 34px; margin-bottom: 8px; }
+    header .subtitle { font-size: 17px; opacity: 0.95; margin-bottom: 20px; color: #d1d5db; }
+    .meta-strip { display: flex; flex-wrap: wrap; gap: 12px; }
+    .meta-strip span { background: rgba(0,115,170,0.35); padding: 6px 14px; border-radius: 20px; font-size: 13px; color: #fff; border: 1px solid #0073aa; }
+    .toc { background: #fff; border: 1px solid #e2e8f0; border-radius: 10px; padding: 22px 26px; margin-bottom: 22px; }
+    .toc h3 { color: #0073aa; margin-bottom: 10px; }
+    .toc ol { padding-left: 20px; }
+    .toc a { color: #0073aa; text-decoration: none; font-weight: 600; }
+    section { background: #fff; border: 1px solid #e2e8f0; border-radius: 10px; padding: 26px 30px; margin-bottom: 22px; }
+    section h2 { color: #0073aa; font-size: 22px; margin-bottom: 12px; padding-bottom: 8px; border-bottom: 3px solid #0073aa; }
+    section h3 { color: #1e293b; font-size: 17px; margin: 18px 0 8px; }
+    section p { margin-bottom: 12px; }
+    section ul, section ol { padding-left: 22px; margin-bottom: 12px; }
+    section li { margin-bottom: 4px; }
+    .callout { border-left: 5px solid #0073aa; background: #eaf3fb; padding: 14px 18px; margin: 14px 0; border-radius: 4px; }
+    .callout.warn { border-left-color: #dc2626; background: #fef2f2; }
+    .callout.tip { border-left-color: #059669; background: #ecfdf5; }
+    .callout strong { color: #0073aa; }
+
+    /* wp-admin mock */
+    .wp-mock {
+        background: #f0f0f1; border-radius: 10px; overflow: hidden;
+        border: 1px solid #cbd5e1; margin: 16px 0;
+        box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+        font-family: -apple-system, 'Segoe UI', sans-serif;
+    }
+    /* Toolbar */
+    .wp-toolbar {
+        background: #1d2327; color: #f0f0f1;
+        padding: 0 12px; height: 40px;
+        display: flex; align-items: center; gap: 16px;
+        font-size: 13px;
+    }
+    .tb-brand { color: #fff; font-weight: 600; }
+    .tb-brand::before { content: 'W'; display: inline-block; width: 20px; height: 20px; background: #0073aa; border-radius: 50%; color: #fff; text-align: center; font-weight: bold; margin-right: 6px; font-size: 12px; line-height: 20px; }
+    .tb-item { color: #c3c4c7; cursor: pointer; padding: 0 6px; }
+    .tb-item:hover { color: #72aee6; }
+    .tb-item .count { background: #d63638; color: #fff; padding: 1px 6px; border-radius: 10px; font-size: 11px; margin-left: 4px; }
+    .tb-spacer { flex: 1; }
+    .tb-howdy { color: #c3c4c7; }
+    .tb-howdy strong { color: #fff; }
+
+    /* Layout */
+    .wp-layout { display: grid; grid-template-columns: 200px 1fr; min-height: 480px; }
+    @media (max-width: 800px) { .wp-layout { grid-template-columns: 1fr; } .wp-sidebar { display: none; } }
+
+    /* Sidebar (wp-admin authentic) */
+    .wp-sidebar {
+        background: #1d2327;
+        color: #f0f0f1;
+    }
+    .wp-menu {
+        padding: 8px 0 8px 12px;
+        border-left: 4px solid transparent;
+        color: #f0f0f1;
+        font-size: 14px;
+        cursor: pointer;
+        display: flex; align-items: center; gap: 10px;
+        transition: 0.1s;
+    }
+    .wp-menu:hover { color: #72aee6; }
+    .wp-menu.active { background: #0073aa; border-left-color: #fff; color: #fff; }
+    .wp-menu .icon { width: 20px; text-align: center; font-size: 15px; color: #a7aaad; }
+    .wp-menu.active .icon { color: #fff; }
+
+    /* Main pane */
+    .wp-main { background: #f0f0f1; padding: 20px; }
+    .wp-main h2 { color: #1d2327; font-size: 23px; font-weight: 400; margin-bottom: 16px; padding: 0; border: 0; }
+    .wp-main h2 button {
+        background: #f0f0f1; border: 1px solid #2271b1; color: #2271b1;
+        padding: 4px 12px; border-radius: 3px; font-size: 13px; cursor: pointer;
+        margin-left: 8px;
+    }
+    .wp-card {
+        background: #fff; border: 1px solid #c3c4c7; border-radius: 4px;
+        padding: 16px; margin-bottom: 12px;
+    }
+    .wp-card h3 { color: #1d2327; font-size: 15px; margin-bottom: 10px; border-bottom: 1px solid #e2e8f0; padding-bottom: 8px; }
+    .wp-card .row { display: grid; grid-template-columns: 60% 40%; padding: 6px 0; font-size: 13px; border-bottom: 1px dotted #e2e8f0; }
+    .wp-card .row:last-child { border-bottom: 0; }
+    .wp-card .row .k { color: #1d2327; }
+    .wp-card .row .v { color: #646970; text-align: right; }
+
+    .wp-table { width: 100%; background: #fff; border: 1px solid #c3c4c7; border-collapse: collapse; font-size: 13px; }
+    .wp-table th { background: #f6f7f7; color: #2c3338; padding: 8px 10px; text-align: left; border-bottom: 1px solid #c3c4c7; font-weight: 600; }
+    .wp-table td { padding: 8px 10px; border-bottom: 1px solid #e2e8f0; color: #1d2327; }
+    .wp-table td a { color: #2271b1; text-decoration: none; font-weight: 600; }
+
+    .wp-widget {
+        background: #fff; border: 1px solid #c3c4c7; padding: 10px 14px;
+        margin-bottom: 8px; font-size: 13px; color: #1d2327; display: flex; justify-content: space-between;
+    }
+    .wp-widget .id { color: #646970; font-size: 11px; }
+
+    /* Scenario challenge */
+    .scenario { background: #f8fafc; border: 2px solid #cbd5e1; border-radius: 10px; padding: 14px 16px; margin: 12px 0; }
+    .scenario h4 { color: #0073aa; font-size: 15px; margin-bottom: 8px; }
+    .scenario .choices { display: flex; gap: 6px; flex-wrap: wrap; margin-top: 8px; }
+    .scenario .choices button {
+        border: 1.5px solid #cbd5e1; background: #fff; color: #1e293b;
+        padding: 6px 12px; border-radius: 6px; font-size: 12.5px; cursor: pointer; font-weight: 600;
+    }
+    .scenario .choices button.picked { background: #0073aa; color: #fff; border-color: #0073aa; }
+    .scenario.correct { border-color: #059669; background: #ecfdf5; }
+    .scenario.wrong { border-color: #dc2626; background: #fef2f2; }
+    .scenario .expl { margin-top: 10px; font-size: 13px; display: none; padding: 8px 12px; border-radius: 6px; }
+    .scenario.correct .expl { display: block; background: #d1fae5; color: #065f46; }
+    .scenario.wrong .expl { display: block; background: #fee2e2; color: #991b1b; }
+
+    .quiz-summary { text-align: center; padding: 30px; background: linear-gradient(135deg, #1d2327 0%, #2c3338 100%); color: #fff; border-radius: 10px; margin: 20px 0; display: none; border: 1px solid #0073aa; }
+    .quiz-summary.show { display: block; }
+    .quiz-summary .score { font-size: 48px; font-weight: bold; color: #0073aa; margin-bottom: 8px; }
+    button.btn { background: #0073aa; color: #fff; border: none; padding: 10px 20px; border-radius: 6px; font-size: 15px; font-weight: 600; cursor: pointer; }
+    button.btn:hover { background: #005a8a; }
+    button.btn.reset { background: #52525b; margin-left: 8px; }
+    footer { text-align: center; color: #64748b; padding: 24px; font-size: 13px; }
+
+    @media (max-width: 800px) {
+        header h1 { font-size: 26px; }
+        .container { padding: 12px; }
+        section { padding: 18px; }
+    }
+
+    /* MTTI logo stamp */
+    .mtti-logo-stamp {
+        position: fixed; top: 14px; right: 18px; z-index: 999;
+        opacity: 0.88; transition: opacity 0.2s;
+    }
+    .mtti-logo-stamp:hover { opacity: 1; }
+    .mtti-logo-stamp img { width: 56px; height: 56px; border-radius: 50%; box-shadow: 0 2px 8px rgba(0,0,0,0.18); }
+</style>
+</head>
+<body>
+<div class="mtti-logo-stamp">
+    <img src="../../Resources/Logo.jpeg" alt="MTTI" title="Masomotele Technical Training Institute — Start learning, Start earning">
+</div>
+
+<div class="container">
+
+<header>
+    <div class="badge">LESSON 8.4  ·  WP-ADMIN  ·  INTERACTIVE</div>
+    <h1>WordPress Dashboard Tour</h1>
+    <div class="subtitle">Every menu, every widget, every trick — Sarah's Karibu Kitchen wp-admin, mocked live.</div>
+    <div class="meta-strip">
+        <span><strong>Duration:</strong> ~30 min interactive</span>
+        <span><strong>Level:</strong> Beginner</span>
+        <span><strong>Tool:</strong> WordPress admin (wp-admin)</span>
+        <span><strong>Handbook:</strong> Part 8, §8.4</span>
+    </div>
+</header>
+
+<div class="toc">
+    <h3>What you'll do in this lesson</h3>
+    <ol>
+        <li><a href="#s1">Explore Sarah's wp-admin (click any sidebar item)</a></li>
+        <li><a href="#s2">Pages vs Posts &mdash; the one concept beginners miss</a></li>
+        <li><a href="#s3">"Where would you go to&hellip;" &mdash; 5 tasks, auto-scored</a></li>
+        <li><a href="#s4">The Toolbar tricks Sarah uses daily</a></li>
+    </ol>
+</div>
+
+<section id="s1">
+    <h2>1. Explore Sarah's wp-admin</h2>
+    <p>Click any menu item in the sidebar &mdash; the main pane updates to show what lives there.</p>
+    <div class="wp-mock">
+        <!-- Toolbar -->
+        <div class="wp-toolbar">
+            <span class="tb-brand">Karibu Kitchen</span>
+            <span class="tb-item">&#8635; Updates<span class="count">3</span></span>
+            <span class="tb-item">&#128172; 0</span>
+            <span class="tb-item">+ New</span>
+            <span class="tb-spacer"></span>
+            <span class="tb-howdy">Howdy, <strong>Sarah</strong> &nbsp;&#9662;</span>
+        </div>
+
+        <!-- Layout -->
+        <div class="wp-layout">
+            <div class="wp-sidebar">
+                <div class="wp-menu active" data-menu="dashboard" onclick="showMenu('dashboard', this)"><span class="icon">&#9776;</span> Dashboard</div>
+                <div class="wp-menu" data-menu="posts" onclick="showMenu('posts', this)"><span class="icon">&#128221;</span> Posts</div>
+                <div class="wp-menu" data-menu="media" onclick="showMenu('media', this)"><span class="icon">&#128247;</span> Media</div>
+                <div class="wp-menu" data-menu="pages" onclick="showMenu('pages', this)"><span class="icon">&#128196;</span> Pages</div>
+                <div class="wp-menu" data-menu="comments" onclick="showMenu('comments', this)"><span class="icon">&#128172;</span> Comments</div>
+                <div class="wp-menu" data-menu="appearance" onclick="showMenu('appearance', this)"><span class="icon">&#127912;</span> Appearance</div>
+                <div class="wp-menu" data-menu="plugins" onclick="showMenu('plugins', this)"><span class="icon">&#128268;</span> Plugins</div>
+                <div class="wp-menu" data-menu="users" onclick="showMenu('users', this)"><span class="icon">&#128101;</span> Users</div>
+                <div class="wp-menu" data-menu="tools" onclick="showMenu('tools', this)"><span class="icon">&#128295;</span> Tools</div>
+                <div class="wp-menu" data-menu="settings" onclick="showMenu('settings', this)"><span class="icon">&#9881;</span> Settings</div>
+            </div>
+            <div class="wp-main" id="wpMain">
+                <!-- populated by JS -->
+            </div>
+        </div>
+    </div>
+    <div class="callout tip">
+        <strong>Fastest way to learn wp-admin:</strong> click every menu once. You'll never touch some of them again, but you'll always know they exist.
+    </div>
+</section>
+
+<section id="s2">
+    <h2>2. Pages vs Posts</h2>
+    <p>The one concept every WordPress beginner gets wrong. Learn it now or lose an hour later.</p>
+    <table class="wp-table" style="width: 100%;">
+        <tr><th style="width: 20%;"></th><th>Posts</th><th>Pages</th></tr>
+        <tr><td><strong>Time-based?</strong></td><td>Yes &mdash; dated, chronological</td><td>No &mdash; static</td></tr>
+        <tr><td><strong>Typical URL</strong></td><td>/2026/07/friday-lunch-special/</td><td>/menu/</td></tr>
+        <tr><td><strong>Sarah's use</strong></td><td>Blog: "This week's specials", "Meet the chef"</td><td>Home, About, Menu, Delivery, Contact</td></tr>
+        <tr><td><strong>Categories?</strong></td><td>Yes, plus tags</td><td>No categories (has parent-child hierarchy)</td></tr>
+        <tr><td><strong>Feed?</strong></td><td>Yes &mdash; RSS</td><td>No</td></tr>
+    </table>
+    <div class="callout warn">
+        <strong>Sarah's five essential pages are Pages, NOT Posts.</strong> If you accidentally build them as Posts they'll appear on the blog feed and disappear off the top-level nav.
+    </div>
+</section>
+
+<section id="s3">
+    <h2>3. "Where would you go to&hellip;" &mdash; auto-scored</h2>
+    <p>Five real Karibu Kitchen tasks. Tap the correct sidebar menu for each.</p>
+
+    <div class="scenario" data-correct="settings">
+        <h4>A. Change the site title from "Just Another WordPress Site" to "Karibu Kitchen &mdash; Eldoret's Freshest Lunch".</h4>
+        <div class="choices">
+            <button data-v="dashboard">Dashboard</button>
+            <button data-v="pages">Pages</button>
+            <button data-v="appearance">Appearance</button>
+            <button data-v="settings">Settings</button>
+            <button data-v="tools">Tools</button>
+        </div>
+        <div class="expl">Settings &rarr; General &rarr; Site Title.</div>
+    </div>
+
+    <div class="scenario" data-correct="plugins">
+        <h4>B. Install Yoast SEO so Sarah can optimise her page titles.</h4>
+        <div class="choices">
+            <button data-v="appearance">Appearance</button>
+            <button data-v="plugins">Plugins</button>
+            <button data-v="tools">Tools</button>
+            <button data-v="settings">Settings</button>
+        </div>
+        <div class="expl">Plugins &rarr; Add New &rarr; search "Yoast SEO" &rarr; Install &rarr; Activate.</div>
+    </div>
+
+    <div class="scenario" data-correct="pages">
+        <h4>C. Add a new "Catering" page for corporate lunch orders.</h4>
+        <div class="choices">
+            <button data-v="posts">Posts</button>
+            <button data-v="pages">Pages</button>
+            <button data-v="media">Media</button>
+            <button data-v="tools">Tools</button>
+        </div>
+        <div class="expl">Pages &rarr; Add New Page. Pages, not Posts &mdash; it's static content.</div>
+    </div>
+
+    <div class="scenario" data-correct="comments">
+        <h4>D. Approve a customer comment that just came in on the "Meet the Chef" post.</h4>
+        <div class="choices">
+            <button data-v="dashboard">Dashboard</button>
+            <button data-v="posts">Posts</button>
+            <button data-v="comments">Comments</button>
+            <button data-v="users">Users</button>
+        </div>
+        <div class="expl">Comments &rarr; Pending &rarr; hover the row &rarr; Approve.</div>
+    </div>
+
+    <div class="scenario" data-correct="appearance">
+        <h4>E. Edit the top-nav menu to add the new "Catering" page next to "Contact".</h4>
+        <div class="choices">
+            <button data-v="settings">Settings</button>
+            <button data-v="pages">Pages</button>
+            <button data-v="appearance">Appearance</button>
+            <button data-v="tools">Tools</button>
+        </div>
+        <div class="expl">Appearance &rarr; Menus &rarr; drag "Catering" into position &rarr; Save Menu.</div>
+    </div>
+
+    <div style="margin-top: 12px;">
+        <button class="btn" onclick="markScenarios()">Mark my answers</button>
+        <button class="btn reset" onclick="resetScenarios()">Reset</button>
+    </div>
+    <div class="quiz-summary" id="scenarioSummary">
+        <div class="score" id="scenarioScore">0 / 5</div>
+        <p id="scenarioMsg"></p>
+    </div>
+</section>
+
+<section id="s4">
+    <h2>4. Toolbar tricks Sarah uses daily</h2>
+    <ul>
+        <li><strong>+ New</strong> &mdash; the fastest way to create a Post, Page, Media upload, or User without leaving the current screen.</li>
+        <li><strong>Updates counter</strong> &mdash; the red number is core, plugin, and theme updates waiting. Never ignore it for more than a week.</li>
+        <li><strong>Howdy, Sarah</strong> &mdash; hover it to Log Out or Edit Profile.</li>
+        <li><strong>Site name (top-left)</strong> &mdash; hover to hop between wp-admin and the public site.</li>
+        <li><strong>Comment bubble</strong> &mdash; unread comments count. Reply promptly &mdash; unanswered comments hurt SEO signals.</li>
+    </ul>
+    <div class="callout tip">
+        <strong>Pro habit:</strong> Sarah opens wp-admin every morning, clears the updates counter, replies to comments, and shuts it. 10 minutes. Site stays healthy.
+    </div>
+</section>
+
+<footer>
+    <p>Lesson 8.4 &mdash; WordPress Dashboard Tour &middot; Masomotele Technical Training Institute &middot; Handbook Part 8, &sect;8.4</p>
+    <p>Next: <strong>Lesson 8.5 &mdash; Create the 5 Essential Pages</strong></p>
+</footer>
+</div>
+
+<script>
+const PANES = {
+    dashboard: `
+        <h2>Dashboard <button>Screen Options</button><button>Help</button></h2>
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
+            <div class="wp-card">
+                <h3>At a Glance</h3>
+                <div class="row"><div class="k">&#128221; 4 Posts</div><div class="v">2 Pages</div></div>
+                <div class="row"><div class="k">&#128172; 3 Comments</div><div class="v">Search Engines: allowed</div></div>
+                <div class="row"><div class="k">WordPress 6.7.2</div><div class="v">Twenty Twenty-Six theme</div></div>
+            </div>
+            <div class="wp-card">
+                <h3>Activity</h3>
+                <div class="row"><div class="k">Meet the Chef</div><div class="v">Published 2h ago</div></div>
+                <div class="row"><div class="k">Friday Specials</div><div class="v">Draft</div></div>
+                <div class="row"><div class="k">2 pending comments</div><div class="v">Moderate</div></div>
+            </div>
+            <div class="wp-card">
+                <h3>Quick Draft</h3>
+                <div style="padding: 8px; background: #f6f7f7; color: #646970; font-size: 13px;">Title&hellip;<br>Content&hellip;<br><button style="margin-top: 6px; background: #2271b1; color: #fff; border: 0; padding: 4px 10px; border-radius: 3px;">Save Draft</button></div>
+            </div>
+            <div class="wp-card">
+                <h3>WordPress Events and News</h3>
+                <div class="row"><div class="k">WordCamp Nairobi</div><div class="v">15 Aug 2026</div></div>
+                <div class="row"><div class="k">WP 6.8 released</div><div class="v">2 weeks ago</div></div>
+            </div>
+        </div>`,
+    posts: `
+        <h2>Posts <button>Add New Post</button></h2>
+        <table class="wp-table">
+            <tr><th>Title</th><th>Author</th><th>Categories</th><th>Date</th></tr>
+            <tr><td><a href="#">Meet the Chef</a></td><td>Sarah</td><td>Story</td><td>Published 2h ago</td></tr>
+            <tr><td><a href="#">Friday Specials &mdash; This Week</a></td><td>Sarah</td><td>Menu</td><td>Draft</td></tr>
+            <tr><td><a href="#">Behind the Kitchen: Ugali Recipe</a></td><td>Sarah</td><td>Recipes</td><td>Published 3d</td></tr>
+            <tr><td><a href="#">Delivery Zones Now Include Racecourse</a></td><td>Sarah</td><td>News</td><td>Published 1w</td></tr>
+        </table>
+        <p style="margin-top: 12px; color: #646970; font-size: 13px;"><strong>Posts</strong> are for blog articles. Dated. Chronological. Great for SEO.</p>`,
+    media: `
+        <h2>Media Library <button>Add New Media File</button></h2>
+        <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(120px, 1fr)); gap: 8px;">
+            <div style="background: linear-gradient(135deg, #fbbf24, #f59e0b); height: 100px; border-radius: 4px; display: flex; align-items: center; justify-content: center; color: #fff; font-weight: bold;">hero.webp</div>
+            <div style="background: linear-gradient(135deg, #84cc16, #65a30d); height: 100px; border-radius: 4px; display: flex; align-items: center; justify-content: center; color: #fff; font-weight: bold;">ugali.webp</div>
+            <div style="background: linear-gradient(135deg, #f43f5e, #be123c); height: 100px; border-radius: 4px; display: flex; align-items: center; justify-content: center; color: #fff; font-weight: bold;">chapati.webp</div>
+            <div style="background: linear-gradient(135deg, #06b6d4, #0e7490); height: 100px; border-radius: 4px; display: flex; align-items: center; justify-content: center; color: #fff; font-weight: bold;">team.jpg</div>
+            <div style="background: linear-gradient(135deg, #a855f7, #7e22ce); height: 100px; border-radius: 4px; display: flex; align-items: center; justify-content: center; color: #fff; font-weight: bold;">reel.mp4</div>
+            <div style="background: linear-gradient(135deg, #eab308, #ca8a04); height: 100px; border-radius: 4px; display: flex; align-items: center; justify-content: center; color: #fff; font-weight: bold;">logo.svg</div>
+        </div>
+        <p style="margin-top: 12px; color: #646970; font-size: 13px;">Every image, PDF, video the site uses. Prefer <strong>.webp</strong> for photos &mdash; smaller, faster.</p>`,
+    pages: `
+        <h2>Pages <button>Add New Page</button></h2>
+        <table class="wp-table">
+            <tr><th>Title</th><th>Author</th><th>Date</th><th>SEO</th></tr>
+            <tr><td><a href="#">Home</a></td><td>Sarah</td><td>Published</td><td style="color: #16a34a;">&#9679; Good</td></tr>
+            <tr><td><a href="#">About</a></td><td>Sarah</td><td>Published</td><td style="color: #f59e0b;">&#9679; OK</td></tr>
+            <tr><td><a href="#">Menu</a></td><td>Sarah</td><td>Published</td><td style="color: #16a34a;">&#9679; Good</td></tr>
+            <tr><td><a href="#">Delivery</a></td><td>Sarah</td><td>Draft</td><td style="color: #dc2626;">&#9679; Missing meta</td></tr>
+            <tr><td><a href="#">Contact</a></td><td>Sarah</td><td>Published</td><td style="color: #16a34a;">&#9679; Good</td></tr>
+        </table>
+        <p style="margin-top: 12px; color: #646970; font-size: 13px;">Sarah's five essential pages. Static. No dates.</p>`,
+    comments: `
+        <h2>Comments</h2>
+        <div class="wp-widget"><div><strong>Wanjiku</strong> on <em>Meet the Chef</em><br><span class="id">"Loved the story! When can I try the ugali?"</span></div><div><a href="#" style="color: #16a34a; margin-right: 8px;">&#10004; Approve</a><a href="#" style="color: #dc2626;">&#10007; Trash</a></div></div>
+        <div class="wp-widget"><div><strong>David K.</strong> on <em>Friday Specials</em><br><span class="id">"Do you deliver to Kapsoya?"</span></div><div><a href="#" style="color: #16a34a; margin-right: 8px;">&#10004; Approve</a><a href="#" style="color: #dc2626;">&#10007; Trash</a></div></div>
+        <div class="wp-widget"><div><strong>SpamBot99</strong> on <em>Home</em><br><span class="id">"Cheap crypto here $$$"</span></div><div><a href="#" style="color: #dc2626;">&#10007; Spam</a></div></div>`,
+    appearance: `
+        <h2>Themes <button>Add New Theme</button></h2>
+        <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px;">
+            <div style="background: #fff; border: 2px solid #16a34a; padding: 10px; border-radius: 4px;"><strong>Twenty Twenty-Six</strong> <span style="background: #16a34a; color: #fff; padding: 2px 6px; border-radius: 3px; font-size: 10px;">ACTIVE</span><br><span style="color: #646970; font-size: 12px;">Default block theme.</span></div>
+            <div style="background: #fff; border: 1px solid #c3c4c7; padding: 10px; border-radius: 4px;"><strong>Astra</strong><br><span style="color: #646970; font-size: 12px;">Fast, popular in Kenyan agencies.</span></div>
+            <div style="background: #fff; border: 1px solid #c3c4c7; padding: 10px; border-radius: 4px;"><strong>GeneratePress</strong><br><span style="color: #646970; font-size: 12px;">Lightweight alt.</span></div>
+        </div>
+        <p style="margin-top: 12px; color: #646970; font-size: 13px;">Also here: Customize, <strong>Menus</strong>, Widgets, Editor. Menus is where you set the top nav.</p>`,
+    plugins: `
+        <h2>Plugins <button>Add New Plugin</button></h2>
+        <table class="wp-table">
+            <tr><th>Plugin</th><th>Description</th><th>Status</th></tr>
+            <tr><td><strong>Akismet Anti-Spam</strong></td><td>Blocks spam comments</td><td style="color: #16a34a;">Active</td></tr>
+            <tr><td><strong>Hello Dolly</strong></td><td>Displays Louis Armstrong lyrics.</td><td style="color: #646970;">Inactive</td></tr>
+            <tr><td><strong>Yoast SEO</strong></td><td>SEO management &mdash; install in 8.7</td><td style="color: #dc2626;">Not installed</td></tr>
+            <tr><td><strong>Contact Form 7</strong></td><td>Forms &mdash; install in 8.7</td><td style="color: #dc2626;">Not installed</td></tr>
+            <tr><td><strong>MonsterInsights</strong></td><td>Google Analytics &mdash; install in 8.7</td><td style="color: #dc2626;">Not installed</td></tr>
+        </table>`,
+    users: `
+        <h2>Users <button>Add New User</button></h2>
+        <table class="wp-table">
+            <tr><th>Username</th><th>Name</th><th>Email</th><th>Role</th></tr>
+            <tr><td>sarah</td><td>Sarah W.</td><td>sarah@karibukitchen.co.ke</td><td>Administrator</td></tr>
+            <tr><td>brian</td><td>Brian M.</td><td>brian@mtti.co.ke</td><td>Editor</td></tr>
+        </table>
+        <p style="margin-top: 12px; color: #646970; font-size: 13px;">Roles: Administrator > Editor > Author > Contributor > Subscriber. Give Brian Editor so he can publish but not break site settings.</p>`,
+    tools: `
+        <h2>Tools</h2>
+        <div class="wp-card"><h3>Available Tools</h3><div class="row"><div class="k">Import</div><div class="v">Bring in content from another site</div></div><div class="row"><div class="k">Export</div><div class="v">Take content out as XML</div></div><div class="row"><div class="k">Site Health</div><div class="v">Diagnostic checks &mdash; run monthly</div></div><div class="row"><div class="k">Export Personal Data</div><div class="v">DPA / GDPR compliance tool</div></div></div>`,
+    settings: `
+        <h2>Settings <button>Screen Options</button></h2>
+        <div class="wp-card"><h3>General</h3>
+            <div class="row"><div class="k">Site Title</div><div class="v">Karibu Kitchen &mdash; Eldoret's Freshest Lunch</div></div>
+            <div class="row"><div class="k">Tagline</div><div class="v">Fresh lunch, delivered.</div></div>
+            <div class="row"><div class="k">Admin Email</div><div class="v">sarah@karibukitchen.co.ke</div></div>
+            <div class="row"><div class="k">Timezone</div><div class="v">Africa/Nairobi (UTC+3)</div></div>
+            <div class="row"><div class="k">Language</div><div class="v">English (Kenya)</div></div>
+        </div>
+        <p style="color: #646970; font-size: 13px;">Also: Writing, Reading, Discussion, Media, Permalinks, Privacy. <strong>Permalinks</strong> should be set to "Post name" for SEO.</p>`
+};
+
+function showMenu(key, el) {
+    document.querySelectorAll('.wp-menu').forEach(m => m.classList.remove('active'));
+    el.classList.add('active');
+    document.getElementById('wpMain').innerHTML = PANES[key];
+}
+showMenu('dashboard', document.querySelector('.wp-menu[data-menu="dashboard"]'));
+
+// Scenarios
+document.querySelectorAll('.scenario .choices button').forEach(btn => {
+    btn.addEventListener('click', () => {
+        const p = btn.closest('.scenario');
+        p.querySelectorAll('button').forEach(b => b.classList.remove('picked'));
+        btn.classList.add('picked');
+    });
+});
+function markScenarios() {
+    const items = document.querySelectorAll('.scenario');
+    let score = 0;
+    items.forEach(sc => {
+        sc.classList.remove('correct', 'wrong');
+        const picked = sc.querySelector('button.picked');
+        if (picked && picked.dataset.v === sc.dataset.correct) { sc.classList.add('correct'); score++; }
+        else if (picked) sc.classList.add('wrong');
+    });
+    const s = document.getElementById('scenarioSummary');
+    s.classList.add('show');
+    document.getElementById('scenarioScore').textContent = score + ' / 5';
+    const m = document.getElementById('scenarioMsg');
+    if (score === 5) m.textContent = 'Perfect. You navigate wp-admin like a pro. Move to 8.5.';
+    else if (score >= 3) m.textContent = 'Solid. Review the wrong-marked scenarios.';
+    else m.textContent = 'Click through every sidebar menu again then retry.';
+    s.scrollIntoView({ behavior: 'smooth', block: 'center' });
+}
+function resetScenarios() {
+    document.querySelectorAll('.scenario').forEach(sc => {
+        sc.classList.remove('correct', 'wrong');
+        sc.querySelectorAll('button').forEach(b => b.classList.remove('picked'));
+    });
+    document.getElementById('scenarioSummary').classList.remove('show');
+}
+</script>
+</body>
+</html>

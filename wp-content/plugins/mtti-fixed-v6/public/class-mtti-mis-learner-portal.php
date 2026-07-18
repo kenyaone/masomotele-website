@@ -165,7 +165,7 @@ class MTTI_MIS_Learner_Portal {
                     case 'chat': $this->render_study_chat($student); break; // alias
                     case 'attendance': $this->render_learner_attendance($student); break;
                     case 'results': $this->render_results($student); break;
-                    case 'transcript': $this->render_results($student); break; // merged into results
+                    case 'transcript': $this->render_transcript($student); break;
                     case 'payments': $this->render_payments($student); break;
                     case 'notices': $this->render_notices($student); break;
                     case 'notifications': $this->render_notifications($student); break;
@@ -270,9 +270,16 @@ class MTTI_MIS_Learner_Portal {
                 'quizNonce'  => wp_create_nonce('mtti_quiz_nonce'),
             ));
 
-            // postMessage relay: intercept submitExamToMTTI() calls from sandboxed iframes
+            // postMessage relay: intercept submitExamToMTTI() calls from sandboxed iframes.
+            // The save is fired with keepalive so it survives the student clicking
+            // "Next" immediately after finishing a quiz (browsers otherwise abort an
+            // in-flight fetch() on navigation), and the Next button is held disabled
+            // with visible "Saving…" feedback until the save is confirmed — so a
+            // student can never navigate past a quiz result that hasn\'t actually
+            // been recorded yet, and gets a clear signal if the save does fail.
             wp_add_inline_script('mtti-learner-portal', '
 (function(){
+    function nextBtn(){ return document.querySelector(".mtti-player-navbar a.mtti-btn-primary"); }
     window.addEventListener("message", function(e) {
         var d = e.data;
         if (!d || d.type !== "mtti_quiz_score") return;
@@ -281,16 +288,34 @@ class MTTI_MIS_Learner_Portal {
             return iframes.length ? iframes[0].getAttribute("data-lesson-id") : 0;
         })();
         if (!lessonId) return;
+
+        var btn = nextBtn();
+        var originalHtml = btn ? btn.innerHTML : null;
+        var originalHref = btn ? btn.getAttribute("href") : null;
+        if (btn) {
+            btn.removeAttribute("href");
+            btn.style.opacity = "0.6";
+            btn.style.pointerEvents = "none";
+            btn.innerHTML = "⏳ Saving your score…";
+        }
+        function restore(ok){
+            if (!btn) return;
+            btn.style.opacity = "";
+            btn.style.pointerEvents = "";
+            if (originalHref) btn.setAttribute("href", originalHref);
+            btn.innerHTML = ok ? originalHtml : "⚠️ Score save failed — " + originalHtml;
+        }
+
         var fd = new FormData();
         fd.append("action",    "mtti_save_quiz_score");
         fd.append("lesson_id", lessonId);
         fd.append("score",     d.score   || 0);
         fd.append("total",     d.total   || 0);
         fd.append("percent",   d.percent || 0);
-        fetch(mttiPortal.ajaxUrl, { method:"POST", body: fd, credentials:"same-origin" })
+        fetch(mttiPortal.ajaxUrl, { method:"POST", body: fd, credentials:"same-origin", keepalive: true })
           .then(function(r){ return r.json(); })
-          .then(function(res){ console.log("[MTTI] Quiz saved", res); })
-          .catch(function(err){ console.warn("[MTTI] Quiz save error", err); });
+          .then(function(res){ console.log("[MTTI] Quiz saved", res); restore(!!(res && res.success)); })
+          .catch(function(err){ console.warn("[MTTI] Quiz save error", err); restore(false); });
     });
 })();
             ');
@@ -575,7 +600,7 @@ function mttiToggleFullscreen(btn){
             case 'assignments': $this->render_assignments($student); break;
             case 'attendance': $this->render_learner_attendance($student); break;
             case 'results': $this->render_results($student); break;
-            case 'transcript': $this->render_results($student); break; // merged
+            case 'transcript': $this->render_transcript($student); break;
             case 'payments': $this->render_payments($student); break;
             case 'notices': $this->render_notices($student); break;
             case 'notifications': $this->render_notifications($student); break;
@@ -1572,7 +1597,9 @@ function mttiToggleFullscreen(btn){
         
         echo '<div class="mtti-results">';
         echo '<h2 class="mtti-page-title">🏆 My Results</h2>';
-        
+
+        $this->render_in_progress_quiz_results($student);
+
         if (!empty($results)) {
             // Group by course
             $grouped = array();
@@ -1602,27 +1629,34 @@ function mttiToggleFullscreen(btn){
             echo '<div><div style="font-size: 2rem; font-weight: bold;">' . $overall_grade . '</div><div>Overall Grade</div></div>';
             echo '</div></div>';
             
+            $results_nonce = wp_create_nonce('mtti_portal_nonce');
             foreach ($grouped as $course => $units) {
                 echo '<div class="mtti-card" style="background: white; padding: 20px; margin-bottom: 15px; border-radius: 10px;">';
                 echo '<h3 style="margin: 0 0 15px; color: #333;"><span style="background: #2E7D32; color: white; padding: 3px 10px; border-radius: 5px; font-size: 0.8rem;">' . esc_html($course) . '</span></h3>';
-                echo '<table class="mtti-table"><thead><tr><th>Unit Code</th><th>Unit Name</th><th>Marks</th><th>Grade</th><th>Status</th></tr></thead><tbody>';
-                
+                echo '<table class="mtti-table"><thead><tr><th>Unit Code</th><th>Unit Name</th><th>Marks</th><th>Grade</th><th>Status</th><th></th></tr></thead><tbody>';
+
                 foreach ($units as $r) {
                     $grade_color = $r->grade == 'DISTINCTION' ? '#2E7D32' : ($r->grade == 'CREDIT' ? '#1976D2' : ($r->grade == 'PASS' ? '#FF9800' : '#D32F2F'));
+                    $transcript_url = add_query_arg(array(
+                        'action'  => 'mtti_student_unit_transcript',
+                        'unit_id' => intval($r->unit_id),
+                        'nonce'   => $results_nonce,
+                    ), admin_url('admin-ajax.php'));
                     echo '<tr>';
                     echo '<td>' . esc_html($r->unit_code) . '</td>';
                     echo '<td><strong>' . esc_html($r->unit_name) . '</strong></td>';
                     echo '<td>' . esc_html($r->score) . '/100</td>';
                     echo '<td><span style="background: ' . $grade_color . '; color: white; padding: 2px 8px; border-radius: 4px; font-weight: bold;">' . esc_html($r->grade) . '</span></td>';
                     echo '<td>' . ($r->passed ? '<span style="color:#2E7D32;">✓ Pass</span>' : '<span style="color:#D32F2F;">✗ Refer</span>') . '</td>';
+                    echo '<td><a href="' . esc_url($transcript_url) . '" target="_blank" class="mtti-btn mtti-btn-secondary" style="padding:4px 10px;font-size:11px;">📄 Transcript</a></td>';
                     echo '</tr>';
                 }
                 echo '</tbody></table></div>';
             }
-            
-            // Print transcript button + certificate download
+
+            // View transcripts (per-unit chooser) + certificate download
             echo '<div style="text-align: center; margin-top: 20px; display:flex; gap:12px; justify-content:center; flex-wrap:wrap;">';
-            echo '<button onclick="window.print()" class="mtti-btn mtti-btn-secondary" style="padding:12px 30px;">📜 Print Transcript</button>';
+            echo '<a href="' . esc_url(add_query_arg('portal_tab', 'transcript', get_permalink())) . '" class="mtti-btn mtti-btn-secondary" style="padding:12px 30px;text-decoration:none;display:inline-block;">📜 View My Transcripts</a>';
 
             // Check if certificate issued for any enrolled course
             $cert = $wpdb->get_row($wpdb->prepare(
@@ -1675,7 +1709,81 @@ function mttiToggleFullscreen(btn){
         }
         echo '</div>';
     }
-    
+
+    /**
+     * Individual quiz scores for units the student is still partway through
+     * — mtti_mis_maybe_complete_unit() only writes a mtti_unit_results row
+     * once every quiz in a unit is passed, so a student who aces their first
+     * quiz in a 6-quiz unit previously saw nothing at all here until the
+     * whole unit was finished. This surfaces per-quiz progress immediately;
+     * the official graded table above is untouched and still only reflects
+     * fully-completed units.
+     */
+    private function render_in_progress_quiz_results($student) {
+        global $wpdb;
+
+        $in_progress_units = $wpdb->get_results($wpdb->prepare(
+            "SELECT DISTINCT l.unit_id, cu.unit_name, cu.unit_code, c.course_name
+             FROM {$wpdb->prefix}mtti_quiz_attempts qa
+             JOIN {$wpdb->prefix}mtti_lessons l ON l.lesson_id = qa.lesson_id
+             JOIN {$wpdb->prefix}mtti_course_units cu ON cu.unit_id = l.unit_id
+             JOIN {$wpdb->prefix}mtti_courses c ON c.course_id = cu.course_id
+             WHERE qa.student_id = %d
+               AND l.unit_id NOT IN (
+                   SELECT unit_id FROM {$wpdb->prefix}mtti_unit_results WHERE student_id = %d
+               )
+             ORDER BY c.course_name, cu.unit_name",
+            $student->student_id, $student->student_id
+        ));
+
+        if (empty($in_progress_units)) return;
+
+        echo '<div class="mtti-card" style="background:#fff;padding:20px;margin-bottom:20px;border-radius:10px;">';
+        echo '<h3 style="margin:0 0 4px;color:#333;">📝 Quiz Scores So Far</h3>';
+        echo '<p style="color:var(--text-3);font-size:13px;margin:0 0 15px;">These units aren\'t fully graded yet — a formal result appears above once every quiz in a unit is passed. Here\'s what you\'ve scored so far.</p>';
+
+        foreach ($in_progress_units as $u) {
+            $quiz_lessons = $wpdb->get_results($wpdb->prepare(
+                "SELECT lesson_id, title FROM {$wpdb->prefix}mtti_lessons
+                 WHERE unit_id = %d AND interactive_role = 'quiz' AND status = 'Published' AND deleted_at IS NULL
+                 ORDER BY order_number",
+                $u->unit_id
+            ));
+            if (empty($quiz_lessons)) continue;
+
+            $done = 0;
+            $rows_html = '';
+            foreach ($quiz_lessons as $ql) {
+                $attempt = $wpdb->get_row($wpdb->prepare(
+                    "SELECT score, total, percent, passed, attempted_at FROM {$wpdb->prefix}mtti_quiz_attempts
+                     WHERE lesson_id = %d AND student_id = %d ORDER BY percent DESC, attempted_at DESC LIMIT 1",
+                    $ql->lesson_id, $student->student_id
+                ));
+                $title = esc_html(preg_replace('/\s*—\s*Quiz$/', '', $ql->title));
+                if ($attempt) {
+                    $done++;
+                    $status = $attempt->passed
+                        ? '<span style="color:#2E7D32;">✓ Passed</span>'
+                        : '<span style="color:#D32F2F;">✗ Not yet passed</span>';
+                    $rows_html .= '<tr><td>' . $title . '</td><td>' . esc_html(round($attempt->percent)) . '%</td><td>' . $status . '</td><td>' . esc_html(date('d M Y', strtotime($attempt->attempted_at))) . '</td></tr>';
+                } else {
+                    $rows_html .= '<tr style="opacity:0.55;"><td>' . $title . '</td><td>—</td><td>Not yet attempted</td><td>—</td></tr>';
+                }
+            }
+
+            $total = count($quiz_lessons);
+            echo '<div style="margin-bottom:16px;">';
+            echo '<div style="display:flex;justify-content:space-between;align-items:baseline;flex-wrap:wrap;gap:6px;margin-bottom:8px;">';
+            echo '<strong>' . esc_html($u->course_name) . ' — ' . esc_html($u->unit_name) . '</strong>';
+            echo '<span style="font-size:12px;color:var(--text-3);">' . $done . ' of ' . $total . ' quizzes attempted</span>';
+            echo '</div>';
+            echo '<div class="mtti-progress-bar"><div class="mtti-progress-fill" style="width:' . intval(($done / $total) * 100) . '%;"></div></div>';
+            echo '<table class="mtti-table" style="margin-top:10px;"><thead><tr><th>Quiz</th><th>Score</th><th>Status</th><th>Date</th></tr></thead><tbody>' . $rows_html . '</tbody></table>';
+            echo '</div>';
+        }
+        echo '</div>';
+    }
+
     /**
      * Render Payments page
      */
@@ -2915,7 +3023,15 @@ function mttiToggleFullscreen(btn){
         // Check if student has access (enrolled in course or free preview)
         $enrolled_ids = $this->get_enrolled_course_ids($student);
         if (!in_array(intval($lesson->course_id), $enrolled_ids) && !$lesson->is_free_preview) {
-            echo '<div class="mtti-empty-state"><h3>Access Denied</h3><p>You are not enrolled in this course.</p></div>';
+            echo '<div class="mtti-empty-state">';
+            echo '<h3>🔒 Access Denied</h3>';
+            echo '<p style="color:var(--text-3);font-size:15px;">You\'re not enrolled in ' . esc_html($lesson->course_name ?: 'this course') . ', so this lesson isn\'t available to you.</p>';
+            echo '<p style="color:var(--text-3);font-size:13px;margin-top:12px;">If you believe this is a mistake, contact your course administrator to check your enrollment.</p>';
+            $courses_url = add_query_arg(array('portal_tab' => 'courses'), get_permalink());
+            echo '<a href="' . esc_url($courses_url) . '" class="mtti-btn mtti-btn-primary" style="text-decoration:none;display:inline-block;margin-top:16px;">📚 Go to My Courses</a>';
+            $dashboard_url = get_permalink();
+            echo '<div style="margin-top:10px;"><a href="' . esc_url($dashboard_url) . '" style="color:#1976D2;text-decoration:none;">← Back to Dashboard</a></div>';
+            echo '</div>';
             return;
         }
 
@@ -3178,16 +3294,23 @@ function mttiToggleFullscreen(btn){
             preg_match('/youtube\.com\/watch\?v=([a-zA-Z0-9_-]+)/', $url, $matches) ||
             preg_match('/youtu\.be\/([a-zA-Z0-9_-]+)/', $url, $matches)) {
             $video_id = $matches[1];
-            return '<div oncontextmenu="return false;" style="user-select: none; -webkit-user-select: none;">
-                <iframe src="https://www.youtube.com/embed/' . esc_attr($video_id) . '?modestbranding=1&rel=0&disablekb=1&fs=0"
-                            style="width: 100%; height: 100%; border: none;"
-                            frameborder="0" allow="autoplay; encrypted-media" allowfullscreen></iframe>
+            // No wrapper div around the iframe: .mtti-player-fill is a flex
+            // column and its CSS gives a nested `iframe` flex:1 to stretch
+            // it full-height, but flex only applies to direct children — an
+            // extra wrapping div here breaks that chain and the iframe
+            // collapses to its tiny default size (the "poor" tiny video
+            // bug). Right-click prevention moves onto the iframe itself
+            // via oncontextmenu, style stays inline since it still needs
+            // !important-free width/height for the flex rule to override.
+            return '<iframe src="https://www.youtube.com/embed/' . esc_attr($video_id) . '?modestbranding=1&rel=0&disablekb=1&fs=0"
+                        oncontextmenu="return false;"
+                        style="width: 100%; height: 100%; border: none;"
+                        frameborder="0" allow="autoplay; encrypted-media" allowfullscreen></iframe>
                 <script>
                     document.addEventListener("keydown", function(e) {
                         if(e.key === "d" || e.key === "s") e.preventDefault();
                     });
-                </script>
-            </div>';
+                </script>';
         }
         
         // Vimeo
@@ -3488,12 +3611,24 @@ function mttiSubmitAttCode(nonce) {
     /**
      * Render Transcript page
      */
+    /**
+     * Transcripts are per-unit, matching the curriculum's per-unit
+     * certification model (a Statement of Attainment is earned per unit,
+     * not per course or per program). This page is just an index of the
+     * student's completed units; each links out to its own official,
+     * letterhead-branded transcript document, rendered server-side by
+     * mtti_mis_output_student_unit_transcript() in mtti-mis.php — the same
+     * template the admin side already used for single-unit transcripts,
+     * now reachable by the student themselves with an ownership check
+     * (resolved from their own logged-in user, never a client-supplied
+     * student_id) instead of requiring an admin to generate it for them.
+     */
     private function render_transcript($student) {
         global $wpdb;
-        
-        // Get unit results for student
+
         $results = $wpdb->get_results($wpdb->prepare(
-            "SELECT ur.*, cu.unit_name, cu.unit_code, c.course_name, c.course_code
+            "SELECT ur.unit_id, ur.percentage, ur.grade, ur.passed,
+                    cu.unit_name, cu.unit_code, c.course_name
              FROM {$wpdb->prefix}mtti_unit_results ur
              JOIN {$wpdb->prefix}mtti_course_units cu ON ur.unit_id = cu.unit_id
              JOIN {$wpdb->prefix}mtti_courses c ON cu.course_id = c.course_id
@@ -3501,161 +3636,49 @@ function mttiSubmitAttCode(nonce) {
              ORDER BY c.course_name, cu.unit_name",
             $student->student_id
         ));
-        
-        // Check if has any results
+
+        echo '<div class="mtti-transcript-page">';
+        echo '<h2 class="mtti-page-title">📜 My Transcripts</h2>';
+
         if (empty($results)) {
-            echo '<div class="mtti-transcript-page">';
-            echo '<h2 class="mtti-page-title">📜 Academic Transcript</h2>';
             echo '<div class="mtti-empty-state" style="text-align: center; padding: 60px 20px;">';
             echo '<span style="font-size: 4rem;">📜</span>';
-            echo '<h3>No Results Available</h3>';
-            echo '<p style="color: #666;">Your marks will appear here once entered by your instructor.</p>';
+            echo '<h3>No Completed Units Yet</h3>';
+            echo '<p style="color: #666;">A transcript becomes available for a unit once every quiz in it is passed. See "Quiz Scores So Far" on My Results to check progress in the meantime.</p>';
             echo '</div></div>';
             return;
         }
-        
-        // Calculate statistics
-        $total_marks = 0;
-        $passed = 0;
-        $failed = 0;
-        foreach ($results as $r) {
-            $total_marks += $r->score;
-            if ($r->passed) $passed++; else $failed++;
-        }
-        $overall_avg = count($results) > 0 ? round($total_marks / count($results), 1) : 0;
-        $overall_grade = $overall_avg >= 80 ? 'DISTINCTION' : ($overall_avg >= 60 ? 'CREDIT' : ($overall_avg >= 50 ? 'PASS' : 'REFER'));
-        $overall_remarks = $overall_grade;
-        
-        // Get fees balance
-        $balance = $wpdb->get_var($wpdb->prepare(
-            "SELECT balance FROM {$wpdb->prefix}mtti_students WHERE student_id = %d",
-            $student->student_id
-        )) ?: 0;
-        
-        // Certificate eligibility — 70% average required on all quizzes
-        $all_passed = ($failed == 0);
-        $avg_above_70 = ($overall_avg >= 70);
-        $fees_cleared = ($balance <= 0);
-        $certificate_eligible = $all_passed && $avg_above_70 && $fees_cleared;
-        
-        $settings = get_option('mtti_mis_settings', array());
-        $institute_name = $settings['institute_name'] ?? 'Masomotele Technical Training Institute';
-        
-        echo '<div class="mtti-transcript-page">';
-        echo '<h2 class="mtti-page-title">📜 Academic Transcript</h2>';
-        
-        // Action buttons
-        echo '<div style="margin-bottom: 20px; display: flex; gap: 10px; flex-wrap: wrap;">';
-        echo '<button onclick="window.print()" class="mtti-btn mtti-btn-primary">🖨️ Print Transcript</button>';
-        
-        // Certificate eligibility message
-        if ($certificate_eligible) {
-            echo '<span style="background: #00b894; color: white; padding: 10px 20px; border-radius: 5px;">✓ Eligible for Certificate</span>';
-        } else {
-            echo '<span style="background: #ff7675; color: white; padding: 10px 20px; border-radius: 5px;">⚠ Not Eligible for Certificate</span>';
-        }
-        echo '</div>';
-        
-        // Eligibility details
-        if (!$certificate_eligible) {
-            echo '<div style="background: #fff3cd; border: 1px solid #ffc107; padding: 15px; border-radius: 8px; margin-bottom: 20px;">';
-            echo '<strong>🎖️ Certificate Requirements (Not Yet Achieved):</strong><ul style="margin: 10px 0 0 20px;">';
-            echo '<li>' . ($all_passed ? '✓' : '✗') . ' All units passed</li>';
-            echo '<li>' . ($avg_above_70 ? '✓' : '✗') . ' Average score 70% or higher (Current: ' . $overall_avg . '%)</li>';
-            echo '<li>' . ($fees_cleared ? '✓' : '✗') . ' Fees fully paid (Balance: KES ' . number_format($balance, 2) . ')</li>';
-            echo '</ul></div>';
-        }
-        
-        // Transcript card
-        echo '<div class="mtti-transcript" id="printable-transcript" style="background: white; border-radius: 8px; padding: 30px; box-shadow: 0 2px 8px rgba(0,0,0,0.1);">';
-        
-        // Header
-        echo '<div class="mtti-transcript-header" style="text-align: center; border-bottom: 2px solid #2E7D32; padding-bottom: 20px; margin-bottom: 20px;">';
-        echo '<img src="' . esc_url(MTTI_MIS_PLUGIN_URL . 'assets/images/logo.jpeg') . '" style="width: 80px; height: 80px; border-radius: 50%; margin-bottom: 10px;">';
-        echo '<h2 style="margin: 10px 0 5px; color: #2E7D32;">' . esc_html($institute_name) . '</h2>';
-        echo '<p style="color: #FF9800; font-style: italic; margin: 0;">Start Learning, Start Earning</p>';
-        echo '<h3 style="margin: 15px 0 0; color: #333;">ACADEMIC TRANSCRIPT</h3>';
-        echo '</div>';
-        
-        // Student Info
-        $enrolled_courses = $this->get_enrolled_courses($student);
-        $course_names = array();
-        if (!empty($enrolled_courses)) {
-            foreach ($enrolled_courses as $ec) {
-                $course_names[] = esc_html($ec->course_code . ' - ' . $ec->course_name);
+
+        echo '<p style="color:var(--text-3);margin-bottom:20px;">Each completed unit has its own official transcript. Select one to view or print it.</p>';
+
+        $nonce = wp_create_nonce('mtti_portal_nonce');
+        $grouped = array();
+        foreach ($results as $r) { $grouped[$r->course_name ?: 'General'][] = $r; }
+
+        foreach ($grouped as $course => $units) {
+            echo '<div class="mtti-card" style="background:#fff;padding:20px;margin-bottom:15px;border-radius:10px;">';
+            echo '<h3 style="margin:0 0 15px;color:#333;"><span style="background:#2E7D32;color:white;padding:3px 10px;border-radius:5px;font-size:0.8rem;">' . esc_html($course) . '</span></h3>';
+            echo '<table class="mtti-table"><thead><tr><th>Unit</th><th>Marks</th><th>Grade</th><th>Status</th><th></th></tr></thead><tbody>';
+
+            foreach ($units as $r) {
+                $grade_color = $r->grade == 'DISTINCTION' ? '#2E7D32' : ($r->grade == 'CREDIT' ? '#1976D2' : ($r->grade == 'PASS' ? '#FF9800' : '#D32F2F'));
+                $transcript_url = add_query_arg(array(
+                    'action'   => 'mtti_student_unit_transcript',
+                    'unit_id'  => intval($r->unit_id),
+                    'nonce'    => $nonce,
+                ), admin_url('admin-ajax.php'));
+
+                echo '<tr>';
+                echo '<td><strong>' . esc_html($r->unit_name) . '</strong><br><span style="font-size:11px;color:var(--text-3);">' . esc_html($r->unit_code) . '</span></td>';
+                echo '<td>' . esc_html($r->percentage) . '%</td>';
+                echo '<td><span style="background:' . $grade_color . ';color:white;padding:2px 8px;border-radius:4px;font-weight:bold;">' . esc_html($r->grade) . '</span></td>';
+                echo '<td>' . ($r->passed ? '<span style="color:#2E7D32;">✓ Pass</span>' : '<span style="color:#D32F2F;">✗ Refer</span>') . '</td>';
+                echo '<td><a href="' . esc_url($transcript_url) . '" target="_blank" class="mtti-btn mtti-btn-secondary" style="padding:6px 14px;font-size:12px;">📄 View Transcript</a></td>';
+                echo '</tr>';
             }
+            echo '</tbody></table></div>';
         }
-        $courses_display = !empty($course_names) ? implode(', ', $course_names) : esc_html($student->course_name ?: 'N/A');
-        
-        echo '<div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 25px; padding: 15px; background: #f8f9fa; border-radius: 6px;">';
-        echo '<div><strong>Name:</strong> ' . esc_html($student->display_name) . '</div>';
-        echo '<div><strong>Admission No:</strong> ' . esc_html($student->admission_number) . '</div>';
-        echo '<div style="grid-column: 1 / -1;"><strong>Course(s):</strong> ' . $courses_display . '</div>';
-        echo '<div><strong>Date:</strong> ' . date('F j, Y') . '</div>';
         echo '</div>';
-        
-        // Results table
-        echo '<table style="width: 100%; border-collapse: collapse; margin-bottom: 20px;">';
-        echo '<thead><tr style="background: #2E7D32; color: white;">';
-        echo '<th style="padding: 12px; text-align: left; border: 1px solid #ddd;">Course</th>';
-        echo '<th style="padding: 12px; text-align: left; border: 1px solid #ddd;">Unit Code</th>';
-        echo '<th style="padding: 12px; text-align: left; border: 1px solid #ddd;">Unit Name</th>';
-        echo '<th style="padding: 12px; text-align: center; border: 1px solid #ddd;">Marks</th>';
-        echo '<th style="padding: 12px; text-align: center; border: 1px solid #ddd;">Grade</th>';
-        echo '<th style="padding: 12px; text-align: center; border: 1px solid #ddd;">Status</th>';
-        echo '</tr></thead><tbody>';
-        
-        foreach ($results as $r) {
-            $status = $r->passed ? 'PASS' : 'REFER';
-            $status_color = $r->passed ? '#4CAF50' : '#D32F2F';
-            $grade_color = $r->grade == 'DISTINCTION' ? '#2E7D32' : ($r->grade == 'CREDIT' ? '#1976D2' : ($r->grade == 'PASS' ? '#FF9800' : '#D32F2F'));
-            
-            echo '<tr>';
-            echo '<td style="padding: 10px; border: 1px solid #ddd;">' . esc_html($r->course_name ?: 'General') . '</td>';
-            echo '<td style="padding: 10px; border: 1px solid #ddd;">' . esc_html($r->unit_code) . '</td>';
-            echo '<td style="padding: 10px; border: 1px solid #ddd;">' . esc_html($r->unit_name) . '</td>';
-            echo '<td style="padding: 10px; border: 1px solid #ddd; text-align: center;">' . $r->score . '/100</td>';
-            echo '<td style="padding: 10px; border: 1px solid #ddd; text-align: center;"><strong style="color: ' . $grade_color . ';">' . esc_html($r->grade) . '</strong></td>';
-            echo '<td style="padding: 10px; border: 1px solid #ddd; text-align: center; color: ' . $status_color . ';"><strong>' . $status . '</strong></td>';
-            echo '</tr>';
-        }
-        
-        echo '</tbody></table>';
-        
-        // Summary
-        echo '<div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 15px; padding: 20px; background: #e8f5e9; border-radius: 6px; text-align: center; margin-bottom: 20px;">';
-        echo '<div><strong style="display: block; color: #666; font-size: 0.9rem;">Total Units</strong><span style="font-size: 1.8rem; color: #333; font-weight: bold;">' . count($results) . '</span></div>';
-        echo '<div><strong style="display: block; color: #666; font-size: 0.9rem;">Passed</strong><span style="font-size: 1.8rem; color: #4CAF50; font-weight: bold;">' . $passed . '</span></div>';
-        echo '<div><strong style="display: block; color: #666; font-size: 0.9rem;">Average</strong><span style="font-size: 1.8rem; color: #2E7D32; font-weight: bold;">' . $overall_avg . '%</span></div>';
-        echo '<div><strong style="display: block; color: #666; font-size: 0.9rem;">Overall Grade</strong><span style="font-size: 1.8rem; color: #2E7D32; font-weight: bold;">' . $overall_grade . '</span></div>';
-        echo '</div>';
-        
-        // Final Result
-        echo '<div style="text-align: center; padding: 15px; background: ' . ($overall_avg >= 70 ? '#d4edda' : '#f8d7da') . '; border-radius: 6px; margin-bottom: 20px;">';
-        echo '<strong style="font-size: 1.2rem;">Final Result: ' . $overall_remarks . ' • ' . ($overall_avg >= 70 ? '✓ Certificate Eligible' : '⚠ Score below 70%') . '</strong>';
-        echo '</div>';
-        
-        // Footer
-        echo '<div style="margin-top: 30px; padding-top: 20px; border-top: 1px solid #ddd; display: flex; justify-content: space-between; align-items: flex-end;">';
-        echo '<div style="text-align: center;"><div style="border-top: 1px solid #333; width: 200px; margin-top: 50px; padding-top: 5px;">Registrar\'s Signature</div></div>';
-        echo '<div style="text-align: center;"><div style="border-top: 1px solid #333; width: 200px; margin-top: 50px; padding-top: 5px;">Date & Stamp</div></div>';
-        echo '</div>';
-        
-        echo '<p style="text-align: center; margin-top: 20px; font-size: 11px; color: #999;">Generated on ' . date('F j, Y \a\t g:i A') . ' | This is a computer-generated document.</p>';
-        
-        echo '</div>'; // End transcript
-        echo '</div>'; // End page
-        
-        // Print styles
-        echo '<style>
-        @media print {
-            body * { visibility: hidden; }
-            #printable-transcript, #printable-transcript * { visibility: visible; }
-            #printable-transcript { position: absolute; left: 0; top: 0; width: 100%; padding: 20px; }
-            .mtti-portal-header, .mtti-portal-sidebar, .mtti-btn, .mtti-page-title { display: none !important; }
-            .mtti-transcript-page > div:not(#printable-transcript) { display: none !important; }
-        }
-        </style>';
     }
     
     // ══════════════════════════════════════════════════════════

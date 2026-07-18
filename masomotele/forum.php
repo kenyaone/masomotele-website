@@ -25,12 +25,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && $action === 'reply' && $topicId) {
     if ($content) {
         $db->insert('forum_posts', ['topic_id'=>$topicId,'user_id'=>$userId,'content'=>$content,'created_at'=>date('Y-m-d H:i:s')]);
         // Badge: first forum post
-        $postCount = (int)$db->fetchColumn("SELECT COUNT(*) FROM forum_posts WHERE user_id=?", [$userId]);
+        $postCount = (int)$db->fetchColumn("SELECT COUNT(*) FROM lms_forum_posts WHERE user_id=?", [$userId]);
         if ($postCount === 1) {
-            $badge = $db->fetchOne("SELECT id FROM badges WHERE trigger_type='first_post'");
+            $badge = $db->fetchOne("SELECT id FROM lms_badges WHERE trigger_type='first_post'");
             if ($badge) {
-                $has = $db->fetchOne("SELECT id FROM user_badges WHERE user_id=? AND badge_id=?", [$userId, $badge['id']]);
-                if (!$has) $db->insert('user_badges', ['user_id'=>$userId,'badge_id'=>$badge['id'],'earned_at'=>date('Y-m-d H:i:s')]);
+                $has = $db->fetchOne("SELECT id FROM lms_user_badges WHERE user_id=? AND badge_id=?", [$userId, $badge['id']]);
+                if (!$has) $db->insert('lms_user_badges', ['user_id'=>$userId,'badge_id'=>$badge['id'],'earned_at'=>date('Y-m-d H:i:s')]);
             }
         }
         header('Location: ' . SITE_URL . '/forum.php?topic=' . $topicId); exit;
@@ -42,9 +42,9 @@ require_once __DIR__ . '/templates/header.php';
 <div class="container">
     <?php if ($topicId): ?>
         <?php
-        $topic = $db->fetchOne("SELECT ft.*, u.name as author FROM forum_topics ft JOIN users u ON ft.user_id=u.id WHERE ft.id=?", [$topicId]);
+        $topic = $db->fetchOne("SELECT ft.*, u.name as author FROM lms_forum_topics ft JOIN users u ON ft.user_id=u.id WHERE ft.id=?", [$topicId]);
         if (!$topic) { echo '<div class="alert alert-danger">Topic not found.</div>'; require_once __DIR__ . '/templates/footer.php'; exit; }
-        $posts = $db->fetchAll("SELECT fp.*, u.name as author, u.photo as author_photo FROM forum_posts fp JOIN users u ON fp.user_id=u.id WHERE fp.topic_id=? ORDER BY fp.created_at", [$topicId]);
+        $posts = $db->fetchAll("SELECT fp.*, u.name as author, u.photo as author_photo FROM lms_forum_posts fp JOIN users u ON fp.user_id=u.id WHERE fp.topic_id=? ORDER BY fp.created_at", [$topicId]);
         ?>
         <div class="d-flex justify-content-between align-items-center mb-3">
             <h4><i class="bi bi-chat-dots me-2 text-primary"></i><?= htmlspecialchars($topic['title']) ?></h4>
@@ -86,7 +86,7 @@ require_once __DIR__ . '/templates/header.php';
                         <label class="form-label">Related Class (optional)</label>
                         <select name="class_id" class="form-select">
                             <option value="">General Discussion</option>
-                            <?php $classes = $db->fetchAll("SELECT id, title FROM classes WHERE status='active'"); ?>
+                            <?php $classes = $db->fetchAll("SELECT id, title FROM lms_classes WHERE status='active'"); ?>
                             <?php foreach ($classes as $c): ?><option value="<?= $c['id'] ?>"><?= htmlspecialchars($c['title']) ?></option><?php endforeach; ?>
                         </select>
                     </div>
@@ -104,9 +104,9 @@ require_once __DIR__ . '/templates/header.php';
         </div>
         <?php
         $topics = $db->fetchAll("SELECT ft.*, u.name as author, c.title as class_title,
-            (SELECT COUNT(*) FROM forum_posts WHERE topic_id=ft.id) as replies,
-            (SELECT MAX(created_at) FROM forum_posts WHERE topic_id=ft.id) as last_reply
-            FROM forum_topics ft JOIN users u ON ft.user_id=u.id LEFT JOIN classes c ON ft.class_id=c.id ORDER BY last_reply DESC");
+            (SELECT COUNT(*) FROM lms_forum_posts WHERE topic_id=ft.id) as replies,
+            (SELECT MAX(created_at) FROM lms_forum_posts WHERE topic_id=ft.id) as last_reply
+            FROM lms_forum_topics ft JOIN users u ON ft.user_id=u.id LEFT JOIN lms_classes c ON ft.class_id=c.id ORDER BY last_reply DESC");
         ?>
         <?php if (empty($topics)): ?>
             <div class="card"><div class="card-body text-muted">No discussions yet. Be the first to start one!</div></div>

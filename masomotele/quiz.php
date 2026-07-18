@@ -35,10 +35,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !$maxReached) {
     if ($passed) {
         $passCount = (int)$db->fetchColumn("SELECT COUNT(*) FROM quiz_attempts WHERE user_id=? AND passed=1", [$userId]);
         if ($passCount === 1) {
-            $badge = $db->fetchOne("SELECT id FROM badges WHERE trigger_type='first_quiz_pass'");
+            $badge = $db->fetchOne("SELECT id FROM lms_badges WHERE trigger_type='first_quiz_pass'");
             if ($badge) {
-                $has = $db->fetchOne("SELECT id FROM user_badges WHERE user_id=? AND badge_id=?", [$userId, $badge['id']]);
-                if (!$has) $db->insert('user_badges', ['user_id'=>$userId,'badge_id'=>$badge['id'],'earned_at'=>date('Y-m-d H:i:s')]);
+                $has = $db->fetchOne("SELECT id FROM lms_user_badges WHERE user_id=? AND badge_id=?", [$userId, $badge['id']]);
+                if (!$has) $db->insert('lms_user_badges', ['user_id'=>$userId,'badge_id'=>$badge['id'],'earned_at'=>date('Y-m-d H:i:s')]);
             }
         }
     }

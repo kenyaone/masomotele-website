@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Digital Forensics Basics (Lesson) | MTTI Computer Applications</title>
+<link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Fredoka:wght@500;600&display=swap" rel="stylesheet">
+<style>
+* { margin:0; padding:0; box-sizing:border-box; }
+body { font-family:'Space Mono', monospace; background:linear-gradient(135deg,#2E7D32 0%,#1565C0 100%); min-height:100vh; padding:20px; color:#fff; }
+.container { max-width:820px; margin:0 auto; }
+.header { text-align:center; margin-bottom:24px; }
+.lesson-tag { display:inline-block; background:rgba(255,255,255,0.2); padding:6px 16px; border-radius:999px; font-size:0.85em; margin-bottom:12px; }
+.header h1 { font-family:'Fredoka', sans-serif; font-size:2em; margin-bottom:6px; text-shadow:3px 3px 0 rgba(0,0,0,0.2); }
+.card { background:#fff; color:#333; border-radius:22px; padding:32px; margin-bottom:20px; box-shadow:0 20px 60px rgba(0,0,0,0.3); }
+.section { margin-bottom:26px; }
+.section:last-child { margin-bottom:0; }
+.section h2 { font-family:'Fredoka', sans-serif; font-size:1.2em; margin-bottom:10px; color:#1565C0; }
+.section .body { line-height:1.65; font-size:0.98em; }
+.section .body p { margin-bottom:10px; }
+.section .body code { background:#f5f7fb; padding:2px 6px; border-radius:4px; font-size:0.92em; }
+.keypoint { background:#fff8e1; border-left:4px solid #ffc107; padding:12px 16px; border-radius:8px; margin-top:12px; font-size:0.92em; }
+</style>
+</head>
+<body>
+<div class="container">
+<div class="header"><div class="lesson-tag">Module 7 · Lesson 7.4</div><h1>Digital Forensics Basics</h1></div>
+<div class="card"><div class="section"><h2>Chain of Custody</h2><div class="body"><p><strong>Chain of custody</strong> is a documented record of exactly who handled a piece of evidence, when, and what was done with it — establishing that evidence was not altered or tampered with between collection and any later use (including potential legal proceedings).</p></div><div class="keypoint"><strong>Key Point.</strong> Evidence with a broken or missing chain of custody can become far less useful or credible, even if its actual content is genuinely accurate — the documented handling matters, not just the content itself.</div></div><div class="section"><h2>Working from Copies</h2><div class="body"><p>Investigators typically create a <strong>forensic copy</strong> (a bit-for-bit image) of a device or drive and examine that copy, rather than the original — preserving the original evidence untouched in case it needs independent re-verification later.</p></div></div><div class="section"><h2>Order of Volatility</h2><div class="body"><p>Some evidence disappears faster than others: data in RAM vanishes when a device powers off, while data on a hard drive persists much longer. The <strong>order of volatility</strong> guides investigators to capture the most fleeting evidence (like RAM contents) first, before it is lost, then move to more persistent sources.</p></div></div><div class="section"><h2>Documentation Throughout</h2><div class="body"><p>Every step of a forensic investigation — what was done, when, by whom, and why — should be documented as it happens, not reconstructed from memory afterward, supporting both the chain of custody and the overall credibility of the investigation.</p></div></div></div>
+</div>
+</body>
+</html>

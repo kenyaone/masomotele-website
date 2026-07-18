@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>The Penetration Testing Methodology (Lesson) | MTTI Computer Applications</title>
+<link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Fredoka:wght@500;600&display=swap" rel="stylesheet">
+<style>
+* { margin:0; padding:0; box-sizing:border-box; }
+body { font-family:'Space Mono', monospace; background:linear-gradient(135deg,#2E7D32 0%,#1565C0 100%); min-height:100vh; padding:20px; color:#fff; }
+.container { max-width:820px; margin:0 auto; }
+.header { text-align:center; margin-bottom:24px; }
+.lesson-tag { display:inline-block; background:rgba(255,255,255,0.2); padding:6px 16px; border-radius:999px; font-size:0.85em; margin-bottom:12px; }
+.header h1 { font-family:'Fredoka', sans-serif; font-size:2em; margin-bottom:6px; text-shadow:3px 3px 0 rgba(0,0,0,0.2); }
+.card { background:#fff; color:#333; border-radius:22px; padding:32px; margin-bottom:20px; box-shadow:0 20px 60px rgba(0,0,0,0.3); }
+.section { margin-bottom:26px; }
+.section:last-child { margin-bottom:0; }
+.section h2 { font-family:'Fredoka', sans-serif; font-size:1.2em; margin-bottom:10px; color:#1565C0; }
+.section .body { line-height:1.65; font-size:0.98em; }
+.section .body p { margin-bottom:10px; }
+.section .body code { background:#f5f7fb; padding:2px 6px; border-radius:4px; font-size:0.92em; }
+.keypoint { background:#fff8e1; border-left:4px solid #ffc107; padding:12px 16px; border-radius:8px; margin-top:12px; font-size:0.92em; }
+</style>
+</head>
+<body>
+<div class="container">
+<div class="header"><div class="lesson-tag">Module 6 · Lesson 6.2</div><h1>The Penetration Testing Methodology</h1></div>
+<div style="background:#fff;color:#333;border-radius:16px;padding:16px;margin-bottom:20px;box-shadow:0 8px 24px rgba(0,0,0,0.12);text-align:center;"><svg viewBox="0 0 500 100" style="width:100%;max-width:560px;height:120px;" xmlns="http://www.w3.org/2000/svg">
+<rect x="20" y="40" width="98" height="50" rx="8" fill="#387633"/><text x="69" y="70" font-size="9" text-anchor="middle" fill="#fff">1. Recon</text><path d="M118,65 h18" stroke="#999" stroke-width="2" marker-end="url(#arrP)"/><rect x="138" y="40" width="98" height="50" rx="8" fill="#259BD7"/><text x="187" y="70" font-size="9" text-anchor="middle" fill="#fff">2. Scan &amp; Enumerate</text><path d="M236,65 h18" stroke="#999" stroke-width="2" marker-end="url(#arrP)"/><rect x="256" y="40" width="98" height="50" rx="8" fill="#387633"/><text x="305" y="70" font-size="9" text-anchor="middle" fill="#fff">3. Exploit</text><path d="M354,65 h18" stroke="#999" stroke-width="2" marker-end="url(#arrP)"/><rect x="374" y="40" width="98" height="50" rx="8" fill="#259BD7"/><text x="423" y="70" font-size="9" text-anchor="middle" fill="#fff">4. Report</text>
+<defs><marker id="arrP" markerWidth="8" markerHeight="8" refX="6" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8 Z" fill="#999"/></marker></defs>
+</svg></div><div class="card"><div class="section"><h2>Reconnaissance</h2><div class="body"><p><strong>Reconnaissance</strong> gathers information about the target before any direct interaction — publicly available information (company website, employee names on LinkedIn, DNS records) that helps build a picture of the target without yet touching its systems directly.</p></div></div><div class="section"><h2>Scanning and Enumeration</h2><div class="body"><p><strong>Scanning</strong> actively probes the target to identify live hosts, open ports, and running services. <strong>Enumeration</strong> goes further, extracting more detailed information from those services (software versions, usernames, shared resources) to identify specific potential weaknesses.</p></div></div><div class="section"><h2>Exploitation</h2><div class="body"><p><strong>Exploitation</strong> is the phase where an identified weakness is actually leveraged to gain some level of unauthorised access — proving the vulnerability is real and exploitable, not just theoretical, within the agreed rules of engagement.</p></div><div class="keypoint"><strong>Key Point.</strong> A vulnerability that looks concerning on paper but cannot actually be exploited in practice is a different (usually lower) priority than one proven exploitable — this is exactly what the exploitation phase establishes.</div></div><div class="section"><h2>Post-Exploitation and Reporting</h2><div class="body"><p><strong>Post-exploitation</strong> assesses what further access or impact is possible from the initial foothold (without necessarily going further than agreed). The final <strong>report</strong> documents findings, severity, evidence, and remediation recommendations — often the single most valuable deliverable of the entire engagement for SafariPay's actual security improvement.</p></div></div></div>
+</div>
+</body>
+</html>

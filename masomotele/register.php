@@ -25,11 +25,11 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
         $result = $auth->register($name, $email, $phone, $password);
         if ($result["success"]) {
             $uid = $result["user_id"];
-            $db->query("UPDATE users SET county=?,school=?,pathway=?,parent_name=?,parent_phone=? WHERE id=?",
+            $db->query("UPDATE lms_users SET county=?,school=?,pathway=?,parent_name=?,parent_phone=? WHERE id=?",
                 [$county,$school,$pathway,$parentName,$parentPhone,$uid]);
             $selectedClass = (int)($_POST['class_id'] ?? 0);
             if ($selectedClass) {
-                $db->query("INSERT IGNORE INTO enrolments (user_id,class_id,enrolled_at,pathway) VALUES (?,?,NOW(),?)",
+                $db->query("INSERT IGNORE INTO lms_enrolments (user_id,class_id,enrolled_at,pathway) VALUES (?,?,NOW(),?)",
                     [$uid,$selectedClass,$pathway]);
             }
             try { $db->query("INSERT INTO analytics_events (user_id,event_type,meta,created_at) VALUES (?,\"registration\",?,NOW())",
@@ -38,11 +38,11 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
         } else { $error = $result["message"]; }
     }
 }
-$allClasses = $db->fetchAll("SELECT id,title FROM classes WHERE status='active' ORDER BY title");
-$totalStudents = $db->fetchColumn("SELECT COUNT(*) FROM users WHERE role=\"student\"") ?? 0;
-$totalLessons  = $db->fetchColumn("SELECT COUNT(*) FROM lessons WHERE status=\"published\"") ?? 0;
+$allClasses = $db->fetchAll("SELECT id,title FROM lms_classes WHERE status='active' ORDER BY title");
+$totalStudents = $db->fetchColumn("SELECT COUNT(*) FROM lms_users WHERE role=\"student\"") ?? 0;
+$totalLessons  = $db->fetchColumn("SELECT COUNT(*) FROM lms_lessons WHERE status=\"published\"") ?? 0;
 $sponsors = [];
-try { $sponsors = $db->fetchAll("SELECT name,tagline FROM sponsors WHERE status=\"active\" AND show_on_dashboard=1 LIMIT 5") ?? []; } catch(Exception $e) {}
+try { $sponsors = $db->fetchAll("SELECT name,tagline FROM lms_sponsors WHERE status=\"active\" AND show_on_dashboard=1 LIMIT 5") ?? []; } catch(Exception $e) {}
 $counties = ["Baringo","Bomet","Bungoma","Busia","Elgeyo-Marakwet","Embu","Garissa","Homa Bay","Isiolo","Kajiado","Kakamega","Kericho","Kiambu","Kilifi","Kirinyaga","Kisii","Kisumu","Kitui","Kwale","Laikipia","Lamu","Machakos","Makueni","Mandera","Marsabit","Meru","Migori","Mombasa","Murang\"a","Nairobi","Nakuru","Nandi","Narok","Nyamira","Nyandarua","Nyeri","Samburu","Siaya","Taita-Taveta","Tana River","Tharaka-Nithi","Trans Nzoia","Turkana","Uasin Gishu","Vihiga","Wajir","West Pokot"];
 ?><!DOCTYPE html>
 <html lang="en">

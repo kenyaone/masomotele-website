@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Feeding Assistance and Mealtime Support | MTTI Computer Applications</title>
+<link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Fredoka:wght@500;600&display=swap" rel="stylesheet">
+<style>
+* { margin:0; padding:0; box-sizing:border-box; }
+body { font-family:'Space Mono', monospace; background:linear-gradient(135deg,#387633 0%,#259BD7 100%); min-height:100vh; padding:20px; color:#fff; }
+.container { max-width:900px; margin:0 auto; }
+.header { text-align:center; margin-bottom:24px; }
+.lesson-tag { display:inline-block; background:rgba(255,255,255,0.2); padding:6px 16px; border-radius:999px; font-size:0.85em; margin-bottom:12px; }
+.header h1 { font-family:'Fredoka', sans-serif; font-size:2em; margin-bottom:6px; text-shadow:3px 3px 0 rgba(0,0,0,0.2); }
+.scenario { background:rgba(255,255,255,0.14); backdrop-filter:blur(10px); border-radius:16px; padding:16px 22px; margin-bottom:20px; border-left:5px solid #ffd54f; font-size:0.95em; line-height:1.55; }
+.task { background:#fff; color:#333; border-radius:20px; padding:24px; margin-bottom:16px; box-shadow:0 14px 40px rgba(0,0,0,0.25); }
+.task-num { display:inline-block; width:28px; height:28px; background:linear-gradient(135deg,#387633 0%,#259BD7 100%); color:#fff; border-radius:50%; text-align:center; line-height:28px; font-family:'Fredoka', sans-serif; font-weight:600; margin-right:8px; }
+.task h3 { font-family:'Fredoka', sans-serif; font-size:1.05em; display:inline; }
+.options { margin-top:14px; display:flex; flex-direction:column; gap:10px; }
+.option { background:#f5f7fb; border:2px solid transparent; padding:12px 16px; border-radius:10px; cursor:pointer; transition:all 0.2s; font-family:'Space Mono', monospace; font-size:0.92em; text-align:left; }
+.option:hover:not(.disabled) { background:#e8f5e9; border-color:#387633; }
+.option.correct { background:#d4edda; border-color:#28a745; color:#155724; }
+.option.wrong { background:#f8d7da; border-color:#dc3545; color:#721c24; }
+.option.disabled { cursor:not-allowed; }
+.feedback { margin-top:14px; padding:12px 16px; border-radius:10px; font-size:0.9em; line-height:1.5; }
+.feedback.correct { background:#d4edda; color:#155724; border-left:4px solid #28a745; }
+.feedback.wrong { background:#f8d7da; color:#721c24; border-left:4px solid #dc3545; }
+.done-banner { text-align:center; padding:20px; color:#fff; font-family:'Fredoka', sans-serif; font-size:1.1em; }
+</style>
+</head>
+<body>
+<div class="container">
+<div class="header"><div class="lesson-tag">Module 7 · Lesson 7.5 · Practical</div><h1>Feeding Assistance and Mealtime Support</h1></div>
+<div class="scenario">Njeri notices her client has recently started struggling to chew food she previously ate without any difficulty, and is deciding how to respond. A supervised kitchen practicum session is recommended to build actual cooking technique — this online lesson builds nutrition knowledge and planning judgement, not hands-on cooking skill itself.</div>
+<div id="tasks"></div>
+<div class="done-banner" id="doneBanner" style="display:none;">✅ Practical complete — you can move to the quiz.</div>
+</div>
+<script>
+const tasks = [{"prompt":"Njeri notices her client suddenly struggling to chew food that was previously no problem. What should she do?","options":["Encourage the client to eat faster to push through the difficulty","Simply switch to softer food from now on without mentioning it to anyone","Ignore it since chewing difficulty is not a real concern","Report this change, since a sudden new difficulty may signal a new or worsening medical issue worth investigating"],"correct":3,"explanation":"A sudden new chewing difficulty should be reported as a potential medical concern, not simply worked around silently."},{"prompt":"Njeri wants to make mealtime feel more like a genuine, pleasant experience rather than just completing a task. What could help?","options":["Rushing through the meal as quickly as possible","Appealing food presentation, comfortable pacing, and treating the meal as a social, dignified moment","Ignoring the client during the meal to save time for other tasks","Serving food in the fastest, most efficient way regardless of presentation"],"correct":1,"explanation":"Attending to presentation, pacing, and the social dimension of mealtime reflects genuine, dignified care beyond mere nutrient delivery."},{"prompt":"The client leaves some food unfinished and Njeri is deciding whether to pressure them to finish it all. What is the appropriate approach?","options":["Insist they finish everything on the plate regardless of their own judgement","Remove the food immediately without any comment","Gently encourage without pressuring or shaming, respecting the client's own judgement about their appetite","Force additional food regardless of the client's preference"],"correct":2,"explanation":"Gentle encouragement without pressure respects the client's own judgement about their appetite and needs."}];
+function escapeHtml(s){return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
+function render(){
+  const c = document.getElementById('tasks');
+  c.innerHTML = tasks.map((t,i)=>`
+    <div class="task" id="task-${i}">
+      <div><span class="task-num">${i+1}</span><h3>${escapeHtml(t.prompt)}</h3></div>
+      <div class="options">
+        ${t.options.map((o,j)=>`<button class="option" onclick="answer(${i},${j})">${escapeHtml(o)}</button>`).join('')}
+      </div>
+    </div>`).join('');
+}
+function answer(i,j){
+  const task = tasks[i];
+  const el = document.getElementById('task-'+i);
+  const btns = el.querySelectorAll('.option');
+  if (btns[0].classList.contains('disabled')) return;
+  btns.forEach(b=>b.classList.add('disabled'));
+  btns[task.correct].classList.add('correct');
+  const right = j === task.correct;
+  if (!right) btns[j].classList.add('wrong');
+  const fb = document.createElement('div');
+  fb.className = 'feedback ' + (right?'correct':'wrong');
+  fb.innerHTML = '<strong>' + (right?'✅ Correct.':'❌ Not quite.') + '</strong><br>' + escapeHtml(task.explanation);
+  el.appendChild(fb);
+  if (i === tasks.length-1) document.getElementById('doneBanner').style.display='block';
+}
+render();
+</script>
+</body>
+</html>

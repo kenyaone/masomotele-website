@@ -16,7 +16,7 @@ $pdo = $db->getConnection();
 $userId = $auth->getUserId();
 $role = $auth->getRole();
 $user = ['id' => $userId, 'role' => $role, 'class_id' => 0];
-if ($role === 'student') { $u = $db->fetchOne("SELECT class_id FROM enrolments WHERE user_id=? AND status='active' LIMIT 1",[$userId]); $user['class_id'] = $u['class_id'] ?? 0; }
+if ($role === 'student') { $u = $db->fetchOne("SELECT class_id FROM lms_enrolments WHERE user_id=? AND status='active' LIMIT 1",[$userId]); $user['class_id'] = $u['class_id'] ?? 0; }
 require_once __DIR__ . '/templates/header.php';
 
 
@@ -181,7 +181,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
 
             // AI check against notes if enabled
             if ($assess['check_notes'] && $assess['lesson_id'] && !empty($questions)) {
-                $lesson = $pdo->prepare("SELECT content_html AS content,title FROM lessons WHERE id=?");
+                $lesson = $pdo->prepare("SELECT content_html AS content,title FROM lms_lessons WHERE id=?");
                 $lesson->execute([$assess['lesson_id']]);
                 $lesson = $lesson->fetch(PDO::FETCH_ASSOC);
                 if ($lesson) {
@@ -212,15 +212,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
 // ─────────────────────────────────────────
 
 // Classes
-$classes = $pdo->query("SELECT id,title AS name FROM classes ORDER BY title")->fetchAll(PDO::FETCH_ASSOC);
+$classes = $pdo->query("SELECT id,title AS name FROM lms_classes ORDER BY title")->fetchAll(PDO::FETCH_ASSOC);
 
 // Subjects
-$subjects = $pdo->query("SELECT id,title AS name,class_id FROM subjects WHERE level_type='subject' ORDER BY title")->fetchAll(PDO::FETCH_ASSOC);
+$subjects = $pdo->query("SELECT id,title AS name,class_id FROM lms_subjects WHERE level_type='subject' ORDER BY title")->fetchAll(PDO::FETCH_ASSOC);
 $subjects_by_class = [];
 foreach ($subjects as $s) { $subjects_by_class[$s['class_id']][] = $s; }
 
 // Lessons
-$lessons = $pdo->query("SELECT id,title,subject_id FROM lessons WHERE status='published' ORDER BY title")->fetchAll(PDO::FETCH_ASSOC);
+$lessons = $pdo->query("SELECT id,title,subject_id FROM lms_lessons WHERE status='published' ORDER BY title")->fetchAll(PDO::FETCH_ASSOC);
 $lessons_by_subject = [];
 foreach ($lessons as $l) { $lessons_by_subject[$l['subject_id']][] = $l; }
 
@@ -228,7 +228,7 @@ foreach ($lessons as $l) { $lessons_by_subject[$l['subject_id']][] = $l; }
 // Fetch assessments based on role
 $base_select = "SELECT a.*, s.title AS subject_name, c.title AS class_name FROM assessments a
     LEFT JOIN subjects s ON s.id=a.subject_id
-    LEFT JOIN classes c ON c.id=a.class_id";
+    LEFT JOIN lms_classes c ON c.id=a.class_id";
 
 if ($role === 'student') {
     $assessments = $db->fetchAll($base_select . "
@@ -260,7 +260,7 @@ if ($view_id) {
     $s = $pdo->prepare("SELECT a.*, s.title AS subject_name, c.title AS class_name, l.title AS lesson_title
         FROM assessments a
         JOIN subjects s ON s.id=a.subject_id
-        JOIN classes c ON c.id=a.class_id
+        JOIN lms_classes c ON c.id=a.class_id
         LEFT JOIN lessons l ON l.id=a.lesson_id
         WHERE a.id=?");
     $s->execute([$view_id]);

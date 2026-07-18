@@ -1,0 +1,497 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lesson 13.4 — Long-form vs Shorts Strategy (Interactive)</title>
+<style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: 'Roboto', 'Segoe UI', -apple-system, sans-serif; line-height: 1.55; color: #0f0f0f; background: #f9f9f9; min-height: 100vh; }
+    .container { max-width: 1200px; margin: 0 auto; padding: 20px; }
+    header {
+        background: linear-gradient(135deg, #2E7D32, #1B5E20);
+        color: #fff; padding: 40px 30px; border-radius: 12px; margin-bottom: 24px;
+        box-shadow: 0 10px 30px rgba(255,0,0,0.25);
+    }
+    header .badge { display: inline-block; background: rgba(255,255,255,0.2); padding: 4px 14px; border-radius: 16px; font-size: 12px; font-weight: bold; letter-spacing: 1px; margin-bottom: 14px; }
+    header h1 { font-size: 34px; margin-bottom: 8px; }
+    header .subtitle { font-size: 17px; opacity: 0.95; margin-bottom: 20px; }
+    .meta-strip { display: flex; flex-wrap: wrap; gap: 12px; }
+    .meta-strip span { background: rgba(255,255,255,0.18); padding: 6px 14px; border-radius: 20px; font-size: 13px; }
+    .toc { background: #fff; border: 1px solid #e5e5e5; border-radius: 10px; padding: 22px 26px; margin-bottom: 22px; }
+    .toc h3 { color: #ff0000; margin-bottom: 10px; }
+    .toc ol { padding-left: 20px; }
+    .toc a { color: #cc0000; text-decoration: none; font-weight: 600; }
+    section { background: #fff; border: 1px solid #e5e5e5; border-radius: 10px; padding: 26px 30px; margin-bottom: 22px; }
+    section h2 { color: #ff0000; font-size: 22px; margin-bottom: 12px; padding-bottom: 8px; border-bottom: 3px solid #ff0000; }
+    section h3 { color: #0f0f0f; font-size: 17px; margin: 18px 0 8px; }
+    section p { margin-bottom: 12px; }
+    section ul, section ol { padding-left: 22px; margin-bottom: 12px; }
+    section li { margin-bottom: 4px; }
+    .callout { border-left: 5px solid #ff0000; background: #fff1f1; padding: 14px 18px; margin: 14px 0; border-radius: 4px; }
+    .callout.warn { border-left-color: #d97706; background: #fef3c7; }
+    .callout.tip { border-left-color: #059669; background: #ecfdf5; }
+    .callout strong { color: #cc0000; }
+    .callout.warn strong { color: #92400e; }
+    .callout.tip strong { color: #065f46; }
+
+    /* Two dashboards side by side */
+    .dash-split { display: grid; grid-template-columns: 1fr 1.4fr; gap: 20px; margin: 18px 0; }
+    @media (max-width: 800px) { .dash-split { grid-template-columns: 1fr; } }
+    .dash-col h3.dash-title { color: #ff0000; font-size: 15px; margin-bottom: 10px; text-align: center; text-transform: uppercase; letter-spacing: 0.5px; }
+
+    /* Shorts phone mock */
+    .phone-frame { max-width: 240px; margin: 0 auto; background: #0f0f0f; border-radius: 30px; padding: 8px; box-shadow: 0 10px 30px rgba(0,0,0,0.2); }
+    .phone-screen { background: #000; border-radius: 22px; overflow: hidden; position: relative; aspect-ratio: 9/19; }
+    .short-stack { position: relative; height: 100%; overflow-y: auto; scroll-snap-type: y mandatory; scrollbar-width: none; }
+    .short-stack::-webkit-scrollbar { display: none; }
+    .short-slot { position: relative; height: 100%; scroll-snap-align: start; background-size: cover; background-position: center; display: flex; flex-direction: column; justify-content: flex-end; padding: 12px; color: #fff; }
+    .short-slot.s1 { background: linear-gradient(160deg, #dc2626 0%, #7f1d1d 60%, #0f0f0f 100%); }
+    .short-slot.s2 { background: linear-gradient(160deg, #d97706 0%, #7c2d12 60%, #0f0f0f 100%); }
+    .short-slot.s3 { background: linear-gradient(160deg, #059669 0%, #064e3b 60%, #0f0f0f 100%); }
+    .short-slot.s4 { background: linear-gradient(160deg, #F57C00 0%, #4c1d95 60%, #0f0f0f 100%); }
+    .short-slot.s5 { background: linear-gradient(160deg, #0891b2 0%, #164e63 60%, #0f0f0f 100%); }
+    .short-actions { position: absolute; right: 8px; bottom: 60px; display: flex; flex-direction: column; gap: 12px; text-align: center; font-size: 10px; }
+    .short-actions .btn-round { background: rgba(255,255,255,0.15); width: 34px; height: 34px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 16px; margin: 0 auto 3px; }
+    .short-meta { position: relative; z-index: 2; }
+    .short-meta .handle { font-weight: 700; font-size: 12px; margin-bottom: 3px; }
+    .short-meta .caption { font-size: 11px; opacity: 0.95; margin-bottom: 6px; }
+    .short-meta .sound { font-size: 10px; opacity: 0.85; display: flex; align-items: center; gap: 4px; }
+
+    /* Long-form watch page */
+    .watch-page { background: #fff; border: 1px solid #e5e5e5; border-radius: 10px; overflow: hidden; }
+    .watch-player { aspect-ratio: 16/9; background: linear-gradient(135deg, #8b1e1e 0%, #0f0f0f 100%); position: relative; display: flex; align-items: center; justify-content: center; color: #fff; font-weight: 700; font-size: 15px; text-align: center; padding: 20px; }
+    .watch-player .play-btn { position: absolute; width: 60px; height: 60px; border-radius: 50%; background: rgba(255,0,0,0.9); display: flex; align-items: center; justify-content: center; font-size: 22px; }
+    .watch-player .time { position: absolute; bottom: 12px; right: 12px; background: rgba(0,0,0,0.7); padding: 3px 8px; border-radius: 4px; font-size: 12px; font-weight: 600; }
+    .watch-body { padding: 16px; }
+    .watch-body h4 { font-size: 16px; margin-bottom: 8px; }
+    .watch-meta { display: flex; align-items: center; gap: 10px; margin-bottom: 10px; padding-bottom: 10px; border-bottom: 1px solid #e5e5e5; flex-wrap: wrap; }
+    .avatar { width: 32px; height: 32px; border-radius: 50%; background: linear-gradient(135deg, #8b1e1e, #d4a34a); color: #fff5e6; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 12px; flex-shrink: 0; }
+    .watch-meta .ch-name { font-weight: 600; font-size: 13px; }
+    .watch-meta .subs { font-size: 12px; color: #606060; }
+    .sub-btn { background: #ff0000; color: #fff; padding: 6px 14px; border-radius: 16px; font-size: 12px; font-weight: 600; margin-left: auto; }
+    .watch-actions { display: flex; gap: 6px; font-size: 12px; }
+    .wa-btn { background: #f2f2f2; padding: 5px 10px; border-radius: 16px; }
+    .watch-desc { background: #f2f2f2; padding: 10px; border-radius: 8px; margin-top: 10px; font-size: 12.5px; }
+    .watch-desc .stats { font-weight: 600; margin-bottom: 4px; }
+
+    /* Comparison table */
+    .compare-tbl { width: 100%; border-collapse: collapse; margin: 14px 0; font-size: 14px; }
+    .compare-tbl th, .compare-tbl td { padding: 10px 12px; border: 1px solid #e5e5e5; text-align: left; vertical-align: top; }
+    .compare-tbl th { background: #ff0000; color: #fff; font-weight: 600; font-size: 13px; }
+    .compare-tbl td:first-child { background: #fafafa; font-weight: 600; width: 25%; }
+
+    /* Content sorter */
+    .sorter { background: #f2f2f2; border: 1.5px solid #e5e5e5; border-radius: 10px; padding: 16px; margin: 14px 0; }
+    .sorter h4 { color: #0f0f0f; margin-bottom: 4px; font-size: 16px; }
+    .sorter .instr { font-size: 13px; color: #606060; margin-bottom: 12px; }
+    .idea-pool { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 8px; margin-bottom: 14px; }
+    .idea-card { background: #fff; border: 1.5px solid #e5e5e5; border-radius: 8px; padding: 10px 12px; }
+    .idea-card .idea-txt { font-size: 13px; color: #0f0f0f; margin-bottom: 6px; }
+    .idea-card .idea-select { display: flex; gap: 4px; flex-wrap: wrap; }
+    .idea-card .idea-select button { padding: 4px 8px; border: 1px solid #ccc; background: #f9f9f9; border-radius: 4px; cursor: pointer; font-size: 11px; font-weight: 600; color: #606060; }
+    .idea-card .idea-select button.picked { background: #ff0000; color: #fff; border-color: #ff0000; }
+    .sorter .actions { margin-top: 8px; }
+    .sorter .result { display: none; margin-top: 12px; padding: 12px; border-radius: 8px; font-size: 14px; }
+    .sorter .result.show { display: block; }
+    .sorter .result.good { background: #d1fae5; color: #065f46; border-left: 4px solid #059669; }
+    .sorter .result.mid { background: #fef3c7; color: #92400e; border-left: 4px solid #d97706; }
+    .sorter .result.bad { background: #fee2e2; color: #991b1b; border-left: 4px solid #dc2626; }
+
+    /* Hook timer */
+    .hook-tool { background: #f2f2f2; border: 1.5px solid #e5e5e5; border-radius: 10px; padding: 16px; margin: 14px 0; }
+    .hook-tool h4 { color: #0f0f0f; margin-bottom: 4px; font-size: 16px; }
+    .hook-tool textarea { width: 100%; min-height: 60px; padding: 10px; border: 1px solid #ccc; border-radius: 6px; font-family: inherit; font-size: 14px; resize: vertical; }
+    .hook-meter { margin-top: 10px; padding: 10px 14px; border-radius: 6px; font-size: 13.5px; background: #fff; border: 1px solid #e5e5e5; }
+    .hook-meter .indicator { font-weight: 700; }
+    .hook-meter.good { background: #d1fae5; border-color: #059669; color: #065f46; }
+    .hook-meter.mid { background: #fef3c7; border-color: #d97706; color: #92400e; }
+    .hook-meter.bad { background: #fee2e2; border-color: #dc2626; color: #991b1b; }
+
+    /* Long-form structure builder */
+    .structure { background: #f2f2f2; border: 1.5px solid #e5e5e5; border-radius: 10px; padding: 16px; margin: 14px 0; }
+    .structure h4 { color: #0f0f0f; margin-bottom: 8px; font-size: 16px; }
+    .part-row { display: grid; grid-template-columns: 150px 1fr 80px; gap: 10px; margin-bottom: 8px; align-items: center; }
+    @media (max-width: 640px) { .part-row { grid-template-columns: 1fr; } }
+    .part-row .part-name { font-weight: 700; color: #0f0f0f; font-size: 13.5px; }
+    .part-row .part-bar { height: 20px; background: #fff; border: 1px solid #e5e5e5; border-radius: 4px; overflow: hidden; position: relative; }
+    .part-row .part-fill { height: 100%; transition: width 0.3s; }
+    .part-row .part-time { text-align: right; font-family: 'Courier New', monospace; font-weight: 700; color: #cc0000; font-size: 13px; }
+    .part-fill.hook { background: linear-gradient(90deg, #dc2626, #ef4444); }
+    .part-fill.promise { background: linear-gradient(90deg, #d97706, #f59e0b); }
+    .part-fill.credential { background: linear-gradient(90deg, #059669, #10b981); }
+    .part-fill.content { background: linear-gradient(90deg, #0891b2, #06b6d4); }
+    .part-fill.rehook { background: linear-gradient(90deg, #F57C00, #a855f7); }
+    .part-fill.cta { background: linear-gradient(90deg, #ff0000, #cc0000); }
+    .total-line { margin-top: 10px; padding: 8px 12px; background: #fff; border-radius: 6px; font-size: 13.5px; font-weight: 600; }
+    .total-line .verdict { float: right; }
+    .total-line .verdict.good { color: #059669; }
+    .total-line .verdict.bad { color: #dc2626; }
+    .part-input { width: 60px; padding: 4px 6px; border: 1px solid #ccc; border-radius: 4px; font-size: 12px; }
+
+    button.btn { background: #ff0000; color: #fff; border: none; padding: 10px 20px; border-radius: 6px; font-size: 14px; font-weight: 600; cursor: pointer; }
+    button.btn:hover { background: #cc0000; }
+    button.btn.reset { background: #606060; margin-left: 8px; }
+
+    footer { text-align: center; color: #606060; padding: 24px; font-size: 13px; }
+
+    /* MTTI logo stamp */
+    .mtti-logo-stamp {
+        position: fixed; top: 14px; right: 18px; z-index: 999;
+        opacity: 0.88; transition: opacity 0.2s;
+    }
+    .mtti-logo-stamp:hover { opacity: 1; }
+    .mtti-logo-stamp img { width: 56px; height: 56px; border-radius: 50%; box-shadow: 0 2px 8px rgba(0,0,0,0.18); }
+</style>
+</head>
+<body>
+<div class="mtti-logo-stamp">
+    <img src="../../Resources/Logo.jpeg" alt="MTTI" title="Masomotele Technical Training Institute — Start learning, Start earning">
+</div>
+
+<div class="container">
+
+<header>
+    <div class="badge">LESSON 13.4  ·  YOUTUBE MARKETING  ·  INTERACTIVE</div>
+    <h1>Long-form vs Shorts Strategy</h1>
+    <div class="subtitle">Brian's Chapa Fitness lives inside vertical Shorts. Sarah's Karibu Kitchen lives inside 3-minute tutorials. Same platform. Opposite formats. When to pick which.</div>
+    <div class="meta-strip">
+        <span><strong>Duration:</strong> ~30 min interactive</span>
+        <span><strong>Level:</strong> Intermediate</span>
+        <span><strong>Personas:</strong> Brian (Shorts) + Sarah (long-form)</span>
+        <span><strong>Handbook:</strong> Module 13, §13.4</span>
+    </div>
+</header>
+
+<div class="toc">
+    <h3>What you'll do in this lesson</h3>
+    <ol>
+        <li><a href="#s1">Two dashboards side by side — Shorts feed vs long-form watch page</a></li>
+        <li><a href="#s2">Format comparison table</a></li>
+        <li><a href="#s3"><strong>Content Strategy Sorter — 8 ideas to place</strong></a></li>
+        <li><a href="#s4"><strong>Shorts Hook Timer — write a first-second hook</strong></a></li>
+        <li><a href="#s5"><strong>Long-form structure builder — 6 parts, 5 minutes</strong></a></li>
+        <li><a href="#s6">The Brian + Sarah cadence</a></li>
+    </ol>
+</div>
+
+<section id="s1">
+    <h2>1. Two dashboards, side by side</h2>
+    <p>Left: Brian's YouTube Shorts feed on a phone. Right: Sarah's long-form watch page on desktop. Note the differences — no scroll on the long-form page, mandatory scroll on Shorts.</p>
+
+    <div class="dash-split">
+        <div class="dash-col">
+            <h3 class="dash-title">Brian &mdash; Shorts feed (mobile)</h3>
+            <div class="phone-frame">
+                <div class="phone-screen">
+                    <div class="short-stack">
+                        <div class="short-slot s1">
+                            <div class="short-meta">
+                                <div class="handle">@chapafitness &nbsp;<span style="background:#fff;color:#000;padding:1px 6px;border-radius:8px;font-size:9px;">Subscribe</span></div>
+                                <div class="caption">Six-pack in six weeks &mdash; day one workout &#128293;</div>
+                                <div class="sound">&#127925; Trending &mdash; Kenyan Drill Beat</div>
+                            </div>
+                            <div class="short-actions">
+                                <div><div class="btn-round">&#10084;</div>18.4K</div>
+                                <div><div class="btn-round">&#128172;</div>412</div>
+                                <div><div class="btn-round">&#8635;</div>Share</div>
+                            </div>
+                        </div>
+                        <div class="short-slot s2">
+                            <div class="short-meta">
+                                <div class="handle">@nairobifit</div>
+                                <div class="caption">Home HIIT no equipment 15 seconds</div>
+                                <div class="sound">&#127925; Amapiano remix</div>
+                            </div>
+                            <div class="short-actions">
+                                <div><div class="btn-round">&#10084;</div>9.1K</div>
+                                <div><div class="btn-round">&#128172;</div>180</div>
+                                <div><div class="btn-round">&#8635;</div>Share</div>
+                            </div>
+                        </div>
+                        <div class="short-slot s3">
+                            <div class="short-meta">
+                                <div class="handle">@chapafitness</div>
+                                <div class="caption">Plank challenge &mdash; 30 second variant</div>
+                                <div class="sound">&#127925; Original sound</div>
+                            </div>
+                            <div class="short-actions">
+                                <div><div class="btn-round">&#10084;</div>22.3K</div>
+                                <div><div class="btn-round">&#128172;</div>530</div>
+                                <div><div class="btn-round">&#8635;</div>Share</div>
+                            </div>
+                        </div>
+                        <div class="short-slot s4">
+                            <div class="short-meta">
+                                <div class="handle">@karibukitchen</div>
+                                <div class="caption">Ugali flip &mdash; one hand only &#128293;</div>
+                                <div class="sound">&#127925; Trending Bongo Flava</div>
+                            </div>
+                            <div class="short-actions">
+                                <div><div class="btn-round">&#10084;</div>34.7K</div>
+                                <div><div class="btn-round">&#128172;</div>890</div>
+                                <div><div class="btn-round">&#8635;</div>Share</div>
+                            </div>
+                        </div>
+                        <div class="short-slot s5">
+                            <div class="short-meta">
+                                <div class="handle">@chapafitness</div>
+                                <div class="caption">Kenyan army push-up test</div>
+                                <div class="sound">&#127925; Trending &mdash; Sauti Sol</div>
+                            </div>
+                            <div class="short-actions">
+                                <div><div class="btn-round">&#10084;</div>16.8K</div>
+                                <div><div class="btn-round">&#128172;</div>240</div>
+                                <div><div class="btn-round">&#8635;</div>Share</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <p style="font-size:12px; color:#606060; text-align:center; margin-top:8px;">Scroll the phone screen &uarr;&darr; to swipe through Shorts.</p>
+        </div>
+
+        <div class="dash-col">
+            <h3 class="dash-title">Sarah &mdash; Long-form watch page (desktop)</h3>
+            <div class="watch-page">
+                <div class="watch-player">
+                    How to Order Lunch Delivery in Eldoret &mdash; Under 30 Min
+                    <div class="play-btn">&#9654;</div>
+                    <div class="time">3:12</div>
+                </div>
+                <div class="watch-body">
+                    <h4>How to Order Lunch Delivery in Eldoret &mdash; Under 30 Min</h4>
+                    <div class="watch-meta">
+                        <div class="avatar">KK</div>
+                        <div>
+                            <div class="ch-name">Karibu Kitchen &nbsp;&#10003;</div>
+                            <div class="subs">1.2K subscribers</div>
+                        </div>
+                        <div class="sub-btn">Subscribe</div>
+                    </div>
+                    <div class="watch-actions">
+                        <div class="wa-btn">&#128077; 340</div>
+                        <div class="wa-btn">&#128078;</div>
+                        <div class="wa-btn">&#8635; Share</div>
+                        <div class="wa-btn">&#128190; Save</div>
+                    </div>
+                    <div class="watch-desc">
+                        <div class="stats">4.2K views &nbsp;·&nbsp; 6 days ago</div>
+                        Order fresh Kenyan lunch delivery in Eldoret from Karibu Kitchen &mdash; hot ugali, mbuzi, kuku, veg delivered in under 30 minutes across Kapsoya, Elgon View, and the CBD...
+                        <div style="margin-top:8px; padding-top:8px; border-top:1px solid #e5e5e5;">
+                            <strong>Chapters:</strong><br>
+                            0:00 Intro &nbsp;·&nbsp; 0:45 Menu &nbsp;·&nbsp; 1:30 WhatsApp order &nbsp;·&nbsp; 2:15 30-min promise &nbsp;·&nbsp; 2:45 Delivery zone map
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<section id="s2">
+    <h2>2. Format comparison</h2>
+    <table class="compare-tbl">
+        <tr><th>Attribute</th><th>Long-form</th><th>Shorts</th></tr>
+        <tr><td>Length</td><td>Over 60 seconds. Aim 3&ndash;10 min.</td><td>60 seconds or less</td></tr>
+        <tr><td>Aspect ratio</td><td>16:9 horizontal</td><td>9:16 vertical</td></tr>
+        <tr><td>Discovery mechanism</td><td>Search, Suggested, Home</td><td>Shorts shelf, aggressive algorithmic push</td></tr>
+        <tr><td>Watch-time measured in</td><td>Minutes viewed</td><td>Loops watched</td></tr>
+        <tr><td>Monetisation</td><td>Mid-roll AdSense (10+ min unlocks it) &mdash; 10&ndash;50&times; per view</td><td>Shorts Ad Revenue Sharing pool</td></tr>
+        <tr><td>Best for</td><td>Consideration + decision + SEO</td><td>Awareness + discovery + Gen-Z</td></tr>
+        <tr><td>Kenyan reach ceiling</td><td>Large but keyword-bound</td><td>Massive &mdash; zero prior audience needed</td></tr>
+    </table>
+    <div class="callout tip">
+        <strong>Brian's rule:</strong> Shorts drive discovery. Long-form drives depth and revenue. Do both.
+    </div>
+</section>
+
+<section id="s3">
+    <h2>3. Content Strategy Sorter</h2>
+    <p>Eight content ideas from real Kenyan creators. For each, pick the best format: Short, Long-form, or Both. Click <em>Auto-mark</em> when done.</p>
+
+    <div class="sorter">
+        <h4>Sort each idea</h4>
+        <div class="instr">Rule of thumb: quick payoff = Short. Depth or SEO intent = Long-form. Repurposable = Both.</div>
+
+        <div class="idea-pool" id="ideaPool">
+            <div class="idea-card" data-answer="short">
+                <div class="idea-txt">1. Brian's 15-second plank challenge</div>
+                <div class="idea-select"><button onclick="pickIdea(this,'short')">Short</button><button onclick="pickIdea(this,'long')">Long-form</button><button onclick="pickIdea(this,'both')">Both</button></div>
+            </div>
+            <div class="idea-card" data-answer="long">
+                <div class="idea-txt">2. Sarah's 5-min "How to source ingredients in Eldoret"</div>
+                <div class="idea-select"><button onclick="pickIdea(this,'short')">Short</button><button onclick="pickIdea(this,'long')">Long-form</button><button onclick="pickIdea(this,'both')">Both</button></div>
+            </div>
+            <div class="idea-card" data-answer="both">
+                <div class="idea-txt">3. Ugali cooking &mdash; can be 30-sec highlight or 3-min tutorial</div>
+                <div class="idea-select"><button onclick="pickIdea(this,'short')">Short</button><button onclick="pickIdea(this,'long')">Long-form</button><button onclick="pickIdea(this,'both')">Both</button></div>
+            </div>
+            <div class="idea-card" data-answer="short">
+                <div class="idea-txt">4. Trending dance-to-workout mashup with Amapiano audio</div>
+                <div class="idea-select"><button onclick="pickIdea(this,'short')">Short</button><button onclick="pickIdea(this,'long')">Long-form</button><button onclick="pickIdea(this,'both')">Both</button></div>
+            </div>
+            <div class="idea-card" data-answer="long">
+                <div class="idea-txt">5. 8-min interview with a Kapsoya customer about lunch delivery</div>
+                <div class="idea-select"><button onclick="pickIdea(this,'short')">Short</button><button onclick="pickIdea(this,'long')">Long-form</button><button onclick="pickIdea(this,'both')">Both</button></div>
+            </div>
+            <div class="idea-card" data-answer="both">
+                <div class="idea-txt">6. Behind-the-scenes rider dashcam: from kitchen to office</div>
+                <div class="idea-select"><button onclick="pickIdea(this,'short')">Short</button><button onclick="pickIdea(this,'long')">Long-form</button><button onclick="pickIdea(this,'both')">Both</button></div>
+            </div>
+            <div class="idea-card" data-answer="long">
+                <div class="idea-txt">7. Full 6-week workout programme walkthrough with chapters</div>
+                <div class="idea-select"><button onclick="pickIdea(this,'short')">Short</button><button onclick="pickIdea(this,'long')">Long-form</button><button onclick="pickIdea(this,'both')">Both</button></div>
+            </div>
+            <div class="idea-card" data-answer="short">
+                <div class="idea-txt">8. 20-second Karibu Kitchen "before &amp; after" plate reveal</div>
+                <div class="idea-select"><button onclick="pickIdea(this,'short')">Short</button><button onclick="pickIdea(this,'long')">Long-form</button><button onclick="pickIdea(this,'both')">Both</button></div>
+            </div>
+        </div>
+
+        <div class="actions">
+            <button class="btn" onclick="markSorter()">Auto-mark my sort</button>
+            <button class="btn reset" onclick="resetSorter()">Reset</button>
+        </div>
+        <div class="result" id="sorterResult"></div>
+    </div>
+</section>
+
+<section id="s4">
+    <h2>4. Shorts Hook Timer</h2>
+    <p>The first second of a Short decides everything. Type Brian's hook line below. Aim: under 8 words, states the payoff, promises a specific outcome.</p>
+
+    <div class="hook-tool">
+        <h4>Type Brian's Shorts hook</h4>
+        <div style="font-size:12.5px; color:#606060; margin-bottom:8px;">Target: 4&ndash;8 words, promises specific outcome, no filler intro ("Hi guys...", "Today I'll...").</div>
+        <textarea id="hookText" oninput="checkHook()" placeholder="Six-pack in six weeks &mdash; day one"></textarea>
+        <div class="hook-meter" id="hookMeter">Type a hook to see the check.</div>
+    </div>
+
+    <div class="callout warn">
+        <strong>Kill words:</strong> "Hi guys", "Today I'll", "In this video", "Welcome back". The algorithm reads these as low-payoff intros and stops pushing.
+    </div>
+</section>
+
+<section id="s5">
+    <h2>5. Long-form structure builder</h2>
+    <p>Every professional long-form video has six parts. Set the seconds for each and hit the target total (~180 sec for Sarah's 3-min video).</p>
+
+    <div class="structure">
+        <h4>Sarah's 3-minute tutorial &mdash; part breakdown</h4>
+        <div id="parts">
+            <div class="part-row" data-part="hook" data-max="30"><div class="part-name">1. Hook</div><div class="part-bar"><div class="part-fill hook" style="width:8%;"></div></div><div><input type="number" class="part-input" value="15" min="0" max="30" oninput="updateParts()"><span style="font-size:11px; color:#606060; margin-left:4px;">s</span></div></div>
+            <div class="part-row" data-part="promise" data-max="20"><div class="part-name">2. Promise</div><div class="part-bar"><div class="part-fill promise" style="width:6%;"></div></div><div><input type="number" class="part-input" value="10" min="0" max="20" oninput="updateParts()"><span style="font-size:11px; color:#606060; margin-left:4px;">s</span></div></div>
+            <div class="part-row" data-part="credential" data-max="20"><div class="part-name">3. Credential</div><div class="part-bar"><div class="part-fill credential" style="width:6%;"></div></div><div><input type="number" class="part-input" value="10" min="0" max="20" oninput="updateParts()"><span style="font-size:11px; color:#606060; margin-left:4px;">s</span></div></div>
+            <div class="part-row" data-part="content" data-max="180"><div class="part-name">4. Content (bulk)</div><div class="part-bar"><div class="part-fill content" style="width:65%;"></div></div><div><input type="number" class="part-input" value="110" min="0" max="180" oninput="updateParts()"><span style="font-size:11px; color:#606060; margin-left:4px;">s</span></div></div>
+            <div class="part-row" data-part="rehook" data-max="20"><div class="part-name">5. Mid re-hook</div><div class="part-bar"><div class="part-fill rehook" style="width:6%;"></div></div><div><input type="number" class="part-input" value="10" min="0" max="20" oninput="updateParts()"><span style="font-size:11px; color:#606060; margin-left:4px;">s</span></div></div>
+            <div class="part-row" data-part="cta" data-max="30"><div class="part-name">6. CTA</div><div class="part-bar"><div class="part-fill cta" style="width:12%;"></div></div><div><input type="number" class="part-input" value="20" min="0" max="30" oninput="updateParts()"><span style="font-size:11px; color:#606060; margin-left:4px;">s</span></div></div>
+        </div>
+        <div class="total-line">Total: <span id="totalSec">175</span> sec / target 180 sec <span class="verdict" id="totalVerdict">&nbsp;</span></div>
+    </div>
+
+    <div class="callout tip">
+        <strong>The re-hook rule:</strong> around the 60% mark, remind the viewer why they are watching. This alone adds 15% to average watch time and is the single easiest edit to add.
+    </div>
+</section>
+
+<section id="s6">
+    <h2>6. The Brian + Sarah cadence</h2>
+    <p>Two mirrored playbooks. Same effort. Different mix.</p>
+    <table class="compare-tbl">
+        <tr><th>Cadence</th><th>Brian &mdash; Chapa Fitness</th><th>Sarah &mdash; Karibu Kitchen</th></tr>
+        <tr><td>Shorts per week</td><td>3 (Mon / Wed / Fri)</td><td>1</td></tr>
+        <tr><td>Long-form per month</td><td>1 (5&ndash;8 min programme walkthrough)</td><td>1 (3&ndash;5 min tutorial)</td></tr>
+        <tr><td>Total uploads per month</td><td>13 &mdash; discovery-heavy</td><td>5 &mdash; decision-heavy</td></tr>
+        <tr><td>Cross-post</td><td>Every Short &rarr; Instagram Reels</td><td>Every long-form &rarr; Facebook Page</td></tr>
+        <tr><td>Signal to optimise</td><td>Watch loops on Shorts</td><td>Avg % viewed on long-form</td></tr>
+    </table>
+    <div class="callout tip">
+        <strong>Wrap:</strong> Different format. Same discipline. Shorts for awareness. Long-form for decision. Brian pushes Sarah on the Shorts game; Sarah pushes Brian on the SEO game.
+    </div>
+</section>
+
+<footer>
+    <p>Lesson 13.4 &mdash; Long-form vs Shorts Strategy &middot; Masomotele Technical Training Institute &middot; Module 13, &sect;13.4</p>
+    <p>Next: <strong>Lesson 13.5 &mdash; YouTube Ads via Google Ads</strong></p>
+</footer>
+</div>
+
+<script>
+function pickIdea(btn, val) {
+    const parent = btn.parentElement;
+    parent.querySelectorAll('button').forEach(b => b.classList.remove('picked'));
+    btn.classList.add('picked');
+    parent.dataset.picked = val;
+}
+
+function markSorter() {
+    const cards = document.querySelectorAll('.idea-card');
+    let correct = 0;
+    let unpicked = 0;
+    cards.forEach(c => {
+        const pick = c.querySelector('.idea-select').dataset.picked;
+        const ans = c.dataset.answer;
+        if (!pick) unpicked++;
+        else if (pick === ans) { correct++; c.style.borderColor = '#059669'; c.style.background = '#ecfdf5'; }
+        else { c.style.borderColor = '#dc2626'; c.style.background = '#fef2f2'; }
+    });
+    const box = document.getElementById('sorterResult');
+    box.classList.remove('good','mid','bad','show');
+    if (unpicked > 0) { box.classList.add('bad','show'); box.innerHTML = '<strong>Pick a format for all ' + cards.length + ' ideas.</strong> ' + unpicked + ' still unpicked.'; return; }
+    let cls, msg;
+    if (correct >= 7) { cls = 'good'; msg = correct + ' / 8. Excellent sort. You have the format instincts down.'; }
+    else if (correct >= 5) { cls = 'mid'; msg = correct + ' / 8. Solid but review the "Both" answers &mdash; anything repurposable is worth uploading twice.'; }
+    else { cls = 'bad'; msg = correct + ' / 8. Return to the comparison table in &sect;2 and try again. Rule: depth + SEO &rarr; long. Payoff in 60 sec &rarr; short.'; }
+    box.classList.add(cls,'show');
+    box.innerHTML = '<strong>' + msg + '</strong>';
+    box.scrollIntoView({ behavior: 'smooth', block: 'center' });
+}
+
+function resetSorter() {
+    document.querySelectorAll('.idea-card').forEach(c => {
+        c.style.borderColor = '#e5e5e5';
+        c.style.background = '#fff';
+        c.querySelectorAll('button').forEach(b => b.classList.remove('picked'));
+        delete c.querySelector('.idea-select').dataset.picked;
+    });
+    document.getElementById('sorterResult').classList.remove('show','good','mid','bad');
+}
+
+function checkHook() {
+    const t = document.getElementById('hookText').value.trim();
+    const words = t ? t.split(/\s+/).length : 0;
+    const meter = document.getElementById('hookMeter');
+    meter.classList.remove('good','mid','bad');
+    const lower = t.toLowerCase();
+    const killWords = ['hi guys','hello everyone','welcome back','today i','in this video','so today','hey guys'];
+    const foundKill = killWords.find(k => lower.startsWith(k));
+    if (!t) { meter.innerHTML = 'Type a hook to see the check.'; }
+    else if (foundKill) { meter.classList.add('bad'); meter.innerHTML = '<span class="indicator">&#10007; Kill-word detected:</span> "' + foundKill + '". Drop the intro. Start on the payoff.'; }
+    else if (words < 3) { meter.classList.add('bad'); meter.innerHTML = '<span class="indicator">Too short (' + words + ' words).</span> Aim 4&ndash;8 words with a specific outcome.'; }
+    else if (words > 10) { meter.classList.add('bad'); meter.innerHTML = '<span class="indicator">Too long (' + words + ' words).</span> The viewer decides in 1 second. Cut to 4&ndash;8 words.'; }
+    else if (words >= 4 && words <= 8) { meter.classList.add('good'); meter.innerHTML = '<span class="indicator">&#10003; ' + words + ' words &mdash; hook-ready.</span> If it also states a concrete outcome, publish.'; }
+    else { meter.classList.add('mid'); meter.innerHTML = '<span class="indicator">' + words + ' words &mdash; close.</span> Tighten to 4&ndash;8.'; }
+}
+
+function updateParts() {
+    let total = 0;
+    let maxTotal = 0;
+    document.querySelectorAll('.part-row').forEach(r => {
+        const val = +r.querySelector('.part-input').value;
+        const max = +r.dataset.max;
+        total += val;
+        maxTotal += max;
+        r.querySelector('.part-fill').style.width = Math.min(100, (val / 180) * 100) + '%';
+    });
+    document.getElementById('totalSec').textContent = total;
+    const v = document.getElementById('totalVerdict');
+    if (total >= 165 && total <= 195) { v.className = 'verdict good'; v.innerHTML = '&#10003; within target'; }
+    else if (total < 90) { v.className = 'verdict bad'; v.innerHTML = '&#10007; too short for long-form'; }
+    else if (total > 600) { v.className = 'verdict bad'; v.innerHTML = '&#10007; too long'; }
+    else { v.className = 'verdict bad'; v.innerHTML = '&#10007; off target'; }
+}
+updateParts();
+</script>
+</body>
+</html>

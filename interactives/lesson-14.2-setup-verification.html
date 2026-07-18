@@ -1,0 +1,448 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lesson 14.2 — Setup + Verification (Interactive)</title>
+<style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: 'Segoe UI', -apple-system, Roboto, sans-serif; line-height: 1.55; color: #0f172a; background: #f8fafc; min-height: 100vh; }
+    .container { max-width: 1200px; margin: 0 auto; padding: 20px; }
+    header {
+        background: linear-gradient(135deg, #2E7D32, #1B5E20);
+        color: #fff; padding: 40px 30px; border-radius: 12px; margin-bottom: 24px;
+        box-shadow: 0 10px 30px rgba(26,115,232,0.25);
+    }
+    header .badge { display: inline-block; background: rgba(255,255,255,0.2); padding: 4px 14px; border-radius: 16px; font-size: 12px; font-weight: bold; letter-spacing: 1px; margin-bottom: 14px; }
+    header h1 { font-size: 32px; margin-bottom: 8px; }
+    header .subtitle { font-size: 17px; opacity: 0.95; margin-bottom: 20px; }
+    .meta-strip { display: flex; flex-wrap: wrap; gap: 12px; }
+    .meta-strip span { background: rgba(255,255,255,0.18); padding: 6px 14px; border-radius: 20px; font-size: 13px; }
+    .toc { background: #fff; border: 1px solid #e2e8f0; border-radius: 10px; padding: 22px 26px; margin-bottom: 22px; }
+    .toc h3 { color: #1a73e8; margin-bottom: 10px; }
+    .toc ol { padding-left: 20px; }
+    .toc a { color: #1a73e8; text-decoration: none; font-weight: 600; }
+    section { background: #fff; border: 1px solid #e2e8f0; border-radius: 10px; padding: 26px 30px; margin-bottom: 22px; }
+    section h2 { color: #1a73e8; font-size: 22px; margin-bottom: 12px; padding-bottom: 8px; border-bottom: 3px solid #1a73e8; }
+    section h3 { color: #0f172a; font-size: 17px; margin: 18px 0 8px; }
+    section p { margin-bottom: 12px; }
+    section ul, section ol { padding-left: 22px; margin-bottom: 12px; }
+    .callout { border-left: 5px solid #1a73e8; background: #e8f0fe; padding: 14px 18px; margin: 14px 0; border-radius: 4px; }
+    .callout.warn { border-left-color: #ea4335; background: #fef2f2; }
+    .callout.tip { border-left-color: #34a853; background: #ecfdf5; }
+    .callout strong { color: #1a73e8; }
+    .callout.warn strong { color: #ea4335; }
+    .callout.tip strong { color: #34a853; }
+
+    /* Business.google.com mock */
+    .bgm { background: #fff; border: 1px solid #dadce0; border-radius: 12px; overflow: hidden; margin: 16px 0; }
+    .bgm-top { background: #fff; padding: 10px 20px; display: flex; align-items: center; gap: 12px; border-bottom: 1px solid #ebedf0; font-size: 14px; }
+    .bgm-top .g { display: inline-flex; align-items: center; font-weight: 500; color: #202124; }
+    .bgm-top .g::before { content: 'G'; background: linear-gradient(45deg, #4285f4, #ea4335, #fbbc04, #34a853); background-clip: text; -webkit-background-clip: text; color: #ea4335; width: 22px; height: 22px; border-radius: 50%; display: inline-flex; align-items: center; justify-content: center; font-size: 14px; font-weight: bold; margin-right: 10px; border: 1px solid #dadce0; }
+    .bgm-top .u { margin-left: auto; background: #ea4335; color: #fff; width: 32px; height: 32px; border-radius: 50%; display: inline-flex; align-items: center; justify-content: center; font-weight: 500; font-size: 14px; }
+
+    .signup-form { padding: 22px; background: #fafbfc; }
+    .signup-form h4 { color: #202124; font-weight: 500; margin-bottom: 4px; font-size: 18px; }
+    .signup-form .sub { color: #5f6368; font-size: 13px; margin-bottom: 16px; }
+    .form-row { margin-bottom: 14px; }
+    .form-row label { display: block; font-size: 12px; color: #5f6368; margin-bottom: 4px; font-weight: 500; }
+    .form-row input, .form-row select { width: 100%; padding: 10px 12px; border: 1px solid #dadce0; border-radius: 4px; font-size: 14px; background: #fff; color: #202124; }
+    .form-row input:focus, .form-row select:focus { outline: 2px solid #1a73e8; border-color: transparent; }
+    .form-row .hint { font-size: 11px; color: #5f6368; margin-top: 3px; }
+    .form-check { color: #34a853; font-size: 12px; margin-top: 4px; display: none; }
+    .form-check.show { display: block; }
+
+    /* Verification method cards */
+    .methods { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 14px; margin: 20px 0; }
+    .method-card { background: #fff; border: 2px solid #e2e8f0; border-radius: 10px; padding: 16px; position: relative; transition: all 0.2s; }
+    .method-card:hover { border-color: #1a73e8; box-shadow: 0 4px 12px rgba(26,115,232,0.1); }
+    .method-card .m-icon { width: 40px; height: 40px; background: #e8f0fe; color: #1a73e8; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 20px; margin-bottom: 10px; }
+    .method-card h5 { font-size: 15px; color: #202124; margin-bottom: 6px; font-weight: 500; }
+    .method-card .desc { font-size: 13px; color: #5f6368; margin-bottom: 10px; min-height: 40px; }
+    .method-card .time { display: inline-block; padding: 3px 10px; border-radius: 12px; font-size: 11px; font-weight: 600; margin-bottom: 8px; }
+    .time.instant { background: #e6f4ea; color: #137333; }
+    .time.slow { background: #fef3c7; color: #92400e; }
+    .time.medium { background: #e8f0fe; color: #1557b0; }
+    .avail { display: flex; align-items: center; gap: 6px; font-size: 12px; font-weight: 600; padding: 6px 10px; border-radius: 6px; }
+    .avail.yes { background: #e6f4ea; color: #137333; }
+    .avail.no { background: #fef2f2; color: #c5221f; }
+
+    /* Scenario picker */
+    .scenario { background: linear-gradient(135deg, #e8f0fe 0%, #f8fafc 100%); border: 2px solid #1a73e8; border-radius: 10px; padding: 20px; margin: 16px 0; }
+    .scenario h4 { color: #1a73e8; margin-bottom: 10px; }
+    .scenario ul { list-style: none; padding-left: 0; }
+    .scenario ul li { padding: 4px 0; font-size: 14px; color: #202124; }
+    .scenario ul li::before { content: '\2713'; color: #34a853; font-weight: bold; margin-right: 8px; }
+
+    .picker { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 10px; margin: 14px 0; }
+    .picker button { padding: 14px 12px; border: 2px solid #dadce0; background: #fff; border-radius: 8px; cursor: pointer; font-weight: 600; color: #202124; font-size: 14px; transition: all 0.2s; }
+    .picker button:hover { border-color: #1a73e8; }
+    .picker button.picked { border-color: #1a73e8; background: #e8f0fe; }
+    .picker button.correct { border-color: #34a853; background: #e6f4ea; color: #137333; }
+    .picker button.wrong { border-color: #ea4335; background: #fef2f2; color: #c5221f; }
+
+    .verdict { display: none; padding: 14px 18px; margin-top: 12px; border-radius: 8px; font-size: 14px; }
+    .verdict.show { display: block; }
+    .verdict.pass { background: #e6f4ea; color: #137333; border-left: 4px solid #34a853; }
+    .verdict.fail { background: #fef2f2; color: #991b1b; border-left: 4px solid #ea4335; }
+
+    /* Fact grid */
+    .fact-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 12px; margin: 16px 0; }
+    .fact-card { background: #f8fafc; border-left: 4px solid #1a73e8; padding: 14px; border-radius: 6px; }
+    .fact-card h5 { color: #1a73e8; font-size: 13px; letter-spacing: 0.5px; text-transform: uppercase; margin-bottom: 4px; }
+    .fact-card p { font-size: 14px; color: #0f172a; margin: 0; }
+
+    /* Quiz */
+    .quiz-question { background: #fff; border: 2px solid #cbd5e1; border-radius: 10px; padding: 18px; margin: 14px 0; }
+    .quiz-question.correct { border-color: #34a853; background: #e6f4ea; }
+    .quiz-question.wrong { border-color: #ea4335; background: #fef2f2; }
+    .quiz-question h4 { margin-bottom: 12px; font-size: 15px; color: #202124; }
+    .quiz-question .options label { display: block; padding: 10px 14px; margin-bottom: 6px; background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 6px; cursor: pointer; font-size: 14px; }
+    .quiz-question .options label:hover { background: #e8f0fe; }
+    .quiz-question .options input[type=radio] { margin-right: 10px; }
+    .quiz-summary { text-align: center; padding: 24px; background: linear-gradient(135deg, #e8f0fe, #f8fafc); border-radius: 10px; margin: 20px 0; display: none; }
+    .quiz-summary.show { display: block; }
+    .quiz-summary .score { font-size: 42px; font-weight: bold; color: #1a73e8; margin-bottom: 8px; }
+    .quiz-btn { background: #1a73e8; color: #fff; border: 0; padding: 10px 20px; border-radius: 6px; cursor: pointer; font-weight: 600; font-size: 14px; }
+    .quiz-btn:hover { background: #1557b0; }
+
+    /* Postcard countdown mock */
+    .postcard-mock { display: grid; grid-template-columns: 260px 1fr; gap: 20px; align-items: center; background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 12px; padding: 20px; margin: 14px 0; }
+    @media (max-width: 640px) { .postcard-mock { grid-template-columns: 1fr; } }
+    .postcard { width: 100%; height: 160px; background: #fef3c7; border: 1px dashed #d97706; border-radius: 8px; padding: 14px; position: relative; box-shadow: 3px 3px 8px rgba(0,0,0,0.08); }
+    .postcard::after { content: ''; position: absolute; top: 12px; right: 12px; width: 44px; height: 30px; background: repeating-linear-gradient(45deg, #ea4335 0, #ea4335 4px, #fff 4px, #fff 8px); border: 1px solid #94a3b8; }
+    .postcard .pc-code { font-family: monospace; font-size: 22px; letter-spacing: 4px; color: #92400e; font-weight: bold; margin-top: 24px; }
+    .postcard .pc-to { font-size: 12px; color: #78350f; }
+    .countdown h4 { color: #92400e; margin-bottom: 10px; }
+    .countdown-bar { height: 20px; background: #fef3c7; border-radius: 10px; overflow: hidden; margin: 10px 0; border: 1px solid #d97706; }
+    .countdown-fill { height: 100%; background: #d97706; width: 86%; transition: width 0.5s; }
+    .countdown-note { font-size: 13px; color: #78350f; }
+
+    footer { text-align: center; color: #64748b; padding: 24px; font-size: 13px; }
+
+    /* MTTI logo stamp */
+    .mtti-logo-stamp {
+        position: fixed; top: 14px; right: 18px; z-index: 999;
+        opacity: 0.88; transition: opacity 0.2s;
+    }
+    .mtti-logo-stamp:hover { opacity: 1; }
+    .mtti-logo-stamp img { width: 56px; height: 56px; border-radius: 50%; box-shadow: 0 2px 8px rgba(0,0,0,0.18); }
+</style>
+</head>
+<body>
+<div class="mtti-logo-stamp">
+    <img src="../../Resources/Logo.jpeg" alt="MTTI" title="Masomotele Technical Training Institute — Start learning, Start earning">
+</div>
+
+<div class="container">
+
+<header>
+    <div class="badge">LESSON 14.2  ·  GOOGLE BUSINESS PROFILE  ·  INTERACTIVE</div>
+    <h1>Setup + Verification</h1>
+    <div class="subtitle">Sign up at business.google.com, fill six fields, then pick the right verification method for Sarah's Kapsoya kitchen.</div>
+    <div class="meta-strip">
+        <span><strong>Duration:</strong> ~35 min interactive</span>
+        <span><strong>Level:</strong> Foundation</span>
+        <span><strong>Tool:</strong> business.google.com</span>
+        <span><strong>Handbook:</strong> Module 14, &sect;14.2</span>
+    </div>
+</header>
+
+<div class="toc">
+    <h3>What you'll do in this lesson</h3>
+    <ol>
+        <li><a href="#s1">Signup at business.google.com</a></li>
+        <li><a href="#s2"><strong>Fill the signup form for Karibu Kitchen</strong></a></li>
+        <li><a href="#s3">The five verification methods</a></li>
+        <li><a href="#s4"><strong>Auto-marked scenario: pick Sarah's right method</strong></a></li>
+        <li><a href="#s5">Postcard countdown: Day 12 of 14</a></li>
+        <li><a href="#s6">What happens the moment verification completes</a></li>
+        <li><a href="#s7"><strong>Self-check quiz</strong></a></li>
+    </ol>
+</div>
+
+<section id="s1">
+    <h2>1. Sign in at business.google.com</h2>
+    <p>Open <strong>business.google.com</strong>. Sign in with the Gmail address Sarah will use to manage the profile forever — usually a business Gmail like <code>sarah@karibukitchen.co.ke</code>, not her personal one.</p>
+    <div class="callout warn">
+        <strong>NAP rule:</strong> Name, Address and Phone on the profile must match the storefront, the website and Facebook exactly. One missing full stop breaks Google's trust match.
+    </div>
+</section>
+
+<section id="s2">
+    <h2>2. The signup form — Karibu Kitchen</h2>
+    <p>Type into each field. The form checks name length, phone format and website format live.</p>
+
+    <div class="bgm">
+        <div class="bgm-top">
+            <span class="g">Business Profile Manager</span>
+            <span class="u">S</span>
+        </div>
+        <div class="signup-form">
+            <h4>Add your business to Google</h4>
+            <div class="sub">Karibu Kitchen &nbsp;&middot;&nbsp; Step 1 of 4</div>
+
+            <div class="form-row">
+                <label>Business name</label>
+                <input id="fName" value="Karibu Kitchen">
+                <div class="hint">Exact match to signboard, invoices and the Kapsoya kitchen door. No keyword stuffing.</div>
+                <div class="form-check" id="cName">&check; Looks clean &mdash; no keyword stuffing detected.</div>
+            </div>
+            <div class="form-row">
+                <label>Primary business category</label>
+                <select id="fCat">
+                    <option value="meal">Meal delivery service</option>
+                    <option value="restaurant">Restaurant</option>
+                    <option value="caterer">Caterer</option>
+                    <option value="african">African restaurant</option>
+                    <option value="fastfood">Fast food restaurant</option>
+                </select>
+                <div class="hint">Pick what MOST customers actually search for. Additional categories come next.</div>
+                <div class="form-check" id="cCat">&check; Meal delivery service &mdash; matches Sarah's actual model.</div>
+            </div>
+            <div class="form-row">
+                <label>Business address</label>
+                <input id="fAddr" value="Kapsoya Road, Eldoret, Kenya">
+                <div class="hint">Physical location. Google will post the verification postcard here if picked.</div>
+            </div>
+            <div class="form-row">
+                <label>Phone number</label>
+                <input id="fPhone" value="+254 722 000 111">
+                <div class="hint">Dedicated business number. Same number on website, Facebook, WhatsApp Business.</div>
+                <div class="form-check" id="cPhone">&check; Kenyan format detected.</div>
+            </div>
+            <div class="form-row">
+                <label>Website</label>
+                <input id="fWeb" value="https://karibukitchen.co.ke">
+                <div class="hint">Enables the Website button on the live listing.</div>
+                <div class="form-check" id="cWeb">&check; HTTPS domain &mdash; unlocks Search Console verification.</div>
+            </div>
+        </div>
+    </div>
+
+    <div class="callout tip">
+        <strong>Additional categories:</strong> Up to nine on top of the one primary. Sarah adds <em>Caterer</em>, <em>African restaurant</em>, <em>Delivery service</em> and <em>Restaurant</em> &mdash; five total.
+    </div>
+</section>
+
+<section id="s3">
+    <h2>3. The five verification methods</h2>
+    <p>Google needs to prove Sarah owns the business. Five methods exist &mdash; availability depends on category and country.</p>
+
+    <div class="methods">
+        <div class="method-card">
+            <div class="m-icon">&#9993;</div>
+            <h5>Postcard</h5>
+            <span class="time slow">~14 days</span>
+            <p class="desc">Mailed to the physical address. Most common globally. Contains a 5-digit code you enter online.</p>
+            <div class="avail yes">&check; Available &mdash; Kapsoya address is postable</div>
+        </div>
+        <div class="method-card">
+            <div class="m-icon">&#128222;</div>
+            <h5>Phone</h5>
+            <span class="time instant">Instant</span>
+            <p class="desc">Automated call or SMS with a code. Available for some categories.</p>
+            <div class="avail no">&times; Not offered &mdash; category ineligible in KE</div>
+        </div>
+        <div class="method-card">
+            <div class="m-icon">&#9993;</div>
+            <h5>Email</h5>
+            <span class="time instant">Instant</span>
+            <p class="desc">Code sent to a domain-matching email. Offered when your Google account uses the same domain as the site.</p>
+            <div class="avail no">&times; Sarah uses Gmail, not Workspace</div>
+        </div>
+        <div class="method-card">
+            <div class="m-icon">&#127909;</div>
+            <h5>Video</h5>
+            <span class="time medium">5-min recording</span>
+            <p class="desc">Record a 5-minute walkthrough of the location plus signage. Reviewed by Google within days.</p>
+            <div class="avail yes">&check; Available &mdash; kitchen has clear signage</div>
+        </div>
+        <div class="method-card">
+            <div class="m-icon">&#9881;</div>
+            <h5>Search Console</h5>
+            <span class="time instant">Instant</span>
+            <p class="desc">Only offered if the same Google account already owns a verified Search Console property for the site.</p>
+            <div class="avail yes">&check; Lesson 9.6 &mdash; already verified</div>
+        </div>
+    </div>
+</section>
+
+<section id="s4">
+    <h2>4. Challenge &mdash; pick Sarah's verification method</h2>
+
+    <div class="scenario">
+        <h4>Sarah's scenario</h4>
+        <ul>
+            <li>Sarah completed Lesson 9.6 and has <strong>karibukitchen.co.ke</strong> verified in Google Search Console using the same Gmail she is now signing into GBP with.</li>
+            <li>Her Kapsoya kitchen has clear road signage.</li>
+            <li>Her Gmail address is on the free Gmail domain (not Google Workspace).</li>
+            <li>Meal delivery service is not currently a phone-eligible category in Kenya.</li>
+            <li>She needs to launch the listing <strong>this week</strong> for a Friday delivery push.</li>
+        </ul>
+    </div>
+
+    <p><strong>Which method should Sarah pick?</strong></p>
+    <div class="picker" id="picker">
+        <button data-key="postcard" onclick="pickMethod(this)">Postcard</button>
+        <button data-key="phone" onclick="pickMethod(this)">Phone</button>
+        <button data-key="email" onclick="pickMethod(this)">Email</button>
+        <button data-key="video" onclick="pickMethod(this)">Video</button>
+        <button data-key="gsc" onclick="pickMethod(this)">Search Console</button>
+    </div>
+
+    <div class="verdict" id="verdict"></div>
+</section>
+
+<section id="s5">
+    <h2>5. If she had picked Postcard &mdash; Day 12 of ~14</h2>
+    <p>Sarah picked Search Console (instant). But if she had picked postcard, this is the wait she would be sitting through.</p>
+
+    <div class="postcard-mock">
+        <div class="postcard">
+            <div class="pc-to">To:<br>Sarah Chebet<br>Karibu Kitchen<br>Kapsoya Road, Eldoret</div>
+            <div class="pc-code">7 4 3 9 2</div>
+        </div>
+        <div class="countdown">
+            <h4>Postcard status &mdash; Day 12 of ~14</h4>
+            <div class="countdown-bar"><div class="countdown-fill"></div></div>
+            <div class="countdown-note">
+                Mailed by Google from Nairobi on Day 1.<br>
+                Estimated arrival: Kapsoya sorting office &mdash; Day 13.<br>
+                <strong>You cannot request a new one for 21 days.</strong><br><br>
+                &check; This is why Sarah picked instant Search Console verification instead. Two-week delay avoided.
+            </div>
+        </div>
+    </div>
+
+    <div class="callout warn">
+        <strong>Postcard risks:</strong> Wrong address = lost postcard = 21-day wait for a replacement. Never open the postcard-verification flow unless the storefront address is perfect on the front of the building.
+    </div>
+</section>
+
+<section id="s6">
+    <h2>6. What happens the moment verification completes</h2>
+    <div class="fact-grid">
+        <div class="fact-card"><h5>Immediately &mdash; Listing live</h5><p>Karibu Kitchen appears in Google Search, Google Maps and the knowledge panel side card.</p></div>
+        <div class="fact-card"><h5>Immediately &mdash; Dashboard unlocks</h5><p>Business Profile Manager reveals Insights, Reviews, Posts, Q&amp;A, Photos, Products, Services.</p></div>
+        <div class="fact-card"><h5>Immediately &mdash; Ranking begins</h5><p>Google measures Relevance, Distance, Prominence for every relevant Eldoret query. Position calculated in real time on each search.</p></div>
+    </div>
+    <div class="callout tip"><strong>Sarah is now in the race.</strong> Position 4 today is default (new listing). Positions 1&ndash;3 are earned via Lessons 14.3, 14.4 and 14.5.</div>
+</section>
+
+<section id="s7">
+    <h2>7. Self-check quiz</h2>
+
+    <div class="quiz-question" data-correct="B"><h4>1. Sarah's business name field should contain&hellip;</h4><div class="options">
+        <label><input type="radio" name="q1" value="A"> A) "Karibu Kitchen Eldoret Delivery Best Prices"</label>
+        <label><input type="radio" name="q1" value="B"> B) Just "Karibu Kitchen" &mdash; exact match to the signboard</label>
+        <label><input type="radio" name="q1" value="C"> C) "Karibu Kitchen &mdash; Kapsoya"</label>
+        <label><input type="radio" name="q1" value="D"> D) Whatever ranks fastest on trial</label>
+    </div></div>
+
+    <div class="quiz-question" data-correct="A"><h4>2. Which primary category matches Karibu Kitchen best?</h4><div class="options">
+        <label><input type="radio" name="q2" value="A"> A) Meal delivery service</label>
+        <label><input type="radio" name="q2" value="B"> B) Restaurant</label>
+        <label><input type="radio" name="q2" value="C"> C) Fast food restaurant</label>
+        <label><input type="radio" name="q2" value="D"> D) Cafeteria</label>
+    </div></div>
+
+    <div class="quiz-question" data-correct="C"><h4>3. NAP consistency stands for&hellip;</h4><div class="options">
+        <label><input type="radio" name="q3" value="A"> A) Name, Address, Photo</label>
+        <label><input type="radio" name="q3" value="B"> B) Name, Aroma, Phone</label>
+        <label><input type="radio" name="q3" value="C"> C) Name, Address, Phone</label>
+        <label><input type="radio" name="q3" value="D"> D) None Above Please</label>
+    </div></div>
+
+    <div class="quiz-question" data-correct="D"><h4>4. Fastest verification method (when available)?</h4><div class="options">
+        <label><input type="radio" name="q4" value="A"> A) Postcard</label>
+        <label><input type="radio" name="q4" value="B"> B) Video</label>
+        <label><input type="radio" name="q4" value="C"> C) Email</label>
+        <label><input type="radio" name="q4" value="D"> D) Search Console (already-verified domain)</label>
+    </div></div>
+
+    <div class="quiz-question" data-correct="B"><h4>5. Sarah picked Search Console verification because&hellip;</h4><div class="options">
+        <label><input type="radio" name="q5" value="A"> A) It was the only method offered.</label>
+        <label><input type="radio" name="q5" value="B"> B) Lesson 9.6 already verified karibukitchen.co.ke on the same Gmail account &mdash; instant.</label>
+        <label><input type="radio" name="q5" value="C"> C) Postcard is more expensive.</label>
+        <label><input type="radio" name="q5" value="D"> D) Google recommended it.</label>
+    </div></div>
+
+    <div style="margin-top:20px;">
+        <button class="quiz-btn" onclick="markQuiz()">Mark my quiz</button>
+    </div>
+
+    <div class="quiz-summary" id="quizSummary"><div class="score" id="scoreDisplay">0 / 5</div><p id="scoreMessage"></p></div>
+</section>
+
+<footer>
+    <p>Lesson 14.2 &middot; Google Business Profile &middot; Masomotele Technical Training Institute &middot; Module 14, &sect;14.2</p>
+    <p>Next: <strong>Lesson 14.3 &mdash; Optimising the Listing</strong></p>
+</footer>
+</div>
+
+<script>
+// Live form checks
+function checkForm() {
+    const name = document.getElementById('fName').value.trim();
+    document.getElementById('cName').classList.toggle('show', name.length > 0 && name.length < 30 && !/best|cheap|delivery|eldoret/i.test(name));
+
+    document.getElementById('cCat').classList.toggle('show', document.getElementById('fCat').value === 'meal');
+
+    const phone = document.getElementById('fPhone').value.replace(/\s/g, '');
+    document.getElementById('cPhone').classList.toggle('show', /^(\+254|0)7\d{8}$/.test(phone));
+
+    const web = document.getElementById('fWeb').value.trim();
+    document.getElementById('cWeb').classList.toggle('show', /^https:\/\/[a-z0-9.-]+\.[a-z]{2,}/i.test(web));
+}
+['fName','fCat','fPhone','fWeb'].forEach(id => {
+    document.getElementById(id).addEventListener('input', checkForm);
+    document.getElementById(id).addEventListener('change', checkForm);
+});
+checkForm();
+
+// Picker
+function pickMethod(btn) {
+    document.querySelectorAll('#picker button').forEach(b => b.classList.remove('picked','correct','wrong'));
+    btn.classList.add('picked');
+    const key = btn.dataset.key;
+    const verdict = document.getElementById('verdict');
+    verdict.classList.add('show');
+
+    const explanations = {
+        postcard: { pass: false, msg: '<strong>Not the best choice.</strong> Postcard works but wastes 14 days. Sarah has an instant option available &mdash; Search Console, because Lesson 9.6 already verified karibukitchen.co.ke on the same Google account. Postcard is the fallback, not the pick.' },
+        phone: { pass: false, msg: '<strong>Not offered.</strong> Meal delivery service is not currently a phone-eligible category in Kenya. Google will not surface this method for Sarah\'s account. Look at the scenario again.' },
+        email: { pass: false, msg: '<strong>Not offered.</strong> Sarah\'s Gmail is on the free @gmail.com domain, not karibukitchen.co.ke. Email verification requires a matching-domain Google Workspace account. Look for the method already unlocked by Lesson 9.6.' },
+        video: { pass: false, msg: '<strong>Available, but overkill.</strong> Video verification takes 5 minutes to record plus 2&ndash;5 days for Google review. Sarah has a faster option &mdash; Search Console is instant because karibukitchen.co.ke is already verified.' },
+        gsc: { pass: true, msg: '<strong>Correct.</strong> Search Console verification is instant, requires zero new steps, and is unlocked because Lesson 9.6 verified karibukitchen.co.ke on the same Gmail. Listing goes live in under a minute. This is exactly what Sarah picks.' }
+    };
+
+    const r = explanations[key];
+    verdict.className = 'verdict show ' + (r.pass ? 'pass' : 'fail');
+    verdict.innerHTML = r.msg;
+    btn.classList.add(r.pass ? 'correct' : 'wrong');
+}
+
+// Quiz
+function markQuiz() {
+    const qs = document.querySelectorAll('.quiz-question');
+    let score = 0;
+    qs.forEach((q, i) => {
+        const correct = q.dataset.correct;
+        const picked = q.querySelector('input[name="q' + (i+1) + '"]:checked');
+        q.classList.remove('correct','wrong');
+        if (picked && picked.value === correct) { q.classList.add('correct'); score++; }
+        else if (picked) q.classList.add('wrong');
+    });
+    const s = document.getElementById('quizSummary');
+    s.classList.add('show');
+    document.getElementById('scoreDisplay').textContent = score + ' / 5';
+    const msg = document.getElementById('scoreMessage');
+    if (score === 5) msg.textContent = 'Perfect. Move to Lesson 14.3 — Optimising the listing.';
+    else if (score >= 3) msg.textContent = 'Strong. Review the missed answers, then move to 14.3.';
+    else msg.textContent = 'Rewatch the video, replay the signup form and picker, then retake.';
+    s.scrollIntoView({ behavior: 'smooth', block: 'center' });
+}
+</script>
+</body>
+</html>

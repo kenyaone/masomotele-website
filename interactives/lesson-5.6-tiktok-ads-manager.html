@@ -1,0 +1,278 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lesson 5.6 — TikTok Ads Manager (Interactive)</title>
+<style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: 'Segoe UI', -apple-system, sans-serif; line-height: 1.55; color: #1e293b; background: #f8fafc; min-height: 100vh; }
+    .container { max-width: 1150px; margin: 0 auto; padding: 20px; }
+    header { background: linear-gradient(135deg, #2E7D32, #1B5E20); color: #fff; padding: 40px 30px; border-radius: 12px; margin-bottom: 24px; box-shadow: 0 10px 30px rgba(254,44,85,0.25); }
+    header .badge { display: inline-block; background: rgba(0,0,0,0.3); padding: 4px 14px; border-radius: 16px; font-size: 12px; font-weight: bold; letter-spacing: 1px; margin-bottom: 14px; }
+    header h1 { font-size: 34px; margin-bottom: 8px; text-shadow: 0 2px 4px rgba(0,0,0,0.15); }
+    header .subtitle { font-size: 17px; opacity: 0.98; margin-bottom: 20px; text-shadow: 0 1px 2px rgba(0,0,0,0.1); }
+    .meta-strip { display: flex; flex-wrap: wrap; gap: 12px; }
+    .meta-strip span { background: rgba(0,0,0,0.2); padding: 6px 14px; border-radius: 20px; font-size: 13px; }
+    .toc { background: #fff; border: 1px solid #e2e8f0; border-radius: 10px; padding: 22px 26px; margin-bottom: 22px; }
+    .toc h3 { color: #fe2c55; margin-bottom: 10px; }
+    .toc ol { padding-left: 20px; }
+    .toc a { color: #fe2c55; text-decoration: none; font-weight: 600; }
+    section { background: #fff; border: 1px solid #e2e8f0; border-radius: 10px; padding: 26px 30px; margin-bottom: 22px; }
+    section h2 { color: #fe2c55; font-size: 22px; margin-bottom: 12px; padding-bottom: 8px; border-bottom: 3px solid #fe2c55; }
+    section p { margin-bottom: 12px; }
+    section ul, section ol { padding-left: 22px; margin-bottom: 12px; }
+    .callout { border-left: 5px solid #fe2c55; background: #fef2f4; padding: 14px 18px; margin: 14px 0; border-radius: 4px; }
+    .callout.warn { border-left-color: #dc2626; background: #fef2f2; }
+    .callout.tip { border-left-color: #059669; background: #ecfdf5; }
+    .callout strong { color: #fe2c55; }
+
+    .persona-card { background: linear-gradient(135deg, #fce7f3, #fbcfe8); border-radius: 10px; padding: 18px 22px; display: flex; gap: 16px; align-items: flex-start; margin: 14px 0; }
+    .persona-avatar { width: 64px; height: 64px; border-radius: 50%; background: linear-gradient(45deg, #fe2c55, #25f4ee); color: #fff; display: flex; align-items: center; justify-content: center; font-size: 28px; font-weight: bold; flex-shrink: 0; }
+    .persona-card h4 { color: #831843; margin-bottom: 4px; }
+    .persona-card p { color: #831843; margin: 0; font-size: 15px; }
+
+    /* Virality scorer — flagship */
+    .scorer { background: #fef2f4; border: 2px solid #fe2c55; border-radius: 10px; padding: 18px; margin: 14px 0; }
+    .scorer h4 { color: #be185d; margin-bottom: 10px; }
+    .scorer-row { margin-bottom: 12px; }
+    .scorer-row label { display: block; font-size: 13px; font-weight: 600; margin-bottom: 4px; }
+    .scorer-row select { width: 100%; padding: 8px 10px; border: 1.5px solid #cbd5e1; border-radius: 6px; font-size: 13px; background: #fff; }
+    .scorer-out { background: #fff; padding: 14px; border-radius: 8px; margin-top: 10px; }
+    .scorer-bar { height: 12px; background: #e2e8f0; border-radius: 6px; overflow: hidden; margin: 8px 0; }
+    .scorer-bar-fill { height: 100%; background: linear-gradient(90deg, #fe2c55, #25f4ee); transition: width 0.4s; }
+    .scorer-verdict { padding: 10px 14px; border-radius: 6px; font-weight: 600; margin-top: 8px; }
+    .scorer-verdict.red { background: #fee2e2; color: #991b1b; }
+    .scorer-verdict.amber { background: #fef3c7; color: #78350f; }
+    .scorer-verdict.green { background: #d1fae5; color: #065f46; }
+
+    /* Non-negotiables */
+    .nn-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 10px; margin: 14px 0; }
+    .nn { background: #f8fafc; border-left: 4px solid #fe2c55; padding: 12px; border-radius: 6px; }
+    .nn .n { display: inline-block; background: #fe2c55; color: #fff; width: 24px; height: 24px; border-radius: 50%; text-align: center; line-height: 24px; font-size: 12px; font-weight: bold; margin-bottom: 4px; }
+    .nn h5 { font-size: 13px; color: #1e293b; margin-bottom: 3px; }
+    .nn p { font-size: 12px; margin: 0; color: #64748b; }
+
+    /* Spark ads visual */
+    .spark { background: linear-gradient(135deg, #fe2c55, #ff6b8b); color: #fff; border-radius: 10px; padding: 20px; margin: 14px 0; }
+    .spark h4 { margin-bottom: 8px; }
+    .spark p { margin-bottom: 8px; }
+    .spark .flow { display: flex; justify-content: center; gap: 20px; margin-top: 12px; flex-wrap: wrap; }
+    .spark .box { background: rgba(255,255,255,0.2); padding: 10px 14px; border-radius: 8px; text-align: center; font-size: 13px; min-width: 130px; }
+    .spark .arrow { align-self: center; font-size: 24px; }
+
+    table { width: 100%; border-collapse: collapse; margin: 14px 0; font-size: 14px; }
+    th, td { padding: 10px 12px; text-align: left; border: 1px solid #e2e8f0; }
+    th { background: #fe2c55; color: #fff; }
+    tr:nth-child(even) { background: #f8fafc; }
+
+    .quiz-question { background: #fff; border: 2px solid #cbd5e1; border-radius: 10px; padding: 18px; margin: 14px 0; }
+    .quiz-question.correct { border-color: #059669; background: #ecfdf5; }
+    .quiz-question.wrong { border-color: #dc2626; background: #fef2f2; }
+    .quiz-question h4 { margin-bottom: 12px; font-size: 15px; color: #1e293b; }
+    .quiz-question .options label { display: block; padding: 10px 14px; margin-bottom: 6px; background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 6px; cursor: pointer; font-size: 14px; }
+    .quiz-question .options label:hover { background: #fef2f4; }
+    .quiz-question .options input[type="radio"] { margin-right: 10px; }
+    .quiz-question .explanation { display: none; margin-top: 12px; padding: 10px 14px; border-radius: 6px; font-size: 14px; }
+    .quiz-question.correct .explanation { display: block; background: #d1fae5; color: #065f46; border-left: 4px solid #059669; }
+    .quiz-question.wrong .explanation { display: block; background: #fee2e2; color: #991b1b; border-left: 4px solid #dc2626; }
+    .quiz-summary { text-align: center; padding: 30px; background: linear-gradient(135deg, #fef2f4, #fce7f3); border-radius: 10px; margin: 20px 0; display: none; }
+    .quiz-summary.show { display: block; }
+    .quiz-summary .score { font-size: 48px; font-weight: bold; color: #fe2c55; margin-bottom: 8px; }
+    button.btn { background: #fe2c55; color: #fff; border: none; padding: 10px 20px; border-radius: 6px; font-size: 15px; font-weight: 600; cursor: pointer; }
+    button.btn:hover { background: #be185d; }
+    button.btn.reset { background: #64748b; margin-left: 8px; }
+    footer { text-align: center; color: #64748b; padding: 24px; font-size: 13px; }
+
+    /* MTTI logo stamp */
+    .mtti-logo-stamp {
+        position: fixed; top: 14px; right: 18px; z-index: 999;
+        opacity: 0.88; transition: opacity 0.2s;
+    }
+    .mtti-logo-stamp:hover { opacity: 1; }
+    .mtti-logo-stamp img { width: 56px; height: 56px; border-radius: 50%; box-shadow: 0 2px 8px rgba(0,0,0,0.18); }
+</style>
+</head>
+<body>
+<div class="mtti-logo-stamp">
+    <img src="../../Resources/Logo.jpeg" alt="MTTI" title="Masomotele Technical Training Institute — Start learning, Start earning">
+</div>
+
+<div class="container">
+<header>
+    <div class="badge">LESSON 5.6  ·  PAID ADVERTISING  ·  INTERACTIVE</div>
+    <h1>TikTok Ads Manager</h1>
+    <div class="subtitle">Fastest-growing paid social. On TikTok, ads that look like ads FAIL.</div>
+    <div class="meta-strip"><span><strong>Duration:</strong> ~30 min</span><span><strong>Handbook:</strong> Part 5, §5.6</span></div>
+</header>
+
+<div class="toc">
+    <h3>What you'll do</h3>
+    <ol>
+        <li><a href="#s1">Meet Brian &amp; Chapa Fitness</a></li>
+        <li><a href="#s2">The 3-level structure (same as Meta)</a></li>
+        <li><a href="#s3">The 8 objectives</a></li>
+        <li><a href="#s4">The 7 creative non-negotiables</a></li>
+        <li><a href="#s5"><strong>Virality scorer — will your ad flop?</strong></a></li>
+        <li><a href="#s6">Spark Ads — the killer feature</a></li>
+        <li><a href="#s7">Pixel + Events API tracking</a></li>
+        <li><a href="#s8">Self-check quiz</a></li>
+    </ol>
+</div>
+
+<section id="s1">
+    <h2>1. Meet Brian &amp; Chapa Fitness</h2>
+    <div class="persona-card">
+        <div class="persona-avatar">B</div>
+        <div>
+            <h4>Brian Otieno — Chapa Fitness (Shopify)</h4>
+            <p>24 y/o. Home-workout apparel from KES 1,200/set. Customers: 16–28. <strong>8,000 organic TikTok followers · 40 sales/week organically</strong>. Wants to <strong>double weekly sales</strong> with KES 25,000/month ad budget — without losing native, low-production style.</p>
+        </div>
+    </div>
+</section>
+
+<section id="s2">
+    <h2>2. The 3-level structure</h2>
+    <p>Same idea as Meta. Different label at level 2.</p>
+    <table>
+        <tr><th>Level</th><th>TikTok</th><th>Meta equivalent</th><th>Contains</th></tr>
+        <tr><td>1</td><td>Campaign</td><td>Campaign</td><td>Objective + campaign budget</td></tr>
+        <tr><td>2</td><td>Ad Group</td><td>Ad Set</td><td>Audience, placement, schedule, bid</td></tr>
+        <tr><td>3</td><td>Ad</td><td>Ad</td><td>The creative</td></tr>
+    </table>
+    <div class="callout tip"><strong>Know Meta Ads? You already know 80% of TikTok Ads.</strong></div>
+</section>
+
+<section id="s3">
+    <h2>3. The 8 objectives</h2>
+    <table>
+        <tr><th>#</th><th>Objective</th><th>Optimises for</th></tr>
+        <tr><td>1</td><td>Reach</td><td>Unique users reached</td></tr>
+        <tr><td>2</td><td>Traffic</td><td>Clicks to a page</td></tr>
+        <tr><td>3</td><td>Video Views</td><td>Watch time</td></tr>
+        <tr><td>4</td><td>Community Interaction</td><td>Follows + profile visits</td></tr>
+        <tr><td>5</td><td>Lead Generation</td><td>In-app Instant Forms</td></tr>
+        <tr><td>6</td><td>App Promotion</td><td>App installs</td></tr>
+        <tr><td>7</td><td>Website Conversions</td><td>TikTok Pixel events</td></tr>
+        <tr style="background:#fef2f4;"><td>8</td><td><strong>Product Sales ★</strong></td><td>Shopify checkout events — <strong>Brian's pick</strong></td></tr>
+    </table>
+</section>
+
+<section id="s4">
+    <h2>4. The 7 creative non-negotiables</h2>
+    <p>Miss any one and your ad flops.</p>
+    <div class="nn-grid">
+        <div class="nn"><span class="n">1</span><h5>Vertical 9:16</h5><p>Anything else gets downgraded</p></div>
+        <div class="nn"><span class="n">2</span><h5>Sound-ON</h5><p>88% of TikTok users watch with sound</p></div>
+        <div class="nn"><span class="n">3</span><h5>Hook in first 3 seconds</h5><p>Attention span is brutal</p></div>
+        <div class="nn"><span class="n">4</span><h5>Native, not polished</h5><p>Look like a creator, not a studio</p></div>
+        <div class="nn"><span class="n">5</span><h5>Trending audio</h5><p>Check Creative Center</p></div>
+        <div class="nn"><span class="n">6</span><h5>Text overlays</h5><p>Many users scroll fast</p></div>
+        <div class="nn"><span class="n">7</span><h5>Clear on-screen CTA</h5><p>"Shop Now" · "Learn More"</p></div>
+    </div>
+</section>
+
+<section id="s5">
+    <h2>5. Virality scorer</h2>
+    <p>Rate your ad against the 7 non-negotiables. The scorer predicts flop or fly.</p>
+    <div class="scorer">
+        <div class="scorer-row"><label>1. Aspect ratio</label><select id="s1s"><option value="0">16:9 landscape</option><option value="0">1:1 square</option><option value="10" selected>9:16 vertical ✓</option></select></div>
+        <div class="scorer-row"><label>2. Sound</label><select id="s2s"><option value="0">Silent / text only</option><option value="6">Voice-over</option><option value="10" selected>Voice + trending audio</option></select></div>
+        <div class="scorer-row"><label>3. Hook (first 3 seconds)</label><select id="s3s"><option value="0">Slow logo intro</option><option value="4">Product shot</option><option value="10" selected>Immediate action + question</option></select></div>
+        <div class="scorer-row"><label>4. Production feel</label><select id="s4s"><option value="0">Studio commercial</option><option value="6">Semi-polished</option><option value="10" selected>Phone-shot, native</option></select></div>
+        <div class="scorer-row"><label>5. Trending audio</label><select id="s5s"><option value="0">No music</option><option value="4">Any music</option><option value="10" selected>Current trending track</option></select></div>
+        <div class="scorer-row"><label>6. Text overlays</label><select id="s6s"><option value="0">None</option><option value="6">Some</option><option value="10" selected>Full captions + context</option></select></div>
+        <div class="scorer-row"><label>7. On-screen CTA</label><select id="s7s"><option value="0">None</option><option value="4">Voice CTA only</option><option value="10" selected>Bold on-screen "Shop Now"</option></select></div>
+
+        <div class="scorer-out">
+            <div style="display:flex; justify-content:space-between; margin-bottom:6px;"><span>Score</span><span id="scoreNum" style="font-weight:bold;">70/70</span></div>
+            <div class="scorer-bar"><div class="scorer-bar-fill" id="scoreBar" style="width:100%;"></div></div>
+            <div class="scorer-verdict green" id="scoreVerdict">✓ Ready to launch — hits all 7 non-negotiables</div>
+        </div>
+    </div>
+</section>
+
+<section id="s6">
+    <h2>6. Spark Ads — the killer feature</h2>
+    <div class="spark">
+        <h4>⚡ Spark Ads = boost an existing organic post as an ad</h4>
+        <p>The post keeps all its original likes, comments, and shares. Looks native because it IS native.</p>
+        <div class="flow">
+            <div class="box">🎥 Brian's organic video<br>10k views, 9% engagement</div>
+            <div class="arrow">→</div>
+            <div class="box">⚡ Add ad budget</div>
+            <div class="arrow">→</div>
+            <div class="box">📈 Reach 10k+ more<br>2–3× higher engagement</div>
+        </div>
+    </div>
+    <div class="callout tip"><strong>Brian's 3 best organic videos</strong> — shorts test, testimonials, unboxing — all become Spark Ads. His paid ads ARE his winning organic content.</div>
+</section>
+
+<section id="s7">
+    <h2>7. Pixel + Events API tracking</h2>
+    <ul>
+        <li><strong>TikTok Pixel</strong> — JavaScript on Shopify tracks ViewContent, AddToCart, InitiateCheckout, CompletePayment</li>
+        <li><strong>Events API</strong> — server-side stream directly from Shopify to TikTok (bypasses cookie blocking)</li>
+        <li><strong>Shopify integration</strong> — one-click install of both</li>
+    </ul>
+    <div class="callout warn"><strong>Do this BEFORE spending one shilling on ads.</strong> Untracked ads = flying blind.</div>
+</section>
+
+<section id="s8">
+    <h2>8. Self-check quiz</h2>
+
+    <div class="quiz-question" data-correct="A"><h4>1. Brian's target CPO objective?</h4><div class="options"><label><input type="radio" name="q1" value="A"> A) Product Sales — his Shopify checkout events</label><label><input type="radio" name="q1" value="B"> B) Reach</label><label><input type="radio" name="q1" value="C"> C) Video Views</label><label><input type="radio" name="q1" value="D"> D) App Promotion</label></div><div class="explanation">Correct — sales optimises for actual purchases.</div></div>
+
+    <div class="quiz-question" data-correct="B"><h4>2. TikTok Ads has how many levels?</h4><div class="options"><label><input type="radio" name="q2" value="A"> A) 2</label><label><input type="radio" name="q2" value="B"> B) 3 (Campaign → Ad Group → Ad)</label><label><input type="radio" name="q2" value="C"> C) 4</label><label><input type="radio" name="q2" value="D"> D) 5</label></div><div class="explanation">Correct — same as Meta.</div></div>
+
+    <div class="quiz-question" data-correct="D"><h4>3. Correct aspect ratio for TikTok?</h4><div class="options"><label><input type="radio" name="q3" value="A"> A) 16:9</label><label><input type="radio" name="q3" value="B"> B) 4:3</label><label><input type="radio" name="q3" value="C"> C) 1:1</label><label><input type="radio" name="q3" value="D"> D) 9:16 vertical</label></div><div class="explanation">Correct — anything else gets downgraded.</div></div>
+
+    <div class="quiz-question" data-correct="C"><h4>4. Percentage of TikTok users watching with sound?</h4><div class="options"><label><input type="radio" name="q4" value="A"> A) 12%</label><label><input type="radio" name="q4" value="B"> B) 50%</label><label><input type="radio" name="q4" value="C"> C) 88%</label><label><input type="radio" name="q4" value="D"> D) 3%</label></div><div class="explanation">Correct — silent-film cuts DO NOT WORK.</div></div>
+
+    <div class="quiz-question" data-correct="B"><h4>5. Hook must land in first…</h4><div class="options"><label><input type="radio" name="q5" value="A"> A) 10 seconds</label><label><input type="radio" name="q5" value="B"> B) 3 seconds</label><label><input type="radio" name="q5" value="C"> C) 30 seconds</label><label><input type="radio" name="q5" value="D"> D) 1 minute</label></div><div class="explanation">Correct — brutal attention span.</div></div>
+
+    <div class="quiz-question" data-correct="A"><h4>6. Spark Ad =</h4><div class="options"><label><input type="radio" name="q6" value="A"> A) Boost an existing organic post as an ad (keeps all likes/comments)</label><label><input type="radio" name="q6" value="B"> B) An ad with sparkles</label><label><input type="radio" name="q6" value="C"> C) An animation</label><label><input type="radio" name="q6" value="D"> D) A live stream</label></div><div class="explanation">Correct — the killer TikTok format.</div></div>
+
+    <div class="quiz-question" data-correct="C"><h4>7. Spark Ads engagement vs traditional ads?</h4><div class="options"><label><input type="radio" name="q7" value="A"> A) Same</label><label><input type="radio" name="q7" value="B"> B) Lower</label><label><input type="radio" name="q7" value="C"> C) 2–3× higher</label><label><input type="radio" name="q7" value="D"> D) 10× lower</label></div><div class="explanation">Correct — native authenticity wins.</div></div>
+
+    <div class="quiz-question" data-correct="D"><h4>8. TikTok Pixel tracks…</h4><div class="options"><label><input type="radio" name="q8" value="A"> A) Nothing</label><label><input type="radio" name="q8" value="B"> B) Only clicks</label><label><input type="radio" name="q8" value="C"> C) Only page views</label><label><input type="radio" name="q8" value="D"> D) ViewContent, AddToCart, InitiateCheckout, CompletePayment</label></div><div class="explanation">Correct — the full funnel.</div></div>
+
+    <div class="quiz-question" data-correct="A"><h4>9. Why polished studio ads fail on TikTok?</h4><div class="options"><label><input type="radio" name="q9" value="A"> A) Users skip anything that looks like an ad</label><label><input type="radio" name="q9" value="B"> B) They cost too much</label><label><input type="radio" name="q9" value="C"> C) They're illegal</label><label><input type="radio" name="q9" value="D"> D) Bad audio</label></div><div class="explanation">Correct — native beats polished on TikTok.</div></div>
+
+    <div class="quiz-question" data-correct="B"><h4>10. Brian's first campaign spend?</h4><div class="options"><label><input type="radio" name="q10" value="A"> A) KES 100,000</label><label><input type="radio" name="q10" value="B"> B) KES 7,000 (KES 500/day × 14 days)</label><label><input type="radio" name="q10" value="C"> C) KES 0</label><label><input type="radio" name="q10" value="D"> D) KES 1,000,000</label></div><div class="explanation">Correct — measured test before scaling.</div></div>
+
+    <div style="margin-top:20px;">
+        <button class="btn" onclick="markQuiz()">Mark my quiz</button>
+        <button class="btn reset" onclick="resetQuiz()">Reset</button>
+    </div>
+    <div class="quiz-summary" id="quizSummary"><div class="score" id="scoreDisplay">0 / 10</div><p id="scoreMessage"></p></div>
+</section>
+
+<footer><p>Lesson 5.6 — TikTok Ads Manager · MTTI · Handbook Part 5, §5.6</p><p>Next: <strong>Lesson 5.7 — Cross-Platform Quick Reference</strong></p></footer>
+</div>
+
+<script>
+function scoreAd() {
+    let total = 0;
+    for (let i = 1; i <= 7; i++) total += +document.getElementById('s' + i + 's').value;
+    document.getElementById('scoreNum').textContent = total + '/70';
+    document.getElementById('scoreBar').style.width = (total / 70 * 100) + '%';
+    const v = document.getElementById('scoreVerdict');
+    if (total >= 60) { v.className = 'scorer-verdict green'; v.textContent = '✓ Ready to launch — hits all/most 7 non-negotiables'; }
+    else if (total >= 40) { v.className = 'scorer-verdict amber'; v.textContent = '~ Marginal — fix the low-scoring items before running paid'; }
+    else { v.className = 'scorer-verdict red'; v.textContent = '✗ Will flop. Do not spend on this creative.'; }
+}
+document.querySelectorAll('.scorer select').forEach(el => el.addEventListener('change', scoreAd));
+scoreAd();
+
+function markQuiz() {
+    const qs = document.querySelectorAll('.quiz-question'); let s = 0;
+    qs.forEach((q, i) => { const c = q.dataset.correct; const p = q.querySelector(`input[name="q${i+1}"]:checked`); q.classList.remove('correct','wrong'); if (p && p.value === c) { q.classList.add('correct'); s++; } else if (p) q.classList.add('wrong'); });
+    const su = document.getElementById('quizSummary'); su.classList.add('show');
+    document.getElementById('scoreDisplay').textContent = `${s} / 10`;
+    document.getElementById('scoreMessage').textContent = s === 10 ? 'Perfect. Move to 5.7.' : s >= 7 ? 'Strong.' : 'Redo the scorer.';
+    su.scrollIntoView({behavior:'smooth',block:'center'});
+}
+function resetQuiz() { document.querySelectorAll('.quiz-question').forEach(q => { q.classList.remove('correct','wrong'); q.querySelectorAll('input[type=radio]').forEach(r => r.checked = false); }); document.getElementById('quizSummary').classList.remove('show'); }
+</script>
+</body></html>

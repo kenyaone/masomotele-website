@@ -3,89 +3,136 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Virtual Lab -- Basic Subnetting Practice -- Practical</title>
+<title>Virtual Lab -- Basic Subnetting Practice</title>
 <link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Fredoka:wght@500;600&display=swap" rel="stylesheet">
 <style>
 * { margin:0; padding:0; box-sizing:border-box; }
 body { font-family:'Segoe UI', -apple-system, sans-serif; background:linear-gradient(135deg,#1e293b,#0f172a); min-height:100vh; padding:20px; color:#e2e8f0; }
-.container { max-width:1000px; margin:0 auto; }
-.header { text-align:center; margin-bottom:20px; }
-.header .tag { display:inline-block; background:rgba(255,255,255,0.12); padding:6px 16px; border-radius:999px; font-size:0.85em; margin-bottom:10px; color:#fbbf24; }
+.container { max-width:900px; margin:0 auto; }
+.header { text-align:center; margin-bottom:18px; }
+.header .tag { display:inline-block; background:rgba(255,255,255,0.12); padding:6px 16px; border-radius:999px; font-size:0.85em; margin-bottom:10px; color:#86efac; }
 .header h1 { font-family:'Fredoka', sans-serif; font-size:2em; color:#fff; }
-.symptom-card { background:#fff; color:#1e293b; border-radius:16px; padding:20px 26px; margin-bottom:20px; box-shadow:0 15px 40px rgba(0,0,0,0.4); border-left:6px solid #dc2626; }
-.symptom-card h3 { color:#dc2626; margin-bottom:8px; font-family:'Fredoka', sans-serif; }
-.bench { background:#fff; color:#1e293b; border-radius:20px; padding:26px 30px; box-shadow:0 20px 60px rgba(0,0,0,0.4); }
-.bench h3 { font-family:'Fredoka', sans-serif; color:#387633; margin-bottom:14px; }
-.checks-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(220px,1fr)); gap:12px; margin-bottom:10px; }
-.check-btn { background:#f8fafc; border:2px solid #e2e8f0; border-radius:12px; padding:14px 16px; cursor:pointer; text-align:left; font-size:0.92em; font-weight:600; color:#334155; transition:all 0.2s; }
-.check-btn:hover:not(:disabled) { border-color:#387633; background:#e8f5e9; }
-.check-btn.checked { border-color:#059669; background:#ecfdf5; color:#065f46; }
-.check-btn.checked.lead { border-color:#387633; background:#e8f5e9; color:#1B5E20; }
-.finding { display:none; margin-top:8px; padding:10px 12px; border-radius:8px; font-size:0.85em; background:#f1f5f9; color:#334155; }
-.finding.show { display:block; }
-.check-wrap { display:flex; flex-direction:column; }
-.final-q { margin-top:22px; padding-top:22px; border-top:2px dashed #e2e8f0; }
-.final-q h4 { font-size:1.05em; margin-bottom:14px; color:#1e293b; }
+.intro-card { background:#fff; color:#1e293b; border-radius:14px; padding:18px 24px; margin-bottom:16px; box-shadow:0 15px 40px rgba(0,0,0,0.4); border-left:6px solid #059669; }
+.intro-card h3 { color:#059669; margin-bottom:6px; font-family:'Fredoka', sans-serif; }
+.panel { background:#0b1220; border:2px solid #334155; border-radius:10px; box-shadow:0 20px 60px rgba(0,0,0,0.5); overflow:hidden; margin-bottom:18px; }
+.panel-titlebar { background:#1e293b; padding:8px 16px; font-size:0.8em; color:#94a3b8; border-bottom:1px solid #334155; }
+.panel-body { padding:22px 26px; }
+.field { margin-bottom:16px; }
+.field label { display:block; font-size:0.85em; color:#93c5fd; margin-bottom:6px; font-weight:600; }
+.field input[type=text], .field input[type=number], .field select { width:100%; background:#1e293b; border:2px solid #334155; color:#e2e8f0; padding:10px 12px; border-radius:8px; font-size:0.95em; font-family:'Space Mono', monospace; }
+.field input:focus, .field select:focus { outline:none; border-color:#059669; }
+.field .checkbox-row { display:flex; align-items:center; gap:8px; }
+.field .checkbox-row input { width:auto; }
+.check-btn { background:linear-gradient(135deg,#059669,#047857); color:#fff; border:none; padding:12px 28px; border-radius:10px; font-size:0.95em; font-weight:700; cursor:pointer; font-family:'Fredoka', sans-serif; }
+.check-btn:hover { transform:scale(1.03); }
+.results { margin-top:18px; display:none; }
+.results.show { display:block; }
+.result-summary { padding:14px 18px; border-radius:10px; margin-bottom:12px; font-weight:700; }
+.result-summary.ok { background:#14532d; color:#86efac; }
+.result-summary.fail { background:#450a0a; color:#fca5a5; }
+.result-row { display:flex; justify-content:space-between; gap:10px; padding:8px 12px; border-radius:6px; font-size:0.85em; margin-bottom:4px; background:#1e293b; }
+.result-row.ok { border-left:3px solid #22c55e; }
+.result-row.fail { border-left:3px solid #ef4444; }
+.final-q { background:#fff; color:#1e293b; border-radius:16px; padding:22px 26px; box-shadow:0 20px 60px rgba(0,0,0,0.4); display:none; }
+.final-q.show { display:block; }
+.final-q h4 { font-size:1.05em; margin-bottom:14px; color:#1e293b; font-family:'Fredoka', sans-serif; }
 .options { display:flex; flex-direction:column; gap:10px; }
 .option { background:#f5f7fb; border:2px solid transparent; padding:14px 18px; border-radius:10px; cursor:pointer; font-size:0.95em; text-align:left; color:#334155; }
-.option:hover:not(.disabled) { background:#e8f5e9; border-color:#387633; }
+.option:hover:not(.disabled) { background:#ecfdf5; border-color:#059669; }
 .option.correct { background:#d4edda; border-color:#28a745; color:#155724; }
 .option.wrong { background:#f8d7da; border-color:#dc3545; color:#721c24; }
 .option.disabled { cursor:not-allowed; }
 .feedback { margin-top:16px; padding:16px 20px; border-radius:10px; font-size:0.95em; }
 .feedback.correct { background:#d4edda; color:#155724; border-left:4px solid #28a745; }
 .feedback.wrong { background:#f8d7da; color:#721c24; border-left:4px solid #dc3545; }
-.hint { margin-top:10px; font-size:0.82em; color:#92400e; background:#fffbeb; padding:8px 12px; border-radius:8px; display:none; }
-.hint.show { display:block; }
 </style>
 </head>
 <body>
 <div class="container">
-<div class="header"><div class="tag">Virtual Lab</div><h1>Virtual Lab -- Basic Subnetting Practice -- Practical</h1></div>
-<div class="symptom-card"><h3>🖥️ Customer's machine — reported symptom</h3><p>A client's network uses 192.168.10.0/26 for their new guest Wi-Fi subnet. James needs to work out the actual usable address range to configure the guest access point correctly.</p></div>
-<div class="bench">
-<h3>🔍 Run diagnostic checks (click each — order doesn't matter, but check at least 3 before you decide)</h3>
-<div class="checks-grid" id="checksGrid"></div>
-<div class="hint" id="hint">Run a few more checks before deciding — a good technician verifies before replacing parts.</div>
-<div class="final-q" id="finalQ" style="display:none;"></div>
+<div class="header"><div class="tag">Config Lab</div><h1>Virtual Lab -- Basic Subnetting Practice</h1></div>
+<div class="intro-card"><h3>📋 Task</h3><p>A client's network uses <strong>192.168.10.0/26</strong> for their new guest Wi-Fi subnet. Work out the real usable address range and enter it below -- this is genuinely calculated, not a fixed multiple choice, so it will check whatever you actually enter.</p></div>
+<div class="panel">
+<div class="panel-titlebar">Configuration -- simulated, no real device is changed</div>
+<div class="panel-body">
+<div id="fieldsWrap"></div>
+<button class="check-btn" onclick="checkConfig()">Check My Configuration</button>
+<div class="results" id="results"></div>
 </div>
+</div>
+<div class="final-q" id="finalQ"></div>
 </div>
 <script>
-const CHECKS = [{"label":"Recall how many usable addresses a /26 subnet provides","finding":"From the earlier lesson's table: a /26 subnet provides 62 usable addresses.","lead":true},{"label":"Identify the network address (the first address in the range)","finding":"The network address is 192.168.10.0 -- this address itself is reserved and not assignable to a device."},{"label":"Work out the broadcast address (the last address in the range)","finding":"For a /26 block starting at 192.168.10.0, the broadcast address is 192.168.10.63 -- also reserved, not assignable to a device."},{"label":"Determine the actual usable host range between those two reserved addresses","finding":"The usable range runs from 192.168.10.1 through 192.168.10.62."},{"label":"Double check the total matches the expected 62 usable addresses","finding":"192.168.10.1 through 192.168.10.62 is exactly 62 addresses, matching the expected count for a /26."}];
-const FINAL = {"text":"What is the correct usable address range for the guest Wi-Fi devices on 192.168.10.0/26?","options":["192.168.10.0 through 192.168.10.63","192.168.10.1 through 192.168.10.62","192.168.10.1 through 192.168.10.254","192.168.10.0 through 192.168.10.255"],"answer":1,"explanation":"192.168.10.0 is the reserved network address and 192.168.10.63 is the reserved broadcast address for this /26 block -- neither can be assigned to an actual device. The genuinely usable range for guest devices is 192.168.10.1 through 192.168.10.62, exactly 62 addresses, matching a /26's known capacity from the earlier lesson."};
-let checkedCount = 0;
-const grid = document.getElementById('checksGrid');
-CHECKS.forEach((c, i) => {
-    const wrap = document.createElement('div');
-    wrap.className = 'check-wrap';
-    const btn = document.createElement('button');
-    btn.className = 'check-btn';
-    btn.textContent = c.label;
-    btn.onclick = () => {
-        if (btn.classList.contains('checked')) return;
-        btn.classList.add('checked');
-        if (c.lead) btn.classList.add('lead');
-        finding.classList.add('show');
-        checkedCount++;
-        maybeShowFinal();
-    };
-    const finding = document.createElement('div');
-    finding.className = 'finding';
-    finding.textContent = c.finding;
-    wrap.appendChild(btn);
-    wrap.appendChild(finding);
-    grid.appendChild(wrap);
-});
-function maybeShowFinal() {
-    if (checkedCount >= 3) {
-        document.getElementById('hint').classList.remove('show');
-        renderFinal();
+const FIELDS = [{"id":"network","label":"Network address","type":"text","placeholder":"e.g. 192.168.10.0"},{"id":"broadcast","label":"Broadcast address","type":"text","placeholder":"e.g. 192.168.10.63"},{"id":"first_host","label":"First usable host address","type":"text","placeholder":""},{"id":"last_host","label":"Last usable host address","type":"text","placeholder":""}];
+const FINAL = {"text":"Why can neither the network address nor the broadcast address be assigned to an actual device?","options":["They can actually be assigned freely","The network address identifies the subnet itself, and the broadcast address is reserved for sending to every device on the subnet at once -- neither is a usable individual host address","Only the broadcast address is reserved, the network address is usable","There is no such thing as a reserved address"],"answer":1,"explanation":"Both ends of a subnet range are reserved for structural purposes -- the network address identifies the subnet as a whole, and the broadcast address reaches every device at once -- leaving only the addresses between them usable for actual devices."};
+
+const wrap = document.getElementById('fieldsWrap');
+FIELDS.forEach(f => {
+    const div = document.createElement('div');
+    div.className = 'field';
+    if (f.type === 'checkbox') {
+        div.innerHTML = `<div class="checkbox-row"><input type="checkbox" id="f_${f.id}"><label for="f_${f.id}" style="margin:0;">${f.label}</label></div>`;
+    } else if (f.type === 'select') {
+        let opts = (f.options || []).map(o => `<option value="${o}">${o}</option>`).join('');
+        div.innerHTML = `<label for="f_${f.id}">${f.label}</label><select id="f_${f.id}"><option value="">-- choose --</option>${opts}</select>`;
+    } else {
+        div.innerHTML = `<label for="f_${f.id}">${f.label}</label><input type="${f.type}" id="f_${f.id}" placeholder="${f.placeholder || ''}">`;
     }
+    wrap.appendChild(div);
+});
+
+function collectValues() {
+    const values = {};
+    FIELDS.forEach(f => {
+        const el = document.getElementById('f_' + f.id);
+        values[f.id] = f.type === 'checkbox' ? el.checked : el.value;
+    });
+    return values;
 }
+
+function evaluate(values) {
+    // Real bitwise computation for 192.168.10.0/26, independent of any
+    // hard-coded answer -- if this scenario's IP/CIDR ever changes, this
+    // still computes the genuinely correct values.
+    const base = [192, 168, 10, 0];
+    const cidr = 26;
+    const ipInt = ((base[0] << 24) | (base[1] << 16) | (base[2] << 8) | base[3]) >>> 0;
+    const maskInt = (0xFFFFFFFF << (32 - cidr)) >>> 0;
+    const netInt = (ipInt & maskInt) >>> 0;
+    const bcastInt = (netInt | (~maskInt >>> 0)) >>> 0;
+    const toIp = n => [(n >>> 24) & 255, (n >>> 16) & 255, (n >>> 8) & 255, n & 255].join('.');
+    const expected = {
+        network: toIp(netInt),
+        broadcast: toIp(bcastInt),
+        first_host: toIp(netInt + 1),
+        last_host: toIp(bcastInt - 1),
+    };
+    const details = [];
+    let allOk = true;
+    ['network','broadcast','first_host','last_host'].forEach(key => {
+        const you = (values[key] || '').trim();
+        const ok = you === expected[key];
+        if (!ok) allOk = false;
+        details.push({ ok, label: key.replace('_',' '), you: you || '(blank)', expected: expected[key] });
+    });
+    return { ok: allOk, summary: allOk ? 'All four values are correct.' : 'One or more values are not correct yet -- check the rows below.', details };
+}
+
+function checkConfig() {
+    const values = collectValues();
+    const result = evaluate(values);
+    const box = document.getElementById('results');
+    box.classList.add('show');
+    let html = `<div class="result-summary ${result.ok ? 'ok' : 'fail'}">${result.ok ? '✅' : '⚠️'} ${result.summary}</div>`;
+    (result.details || []).forEach(d => {
+        html += `<div class="result-row ${d.ok ? 'ok' : 'fail'}"><span>${d.label}</span><span>${d.ok ? '✓' : ('you: ' + d.you + ' -- expected: ' + d.expected)}</span></div>`;
+    });
+    box.innerHTML = html;
+    document.getElementById('finalQ').classList.add('show');
+}
+
 function renderFinal() {
     const fq = document.getElementById('finalQ');
-    fq.style.display = 'block';
-    let html = `<h4>🛠️ Based on what you found — what's the actual fix?</h4><div class="options">`;
+    let html = '<h4>🛠️ Final check</h4><div class="options">';
     FINAL.options.forEach((o, i) => { html += `<button class="option" onclick="selectFinal(${i})">${o}</button>`; });
     html += '</div>';
     fq.innerHTML = html;
@@ -98,10 +145,10 @@ function selectFinal(i) {
     if (!right) btns[i].classList.add('wrong');
     const fb = document.createElement('div');
     fb.className = 'feedback ' + (right ? 'correct' : 'wrong');
-    fb.innerHTML = `<strong>${right ? '✅ Correct diagnosis.' : '❌ Not the actual fault.'}</strong><br>${FINAL.explanation}`;
+    fb.innerHTML = `<strong>${right ? '✅ Correct.' : '❌ Not quite.'}</strong><br>${FINAL.explanation}`;
     document.getElementById('finalQ').appendChild(fb);
 }
-document.getElementById('hint').classList.add('show');
+renderFinal();
 </script>
 </body>
 </html>

@@ -3,89 +3,229 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Virtual Lab -- Identify the OSI Layer -- Practical</title>
-<link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Fredoka:wght@500;600&display=swap" rel="stylesheet">
+<title>Virtual Lab -- Identify the OSI Layer</title>
+<link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Fredoka:wght@500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
 <style>
 * { margin:0; padding:0; box-sizing:border-box; }
 body { font-family:'Segoe UI', -apple-system, sans-serif; background:linear-gradient(135deg,#1e293b,#0f172a); min-height:100vh; padding:20px; color:#e2e8f0; }
 .container { max-width:1000px; margin:0 auto; }
-.header { text-align:center; margin-bottom:20px; }
-.header .tag { display:inline-block; background:rgba(255,255,255,0.12); padding:6px 16px; border-radius:999px; font-size:0.85em; margin-bottom:10px; color:#fbbf24; }
+.header { text-align:center; margin-bottom:18px; }
+.header .tag { display:inline-block; background:rgba(255,255,255,0.12); padding:6px 16px; border-radius:999px; font-size:0.85em; margin-bottom:10px; color:#93c5fd; }
 .header h1 { font-family:'Fredoka', sans-serif; font-size:2em; color:#fff; }
-.symptom-card { background:#fff; color:#1e293b; border-radius:16px; padding:20px 26px; margin-bottom:20px; box-shadow:0 15px 40px rgba(0,0,0,0.4); border-left:6px solid #dc2626; }
-.symptom-card h3 { color:#dc2626; margin-bottom:8px; font-family:'Fredoka', sans-serif; }
-.bench { background:#fff; color:#1e293b; border-radius:20px; padding:26px 30px; box-shadow:0 20px 60px rgba(0,0,0,0.4); }
-.bench h3 { font-family:'Fredoka', sans-serif; color:#387633; margin-bottom:14px; }
-.checks-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(220px,1fr)); gap:12px; margin-bottom:10px; }
-.check-btn { background:#f8fafc; border:2px solid #e2e8f0; border-radius:12px; padding:14px 16px; cursor:pointer; text-align:left; font-size:0.92em; font-weight:600; color:#334155; transition:all 0.2s; }
-.check-btn:hover:not(:disabled) { border-color:#387633; background:#e8f5e9; }
-.check-btn.checked { border-color:#059669; background:#ecfdf5; color:#065f46; }
-.check-btn.checked.lead { border-color:#387633; background:#e8f5e9; color:#1B5E20; }
-.finding { display:none; margin-top:8px; padding:10px 12px; border-radius:8px; font-size:0.85em; background:#f1f5f9; color:#334155; }
-.finding.show { display:block; }
-.check-wrap { display:flex; flex-direction:column; }
-.final-q { margin-top:22px; padding-top:22px; border-top:2px dashed #e2e8f0; }
-.final-q h4 { font-size:1.05em; margin-bottom:14px; color:#1e293b; }
+.intro-card { background:#fff; color:#1e293b; border-radius:14px; padding:18px 24px; margin-bottom:16px; box-shadow:0 15px 40px rgba(0,0,0,0.4); border-left:6px solid #2563eb; }
+.intro-card h3 { color:#2563eb; margin-bottom:6px; font-family:'Fredoka', sans-serif; }
+.terminal { background:#0b1220; border:2px solid #334155; border-radius:10px; box-shadow:0 20px 60px rgba(0,0,0,0.5); overflow:hidden; margin-bottom:18px; }
+.term-titlebar { background:#1e293b; padding:8px 16px; font-size:0.8em; color:#94a3b8; border-bottom:1px solid #334155; display:flex; justify-content:space-between; }
+.term-body { padding:16px 20px; font-family:'JetBrains Mono', 'Courier New', monospace; font-size:0.88em; line-height:1.6; height:340px; overflow-y:auto; }
+.term-line { white-space:pre-wrap; word-break:break-word; }
+.term-line.cmd { color:#93c5fd; }
+.term-line.out { color:#cbd5e1; }
+.term-line.err { color:#fca5a5; }
+.term-line.ok { color:#86efac; }
+.term-input-row { display:flex; align-items:center; padding:10px 20px 16px; font-family:'JetBrains Mono', 'Courier New', monospace; font-size:0.88em; }
+.term-prompt { color:#22c55e; margin-right:8px; white-space:nowrap; }
+.term-input { flex:1; background:transparent; border:none; outline:none; color:#e2e8f0; font-family:inherit; font-size:1em; }
+.help-strip { font-size:0.8em; color:#64748b; padding:0 20px 14px; }
+.help-strip code { color:#93c5fd; }
+.final-q { background:#fff; color:#1e293b; border-radius:16px; padding:22px 26px; box-shadow:0 20px 60px rgba(0,0,0,0.4); }
+.final-q h4 { font-size:1.05em; margin-bottom:14px; color:#1e293b; font-family:'Fredoka', sans-serif; }
 .options { display:flex; flex-direction:column; gap:10px; }
 .option { background:#f5f7fb; border:2px solid transparent; padding:14px 18px; border-radius:10px; cursor:pointer; font-size:0.95em; text-align:left; color:#334155; }
-.option:hover:not(.disabled) { background:#e8f5e9; border-color:#387633; }
+.option:hover:not(.disabled) { background:#eff6ff; border-color:#2563eb; }
 .option.correct { background:#d4edda; border-color:#28a745; color:#155724; }
 .option.wrong { background:#f8d7da; border-color:#dc3545; color:#721c24; }
 .option.disabled { cursor:not-allowed; }
 .feedback { margin-top:16px; padding:16px 20px; border-radius:10px; font-size:0.95em; }
 .feedback.correct { background:#d4edda; color:#155724; border-left:4px solid #28a745; }
 .feedback.wrong { background:#f8d7da; color:#721c24; border-left:4px solid #dc3545; }
-.hint { margin-top:10px; font-size:0.82em; color:#92400e; background:#fffbeb; padding:8px 12px; border-radius:8px; display:none; }
-.hint.show { display:block; }
 </style>
 </head>
 <body>
 <div class="container">
-<div class="header"><div class="tag">Virtual Lab</div><h1>Virtual Lab -- Identify the OSI Layer -- Practical</h1></div>
-<div class="symptom-card"><h3>🖥️ Customer's machine — reported symptom</h3><p>A staff member at a client office says: "I can open some websites but not others, and my colleague right next to me has no problem with any of them."</p></div>
-<div class="bench">
-<h3>🔍 Run diagnostic checks (click each — order doesn't matter, but check at least 3 before you decide)</h3>
-<div class="checks-grid" id="checksGrid"></div>
-<div class="hint" id="hint">Run a few more checks before deciding — a good technician verifies before replacing parts.</div>
-<div class="final-q" id="finalQ" style="display:none;"></div>
+<div class="header"><div class="tag">CLI Simulator</div><h1>Virtual Lab -- Identify the OSI Layer</h1></div>
+<div class="intro-card"><h3>🖥️ Situation</h3><p>A staff member says: "I can open some websites but not others, and my colleague right next to me has no problem with any of them." Use the terminal to gather real evidence before deciding which OSI layer the fault is at.</p></div>
+<div class="terminal">
+<div class="term-titlebar"><span>Command Prompt -- simulated, no real network is touched</span><span id="promptHost"></span></div>
+<div class="term-body" id="termBody"></div>
+<div class="term-input-row"><span class="term-prompt" id="promptLabel">&gt;</span><input type="text" class="term-input" id="termInput" autocomplete="off" spellcheck="false" placeholder="Type a command and press Enter..."></div>
+<div class="help-strip">Try: <code>help</code>, <code>ipconfig</code>, <code>ping &lt;target&gt;</code>, <code>tracert &lt;target&gt;</code>, <code>nslookup &lt;name&gt;</code>, <code>subnetcalc &lt;ip&gt;/&lt;cidr&gt;</code>, <code>clear</code></div>
 </div>
+<div class="final-q" id="finalQ"></div>
 </div>
 <script>
-const CHECKS = [{"label":"Check the physical cable and network adapter status","finding":"Cable connected, network adapter shows a healthy, active connection -- no Layer 1 issue apparent."},{"label":"Check whether the device has a valid IP address on the local network","finding":"IP address is valid and correctly matches the local network range."},{"label":"Try accessing the failing websites by typing their raw IP address instead of the domain name","finding":"The websites load successfully when accessed by raw IP address instead of by name.","lead":true},{"label":"Compare DNS server settings between this device and the working colleague's device","finding":"This device is using a different, misconfigured DNS server; the colleague's device uses the correct one."},{"label":"Check Layer 2 connectivity by pinging another device on the same local network","finding":"Ping to another local device succeeds normally."}];
-const FINAL = {"text":"Based on the evidence, which layer does this problem actually belong to?","options":["Layer 1, Physical","Layer 2, Data Link","Layer 7, Application (specifically a DNS/name-resolution problem)","Layer 4, Transport"],"answer":2,"explanation":"Websites working by raw IP address but failing by name is the signature symptom of a DNS problem -- name resolution is an application-layer service. Layers 1, 2 and 3 all tested healthy (cable fine, valid IP, local ping succeeds), correctly ruling them out before landing on the real cause."};
-let checkedCount = 0;
-const grid = document.getElementById('checksGrid');
-CHECKS.forEach((c, i) => {
-    const wrap = document.createElement('div');
-    wrap.className = 'check-wrap';
-    const btn = document.createElement('button');
-    btn.className = 'check-btn';
-    btn.textContent = c.label;
-    btn.onclick = () => {
-        if (btn.classList.contains('checked')) return;
-        btn.classList.add('checked');
-        if (c.lead) btn.classList.add('lead');
-        finding.classList.add('show');
-        checkedCount++;
-        maybeShowFinal();
-    };
-    const finding = document.createElement('div');
-    finding.className = 'finding';
-    finding.textContent = c.finding;
-    wrap.appendChild(btn);
-    wrap.appendChild(finding);
-    grid.appendChild(wrap);
-});
-function maybeShowFinal() {
-    if (checkedCount >= 3) {
-        document.getElementById('hint').classList.remove('show');
-        renderFinal();
-    }
+const STATE = {"prompt":"C:\\>","initial_ipconfig":{"adapter":"Ethernet adapter Local Area Connection","ipv4":"192.168.1.42","mask":"255.255.255.0","gateway":"192.168.1.1"},"ping_targets":{"192.168.1.1":{"success":true,"min_ms":1,"max_ms":3},"8.8.8.8":{"success":true,"min_ms":10,"max_ms":18},"example-shop.com":{"success":false,"message":"Ping request could not find host example-shop.com. Please check the name and try again."}},"nslookup_targets":{"example-shop.com":{"success":false}}};
+const FINAL = {"text":"Based on the commands you ran, which layer does this problem belong to?","options":["Layer 1, Physical","Layer 2, Data Link","Layer 7, Application (specifically a DNS/name-resolution problem)","Layer 4, Transport"],"answer":2,"explanation":"Ping to the gateway and to a raw external IP (8.8.8.8) both succeed, ruling out Layers 1-3. Ping and nslookup both fail specifically for the domain name, the classic signature of a DNS (application-layer) problem, not a lower-layer fault."};
+const body = document.getElementById('termBody');
+const input = document.getElementById('termInput');
+let dhcpRenewed = false;
+
+function print(text, cls) {
+    const div = document.createElement('div');
+    div.className = 'term-line ' + (cls || 'out');
+    div.textContent = text;
+    body.appendChild(div);
+    body.scrollTop = body.scrollHeight;
 }
+function printEmpty() { print('', 'out'); }
+
+function currentIpconfig() {
+    return (dhcpRenewed && STATE.renewed_ipconfig) ? STATE.renewed_ipconfig : STATE.initial_ipconfig;
+}
+
+function cmdIpconfig(args) {
+    const cfg = currentIpconfig();
+    if (args.includes('/release')) {
+        print('Ethernet adapter: IPv4 Address released.', 'out');
+        return;
+    }
+    if (args.includes('/renew')) {
+        print('Ethernet adapter: Renewing IP address...', 'out');
+        if (STATE.dhcp_fixed_after_renew && STATE.renewed_ipconfig) {
+            dhcpRenewed = true;
+            print('Successfully obtained a new address.', 'ok');
+        } else {
+            print('Unable to contact your DHCP server. Request timed out.', 'err');
+        }
+        return;
+    }
+    if (cfg.media_disconnected) {
+        print((cfg.adapter || 'Ethernet adapter Local Area Connection') + ':', 'out');
+        print('   Media State . . . . . . . . . . . : Media disconnected', 'err');
+        return;
+    }
+    print((cfg.adapter || 'Ethernet adapter Local Area Connection') + ':', 'out');
+    print('   IPv4 Address. . . . . . . . . . . : ' + cfg.ipv4, 'out');
+    print('   Subnet Mask . . . . . . . . . . . : ' + cfg.mask, 'out');
+    print('   Default Gateway . . . . . . . . . : ' + (cfg.gateway || '(none)'), 'out');
+}
+
+function randInt(min, max) { return Math.floor(Math.random() * (max - min + 1)) + min; }
+
+function cmdPing(target) {
+    if (!target) { print('Usage: ping <target>', 'err'); return; }
+    const t = (STATE.ping_targets || {})[target];
+    if (!t) {
+        print('Ping request could not find host ' + target + '. Please check the name and try again.', 'err');
+        return;
+    }
+    print('Pinging ' + target + ' with 32 bytes of data:', 'out');
+    if (!t.success && !t.pattern) {
+        for (let i = 0; i < 4; i++) print(t.message || 'Request timed out.', 'err');
+        return;
+    }
+    let total = 0, received = 0;
+    const pattern = t.pattern || [true, true, true, true];
+    pattern.forEach(ok => {
+        if (ok) {
+            const ms = randInt(t.min_ms || 1, t.max_ms || 20);
+            total += ms; received++;
+            print('Reply from ' + target + ': bytes=32 time=' + ms + 'ms TTL=64', 'ok');
+        } else {
+            print(t.message || 'Request timed out.', 'err');
+        }
+    });
+    printEmpty();
+    const lostPct = Math.round(((pattern.length - received) / pattern.length) * 100);
+    print('Ping statistics: Packets: Sent = ' + pattern.length + ', Received = ' + received + ', Lost = ' + (pattern.length - received) + ' (' + lostPct + '% loss)', lostPct > 0 ? 'err' : 'out');
+    if (received === 0) return;
+    print('Approximate round trip: Average = ' + Math.round(total / received) + 'ms', 'out');
+}
+
+function cmdTracert(target) {
+    if (!target) { print('Usage: tracert <target>', 'err'); return; }
+    const hops = (STATE.tracert_targets || {})[target];
+    if (!hops) { print('Unable to resolve target system name ' + target + '.', 'err'); return; }
+    print('Tracing route to ' + target + ' over a maximum of 30 hops:', 'out');
+    hops.forEach((hop, i) => {
+        if (hop.ip === '*') { print((i + 1) + '    *        *        *     Request timed out.', 'err'); return; }
+        const times = (hop.ms || [randInt(1, 10), randInt(1, 10), randInt(1, 10)]).map(m => m + ' ms').join('    ');
+        print((i + 1) + '    ' + times + '    ' + hop.ip, 'out');
+    });
+    print('Trace complete.', 'out');
+}
+
+function cmdNslookup(target) {
+    if (!target) { print('Usage: nslookup <name>', 'err'); return; }
+    const r = (STATE.nslookup_targets || {})[target];
+    if (!r || !r.success) { print('*** Request to ' + target + ' timed out', 'err'); return; }
+    print('Server:  ' + (STATE.dns_server || 'dns.local'), 'out');
+    print('Address:  ' + (STATE.dns_server_ip || '192.168.1.1'), 'out');
+    printEmpty();
+    print('Non-authoritative answer:', 'out');
+    print('Name:    ' + target, 'out');
+    print('Address:  ' + r.ip, 'ok');
+}
+
+// Real bitwise subnet math -- works for any IP/CIDR the student types.
+function cmdSubnetcalc(arg) {
+    const m = /^(\d{1,3})\.(\d{1,3})\.(\d{1,3})\.(\d{1,3})\/(\d{1,2})$/.exec(arg || '');
+    if (!m) { print('Usage: subnetcalc <ip>/<cidr>, e.g. subnetcalc 192.168.10.0/26', 'err'); return; }
+    const octets = [1, 2, 3, 4].map(i => parseInt(m[i], 10));
+    const cidr = parseInt(m[5], 10);
+    if (octets.some(o => o > 255) || cidr < 0 || cidr > 32) { print('Invalid IP address or CIDR value.', 'err'); return; }
+    const ipInt = ((octets[0] << 24) | (octets[1] << 16) | (octets[2] << 8) | octets[3]) >>> 0;
+    const maskInt = cidr === 0 ? 0 : (0xFFFFFFFF << (32 - cidr)) >>> 0;
+    const netInt = (ipInt & maskInt) >>> 0;
+    const bcastInt = (netInt | (~maskInt >>> 0)) >>> 0;
+    const toIp = n => [(n >>> 24) & 255, (n >>> 16) & 255, (n >>> 8) & 255, n & 255].join('.');
+    const totalHosts = Math.pow(2, 32 - cidr);
+    const usable = cidr >= 31 ? 0 : totalHosts - 2;
+    print('Network address:    ' + toIp(netInt) + '/' + cidr, 'ok');
+    print('Subnet mask:        ' + toIp(maskInt), 'out');
+    print('Broadcast address:  ' + toIp(bcastInt), 'ok');
+    if (usable > 0) {
+        print('Usable host range:  ' + toIp(netInt + 1) + ' - ' + toIp(bcastInt - 1), 'ok');
+    } else {
+        print('Usable host range:  none (point-to-point /' + cidr + ' link)', 'out');
+    }
+    print('Usable hosts:       ' + usable, 'out');
+}
+
+function runCommand(raw) {
+    print((document.getElementById('promptLabel').textContent) + ' ' + raw, 'cmd');
+    const parts = raw.trim().split(/\s+/).filter(Boolean);
+    if (parts.length === 0) return;
+    const cmd = parts[0].toLowerCase();
+    const rest = parts.slice(1);
+    if (cmd === 'help') {
+        print('Available commands:', 'out');
+        print('  ipconfig [/release | /renew]   -- show or renew this machine\'s network config', 'out');
+        print('  ping <target>                  -- test reachability of an address or name', 'out');
+        print('  tracert <target>               -- show the path to a destination', 'out');
+        print('  nslookup <name>                -- resolve a domain name to an IP', 'out');
+        print('  subnetcalc <ip>/<cidr>          -- calculate network/broadcast/usable range for any subnet', 'out');
+        print('  clear                          -- clear the screen', 'out');
+    } else if (cmd === 'clear') {
+        body.innerHTML = '';
+    } else if (cmd === 'ipconfig') {
+        cmdIpconfig(rest);
+    } else if (cmd === 'ping') {
+        cmdPing(rest[0]);
+    } else if (cmd === 'tracert') {
+        cmdTracert(rest[0]);
+    } else if (cmd === 'nslookup') {
+        cmdNslookup(rest[0]);
+    } else if (cmd === 'subnetcalc') {
+        cmdSubnetcalc(rest[0]);
+    } else {
+        print('\'' + cmd + '\' is not recognized as a command. Type \'help\' for a list of commands.', 'err');
+    }
+    printEmpty();
+}
+
+input.addEventListener('keydown', e => {
+    if (e.key === 'Enter' && input.value.trim() !== '') {
+        runCommand(input.value);
+        input.value = '';
+    }
+});
+document.getElementById('promptLabel').textContent = STATE.prompt || 'C:\\>';
+print('Simulated command prompt ready. Type help to see available commands.', 'out');
+printEmpty();
+
 function renderFinal() {
     const fq = document.getElementById('finalQ');
-    fq.style.display = 'block';
-    let html = `<h4>🛠️ Based on what you found — what's the actual fix?</h4><div class="options">`;
+    let html = '<h4>🛠️ Based on what the commands showed you -- what is the actual issue?</h4><div class="options">';
     FINAL.options.forEach((o, i) => { html += `<button class="option" onclick="selectFinal(${i})">${o}</button>`; });
     html += '</div>';
     fq.innerHTML = html;
@@ -101,7 +241,8 @@ function selectFinal(i) {
     fb.innerHTML = `<strong>${right ? '✅ Correct diagnosis.' : '❌ Not the actual fault.'}</strong><br>${FINAL.explanation}`;
     document.getElementById('finalQ').appendChild(fb);
 }
-document.getElementById('hint').classList.add('show');
+renderFinal();
+input.focus();
 </script>
 </body>
 </html>

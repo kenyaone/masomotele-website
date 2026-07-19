@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Virtual Lab -- Choosing the Right PPE -- Practical</title>
+<link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Fredoka:wght@500;600&display=swap" rel="stylesheet">
+<style>
+* { margin:0; padding:0; box-sizing:border-box; }
+body { font-family:'Segoe UI', -apple-system, sans-serif; background:linear-gradient(135deg,#1e293b,#0f172a); min-height:100vh; padding:20px; color:#e2e8f0; }
+.container { max-width:1000px; margin:0 auto; }
+.header { text-align:center; margin-bottom:20px; }
+.header .tag { display:inline-block; background:rgba(255,255,255,0.12); padding:6px 16px; border-radius:999px; font-size:0.85em; margin-bottom:10px; color:#fbbf24; }
+.header h1 { font-family:'Fredoka', sans-serif; font-size:2em; color:#fff; }
+.symptom-card { background:#fff; color:#1e293b; border-radius:16px; padding:20px 26px; margin-bottom:20px; box-shadow:0 15px 40px rgba(0,0,0,0.4); border-left:6px solid #dc2626; }
+.symptom-card h3 { color:#dc2626; margin-bottom:8px; font-family:'Fredoka', sans-serif; }
+.bench { background:#fff; color:#1e293b; border-radius:20px; padding:26px 30px; box-shadow:0 20px 60px rgba(0,0,0,0.4); }
+.bench h3 { font-family:'Fredoka', sans-serif; color:#387633; margin-bottom:14px; }
+.checks-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(220px,1fr)); gap:12px; margin-bottom:10px; }
+.check-btn { background:#f8fafc; border:2px solid #e2e8f0; border-radius:12px; padding:14px 16px; cursor:pointer; text-align:left; font-size:0.92em; font-weight:600; color:#334155; transition:all 0.2s; }
+.check-btn:hover:not(:disabled) { border-color:#387633; background:#e8f5e9; }
+.check-btn.checked { border-color:#059669; background:#ecfdf5; color:#065f46; }
+.check-btn.checked.lead { border-color:#387633; background:#e8f5e9; color:#1B5E20; }
+.finding { display:none; margin-top:8px; padding:10px 12px; border-radius:8px; font-size:0.85em; background:#f1f5f9; color:#334155; }
+.finding.show { display:block; }
+.check-wrap { display:flex; flex-direction:column; }
+.final-q { margin-top:22px; padding-top:22px; border-top:2px dashed #e2e8f0; }
+.final-q h4 { font-size:1.05em; margin-bottom:14px; color:#1e293b; }
+.options { display:flex; flex-direction:column; gap:10px; }
+.option { background:#f5f7fb; border:2px solid transparent; padding:14px 18px; border-radius:10px; cursor:pointer; font-size:0.95em; text-align:left; color:#334155; }
+.option:hover:not(.disabled) { background:#e8f5e9; border-color:#387633; }
+.option.correct { background:#d4edda; border-color:#28a745; color:#155724; }
+.option.wrong { background:#f8d7da; border-color:#dc3545; color:#721c24; }
+.option.disabled { cursor:not-allowed; }
+.feedback { margin-top:16px; padding:16px 20px; border-radius:10px; font-size:0.95em; }
+.feedback.correct { background:#d4edda; color:#155724; border-left:4px solid #28a745; }
+.feedback.wrong { background:#f8d7da; color:#721c24; border-left:4px solid #dc3545; }
+.hint { margin-top:10px; font-size:0.82em; color:#92400e; background:#fffbeb; padding:8px 12px; border-radius:8px; display:none; }
+.hint.show { display:block; }
+</style>
+</head>
+<body>
+<div class="container">
+<div class="header"><div class="tag">Virtual Lab</div><h1>Virtual Lab -- Choosing the Right PPE -- Practical</h1></div>
+<div class="symptom-card"><h3>🖥️ Customer's machine — reported symptom</h3><p>Mercy is about to assist with changing the dressing on a patient's wound that has some visible drainage. There is a realistic chance of contact with body fluids, but no reason to expect splashing to the face or heavy soiling of clothing.</p></div>
+<div class="bench">
+<h3>🔍 Run diagnostic checks (click each — order doesn't matter, but check at least 3 before you decide)</h3>
+<div class="checks-grid" id="checksGrid"></div>
+<div class="hint" id="hint">Run a few more checks before deciding — a good technician verifies before replacing parts.</div>
+<div class="final-q" id="finalQ" style="display:none;"></div>
+</div>
+</div>
+<script>
+const CHECKS = [{"id":"gloves","label":"Put on gloves","finding":"Correct -- gloves are the minimum requirement here since direct contact with wound drainage is expected."},{"id":"apron","label":"Put on a full protective apron","finding":"Not necessary for this specific task -- there's no expectation of splashing or heavy soiling that would require an apron on top of gloves."},{"id":"mask_eye","label":"Put on a mask and eye protection","finding":"Not necessary here -- there's no expectation of splashing to the face for this particular dressing change."},{"id":"handwash","label":"Perform hand hygiene before and after the task, regardless of glove use","finding":"Correct and essential -- hand hygiene is required before AND after glove use, not replaced by it."}];
+const FINAL = {"text":"For this specific dressing change (drainage present, no splash/heavy-soiling risk), what is the correctly matched PPE choice?","options":["Full PPE -- gloves, apron, mask and eye protection every time, regardless of the specific task","Gloves, combined with proper hand hygiene before and after -- matched to the actual risk of this specific task, without unnecessary extra PPE","No PPE at all, since the patient is already known","Only a mask, since infection is airborne"],"answer":1,"explanation":"PPE choice should match the actual risk of the specific task -- here, contact with drainage justifies gloves, but there's no splash or heavy-soiling risk that would justify an apron, mask or eye protection. Hand hygiene is required regardless of glove use, not replaced by it."};
+let checkedCount = 0;
+const grid = document.getElementById('checksGrid');
+CHECKS.forEach((c, i) => {
+    const wrap = document.createElement('div');
+    wrap.className = 'check-wrap';
+    const btn = document.createElement('button');
+    btn.className = 'check-btn';
+    btn.textContent = c.label;
+    btn.onclick = () => {
+        if (btn.classList.contains('checked')) return;
+        btn.classList.add('checked');
+        if (c.lead) btn.classList.add('lead');
+        finding.classList.add('show');
+        checkedCount++;
+        maybeShowFinal();
+    };
+    const finding = document.createElement('div');
+    finding.className = 'finding';
+    finding.textContent = c.finding;
+    wrap.appendChild(btn);
+    wrap.appendChild(finding);
+    grid.appendChild(wrap);
+});
+function maybeShowFinal() {
+    if (checkedCount >= 3) {
+        document.getElementById('hint').classList.remove('show');
+        renderFinal();
+    }
+}
+function renderFinal() {
+    const fq = document.getElementById('finalQ');
+    fq.style.display = 'block';
+    let html = `<h4>🛠️ Based on what you found — what's the actual fix?</h4><div class="options">`;
+    FINAL.options.forEach((o, i) => { html += `<button class="option" onclick="selectFinal(${i})">${o}</button>`; });
+    html += '</div>';
+    fq.innerHTML = html;
+}
+function selectFinal(i) {
+    const btns = document.querySelectorAll('#finalQ .option');
+    btns.forEach(b => b.classList.add('disabled'));
+    btns[FINAL.answer].classList.add('correct');
+    const right = i === FINAL.answer;
+    if (!right) btns[i].classList.add('wrong');
+    const fb = document.createElement('div');
+    fb.className = 'feedback ' + (right ? 'correct' : 'wrong');
+    fb.innerHTML = `<strong>${right ? '✅ Correct diagnosis.' : '❌ Not the actual fault.'}</strong><br>${FINAL.explanation}`;
+    document.getElementById('finalQ').appendChild(fb);
+}
+document.getElementById('hint').classList.add('show');
+</script>
+</body>
+</html>

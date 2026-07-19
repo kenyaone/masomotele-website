@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>DHCP and DNS Fundamentals</title>
+<link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Fredoka:wght@500;600&display=swap" rel="stylesheet">
+<style>
+* { margin:0; padding:0; box-sizing:border-box; }
+body { font-family:'Segoe UI', -apple-system, sans-serif; line-height:1.6; color:#1e293b; background:#f8fafc; }
+.container { max-width:1000px; margin:0 auto; padding:20px; }
+header { background:linear-gradient(135deg,#387633,#259BD7); color:#fff; padding:36px 30px; border-radius:12px; margin-bottom:22px; box-shadow:0 10px 30px rgba(56,118,51,0.25); }
+header .badge { display:inline-block; background:rgba(255,255,255,0.2); padding:4px 14px; border-radius:16px; font-size:12px; font-weight:bold; letter-spacing:1px; margin-bottom:12px; }
+header h1 { font-size:30px; margin-bottom:8px; }
+section { background:#fff; border:1px solid #e2e8f0; border-radius:10px; padding:24px 28px; margin-bottom:20px; }
+section h2 { color:#387633; font-size:21px; margin-bottom:12px; padding-bottom:8px; border-bottom:3px solid #387633; }
+section h3 { color:#0f172a; font-size:16px; margin:16px 0 8px; }
+section p { margin-bottom:12px; }
+section ul, section ol { padding-left:22px; margin-bottom:12px; }
+section li { margin-bottom:5px; }
+.callout { border-left:5px solid #387633; background:#e8f5e9; padding:14px 18px; margin:14px 0; border-radius:4px; }
+.callout.tip { border-left-color:#059669; background:#ecfdf5; }
+.callout.warn { border-left-color:#dc2626; background:#fef2f2; }
+.callout strong { color:#1B5E20; }
+.callout.tip strong { color:#065f46; }
+.callout.warn strong { color:#991b1b; }
+.tech-card { background:linear-gradient(135deg,#fef3c7,#fde68a); border-radius:10px; padding:16px 20px; display:flex; gap:14px; align-items:flex-start; margin:14px 0; }
+.tech-avatar { width:52px; height:52px; border-radius:50%; background:#387633; color:#fff; display:flex; align-items:center; justify-content:center; font-size:22px; font-weight:bold; flex-shrink:0; }
+.tech-card p { color:#259BD7; margin:0; font-size:14px; }
+table { width:100%; border-collapse:collapse; margin:14px 0; font-size:13.5px; }
+th { background:#e8f5e9; color:#1B5E20; padding:9px 10px; text-align:left; border:1px solid #c8e6c9; }
+td { padding:9px 10px; border:1px solid #e2e8f0; }
+tr:nth-child(even) td { background:#f8fafc; }
+</style>
+</head>
+<body>
+<div class="container">
+<header><div class="badge">Lesson</div><h1>DHCP and DNS Fundamentals</h1></header>
+<section><h2>1. DHCP -- Dynamic Host Configuration Protocol</h2><p>DHCP automatically assigns IP addresses (and related settings like subnet mask, default gateway and DNS server) to devices joining a network, so nobody has to manually type in an IP address on every device. Without DHCP, every single device would need manual IP configuration -- workable for a handful of devices, completely impractical for a real office.</p></section><section><h2>2. The DHCP process, briefly</h2><p>When a device joins a network, it broadcasts a request for an address. A DHCP server (usually built into the router, or a dedicated server in larger networks) offers an available address, the device accepts it, and the server acknowledges the assignment -- this whole exchange typically happens in a fraction of a second, invisibly to the user. The address is "leased" for a period of time and typically renewed automatically before it expires.</p></section><section><h2>3. DNS -- Domain Name System</h2><p>DNS translates human-friendly names (like a website address) into the numeric IP addresses computers actually use to communicate. Without DNS, users would need to memorise numeric addresses for every website and service they use -- DNS is effectively the internet's phone book.</p></section><section><h2>4. Why these two matter so much for troubleshooting</h2><div class="callout tip">A huge share of "the internet is not working" complaints trace back to one of these two services -- either a device failed to get a working address from DHCP (covered in the earlier Virtual Lab on APIPA addresses), or DNS failed to resolve a name to an address even though the underlying connection is fine (the exact pattern from the OSI layer Virtual Lab earlier in this course). Recognising which of the two is failing narrows troubleshooting dramatically.</div></section>
+</div>
+</body>
+</html>

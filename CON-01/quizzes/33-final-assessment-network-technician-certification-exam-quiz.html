@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CON-01 Final Assessment</title>
+<link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Fredoka:wght@500;600&display=swap" rel="stylesheet">
+<style>
+* { margin:0; padding:0; box-sizing:border-box; }
+body { font-family:'Space Mono', monospace; background:linear-gradient(135deg,#667eea 0%,#764ba2 100%); min-height:100vh; padding:20px; color:#fff; }
+.container { max-width:900px; margin:0 auto; }
+.header { text-align:center; margin-bottom:30px; }
+.header .lesson-tag { display:inline-block; background:rgba(255,255,255,0.2); padding:6px 16px; border-radius:999px; font-size:0.85em; margin-bottom:12px; }
+.header h1 { font-family:'Fredoka', sans-serif; font-size:2.2em; margin-bottom:8px; text-shadow:3px 3px 0 rgba(0,0,0,0.2); }
+.score-board { background:rgba(255,255,255,0.15); backdrop-filter:blur(10px); border-radius:20px; padding:20px; margin-bottom:20px; display:flex; justify-content:space-around; }
+.score-item { text-align:center; }
+.score-item .label { font-size:0.85em; opacity:0.9; margin-bottom:4px; }
+.score-item .value { font-size:1.8em; font-weight:bold; font-family:'Fredoka', sans-serif; }
+.progress-bar { width:100%; height:8px; background:rgba(255,255,255,0.3); border-radius:10px; margin-bottom:25px; overflow:hidden; }
+.progress-fill { height:100%; background:linear-gradient(90deg,#fbbf24 0%,#f59e0b 100%); border-radius:10px; transition:width 0.5s ease; width:0%; }
+.exercise-card { background:white; color:#333; border-radius:25px; padding:35px; margin-bottom:20px; box-shadow:0 20px 60px rgba(0,0,0,0.3); }
+.question { font-size:1.15em; margin-bottom:20px; font-weight:700; line-height:1.4; }
+.options { display:flex; flex-direction:column; gap:12px; }
+.option { background:#f5f7fb; border:2px solid transparent; padding:16px 20px; border-radius:12px; cursor:pointer; transition:all 0.2s ease; font-family:'Space Mono', monospace; font-size:0.98em; text-align:left; }
+.option:hover:not(.disabled) { background:#eef1fb; border-color:#667eea; transform:translateX(4px); }
+.option.correct { background:#d4edda; border-color:#28a745; color:#155724; }
+.option.wrong { background:#f8d7da; border-color:#dc3545; color:#721c24; }
+.option.disabled { cursor:not-allowed; opacity:0.85; }
+.feedback { margin-top:22px; padding:18px 22px; border-radius:12px; font-size:0.98em; line-height:1.5; }
+.feedback.correct { background:#d4edda; color:#155724; border-left:4px solid #28a745; }
+.feedback.wrong { background:#f8d7da; color:#721c24; border-left:4px solid #dc3545; }
+.next-btn, .restart-btn { margin-top:20px; background:linear-gradient(135deg,#667eea 0%,#764ba2 100%); color:white; border:none; padding:14px 32px; border-radius:12px; font-size:1em; cursor:pointer; font-family:'Fredoka', sans-serif; box-shadow:0 6px 18px rgba(0,0,0,0.2); }
+.results { text-align:center; padding:25px 15px; }
+.results h2 { font-family:'Fredoka', sans-serif; font-size:2em; margin-bottom:12px; color:#333; }
+.results .final-score { font-size:3em; font-family:'Fredoka', sans-serif; color:#667eea; margin:20px 0; }
+.badge { display:inline-block; font-size:3.5em; margin:8px 0; }
+</style>
+</head>
+<body>
+<div class="container">
+<div class="header"><div class="lesson-tag">Final Assessment - Quiz</div><h1>CON-01 Final Assessment</h1></div>
+<div class="score-board">
+<div class="score-item"><div class="label">Score</div><div class="value" id="score">0</div></div>
+<div class="score-item"><div class="label">Question</div><div class="value"><span id="current">1</span>/<span id="total">10</span></div></div>
+<div class="score-item"><div class="label">Streak</div><div class="value" id="streak">0</div></div>
+</div>
+<div class="progress-bar"><div class="progress-fill" id="progress"></div></div>
+<div class="exercise-card" id="exerciseCard"></div>
+</div>
+<script>
+const exercises = [{"id":"q1","text":"What is the minimum requirement for something to be considered a computer network?","options":["At least 100 devices","Two or more devices connected to share resources and communicate","A dedicated server","An internet connection"],"answer":1,"explanation":"The core definition of a network is simply two or more connected devices able to communicate and share resources."},{"id":"q2","text":"What generally distinguishes a WAN from a LAN?","options":["WANs are always wireless","A WAN spans multiple, often distant, sites, while a LAN is confined to one location","WANs are always faster than LANs","There is no real difference"],"answer":1,"explanation":"Geographic scope is the defining difference between a WAN and a LAN."},{"id":"q3","text":"What does latency measure?","options":["The maximum theoretical speed of a connection","The delay between sending a request and receiving a response","The number of connected devices","The brand of a router"],"answer":1,"explanation":"Latency specifically measures delay, typically in milliseconds."},{"id":"q4","text":"Which OSI layer handles logical (IP) addressing and routing between different networks?","options":["Layer 2, Data Link","Layer 3, Network","Layer 5, Session","Layer 6, Presentation"],"answer":1,"explanation":"IP addressing and inter-network routing is the core job of Layer 3, Network."},{"id":"q5","text":"What is the PDU (Protocol Data Unit) name at the Data Link layer?","options":["Packet","Segment","Frame","Bits"],"answer":2,"explanation":"'Frame' is the specific term for the PDU at the Data Link layer."},{"id":"q6","text":"What OSI layer do switches primarily operate at?","options":["Layer 1, Physical","Layer 2, Data Link","Layer 3, Network","Layer 7, Application"],"answer":1,"explanation":"Switches make forwarding decisions based on MAC addresses, which is Layer 2, Data Link."},{"id":"q7","text":"What is a key advantage of fiber optic cable over copper?","options":["It is always cheaper to install","It supports much higher speeds and longer distances, and is immune to electrical interference","It uses RJ45 connectors exclusively","It cannot be damaged under any circumstances"],"answer":1,"explanation":"Fiber's light-based transmission gives it significant speed, distance and interference-immunity advantages over copper."},{"id":"q8","text":"Which of these is a private IP address range?","options":["8.8.8.8","192.168.0.0-192.168.255.255","1.1.1.1","172.15.0.0-172.15.255.255"],"answer":1,"explanation":"192.168.0.0-192.168.255.255 is one of the officially reserved private address ranges."},{"id":"q9","text":"What problem does NAT solve?","options":["It encrypts network traffic","It lets many privately-addressed devices share one public IP address for internet access","It speeds up DNS lookups","It replaces the need for a router entirely"],"answer":1,"explanation":"NAT translates between private internal addresses and a shared public address for internet access."},{"id":"q10","text":"How many usable host addresses does a standard /24 network provide?","options":["256","254","126","24"],"answer":1,"explanation":"A /24 has 256 total addresses, minus 2 reserved, leaving 254 usable."},{"id":"q11","text":"What does an address in the 169.254.x.x range specifically indicate?","options":["A normal, correctly assigned address from the router","An APIPA address, self-assigned because the device could not reach a DHCP server","A public internet address","A DNS server's address"],"answer":1,"explanation":"169.254.x.x is the specific range used for automatic private addressing when DHCP fails."},{"id":"q12","text":"What is a key trade-off of the 5 GHz Wi-Fi band compared to 2.4 GHz?","options":["5 GHz has longer range but is slower","5 GHz is generally faster and less congested, but has shorter range and penetrates walls less effectively","There is no real difference between the two bands","2.4 GHz is always faster than 5 GHz"],"answer":1,"explanation":"5 GHz trades shorter range for generally faster, less congested speeds."},{"id":"q13","text":"What commonly causes Wi-Fi interference in densely populated areas like apartment buildings?","options":["There is no real cause, it is random","Many nearby networks competing for the same or overlapping channels","A lack of ethernet cables","The wrong subnet mask"],"answer":1,"explanation":"Channel congestion from many nearby overlapping networks is a common cause of interference in dense areas."},{"id":"q14","text":"What does DHCP automatically assign to a joining device?","options":["Only the device's MAC address","An IP address and related settings like subnet mask, default gateway and DNS server","A physical cable","A Wi-Fi password"],"answer":1,"explanation":"DHCP assigns a full set of network configuration, not just an IP address."},{"id":"q15","text":"Which port is standard for encrypted, secure web browsing?","options":["Port 80","Port 443","Port 21","Port 25"],"answer":1,"explanation":"Port 443 is the standard for HTTPS, encrypted secure web traffic."},{"id":"q16","text":"What is the basic value of VLAN segmentation?","options":["It has no practical security value","It lets one physical switch behave as several isolated networks, so a compromise in one segment does not automatically expose the others","It makes all devices completely invisible to each other permanently","It replaces the need for a firewall entirely"],"answer":1,"explanation":"Logical isolation between segments is the core security value of VLANs."},{"id":"q17","text":"Which Wi-Fi security standard should never be used on a modern network?","options":["WPA3","WPA2","WEP","There is no standard to avoid"],"answer":2,"explanation":"WEP is cryptographically broken and should never be used on a modern network."},{"id":"q18","text":"What does the ping command test?","options":["A device's own IP configuration","Whether a target address responds, and how long the round trip takes","The exact path traffic takes to a destination","The Wi-Fi channel in use"],"answer":1,"explanation":"Ping tests basic reachability and round-trip response time to a target."},{"id":"q19","text":"What does tracert (or traceroute) reveal that a simple ping does not?","options":["Nothing extra, they are identical tools","Each hop (router) along the path to a destination, helping pinpoint where a failure occurs","A device's IP address","The Wi-Fi signal strength"],"answer":1,"explanation":"Tracert's hop-by-hop view goes beyond ping's simple reachability check."},{"id":"q20","text":"What is the recommended way to verify a caller claiming to be a client's IT manager requesting urgent access?","options":["Trust the caller's own provided contact details","Call back using an independently known, previously-established number, not one supplied by the caller","Grant access immediately to avoid any delay","Ask the caller for their opinion on whether they are trustworthy"],"answer":1,"explanation":"Independent verification through a pre-established, trusted channel is the standard defence against impersonation-based social engineering."}];
+let currentQuestion = 0, score = 0, streak = 0, answered = false;
+function updateScoreboard() {
+    document.getElementById('score').textContent = score;
+    document.getElementById('current').textContent = Math.min(currentQuestion + 1, exercises.length);
+    document.getElementById('total').textContent = exercises.length;
+    document.getElementById('streak').textContent = streak;
+    document.getElementById('progress').style.width = ((currentQuestion) / exercises.length) * 100 + '%';
+}
+function escapeHtml(s) { return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+function renderQuestion() {
+    answered = false;
+    const q = exercises[currentQuestion];
+    let html = '';
+    if (q.scenario) html += `<div class="feedback" style="background:#eef1fb;border-left:4px solid #f59e0b;margin-top:0;margin-bottom:20px;"><strong>Scenario.</strong> ${escapeHtml(q.scenario)}</div>`;
+    html += `<div class="question">${escapeHtml(q.text)}</div><div class="options">`;
+    q.options.forEach((o, i) => { html += `<button class="option" onclick="selectAnswer(${i})">${escapeHtml(o)}</button>`; });
+    html += '</div>';
+    document.getElementById('exerciseCard').innerHTML = html;
+    updateScoreboard();
+}
+function selectAnswer(i) {
+    if (answered) return;
+    answered = true;
+    const q = exercises[currentQuestion];
+    const btns = document.querySelectorAll('.option');
+    btns.forEach(b => b.classList.add('disabled'));
+    btns[q.answer].classList.add('correct');
+    const right = i === q.answer;
+    if (!right) btns[i].classList.add('wrong');
+    if (right) { score += 10; streak += 1; } else { streak = 0; }
+    const fb = document.createElement('div');
+    fb.className = 'feedback ' + (right ? 'correct' : 'wrong');
+    fb.innerHTML = `<strong>${right ? '✅ Correct.' : '❌ Not quite.'}</strong><br>${escapeHtml(q.explanation)}`;
+    document.getElementById('exerciseCard').appendChild(fb);
+    const nb = document.createElement('button');
+    nb.className = 'next-btn';
+    nb.textContent = currentQuestion === exercises.length - 1 ? 'See results →' : 'Next question →';
+    nb.onclick = nextQuestion;
+    document.getElementById('exerciseCard').appendChild(nb);
+    updateScoreboard();
+}
+function nextQuestion() {
+    currentQuestion++;
+    if (currentQuestion >= exercises.length) return showResults();
+    renderQuestion();
+}
+function showResults() {
+    document.getElementById('progress').style.width = '100%';
+    const total = exercises.length * 10;
+    const pct = Math.round(score / total * 100);
+    if (window.parent) window.parent.postMessage({type:"mtti_quiz_score", score: score, total: total, percent: pct}, "*");
+    let badge = '🔧', msg = 'Excellent — you have a solid grasp of this topic.';
+    if (pct < 50) { badge = '🌱'; msg = 'Good first attempt. Review the lesson and try again.'; }
+    else if (pct < 80) { badge = '🛠️'; msg = 'Solid progress. Review what you missed and retry.'; }
+    document.getElementById('exerciseCard').innerHTML = `<div class="results"><span class="badge">${badge}</span><h2>Quiz Complete</h2><div class="final-score">${score} / ${total}</div><p><strong>${pct}%</strong> · Longest streak: ${streak}</p><p>${msg}</p><button class="restart-btn" onclick="restart()">Try again 🔁</button></div>`;
+}
+function restart() { currentQuestion = 0; score = 0; streak = 0; renderQuestion(); }
+renderQuestion();
+</script>
+</body>
+</html>

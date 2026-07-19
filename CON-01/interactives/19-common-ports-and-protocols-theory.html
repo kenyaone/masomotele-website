@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Common Ports and Protocols</title>
+<link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Fredoka:wght@500;600&display=swap" rel="stylesheet">
+<style>
+* { margin:0; padding:0; box-sizing:border-box; }
+body { font-family:'Segoe UI', -apple-system, sans-serif; line-height:1.6; color:#1e293b; background:#f8fafc; }
+.container { max-width:1000px; margin:0 auto; padding:20px; }
+header { background:linear-gradient(135deg,#387633,#259BD7); color:#fff; padding:36px 30px; border-radius:12px; margin-bottom:22px; box-shadow:0 10px 30px rgba(56,118,51,0.25); }
+header .badge { display:inline-block; background:rgba(255,255,255,0.2); padding:4px 14px; border-radius:16px; font-size:12px; font-weight:bold; letter-spacing:1px; margin-bottom:12px; }
+header h1 { font-size:30px; margin-bottom:8px; }
+section { background:#fff; border:1px solid #e2e8f0; border-radius:10px; padding:24px 28px; margin-bottom:20px; }
+section h2 { color:#387633; font-size:21px; margin-bottom:12px; padding-bottom:8px; border-bottom:3px solid #387633; }
+section h3 { color:#0f172a; font-size:16px; margin:16px 0 8px; }
+section p { margin-bottom:12px; }
+section ul, section ol { padding-left:22px; margin-bottom:12px; }
+section li { margin-bottom:5px; }
+.callout { border-left:5px solid #387633; background:#e8f5e9; padding:14px 18px; margin:14px 0; border-radius:4px; }
+.callout.tip { border-left-color:#059669; background:#ecfdf5; }
+.callout.warn { border-left-color:#dc2626; background:#fef2f2; }
+.callout strong { color:#1B5E20; }
+.callout.tip strong { color:#065f46; }
+.callout.warn strong { color:#991b1b; }
+.tech-card { background:linear-gradient(135deg,#fef3c7,#fde68a); border-radius:10px; padding:16px 20px; display:flex; gap:14px; align-items:flex-start; margin:14px 0; }
+.tech-avatar { width:52px; height:52px; border-radius:50%; background:#387633; color:#fff; display:flex; align-items:center; justify-content:center; font-size:22px; font-weight:bold; flex-shrink:0; }
+.tech-card p { color:#259BD7; margin:0; font-size:14px; }
+table { width:100%; border-collapse:collapse; margin:14px 0; font-size:13.5px; }
+th { background:#e8f5e9; color:#1B5E20; padding:9px 10px; text-align:left; border:1px solid #c8e6c9; }
+td { padding:9px 10px; border:1px solid #e2e8f0; }
+tr:nth-child(even) td { background:#f8fafc; }
+</style>
+</head>
+<body>
+<div class="container">
+<header><div class="badge">Lesson</div><h1>Common Ports and Protocols</h1></header>
+<section><h2>1. What is a port?</h2><p>A port is a numbered "door" on a device that a specific service listens on, letting one device run many different network services simultaneously without them interfering with each other. An IP address gets traffic to the right device; the port number gets it to the right SERVICE on that device.</p></section><section><h2>2. Common ports worth recognising</h2><table><tr><th>Port</th><th>Protocol</th><th>Used for</th></tr><tr><td>80</td><td>HTTP</td><td>Regular, unencrypted web browsing</td></tr><tr><td>443</td><td>HTTPS</td><td>Encrypted, secure web browsing -- the padlock icon in a browser</td></tr><tr><td>21</td><td>FTP</td><td>File transfer</td></tr><tr><td>22</td><td>SSH</td><td>Secure remote command-line access to a device</td></tr><tr><td>25</td><td>SMTP</td><td>Sending email</td></tr><tr><td>53</td><td>DNS</td><td>Domain name resolution, covered in the previous topic</td></tr></table><div class="callout tip">You do not need to memorise every port in existence -- recognising this short, genuinely common list covers the large majority of real-world support scenarios at a foundational level.</div></section><section><h2>3. Why firewalls filter by port</h2><p>A firewall can block or allow traffic based on which port it is heading to -- for example, allowing port 443 (secure web browsing) while blocking port 21 (older, less secure file transfer) on a business network. This is a basic, common form of network security control, covered in more depth in the next unit.</p></section><section><h2>4. A practical habit</h2>' . $TECH('When a client says "the website works on my phone but not on my work laptop," one of James\' first questions is whether the office firewall might be blocking a specific port the site needs -- a corporate firewall silently blocking an uncommon port is a real, recurring cause worth checking early, not late.') . '</section>
+</div>
+</body>
+</html>

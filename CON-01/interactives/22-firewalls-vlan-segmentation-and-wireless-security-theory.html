@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Firewalls, VLAN Segmentation and Wireless Security</title>
+<link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Fredoka:wght@500;600&display=swap" rel="stylesheet">
+<style>
+* { margin:0; padding:0; box-sizing:border-box; }
+body { font-family:'Segoe UI', -apple-system, sans-serif; line-height:1.6; color:#1e293b; background:#f8fafc; }
+.container { max-width:1000px; margin:0 auto; padding:20px; }
+header { background:linear-gradient(135deg,#387633,#259BD7); color:#fff; padding:36px 30px; border-radius:12px; margin-bottom:22px; box-shadow:0 10px 30px rgba(56,118,51,0.25); }
+header .badge { display:inline-block; background:rgba(255,255,255,0.2); padding:4px 14px; border-radius:16px; font-size:12px; font-weight:bold; letter-spacing:1px; margin-bottom:12px; }
+header h1 { font-size:30px; margin-bottom:8px; }
+section { background:#fff; border:1px solid #e2e8f0; border-radius:10px; padding:24px 28px; margin-bottom:20px; }
+section h2 { color:#387633; font-size:21px; margin-bottom:12px; padding-bottom:8px; border-bottom:3px solid #387633; }
+section h3 { color:#0f172a; font-size:16px; margin:16px 0 8px; }
+section p { margin-bottom:12px; }
+section ul, section ol { padding-left:22px; margin-bottom:12px; }
+section li { margin-bottom:5px; }
+.callout { border-left:5px solid #387633; background:#e8f5e9; padding:14px 18px; margin:14px 0; border-radius:4px; }
+.callout.tip { border-left-color:#059669; background:#ecfdf5; }
+.callout.warn { border-left-color:#dc2626; background:#fef2f2; }
+.callout strong { color:#1B5E20; }
+.callout.tip strong { color:#065f46; }
+.callout.warn strong { color:#991b1b; }
+.tech-card { background:linear-gradient(135deg,#fef3c7,#fde68a); border-radius:10px; padding:16px 20px; display:flex; gap:14px; align-items:flex-start; margin:14px 0; }
+.tech-avatar { width:52px; height:52px; border-radius:50%; background:#387633; color:#fff; display:flex; align-items:center; justify-content:center; font-size:22px; font-weight:bold; flex-shrink:0; }
+.tech-card p { color:#259BD7; margin:0; font-size:14px; }
+table { width:100%; border-collapse:collapse; margin:14px 0; font-size:13.5px; }
+th { background:#e8f5e9; color:#1B5E20; padding:9px 10px; text-align:left; border:1px solid #c8e6c9; }
+td { padding:9px 10px; border:1px solid #e2e8f0; }
+tr:nth-child(even) td { background:#f8fafc; }
+</style>
+</head>
+<body>
+<div class="container">
+<header><div class="badge">Lesson</div><h1>Firewalls, VLAN Segmentation and Wireless Security</h1></header>
+<section><h2>1. Firewalls</h2><p>A firewall controls which network traffic is allowed in or out, based on rules -- by port (covered in the previous unit), by source/destination address, or by other criteria. A firewall can be a dedicated hardware device, built into a router, or software running on an individual computer. Its job is filtering, not detecting or removing malware already inside a network.</p></section><section><h2>2. VLANs -- the basic idea</h2><p>A VLAN (Virtual LAN) lets one physical switch behave as if it were several separate, isolated networks -- for example, keeping office computers, guest Wi-Fi, and security cameras logically separated even though they might share the same physical switch hardware. This is genuinely useful basic segmentation: if one segment is compromised, the others are not automatically exposed. Deep VLAN trunking configuration is beyond this course's foundational scope -- what matters here is understanding WHY segmentation is valuable.</p></section><section><h2>3. Wireless security standards</h2><table><tr><th>Standard</th><th>Status</th></tr><tr><td>WEP</td><td>Old, cryptographically broken -- should never be used today</td></tr><tr><td>WPA2</td><td>Solid, still widely used and acceptable standard</td></tr><tr><td>WPA3</td><td>Current best practice, stronger protections, increasingly common on newer equipment</td></tr></table></section><section><h2>4. Guest networks</h2><div class="callout tip">A separate guest Wi-Fi network -- effectively a simple, practical use of the VLAN segmentation idea -- lets visitors get internet access without ever touching the main business network where sensitive files and devices live. This is one of the cheapest, easiest security improvements James recommends on almost every business site visit.</div></section>
+</div>
+</body>
+</html>

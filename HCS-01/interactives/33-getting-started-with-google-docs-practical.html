@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Getting Started with Google Docs -- Practical</title>
+<link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Fredoka:wght@500;600&display=swap" rel="stylesheet">
+<style>
+* { margin:0; padding:0; box-sizing:border-box; }
+body { font-family:'Segoe UI', -apple-system, sans-serif; background:linear-gradient(135deg,#1e293b,#0f172a); min-height:100vh; padding:20px; color:#e2e8f0; }
+.container { max-width:900px; margin:0 auto; }
+.header { text-align:center; margin-bottom:20px; }
+.header .tag { display:inline-block; background:rgba(255,255,255,0.12); padding:6px 16px; border-radius:999px; font-size:0.85em; margin-bottom:10px; color:#93c5fd; }
+.header h1 { font-family:'Fredoka', sans-serif; font-size:2em; color:#fff; }
+.progress-steps { display:flex; gap:6px; margin-bottom:18px; justify-content:center; }
+.step-dot { width:28px; height:6px; border-radius:4px; background:#334155; }
+.step-dot.done { background:#2563eb; }
+.step-dot.active { background:#fbbf24; }
+.screen-mock { background:#0b1220; border:2px solid #334155; border-radius:10px; box-shadow:0 20px 60px rgba(0,0,0,0.5); overflow:hidden; }
+.screen-titlebar { background:#1e293b; padding:8px 16px; font-size:0.8em; color:#94a3b8; border-bottom:1px solid #334155; display:flex; justify-content:space-between; }
+.screen-body { padding:26px 30px; }
+.screen-body h3 { color:#fbbf24; font-family:'Fredoka', sans-serif; margin-bottom:10px; font-size:1.3em; }
+.screen-body p.desc { color:#cbd5e1; margin-bottom:18px; font-size:0.95em; line-height:1.5; }
+.opt-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(180px,1fr)); gap:12px; }
+.opt-btn { background:#1e293b; border:2px solid #334155; color:#e2e8f0; padding:14px 16px; border-radius:8px; cursor:pointer; font-size:0.92em; font-weight:600; text-align:center; transition:all 0.15s; }
+.opt-btn:hover:not(:disabled) { border-color:#2563eb; background:#1e3a5f; }
+.opt-btn.correct { border-color:#22c55e; background:#14532d; }
+.opt-btn.wrong { border-color:#dc2626; background:#450a0a; }
+.hint-box { margin-top:14px; padding:10px 14px; border-radius:8px; font-size:0.85em; background:#3f1d1d; color:#fca5a5; display:none; }
+.hint-box.show { display:block; }
+.done-card { text-align:center; padding:30px; }
+.done-card .big { font-size:3em; margin-bottom:10px; }
+.done-card h3 { color:#22c55e; font-family:'Fredoka', sans-serif; margin-bottom:8px; }
+</style>
+</head>
+<body>
+<div class="container">
+<div class="header"><div class="tag">Software Simulation</div><h1>Getting Started with Google Docs -- Practical</h1></div>
+<div class="progress-steps" id="steps"></div>
+<div class="screen-mock">
+<div class="screen-titlebar"><span id="titlebarLeft">—</span><span id="titlebarRight">Simulation — no real changes are made</span></div>
+<div class="screen-body" id="screenBody"></div>
+</div>
+</div>
+<script>
+const SCREENS = [{"titlebar":"Web Browser","heading":"Mercy wants to start a new Google Doc on the ward's shared computer.","desc":"What is the first step to access Google Docs?","options":["Open a word processor installed on the computer instead","Open a web browser, go to Google Docs (or Drive), and sign in with a Google account","Unplug the computer from the network first","Call IT support before doing anything"],"answer":1,"hint":"Google Docs runs in a browser and requires signing in with a Google account."},{"titlebar":"Google Drive","heading":"Mercy is signed in and looking at her Google Drive.","desc":"How does she start a brand-new blank Google Doc?","options":["Click '+ New', then choose Google Docs (Blank document)","Delete an old file to make space first","Right-click and select 'Print'","Close the browser and reopen it"],"answer":0,"hint":"Look for the button that creates something new in Drive."},{"titlebar":"Untitled Document","heading":"A new blank document has opened and Mercy has started typing her weekly supply report.","desc":"She notices there is no visible Save button. What should she understand about this?","options":["Her work is not being saved anywhere and will be lost","Google Docs automatically and continuously saves her changes to Google Drive as she types","She must remember to email herself a copy every few minutes instead","The document only saves once she closes the browser"],"answer":1,"hint":"Google Docs saves continuously in the background -- watch for the small saving indicator."},{"titlebar":"Naming the Document","heading":"The document is still called 'Untitled document' at the top of the page.","desc":"What should Mercy do to give it a clear, findable name?","options":["Leave it as 'Untitled document' since Google fixes it automatically","Click on 'Untitled document' at the top and type a clear name like 'Weekly Supply Report'","Delete the whole document and start again","Change her Google account name instead"],"answer":1,"hint":"The document title itself is directly clickable and editable at the top of the page."}];
+let idx = 0;
+function renderSteps() {
+    const el = document.getElementById('steps');
+    el.innerHTML = '';
+    SCREENS.forEach((s, i) => {
+        const d = document.createElement('div');
+        d.className = 'step-dot' + (i < idx ? ' done' : (i === idx ? ' active' : ''));
+        el.appendChild(d);
+    });
+}
+function renderScreen() {
+    renderSteps();
+    if (idx >= SCREENS.length) return renderDone();
+    const s = SCREENS[idx];
+    document.getElementById('titlebarLeft').textContent = s.titlebar;
+    const body = document.getElementById('screenBody');
+    let html = `<h3>${s.heading}</h3><p class="desc">${s.desc}</p><div class="opt-grid">`;
+    s.options.forEach((o, i) => { html += `<button class="opt-btn" onclick="pick(${i})">${o}</button>`; });
+    html += `</div><div class="hint-box" id="hintBox"></div>`;
+    body.innerHTML = html;
+}
+function pick(i) {
+    const s = SCREENS[idx];
+    const btns = document.querySelectorAll('.opt-btn');
+    if (i === s.answer) {
+        btns[i].classList.add('correct');
+        setTimeout(() => { idx++; renderScreen(); }, 500);
+    } else {
+        btns.forEach(b => b.disabled = true);
+        btns[i].classList.add('wrong');
+        const hb = document.getElementById('hintBox');
+        hb.textContent = '💡 ' + (s.hint || 'Not quite — think about it and try another option.');
+        hb.classList.add('show');
+        setTimeout(() => { btns.forEach(b => { b.disabled = false; b.classList.remove('wrong'); }); }, 1200);
+    }
+}
+function renderDone() {
+    document.getElementById('screenBody').innerHTML = `<div class="done-card"><div class="big">✅</div><h3>Simulation complete</h3><p style="color:#cbd5e1;">You walked through every step correctly. Continue to the next lesson when ready.</p></div>`;
+}
+renderScreen();
+</script>
+</body>
+</html>

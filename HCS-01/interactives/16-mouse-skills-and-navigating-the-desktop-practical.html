@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Mouse Skills and Navigating the Desktop -- Practical</title>
+<link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Fredoka:wght@500;600&display=swap" rel="stylesheet">
+<style>
+* { margin:0; padding:0; box-sizing:border-box; }
+body { font-family:'Segoe UI', -apple-system, sans-serif; background:linear-gradient(135deg,#1e293b,#0f172a); min-height:100vh; padding:20px; color:#e2e8f0; }
+.container { max-width:900px; margin:0 auto; }
+.header { text-align:center; margin-bottom:20px; }
+.header .tag { display:inline-block; background:rgba(255,255,255,0.12); padding:6px 16px; border-radius:999px; font-size:0.85em; margin-bottom:10px; color:#93c5fd; }
+.header h1 { font-family:'Fredoka', sans-serif; font-size:2em; color:#fff; }
+.progress-steps { display:flex; gap:6px; margin-bottom:18px; justify-content:center; }
+.step-dot { width:28px; height:6px; border-radius:4px; background:#334155; }
+.step-dot.done { background:#2563eb; }
+.step-dot.active { background:#fbbf24; }
+.screen-mock { background:#0b1220; border:2px solid #334155; border-radius:10px; box-shadow:0 20px 60px rgba(0,0,0,0.5); overflow:hidden; }
+.screen-titlebar { background:#1e293b; padding:8px 16px; font-size:0.8em; color:#94a3b8; border-bottom:1px solid #334155; display:flex; justify-content:space-between; }
+.screen-body { padding:26px 30px; }
+.screen-body h3 { color:#fbbf24; font-family:'Fredoka', sans-serif; margin-bottom:10px; font-size:1.3em; }
+.screen-body p.desc { color:#cbd5e1; margin-bottom:18px; font-size:0.95em; line-height:1.5; }
+.opt-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(180px,1fr)); gap:12px; }
+.opt-btn { background:#1e293b; border:2px solid #334155; color:#e2e8f0; padding:14px 16px; border-radius:8px; cursor:pointer; font-size:0.92em; font-weight:600; text-align:center; transition:all 0.15s; }
+.opt-btn:hover:not(:disabled) { border-color:#2563eb; background:#1e3a5f; }
+.opt-btn.correct { border-color:#22c55e; background:#14532d; }
+.opt-btn.wrong { border-color:#dc2626; background:#450a0a; }
+.hint-box { margin-top:14px; padding:10px 14px; border-radius:8px; font-size:0.85em; background:#3f1d1d; color:#fca5a5; display:none; }
+.hint-box.show { display:block; }
+.done-card { text-align:center; padding:30px; }
+.done-card .big { font-size:3em; margin-bottom:10px; }
+.done-card h3 { color:#22c55e; font-family:'Fredoka', sans-serif; margin-bottom:8px; }
+</style>
+</head>
+<body>
+<div class="container">
+<div class="header"><div class="tag">Software Simulation</div><h1>Mouse Skills and Navigating the Desktop -- Practical</h1></div>
+<div class="progress-steps" id="steps"></div>
+<div class="screen-mock">
+<div class="screen-titlebar"><span id="titlebarLeft">—</span><span id="titlebarRight">Simulation — no real changes are made</span></div>
+<div class="screen-body" id="screenBody"></div>
+</div>
+</div>
+<script>
+const SCREENS = [{"titlebar":"Hospital PC -- Desktop","heading":"Mercy needs to open the ward's Patient Records icon on the desktop.","desc":"What should she do to open it?","options":["Single left-click it once and wait","Double left-click it","Right-click it and select nothing","Press Enter without clicking anything"],"answer":1,"hint":"A single click only selects an icon -- opening it requires a double-click."},{"titlebar":"Hospital PC -- Patient Records List","heading":"Mercy sees a list of patient entries and wants to select one entry, without opening it yet, to check a detail first.","desc":"Which action correctly selects the entry without opening it?","options":["Double-click the entry","A single left-click on the entry","Right-click and choose Delete","Scroll past it repeatedly"],"answer":1,"hint":"Selecting, as opposed to opening, only needs a single click."},{"titlebar":"Hospital PC -- Patient Records List","heading":"Mercy wants to see the available options for a specific file, like rename or copy, without opening it.","desc":"What should she do?","options":["Double-click the file to open it fully first","Right-click the file to open its context menu of options","Drag the file to the very bottom of the screen","Press Backspace"],"answer":1,"hint":"A context menu of actions for an item appears with a right-click."},{"titlebar":"Hospital PC -- Long Shift Report","heading":"Mercy has opened a long shift report document and needs to read further down the page.","desc":"What is the correct way to move down through the document?","options":["Close the document and reopen it","Use the scroll wheel, or the on-screen scrollbar, to move down","Right-click repeatedly until the page moves","Unplug the mouse"],"answer":1,"hint":"Scrolling, with the wheel or scrollbar, is how you move through content that extends beyond the visible window."}];
+let idx = 0;
+function renderSteps() {
+    const el = document.getElementById('steps');
+    el.innerHTML = '';
+    SCREENS.forEach((s, i) => {
+        const d = document.createElement('div');
+        d.className = 'step-dot' + (i < idx ? ' done' : (i === idx ? ' active' : ''));
+        el.appendChild(d);
+    });
+}
+function renderScreen() {
+    renderSteps();
+    if (idx >= SCREENS.length) return renderDone();
+    const s = SCREENS[idx];
+    document.getElementById('titlebarLeft').textContent = s.titlebar;
+    const body = document.getElementById('screenBody');
+    let html = `<h3>${s.heading}</h3><p class="desc">${s.desc}</p><div class="opt-grid">`;
+    s.options.forEach((o, i) => { html += `<button class="opt-btn" onclick="pick(${i})">${o}</button>`; });
+    html += `</div><div class="hint-box" id="hintBox"></div>`;
+    body.innerHTML = html;
+}
+function pick(i) {
+    const s = SCREENS[idx];
+    const btns = document.querySelectorAll('.opt-btn');
+    if (i === s.answer) {
+        btns[i].classList.add('correct');
+        setTimeout(() => { idx++; renderScreen(); }, 500);
+    } else {
+        btns.forEach(b => b.disabled = true);
+        btns[i].classList.add('wrong');
+        const hb = document.getElementById('hintBox');
+        hb.textContent = '💡 ' + (s.hint || 'Not quite — think about it and try another option.');
+        hb.classList.add('show');
+        setTimeout(() => { btns.forEach(b => { b.disabled = false; b.classList.remove('wrong'); }); }, 1200);
+    }
+}
+function renderDone() {
+    document.getElementById('screenBody').innerHTML = `<div class="done-card"><div class="big">✅</div><h3>Simulation complete</h3><p style="color:#cbd5e1;">You walked through every step correctly. Continue to the next lesson when ready.</p></div>`;
+}
+renderScreen();
+</script>
+</body>
+</html>

@@ -150,9 +150,14 @@ class MTTI_MIS_Shortcodes {
             get_current_user_id()
         ));
         if (!$student_id) return array();
+        // 'Completed' is included so a student who finished a course still
+        // sees "Continue Learning" (to review it) instead of being sent
+        // back through "Enroll & Pay Now" for a course they already paid
+        // for and finished — same fix as get_enrolled_course_ids() in the
+        // learner portal class, which this must stay in sync with.
         $ids = $wpdb->get_col($wpdb->prepare(
             "SELECT DISTINCT course_id FROM {$wpdb->prefix}mtti_enrollments
-             WHERE student_id = %d AND status IN ('Active','Enrolled','In Progress')",
+             WHERE student_id = %d AND status IN ('Active','Enrolled','In Progress','Completed')",
             $student_id
         ));
         return array_map('intval', $ids);

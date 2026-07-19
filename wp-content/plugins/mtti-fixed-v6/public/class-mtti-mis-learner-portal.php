@@ -3068,7 +3068,12 @@ function mttiToggleFullscreen(btn){
         // rebuilt SMD-01) — layered on top of, not instead of, the mandatory
         // time-gate above. No-op for every other course (see
         // course_uses_sequential_gating()).
-        if ($is_released && $this->course_uses_sequential_gating($lesson->course_id)) {
+        // Admin/staff preview is exempt: it uses the student_id=0 sentinel
+        // (build_admin_preview_student()), which structurally can never
+        // have real lesson_views/quiz_attempts rows, so prerequisite_satisfied()
+        // would otherwise always fail past the very first lesson — blocking
+        // admins from previewing any course content beyond lesson one.
+        if ($is_released && $this->course_uses_sequential_gating($lesson->course_id) && !$this->is_admin_preview()) {
             if (!$this->prerequisite_satisfied($lesson->course_id, $lesson->order_number, $student->student_id)) {
                 $is_released = false;
                 $locked_message = "Complete the previous step in this course first to unlock this one.";

@@ -1,0 +1,728 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SMD-01 Final Assessment | MTTI Digital Marketing</title>
+    <link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Fredoka:wght@500;600&display=swap" rel="stylesheet">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Space Mono', monospace;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh; padding: 20px; color: #fff;
+        }
+        .container { max-width: 900px; margin: 0 auto; }
+        .header { text-align: center; margin-bottom: 30px; animation: slideDown 0.6s ease-out; }
+        .header .lesson-tag {
+            display: inline-block; background: rgba(255,255,255,0.2);
+            padding: 6px 16px; border-radius: 999px;
+            font-size: 0.85em; margin-bottom: 12px;
+        }
+        .header h1 {
+            font-family: 'Fredoka', sans-serif; font-size: 2.2em;
+            margin-bottom: 8px; text-shadow: 3px 3px 0 rgba(0,0,0,0.2);
+        }
+        .header p { opacity: 0.95; font-size: 0.95em; }
+        .score-board {
+            background: rgba(255,255,255,0.15); backdrop-filter: blur(10px);
+            border-radius: 20px; padding: 20px; margin-bottom: 20px;
+            display: flex; justify-content: space-around;
+            animation: fadeIn 0.8s ease-out 0.2s both;
+        }
+        .score-item { text-align: center; }
+        .score-item .label { font-size: 0.85em; opacity: 0.9; margin-bottom: 4px; }
+        .score-item .value {
+            font-size: 1.8em; font-weight: bold; font-family: 'Fredoka', sans-serif;
+        }
+        .progress-bar {
+            width: 100%; height: 8px; background: rgba(255,255,255,0.3);
+            border-radius: 10px; margin-bottom: 25px; overflow: hidden;
+        }
+        .progress-fill {
+            height: 100%; background: linear-gradient(90deg, #f093fb 0%, #f5576c 100%);
+            border-radius: 10px; transition: width 0.5s ease; width: 0%;
+        }
+        .exercise-card {
+            background: white; color: #333; border-radius: 25px;
+            padding: 35px; margin-bottom: 20px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            animation: fadeIn 0.6s ease-out both;
+        }
+        .scenario {
+            background: linear-gradient(135deg, #fff8e1 0%, #ffecb3 100%);
+            border-left: 5px solid #ffc107;
+            padding: 20px 24px; border-radius: 12px;
+            margin-bottom: 24px;
+            font-size: 0.98em; line-height: 1.55;
+        }
+        .scenario strong { color: #7a5a00; font-family: 'Fredoka', sans-serif; }
+        .question {
+            font-size: 1.15em; margin-bottom: 20px;
+            font-weight: 700; line-height: 1.4;
+        }
+        .options { display: flex; flex-direction: column; gap: 12px; }
+        .option {
+            background: #f5f7fb; border: 2px solid transparent;
+            padding: 16px 20px; border-radius: 12px;
+            cursor: pointer; transition: all 0.2s ease;
+            font-family: 'Space Mono', monospace; font-size: 0.98em; text-align: left;
+        }
+        .option:hover:not(.disabled) {
+            background: #eef1fb; border-color: #667eea; transform: translateX(4px);
+        }
+        .option.correct { background: #d4edda; border-color: #28a745; color: #155724; }
+        .option.wrong { background: #f8d7da; border-color: #dc3545; color: #721c24; animation: shake 0.4s; }
+        .option.disabled { cursor: not-allowed; opacity: 0.85; }
+        .feedback {
+            margin-top: 22px; padding: 18px 22px; border-radius: 12px;
+            animation: slideUp 0.4s ease-out;
+            font-size: 0.98em; line-height: 1.5;
+        }
+        .feedback.correct { background: #d4edda; color: #155724; border-left: 4px solid #28a745; }
+        .feedback.wrong { background: #f8d7da; color: #721c24; border-left: 4px solid #dc3545; }
+        .feedback strong { font-family: 'Fredoka', sans-serif; }
+        .next-btn, .restart-btn {
+            margin-top: 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white; border: none;
+            padding: 14px 32px; border-radius: 12px;
+            font-size: 1em; cursor: pointer;
+            font-family: 'Fredoka', sans-serif;
+            box-shadow: 0 6px 18px rgba(0,0,0,0.2);
+            transition: transform 0.2s ease;
+        }
+        .next-btn:hover, .restart-btn:hover { transform: scale(1.04); }
+        .results {
+            text-align: center; padding: 25px 15px;
+            animation: bounceIn 0.6s ease-out;
+        }
+        .results h2 {
+            font-family: 'Fredoka', sans-serif; font-size: 2em;
+            margin-bottom: 12px; color: #333;
+        }
+        .results .final-score {
+            font-size: 3em; font-family: 'Fredoka', sans-serif;
+            color: #667eea; margin: 20px 0;
+        }
+        .results p { color: #555; margin-bottom: 12px; }
+        .badge { display: inline-block; font-size: 3.5em; margin: 8px 0; }
+        @keyframes slideDown { from { opacity: 0; transform: translateY(-30px); } to { opacity: 1; transform: translateY(0); } }
+        @keyframes fadeIn { from { opacity: 0; transform: scale(0.96); } to { opacity: 1; transform: scale(1); } }
+        @keyframes slideUp { from { opacity: 0; transform: translateY(15px); } to { opacity: 1; transform: translateY(0); } }
+        @keyframes shake { 0%,100% { transform: translateX(0); } 25% { transform: translateX(-8px); } 75% { transform: translateX(8px); } }
+        @keyframes bounceIn { 0% { opacity: 0; transform: scale(0.4); } 60% { transform: scale(1.05); } 100% { opacity: 1; transform: scale(1); } }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <div class="lesson-tag">Final Assessment</div><h1>SMD-01 Comprehensive Final Exam</h1><p>42 questions covering all 15 units — pass to complete the course</p>
+        </div>
+
+        <div class="score-board">
+            <div class="score-item"><div class="label">Score</div><div class="value" id="score">0</div></div>
+            <div class="score-item"><div class="label">Question</div><div class="value"><span id="current">1</span>/<span id="total">10</span></div></div>
+            <div class="score-item"><div class="label">Streak</div><div class="value" id="streak">0</div></div>
+        </div>
+
+        <div class="progress-bar"><div class="progress-fill" id="progress"></div></div>
+
+        <div class="exercise-card" id="exerciseCard"></div>
+    </div>
+
+    <script>
+        const exercises = [
+    {
+        "scenario": "Sarah's sister-in-law tells her Karibu Kitchen \"needs digital marketing\", and Sarah assumes that means paying for Facebook adverts. Her cousin quotes KES 40,000 a month for a \"complete package\". Sarah has KES 15,000 a month and wants 200 new lunch orders in month one.",
+        "question": "Which statement should you make to Sarah first?",
+        "options": [
+            "\"Take the KES 40,000 package \u2014 you cannot do this yourself.\"",
+            "\"Digital marketing is one thing \u2014 Facebook adverts. Stick with that.\"",
+            "\"Digital marketing is nine connected activities. You can start with three of them yourself on your KES 15,000 budget.\"",
+            "\"Stop marketing until the business earns more.\""
+        ],
+        "correct": 2,
+        "explanation": "Digital marketing is not one activity \u2014 it's the nine elements from \u00a71.1 (content, social, email, mobile, affiliate, SEM, SEO, display, analytics). Sarah does not need to buy a KES 40,000 package to run three of them well herself. The \"one thing = Facebook ads\" myth is exactly what this lesson exists to correct."
+    },
+    {
+        "scenario": "Sarah's cousin argues: \"Just start posting on Facebook. Do not waste time planning a strategy.\"",
+        "question": "Why is this advice wrong?",
+        "options": [
+            "It is not wrong \u2014 planning is optional for small businesses.",
+            "It is wrong because without alignment to business goals, defined objectives, target audience, and a way to measure results, Sarah will spend her KES 15,000 with nothing to show for it.",
+            "It is wrong because Facebook is a bad platform for restaurants.",
+            "It is wrong only for large businesses \u2014 Sarah is small enough to skip planning."
+        ],
+        "correct": 1,
+        "explanation": "Section 1.2 defines a digital marketing strategy through eight elements \u2014 alignment to goals, objectives, target audience, competitor analysis, platform selection, content planning, budget allocation, reporting. Skipping any of these is what turns marketing budgets into wasted money. Small businesses need this MORE than large ones because their budgets are more precious."
+    },
+    {
+        "scenario": "Sarah insists her target audience for Karibu Kitchen's dinner delivery is \"everyone in Eldoret\". You need to teach her about buyer personas.",
+        "question": "Which of these is a proper buyer persona for her dinner-delivery service?",
+        "options": [
+            "\"Everyone with a phone in Eldoret.\"",
+            "\"Anyone who eats food.\"",
+            "\"Office workers aged 25 to 50, living in Kapsoya, Elgon View or Racecourse, with families of three to five, who own smartphones and order dinner because they are too tired to cook after work.\"",
+            "\"People who like Kenyan food, worldwide.\""
+        ],
+        "correct": 2,
+        "explanation": "Section 1.2 uses this exact example: a real persona names age, location, household size, device, and the underlying motivation. Options 1, 2, and 4 are the \"trying to sell to everyone means selling to no one\" mistake the lesson warns against."
+    },
+    {
+        "scenario": "Sarah's cousin insists: \"You do not need a website \u2014 everyone is on Facebook and WhatsApp anyway.\" But when Sarah searches Google for \"lunch delivery Eldoret\", Nyakinyua Kitchen's WordPress site sits at position one and Karibu Kitchen does not appear at all.",
+        "question": "Which reply best captures the Lesson 2.1 message?",
+        "options": [
+            "\"Your cousin is right \u2014 a Facebook page is enough for any small business.\"",
+            "\"A social profile alone is not a substitute for a proper website, and a website alone is not a substitute for being findable on Google. You need more than one doorway.\"",
+            "\"Shut down the Facebook page and only build a website.\"",
+            "\"Buy a mobile app \u2014 that will fix the Google problem.\""
+        ],
+        "correct": 1,
+        "explanation": "Section 2.1 frames web presence as a set of doorways \u2014 most businesses need more than one. Sarah cannot compete on Google with a Facebook page alone. Option 1 keeps her invisible on Google. Option 3 throws away her existing audience. Option 4 is expensive and does not help with search."
+    },
+    {
+        "scenario": "Sarah is drawing her five WordPress pages for Karibu Kitchen on a piece of paper. She asks which pages a small restaurant website absolutely must have.",
+        "question": "From the eight essential parts in Lesson 2.2, which five best fit Karibu Kitchen?",
+        "options": [
+            "Homepage, About, Contact, News/Blog, Services/Product descriptions.",
+            "Homepage, checkout, sitemap, whitepaper, admin dashboard.",
+            "Only a homepage \u2014 everything else is optional.",
+            "Twelve landing pages, one per product, with no About or Contact."
+        ],
+        "correct": 0,
+        "explanation": "Section 2.2 names eight parts and points out that Sarah, a restaurant, needs the first five: homepage, company info, contact, news/blog, services/products. She does not need e-commerce (WhatsApp handles orders) or a full sitemap page yet."
+    },
+    {
+        "scenario": "Sarah's cousin promises she can be on Google's first page \"by next Tuesday\" if she pays KES 30,000 to a friend who runs a \"secret SEO trick\".",
+        "question": "What is the accurate expectation you should set, per Lesson 2.3?",
+        "options": [
+            "One week \u2014 SEO is instant if the developer is skilled.",
+            "Three to six months of consistent work before real results appear \u2014 SEO has no legitimate shortcut.",
+            "One year minimum \u2014 SEO cannot work faster than that.",
+            "Never \u2014 small businesses in Eldoret cannot rank on Google."
+        ],
+        "correct": 1,
+        "explanation": "Section 2.3 sets the honest expectation: three to six months of consistent work. The \"start today, not next month\" principle exists because there is no shortcut. Option 1 is a scam sales pitch, option 3 is too pessimistic, option 4 contradicts the whole lesson."
+    },
+    {
+        "scenario": "Sarah's cousin insists Karibu Kitchen must join every platform: Facebook, Instagram, TikTok, LinkedIn, X, YouTube, Pinterest, Snapchat, Threads, and Reddit. Sarah has time to genuinely maintain three at most.",
+        "question": "What does Lesson 3.1 say is the single most important skill in social media marketing?",
+        "options": [
+            "Being on every platform, at all times.",
+            "Choosing the right platform for the right audience.",
+            "Posting daily on all ten platforms.",
+            "Buying followers on every platform to look big."
+        ],
+        "correct": 1,
+        "explanation": "Section 3.1 explicitly names \"choosing the right platform for the right audience\" as the single most important skill in social media marketing. Being everywhere but reaching nobody is the classic small-business mistake. Buying followers violates every professional habit later in the module."
+    },
+    {
+        "scenario": "Sarah posted brilliantly for one week \u2014 daily photos, replies to every comment \u2014 then went silent for three weeks because the kitchen was busy. Her reach dropped by 70 per cent.",
+        "question": "Which of the three professional habits from Lesson 3.1 is she breaking?",
+        "options": [
+            "Quality over quantity.",
+            "Consistency \u2014 posting on a schedule, weekly at minimum, daily is better. Sporadic brilliance is worse than steady presence.",
+            "Engagement.",
+            "None \u2014 the algorithm always recovers."
+        ],
+        "correct": 1,
+        "explanation": "Section 3.1's three habits are consistency, quality over quantity, and engagement. Consistency is the one Sarah is breaking. The lesson is explicit: post on a schedule, weekly minimum, daily better. The other habits are being kept during the active weeks."
+    },
+    {
+        "scenario": "Sarah writes her Facebook bio as: \"Karibu Kitchen. Food.\"",
+        "question": "Which rewrite matches Lesson 3.2's guidance for a business bio?",
+        "options": [
+            "\"Karibu Kitchen.\"",
+            "\"Karibu Kitchen \u2014 fresh Kenyan lunch, delivered daily to Eldoret CBD. Dinner delivered to Kapsoya, Elgon View, Racecourse. WhatsApp to order.\"",
+            "\"Yummy food. Order today. Nice.\"",
+            "A 500-word essay on the history of Kenyan cuisine."
+        ],
+        "correct": 1,
+        "explanation": "Section 3.2 defines a bio as concise (one or two sentences) with three ingredients: WHAT you sell, WHERE, and a CALL TO ACTION. The lesson uses this exact example. Options 1 and 3 lack detail and CTA. Option 4 is too long for a bio."
+    },
+    {
+        "scenario": "Sarah opens the Facebook app, writes a lunch post, and publishes it. Then she opens the Instagram app, retypes it, and publishes it. Then she opens Google Business Profile and does it again. Three times a week. Ninety minutes lost every week to app-switching, forgetting what she posted where, and skipping days when the kitchen is busy.",
+        "question": "What tool from Lesson 4.1 solves this problem, and how?",
+        "options": [
+            "Hire two staff to manage each platform separately.",
+            "A social media management service \u2014 a single dashboard that lets you write a post once, schedule it across every platform, monitor all comments from one inbox, and see analytics on one screen.",
+            "Give up on Instagram and Google \u2014 stick to Facebook only.",
+            "Post the same thing 30 times a day so something sticks."
+        ],
+        "correct": 1,
+        "explanation": "Section 4.1 defines a social media management service as a single dashboard for multiple accounts \u2014 write once, schedule once, one inbox, one analytics view. Options 1 wastes money; option 3 abandons two-thirds of her plan; option 4 spams her audience."
+    },
+    {
+        "scenario": "Sarah's cousin is back: \"Post one TikTok. Go viral. Twenty million views. Orders pour in. Done.\"",
+        "question": "How does Lesson 4.2 frame the \"go viral\" strategy?",
+        "options": [
+            "Viral is the only strategy that works \u2014 always chase it.",
+            "Going viral is not a strategy \u2014 it is the lottery. Real professionals build slow, steady, growing audiences. Viral videos are lightning strikes; steady audiences are the sunrise you can plan around.",
+            "Sarah must go viral every week or the business fails.",
+            "Only videos over one hour go viral."
+        ],
+        "correct": 1,
+        "explanation": "Section 4.2 uses the exact lottery/lightning/sunrise metaphor. Chasing viral fantasies wastes time; building a reliable audience is what pays the bills. When content DOES go viral it is a bonus, not the plan."
+    },
+    {
+        "scenario": "Yesterday afternoon a customer wrote on Karibu Kitchen's Facebook Page: \"This food is disgusting. Do not order here.\" It has been up 12 hours. 34 people have seen it. 1 person liked it. Sarah's first instinct is to delete it, her second is to reply angrily.",
+        "question": "Which professional response does Lesson 4.3 teach?",
+        "options": [
+            "Delete the comment immediately.",
+            "Reply angrily in public \u2014 customers respect a firm defence.",
+            "Do neither. Reply within two hours with three sentences: (1) acknowledge with empathy \u2014 \"I am so sorry your meal was not up to our standards\"; (2) offer to make it right \u2014 \"This is not the experience we want any customer to have\"; (3) take it offline \u2014 \"Please DM me the details of your order \u2014 I would like to make it right personally. Sarah.\"",
+            "Ignore it \u2014 it will disappear."
+        ],
+        "correct": 2,
+        "explanation": "Section 4.3 walks through this exact three-sentence formula: acknowledge, offer, take offline. Delete is worse than the comment. Angry replies live forever in screenshots. Silence lets 34 watchers assume it is true. The professional reply turns the angry comment into a public testimonial."
+    },
+    {
+        "scenario": "Sarah's cousin is back with fresh advice: he tells her that \"online advertising means Google Ads\" and that everything else \u2014 Meta, TikTok, LinkedIn \u2014 is really just a variation of Google. Sarah has KES 15,000 a month for Karibu Kitchen and wants to know if that is true before she picks a platform.",
+        "question": "How should you correct him?",
+        "options": [
+            "He is correct \u2014 Google Ads owns every online advertising platform.",
+            "Every online ad platform falls into one of two families: Search Engine Marketing, where ads appear in response to a search query, and Social and Display, where ads appear in feeds, stories, or on other websites. Google Ads is only the giant of the SEM family.",
+            "Online advertising is really six unrelated families and none of them talk to each other.",
+            "Online advertising is only social \u2014 search ads no longer count in Kenya."
+        ],
+        "correct": 1,
+        "explanation": "Section 5.1 splits every online ad platform into exactly two families \u2014 SEM (Google Ads, Microsoft Advertising, Yahoo) and Social/Display (Meta, LinkedIn, X, TikTok, YouTube, display networks). Google dominates the SEM family with over 90% of world search-ad spend, but it does not own Meta, TikTok, or LinkedIn."
+    },
+    {
+        "scenario": "Sarah's cousin says: \"Just shoot your food videos in landscape \u2014 that is what proper videographers do.\" Sarah checks her Instagram: her landscape videos look tiny with big black bars top and bottom on every phone.",
+        "question": "How should she shoot food videos going forward, according to Slide 8 of \u00a75.3?",
+        "options": [
+            "Landscape 16:9, 60 seconds, laptop-sized text \u2014 proper cinema style.",
+            "Vertical 9:16 ratio, 30 seconds or less, headlines under 60 characters so they fit on one line of a phone display, and buttons at least 44 pixels tall so a thumb can tap them.",
+            "Square 1:1 only, no vertical option.",
+            "It does not matter \u2014 phones auto-rotate."
+        ],
+        "correct": 1,
+        "explanation": "Slide 8 of \u00a75.3 lays out Sarah's mobile-first content plan: portrait photos, vertical 9:16 video, under 30 seconds, headlines under 60 characters, buttons minimum 44 pixels tall, forms under three fields, hamburger menu. Landscape video is wasted screen space on the phone."
+    },
+    {
+        "scenario": "Wangari's boss asks: \"If LinkedIn CPCs are USD 5-15 and Meta CPCs are USD 0.50-2, is LinkedIn really 5-30x more expensive per click? Is it worth it?\"",
+        "question": "What is the honest professional answer, using \u00a75.5's benchmarks?",
+        "options": [
+            "LinkedIn is only 2x more expensive \u2014 the numbers are exaggerated.",
+            "Yes, LinkedIn is 50-100x more expensive per interaction than Meta on a like-for-like basis (CPCs USD 5-15 vs Meta cents to a dollar; cost per lead USD 25-75 vs USD 0.20-1 on Meta). It IS justified when one closed deal is worth KES 350,000, like Wangari's workshops. It is NOT justified for a KES 400 lunch order.",
+            "LinkedIn is cheaper than Meta once you factor in lead quality.",
+            "There is no cost difference between LinkedIn and Meta."
+        ],
+        "correct": 1,
+        "explanation": "Slide 8 of \u00a75.5 gives exact benchmarks: CPC USD 5-15 (20-30 in finance/legal), CPM USD 30-100, cost per lead USD 25-75, versus Meta at USD 0.20-1 per lead \u2014 meaning LinkedIn is 50-100x more expensive per interaction. It is only rational when the closed deal is high-value, like Wangari's B2B workshops. Never for Sarah's lunch delivery."
+    },
+    {
+        "scenario": "Sarah has spent KES 45,000 on Meta ads over three months. Her cousin, again, tells her to switch them all off because \"they feel like they are losing money\". Sarah is about to make a KES 45,000-a-quarter decision based on a feeling.",
+        "question": "Which statement from Lesson 6.1 should you put to Sarah first?",
+        "options": [
+            "\"Feelings are a valid input \u2014 if the ads feel wrong, switch them off.\"",
+            "\"The one rule of digital marketing is that you cannot improve what you do not measure. Before you switch anything off, we look at the numbers.\"",
+            "\"Trust your cousin \u2014 he has seen more Facebook adverts than you have.\"",
+            "\"Ignore the numbers and post more often \u2014 volume beats analysis.\""
+        ],
+        "correct": 1,
+        "explanation": "Section 6.1 opens with the one rule of all digital marketing: you cannot improve what you do not measure. Analytics exists precisely to replace feelings like Sarah's (and her cousin's) with numbers. Every other option promotes guessing over measurement."
+    },
+    {
+        "scenario": "Sarah's cousin brags: \"Nyakinyua Kitchen gets 15,000 site visitors a month. Karibu Kitchen only got 2,300.\" Sarah looks closer: of her 2,300 visitors, 170 placed an order. Nyakinyua gets fewer than 150 orders from their 15,000.",
+        "question": "Which lesson from Lesson 6.2 applies here?",
+        "options": [
+            "Quantity of traffic always wins \u2014 Nyakinyua is objectively doing better.",
+            "Quality of traffic matters more than quantity. Sarah's 7.4% conversion rate crushes Nyakinyua's sub-1%, and she is outperforming a site with six times her traffic.",
+            "Sarah must copy Nyakinyua's SEO strategy immediately.",
+            "Both sites are performing the same because visitors are visitors."
+        ],
+        "correct": 1,
+        "explanation": "Section 6.2's \"quality beats quantity\" example uses these exact numbers. Sarah's 170 out of 2,300 is a ~7% conversion rate; Nyakinyua's is well under 1%. Fewer, better-matched visitors beat a flood of the wrong visitors."
+    },
+    {
+        "scenario": "Sarah wonders if it is unethical to look at Nyakinyua Kitchen's public Facebook post engagement, posting frequency, and follower growth.",
+        "question": "How does Lesson 6.3 frame this?",
+        "options": [
+            "Illegal \u2014 it is a data-protection violation to look at a public page.",
+            "Spying \u2014 never look at competitors.",
+            "Competitive benchmarking \u2014 Nyakinyua's post engagement, posting frequency and follower growth are all public. Use them to spot opportunities (like Nyakinyua slowing from 5 posts a week to 2).",
+            "Pointless \u2014 competitor data teaches nothing."
+        ],
+        "correct": 2,
+        "explanation": "Section 6.3 calls this competitive benchmarking, not spying. Sarah's example: Nyakinyua dropped from 5 posts a week to 2, so Sarah raised hers to 6 and overtook them in Google search and social engagement within a month."
+    },
+    {
+        "scenario": "Sarah is in month four. Her ads are stable but her Instagram feed shows the same food photo four times this week, each post with fewer likes than the last. Her feed uses three different fonts and six different filter styles.",
+        "question": "What is Sarah's core content problem, in the language of Lesson 7.1?",
+        "options": [
+            "She is posting too infrequently \u2014 she should post 20 times a day.",
+            "She is in a content rut \u2014 no consistent theme, no variety of visual content types, and no brand consistency across posts.",
+            "Her food is bad.",
+            "Instagram is the wrong platform for a restaurant."
+        ],
+        "correct": 1,
+        "explanation": "Section 7.1 opens with Sarah's exact content rut: repetition, inconsistent fonts and filters, and a feed that looks like it was posted by four different people. Module 7 is designed to solve precisely this problem."
+    },
+    {
+        "scenario": "Sarah always centres her food photos dead in the middle of the frame. The compositions feel flat.",
+        "question": "Which composition principle from Lesson 7.3 should she apply?",
+        "options": [
+            "The rule of thirds \u2014 imagine a 3x3 grid over the image and place the subject on one of the four intersection points where the human eye naturally focuses. Most phone camera apps have a grid setting she should turn on.",
+            "The rule of centring \u2014 always centre everything.",
+            "The rule of fifths \u2014 use a 5x5 grid.",
+            "None \u2014 flat is fine."
+        ],
+        "correct": 0,
+        "explanation": "Section 7.3 introduces the rule of thirds: place the subject at one of the four grid intersections rather than dead centre. Every modern phone camera app has a grid option \u2014 Sarah should turn it on and use it."
+    },
+    {
+        "scenario": "Sarah uploads a lunch photo to her Karibu Kitchen WordPress site with alt text: \"IMG_0342.jpg\".",
+        "question": "Which alt-text guidance from Lesson 7.6 should she follow instead?",
+        "options": [
+            "Alt text is optional.",
+            "Alt text is a plain-text description used by screen readers AND search engines. Good example: \"Ugali and beef stew in a takeaway container with a spoon\". Describe what is in the image; include a keyword naturally; keep it concise (about 125 characters is the usual guidance); do NOT start with \"image of\" or \"picture of\" \u2014 screen readers already announce that.",
+            "Start every alt text with \"image of\" or \"picture of\".",
+            "Use the file name always."
+        ],
+        "correct": 1,
+        "explanation": "Section 7.6's alt-text rule + WCAG guidance: describe the image concisely (typically \u2264125 chars), include a natural keyword, and skip \"image of\" / \"picture of\" (redundant for screen readers). Alt text also helps SEO \u2014 see Lesson 2.3."
+    },
+    {
+        "scenario": "Sarah's cousin tells her WordPress is dying and she should use a drag-and-drop site builder instead. Sarah is worried she is choosing a technology employers no longer care about.",
+        "question": "What is the honest 2026 answer you should give Sarah?",
+        "options": [
+            "Her cousin is right \u2014 WordPress is on its way out.",
+            "WordPress powers about 43 per cent of the web in 2026, and over 60 per cent of Kenyan digital marketing job listings still expect WordPress skills, so learning it is a direct career investment.",
+            "WordPress only matters for blogs and is useless for a restaurant.",
+            "Employers only care about hand-coded HTML sites."
+        ],
+        "correct": 1,
+        "explanation": "Slide 2 of Lesson 8.2 is explicit \u2014 WordPress runs 43 per cent of the internet in 2026 and over 60 per cent of Kenyan digital marketing job listings require WordPress. Learning WordPress is not nostalgia, it is employability."
+    },
+    {
+        "scenario": "Sarah opens Studio and wants to log in to the WordPress admin area for Karibu Kitchen for the first time.",
+        "question": "How does she get to wp-admin?",
+        "options": [
+            "Open her browser and guess the login URL.",
+            "In Studio, click the WP Admin button on her Karibu Kitchen site card. The login page opens in the browser. Enter the admin username and the password Studio auto-generated in Lesson 8.3.",
+            "Reinstall Studio.",
+            "Ask Automattic support to log her in."
+        ],
+        "correct": 1,
+        "explanation": "Slide 2 describes the login flow \u2014 click WP Admin on the site card in Studio, then enter the auto-generated credentials from Lesson 8.3."
+    },
+    {
+        "scenario": "Sarah is worried that switching from Twenty Twenty-Six to Astra will delete her five pages of content.",
+        "question": "What is the honest answer?",
+        "options": [
+            "Yes \u2014 themes destroy page content on switch.",
+            "No \u2014 themes control layout, typography, colours, and component styles, but NOT the content. Sarah's five pages stay exactly the same. Only the wrapper changes.",
+            "Only Astra deletes content.",
+            "Only WordPress.com deletes content."
+        ],
+        "correct": 1,
+        "explanation": "Slide 2 explains what a theme controls \u2014 layout, typography, colours, component styles. Themes do NOT touch content. Sarah can install Astra, hate it, uninstall it, and nothing is lost."
+    },
+    {
+        "scenario": "Sarah has finished building karibukitchen.co.ke and wants to write ten blog posts immediately about 'artisan lunch' \u2014 the word she personally uses for her food.",
+        "question": "What is the correct sequence in Lesson 9.2?",
+        "options": [
+            "Write first, research later \u2014 inspiration matters more.",
+            "Research keywords BEFORE writing. Keywords tell you what customers actually type, not what YOU think they type. Nobody in Eldoret searches 'artisan lunch'.",
+            "Skip keywords entirely \u2014 Google guesses intent.",
+            "Copy Nyakinyua Kitchen's blog verbatim."
+        ],
+        "correct": 1,
+        "explanation": "Slide 2 is explicit \u2014 research before writing. Keywords reveal what customers actually type. Sarah's 'artisan lunch' is not what her Eldoret customers search for."
+    },
+    {
+        "scenario": "Sarah thinks SEO ends with Yoast and content. Her trainer disagrees.",
+        "question": "What is Lesson 9.4's definition of technical SEO?",
+        "options": [
+            "Everything Google reads about your site OTHER than words and images \u2014 site speed, mobile responsiveness, whether search engines can crawl, HTTPS, whether pages are indexed, sitemap, robots.txt.",
+            "Only the choice of theme.",
+            "Only the CMS version number.",
+            "Only what the developer types by hand."
+        ],
+        "correct": 0,
+        "explanation": "Slide 2 defines technical SEO as everything Google reads other than words/images \u2014 speed, mobile, crawlability, HTTPS, indexing, sitemap, robots.txt. Yoast handles the writing. Technical SEO handles the plumbing."
+    },
+    {
+        "scenario": "Sarah asks what Google Search Console actually shows that no other tool shows.",
+        "question": "Which set of five matches Lesson 9.6?",
+        "options": [
+            "Facebook likes, Instagram followers, YouTube subs, TikTok views, Twitter retweets.",
+            "How many people saw your site in Google search results, how many clicked, which keywords brought them, which pages are indexed vs not, and technical problems Google detected while crawling.",
+            "Server RAM, disk usage, database size, plugin count, theme count.",
+            "Number of orders, total revenue, refund rate, delivery time, customer rating."
+        ],
+        "correct": 1,
+        "explanation": "Slide 2 lists the five \u2014 impressions in Google, clicks, keyword queries, indexing status, and crawl problems. This is how Google sees your site, not how visitors experience it (GA4 covers that)."
+    },
+    {
+        "scenario": "You are a junior Google Ads specialist at a Nairobi digital agency. Your new client is Mwema Coffee House. The brief: daily budget KES 1,000, seven-day total KES 7,000, average order value KES 1,500, gross margin 40 per cent, conversion goal an actual online purchase (not a click).",
+        "question": "What is Mwema's maximum profitable CPA?",
+        "options": [
+            "KES 1,500 \u2014 the full AOV.",
+            "KES 600 \u2014 because 40 per cent of KES 1,500 gross profit is what each sale generates. Above KES 600 CPA and Mwema loses money.",
+            "KES 100 \u2014 arbitrarily low.",
+            "KES 7,000 \u2014 the total campaign budget."
+        ],
+        "correct": 1,
+        "explanation": "Slide 3 does the maths \u2014 KES 1,500 AOV x 40% margin = KES 600 gross profit per sale. That is the maximum profitable CPA. Above it, every sale loses money."
+    },
+    {
+        "scenario": "You want to structure Mwema's campaign correctly before turning any sliders.",
+        "question": "Which structure matches Lesson 10.1?",
+        "options": [
+            "Ten campaigns, no ad groups, one keyword.",
+            "One campaign (sets goal and budget cap), one ad group (holds keywords and ads), 3-5 keywords, 2-3 ad variations. Simple. Enough to compete.",
+            "One campaign, one ad group, 500 keywords, one ad.",
+            "No structure \u2014 just spend."
+        ],
+        "correct": 1,
+        "explanation": "Slide 5 recaps campaign structure \u2014 one campaign, one ad group, 3-5 keywords, 2-3 ad variations. This is the minimum viable structure for the lab."
+    },
+    {
+        "scenario": "You are turning Slider 3 \u2014 keyword match type. The tightness options are Broad, Phrase, Exact.",
+        "question": "Which setting is on the winning recipe from Slide 8?",
+        "options": [
+            "Broad \u2014 cast the widest net.",
+            "Phrase or Exact \u2014 tighter match cuts impressions but raises CTR and conversion rate.",
+            "Broad, then broader.",
+            "Off \u2014 no match type."
+        ],
+        "correct": 1,
+        "explanation": "Slide 6 explains match type \u2014 tighter = fewer impressions, higher CTR and conversion rate. Slide 8's winning recipe uses Phrase or Exact, never Broad."
+    },
+    {
+        "scenario": "Sarah has been running Karibu Kitchen's Meta ads for three months from the personal ad account Meta auto-created when she first clicked Boost Post. Her cousin asks if he can help manage the ads. Sarah is nervous about sharing her personal Facebook password.",
+        "question": "What should Sarah do?",
+        "options": [
+            "Keep going with the personal ad account and share her Facebook password with her cousin \u2014 it is faster.",
+            "Set up a Business Manager at business.facebook.com. The BM owns the Page, the ad account, the Pixel, and the Instagram \u2014 Sarah remains Admin, her cousin becomes Employee with task-based permissions, and no passwords are shared.",
+            "Delete the ad account and start over on Instagram only.",
+            "Give her cousin her Meta email and reset the password every week."
+        ],
+        "correct": 1,
+        "explanation": "Slide 2 of \u00a711.1 is explicit: personal ad accounts are fragile \u2014 they die with the personal Facebook and cannot delegate cleanly. Business Manager is a separate container owned by the business, with named users, task-based permissions, and full audit logging. Never share personal credentials."
+    },
+    {
+        "scenario": "Sarah's cookie banner has an \"Accept all\" button but no \"Reject\" option, and there is no way for a visitor to withdraw consent after they click Accept.",
+        "question": "Does this comply with the Kenya Data Protection Act 2019?",
+        "options": [
+            "Yes \u2014 Accept-only banners are fine under Kenyan law.",
+            "No. DPA 2019 requires informed consent (which means a genuine option to reject), a privacy policy naming data processors like Meta, and an ongoing right to withdraw consent. Sarah must add a Reject button, a settings-based withdrawal mechanism, and a privacy policy that names Meta.",
+            "Yes \u2014 as long as she is in Eldoret rather than Nairobi.",
+            "Only if the site is in Kiswahili."
+        ],
+        "correct": 1,
+        "explanation": "Slide 8 of \u00a711.2 covers the three DPA 2019 obligations: (1) informed consent banner with accept/reject, (2) a privacy policy naming processors, (3) an ongoing right to withdraw. Accept-only banners are non-compliant. The Office of the Data Protection Commissioner can fine breaches up to KES 5,000,000."
+    },
+    {
+        "scenario": "Sarah writes 240 characters of primary text for her feed ad. On mobile it gets truncated to \"See More\" and viewers do not click through.",
+        "question": "What is Meta's safe zone for primary text, and how should she design?",
+        "options": [
+            "500 characters \u2014 Meta never truncates.",
+            "125 characters \u2014 the safe zone before Meta shows \"See More\" on mobile. Design so the key message plus the CTA land within the first 125 characters. Extra copy can follow but should not be load-bearing.",
+            "25 characters \u2014 one short sentence only.",
+            "1,000 characters \u2014 the longer the better."
+        ],
+        "correct": 1,
+        "explanation": "Slide 7 of \u00a711.4: primary text safe zone is 125 characters. Headline is 40 characters. Description is 30 characters. Design every ad to fit inside those limits \u2014 over 80% of impressions land on mobile, where truncation kills click-through rate."
+    },
+    {
+        "scenario": "Brian has been running Chapa Fitness TikTok ads from a plain Business account he created inside the TikTok app. His freelance video editor needs to help build ads, and Brian is nervous about sharing his personal TikTok password.",
+        "question": "What should Brian do?",
+        "options": [
+            "Keep going on the plain in-app Business account and share his personal TikTok password with the editor.",
+            "Set up a TikTok Business Centre at business.tiktok.com. The Business Centre OWNS the ad account, pixel, catalogue, and linked TikTok account \u2014 Brian stays Admin, the editor is added as Operator on the ad account only, and no passwords are shared.",
+            "Delete the ad account and only run organic TikTok.",
+            "Give the editor Brian's phone number and TikTok verification codes each morning."
+        ],
+        "correct": 1,
+        "explanation": "Slide 2 of \u00a712.1 explains the graduation from a plain Business account to a proper Business Centre at business.tiktok.com. The Business Centre is a container owned by the business, with named users, per-asset permissions, and full logging. Never share personal credentials."
+    },
+    {
+        "scenario": "Brian launched the Pixel and moved straight into a new campaign without ever opening the TikTok Pixel Helper. A week later he realises the Purchase event has never fired \u2014 he has no purchase attribution at all.",
+        "question": "What should he have done between install and campaign launch?",
+        "options": [
+            "Nothing extra \u2014 TikTok verifies installs automatically.",
+            "Install TikTok Pixel Helper (Chrome), walk the full purchase flow (homepage \u2192 product page \u2192 cart \u2192 checkout \u2192 thank-you page), confirm all five standard events fire with correct parameters in Pixel Helper, and cross-check the server-side copies in Events Manager BEFORE trusting attribution.",
+            "Send TikTok an email asking them to verify.",
+            "Reinstall the Pixel every Monday."
+        ],
+        "correct": 1,
+        "explanation": "Slide 7 of \u00a712.2 covers Pixel Helper verification. Every install must be walked end-to-end. Pixel Helper shows the browser copies; Events Manager confirms the server copies. Skipping this step is one of the most common mistakes."
+    },
+    {
+        "scenario": "Brian is writing the opening line for a new Chapa Fitness video. TikTok users swipe away in under three seconds if the hook does not land.",
+        "question": "Which set of hook types should he choose from?",
+        "options": [
+            "Weather, sports scores, greeting, and thanks.",
+            "The four hook types from Slide 5: the question, the contradiction, the stakes, and the curiosity gap.",
+            "The single \"corporate greeting\" hook.",
+            "TikTok does not need hooks \u2014 videos always play to the end."
+        ],
+        "correct": 1,
+        "explanation": "Slide 5 of \u00a712.4 gives the four hook types every Chapa Fitness video should be built on. Each is a promise the rest of the video must keep. Miss the hook = ad dies in 3 seconds."
+    },
+    {
+        "scenario": "Sarah tells a trainee: \"YouTube is basically a social network like Facebook. People just scroll.\" The trainee is confused because Google keeps recommending YouTube videos when he types how-to questions.",
+        "question": "What is the correct professional description of YouTube's role?",
+        "options": [
+            "YouTube is only a social network \u2014 the trainee is imagining the Google results.",
+            "YouTube is the world's #2 search engine, behind only Google itself. Over 2.7 billion monthly users, more than 1 billion hours watched per day, and roughly 40% of \"how to\" Google queries surface a YouTube video carousel above written results.",
+            "YouTube is a paid-only platform for large brands.",
+            "YouTube is a TV network, not a search engine."
+        ],
+        "correct": 1,
+        "explanation": "Slide 2 of \u00a713.1: YouTube is the #2 search engine on Earth, behind only Google. It is a search + discovery + entertainment platform simultaneously \u2014 and for how-to queries it also powers Google's own results page."
+    },
+    {
+        "scenario": "Sarah's cousin will help post short-form clips and reply to comments. Sarah does not want to share her personal Google password.",
+        "question": "What is the correct professional setup?",
+        "options": [
+            "Share the Google password in the family WhatsApp group.",
+            "Because the channel is a Brand account, Sarah adds her cousin as a named Manager. He signs in with his own Google, works on the Karibu Kitchen channel, and can be removed at any time with one click. No password sharing \u2014 same discipline as Meta Business Manager.",
+            "Only the Owner can ever touch a Brand-account channel.",
+            "Sarah must create a separate YouTube channel just for her cousin."
+        ],
+        "correct": 1,
+        "explanation": "Slide 2 + Slide 8 of \u00a713.2: Brand accounts support multiple named managers. Sarah = Owner. Cousin = Manager. No password sharing, ever. When he leaves, one click removes access."
+    },
+    {
+        "scenario": "Sarah is publishing a 5-minute long-form tutorial and asks: \"Should I put my Subscribe CTA, WhatsApp CTA, and website CTA all at the end?\"",
+        "question": "What is the correct rule?",
+        "options": [
+            "Yes \u2014 more CTAs is always better.",
+            "One CTA per video. Never three. Stacking CTAs splits the viewer's attention and reduces action rate on all of them. Sarah picks the ONE that matters most for this video \u2014 for a decision-stage tutorial, WhatsApp order is usually the winner. Move the others to the pinned comment.",
+            "Zero CTAs \u2014 never ask for anything.",
+            "Six CTAs is the sweet spot."
+        ],
+        "correct": 1,
+        "explanation": "Slide 6 of \u00a713.4: the six-part long-form structure ends with ONE clear CTA. Multiple CTAs dilute action. Extra links go in the description and pinned comment."
+    },
+    {
+        "scenario": "Sarah has heard people talk about \"Google My Business\" and also about \"Google Business Profile\". She asks whether they are two different products.",
+        "question": "Which is correct?",
+        "options": [
+            "They are separate products with different logins.",
+            "Same product. Google renamed Google My Business to Google Business Profile in 2021 and moved management into the Business Profile Manager. Same free listing, same features, new name.",
+            "Google My Business was replaced by Google Ads.",
+            "Google Business Profile is a paid tier of Google My Business."
+        ],
+        "correct": 1,
+        "explanation": "Slide 2 of \u00a714.1: GBP was called Google My Business until 2021. Same free product, renamed. No paid tier \u2014 GBP is completely free."
+    },
+    {
+        "scenario": "Sarah's options are: postcard (available, slow), phone (not offered for her category), email (not offered because her Gmail domain does not match karibukitchen.co.ke), video (available), Search Console (available \u2014 Lesson 9.6 already verified the domain).",
+        "question": "Which method should she pick?",
+        "options": [
+            "Postcard \u2014 because it is the most common globally.",
+            "Search Console \u2014 instant, and Lesson 9.6 already earned her the shortcut. Take the fastest method available.",
+            "Wait until phone verification becomes available.",
+            "Do not verify \u2014 it is optional."
+        ],
+        "correct": 1,
+        "explanation": "Slide 7: Sarah has two open options \u2014 video and Search Console. Search Console is instant and she already owns the domain proof, so it wins. Rule: take the fastest available method."
+    },
+    {
+        "scenario": "Karibu Kitchen is at 47 reviews and Sarah's cousin suggests they pay KES 50 per fake review to a Facebook contact to reach 100 reviews faster.",
+        "question": "What is wrong with this?",
+        "options": [
+            "Nothing \u2014 everyone does it.",
+            "Buying reviews is Google's #1 shortcut mistake. Google detects fake reviews at scale, removes them, flags the profile, and in severe cases suspends the entire listing. Competitors also report each other. Real customer + real transaction is the ONLY sustainable review source.",
+            "It is a great idea \u2014 Google encourages it.",
+            "It only counts as fraud if she pays more than KES 200 per review."
+        ],
+        "correct": 1,
+        "explanation": "Slide 6: never buy reviews. Detection is easy, removal is automatic, suspension is possible. Real customer + real transaction only. No shortcuts."
+    }
+];
+
+        let currentQuestion = 0, score = 0, streak = 0, answered = false;
+
+        function updateScoreboard() {
+            document.getElementById('score').textContent = score;
+            document.getElementById('current').textContent = Math.min(currentQuestion + 1, exercises.length);
+            document.getElementById('total').textContent = exercises.length;
+            document.getElementById('streak').textContent = streak;
+            document.getElementById('progress').style.width = ((currentQuestion) / exercises.length) * 100 + '%';
+        }
+
+        function escapeHtml(s) {
+            return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+        }
+
+        function renderQuestion() {
+            answered = false;
+            const q = exercises[currentQuestion];
+            let html = '';
+            if (q.scenario) {
+                html += `<div class="scenario"><strong>Scenario.</strong> ${escapeHtml(q.scenario)}</div>`;
+            }
+            html += `<div class="question">${escapeHtml(q.question)}</div>`;
+            html += '<div class="options">';
+            q.options.forEach((o, i) => {
+                html += `<button class="option" onclick="selectAnswer(${i})">${escapeHtml(o)}</button>`;
+            });
+            html += '</div>';
+            document.getElementById('exerciseCard').innerHTML = html;
+            updateScoreboard();
+        }
+
+        function selectAnswer(i) {
+            if (answered) return;
+            answered = true;
+            const q = exercises[currentQuestion];
+            const btns = document.querySelectorAll('.option');
+            btns.forEach(b => b.classList.add('disabled'));
+            btns[q.correct].classList.add('correct');
+            const right = i === q.correct;
+            if (!right) btns[i].classList.add('wrong');
+            if (right) { score += 10; streak += 1; } else { streak = 0; }
+            const fb = document.createElement('div');
+            fb.className = 'feedback ' + (right ? 'correct' : 'wrong');
+            fb.innerHTML = `<strong>${right ? '✅ Correct.' : '❌ Not quite.'}</strong><br>${escapeHtml(q.explanation)}`;
+            document.getElementById('exerciseCard').appendChild(fb);
+            const nb = document.createElement('button');
+            nb.className = 'next-btn';
+            nb.textContent = currentQuestion === exercises.length - 1 ? 'See results →' : 'Next scenario →';
+            nb.onclick = nextQuestion;
+            document.getElementById('exerciseCard').appendChild(nb);
+            updateScoreboard();
+        }
+
+        function nextQuestion() {
+            currentQuestion++;
+            if (currentQuestion >= exercises.length) return showResults();
+            renderQuestion();
+        }
+
+        function showResults() {
+            document.getElementById('progress').style.width = '100%';
+            const total = exercises.length * 10;
+            const pct = Math.round(score / total * 100);
+            if (window.parent) { window.parent.postMessage({type:"mtti_quiz_score", score: score, total: total, percent: pct}, "*"); }
+            let badge = '🌟', msg = 'Excellent work. You have a professional grasp of this lesson.';
+            if (pct < 50) { badge = '🌱'; msg = 'Good first attempt. Re-watch the lesson video and try again.'; }
+            else if (pct < 80) { badge = '📚'; msg = 'Solid progress. Review the scenarios you missed and retry.'; }
+            document.getElementById('exerciseCard').innerHTML = `
+                <div class="results">
+                    <span class="badge">${badge}</span>
+                    <h2>Quiz Complete</h2>
+                    <div class="final-score">${score} / ${total}</div>
+                    <p><strong>${pct}%</strong> · Longest streak: ${streak}</p>
+                    <p>${msg}</p>
+                    <button class="restart-btn" onclick="restart()">Try again 🔁</button>
+                </div>`;
+        }
+
+        function restart() {
+            currentQuestion = 0; score = 0; streak = 0;
+            renderQuestion();
+        }
+
+        renderQuestion();
+    </script>
+</body>
+</html>

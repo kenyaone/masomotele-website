@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CCI-01 Final Assessment | MTTI CCTV Installation</title>
+<link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Fredoka:wght@500;600&display=swap" rel="stylesheet">
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body { font-family: 'Space Mono', monospace; background: linear-gradient(135deg, #263238 0%, #37474F 100%); min-height: 100vh; padding: 20px; color: #fff; }
+.container { max-width: 900px; margin: 0 auto; }
+.header { text-align: center; margin-bottom: 30px; }
+.header .lesson-tag { display: inline-block; background: rgba(255,255,255,0.2); padding: 6px 16px; border-radius: 999px; font-size: 0.85em; margin-bottom: 12px; }
+.header h1 { font-family: 'Fredoka', sans-serif; font-size: 2.2em; margin-bottom: 8px; text-shadow: 3px 3px 0 rgba(0,0,0,0.2); }
+.score-board { background: rgba(255,255,255,0.15); backdrop-filter: blur(10px); border-radius: 20px; padding: 20px; margin-bottom: 20px; display: flex; justify-content: space-around; }
+.score-item { text-align: center; }
+.score-item .label { font-size: 0.85em; opacity: 0.9; margin-bottom: 4px; }
+.score-item .value { font-size: 1.8em; font-weight: bold; font-family: 'Fredoka', sans-serif; }
+.progress-bar { width: 100%; height: 8px; background: rgba(255,255,255,0.3); border-radius: 10px; margin-bottom: 25px; overflow: hidden; }
+.progress-fill { height: 100%; background: linear-gradient(90deg, #4FC3F7 0%, #29B6F6 100%); border-radius: 10px; transition: width 0.5s ease; width: 0%; }
+.exercise-card { background: white; color: #333; border-radius: 25px; padding: 35px; margin-bottom: 20px; box-shadow: 0 20px 60px rgba(0,0,0,0.3); }
+.scenario { background: linear-gradient(135deg, #eceff1 0%, #cfd8dc 100%); border-left: 5px solid #546e7a; padding: 20px 24px; border-radius: 12px; margin-bottom: 24px; font-size: 0.98em; line-height: 1.55; }
+.scenario strong { color: #263238; font-family: 'Fredoka', sans-serif; }
+.question { font-size: 1.15em; margin-bottom: 20px; font-weight: 700; line-height: 1.4; }
+.options { display: flex; flex-direction: column; gap: 12px; }
+.option { background: #f5f7fb; border: 2px solid transparent; padding: 16px 20px; border-radius: 12px; cursor: pointer; transition: all 0.2s ease; font-family: 'Space Mono', monospace; font-size: 0.98em; text-align: left; }
+.option:hover:not(.disabled) { background: #eef1fb; border-color: #546e7a; transform: translateX(4px); }
+.option.correct { background: #d4edda; border-color: #28a745; color: #155724; }
+.option.wrong { background: #f8d7da; border-color: #dc3545; color: #721c24; }
+.option.disabled { cursor: not-allowed; opacity: 0.85; }
+.feedback { margin-top: 22px; padding: 18px 22px; border-radius: 12px; font-size: 0.98em; line-height: 1.5; }
+.feedback.correct { background: #d4edda; color: #155724; border-left: 4px solid #28a745; }
+.feedback.wrong { background: #f8d7da; color: #721c24; border-left: 4px solid #dc3545; }
+.next-btn, .restart-btn { margin-top: 20px; background: linear-gradient(135deg, #546e7a 0%, #263238 100%); color: white; border: none; padding: 14px 32px; border-radius: 12px; font-size: 1em; cursor: pointer; font-family: 'Fredoka', sans-serif; box-shadow: 0 6px 18px rgba(0,0,0,0.2); }
+.results { text-align: center; padding: 25px 15px; }
+.results h2 { font-family: 'Fredoka', sans-serif; font-size: 2em; margin-bottom: 12px; color: #333; }
+.results .final-score { font-size: 3em; font-family: 'Fredoka', sans-serif; color: #263238; margin: 20px 0; }
+.results p { color: #555; margin-bottom: 12px; }
+.badge { display: inline-block; font-size: 3.5em; margin: 8px 0; }
+</style>
+</head>
+<body>
+<div class="container">
+<div class="header">
+<div class="lesson-tag">CCI-01 &middot; Final Assessment</div>
+<h1>CCTV Installation &mdash; Final Assessment</h1>
+</div>
+<div class="score-board">
+<div class="score-item"><div class="label">Score</div><div class="value" id="score">0</div></div>
+<div class="score-item"><div class="label">Question</div><div class="value"><span id="current">1</span>/<span id="total">17</span></div></div>
+<div class="score-item"><div class="label">Streak</div><div class="value" id="streak">0</div></div>
+</div>
+<div class="progress-bar"><div class="progress-fill" id="progress"></div></div>
+<div class="exercise-card" id="exerciseCard"></div>
+</div>
+<script>
+const exercises = [{"scenario":"A client wants a discreet camera for their shop interior, and a highly visible camera at the main gate to deter intruders.","question":"Which camera types best fit these two needs?","options":["A dome camera indoors (discreet), a bullet camera at the gate (visible deterrent)","Only PTZ cameras everywhere","Only bullet cameras everywhere","Camera type never matters"],"correct":0,"explanation":"Dome cameras are less conspicuous for interiors; bullet cameras are a visible, deterrent-style choice for entry points."},{"scenario":"Dennis is choosing a lens for a camera that needs to cover a wide area versus one that needs to zoom in on a specific point.","question":"What should guide this choice?","options":["Field of view and whether a fixed or varifocal lens fits the need","The camera's color, which matters more than the lens","Lenses are all identical regardless of use case","Only resolution matters, never the lens"],"correct":0,"explanation":"Lens choice (fixed vs varifocal) and field of view directly determine coverage area and framing for a given location."},{"scenario":"A client's building already has old coax cabling installed.","question":"What does this most likely mean for the camera system choice?","options":["An analog/coax-based system may fit best, reusing the existing cabling","IP cameras must always be used regardless of existing wiring","Cabling type is irrelevant to system choice","The building must be rewired no matter what"],"correct":0,"explanation":"Existing cabling infrastructure is a major practical factor in choosing between an analog and an IP/PoE camera system."},{"scenario":"Before quoting a new installation, Dennis walks the client's property.","question":"What is this step called, and why does it matter?","options":["A site survey \u2014 it identifies blind spots, entry points, and existing infrastructure before quoting","A random walk with no real purpose","A step that can always be skipped","A billing procedure only"],"correct":0,"explanation":"A site survey is essential groundwork \u2014 it reveals what the system actually needs to cover before any design or quote is made."},{"scenario":"Dennis is placing cameras to cover a client's entrances without excessive overlap or wasted coverage.","question":"What is he practicing?","options":["Camera placement and coverage planning","Video compression","Firmware flashing","Cable termination"],"correct":0,"explanation":"Coverage planning balances effective placement against overlap and wasted camera coverage."},{"scenario":"A small shop owner has a modest budget but wants meaningful security coverage.","question":"What's the right approach for Dennis?","options":["Balance their actual risk/needs against their budget, without over-selling unnecessary equipment","Always sell the most expensive system regardless of need","Refuse to work with a limited budget","Ignore the client's budget entirely"],"correct":0,"explanation":"Matching the system to the client's real needs and budget is both good practice and good business."},{"scenario":"Dennis is mounting an outdoor camera on a client's building.","question":"What should he prioritize?","options":["A secure mounting surface, weatherproofing, and basic working-at-height safety","Mounting anywhere convenient regardless of stability","Skipping weatherproofing to save time","Ignoring ladder safety since it's a quick job"],"correct":0,"explanation":"Secure mounting, weatherproofing for outdoor exposure, and basic safety practices are all essential during installation."},{"scenario":"Dennis is running cable from a camera back to the recorder.","question":"What should he avoid?","options":["Sharp bends in the cable and sources of interference along the route","Using any connector type at all","Routing cable in a straight line","Labeling the cable runs"],"correct":0,"explanation":"Sharp bends and interference sources can degrade signal quality \u2014 cable routing should avoid both."},{"scenario":"After running cables, Dennis connects the cameras to the DVR/NVR.","question":"What comes next in setup?","options":["Basic network configuration (IP address, port forwarding) and recording schedule setup","Nothing further is needed","Immediately disconnecting the client's router","Deleting all existing recordings"],"correct":0,"explanation":"After physical connection, network settings and recording schedules complete the installation configuration."},{"scenario":"A client wants to know how much hard drive storage they need for 16 cameras and 30 days of retention.","question":"What determines this calculation?","options":["Resolution, frame rate, number of cameras, and desired retention period together","Only the number of cameras, nothing else","Storage needs are always the same regardless of setup","The brand of the DVR alone"],"correct":0,"explanation":"Storage capacity planning depends on resolution, frame rate, camera count, and how long footage must be retained."},{"scenario":"A client wants to view their cameras from their phone while traveling.","question":"What should Dennis set up for them?","options":["The manufacturer's remote viewing app, and discuss whether cloud backup is worth the added cost","Nothing, remote viewing isn't possible","Only cloud backup, skip the app entirely","A completely separate system just for phone viewing"],"correct":0,"explanation":"Remote viewing apps enable phone access; cloud backup is a separate cost/benefit decision layered on top."},{"scenario":"A client reports a camera showing no signal.","question":"What's a sound troubleshooting order?","options":["Check power, then cable, then connector, then camera, then recorder \u2014 in a logical sequence","Replace the entire system immediately","Guess randomly which part is broken","Ignore the report until more cameras fail"],"correct":0,"explanation":"A logical, sequential troubleshooting order (power \u2192 cable \u2192 connector \u2192 camera \u2192 recorder) finds faults efficiently."},{"scenario":"Dennis performs a routine maintenance visit on an installed system.","question":"What should this include?","options":["Cleaning lenses/housings, checking connections, and applying firmware updates","Replacing the entire system every visit","Nothing, systems never need maintenance","Only checking the client's WiFi password"],"correct":0,"explanation":"Routine maintenance keeps image quality and security current \u2014 lens cleaning, connection checks, and firmware updates all matter."},{"scenario":"A client calls saying \"the camera stopped recording\" before Dennis has even seen the system.","question":"What's the appropriate first step?","options":["Triage the issue over the phone before committing to a costly site visit","Immediately dispatch a technician regardless of the issue","Tell the client to buy a new system","Ignore the call until the client calls back three times"],"correct":0,"explanation":"Phone triage can resolve or narrow down simple issues before an expensive, unnecessary site visit."},{"scenario":"Dennis is deciding whether to enable AI-based smart detection instead of basic motion detection for a client.","question":"What's the advantage of smart detection?","options":["It distinguishes a person/vehicle from irrelevant movement like a tree branch or a cat, reducing false alerts","It requires no camera at all","It disables all recording","It only works at night"],"correct":0,"explanation":"AI-based smart detection reduces false alerts by distinguishing meaningful movement (people, vehicles) from irrelevant motion."},{"scenario":"Dennis gets a fault description over the phone and wants a quick first-pass troubleshooting checklist before a site visit.","question":"What's a reasonable use of AI here?","options":["Describing the symptom to an AI assistant for an initial checklist, then verifying against the manual","Trusting the AI's answer completely with no further checking","Refusing to use any tools to help troubleshoot","Only using AI to write client invoices"],"correct":0,"explanation":"Using AI for an initial troubleshooting checklist can save time, as long as its suggestions are still verified before acting."},{"scenario":"An AI assistant suggests a specific cable length limit for Dennis's installation.","question":"What should he do before applying this to a client's live system?","options":["Double-check the AI's suggestion against the actual equipment manual first","Apply it immediately without checking anything","Ignore all AI suggestions permanently","Ask the client to verify it instead"],"correct":0,"explanation":"AI suggestions should be verified against authoritative sources (like an equipment manual) before changing a client's live system."}];
+let currentQuestion = 0, score = 0, streak = 0, answered = false;
+function updateScoreboard() {
+    document.getElementById('score').textContent = score;
+    document.getElementById('current').textContent = Math.min(currentQuestion + 1, exercises.length);
+    document.getElementById('total').textContent = exercises.length;
+    document.getElementById('streak').textContent = streak;
+    document.getElementById('progress').style.width = ((currentQuestion) / exercises.length) * 100 + '%';
+}
+function escapeHtml(s) { return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+function renderQuestion() {
+    answered = false;
+    const q = exercises[currentQuestion];
+    let html = '';
+    if (q.scenario) html += `<div class="scenario"><strong>Scenario.</strong> ${escapeHtml(q.scenario)}</div>`;
+    html += `<div class="question">${escapeHtml(q.question)}</div>`;
+    html += '<div class="options">';
+    q.options.forEach((o, i) => { html += `<button class="option" onclick="selectAnswer(${i})">${escapeHtml(o)}</button>`; });
+    html += '</div>';
+    document.getElementById('exerciseCard').innerHTML = html;
+    updateScoreboard();
+}
+function selectAnswer(i) {
+    if (answered) return;
+    answered = true;
+    const q = exercises[currentQuestion];
+    const btns = document.querySelectorAll('.option');
+    btns.forEach(b => b.classList.add('disabled'));
+    btns[q.correct].classList.add('correct');
+    const right = i === q.correct;
+    if (!right) btns[i].classList.add('wrong');
+    if (right) { score += 10; streak += 1; } else { streak = 0; }
+    const fb = document.createElement('div');
+    fb.className = 'feedback ' + (right ? 'correct' : 'wrong');
+    fb.innerHTML = `<strong>${right ? '✅ Correct.' : '❌ Not quite.'}</strong><br>${escapeHtml(q.explanation)}`;
+    document.getElementById('exerciseCard').appendChild(fb);
+    const nb = document.createElement('button');
+    nb.className = 'next-btn';
+    nb.textContent = currentQuestion === exercises.length - 1 ? 'See results →' : 'Next question →';
+    nb.onclick = nextQuestion;
+    document.getElementById('exerciseCard').appendChild(nb);
+    updateScoreboard();
+}
+function nextQuestion() { currentQuestion++; if (currentQuestion >= exercises.length) return showResults(); renderQuestion(); }
+function showResults() {
+    document.getElementById('progress').style.width = '100%';
+    const total = exercises.length * 10;
+    const pct = Math.round(score / total * 100);
+    if (window.parent) { window.parent.postMessage({type:"mtti_quiz_score", score: score, total: total, percent: pct}, "*"); }
+    let badge = '🌟', msg = 'Excellent work. You have a solid grasp of CCTV installation fundamentals.';
+    if (pct < 50) { badge = '🌱'; msg = 'Good first attempt. Review the units and try again.'; }
+    else if (pct < 80) { badge = '📚'; msg = 'Solid progress. Review the questions you missed and retry.'; }
+    document.getElementById('exerciseCard').innerHTML = `
+        <div class="results">
+            <span class="badge">${badge}</span>
+            <h2>Final Assessment Complete</h2>
+            <div class="final-score">${score} / ${total}</div>
+            <p><strong>${pct}%</strong> · Longest streak: ${streak}</p>
+            <p>${msg}</p>
+            <button class="restart-btn" onclick="restart()">Try again 🔁</button>
+        </div>`;
+}
+function restart() { currentQuestion = 0; score = 0; streak = 0; renderQuestion(); }
+renderQuestion();
+</script>
+</body>
+</html>

@@ -1,0 +1,346 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TikTok Analytics + Optimisation | MTTI Digital Marketing</title>
+    <link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Fredoka:wght@500;600&display=swap" rel="stylesheet">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Space Mono', monospace;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh; padding: 20px; color: #fff;
+        }
+        .container { max-width: 900px; margin: 0 auto; }
+        .header { text-align: center; margin-bottom: 30px; animation: slideDown 0.6s ease-out; }
+        .header .lesson-tag {
+            display: inline-block; background: rgba(255,255,255,0.2);
+            padding: 6px 16px; border-radius: 999px;
+            font-size: 0.85em; margin-bottom: 12px;
+        }
+        .header h1 {
+            font-family: 'Fredoka', sans-serif; font-size: 2.2em;
+            margin-bottom: 8px; text-shadow: 3px 3px 0 rgba(0,0,0,0.2);
+        }
+        .header p { opacity: 0.95; font-size: 0.95em; }
+        .score-board {
+            background: rgba(255,255,255,0.15); backdrop-filter: blur(10px);
+            border-radius: 20px; padding: 20px; margin-bottom: 20px;
+            display: flex; justify-content: space-around;
+            animation: fadeIn 0.8s ease-out 0.2s both;
+        }
+        .score-item { text-align: center; }
+        .score-item .label { font-size: 0.85em; opacity: 0.9; margin-bottom: 4px; }
+        .score-item .value {
+            font-size: 1.8em; font-weight: bold; font-family: 'Fredoka', sans-serif;
+        }
+        .progress-bar {
+            width: 100%; height: 8px; background: rgba(255,255,255,0.3);
+            border-radius: 10px; margin-bottom: 25px; overflow: hidden;
+        }
+        .progress-fill {
+            height: 100%; background: linear-gradient(90deg, #f093fb 0%, #f5576c 100%);
+            border-radius: 10px; transition: width 0.5s ease; width: 0%;
+        }
+        .exercise-card {
+            background: white; color: #333; border-radius: 25px;
+            padding: 35px; margin-bottom: 20px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            animation: fadeIn 0.6s ease-out both;
+        }
+        .scenario {
+            background: linear-gradient(135deg, #fff8e1 0%, #ffecb3 100%);
+            border-left: 5px solid #ffc107;
+            padding: 20px 24px; border-radius: 12px;
+            margin-bottom: 24px;
+            font-size: 0.98em; line-height: 1.55;
+        }
+        .scenario strong { color: #7a5a00; font-family: 'Fredoka', sans-serif; }
+        .question {
+            font-size: 1.15em; margin-bottom: 20px;
+            font-weight: 700; line-height: 1.4;
+        }
+        .options { display: flex; flex-direction: column; gap: 12px; }
+        .option {
+            background: #f5f7fb; border: 2px solid transparent;
+            padding: 16px 20px; border-radius: 12px;
+            cursor: pointer; transition: all 0.2s ease;
+            font-family: 'Space Mono', monospace; font-size: 0.98em; text-align: left;
+        }
+        .option:hover:not(.disabled) {
+            background: #eef1fb; border-color: #667eea; transform: translateX(4px);
+        }
+        .option.correct { background: #d4edda; border-color: #28a745; color: #155724; }
+        .option.wrong { background: #f8d7da; border-color: #dc3545; color: #721c24; animation: shake 0.4s; }
+        .option.disabled { cursor: not-allowed; opacity: 0.85; }
+        .feedback {
+            margin-top: 22px; padding: 18px 22px; border-radius: 12px;
+            animation: slideUp 0.4s ease-out;
+            font-size: 0.98em; line-height: 1.5;
+        }
+        .feedback.correct { background: #d4edda; color: #155724; border-left: 4px solid #28a745; }
+        .feedback.wrong { background: #f8d7da; color: #721c24; border-left: 4px solid #dc3545; }
+        .feedback strong { font-family: 'Fredoka', sans-serif; }
+        .next-btn, .restart-btn {
+            margin-top: 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white; border: none;
+            padding: 14px 32px; border-radius: 12px;
+            font-size: 1em; cursor: pointer;
+            font-family: 'Fredoka', sans-serif;
+            box-shadow: 0 6px 18px rgba(0,0,0,0.2);
+            transition: transform 0.2s ease;
+        }
+        .next-btn:hover, .restart-btn:hover { transform: scale(1.04); }
+        .results {
+            text-align: center; padding: 25px 15px;
+            animation: bounceIn 0.6s ease-out;
+        }
+        .results h2 {
+            font-family: 'Fredoka', sans-serif; font-size: 2em;
+            margin-bottom: 12px; color: #333;
+        }
+        .results .final-score {
+            font-size: 3em; font-family: 'Fredoka', sans-serif;
+            color: #667eea; margin: 20px 0;
+        }
+        .results p { color: #555; margin-bottom: 12px; }
+        .badge { display: inline-block; font-size: 3.5em; margin: 8px 0; }
+        @keyframes slideDown { from { opacity: 0; transform: translateY(-30px); } to { opacity: 1; transform: translateY(0); } }
+        @keyframes fadeIn { from { opacity: 0; transform: scale(0.96); } to { opacity: 1; transform: scale(1); } }
+        @keyframes slideUp { from { opacity: 0; transform: translateY(15px); } to { opacity: 1; transform: translateY(0); } }
+        @keyframes shake { 0%,100% { transform: translateX(0); } 25% { transform: translateX(-8px); } 75% { transform: translateX(8px); } }
+        @keyframes bounceIn { 0% { opacity: 0; transform: scale(0.4); } 60% { transform: scale(1.05); } 100% { opacity: 1; transform: scale(1); } }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <div class="lesson-tag">Module 12 · Lesson 12.5</div>
+            <h1>TikTok Analytics + Optimisation</h1>
+            <p>10 Brian Otieno scenarios — metrics, columns, breakdowns, kill-scale-leave, bidding, attribution</p>
+        </div>
+
+        <div class="score-board">
+            <div class="score-item"><div class="label">Score</div><div class="value" id="score">0</div></div>
+            <div class="score-item"><div class="label">Question</div><div class="value"><span id="current">1</span>/<span id="total">10</span></div></div>
+            <div class="score-item"><div class="label">Streak</div><div class="value" id="streak">0</div></div>
+        </div>
+
+        <div class="progress-bar"><div class="progress-fill" id="progress"></div></div>
+
+        <div class="exercise-card" id="exerciseCard"></div>
+    </div>
+
+    <script>
+        const exercises = [
+  {
+    "scenario": "Brian is looking at TikTok Analytics inside the Business account app AND at Ads Manager reports at ads.tiktok.com. The numbers do not match, and a Spark Ad appears in both.",
+    "question": "How should he think about the two surfaces?",
+    "options": [
+      "The two must always match — one is broken.",
+      "They are two separate surfaces. Organic TikTok Analytics answers \"is my content connecting?\" (organic reach + follower demographics). Ads Manager answers \"is my spend converting?\" (paid campaign performance). Spark Ads appear in both — do NOT double-count them.",
+      "TikTok Analytics is fake data.",
+      "Ads Manager overrides everything else."
+    ],
+    "correct": 1,
+    "explanation": "Slide 2 of §12.5 draws the line. Organic Analytics = content signal. Ads Manager = spend signal. Spark Ads live in both because they are organic content promoted as paid — Brian must be disciplined not to add the two together."
+  },
+  {
+    "scenario": "Brian's ad group shows a 32% first-two-second retention rate on impressions.",
+    "question": "Which metric is this, and how should Brian read it?",
+    "options": [
+      "Frequency — refresh the creative.",
+      "Hook rate. It is first-2-second retention ÷ impressions. Target is above 30%. 32% means the hook is landing — a strong signal to keep this creative in rotation and let it run.",
+      "CPM — cost per 1,000 impressions.",
+      "ROAS — return on ad spend."
+    ],
+    "correct": 1,
+    "explanation": "Slide 3 of §12.5 defines the hook rate as first-2-second retention ÷ impressions with a 30%+ target. 32% is comfortably above target — the hook is doing its job."
+  },
+  {
+    "scenario": "Brian opens Ads Manager and sees TikTok's default column layout — Campaign name, Delivery, Spend, Impressions. He cannot see CPA, ROAS, hook rate, or frequency without hunting through menus.",
+    "question": "What should he do once, and reuse forever?",
+    "options": [
+      "Screenshot the default columns every day.",
+      "Build a custom column set (e.g. \"Brian pro\") with 12 columns — Campaign · Status · Delivery · Spend · Impressions · Reach · Frequency · CPM · CPC · CTR · ThruPlay · Hook · Purchases · CPA · ROAS · Learning — save it, and use it on every campaign review. Consistent columns make patterns visible across weeks.",
+      "Export to Excel and rebuild by hand each week.",
+      "Ask TikTok support to change the default for him."
+    ],
+    "correct": 1,
+    "explanation": "Slide 4 of §12.5 is explicit: save one professional column set on day one and reuse forever. Random column selection hides trends. Every TikTok pro has a saved column view."
+  },
+  {
+    "scenario": "Brian's Chapa Fitness campaign shows an overall ROAS of 2.4× — below his 3× target. He is about to kill the whole campaign.",
+    "question": "What should he do first?",
+    "options": [
+      "Kill the campaign immediately.",
+      "Run breakdowns before killing. By placement (TikTok vs Pangle vs News Feed), by age + gender, by day + hour, by placement position, and by attribution window. The aggregate 2.4× likely hides a 4× winner on TikTok placement + 16-24 audience and a 0.6× loser on Pangle. Kill the loser slice, scale the winner slice.",
+      "Double the budget on the whole campaign.",
+      "Restart from zero."
+    ],
+    "correct": 1,
+    "explanation": "Slide 5 of §12.5 is clear: aggregate reporting is a lie by omission. Breakdowns expose the truth. A 2.4× overall almost always hides a 4-6× winner sub-slice and a 0.5× loser sub-slice. Kill the loser, scale the winner — do not kill the campaign."
+  },
+  {
+    "scenario": "Brian's cold prospecting ad group has spent KES 4,500 with zero purchases. His CPA target is KES 400. His ROAS is 0×.",
+    "question": "What is the correct call under the kill-scale-leave loop?",
+    "options": [
+      "Give it another two weeks.",
+      "Kill immediately. CPA is more than 5× target and ROAS is below 0.5×. Both are kill triggers from Slide 6. Waiting only spends more money on a loser. Do not rescue.",
+      "Raise the budget to unlock better delivery.",
+      "Duplicate it into three new ad groups."
+    ],
+    "correct": 1,
+    "explanation": "Slide 6 of §12.5 gives the kill rule: CPA above 5× target OR ROAS below 0.5× = kill. Both are hit here. Discipline wins — the algorithm has had a fair test."
+  },
+  {
+    "scenario": "Brian's retargeting ad group is winning at CPA KES 210 (target KES 300) and ROAS 4.1×. He wants to scale it.",
+    "question": "How fast should he scale?",
+    "options": [
+      "Double the daily budget overnight.",
+      "Raise the daily budget by 20% every 3-4 days. Larger jumps re-enter the Learning Phase and typically blow up CPA. Stay inside the ≤20% every 3-4 days rule.",
+      "Ten-x the budget once and hope.",
+      "Move the ad group to Cost Cap first."
+    ],
+    "correct": 1,
+    "explanation": "Slide 6 of §12.5 gives the scale rule: winners get +20% budget every 3-4 days. Larger jumps re-enter Learning and CPA collapses. Small, patient, disciplined scaling is what compounds."
+  },
+  {
+    "scenario": "Brian's Meta rep advises: \"Switch every new TikTok ad group from Automatic Optimisation to Cost Cap on day one for maximum CPA control.\"",
+    "question": "How should Brian respond?",
+    "options": [
+      "Follow the advice — Cost Cap always wins.",
+      "Politely disagree. Cost Cap starves new ad groups during Learning and usually underperforms Automatic Optimisation until the algorithm has data. Start every new ad group on Automatic. Switch to Cost Cap ONLY after ~50 conversions and CPA has stabilised. In practice, most winners stay on Automatic forever.",
+      "Switch all live ad groups tonight.",
+      "Only if the rep pays for the campaign."
+    ],
+    "correct": 1,
+    "explanation": "Slide 7 of §12.5: Automatic Optimisation is the default and — surprisingly to beginners — usually the winner. Cost Cap looks like control but starves new ad groups. Move only after 50 conversions and stable CPA."
+  },
+  {
+    "scenario": "Brian's ad group frequency has climbed from 1.8 to 4.3 in a week, and CTR has dropped from 2.6% to 0.7%.",
+    "question": "What is the correct call?",
+    "options": [
+      "Raise the budget to fight the declining CTR.",
+      "Creative fatigue. Frequency above 3 with a collapsing CTR is a classic pattern. Refresh with a new Spark Ad — do not raise budget on a tired video. Same lesson as Meta's frequency > 3 refresh trigger from Lesson 11.5.",
+      "Kill the campaign and restart.",
+      "Leave it — CTR always recovers."
+    ],
+    "correct": 1,
+    "explanation": "Slide 3 of §12.5 flags frequency > 3 as a refresh trigger and Slide 6 excludes rescuing losers. Fatigue is real; the fix is a fresh Spark Ad — not more budget on the tired one."
+  },
+  {
+    "scenario": "Brian compares his Ads Manager totals: 7-day-click gives 142 purchases; 1-day-view gives 78 additional purchases (unique). 1-day-view is much smaller than 7-day-click.",
+    "question": "What does this pattern tell him?",
+    "options": [
+      "View-through is worthless and should be disabled.",
+      "View attribution is adding a moderate incremental signal — 55% of click totals — but click-through is still the dominant, most trustworthy attribution. Keep 7-day click + 1-day view as the default and treat view-through as a sanity check, not a primary reporting number.",
+      "TikTok has broken and must be reinstalled.",
+      "The numbers should be added and reported as 220 purchases everywhere."
+    ],
+    "correct": 1,
+    "explanation": "Slide 8 of §12.5: real incrementality lives in click-through. When 7-day click dominates, view-through is a healthy add-on. When view-through dominates click, TikTok is claiming credit for people who would have bought anyway — a red flag."
+  },
+  {
+    "scenario": "A trainee summarises Lesson 12.5 in one line: \"Organic TikTok Analytics and Ads Manager report the same numbers, hook rate is impressions per user, and Cost Cap should be the default for new ad groups.\"",
+    "question": "How many of those three claims are correct?",
+    "options": [
+      "All three.",
+      "Two — the hook rate and Cost Cap parts.",
+      "Zero — every claim is wrong.",
+      "One — only the analytics part."
+    ],
+    "correct": 2,
+    "explanation": "Every claim is wrong. Organic Analytics and Ads Manager are SEPARATE surfaces with different scopes (Slide 2). Hook rate is first-2-second RETENTION ÷ impressions — NOT impressions per user (that is frequency) (Slide 3). And Automatic Optimisation is the default for new ad groups, NOT Cost Cap (Slide 7)."
+  }
+];
+
+        let currentQuestion = 0, score = 0, streak = 0, answered = false;
+
+        function updateScoreboard() {
+            document.getElementById('score').textContent = score;
+            document.getElementById('current').textContent = Math.min(currentQuestion + 1, exercises.length);
+            document.getElementById('total').textContent = exercises.length;
+            document.getElementById('streak').textContent = streak;
+            document.getElementById('progress').style.width = ((currentQuestion) / exercises.length) * 100 + '%';
+        }
+
+        function escapeHtml(s) {
+            return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+        }
+
+        function renderQuestion() {
+            answered = false;
+            const q = exercises[currentQuestion];
+            let html = '';
+            if (q.scenario) {
+                html += `<div class="scenario"><strong>Scenario.</strong> ${escapeHtml(q.scenario)}</div>`;
+            }
+            html += `<div class="question">${escapeHtml(q.question)}</div>`;
+            html += '<div class="options">';
+            q.options.forEach((o, i) => {
+                html += `<button class="option" onclick="selectAnswer(${i})">${escapeHtml(o)}</button>`;
+            });
+            html += '</div>';
+            document.getElementById('exerciseCard').innerHTML = html;
+            updateScoreboard();
+        }
+
+        function selectAnswer(i) {
+            if (answered) return;
+            answered = true;
+            const q = exercises[currentQuestion];
+            const btns = document.querySelectorAll('.option');
+            btns.forEach(b => b.classList.add('disabled'));
+            btns[q.correct].classList.add('correct');
+            const right = i === q.correct;
+            if (!right) btns[i].classList.add('wrong');
+            if (right) { score += 10; streak += 1; } else { streak = 0; }
+            const fb = document.createElement('div');
+            fb.className = 'feedback ' + (right ? 'correct' : 'wrong');
+            fb.innerHTML = `<strong>${right ? '✅ Correct.' : '❌ Not quite.'}</strong><br>${escapeHtml(q.explanation)}`;
+            document.getElementById('exerciseCard').appendChild(fb);
+            const nb = document.createElement('button');
+            nb.className = 'next-btn';
+            nb.textContent = currentQuestion === exercises.length - 1 ? 'See results →' : 'Next scenario →';
+            nb.onclick = nextQuestion;
+            document.getElementById('exerciseCard').appendChild(nb);
+            updateScoreboard();
+        }
+
+        function nextQuestion() {
+            currentQuestion++;
+            if (currentQuestion >= exercises.length) return showResults();
+            renderQuestion();
+        }
+
+        function showResults() {
+            document.getElementById('progress').style.width = '100%';
+            const total = exercises.length * 10;
+            const pct = Math.round(score / total * 100);
+            if (window.parent) { window.parent.postMessage({type:"mtti_quiz_score", score: score, total: total, percent: pct}, "*"); }
+            let badge = '🌟', msg = 'Excellent work. You have a professional grasp of this lesson.';
+            if (pct < 50) { badge = '🌱'; msg = 'Good first attempt. Re-watch the lesson video and try again.'; }
+            else if (pct < 80) { badge = '📚'; msg = 'Solid progress. Review the scenarios you missed and retry.'; }
+            document.getElementById('exerciseCard').innerHTML = `
+                <div class="results">
+                    <span class="badge">${badge}</span>
+                    <h2>Quiz Complete</h2>
+                    <div class="final-score">${score} / ${total}</div>
+                    <p><strong>${pct}%</strong> · Longest streak: ${streak}</p>
+                    <p>${msg}</p>
+                    <button class="restart-btn" onclick="restart()">Try again 🔁</button>
+                </div>`;
+        }
+
+        function restart() {
+            currentQuestion = 0; score = 0; streak = 0;
+            renderQuestion();
+        }
+
+        renderQuestion();
+    </script>
+</body>
+</html>

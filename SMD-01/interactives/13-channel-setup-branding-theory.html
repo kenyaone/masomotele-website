@@ -1,0 +1,580 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lesson 13.2 — Channel Setup & Branding (Interactive)</title>
+<style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: 'Roboto', 'Segoe UI', -apple-system, sans-serif; line-height: 1.55; color: #0f0f0f; background: #f9f9f9; min-height: 100vh; }
+    .container { max-width: 1200px; margin: 0 auto; padding: 20px; }
+    header {
+        background: linear-gradient(135deg, #2E7D32, #1B5E20);
+        color: #fff; padding: 40px 30px; border-radius: 12px; margin-bottom: 24px;
+        box-shadow: 0 10px 30px rgba(255,0,0,0.25);
+    }
+    header .badge { display: inline-block; background: rgba(255,255,255,0.2); padding: 4px 14px; border-radius: 16px; font-size: 12px; font-weight: bold; letter-spacing: 1px; margin-bottom: 14px; }
+    header h1 { font-size: 34px; margin-bottom: 8px; }
+    header .subtitle { font-size: 17px; opacity: 0.95; margin-bottom: 20px; }
+    .meta-strip { display: flex; flex-wrap: wrap; gap: 12px; }
+    .meta-strip span { background: rgba(255,255,255,0.18); padding: 6px 14px; border-radius: 20px; font-size: 13px; }
+    .toc { background: #fff; border: 1px solid #e5e5e5; border-radius: 10px; padding: 22px 26px; margin-bottom: 22px; }
+    .toc h3 { color: #ff0000; margin-bottom: 10px; }
+    .toc ol { padding-left: 20px; }
+    .toc a { color: #cc0000; text-decoration: none; font-weight: 600; }
+    section { background: #fff; border: 1px solid #e5e5e5; border-radius: 10px; padding: 26px 30px; margin-bottom: 22px; }
+    section h2 { color: #ff0000; font-size: 22px; margin-bottom: 12px; padding-bottom: 8px; border-bottom: 3px solid #ff0000; }
+    section h3 { color: #0f0f0f; font-size: 17px; margin: 18px 0 8px; }
+    section p { margin-bottom: 12px; }
+    section ul, section ol { padding-left: 22px; margin-bottom: 12px; }
+    section li { margin-bottom: 4px; }
+    .callout { border-left: 5px solid #ff0000; background: #fff1f1; padding: 14px 18px; margin: 14px 0; border-radius: 4px; }
+    .callout.warn { border-left-color: #d97706; background: #fef3c7; }
+    .callout.tip { border-left-color: #059669; background: #ecfdf5; }
+    .callout strong { color: #cc0000; }
+    .callout.warn strong { color: #92400e; }
+    .callout.tip strong { color: #065f46; }
+
+    /* Studio mock */
+    .studio { border: 1px solid #e5e5e5; border-radius: 10px; overflow: hidden; margin: 14px 0; background: #fff; }
+    .studio-top { background: #0f0f0f; color: #fff; padding: 10px 16px; display: flex; align-items: center; gap: 14px; font-size: 14px; }
+    .studio-top .logo { display: inline-flex; align-items: center; font-weight: 700; }
+    .studio-top .logo .play { display:inline-flex; align-items:center; justify-content:center; width: 26px; height: 18px; background: #ff0000; color: #fff; border-radius: 4px; margin-right: 6px; font-size: 11px; }
+    .studio-top .crumb { color: #aaa; font-size: 13px; margin-left: auto; }
+    .studio-body { display: grid; grid-template-columns: 200px 1fr; min-height: 500px; }
+    @media (max-width: 800px) { .studio-body { grid-template-columns: 1fr; } .studio-side { display: none; } }
+    .studio-side { background: #fff; border-right: 1px solid #e5e5e5; padding: 10px 0; font-size: 13.5px; }
+    .studio-menu { padding: 8px 20px; color: #0f0f0f; cursor: pointer; border-left: 3px solid transparent; }
+    .studio-menu:hover { background: #f2f2f2; }
+    .studio-menu.active { border-left-color: #ff0000; color: #cc0000; background: #fff1f1; font-weight: 600; }
+    .studio-menu .icon { display: inline-block; width: 20px; margin-right: 8px; }
+    .studio-main { padding: 20px 24px; background: #fafafa; }
+
+    .cust-tabs { display: flex; gap: 4px; border-bottom: 2px solid #e5e5e5; margin-bottom: 20px; flex-wrap: wrap; }
+    .cust-tabs button { background: none; border: none; padding: 10px 18px; cursor: pointer; font-size: 14px; font-weight: 600; color: #606060; border-bottom: 3px solid transparent; margin-bottom: -2px; }
+    .cust-tabs button.active { color: #ff0000; border-bottom-color: #ff0000; }
+    .cust-panel { display: none; }
+    .cust-panel.active { display: block; }
+
+    .field { margin-bottom: 20px; }
+    .field label.field-label { display: block; font-size: 15px; font-weight: 600; color: #0f0f0f; margin-bottom: 4px; }
+    .field .hint { font-size: 12.5px; color: #606060; margin-bottom: 8px; }
+
+    /* Upload spots */
+    .upload-spot { border: 2px dashed #ccc; border-radius: 8px; background: #fff; padding: 16px; display: flex; align-items: center; gap: 16px; }
+    .upload-spot .preview { border: 1px solid #e5e5e5; background: #f2f2f2; display: flex; align-items: center; justify-content: center; color: #606060; font-size: 12px; text-align: center; flex-shrink: 0; }
+    .pfp-preview { width: 96px; height: 96px; border-radius: 50%; overflow: hidden; }
+    .pfp-preview .inner { width:100%; height:100%; background: linear-gradient(135deg, #8b1e1e, #d4a34a); color: #fff5e6; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 22px; }
+    .upload-spot .up-info { font-size: 13.5px; color: #606060; }
+    .upload-spot .up-info strong { color: #0f0f0f; }
+
+    /* Banner canvas */
+    .banner-canvas { position: relative; width: 100%; aspect-ratio: 2560/1440; background: linear-gradient(135deg, #8b1e1e 0%, #b8860b 60%, #d4a34a 100%); border-radius: 8px; overflow: hidden; margin-bottom: 12px; color: #fff5e6; }
+    .banner-canvas .bg-text { position: absolute; top: 14%; left: 6%; font-size: 3vw; font-weight: 700; text-shadow: 0 2px 8px rgba(0,0,0,0.3); }
+    .banner-canvas .food { position: absolute; right: 3%; bottom: 5%; width: 30%; height: 60%; background: radial-gradient(circle at 50% 50%, #f59e0b, #7c2d12 70%); border-radius: 12px; opacity: 0.85; }
+    .banner-safe { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 60.4%; aspect-ratio: 1546/423; border: 3px dashed rgba(255,255,255,0.9); display: flex; flex-direction: column; align-items: center; justify-content: center; font-size: 1.6vw; font-weight: 700; text-align: center; text-shadow: 0 2px 6px rgba(0,0,0,0.4); }
+    .banner-safe .lbl { position: absolute; top: -22px; left: 0; font-size: 11px; background: rgba(255,255,255,0.9); color: #0f0f0f; padding: 2px 8px; border-radius: 4px; font-weight: 600; }
+    .safe-note { font-size: 12.5px; color: #606060; margin-top: 6px; }
+
+    /* Banner scenario picker */
+    .scenario-row { display: flex; gap: 8px; flex-wrap: wrap; margin: 12px 0 8px; }
+    .scenario-row button { padding: 8px 14px; border: 2px solid #e5e5e5; background: #fff; border-radius: 8px; cursor: pointer; font-size: 13px; font-weight: 600; color: #606060; }
+    .scenario-row button.active { border-color: #ff0000; color: #cc0000; background: #fff1f1; }
+    .device-crops { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-top: 12px; }
+    @media (max-width: 600px) { .device-crops { grid-template-columns: 1fr; } }
+    .device-crop { background: #fff; border: 1px solid #e5e5e5; border-radius: 8px; padding: 10px; text-align: center; }
+    .device-crop h5 { font-size: 12px; color: #606060; margin-bottom: 6px; text-transform: uppercase; letter-spacing: 0.5px; }
+    .device-crop .strip { width: 100%; height: 60px; background: linear-gradient(135deg, #8b1e1e, #d4a34a); border-radius: 4px; position: relative; overflow: hidden; }
+    .device-crop .strip .logo { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); font-size: 11px; font-weight: 700; color: #fff5e6; text-shadow: 0 1px 3px rgba(0,0,0,0.5); }
+    .device-crop .verdict { font-size: 12px; margin-top: 6px; font-weight: 600; }
+    .device-crop .verdict.pass { color: #059669; }
+    .device-crop .verdict.fail { color: #dc2626; }
+
+    /* Layout mock */
+    .layout-preview { background: #fff; border: 1px solid #e5e5e5; border-radius: 8px; padding: 16px; margin-top: 12px; }
+    .featured-video { display: grid; grid-template-columns: 320px 1fr; gap: 14px; padding-bottom: 12px; border-bottom: 1px solid #e5e5e5; margin-bottom: 12px; }
+    @media (max-width: 600px) { .featured-video { grid-template-columns: 1fr; } }
+    .featured-video .vid-thumb { aspect-ratio: 16/9; background: linear-gradient(135deg, #dc2626, #7f1d1d); border-radius: 8px; display: flex; align-items: center; justify-content: center; color: #fff; font-weight: 700; font-size: 14px; text-align: center; padding: 10px; }
+    .featured-video .vid-info h5 { font-size: 15px; color: #0f0f0f; margin-bottom: 4px; }
+    .featured-video .vid-info .meta { color: #606060; font-size: 13px; margin-bottom: 8px; }
+    .featured-video .vid-info p { font-size: 13px; color: #0f0f0f; }
+    .playlist-row { margin-bottom: 14px; }
+    .playlist-row h5 { font-size: 14px; margin-bottom: 8px; color: #0f0f0f; }
+    .playlist-strip { display: flex; gap: 10px; overflow-x: auto; padding-bottom: 4px; }
+    .pl-card { flex: 0 0 140px; }
+    .pl-card .pl-thumb { aspect-ratio: 16/9; border-radius: 6px; display: flex; align-items: center; justify-content: center; color: #fff; font-size: 11px; font-weight: 600; padding: 6px; text-align: center; }
+    .pl-card h6 { font-size: 12px; margin-top: 4px; color: #0f0f0f; line-height: 1.2; }
+    .pl-thumb.a { background: linear-gradient(135deg, #dc2626, #7f1d1d); }
+    .pl-thumb.b { background: linear-gradient(135deg, #d97706, #92400e); }
+    .pl-thumb.c { background: linear-gradient(135deg, #059669, #064e3b); }
+    .pl-thumb.d { background: linear-gradient(135deg, #F57C00, #4c1d95); }
+    .pl-thumb.e { background: linear-gradient(135deg, #0891b2, #164e63); }
+
+    /* Basic info form */
+    .form-row { display: grid; grid-template-columns: 200px 1fr; gap: 12px; margin-bottom: 12px; align-items: start; }
+    @media (max-width: 600px) { .form-row { grid-template-columns: 1fr; } }
+    .form-row label { font-weight: 600; color: #0f0f0f; padding-top: 8px; font-size: 14px; }
+    .form-row input, .form-row textarea, .form-row select { padding: 8px 12px; border: 1px solid #ccc; border-radius: 6px; font-size: 14px; font-family: inherit; width: 100%; }
+    .form-row textarea { min-height: 90px; resize: vertical; }
+    .link-chip { display: inline-block; background: #f2f2f2; padding: 6px 12px; border-radius: 16px; font-size: 12.5px; margin: 2px 4px 2px 0; color: #0f0f0f; }
+
+    /* Checklist */
+    .checklist { background: #f2f2f2; border: 1.5px solid #e5e5e5; border-radius: 10px; padding: 18px; margin: 14px 0; }
+    .checklist h4 { color: #0f0f0f; margin-bottom: 10px; font-size: 16px; }
+    .check-item { display: flex; align-items: flex-start; gap: 10px; padding: 8px 0; border-bottom: 1px solid #e5e5e5; }
+    .check-item:last-child { border-bottom: 0; }
+    .check-item input[type="checkbox"] { margin-top: 3px; accent-color: #ff0000; transform: scale(1.2); }
+    .check-item label { font-size: 14px; color: #0f0f0f; cursor: pointer; flex: 1; }
+    .check-item .req { color: #dc2626; font-size: 11px; font-weight: 700; margin-left: 4px; }
+    .checklist .actions { margin-top: 12px; }
+    .checklist .result { margin-top: 12px; padding: 12px; border-radius: 8px; display: none; font-size: 14px; }
+    .checklist .result.show { display: block; }
+    .checklist .result.good { background: #d1fae5; color: #065f46; border-left: 4px solid #059669; }
+    .checklist .result.mid { background: #fef3c7; color: #92400e; border-left: 4px solid #d97706; }
+    .checklist .result.bad { background: #fee2e2; color: #991b1b; border-left: 4px solid #dc2626; }
+
+    button.btn { background: #ff0000; color: #fff; border: none; padding: 10px 20px; border-radius: 6px; font-size: 14px; font-weight: 600; cursor: pointer; }
+    button.btn:hover { background: #cc0000; }
+    button.btn.reset { background: #606060; margin-left: 8px; }
+
+    footer { text-align: center; color: #606060; padding: 24px; font-size: 13px; }
+
+    /* MTTI logo stamp */
+    .mtti-logo-stamp {
+        position: fixed; top: 14px; right: 18px; z-index: 999;
+        opacity: 0.88; transition: opacity 0.2s;
+    }
+    .mtti-logo-stamp:hover { opacity: 1; }
+    .mtti-logo-stamp img { width: 56px; height: 56px; border-radius: 50%; box-shadow: 0 2px 8px rgba(0,0,0,0.18); }
+</style>
+</head>
+<body>
+<div class="mtti-logo-stamp">
+    <img src="../../Resources/Logo.jpeg" alt="MTTI" title="Masomotele Technical Training Institute — Start learning, Start earning">
+</div>
+
+<div class="container">
+
+<header>
+    <div class="badge">LESSON 13.2  ·  YOUTUBE MARKETING  ·  INTERACTIVE</div>
+    <h1>Channel Setup & Branding</h1>
+    <div class="subtitle">Configure Sarah's Karibu Kitchen channel in YouTube Studio Customisation. Layout, Branding, Basic info, and the banner-safe-area check that trips up 80% of new channels.</div>
+    <div class="meta-strip">
+        <span><strong>Duration:</strong> ~35 min interactive</span>
+        <span><strong>Level:</strong> Beginner</span>
+        <span><strong>Tool:</strong> studio.youtube.com</span>
+        <span><strong>Handbook:</strong> Module 13, §13.2</span>
+    </div>
+</header>
+
+<div class="toc">
+    <h3>What you'll do in this lesson</h3>
+    <ol>
+        <li><a href="#s1">Personal vs Brand account</a></li>
+        <li><a href="#s2">Studio Customisation — Layout / Branding / Basic info</a></li>
+        <li><a href="#s3"><strong>Banner-safe-area visualiser (interactive)</strong></a></li>
+        <li><a href="#s4">The About tab — SEO-load-bearing text</a></li>
+        <li><a href="#s5"><strong>Channel-name checklist — score Sarah's setup</strong></a></li>
+    </ol>
+</div>
+
+<section id="s1">
+    <h2>1. Personal vs Brand account</h2>
+    <p>Every YouTube channel sits under a Google account. Two flavours — pick the second.</p>
+    <table style="width:100%; border-collapse:collapse; font-size:14px;">
+        <tr><th style="background:#ff0000;color:#fff;padding:10px;text-align:left;">Personal Google account</th><th style="background:#ff0000;color:#fff;padding:10px;text-align:left;">Brand account &#9733;</th></tr>
+        <tr>
+            <td style="padding:12px;border:1px solid #e5e5e5;vertical-align:top;">Fast setup. Simple. But the channel dies if Sarah's personal Google is suspended. No one else can be added as a manager.</td>
+            <td style="padding:12px;border:1px solid #e5e5e5;vertical-align:top;">Separate identity under Sarah's Google. Its own channel, its own permissions, multiple named managers. Business owns the container, not the person.</td>
+        </tr>
+    </table>
+    <div class="callout tip">
+        <strong>Sarah's choice:</strong> Brand account linked to <code>karibukitchen.co.ke</code> Workspace. Adds her cousin as Manager. If Sarah's Google ever gets locked, Karibu Kitchen keeps posting.
+    </div>
+</section>
+
+<section id="s2">
+    <h2>2. YouTube Studio &rarr; Customisation</h2>
+    <p>This is the mock. Click the tabs to move between Layout, Branding, and Basic info — the three panels that define the channel.</p>
+
+    <div class="studio">
+        <div class="studio-top">
+            <div class="logo"><span class="play">&#9654;</span>Studio</div>
+            <span style="color:#aaa; font-size:13px;">Karibu Kitchen &nbsp; &#9662;</span>
+            <span class="crumb">Customisation</span>
+        </div>
+        <div class="studio-body">
+            <div class="studio-side">
+                <div class="studio-menu"><span class="icon">&#127760;</span>Dashboard</div>
+                <div class="studio-menu"><span class="icon">&#127916;</span>Content</div>
+                <div class="studio-menu"><span class="icon">&#128172;</span>Comments</div>
+                <div class="studio-menu"><span class="icon">&#128200;</span>Analytics</div>
+                <div class="studio-menu active"><span class="icon">&#127912;</span>Customisation</div>
+                <div class="studio-menu"><span class="icon">&#127925;</span>Audio library</div>
+                <div class="studio-menu"><span class="icon">&#9881;</span>Settings</div>
+            </div>
+            <div class="studio-main">
+                <div class="cust-tabs">
+                    <button class="active" onclick="showCust('layout', this)">Layout</button>
+                    <button onclick="showCust('brand', this)">Branding</button>
+                    <button onclick="showCust('basic', this)">Basic info</button>
+                </div>
+
+                <!-- LAYOUT -->
+                <div class="cust-panel active" id="cust-layout">
+                    <div class="field">
+                        <label class="field-label">Featured video for non-subscribers (channel trailer)</label>
+                        <div class="hint">30–90 second sales pitch. Auto-plays for anyone who hasn't subscribed yet.</div>
+                        <div class="layout-preview">
+                            <div class="featured-video">
+                                <div class="vid-thumb">Karibu Kitchen — Meet Sarah &nbsp;·&nbsp; 0:35</div>
+                                <div class="vid-info">
+                                    <h5>Karibu Kitchen — Fresh Kenyan Lunch, Eldoret, 30 min</h5>
+                                    <div class="meta">Karibu Kitchen · 0:35 · Channel trailer</div>
+                                    <p>Hi, I'm Sarah. I run Karibu Kitchen in Eldoret. On this channel I show you how to cook fresh Kenyan meals and how our delivery works. Subscribe if you want lunch inspiration.</p>
+                                </div>
+                            </div>
+                            <div class="playlist-row">
+                                <h5>Fresh Recipes (12 videos)</h5>
+                                <div class="playlist-strip">
+                                    <div class="pl-card"><div class="pl-thumb a">Ugali no lumps</div><h6>How to Make Perfect Ugali</h6></div>
+                                    <div class="pl-card"><div class="pl-thumb b">Chapati soft</div><h6>Soft Chapati Every Time</h6></div>
+                                    <div class="pl-card"><div class="pl-thumb c">Sukuma wiki</div><h6>Sukuma Wiki 4 Min</h6></div>
+                                    <div class="pl-card"><div class="pl-thumb d">Beef stew</div><h6>Kenyan Beef Stew</h6></div>
+                                </div>
+                            </div>
+                            <div class="playlist-row">
+                                <h5>Delivery Diaries (5 videos)</h5>
+                                <div class="playlist-strip">
+                                    <div class="pl-card"><div class="pl-thumb e">Elgon View run</div><h6>Elgon View Delivery</h6></div>
+                                    <div class="pl-card"><div class="pl-thumb a">Kapsoya lunch</div><h6>Kapsoya Office Lunch</h6></div>
+                                    <div class="pl-card"><div class="pl-thumb b">CBD 30 min</div><h6>CBD in 30 Minutes</h6></div>
+                                </div>
+                            </div>
+                            <div class="playlist-row">
+                                <h5>Behind the Kitchen (3 videos)</h5>
+                                <div class="playlist-strip">
+                                    <div class="pl-card"><div class="pl-thumb c">Sourcing</div><h6>Where We Buy Ingredients</h6></div>
+                                    <div class="pl-card"><div class="pl-thumb d">Team</div><h6>Meet the Team</h6></div>
+                                    <div class="pl-card"><div class="pl-thumb e">Kitchen tour</div><h6>Full Kitchen Tour</h6></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="callout tip">
+                        <strong>Rule:</strong> 3–5 core playlists to start. Not 15. Not 1. Each playlist becomes a row on your channel homepage AND ranks in YouTube Search on its own.
+                    </div>
+                </div>
+
+                <!-- BRANDING -->
+                <div class="cust-panel" id="cust-brand">
+                    <div class="field">
+                        <label class="field-label">Picture (channel avatar)</label>
+                        <div class="hint">Recommended: 800 &times; 800 px. Displayed as a circle. PNG or JPG under 4 MB.</div>
+                        <div class="upload-spot">
+                            <div class="preview pfp-preview"><div class="inner">KK</div></div>
+                            <div class="up-info">
+                                <strong>karibu-kitchen-logo-mark.png</strong><br>
+                                800 &times; 800 · 42 KB<br>
+                                <em style="color:#606060;">Logo mark only — full stacked lockup becomes unreadable at avatar size.</em>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="field">
+                        <label class="field-label">Banner image</label>
+                        <div class="hint">Upload: 2560 &times; 1440 px. Safe area (visible on ALL devices): 1546 &times; 423 px, centred. See §3 for the interactive visualiser.</div>
+                        <div class="banner-canvas">
+                            <div class="bg-text">Karibu Kitchen</div>
+                            <div class="food"></div>
+                            <div class="banner-safe">
+                                <span class="lbl">SAFE AREA 1546 &times; 423</span>
+                                Karibu Kitchen<br>
+                                <span style="font-size:0.7em; opacity:0.9;">Hot lunch delivered in 30 min · Eldoret</span>
+                            </div>
+                        </div>
+                        <div class="safe-note">Dashed rectangle = safe area. Everything inside is guaranteed to show on mobile. Everything outside gets cropped on smaller screens.</div>
+                    </div>
+
+                    <div class="field">
+                        <label class="field-label">Video watermark</label>
+                        <div class="hint">150 &times; 150 px PNG with transparent background. Appears bottom-right on every video with a Subscribe overlay.</div>
+                        <div class="upload-spot">
+                            <div class="preview" style="width:60px; height:60px; border-radius:6px;">KK</div>
+                            <div class="up-info"><strong>watermark-transparent.png</strong><br>150 &times; 150 · 8 KB</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- BASIC INFO -->
+                <div class="cust-panel" id="cust-basic">
+                    <div class="form-row">
+                        <label>Channel name</label>
+                        <input value="Karibu Kitchen">
+                    </div>
+                    <div class="form-row">
+                        <label>Handle</label>
+                        <input value="@karibukitchen">
+                    </div>
+                    <div class="form-row">
+                        <label>Description</label>
+                        <textarea>Karibu Kitchen is Eldoret's home-cooked lunch delivery service. Fresh Kenyan meals — ugali, mbuzi, kuku, veg — delivered hot in 30 minutes across Kapsoya, Elgon View, and the CBD. New tutorials every Wednesday. WhatsApp orders: +254 700 000 000.</textarea>
+                    </div>
+                    <div class="form-row">
+                        <label>Business email</label>
+                        <input value="hello@karibukitchen.co.ke">
+                    </div>
+                    <div class="form-row">
+                        <label>Country</label>
+                        <select><option>Kenya</option><option>Uganda</option><option>Tanzania</option></select>
+                    </div>
+                    <div class="form-row">
+                        <label>Links (max 14)</label>
+                        <div>
+                            <span class="link-chip">&#127760; karibukitchen.co.ke</span>
+                            <span class="link-chip">&#128241; Instagram @karibukitchen</span>
+                            <span class="link-chip">&#128172; WhatsApp Business</span>
+                            <span class="link-chip">&#127925; TikTok @karibukitchen</span>
+                        </div>
+                    </div>
+                    <div class="callout">
+                        <strong>SEO-load-bearing:</strong> The first 100–150 characters of the description are what YouTube's classifier and the About tab preview show. Front-load "Eldoret" + "lunch delivery" + "Kenyan meals" — the exact phrases people search.
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<section id="s3">
+    <h2>3. Banner-safe-area visualiser</h2>
+    <p>The banner image gets cropped differently on TV, desktop, tablet, and mobile. The <em>safe area</em> (1546 &times; 423 centred) is the strip guaranteed to appear on all four. Pick a scenario below and see which one survives.</p>
+
+    <div class="scenario-row">
+        <button class="active" onclick="pickScenario(1, this)">Scenario A: Logo centred in safe area</button>
+        <button onclick="pickScenario(2, this)">Scenario B: Logo top-left corner</button>
+        <button onclick="pickScenario(3, this)">Scenario C: Full-bleed food photo, no logo</button>
+    </div>
+
+    <div class="banner-canvas" id="scenarioCanvas">
+        <div class="bg-text" id="scnBg">Karibu Kitchen</div>
+        <div class="food"></div>
+        <div class="banner-safe" id="scnSafe">
+            <span class="lbl">SAFE AREA</span>
+            <span id="scnSafeText">Karibu Kitchen<br><span style="font-size:0.7em; opacity:0.9;">30 min · Eldoret</span></span>
+        </div>
+    </div>
+    <div class="safe-note" id="scnNote">Logo sits inside the safe area. Every device sees it. This is the correct setup.</div>
+
+    <div class="device-crops">
+        <div class="device-crop">
+            <h5>TV / Full desktop</h5>
+            <div class="strip" id="crop-tv"><span class="logo" id="crop-tv-t">Karibu Kitchen</span></div>
+            <div class="verdict pass" id="crop-tv-v">&#10003; Logo visible</div>
+        </div>
+        <div class="device-crop">
+            <h5>Desktop</h5>
+            <div class="strip" id="crop-desk"><span class="logo" id="crop-desk-t">Karibu Kitchen</span></div>
+            <div class="verdict pass" id="crop-desk-v">&#10003; Logo visible</div>
+        </div>
+        <div class="device-crop">
+            <h5>Mobile</h5>
+            <div class="strip" id="crop-mob"><span class="logo" id="crop-mob-t">Karibu Kitchen</span></div>
+            <div class="verdict pass" id="crop-mob-v">&#10003; Logo visible</div>
+        </div>
+    </div>
+
+    <div class="callout warn">
+        <strong>The lesson:</strong> Anything outside the 1546 &times; 423 safe area gets cut on mobile. Since 70% of Kenyan viewers are on mobile, "logo top-left" is a killer mistake.
+    </div>
+</section>
+
+<section id="s4">
+    <h2>4. The About tab — SEO-load-bearing text</h2>
+    <p>The About tab tells YouTube's algorithm what the channel is about, and gives new viewers the trust signals to subscribe. Four elements — every one non-optional.</p>
+    <ol>
+        <li><strong>Channel description.</strong> 200–400 words. Keywords front-loaded in the first sentence.</li>
+        <li><strong>Business email.</strong> Enables brand-deal inbounds and press. Skipping this signals "hobbyist".</li>
+        <li><strong>Country: Kenya.</strong> Powers the "recommended for you" localisation.</li>
+        <li><strong>Links.</strong> Website, WhatsApp, Instagram, TikTok. Every relevant social. Max 14.</li>
+    </ol>
+    <div class="callout">
+        <strong>Sarah's first sentence:</strong> "Karibu Kitchen is Eldoret's home-cooked lunch delivery service." One sentence = business + city + category. YouTube's classifier reads this before anything else.
+    </div>
+</section>
+
+<section id="s5">
+    <h2>5. Channel-name checklist — score Sarah's setup</h2>
+    <p>Tick every box that applies to Sarah's Karibu Kitchen channel launch. Click <em>Score my checklist</em> for auto-marking.</p>
+
+    <div class="checklist">
+        <h4>Karibu Kitchen — launch checklist</h4>
+        <div class="check-item"><input type="checkbox" id="c1"><label for="c1">Brand account (not personal) linked to karibukitchen.co.ke Workspace<span class="req">REQ</span></label></div>
+        <div class="check-item"><input type="checkbox" id="c2"><label for="c2">Handle <code>@karibukitchen</code> matches Instagram + TikTok handles<span class="req">REQ</span></label></div>
+        <div class="check-item"><input type="checkbox" id="c3"><label for="c3">Profile picture 800 &times; 800 — logo mark only (not stacked lockup)<span class="req">REQ</span></label></div>
+        <div class="check-item"><input type="checkbox" id="c4"><label for="c4">Banner 2560 &times; 1440 with logo + tagline inside the 1546 &times; 423 safe area<span class="req">REQ</span></label></div>
+        <div class="check-item"><input type="checkbox" id="c5"><label for="c5">Watermark 150 &times; 150 PNG on transparent background</label></div>
+        <div class="check-item"><input type="checkbox" id="c6"><label for="c6">Description opens with "Eldoret" + "lunch delivery" + "Kenyan meals"<span class="req">REQ</span></label></div>
+        <div class="check-item"><input type="checkbox" id="c7"><label for="c7">Business email set to hello@karibukitchen.co.ke</label></div>
+        <div class="check-item"><input type="checkbox" id="c8"><label for="c8">Country set to Kenya</label></div>
+        <div class="check-item"><input type="checkbox" id="c9"><label for="c9">Three playlists created: Fresh Recipes, Delivery Diaries, Behind the Kitchen<span class="req">REQ</span></label></div>
+        <div class="check-item"><input type="checkbox" id="c10"><label for="c10">35-second channel trailer uploaded and set as "Video for non-subscribers"</label></div>
+        <div class="check-item"><input type="checkbox" id="c11"><label for="c11">Cousin added as Manager (business continuity)</label></div>
+        <div class="check-item"><input type="checkbox" id="c12"><label for="c12">Links added: website, WhatsApp, Instagram, TikTok</label></div>
+
+        <div class="actions">
+            <button class="btn" onclick="scoreChecklist()">Score my checklist</button>
+            <button class="btn reset" onclick="resetChecklist()">Reset</button>
+        </div>
+        <div class="result" id="checkResult"></div>
+    </div>
+</section>
+
+<footer>
+    <p>Lesson 13.2 — Channel Setup & Branding · Masomotele Technical Training Institute · Module 13, §13.2</p>
+    <p>Next: <strong>Lesson 13.3 — YouTube SEO</strong></p>
+</footer>
+</div>
+
+<script>
+function showCust(name, btn) {
+    document.querySelectorAll('.cust-panel').forEach(p => p.classList.remove('active'));
+    document.querySelectorAll('.cust-tabs button').forEach(b => b.classList.remove('active'));
+    document.getElementById('cust-' + name).classList.add('active');
+    btn.classList.add('active');
+}
+
+const scenarios = {
+    1: {
+        bg: 'Karibu Kitchen',
+        safeText: 'Karibu Kitchen<br><span style="font-size:0.7em; opacity:0.9;">30 min · Eldoret</span>',
+        note: 'Logo sits inside the safe area. Every device sees it. This is the correct setup.',
+        tv: { pass: true, txt: 'Karibu Kitchen' },
+        desk: { pass: true, txt: 'Karibu Kitchen' },
+        mob: { pass: true, txt: 'Karibu Kitchen' }
+    },
+    2: {
+        bg: '',
+        safeText: '<span style="opacity:0.4;">(logo not here)</span>',
+        note: 'Logo is in the top-left corner — OUTSIDE the safe area. TV screens see it. Desktop crops half. Mobile crops it out entirely.',
+        tv: { pass: true, txt: 'Karibu Kitchen' },
+        desk: { pass: false, txt: 'Kar...' },
+        mob: { pass: false, txt: '' }
+    },
+    3: {
+        bg: '',
+        safeText: '<span style="opacity:0.4;">(no logo — just food photo)</span>',
+        note: 'Full-bleed food photography with no text overlay. Looks pretty but no branding, no tagline, no CTA. New viewers scroll past without registering the channel name.',
+        tv: { pass: false, txt: '(no branding)' },
+        desk: { pass: false, txt: '(no branding)' },
+        mob: { pass: false, txt: '(no branding)' }
+    }
+};
+
+function pickScenario(n, btn) {
+    document.querySelectorAll('.scenario-row button').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    const s = scenarios[n];
+    document.getElementById('scnBg').innerHTML = s.bg;
+    document.getElementById('scnSafeText').innerHTML = s.safeText;
+    document.getElementById('scnNote').textContent = s.note;
+    ['tv','desk','mob'].forEach(d => {
+        document.getElementById('crop-' + d + '-t').textContent = s[d].txt;
+        const v = document.getElementById('crop-' + d + '-v');
+        if (s[d].pass) { v.className = 'verdict pass'; v.innerHTML = '&#10003; Logo visible'; }
+        else { v.className = 'verdict fail'; v.innerHTML = '&#10007; Cropped / missing'; }
+    });
+}
+
+function scoreChecklist() {
+    const boxes = document.querySelectorAll('.checklist input[type="checkbox"]');
+    let ticked = 0;
+    boxes.forEach(b => { if (b.checked) ticked++; });
+    const total = boxes.length;
+    const box = document.getElementById('checkResult');
+    box.classList.remove('good','mid','bad','show');
+
+    // Check REQ items (c1, c2, c3, c4, c6, c9)
+    const reqIds = ['c1','c2','c3','c4','c6','c9'];
+    const reqMissed = reqIds.filter(id => !document.getElementById(id).checked);
+
+    let cls, msg;
+    if (reqMissed.length === 0 && ticked === total) { cls = 'good'; msg = 'All ' + total + ' items ticked. Karibu Kitchen channel is launch-ready. Publish it.'; }
+    else if (reqMissed.length === 0) { cls = 'mid'; msg = ticked + '/' + total + ' complete. All required items are done — the rest are polish. Safe to publish and add the extras this week.'; }
+    else { cls = 'bad'; msg = ticked + '/' + total + ' — you missed ' + reqMissed.length + ' REQUIRED item(s). Fix these before launching: ' + reqMissed.map(id => document.querySelector('label[for="' + id + '"]').textContent.replace('REQ','').trim()).join('; '); }
+
+    box.classList.add(cls, 'show');
+    box.innerHTML = '<strong>Score: ' + ticked + ' / ' + total + '</strong><br>' + msg;
+    box.scrollIntoView({ behavior: 'smooth', block: 'center' });
+}
+
+function resetChecklist() {
+    document.querySelectorAll('.checklist input[type="checkbox"]').forEach(b => b.checked = false);
+    document.getElementById('checkResult').classList.remove('show','good','mid','bad');
+}
+</script>
+<style id="mtti-paginator-style">
+  section[data-mtti-page] { display: none !important; }
+  section[data-mtti-page].mtti-active { display: block !important; }
+  #mtti-paginator-bar {
+    position: sticky; bottom: 0; left: 0; right: 0;
+    background: #fff; border-top: 2px solid #e2e8f0;
+    padding: 12px 20px; margin-top: 20px;
+    display: flex; align-items: center; justify-content: space-between; gap: 12px;
+    font-family: 'Segoe UI', -apple-system, sans-serif;
+    box-shadow: 0 -4px 16px rgba(0,0,0,0.08);
+    z-index: 100;
+  }
+  #mtti-paginator-bar button {
+    background: #2E7D32; color: #fff; border: none; padding: 10px 18px;
+    border-radius: 8px; font-size: 13px; font-weight: 600; cursor: pointer;
+  }
+  #mtti-paginator-bar button:disabled { background: #cbd5e1; cursor: not-allowed; }
+  #mtti-paginator-bar button.mtti-prev { background: #64748b; }
+  #mtti-paginator-progress { font-size: 12px; color: #64748b; font-weight: 600; }
+</style>
+<script id="mtti-paginator-script">
+(function(){
+  function init(){
+    var sections = Array.prototype.slice.call(document.querySelectorAll('section[id]'));
+    // Only sections that are real content blocks (has an <h2>), skip stray/decorative ones.
+    sections = sections.filter(function(s){ return s.querySelector('h2'); });
+    if (sections.length < 2) return; // nothing to paginate
+
+    sections.forEach(function(s, i){ s.setAttribute('data-mtti-page', i); });
+    var current = 0;
+
+    var bar = document.createElement('div');
+    bar.id = 'mtti-paginator-bar';
+    bar.innerHTML =
+      '<button class="mtti-prev" id="mtti-pg-prev">← Previous</button>' +
+      '<span id="mtti-paginator-progress"></span>' +
+      '<button id="mtti-pg-next">Next →</button>';
+    sections[sections.length - 1].insertAdjacentElement('afterend', bar);
+
+    var prevBtn = bar.querySelector('#mtti-pg-prev');
+    var nextBtn = bar.querySelector('#mtti-pg-next');
+    var progress = bar.querySelector('#mtti-paginator-progress');
+
+    function render(){
+      sections.forEach(function(s, i){ s.classList.toggle('mtti-active', i === current); });
+      prevBtn.disabled = (current === 0);
+      nextBtn.textContent = (current === sections.length - 1) ? 'Done ✓' : 'Next →';
+      progress.textContent = 'Section ' + (current + 1) + ' of ' + sections.length;
+      window.scrollTo(0, 0);
+    }
+    prevBtn.addEventListener('click', function(){ if (current > 0) { current--; render(); } });
+    nextBtn.addEventListener('click', function(){
+      if (current < sections.length - 1) { current++; render(); }
+    });
+    render();
+  }
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', init);
+  } else {
+    init();
+  }
+})();
+</script>
+</body>
+</html>

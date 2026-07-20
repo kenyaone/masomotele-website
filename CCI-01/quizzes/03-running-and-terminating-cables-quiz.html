@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Running and Terminating Cables — Quiz | MTTI CCTV Installation</title>
+<link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Fredoka:wght@500;600&display=swap" rel="stylesheet">
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body { font-family: 'Space Mono', monospace; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); min-height: 100vh; padding: 20px; color: #fff; }
+.container { max-width: 900px; margin: 0 auto; }
+.header { text-align: center; margin-bottom: 30px; }
+.header .lesson-tag { display: inline-block; background: rgba(255,255,255,0.2); padding: 6px 16px; border-radius: 999px; font-size: 0.85em; margin-bottom: 12px; }
+.header h1 { font-family: 'Fredoka', sans-serif; font-size: 2.2em; margin-bottom: 8px; text-shadow: 3px 3px 0 rgba(0,0,0,0.2); }
+.score-board { background: rgba(255,255,255,0.15); backdrop-filter: blur(10px); border-radius: 20px; padding: 20px; margin-bottom: 20px; display: flex; justify-content: space-around; }
+.score-item { text-align: center; }
+.score-item .label { font-size: 0.85em; opacity: 0.9; margin-bottom: 4px; }
+.score-item .value { font-size: 1.8em; font-weight: bold; font-family: 'Fredoka', sans-serif; }
+.progress-bar { width: 100%; height: 8px; background: rgba(255,255,255,0.3); border-radius: 10px; margin-bottom: 25px; overflow: hidden; }
+.progress-fill { height: 100%; background: linear-gradient(90deg, #f093fb 0%, #f5576c 100%); border-radius: 10px; transition: width 0.5s ease; width: 0%; }
+.exercise-card { background: white; color: #333; border-radius: 25px; padding: 35px; margin-bottom: 20px; box-shadow: 0 20px 60px rgba(0,0,0,0.3); }
+.scenario { background: linear-gradient(135deg, #fff8e1 0%, #ffecb3 100%); border-left: 5px solid #ffc107; padding: 20px 24px; border-radius: 12px; margin-bottom: 24px; font-size: 0.98em; line-height: 1.55; }
+.scenario strong { color: #7a5a00; font-family: 'Fredoka', sans-serif; }
+.question { font-size: 1.15em; margin-bottom: 20px; font-weight: 700; line-height: 1.4; }
+.options { display: flex; flex-direction: column; gap: 12px; }
+.option { background: #f5f7fb; border: 2px solid transparent; padding: 16px 20px; border-radius: 12px; cursor: pointer; transition: all 0.2s ease; font-family: 'Space Mono', monospace; font-size: 0.98em; text-align: left; }
+.option:hover:not(.disabled) { background: #eef1fb; border-color: #667eea; transform: translateX(4px); }
+.option.correct { background: #d4edda; border-color: #28a745; color: #155724; }
+.option.wrong { background: #f8d7da; border-color: #dc3545; color: #721c24; }
+.option.disabled { cursor: not-allowed; opacity: 0.85; }
+.feedback { margin-top: 22px; padding: 18px 22px; border-radius: 12px; font-size: 0.98em; line-height: 1.5; }
+.feedback.correct { background: #d4edda; color: #155724; border-left: 4px solid #28a745; }
+.feedback.wrong { background: #f8d7da; color: #721c24; border-left: 4px solid #dc3545; }
+.next-btn, .restart-btn { margin-top: 20px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; border: none; padding: 14px 32px; border-radius: 12px; font-size: 1em; cursor: pointer; font-family: 'Fredoka', sans-serif; box-shadow: 0 6px 18px rgba(0,0,0,0.2); }
+.results { text-align: center; padding: 25px 15px; }
+.results h2 { font-family: 'Fredoka', sans-serif; font-size: 2em; margin-bottom: 12px; color: #333; }
+.results .final-score { font-size: 3em; font-family: 'Fredoka', sans-serif; color: #667eea; margin: 20px 0; }
+.results p { color: #555; margin-bottom: 12px; }
+.badge { display: inline-block; font-size: 3.5em; margin: 8px 0; }
+</style>
+</head>
+<body>
+<div class="container">
+<div class="header">
+<div class="lesson-tag">Unit 3 · Topic 3.2 · Quiz</div>
+<h1>Running and Terminating Cables</h1>
+</div>
+<div class="score-board">
+<div class="score-item"><div class="label">Score</div><div class="value" id="score">0</div></div>
+<div class="score-item"><div class="label">Question</div><div class="value"><span id="current">1</span>/<span id="total">7</span></div></div>
+<div class="score-item"><div class="label">Streak</div><div class="value" id="streak">0</div></div>
+</div>
+<div class="progress-bar"><div class="progress-fill" id="progress"></div></div>
+<div class="exercise-card" id="exerciseCard"></div>
+</div>
+<script>
+const exercises = [
+{"scenario":"Dennis's planned cable route passes within a few centimeters of a fluorescent light fitting's ballast.","question":"What is the main risk here?","options":["The ballast can induce electrical noise into the cable, causing a flickering or banding picture","The cable will melt from the light's heat","Fluorescent lights have no effect on CCTV cable at all","The cable will become permanently magnetized"],"correct":0,"explanation":"Ballasts in fluorescent fittings are a well-known source of electrical interference for nearby data and video cable."},
+{"scenario":"A cable run has to pass through a tight 90-degree conduit fitting.","question":"What happens if Dennis bends the cable tighter than its minimum bend radius?","options":["Nothing, cable can be bent to any angle safely","The copper core or coax shield can crack or thin internally, causing signal problems later","The cable becomes more flexible permanently","It improves the signal strength"],"correct":1,"explanation":"Exceeding the minimum bend radius can damage the internal conductor or shield, leading to intermittent faults that may not appear immediately."},
+{"scenario":"Dennis is terminating RJ45 connectors for an IP camera run, one plug at each end.","question":"What is essential for the link to work reliably?","options":["Using a different wire order at each end for variety","Following the same wiring standard, such as T568B, consistently at both ends","Leaving several centimeters of untwisted wire at the tip for flexibility","It does not matter which wires go where"],"correct":1,"explanation":"Both ends must follow the same wiring standard consistently, and untwisted length should be minimized, not maximized, to avoid interference."},
+{"scenario":"Dennis is deciding between a twist-on and a crimp-style BNC connector for an analog camera's coax run.","question":"Which is the better long-term choice and why?","options":["Twist-on, because it is quicker to fit on site","Crimp-style, because it grips the cable and shield firmly and resists working loose","Neither matters, both perform identically over time","Twist-on, because it needs no tools at all"],"correct":1,"explanation":"Crimp-style BNC connectors provide a firm, lasting grip, while twist-on types are prone to loosening and causing intermittent picture loss."},
+{"scenario":"Dennis leaves extra slack in the cable at both the camera end and the recorder end before final termination.","question":"Why is this good practice?","options":["It looks tidier only, with no practical benefit","It allows re-termination later without shortening or straining the run","It reduces the total cost of the cable","It is required only for outdoor runs"],"correct":1,"explanation":"Slack gives room to re-terminate a connector if it fails or needs replacing, without having to run a whole new cable."},
+{"scenario":"Before Dennis signs off a job, he tests every terminated cable run with a cable tester.","question":"Why is this step important, especially before closing up walls or ceilings?","options":["It has no real benefit, terminations rarely fail","It catches faulty terminations while they are still cheap and easy to fix, before areas are sealed up","It is only needed for very long cable runs","It replaces the need for correct wire order"],"correct":1,"explanation":"Testing before closing up construction catches problems while access is easy — finding a fault after ceilings are closed is far more costly to fix."},
+{"scenario":"A section of cable in the ceiling void rests directly across a sharp edge of metal trunking.","question":"What is the main risk of leaving it routed this way?","options":["The cable jacket can be cut or worn through over time, eventually causing a fault","It improves airflow around the cable","It has no effect since cable jackets are indestructible","It will automatically self-heal any damage"],"correct":0,"explanation":"A sharp metal edge can gradually cut into the cable jacket from vibration and movement, eventually exposing or damaging the conductors inside."}
+];
+let currentQuestion = 0, score = 0, streak = 0, answered = false;
+function updateScoreboard() {
+    document.getElementById('score').textContent = score;
+    document.getElementById('current').textContent = Math.min(currentQuestion + 1, exercises.length);
+    document.getElementById('total').textContent = exercises.length;
+    document.getElementById('streak').textContent = streak;
+    document.getElementById('progress').style.width = ((currentQuestion) / exercises.length) * 100 + '%';
+}
+function escapeHtml(s) { return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+function renderQuestion() {
+    answered = false;
+    const q = exercises[currentQuestion];
+    let html = '';
+    if (q.scenario) html += `<div class="scenario"><strong>Scenario.</strong> ${escapeHtml(q.scenario)}</div>`;
+    html += `<div class="question">${escapeHtml(q.question)}</div>`;
+    html += '<div class="options">';
+    q.options.forEach((o, i) => { html += `<button class="option" onclick="selectAnswer(${i})">${escapeHtml(o)}</button>`; });
+    html += '</div>';
+    document.getElementById('exerciseCard').innerHTML = html;
+    updateScoreboard();
+}
+function selectAnswer(i) {
+    if (answered) return;
+    answered = true;
+    const q = exercises[currentQuestion];
+    const btns = document.querySelectorAll('.option');
+    btns.forEach(b => b.classList.add('disabled'));
+    btns[q.correct].classList.add('correct');
+    const right = i === q.correct;
+    if (!right) btns[i].classList.add('wrong');
+    if (right) { score += 10; streak += 1; } else { streak = 0; }
+    const fb = document.createElement('div');
+    fb.className = 'feedback ' + (right ? 'correct' : 'wrong');
+    fb.innerHTML = `<strong>${right ? '✅ Correct.' : '❌ Not quite.'}</strong><br>${escapeHtml(q.explanation)}`;
+    document.getElementById('exerciseCard').appendChild(fb);
+    const nb = document.createElement('button');
+    nb.className = 'next-btn';
+    nb.textContent = currentQuestion === exercises.length - 1 ? 'See results →' : 'Next scenario →';
+    nb.onclick = nextQuestion;
+    document.getElementById('exerciseCard').appendChild(nb);
+    updateScoreboard();
+}
+function nextQuestion() { currentQuestion++; if (currentQuestion >= exercises.length) return showResults(); renderQuestion(); }
+function showResults() {
+    document.getElementById('progress').style.width = '100%';
+    const total = exercises.length * 10;
+    const pct = Math.round(score / total * 100);
+    if (window.parent) { window.parent.postMessage({type:"mtti_quiz_score", score: score, total: total, percent: pct}, "*"); }
+    let badge = '🌟', msg = 'Excellent work. You have a professional grasp of this lesson.';
+    if (pct < 50) { badge = '🌱'; msg = 'Good first attempt. Review the lesson and try again.'; }
+    else if (pct < 80) { badge = '📚'; msg = 'Solid progress. Review the scenarios you missed and retry.'; }
+    document.getElementById('exerciseCard').innerHTML = `
+        <div class="results">
+            <span class="badge">${badge}</span>
+            <h2>Quiz Complete</h2>
+            <div class="final-score">${score} / ${total}</div>
+            <p><strong>${pct}%</strong> · Longest streak: ${streak}</p>
+            <p>${msg}</p>
+            <button class="restart-btn" onclick="restart()">Try again 🔁</button>
+        </div>`;
+}
+function restart() { currentQuestion = 0; score = 0; streak = 0; renderQuestion(); }
+renderQuestion();
+</script>
+</body>
+</html>

@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Project Setup — Aspect Ratio, Resolution, and Frame Rate | MTTI Video Editing</title>
+    <link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Fredoka:wght@500;600&display=swap" rel="stylesheet">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Space Mono', monospace; background: linear-gradient(135deg, #1A0B3D 0%, #0D47A1 100%); min-height: 100vh; padding: 20px; color: #fff; }
+        .container { max-width: 900px; margin: 0 auto; }
+        .header { text-align: center; margin-bottom: 30px; }
+        .header .lesson-tag { display: inline-block; background: rgba(255,255,255,0.2); padding: 6px 16px; border-radius: 999px; font-size: 0.85em; margin-bottom: 12px; }
+        .header h1 { font-family: 'Fredoka', sans-serif; font-size: 2.2em; margin-bottom: 8px; text-shadow: 3px 3px 0 rgba(0,0,0,0.2); }
+        .score-board { background: rgba(255,255,255,0.15); backdrop-filter: blur(10px); border-radius: 20px; padding: 20px; margin-bottom: 20px; display: flex; justify-content: space-around; }
+        .score-item { text-align: center; }
+        .score-item .label { font-size: 0.85em; opacity: 0.9; margin-bottom: 4px; }
+        .score-item .value { font-size: 1.8em; font-weight: bold; font-family: 'Fredoka', sans-serif; }
+        .progress-bar { width: 100%; height: 8px; background: rgba(255,255,255,0.3); border-radius: 10px; margin-bottom: 25px; overflow: hidden; }
+        .progress-fill { height: 100%; background: linear-gradient(90deg, #f7971e 0%, #ffd200 100%); border-radius: 10px; transition: width 0.5s ease; width: 0%; }
+        .exercise-card { background: white; color: #333; border-radius: 25px; padding: 35px; margin-bottom: 20px; box-shadow: 0 20px 60px rgba(0,0,0,0.3); }
+        .scenario { background: linear-gradient(135deg, #fff8e1 0%, #ffecb3 100%); border-left: 5px solid #ffc107; padding: 20px 24px; border-radius: 12px; margin-bottom: 24px; font-size: 0.98em; line-height: 1.55; }
+        .scenario strong { color: #7a5a00; font-family: 'Fredoka', sans-serif; }
+        .question { font-size: 1.15em; margin-bottom: 20px; font-weight: 700; line-height: 1.4; }
+        .options { display: flex; flex-direction: column; gap: 12px; }
+        .option { background: #f5f7fb; border: 2px solid transparent; padding: 16px 20px; border-radius: 12px; cursor: pointer; transition: all 0.2s ease; font-family: 'Space Mono', monospace; font-size: 0.98em; text-align: left; }
+        .option:hover:not(.disabled) { background: #eef2fb; border-color: #0D47A1; transform: translateX(4px); }
+        .option.correct { background: #d4edda; border-color: #28a745; color: #155724; }
+        .option.wrong { background: #f8d7da; border-color: #dc3545; color: #721c24; }
+        .option.disabled { cursor: not-allowed; opacity: 0.85; }
+        .feedback { margin-top: 22px; padding: 18px 22px; border-radius: 12px; font-size: 0.98em; line-height: 1.5; }
+        .feedback.correct { background: #d4edda; color: #155724; border-left: 4px solid #28a745; }
+        .feedback.wrong { background: #f8d7da; color: #721c24; border-left: 4px solid #dc3545; }
+        .next-btn, .restart-btn { margin-top: 20px; background: linear-gradient(135deg, #1A0B3D 0%, #0D47A1 100%); color: white; border: none; padding: 14px 32px; border-radius: 12px; font-size: 1em; cursor: pointer; font-family: 'Fredoka', sans-serif; box-shadow: 0 6px 18px rgba(0,0,0,0.2); }
+        .results { text-align: center; padding: 25px 15px; }
+        .results h2 { font-family: 'Fredoka', sans-serif; font-size: 2em; margin-bottom: 12px; color: #333; }
+        .results .final-score { font-size: 3em; font-family: 'Fredoka', sans-serif; color: #0D47A1; margin: 20px 0; }
+        .results p { color: #555; margin-bottom: 12px; }
+        .badge { display: inline-block; font-size: 3.5em; margin: 8px 0; }
+
+        /* How-To intro screen — shown before question 1, not scored */
+        .howto-card { background: white; color: #333; border-radius: 25px; padding: 35px; margin-bottom: 20px; box-shadow: 0 20px 60px rgba(0,0,0,0.3); }
+        .howto-card h3 { font-family: 'Fredoka', sans-serif; font-size: 1.3em; margin-bottom: 12px; color: #0D47A1; }
+        .howto-card p { line-height: 1.6; margin-bottom: 16px; color: #444; }
+        .howto-fields { display: flex; flex-direction: column; gap: 16px; margin-bottom: 18px; }
+        .howto-field { background: #f5f7fb; border-radius: 12px; padding: 14px 18px; display: flex; flex-wrap: wrap; align-items: center; gap: 10px; }
+        .howto-field label { flex: 1 1 220px; font-weight: 700; font-size: 0.92em; color: #333; }
+        .howto-field select { font-family: 'Space Mono', monospace; font-size: 0.95em; padding: 8px 12px; border-radius: 8px; border: 2px solid #ccd6e8; background: #fff; }
+        .howto-field select.hf-correct { border-color: #28a745; }
+        .howto-field select.hf-wrong { border-color: #dc3545; }
+        .howto-field-result { font-size: 1.2em; min-width: 24px; text-align: center; }
+        .howto-banner { margin-top: 4px; margin-bottom: 18px; padding: 12px 16px; border-radius: 10px; font-size: 0.9em; font-weight: 700; display: none; }
+        .howto-banner.show { display: block; }
+        .howto-banner.ok { background: #d4edda; color: #155724; }
+        .howto-banner.fail { background: #f8d7da; color: #721c24; }
+        .start-quiz-btn { margin-top: 4px; background: linear-gradient(135deg, #1A0B3D 0%, #0D47A1 100%); color: white; border: none; padding: 14px 32px; border-radius: 12px; font-size: 1em; cursor: pointer; font-family: 'Fredoka', sans-serif; box-shadow: 0 6px 18px rgba(0,0,0,0.2); }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <div class="lesson-tag">Unit 21 · Topic 3 · Quiz</div>
+            <h1>Project Setup — Aspect Ratio, Resolution, and Frame Rate</h1>
+        </div>
+        <div class="score-board">
+            <div class="score-item"><div class="label">Score</div><div class="value" id="score">0</div></div>
+            <div class="score-item"><div class="label">Question</div><div class="value"><span id="current">1</span>/<span id="total">10</span></div></div>
+            <div class="score-item"><div class="label">Streak</div><div class="value" id="streak">0</div></div>
+        </div>
+        <div class="progress-bar"><div class="progress-fill" id="progress"></div></div>
+        <div class="exercise-card" id="exerciseCard"></div>
+    </div>
+    <script>
+        const exercises = [{"scenario":"The church wants Sunday's event highlights delivered as both a vertical Instagram Reel and a separate widescreen YouTube upload.","question":"What should Otieno set first when starting each version's project?","options":["The video title, since ratio doesn't matter until export","The aspect ratio matching each platform: 9:16 for the Reel, 16:9 for YouTube","The background music, before anything else","Nothing \u2014 one project automatically works for both platforms"],"correct":1,"explanation":"Aspect ratio should be set per platform at the start of each project, since Reels and YouTube expect different canvas shapes."},{"scenario":"Otieno needs to deliver a short clip as a WhatsApp Status update, which displays full-screen and vertical on a phone.","question":"Which aspect ratio fits this delivery best?","options":["16:9 widescreen","9:16 vertical","1:1 square only","Aspect ratio doesn't matter for WhatsApp Status"],"correct":1,"explanation":"Like Reels and TikTok, WhatsApp Status displays full-screen vertical video, so a 9:16 canvas is the right fit."},{"scenario":"Otieno shot some reception dancing clips at 60fps for smooth slow-motion, but most of the day's footage was shot at a standard 30fps.","question":"What should he do about the project's frame rate, and when?","options":["Ignore frame rate entirely \u2014 it never affects playback","Set the project's frame rate to match the footage before importing, to avoid stutter or unwanted slow-motion on mismatched clips","Always set frame rate to the highest number possible regardless of footage","Only set frame rate after the whole video is already edited and ready to export"],"correct":1,"explanation":"Setting frame rate before import, matched to the footage, avoids playback problems like stutter or clips running at the wrong speed relative to the project."},{"scenario":"A promo clip was originally filmed in 16:9 landscape, but the client now needs a 9:16 vertical Reel version.","question":"Which CapCut tool automatically repositions the subject to fit the new vertical canvas?","options":["Split tool","Auto Reframe","Background Remover","Ripple delete"],"correct":1,"explanation":"Auto Reframe is built specifically to detect the subject in a clip and reposition the crop so it stays in frame when the aspect ratio changes."},{"scenario":"Otieno arranges an entire timeline of clips first, then changes the project's aspect ratio from 16:9 to 9:16 afterward.","question":"What is the main risk of changing aspect ratio this late in the process?","options":["There is no risk \u2014 aspect ratio can be changed at any time with zero side effects","Every clip already placed may need manual re-cropping or repositioning to fit the new shape","Changing aspect ratio late always deletes all imported footage","It has no effect on anything already on the timeline"],"correct":1,"explanation":"Changing the canvas shape after clips are arranged can force Otieno to manually adjust every clip's framing, which locking in the ratio first would have avoided."},{"scenario":"Otieno is exporting the YouTube version of the event highlights and wants it sharp on a laptop or TV screen without an unnecessarily huge file.","question":"Which resolution is a reasonable, professional default for this export?","options":["240p, since lower resolution is always safer","1080p, balancing a clean, sharp look with a manageable file size","4K for every single export regardless of platform or need","Resolution has no effect on how sharp the video looks"],"correct":1,"explanation":"1080p is a common, sensible default that looks sharp on most screens without producing the very large files that 4K would."},{"scenario":"When exporting, CapCut offers Otieno separate presets labeled for Reels/TikTok, YouTube, and WhatsApp Status.","question":"Why do these separate export presets exist instead of one universal export setting?","options":["They are purely cosmetic and all produce an identical file","Each platform expects a specific combination of ratio, resolution, and duration, so the presets automatically apply the right settings for that destination","Presets only affect the video's file name, nothing else","Only one of the presets actually works; the others are placeholders"],"correct":1,"explanation":"Export presets exist because each platform has its own expected ratio, resolution, and length \u2014 choosing the matching preset applies the correct settings automatically instead of Otieno configuring them by hand each time."}];
+        let currentQuestion = 0, score = 0, streak = 0, answered = false;
+        function updateScoreboard() {
+            document.getElementById('score').textContent = score;
+            document.getElementById('current').textContent = Math.min(currentQuestion + 1, exercises.length);
+            document.getElementById('total').textContent = exercises.length;
+            document.getElementById('streak').textContent = streak;
+            document.getElementById('progress').style.width = ((currentQuestion) / exercises.length) * 100 + '%';
+        }
+        function escapeHtml(s) { return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+        function renderQuestion() {
+            answered = false;
+            const q = exercises[currentQuestion];
+            let html = '';
+            if (q.scenario) html += `<div class="scenario"><strong>Scenario.</strong> ${escapeHtml(q.scenario)}</div>`;
+            html += `<div class="question">${escapeHtml(q.question)}</div>`;
+            html += '<div class="options">';
+            q.options.forEach((o, i) => { html += `<button class="option" onclick="selectAnswer(${i})">${escapeHtml(o)}</button>`; });
+            html += '</div>';
+            document.getElementById('exerciseCard').innerHTML = html;
+            updateScoreboard();
+        }
+        function selectAnswer(i) {
+            if (answered) return;
+            answered = true;
+            const q = exercises[currentQuestion];
+            const btns = document.querySelectorAll('.option');
+            btns.forEach(b => b.classList.add('disabled'));
+            btns[q.correct].classList.add('correct');
+            const right = i === q.correct;
+            if (!right) btns[i].classList.add('wrong');
+            if (right) { score += 10; streak += 1; } else { streak = 0; }
+            const fb = document.createElement('div');
+            fb.className = 'feedback ' + (right ? 'correct' : 'wrong');
+            fb.innerHTML = `<strong>${right ? '&#9989; Correct.' : '&#10060; Not quite.'}</strong><br>${escapeHtml(q.explanation)}`;
+            document.getElementById('exerciseCard').appendChild(fb);
+            const nb = document.createElement('button');
+            nb.className = 'next-btn';
+            nb.textContent = currentQuestion === exercises.length - 1 ? 'See results →' : 'Next scenario →';
+            nb.onclick = nextQuestion;
+            document.getElementById('exerciseCard').appendChild(nb);
+            updateScoreboard();
+        }
+        function nextQuestion() { currentQuestion++; if (currentQuestion >= exercises.length) return showResults(); renderQuestion(); }
+        function showResults() {
+            document.getElementById('progress').style.width = '100%';
+            const total = exercises.length * 10;
+            const pct = Math.round(score / total * 100);
+            if (window.parent) { window.parent.postMessage({type:"mtti_quiz_score", score: score, total: total, percent: pct}, "*"); }
+            let badge = '\u{1F31F}', msg = 'Excellent work. Otieno-level footage-handling know-how.';
+            if (pct < 50) { badge = '\u{1F331}'; msg = 'Good first attempt. Review the lesson and try again.'; }
+            else if (pct < 80) { badge = '\u{1F4DA}'; msg = 'Solid progress. Review the scenarios you missed and retry.'; }
+            document.getElementById('exerciseCard').innerHTML = `
+                <div class="results">
+                    <span class="badge">${badge}</span>
+                    <h2>Quiz Complete</h2>
+                    <div class="final-score">${score} / ${total}</div>
+                    <p><strong>${pct}%</strong> &middot; Longest streak: ${streak}</p>
+                    <p>${msg}</p>
+                    <button class="restart-btn" onclick="restart()">Try again &#128257;</button>
+                </div>`;
+        }
+        function restart() { currentQuestion = 0; score = 0; streak = 0; renderQuestion(); }
+
+        /* How-To intro — a small, ungraded field-check demo shown before the
+           quiz starts, directly rehearsing the "set the aspect ratio to
+           match the platform, before starting each version's project"
+           mechanic that the first quiz scenario asks about, so it's not
+           being asked cold. */
+        const HOWTO_RULES = [
+            { id: 'howtoReelRatio', label: 'Instagram Reel project', op: 'eq', target: '9:16' },
+            { id: 'howtoYtRatio', label: 'YouTube project', op: 'eq', target: '16:9' },
+        ];
+
+        function applyOp(op, value, target) {
+            switch (op) {
+                case 'eq': return value === target;
+                case 'gte': return parseFloat(value) >= parseFloat(target);
+                case 'lte': return parseFloat(value) <= parseFloat(target);
+                default: return false;
+            }
+        }
+
+        function checkHowto() {
+            let allOk = true;
+            HOWTO_RULES.forEach(rule => {
+                const el = document.getElementById(rule.id);
+                const resEl = document.getElementById(rule.id + 'Result');
+                const ok = applyOp(rule.op, el.value, rule.target);
+                if (!ok) allOk = false;
+                resEl.textContent = ok ? '✅' : '❌';
+                resEl.className = 'howto-field-result ' + (ok ? 'ok' : 'fail');
+                el.classList.toggle('hf-correct', ok);
+                el.classList.toggle('hf-wrong', !ok);
+            });
+            const banner = document.getElementById('howtoBanner');
+            banner.classList.add('show');
+            banner.className = 'howto-banner show ' + (allOk ? 'ok' : 'fail');
+            banner.textContent = allOk
+                ? '✅ Both set correctly — matching the aspect ratio to the platform before you start editing avoids reframing every clip later.'
+                : '❌ Not quite yet — check each dropdown against the platform it is being delivered to.';
+        }
+
+        function renderHowto() {
+            document.getElementById('exerciseCard').innerHTML = `
+                <div class="howto-card">
+                    <h3>🔍 Quick How-To: Setting Aspect Ratio First</h3>
+                    <p>One of the scenarios coming up asks about this exact situation: the church wants Sunday's highlights delivered as both a vertical Reel and a widescreen YouTube upload. Here's the fix — <strong>set each project's aspect ratio to match its platform before you start editing</strong>. Pick the right ratio for each project below, then check your work.</p>
+                    <div class="howto-fields" id="howtoFields">
+                        <div class="howto-field">
+                            <label for="howtoReelRatio">Instagram Reel project — aspect ratio</label>
+                            <select id="howtoReelRatio">
+                                <option value="16:9">16:9 widescreen</option>
+                                <option value="9:16">9:16 vertical</option>
+                                <option value="1:1">1:1 square</option>
+                            </select>
+                            <span class="howto-field-result" id="howtoReelRatioResult"></span>
+                        </div>
+                        <div class="howto-field">
+                            <label for="howtoYtRatio">YouTube upload project — aspect ratio</label>
+                            <select id="howtoYtRatio">
+                                <option value="9:16">9:16 vertical</option>
+                                <option value="16:9">16:9 widescreen</option>
+                                <option value="1:1">1:1 square</option>
+                            </select>
+                            <span class="howto-field-result" id="howtoYtRatioResult"></span>
+                        </div>
+                    </div>
+                    <div class="howto-banner" id="howtoBanner"></div>
+                    <button class="start-quiz-btn" id="checkHowtoBtn">Check My Settings</button>
+                    <button class="start-quiz-btn" id="startQuizBtn" style="margin-left:10px;background:linear-gradient(135deg,#28a745,#1e7e34);">Start Quiz →</button>
+                </div>`;
+            document.getElementById('checkHowtoBtn').addEventListener('click', checkHowto);
+            document.getElementById('startQuizBtn').addEventListener('click', renderQuestion);
+        }
+
+        renderHowto();
+    </script>
+</body>
+</html>

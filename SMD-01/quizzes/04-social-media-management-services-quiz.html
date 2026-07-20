@@ -1,0 +1,346 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Social Media Management Services | MTTI Digital Marketing</title>
+    <link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Fredoka:wght@500;600&display=swap" rel="stylesheet">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Space Mono', monospace;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh; padding: 20px; color: #fff;
+        }
+        .container { max-width: 900px; margin: 0 auto; }
+        .header { text-align: center; margin-bottom: 30px; animation: slideDown 0.6s ease-out; }
+        .header .lesson-tag {
+            display: inline-block; background: rgba(255,255,255,0.2);
+            padding: 6px 16px; border-radius: 999px;
+            font-size: 0.85em; margin-bottom: 12px;
+        }
+        .header h1 {
+            font-family: 'Fredoka', sans-serif; font-size: 2.2em;
+            margin-bottom: 8px; text-shadow: 3px 3px 0 rgba(0,0,0,0.2);
+        }
+        .header p { opacity: 0.95; font-size: 0.95em; }
+        .score-board {
+            background: rgba(255,255,255,0.15); backdrop-filter: blur(10px);
+            border-radius: 20px; padding: 20px; margin-bottom: 20px;
+            display: flex; justify-content: space-around;
+            animation: fadeIn 0.8s ease-out 0.2s both;
+        }
+        .score-item { text-align: center; }
+        .score-item .label { font-size: 0.85em; opacity: 0.9; margin-bottom: 4px; }
+        .score-item .value {
+            font-size: 1.8em; font-weight: bold; font-family: 'Fredoka', sans-serif;
+        }
+        .progress-bar {
+            width: 100%; height: 8px; background: rgba(255,255,255,0.3);
+            border-radius: 10px; margin-bottom: 25px; overflow: hidden;
+        }
+        .progress-fill {
+            height: 100%; background: linear-gradient(90deg, #f093fb 0%, #f5576c 100%);
+            border-radius: 10px; transition: width 0.5s ease; width: 0%;
+        }
+        .exercise-card {
+            background: white; color: #333; border-radius: 25px;
+            padding: 35px; margin-bottom: 20px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            animation: fadeIn 0.6s ease-out both;
+        }
+        .scenario {
+            background: linear-gradient(135deg, #fff8e1 0%, #ffecb3 100%);
+            border-left: 5px solid #ffc107;
+            padding: 20px 24px; border-radius: 12px;
+            margin-bottom: 24px;
+            font-size: 0.98em; line-height: 1.55;
+        }
+        .scenario strong { color: #7a5a00; font-family: 'Fredoka', sans-serif; }
+        .question {
+            font-size: 1.15em; margin-bottom: 20px;
+            font-weight: 700; line-height: 1.4;
+        }
+        .options { display: flex; flex-direction: column; gap: 12px; }
+        .option {
+            background: #f5f7fb; border: 2px solid transparent;
+            padding: 16px 20px; border-radius: 12px;
+            cursor: pointer; transition: all 0.2s ease;
+            font-family: 'Space Mono', monospace; font-size: 0.98em; text-align: left;
+        }
+        .option:hover:not(.disabled) {
+            background: #eef1fb; border-color: #667eea; transform: translateX(4px);
+        }
+        .option.correct { background: #d4edda; border-color: #28a745; color: #155724; }
+        .option.wrong { background: #f8d7da; border-color: #dc3545; color: #721c24; animation: shake 0.4s; }
+        .option.disabled { cursor: not-allowed; opacity: 0.85; }
+        .feedback {
+            margin-top: 22px; padding: 18px 22px; border-radius: 12px;
+            animation: slideUp 0.4s ease-out;
+            font-size: 0.98em; line-height: 1.5;
+        }
+        .feedback.correct { background: #d4edda; color: #155724; border-left: 4px solid #28a745; }
+        .feedback.wrong { background: #f8d7da; color: #721c24; border-left: 4px solid #dc3545; }
+        .feedback strong { font-family: 'Fredoka', sans-serif; }
+        .next-btn, .restart-btn {
+            margin-top: 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white; border: none;
+            padding: 14px 32px; border-radius: 12px;
+            font-size: 1em; cursor: pointer;
+            font-family: 'Fredoka', sans-serif;
+            box-shadow: 0 6px 18px rgba(0,0,0,0.2);
+            transition: transform 0.2s ease;
+        }
+        .next-btn:hover, .restart-btn:hover { transform: scale(1.04); }
+        .results {
+            text-align: center; padding: 25px 15px;
+            animation: bounceIn 0.6s ease-out;
+        }
+        .results h2 {
+            font-family: 'Fredoka', sans-serif; font-size: 2em;
+            margin-bottom: 12px; color: #333;
+        }
+        .results .final-score {
+            font-size: 3em; font-family: 'Fredoka', sans-serif;
+            color: #667eea; margin: 20px 0;
+        }
+        .results p { color: #555; margin-bottom: 12px; }
+        .badge { display: inline-block; font-size: 3.5em; margin: 8px 0; }
+        @keyframes slideDown { from { opacity: 0; transform: translateY(-30px); } to { opacity: 1; transform: translateY(0); } }
+        @keyframes fadeIn { from { opacity: 0; transform: scale(0.96); } to { opacity: 1; transform: scale(1); } }
+        @keyframes slideUp { from { opacity: 0; transform: translateY(15px); } to { opacity: 1; transform: translateY(0); } }
+        @keyframes shake { 0%,100% { transform: translateX(0); } 25% { transform: translateX(-8px); } 75% { transform: translateX(8px); } }
+        @keyframes bounceIn { 0% { opacity: 0; transform: scale(0.4); } 60% { transform: scale(1.05); } 100% { opacity: 1; transform: scale(1); } }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <div class="lesson-tag">Module 4 · Lesson 4.1</div>
+            <h1>Social Media Management Services</h1>
+            <p>10 Karibu Kitchen scenarios — pick the right dashboard, master scheduling, and hit peak posting windows</p>
+        </div>
+
+        <div class="score-board">
+            <div class="score-item"><div class="label">Score</div><div class="value" id="score">0</div></div>
+            <div class="score-item"><div class="label">Question</div><div class="value"><span id="current">1</span>/<span id="total">10</span></div></div>
+            <div class="score-item"><div class="label">Streak</div><div class="value" id="streak">0</div></div>
+        </div>
+
+        <div class="progress-bar"><div class="progress-fill" id="progress"></div></div>
+
+        <div class="exercise-card" id="exerciseCard"></div>
+    </div>
+
+    <script>
+        const exercises = [
+  {
+    "scenario": "Sarah opens the Facebook app, writes a lunch post, and publishes it. Then she opens the Instagram app, retypes it, and publishes it. Then she opens Google Business Profile and does it again. Three times a week. Ninety minutes lost every week to app-switching, forgetting what she posted where, and skipping days when the kitchen is busy.",
+    "question": "What tool from Lesson 4.1 solves this problem, and how?",
+    "options": [
+      "Hire two staff to manage each platform separately.",
+      "A social media management service — a single dashboard that lets you write a post once, schedule it across every platform, monitor all comments from one inbox, and see analytics on one screen.",
+      "Give up on Instagram and Google — stick to Facebook only.",
+      "Post the same thing 30 times a day so something sticks."
+    ],
+    "correct": 1,
+    "explanation": "Section 4.1 defines a social media management service as a single dashboard for multiple accounts — write once, schedule once, one inbox, one analytics view. Options 1 wastes money; option 3 abandons two-thirds of her plan; option 4 spams her audience."
+  },
+  {
+    "scenario": "Sarah is choosing a management service. She has KES 0 spare for a subscription. Her two priority platforms are Facebook and Instagram.",
+    "question": "Which service does Lesson 4.1 identify as Sarah's answer, and why?",
+    "options": [
+      "Sprout Social — expensive, agency-favourite.",
+      "Meta Business Suite — free, official, manages Facebook and Instagram from one dashboard, no credit card required.",
+      "Hootsuite — paid, industry veteran.",
+      "HubSpot Marketing — powerful but pricey."
+    ],
+    "correct": 1,
+    "explanation": "Section 4.1 explicitly picks Meta Business Suite as Sarah's answer: free, official Meta tool, covers her two most important channels. The other services are legitimate options but wrong for her budget and platform mix. \"If Sarah does nothing else in this module, she should install Meta Business Suite before the end of the day.\""
+  },
+  {
+    "scenario": "You are teaching Sarah the six management services worth knowing.",
+    "question": "Which list matches Lesson 4.1?",
+    "options": [
+      "Meta Business Suite, Hootsuite, Buffer, Sprout Social, Later, HubSpot Marketing.",
+      "Canva, Figma, Photoshop, Illustrator, Lightroom, GIMP.",
+      "Facebook Ads Manager, Google Ads, TikTok Ads, X Ads, LinkedIn Ads, Bing Ads.",
+      "Word, Excel, PowerPoint, Outlook, Teams, OneDrive."
+    ],
+    "correct": 0,
+    "explanation": "Section 4.1 names these six exactly: Meta Business Suite (free, Facebook and Instagram), Hootsuite (paid veteran), Buffer (simpler, free tier), Sprout Social (professional, expensive), Later (Instagram-focused), HubSpot Marketing (integrates with HubSpot CRM). Option 2 is design tools; option 3 is ad platforms; option 4 is Office apps."
+  },
+  {
+    "scenario": "Sarah wants to know what Meta Business Suite actually DOES for her business.",
+    "question": "Which capability set does Lesson 4.1 attribute to Meta Business Suite?",
+    "options": [
+      "Only scheduling — nothing else.",
+      "Schedule to Facebook and Instagram (write once, publish twice), unified comment and DM inbox, post analytics, built-in Ads Manager, team member and permission management — all free.",
+      "It replaces WordPress as a website builder.",
+      "It runs TikTok ads."
+    ],
+    "correct": 1,
+    "explanation": "Section 4.1 names these six capabilities: schedule to Facebook AND Instagram, one inbox for comments and DMs from both, post analytics, built-in ad creation, team/permission management. All free, no trial, no credit card. Options 3 and 4 are outside its scope."
+  },
+  {
+    "scenario": "Sarah's cousin says scheduling is \"cheating\" and posts should always be written live and published immediately for authenticity.",
+    "question": "Why does Lesson 4.1 call scheduling the single biggest advantage of a management service?",
+    "options": [
+      "Because platforms punish live posting.",
+      "Because batch writing on one day (e.g. Monday morning) lets a whole week's content publish automatically — even when the kitchen is closed, when Sarah is asleep, or when she is at her sister's wedding. Professionals do this. Amateurs post nine times manually.",
+      "Because scheduled posts are cheaper than live ones.",
+      "Because live posting is illegal in Kenya."
+    ],
+    "correct": 1,
+    "explanation": "Section 4.1 makes the batch-write-Monday-schedule-all-week case explicitly. This one habit separates professionals from amateurs — and Sarah's competitor Nyakinyua Kitchen does not do it. Options 1, 3 and 4 are invented."
+  },
+  {
+    "scenario": "Sarah is picking WHEN to schedule her Karibu Kitchen content for a Kenyan consumer audience on Facebook and Instagram.",
+    "question": "Which posting windows does Lesson 4.1 identify as best?",
+    "options": [
+      "3am to 5am weekdays.",
+      "Weekday evenings 7pm to 9pm (when office workers are relaxing at home) and weekend late mornings 10am to 1pm (when families are catching up online before Sunday lunch).",
+      "Only Friday at midnight.",
+      "Only when Sarah personally feels like posting."
+    ],
+    "correct": 1,
+    "explanation": "Section 4.1 gives these two windows for Kenyan consumer audiences: weekday 7–9pm and weekend 10am–1pm. Strong content goes into peak windows; weaker daily reminders into off-peak. The lesson also says to test her own audience because every account varies."
+  },
+  {
+    "scenario": "Sarah has strong content — beautiful lunch photos, a delivery-driver testimonial, a chapati how-to video — and weaker filler content — a plain \"open today\" reminder, a generic quote.",
+    "question": "How does Lesson 4.1 say she should distribute these across the day?",
+    "options": [
+      "Post the weakest content in the peak window and the strongest at 3am.",
+      "Schedule the strongest content — lunch photos, delivery updates, testimonials — inside the peak windows (weekday 7–9pm, weekend 10am–1pm). Put weaker filler content into off-peak times.",
+      "Post everything at exactly the same time.",
+      "Never post filler content."
+    ],
+    "correct": 1,
+    "explanation": "Section 4.1 says put strong content into peak windows to maximise reach. Weaker content still has a role, but it should not consume prime slots. Option 1 wastes the strongest content on nobody; option 3 spams; option 4 removes rhythm."
+  },
+  {
+    "scenario": "Sarah's new weekly routine, from Lesson 4.1: Monday morning, 7am, before the kitchen opens.",
+    "question": "Which routine matches the lesson's description?",
+    "options": [
+      "Sit down with her phone for 60 minutes, write six posts (three Facebook, three Instagram), take fresh photos of Sunday's ugali and beef stew, schedule them into the six ideal windows across the week, close Meta Business Suite, and not open a social media app again all week — only checking the inbox for messages and orders.",
+      "Post on the fly, whenever she remembers, seven times a day.",
+      "Post nothing for a week, then 30 posts on Friday.",
+      "Only post reactively — never plan ahead."
+    ],
+    "correct": 0,
+    "explanation": "Section 4.1 describes this exact Monday-hour routine: six posts written and scheduled, then closed. She checks the inbox during the week for messages and orders, but does not manually publish. Sixty minutes on Monday buys a full week's presence and frees time for the actual business."
+  },
+  {
+    "scenario": "Wangari Kamau at Wangari Wellness runs a B2B corporate wellness service targeting HR directors and CFOs at Nairobi banks. She asks whether Meta Business Suite is her answer too.",
+    "question": "How should you contrast Wangari and Sarah, using Lesson 4.1?",
+    "options": [
+      "They should both use only Meta Business Suite — audience does not matter.",
+      "Meta Business Suite is Sarah's answer because her audience lives on Facebook and Instagram. Wangari's audience is on LinkedIn, so Meta Business Suite covers none of her key channels — she needs a service that supports LinkedIn (e.g. Hootsuite or Buffer).",
+      "Wangari should abandon LinkedIn.",
+      "Sarah should switch to LinkedIn too."
+    ],
+    "correct": 1,
+    "explanation": "Section 4.1 makes it clear Meta Business Suite is picked for Sarah because it covers her two most important channels. For a LinkedIn-first B2B business like Wangari's, the tool must match — Hootsuite or Buffer supports LinkedIn. Match the tool to the channels the audience actually uses."
+  },
+  {
+    "scenario": "Sarah has a Buffer free-tier account and wonders if it is a valid alternative to Meta Business Suite.",
+    "question": "How does Lesson 4.1 describe Buffer?",
+    "options": [
+      "Illegal in Kenya.",
+      "Simpler than Hootsuite, with a free tier for three social accounts — a legitimate alternative, though Meta Business Suite is chosen for Sarah because it is Meta's official free tool covering Facebook and Instagram natively.",
+      "The most expensive service on the list.",
+      "Only for TikTok."
+    ],
+    "correct": 1,
+    "explanation": "Section 4.1 describes Buffer as simpler than Hootsuite with a free tier for three social accounts. It is a real option, especially if Sarah later adds a LinkedIn or X account. Meta Business Suite still wins for pure Facebook + Instagram management because it is native and free."
+  }
+];
+
+        let currentQuestion = 0, score = 0, streak = 0, answered = false;
+
+        function updateScoreboard() {
+            document.getElementById('score').textContent = score;
+            document.getElementById('current').textContent = Math.min(currentQuestion + 1, exercises.length);
+            document.getElementById('total').textContent = exercises.length;
+            document.getElementById('streak').textContent = streak;
+            document.getElementById('progress').style.width = ((currentQuestion) / exercises.length) * 100 + '%';
+        }
+
+        function escapeHtml(s) {
+            return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+        }
+
+        function renderQuestion() {
+            answered = false;
+            const q = exercises[currentQuestion];
+            let html = '';
+            if (q.scenario) {
+                html += `<div class="scenario"><strong>Scenario.</strong> ${escapeHtml(q.scenario)}</div>`;
+            }
+            html += `<div class="question">${escapeHtml(q.question)}</div>`;
+            html += '<div class="options">';
+            q.options.forEach((o, i) => {
+                html += `<button class="option" onclick="selectAnswer(${i})">${escapeHtml(o)}</button>`;
+            });
+            html += '</div>';
+            document.getElementById('exerciseCard').innerHTML = html;
+            updateScoreboard();
+        }
+
+        function selectAnswer(i) {
+            if (answered) return;
+            answered = true;
+            const q = exercises[currentQuestion];
+            const btns = document.querySelectorAll('.option');
+            btns.forEach(b => b.classList.add('disabled'));
+            btns[q.correct].classList.add('correct');
+            const right = i === q.correct;
+            if (!right) btns[i].classList.add('wrong');
+            if (right) { score += 10; streak += 1; } else { streak = 0; }
+            const fb = document.createElement('div');
+            fb.className = 'feedback ' + (right ? 'correct' : 'wrong');
+            fb.innerHTML = `<strong>${right ? '✅ Correct.' : '❌ Not quite.'}</strong><br>${escapeHtml(q.explanation)}`;
+            document.getElementById('exerciseCard').appendChild(fb);
+            const nb = document.createElement('button');
+            nb.className = 'next-btn';
+            nb.textContent = currentQuestion === exercises.length - 1 ? 'See results →' : 'Next scenario →';
+            nb.onclick = nextQuestion;
+            document.getElementById('exerciseCard').appendChild(nb);
+            updateScoreboard();
+        }
+
+        function nextQuestion() {
+            currentQuestion++;
+            if (currentQuestion >= exercises.length) return showResults();
+            renderQuestion();
+        }
+
+        function showResults() {
+            document.getElementById('progress').style.width = '100%';
+            const total = exercises.length * 10;
+            const pct = Math.round(score / total * 100);
+            if (window.parent) { window.parent.postMessage({type:"mtti_quiz_score", score: score, total: total, percent: pct}, "*"); }
+            let badge = '🌟', msg = 'Excellent work. You have a professional grasp of this lesson.';
+            if (pct < 50) { badge = '🌱'; msg = 'Good first attempt. Re-watch the lesson video and try again.'; }
+            else if (pct < 80) { badge = '📚'; msg = 'Solid progress. Review the scenarios you missed and retry.'; }
+            document.getElementById('exerciseCard').innerHTML = `
+                <div class="results">
+                    <span class="badge">${badge}</span>
+                    <h2>Quiz Complete</h2>
+                    <div class="final-score">${score} / ${total}</div>
+                    <p><strong>${pct}%</strong> · Longest streak: ${streak}</p>
+                    <p>${msg}</p>
+                    <button class="restart-btn" onclick="restart()">Try again 🔁</button>
+                </div>`;
+        }
+
+        function restart() {
+            currentQuestion = 0; score = 0; streak = 0;
+            renderQuestion();
+        }
+
+        renderQuestion();
+    </script>
+</body>
+</html>

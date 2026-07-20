@@ -112,6 +112,24 @@
         @keyframes slideUp { from { opacity: 0; transform: translateY(15px); } to { opacity: 1; transform: translateY(0); } }
         @keyframes shake { 0%,100% { transform: translateX(0); } 25% { transform: translateX(-8px); } 75% { transform: translateX(8px); } }
         @keyframes bounceIn { 0% { opacity: 0; transform: scale(0.4); } 60% { transform: scale(1.05); } 100% { opacity: 1; transform: scale(1); } }
+
+        /* How-To intro screen — shown before question 1, not scored */
+        .howto-card { background: white; color: #333; border-radius: 25px; padding: 35px; margin-bottom: 20px; box-shadow: 0 20px 60px rgba(0,0,0,0.3); }
+        .howto-card h3 { font-family: 'Fredoka', sans-serif; font-size: 1.3em; margin-bottom: 12px; color: #667eea; }
+        .howto-card p { line-height: 1.6; margin-bottom: 16px; color: #444; }
+        .howto-field { margin-bottom: 18px; }
+        .howto-field label { display: block; font-weight: 700; margin-bottom: 6px; color: #333; font-family: 'Fredoka', sans-serif; font-size: 0.95em; }
+        .howto-field input, .howto-field select { font-family: 'Space Mono', monospace; font-size: 0.98em; padding: 10px 14px; border-radius: 8px; border: 2px solid #ddd; width: 100%; max-width: 260px; }
+        .howto-field input:focus, .howto-field select:focus { outline: none; border-color: #667eea; }
+        .howto-result { margin-top: 8px; font-size: 0.88em; font-weight: 700; display: none; }
+        .howto-result.show { display: block; }
+        .howto-result.ok { color: #155724; }
+        .howto-result.fail { color: #721c24; }
+        .howto-banner { margin-top: 4px; margin-bottom: 18px; padding: 12px 16px; border-radius: 10px; font-size: 0.9em; font-weight: 700; display: none; }
+        .howto-banner.show { display: block; }
+        .howto-banner.ok { background: #d4edda; color: #155724; }
+        .howto-banner.fail { background: #f8d7da; color: #721c24; }
+        .start-quiz-btn { margin-top: 4px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; border: none; padding: 14px 32px; border-radius: 12px; font-size: 1em; cursor: pointer; font-family: 'Fredoka', sans-serif; box-shadow: 0 6px 18px rgba(0,0,0,0.2); }
     </style>
 </head>
 <body>
@@ -340,7 +358,55 @@
             renderQuestion();
         }
 
-        renderQuestion();
+        /* How-To intro — a small, ungraded field-check demo shown before the
+           quiz starts, rehearsing the WCAG contrast-ratio check that one of
+           the quiz questions asks about, so it is not asked cold. */
+        const HOWTO_RULES = [
+            { id: 'howtoContrast', op: 'gte', target: 4.5 },
+        ];
+
+        function howtoCheckRule(rule) {
+            const el = document.getElementById(rule.id);
+            const num = parseFloat(String(el.value).trim());
+            if (rule.op === 'gte') return !isNaN(num) && num >= rule.target;
+            return false;
+        }
+
+        function checkHowto() {
+            let allOk = true;
+            HOWTO_RULES.forEach(rule => {
+                const ok = howtoCheckRule(rule);
+                if (!ok) allOk = false;
+                const resEl = document.getElementById(rule.id + 'Result');
+                resEl.className = 'howto-result show ' + (ok ? 'ok' : 'fail');
+                resEl.textContent = ok ? '✅ Good — meets 4.5:1.' : '❌ Needs to be 4.5 or higher.';
+            });
+            const banner = document.getElementById('howtoBanner');
+            banner.className = 'howto-banner show ' + (allOk ? 'ok' : 'fail');
+            banner.textContent = allOk
+                ? '✅ Good to publish — 4.5:1 or higher meets WCAG 2.1 AA for normal text.'
+                : '❌ Not yet — normal body text needs at least a 4.5:1 contrast ratio. Try a darker text colour or lighter background and re-measure.';
+        }
+
+        function renderHowto() {
+            document.getElementById('exerciseCard').innerHTML = `
+                <div class="howto-card">
+                    <h3>🔍 Quick How-To: Checking Text Contrast</h3>
+                    <p>James picked a light grey (#9E9E9E) for his product description text on a white background. One of the questions coming up is about the minimum contrast ratio for body text under WCAG 2.1 AA. Type in the contrast ratio a checker tool reports, then check whether it passes.</p>
+                    <div class="howto-field">
+                        <label for="howtoContrast">Measured contrast ratio (e.g. 4.5)</label>
+                        <input type="text" id="howtoContrast" value="3.2">
+                        <div class="howto-result" id="howtoContrastResult"></div>
+                    </div>
+                    <div class="howto-banner" id="howtoBanner"></div>
+                    <button class="start-quiz-btn" id="checkHowtoBtn">Check My Contrast</button>
+                    <button class="start-quiz-btn" id="startQuizBtn" style="margin-left:10px;background:linear-gradient(135deg,#28a745,#1e7e34);">Start Quiz →</button>
+                </div>`;
+            document.getElementById('checkHowtoBtn').addEventListener('click', checkHowto);
+            document.getElementById('startQuizBtn').addEventListener('click', renderQuestion);
+        }
+
+        renderHowto();
     </script>
 </body>
 </html>

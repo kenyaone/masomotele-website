@@ -1,0 +1,346 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Social Media Insights | MTTI Digital Marketing</title>
+    <link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Fredoka:wght@500;600&display=swap" rel="stylesheet">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Space Mono', monospace;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh; padding: 20px; color: #fff;
+        }
+        .container { max-width: 900px; margin: 0 auto; }
+        .header { text-align: center; margin-bottom: 30px; animation: slideDown 0.6s ease-out; }
+        .header .lesson-tag {
+            display: inline-block; background: rgba(255,255,255,0.2);
+            padding: 6px 16px; border-radius: 999px;
+            font-size: 0.85em; margin-bottom: 12px;
+        }
+        .header h1 {
+            font-family: 'Fredoka', sans-serif; font-size: 2.2em;
+            margin-bottom: 8px; text-shadow: 3px 3px 0 rgba(0,0,0,0.2);
+        }
+        .header p { opacity: 0.95; font-size: 0.95em; }
+        .score-board {
+            background: rgba(255,255,255,0.15); backdrop-filter: blur(10px);
+            border-radius: 20px; padding: 20px; margin-bottom: 20px;
+            display: flex; justify-content: space-around;
+            animation: fadeIn 0.8s ease-out 0.2s both;
+        }
+        .score-item { text-align: center; }
+        .score-item .label { font-size: 0.85em; opacity: 0.9; margin-bottom: 4px; }
+        .score-item .value {
+            font-size: 1.8em; font-weight: bold; font-family: 'Fredoka', sans-serif;
+        }
+        .progress-bar {
+            width: 100%; height: 8px; background: rgba(255,255,255,0.3);
+            border-radius: 10px; margin-bottom: 25px; overflow: hidden;
+        }
+        .progress-fill {
+            height: 100%; background: linear-gradient(90deg, #f093fb 0%, #f5576c 100%);
+            border-radius: 10px; transition: width 0.5s ease; width: 0%;
+        }
+        .exercise-card {
+            background: white; color: #333; border-radius: 25px;
+            padding: 35px; margin-bottom: 20px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            animation: fadeIn 0.6s ease-out both;
+        }
+        .scenario {
+            background: linear-gradient(135deg, #fff8e1 0%, #ffecb3 100%);
+            border-left: 5px solid #ffc107;
+            padding: 20px 24px; border-radius: 12px;
+            margin-bottom: 24px;
+            font-size: 0.98em; line-height: 1.55;
+        }
+        .scenario strong { color: #7a5a00; font-family: 'Fredoka', sans-serif; }
+        .question {
+            font-size: 1.15em; margin-bottom: 20px;
+            font-weight: 700; line-height: 1.4;
+        }
+        .options { display: flex; flex-direction: column; gap: 12px; }
+        .option {
+            background: #f5f7fb; border: 2px solid transparent;
+            padding: 16px 20px; border-radius: 12px;
+            cursor: pointer; transition: all 0.2s ease;
+            font-family: 'Space Mono', monospace; font-size: 0.98em; text-align: left;
+        }
+        .option:hover:not(.disabled) {
+            background: #eef1fb; border-color: #667eea; transform: translateX(4px);
+        }
+        .option.correct { background: #d4edda; border-color: #28a745; color: #155724; }
+        .option.wrong { background: #f8d7da; border-color: #dc3545; color: #721c24; animation: shake 0.4s; }
+        .option.disabled { cursor: not-allowed; opacity: 0.85; }
+        .feedback {
+            margin-top: 22px; padding: 18px 22px; border-radius: 12px;
+            animation: slideUp 0.4s ease-out;
+            font-size: 0.98em; line-height: 1.5;
+        }
+        .feedback.correct { background: #d4edda; color: #155724; border-left: 4px solid #28a745; }
+        .feedback.wrong { background: #f8d7da; color: #721c24; border-left: 4px solid #dc3545; }
+        .feedback strong { font-family: 'Fredoka', sans-serif; }
+        .next-btn, .restart-btn {
+            margin-top: 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white; border: none;
+            padding: 14px 32px; border-radius: 12px;
+            font-size: 1em; cursor: pointer;
+            font-family: 'Fredoka', sans-serif;
+            box-shadow: 0 6px 18px rgba(0,0,0,0.2);
+            transition: transform 0.2s ease;
+        }
+        .next-btn:hover, .restart-btn:hover { transform: scale(1.04); }
+        .results {
+            text-align: center; padding: 25px 15px;
+            animation: bounceIn 0.6s ease-out;
+        }
+        .results h2 {
+            font-family: 'Fredoka', sans-serif; font-size: 2em;
+            margin-bottom: 12px; color: #333;
+        }
+        .results .final-score {
+            font-size: 3em; font-family: 'Fredoka', sans-serif;
+            color: #667eea; margin: 20px 0;
+        }
+        .results p { color: #555; margin-bottom: 12px; }
+        .badge { display: inline-block; font-size: 3.5em; margin: 8px 0; }
+        @keyframes slideDown { from { opacity: 0; transform: translateY(-30px); } to { opacity: 1; transform: translateY(0); } }
+        @keyframes fadeIn { from { opacity: 0; transform: scale(0.96); } to { opacity: 1; transform: scale(1); } }
+        @keyframes slideUp { from { opacity: 0; transform: translateY(15px); } to { opacity: 1; transform: translateY(0); } }
+        @keyframes shake { 0%,100% { transform: translateX(0); } 25% { transform: translateX(-8px); } 75% { transform: translateX(8px); } }
+        @keyframes bounceIn { 0% { opacity: 0; transform: scale(0.4); } 60% { transform: scale(1.05); } 100% { opacity: 1; transform: scale(1); } }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <div class="lesson-tag">Module 6 · Lesson 6.3</div>
+            <h1>Social Media Insights</h1>
+            <p>10 Karibu Kitchen scenarios — Meta Business Suite, the 80/20 rule, and the Friday review habit</p>
+        </div>
+
+        <div class="score-board">
+            <div class="score-item"><div class="label">Score</div><div class="value" id="score">0</div></div>
+            <div class="score-item"><div class="label">Question</div><div class="value"><span id="current">1</span>/<span id="total">10</span></div></div>
+            <div class="score-item"><div class="label">Streak</div><div class="value" id="streak">0</div></div>
+        </div>
+
+        <div class="progress-bar"><div class="progress-fill" id="progress"></div></div>
+
+        <div class="exercise-card" id="exerciseCard"></div>
+    </div>
+
+    <script>
+        const exercises = [
+  {
+    "scenario": "Sarah opens Meta Business Suite Insights on a Friday afternoon. She sees a number called \"engagement\" but is not sure what it counts.",
+    "question": "Which definition from Lesson 6.3 is correct?",
+    "options": [
+      "Engagement = the number of unique people who saw your content at least once.",
+      "Engagement = the sum of likes, comments, shares, and other interactions on your content.",
+      "Engagement = the number of times your brand was referenced by other users.",
+      "Engagement = clicks divided by impressions."
+    ],
+    "correct": 1,
+    "explanation": "Lesson 6.3 defines the five core social analytics terms. Engagement is the sum of likes, comments, shares, and other interactions. Option 1 is reach; option 3 is mentions; option 4 is CTR."
+  },
+  {
+    "scenario": "Sarah wants free analytics that cover BOTH her Facebook Page and her Instagram account from one dashboard.",
+    "question": "Which platform tool from Lesson 6.3 does that job for her?",
+    "options": [
+      "Hootsuite Analytics — paid, multi-platform.",
+      "Meta Business Suite insights — free analytics that covers both Facebook and Instagram.",
+      "X/Twitter Analytics — covers Facebook and Instagram if you have an X account.",
+      "TikTok Analytics — covers all Meta platforms."
+    ],
+    "correct": 1,
+    "explanation": "Section 6.3 names Meta Business Suite insights as Sarah's main dashboard because it covers Facebook AND Instagram in one free tool. Hootsuite is paid and only worth it once she manages 3+ accounts across 2+ platforms."
+  },
+  {
+    "scenario": "After 30 days on Meta Business Suite, Sarah sees six data points including \"Best-performing content type: Reels beat static images 3:1\" and \"Best posting time: 7:45 p.m. weekday evenings.\"",
+    "question": "What should Sarah do next week, according to Lesson 6.3?",
+    "options": [
+      "Ignore the data and post whatever she feels like.",
+      "Post more Reels, schedule them for 7:45 p.m. on weekdays, and stop wasting effort on static images.",
+      "Delete her Reels and post only static images.",
+      "Post at 3 a.m. because the algorithm rewards \"unusual\" times."
+    ],
+    "correct": 1,
+    "explanation": "Section 6.3's whole Meta Business Suite worked example concludes: post more Reels, at 7:45 p.m., stop wasting effort on static images. This is analytics used to change behaviour — the discipline established in 6.1."
+  },
+  {
+    "scenario": "Sarah has one Reel that flopped on a Tuesday. Out of five posts that week it was the only weak one. Her cousin declares her whole Reels strategy \"broken\".",
+    "question": "Which of the three social-insights mistakes from Lesson 6.3 is her cousin making?",
+    "options": [
+      "Measuring a period too short — one bad post out of five in a week is not a strategy failure. Judge across a full month.",
+      "Fixating on follower count.",
+      "Comparing to Safaricom's marketing budget.",
+      "Nothing — a single bad Reel proves the strategy is dead."
+    ],
+    "correct": 0,
+    "explanation": "Section 6.3 warns against measuring a period too short. One weak post in a week is noise; a full-month view reveals the pattern. Follower fixation and unrealistic benchmarks are the other two named mistakes, but not the one at play here."
+  },
+  {
+    "scenario": "Sarah's cousin compares her Karibu Kitchen engagement to Safaricom's official Instagram engagement and says she is \"failing badly\".",
+    "question": "Which of the three mistakes from Lesson 6.3 is this?",
+    "options": [
+      "Fixating on follower count.",
+      "Measuring a period too short.",
+      "Comparing to unrelated benchmarks — a KES 15,000-a-month lunch business does not need to match a listed telco's marketing spend. Compare to yourself, month over month.",
+      "None — Safaricom is the right benchmark."
+    ],
+    "correct": 2,
+    "explanation": "Section 6.3 warns against comparing to unrelated benchmarks. The right comparison is Sarah-vs-Sarah, month over month. Safaricom's engagement is powered by a marketing budget thousands of times larger."
+  },
+  {
+    "scenario": "Sarah reviews her month and sees that 20% of her posts (three Reels — all with her face on camera, all ending with a clear \"Order Now\" call to action) drove 80% of her engagement.",
+    "question": "Which rule from Lesson 6.3 is she seeing, and what should she do?",
+    "options": [
+      "The 50/50 rule — post whatever, engagement is random.",
+      "The 80/20 content rule — 20% of posts drive 80% of engagement. Identify what makes the top 20% work and produce more like them. Stop experimenting randomly.",
+      "The 90/10 rule — 10% of posts drive 90% of engagement, so post 90% less.",
+      "The 100/0 rule — one post drives all engagement, so post once a month."
+    ],
+    "correct": 1,
+    "explanation": "Section 6.3 states the 80/20 content rule directly and gives Sarah's exact formula: Reels + face on camera + \"Order Now\" call to action. Doubling down on the winning formula beats random experimentation."
+  },
+  {
+    "scenario": "Sarah wonders if it is unethical to look at Nyakinyua Kitchen's public Facebook post engagement, posting frequency, and follower growth.",
+    "question": "How does Lesson 6.3 frame this?",
+    "options": [
+      "Illegal — it is a data-protection violation to look at a public page.",
+      "Spying — never look at competitors.",
+      "Competitive benchmarking — Nyakinyua's post engagement, posting frequency and follower growth are all public. Use them to spot opportunities (like Nyakinyua slowing from 5 posts a week to 2).",
+      "Pointless — competitor data teaches nothing."
+    ],
+    "correct": 2,
+    "explanation": "Section 6.3 calls this competitive benchmarking, not spying. Sarah's example: Nyakinyua dropped from 5 posts a week to 2, so Sarah raised hers to 6 and overtook them in Google search and social engagement within a month."
+  },
+  {
+    "scenario": "Sarah wants a fixed, repeatable Friday habit. She has four channels she cares about: Meta (Facebook + Instagram), Google Business Profile, TikTok, and WhatsApp Business.",
+    "question": "Which weekly rhythm from Lesson 6.3 fits?",
+    "options": [
+      "Two hours in Meta only, ignore the others.",
+      "Thirty minutes total: 15 min in Meta Business Suite; 5 min on Google Business Profile insights; 5 min on TikTok Analytics; 5 min on WhatsApp Business analytics. Every observation goes into a two-column notebook: what worked, what to try.",
+      "Six hours across all platforms every day of the week.",
+      "Never — she should hire an agency."
+    ],
+    "correct": 1,
+    "explanation": "Section 6.3 gives Sarah's exact Friday 30-minute template: 15/5/5/5 across the four platforms, with a two-column notebook (what worked / what to try next week). This is what professionals actually do."
+  },
+  {
+    "scenario": "Sarah is proud that her follower count is up by 120 this month. She wants to declare her marketing a success on this basis alone.",
+    "question": "How should Lesson 6.3 push back?",
+    "options": [
+      "Follower count is the ultimate success metric — she is right.",
+      "Fixating on follower count is one of the three named social-insights mistakes. It is a vanity metric. Total orders (and revenue) beats total followers every time.",
+      "Follower count matters more than sales for a lunch business.",
+      "Follower count is the same thing as engagement."
+    ],
+    "correct": 1,
+    "explanation": "Section 6.3 explicitly names follower fixation as mistake three, echoing 6.1's vanity-vs-business-metrics line. Growth of 120 followers is only meaningful if orders and revenue also moved."
+  },
+  {
+    "scenario": "Sarah is drawing up her list of social analytics terms for the practical lab. She has \"reach\" and \"trends\" but forgets the fifth.",
+    "question": "Which of the five terms from Lesson 6.3 is she missing?",
+    "options": [
+      "ROAS — the return on ad spend for social posts.",
+      "Inbound links — links from other websites or profiles that point back to yours.",
+      "CPM — cost per thousand impressions.",
+      "Bounce rate — the percentage of visitors who leave after one page."
+    ],
+    "correct": 1,
+    "explanation": "The five terms in §6.3 are engagement, reach, mentions, trends, and inbound links. ROAS and CPM are ad metrics (§6.4); bounce rate is a GA4 metric (§6.2)."
+  }
+];
+
+        let currentQuestion = 0, score = 0, streak = 0, answered = false;
+
+        function updateScoreboard() {
+            document.getElementById('score').textContent = score;
+            document.getElementById('current').textContent = Math.min(currentQuestion + 1, exercises.length);
+            document.getElementById('total').textContent = exercises.length;
+            document.getElementById('streak').textContent = streak;
+            document.getElementById('progress').style.width = ((currentQuestion) / exercises.length) * 100 + '%';
+        }
+
+        function escapeHtml(s) {
+            return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+        }
+
+        function renderQuestion() {
+            answered = false;
+            const q = exercises[currentQuestion];
+            let html = '';
+            if (q.scenario) {
+                html += `<div class="scenario"><strong>Scenario.</strong> ${escapeHtml(q.scenario)}</div>`;
+            }
+            html += `<div class="question">${escapeHtml(q.question)}</div>`;
+            html += '<div class="options">';
+            q.options.forEach((o, i) => {
+                html += `<button class="option" onclick="selectAnswer(${i})">${escapeHtml(o)}</button>`;
+            });
+            html += '</div>';
+            document.getElementById('exerciseCard').innerHTML = html;
+            updateScoreboard();
+        }
+
+        function selectAnswer(i) {
+            if (answered) return;
+            answered = true;
+            const q = exercises[currentQuestion];
+            const btns = document.querySelectorAll('.option');
+            btns.forEach(b => b.classList.add('disabled'));
+            btns[q.correct].classList.add('correct');
+            const right = i === q.correct;
+            if (!right) btns[i].classList.add('wrong');
+            if (right) { score += 10; streak += 1; } else { streak = 0; }
+            const fb = document.createElement('div');
+            fb.className = 'feedback ' + (right ? 'correct' : 'wrong');
+            fb.innerHTML = `<strong>${right ? '✅ Correct.' : '❌ Not quite.'}</strong><br>${escapeHtml(q.explanation)}`;
+            document.getElementById('exerciseCard').appendChild(fb);
+            const nb = document.createElement('button');
+            nb.className = 'next-btn';
+            nb.textContent = currentQuestion === exercises.length - 1 ? 'See results →' : 'Next scenario →';
+            nb.onclick = nextQuestion;
+            document.getElementById('exerciseCard').appendChild(nb);
+            updateScoreboard();
+        }
+
+        function nextQuestion() {
+            currentQuestion++;
+            if (currentQuestion >= exercises.length) return showResults();
+            renderQuestion();
+        }
+
+        function showResults() {
+            document.getElementById('progress').style.width = '100%';
+            const total = exercises.length * 10;
+            const pct = Math.round(score / total * 100);
+            if (window.parent) { window.parent.postMessage({type:"mtti_quiz_score", score: score, total: total, percent: pct}, "*"); }
+            let badge = '🌟', msg = 'Excellent work. You have a professional grasp of this lesson.';
+            if (pct < 50) { badge = '🌱'; msg = 'Good first attempt. Re-watch the lesson video and try again.'; }
+            else if (pct < 80) { badge = '📚'; msg = 'Solid progress. Review the scenarios you missed and retry.'; }
+            document.getElementById('exerciseCard').innerHTML = `
+                <div class="results">
+                    <span class="badge">${badge}</span>
+                    <h2>Quiz Complete</h2>
+                    <div class="final-score">${score} / ${total}</div>
+                    <p><strong>${pct}%</strong> · Longest streak: ${streak}</p>
+                    <p>${msg}</p>
+                    <button class="restart-btn" onclick="restart()">Try again 🔁</button>
+                </div>`;
+        }
+
+        function restart() {
+            currentQuestion = 0; score = 0; streak = 0;
+            renderQuestion();
+        }
+
+        renderQuestion();
+    </script>
+</body>
+</html>

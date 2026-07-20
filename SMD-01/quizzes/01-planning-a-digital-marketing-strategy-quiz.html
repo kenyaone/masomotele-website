@@ -1,0 +1,346 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Planning a Digital Marketing Strategy | MTTI Digital Marketing</title>
+    <link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Fredoka:wght@500;600&display=swap" rel="stylesheet">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Space Mono', monospace;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh; padding: 20px; color: #fff;
+        }
+        .container { max-width: 900px; margin: 0 auto; }
+        .header { text-align: center; margin-bottom: 30px; animation: slideDown 0.6s ease-out; }
+        .header .lesson-tag {
+            display: inline-block; background: rgba(255,255,255,0.2);
+            padding: 6px 16px; border-radius: 999px;
+            font-size: 0.85em; margin-bottom: 12px;
+        }
+        .header h1 {
+            font-family: 'Fredoka', sans-serif; font-size: 2.2em;
+            margin-bottom: 8px; text-shadow: 3px 3px 0 rgba(0,0,0,0.2);
+        }
+        .header p { opacity: 0.95; font-size: 0.95em; }
+        .score-board {
+            background: rgba(255,255,255,0.15); backdrop-filter: blur(10px);
+            border-radius: 20px; padding: 20px; margin-bottom: 20px;
+            display: flex; justify-content: space-around;
+            animation: fadeIn 0.8s ease-out 0.2s both;
+        }
+        .score-item { text-align: center; }
+        .score-item .label { font-size: 0.85em; opacity: 0.9; margin-bottom: 4px; }
+        .score-item .value {
+            font-size: 1.8em; font-weight: bold; font-family: 'Fredoka', sans-serif;
+        }
+        .progress-bar {
+            width: 100%; height: 8px; background: rgba(255,255,255,0.3);
+            border-radius: 10px; margin-bottom: 25px; overflow: hidden;
+        }
+        .progress-fill {
+            height: 100%; background: linear-gradient(90deg, #f093fb 0%, #f5576c 100%);
+            border-radius: 10px; transition: width 0.5s ease; width: 0%;
+        }
+        .exercise-card {
+            background: white; color: #333; border-radius: 25px;
+            padding: 35px; margin-bottom: 20px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            animation: fadeIn 0.6s ease-out both;
+        }
+        .scenario {
+            background: linear-gradient(135deg, #fff8e1 0%, #ffecb3 100%);
+            border-left: 5px solid #ffc107;
+            padding: 20px 24px; border-radius: 12px;
+            margin-bottom: 24px;
+            font-size: 0.98em; line-height: 1.55;
+        }
+        .scenario strong { color: #7a5a00; font-family: 'Fredoka', sans-serif; }
+        .question {
+            font-size: 1.15em; margin-bottom: 20px;
+            font-weight: 700; line-height: 1.4;
+        }
+        .options { display: flex; flex-direction: column; gap: 12px; }
+        .option {
+            background: #f5f7fb; border: 2px solid transparent;
+            padding: 16px 20px; border-radius: 12px;
+            cursor: pointer; transition: all 0.2s ease;
+            font-family: 'Space Mono', monospace; font-size: 0.98em; text-align: left;
+        }
+        .option:hover:not(.disabled) {
+            background: #eef1fb; border-color: #667eea; transform: translateX(4px);
+        }
+        .option.correct { background: #d4edda; border-color: #28a745; color: #155724; }
+        .option.wrong { background: #f8d7da; border-color: #dc3545; color: #721c24; animation: shake 0.4s; }
+        .option.disabled { cursor: not-allowed; opacity: 0.85; }
+        .feedback {
+            margin-top: 22px; padding: 18px 22px; border-radius: 12px;
+            animation: slideUp 0.4s ease-out;
+            font-size: 0.98em; line-height: 1.5;
+        }
+        .feedback.correct { background: #d4edda; color: #155724; border-left: 4px solid #28a745; }
+        .feedback.wrong { background: #f8d7da; color: #721c24; border-left: 4px solid #dc3545; }
+        .feedback strong { font-family: 'Fredoka', sans-serif; }
+        .next-btn, .restart-btn {
+            margin-top: 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white; border: none;
+            padding: 14px 32px; border-radius: 12px;
+            font-size: 1em; cursor: pointer;
+            font-family: 'Fredoka', sans-serif;
+            box-shadow: 0 6px 18px rgba(0,0,0,0.2);
+            transition: transform 0.2s ease;
+        }
+        .next-btn:hover, .restart-btn:hover { transform: scale(1.04); }
+        .results {
+            text-align: center; padding: 25px 15px;
+            animation: bounceIn 0.6s ease-out;
+        }
+        .results h2 {
+            font-family: 'Fredoka', sans-serif; font-size: 2em;
+            margin-bottom: 12px; color: #333;
+        }
+        .results .final-score {
+            font-size: 3em; font-family: 'Fredoka', sans-serif;
+            color: #667eea; margin: 20px 0;
+        }
+        .results p { color: #555; margin-bottom: 12px; }
+        .badge { display: inline-block; font-size: 3.5em; margin: 8px 0; }
+        @keyframes slideDown { from { opacity: 0; transform: translateY(-30px); } to { opacity: 1; transform: translateY(0); } }
+        @keyframes fadeIn { from { opacity: 0; transform: scale(0.96); } to { opacity: 1; transform: scale(1); } }
+        @keyframes slideUp { from { opacity: 0; transform: translateY(15px); } to { opacity: 1; transform: translateY(0); } }
+        @keyframes shake { 0%,100% { transform: translateX(0); } 25% { transform: translateX(-8px); } 75% { transform: translateX(8px); } }
+        @keyframes bounceIn { 0% { opacity: 0; transform: scale(0.4); } 60% { transform: scale(1.05); } 100% { opacity: 1; transform: scale(1); } }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <div class="lesson-tag">Module 1 · Lesson 1.2</div>
+            <h1>Planning a Digital Marketing Strategy</h1>
+            <p>10 Karibu Kitchen scenarios — apply the eight strategy elements, SMART, and buyer personas</p>
+        </div>
+
+        <div class="score-board">
+            <div class="score-item"><div class="label">Score</div><div class="value" id="score">0</div></div>
+            <div class="score-item"><div class="label">Question</div><div class="value"><span id="current">1</span>/<span id="total">10</span></div></div>
+            <div class="score-item"><div class="label">Streak</div><div class="value" id="streak">0</div></div>
+        </div>
+
+        <div class="progress-bar"><div class="progress-fill" id="progress"></div></div>
+
+        <div class="exercise-card" id="exerciseCard"></div>
+    </div>
+
+    <script>
+        const exercises = [
+  {
+    "scenario": "Sarah's cousin repeats his favourite advice: \"Just start posting on Facebook and see what happens — a strategy is a document for corporate people, not for a Kapsoya lunch business.\" Sarah has KES 15,000 a month and cannot afford wasted spend.",
+    "question": "What is the strongest single reason to reject the cousin's advice?",
+    "options": [
+      "A strategy is only useful once revenue is above KES 500,000 a month.",
+      "A digital marketing strategy answers three questions before the first shilling is spent — what am I trying to achieve, who am I trying to reach, and how will I know it is working — and skipping it is how small budgets disappear.",
+      "Facebook is a bad platform for restaurants in Eldoret.",
+      "Sarah should stop marketing entirely until she can pay a consultant."
+    ],
+    "correct": 1,
+    "explanation": "Section 1.2 opens with the exact three-question test a strategy exists to answer. Small budgets need MORE planning than large ones because there is less room for waste. Option 1 is invented. Option 3 is wrong about the platform. Option 4 abandons the business."
+  },
+  {
+    "scenario": "You are walking Sarah through the eight elements of a digital marketing strategy so she can plan Karibu Kitchen's next quarter properly.",
+    "question": "Which list correctly names the eight elements introduced in Lesson 1.2?",
+    "options": [
+      "Logo, colour palette, fonts, hashtags, captions, filters, followers, likes.",
+      "SEO, PPC, SEM, SMM, CRM, CMS, DPA, KPI.",
+      "Alignment to business goals, marketing objectives, target audience, competitor analysis, platform selection, content planning, budget allocation, reporting.",
+      "Facebook, Instagram, TikTok, YouTube, LinkedIn, Twitter, Pinterest, WhatsApp."
+    ],
+    "correct": 2,
+    "explanation": "Section 1.2 lists the eight elements explicitly: goals, objectives, audience, competitors, platforms, content, budget, reporting. Option 1 is brand elements only. Option 2 is a jumble of acronyms. Option 4 is platforms, which is only element five."
+  },
+  {
+    "scenario": "Sarah's first draft objective is: \"Get more Facebook customers.\" She wants you to convert it into a professional SMART objective for her dinner-delivery service in Kapsoya. She currently averages 40 orders a week.",
+    "question": "Which rewrite is genuinely SMART?",
+    "options": [
+      "\"Become the biggest lunch delivery business in Eldoret.\"",
+      "\"Grow dinner-delivery orders in Kapsoya by 20 per cent over the next 90 days by boosting three Facebook posts per week.\"",
+      "\"Post more on Facebook this year.\"",
+      "\"Reach one million people every week within one month.\""
+    ],
+    "correct": 1,
+    "explanation": "Section 1.2 defines SMART = Specific, Measurable, Achievable, Relevant, Time-bound. Only option 2 hits all five (specific to Kapsoya dinner, measurable 20 per cent, achievable from a 40-order baseline, relevant to her business, and time-bound at 90 days). Option 1 is vague, option 3 is not measurable or time-bound, option 4 is not achievable."
+  },
+  {
+    "scenario": "Sarah insists her target audience for Karibu Kitchen's dinner delivery is \"everyone in Eldoret\". You need to teach her about buyer personas.",
+    "question": "Which of these is a proper buyer persona for her dinner-delivery service?",
+    "options": [
+      "\"Everyone with a phone in Eldoret.\"",
+      "\"Anyone who eats food.\"",
+      "\"Office workers aged 25 to 50, living in Kapsoya, Elgon View or Racecourse, with families of three to five, who own smartphones and order dinner because they are too tired to cook after work.\"",
+      "\"People who like Kenyan food, worldwide.\""
+    ],
+    "correct": 2,
+    "explanation": "Section 1.2 uses this exact example: a real persona names age, location, household size, device, and the underlying motivation. Options 1, 2, and 4 are the \"trying to sell to everyone means selling to no one\" mistake the lesson warns against."
+  },
+  {
+    "scenario": "Sarah is planning what to actually post on Facebook and Instagram for the next month. She asks you which content types are known to drive traffic and engagement.",
+    "question": "Which set is drawn from the eight content types listed in Lesson 1.2?",
+    "options": [
+      "Chain letters, spam, pop-ups, auto-DMs.",
+      "Infographics, memes, videos, how-to guides, product reviews, testimonials, lists, whitepapers.",
+      "Court judgments, government gazettes, tax returns, KRA notices.",
+      "Only text posts — images distract from the message."
+    ],
+    "correct": 1,
+    "explanation": "Section 1.2 lists exactly these eight content types as the formats that drive real traffic and engagement. The lesson also stresses picking two or three that fit the audience — not doing all eight. Options 1 and 3 are irrelevant, option 4 contradicts the lesson."
+  },
+  {
+    "scenario": "Sarah's Karibu Kitchen Facebook page uses a maroon-and-gold logo. Her Instagram uses a green logo. Her printed flyers use a blue logo with a different font. Her WhatsApp Business photo is a plate of food with no branding.",
+    "question": "What is the fastest professional fix?",
+    "options": [
+      "Leave everything as-is — variety keeps the brand \"fresh\".",
+      "Standardise the logo, colours, fonts, and tone of voice across every channel so customers recognise Karibu Kitchen instantly, no matter where they see it.",
+      "Copy Nyakinyua Kitchen's exact brand elements.",
+      "Change the whole brand every quarter."
+    ],
+    "correct": 1,
+    "explanation": "Section 1.2 makes brand consistency a KEY POINT — same logo, same voice, same colours, same values across website, social, and email. Option 1 destroys recognition, option 3 destroys differentiation, option 4 is exhausting and confusing."
+  },
+  {
+    "scenario": "Sarah's cousin, a business partner, a delivery rider, and her sister-in-law all have full admin access to Karibu Kitchen's Facebook Page — passwords are shared over WhatsApp on a group called \"KK Team\". Nobody has 2FA.",
+    "question": "Which action from the Lesson 1.2 access-and-security section should you take FIRST?",
+    "options": [
+      "Add three more people to the group so posts happen faster.",
+      "Apply least-privilege — reduce the admin list to only those who genuinely need it, use unique passwords stored in a password manager, and enable two-factor authentication on every remaining account.",
+      "Post the password publicly so any staff can help.",
+      "Only enable 2FA — access lists do not matter."
+    ],
+    "correct": 1,
+    "explanation": "Section 1.2's access-and-security slide is explicit: least-privilege access, long unique passwords, a password manager, and 2FA on every account. Sharing passwords in a WhatsApp group is exactly the day-one mistake that leads to \"by month three someone else is running your Instagram\"."
+  },
+  {
+    "scenario": "Sarah wants to skip the \"competitor analysis\" element. She says: \"I do not care what Nyakinyua Kitchen does — I just want to run my own business.\"",
+    "question": "Why is competitor analysis still one of the eight required elements?",
+    "options": [
+      "So Sarah can copy Nyakinyua's posts exactly and confuse their customers.",
+      "It reveals which platforms competitors are winning on, which keywords they rank for, what content works in the local market, and where the gaps are that Karibu Kitchen can occupy.",
+      "It is not required — the lesson says you can skip it.",
+      "So Sarah can post negative comments on Nyakinyua's page."
+    ],
+    "correct": 1,
+    "explanation": "Section 1.2 names competitor analysis as element four and says \"miss any one, and the plan has a hole\". Its purpose is intelligence, not imitation or sabotage. Options 1 and 4 are unprofessional and would damage her brand. Option 3 contradicts the lesson."
+  },
+  {
+    "scenario": "Sarah has KES 15,000 a month total. She is deciding how to split it between Facebook boosts, Instagram boosts, WhatsApp Business marketing, and Google Business Profile posts (which are free).",
+    "question": "Which approach fits the \"budget allocation\" element from Lesson 1.2?",
+    "options": [
+      "Split KES 15,000 equally across every platform whether it works or not.",
+      "Allocate by expected impact on the SMART objective — spend most on the channel that reaches her Kapsoya persona best, spend zero on channels with no persona fit, and reserve a small amount for testing.",
+      "Spend the whole KES 15,000 on TikTok influencers.",
+      "Stop budgeting — just spend until the money runs out."
+    ],
+    "correct": 1,
+    "explanation": "Section 1.2 element seven — budget allocation — is deliberate assignment of money to channels that match the audience and objective. Equal splits ignore fit; option 3 ignores the persona; option 4 is not planning at all."
+  },
+  {
+    "scenario": "Three months into her strategy Sarah asks: \"How will I know if this is working? I do not want to just feel busy.\" She has a Facebook page, an Instagram page, a Google Business Profile, and a WhatsApp Business number.",
+    "question": "Which answer applies the \"reporting\" element of Lesson 1.2 correctly?",
+    "options": [
+      "Count her follower total once a year and hope it grew.",
+      "Set a monthly reporting rhythm that tracks specific metrics per channel — reach, engagement, click-throughs, WhatsApp order enquiries, actual orders — against her SMART objective, then adjust the plan.",
+      "Trust her gut — reporting is for corporate offices.",
+      "Only track vanity metrics like likes, because those look best in screenshots."
+    ],
+    "correct": 1,
+    "explanation": "Section 1.2 element eight is reporting — the metrics you track and the rhythm at which you review them. The point is to close the loop back to element one (business goals) and element two (SMART objective) so the plan can be adjusted with real data. Options 1, 3 and 4 all abandon measurement."
+  }
+];
+
+        let currentQuestion = 0, score = 0, streak = 0, answered = false;
+
+        function updateScoreboard() {
+            document.getElementById('score').textContent = score;
+            document.getElementById('current').textContent = Math.min(currentQuestion + 1, exercises.length);
+            document.getElementById('total').textContent = exercises.length;
+            document.getElementById('streak').textContent = streak;
+            document.getElementById('progress').style.width = ((currentQuestion) / exercises.length) * 100 + '%';
+        }
+
+        function escapeHtml(s) {
+            return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+        }
+
+        function renderQuestion() {
+            answered = false;
+            const q = exercises[currentQuestion];
+            let html = '';
+            if (q.scenario) {
+                html += `<div class="scenario"><strong>Scenario.</strong> ${escapeHtml(q.scenario)}</div>`;
+            }
+            html += `<div class="question">${escapeHtml(q.question)}</div>`;
+            html += '<div class="options">';
+            q.options.forEach((o, i) => {
+                html += `<button class="option" onclick="selectAnswer(${i})">${escapeHtml(o)}</button>`;
+            });
+            html += '</div>';
+            document.getElementById('exerciseCard').innerHTML = html;
+            updateScoreboard();
+        }
+
+        function selectAnswer(i) {
+            if (answered) return;
+            answered = true;
+            const q = exercises[currentQuestion];
+            const btns = document.querySelectorAll('.option');
+            btns.forEach(b => b.classList.add('disabled'));
+            btns[q.correct].classList.add('correct');
+            const right = i === q.correct;
+            if (!right) btns[i].classList.add('wrong');
+            if (right) { score += 10; streak += 1; } else { streak = 0; }
+            const fb = document.createElement('div');
+            fb.className = 'feedback ' + (right ? 'correct' : 'wrong');
+            fb.innerHTML = `<strong>${right ? '✅ Correct.' : '❌ Not quite.'}</strong><br>${escapeHtml(q.explanation)}`;
+            document.getElementById('exerciseCard').appendChild(fb);
+            const nb = document.createElement('button');
+            nb.className = 'next-btn';
+            nb.textContent = currentQuestion === exercises.length - 1 ? 'See results →' : 'Next scenario →';
+            nb.onclick = nextQuestion;
+            document.getElementById('exerciseCard').appendChild(nb);
+            updateScoreboard();
+        }
+
+        function nextQuestion() {
+            currentQuestion++;
+            if (currentQuestion >= exercises.length) return showResults();
+            renderQuestion();
+        }
+
+        function showResults() {
+            document.getElementById('progress').style.width = '100%';
+            const total = exercises.length * 10;
+            const pct = Math.round(score / total * 100);
+            if (window.parent) { window.parent.postMessage({type:"mtti_quiz_score", score: score, total: total, percent: pct}, "*"); }
+            let badge = '🌟', msg = 'Excellent work. You have a professional grasp of this lesson.';
+            if (pct < 50) { badge = '🌱'; msg = 'Good first attempt. Re-watch the lesson video and try again.'; }
+            else if (pct < 80) { badge = '📚'; msg = 'Solid progress. Review the scenarios you missed and retry.'; }
+            document.getElementById('exerciseCard').innerHTML = `
+                <div class="results">
+                    <span class="badge">${badge}</span>
+                    <h2>Quiz Complete</h2>
+                    <div class="final-score">${score} / ${total}</div>
+                    <p><strong>${pct}%</strong> · Longest streak: ${streak}</p>
+                    <p>${msg}</p>
+                    <button class="restart-btn" onclick="restart()">Try again 🔁</button>
+                </div>`;
+        }
+
+        function restart() {
+            currentQuestion = 0; score = 0; streak = 0;
+            renderQuestion();
+        }
+
+        renderQuestion();
+    </script>
+</body>
+</html>

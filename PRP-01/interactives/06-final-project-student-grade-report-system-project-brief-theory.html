@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Final Project: Student Grade Report System | MTTI Programming Principles</title>
+<link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Fredoka:wght@500;600&display=swap" rel="stylesheet">
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body {
+    font-family: 'Space Mono', monospace;
+    background: linear-gradient(135deg, #2E7D32 0%, #1565C0 100%);
+    min-height: 100vh; padding: 20px; color: #fff;
+}
+.container { max-width: 900px; margin: 0 auto; }
+.header { text-align: center; margin-bottom: 26px; }
+.lesson-tag { display: inline-block; background: rgba(255,255,255,0.2); padding: 6px 16px; border-radius: 999px; font-size: 0.85em; margin-bottom: 12px; }
+.header h1 { font-family: 'Fredoka', sans-serif; font-size: 2.1em; margin-bottom: 8px; text-shadow: 3px 3px 0 rgba(0,0,0,0.2); }
+.task {
+    background: white; color: #333; border-radius: 22px;
+    padding: 26px; margin-bottom: 20px;
+    box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+}
+.task h2 { font-family: 'Fredoka', sans-serif; font-size: 1.3em; margin-bottom: 14px; display: flex; align-items: center; }
+.task-num {
+    display: inline-block; width: 30px; height: 30px;
+    background: linear-gradient(135deg, #2E7D32 0%, #1565C0 100%);
+    color: white; border-radius: 50%; text-align: center; line-height: 30px;
+    font-family: 'Fredoka', sans-serif; font-weight: 600; margin-right: 10px; flex-shrink: 0; font-size: 0.75em;
+}
+.section-body { color: #444; font-size: 0.98em; line-height: 1.7; }
+.section-body p { margin-bottom: 12px; }
+.section-body strong { color: #1B5E20; }
+.section-body ul, .section-body ol { margin: 10px 0 14px 22px; }
+.section-body li { margin-bottom: 6px; }
+.code-block {
+    background: #1e1e2e; color: #cdd6f4; border-radius: 10px;
+    padding: 16px 18px; margin-top: 10px; overflow-x: auto;
+    font-family: 'Courier New', monospace; font-size: 0.88em; line-height: 1.6;
+}
+</style>
+</head>
+<body>
+<div class="container">
+    <div class="header">
+        <div class="lesson-tag">Final Project and Assessment</div>
+        <h1>Final Project: Student Grade Report System</h1>
+    </div>
+    <div class="task"><h2><span class="task-num">1</span>Welcome to Your Final Project</h2><div class="section-body"><p>Every skill from this course comes together here. You'll build a small <strong>Student Grade Report System</strong> that takes a list of student records, safely handles bad data, calculates grades and a class average, and saves a summary report to a file — a realistic, working program, not just an isolated exercise.</p></div></div><div class="task"><h2><span class="task-num">2</span>Project Requirements</h2><div class="section-body"><ol><li>Define a function <code>get_grade(score)</code> that returns "A" for 80 and above, "B" for 60-79, and "C" for below 60 (from Unit 3).</li><li>Loop through a list of student dictionaries, each with a <code>name</code> and a <code>score</code> stored as text — one entry is deliberately invalid (from Unit 4).</li><li>Use try/except to safely convert each score to a number, skipping and reporting any invalid entries instead of crashing (from Unit 5).</li><li>For valid students, calculate their grade and print a summary line, while building up a running total for the class average (from Units 2 and 3).</li><li>After processing everyone, calculate and print the class average, then save a report to a file (from Unit 5).</li></ol></div></div><div class="task"><h2><span class="task-num">3</span>A Similar Worked Example</h2><div class="section-body"><p>Here's the same overall pattern applied to a simpler pass/fail check, to illustrate the shape of the solution without giving away the actual project:</p><pre class="code-block"><code>attendance = [
+    {&quot;name&quot;: &quot;Zawadi&quot;, &quot;days&quot;: &quot;18&quot;},
+    {&quot;name&quot;: &quot;Otieno&quot;, &quot;days&quot;: &quot;N/A&quot;},
+]
+
+def get_status(days):
+    return &quot;Good&quot; if days &gt;= 15 else &quot;Low&quot;
+
+for record in attendance:
+    try:
+        days = int(record[&quot;days&quot;])
+    except ValueError:
+        print(&quot;Skipping&quot;, record[&quot;name&quot;], &quot;: invalid days&quot;)
+        continue
+    print(record[&quot;name&quot;], &quot;-&quot;, get_status(days))</code></pre></div></div>
+</div>
+</body>
+</html>

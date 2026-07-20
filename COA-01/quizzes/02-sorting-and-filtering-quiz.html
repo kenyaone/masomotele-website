@@ -37,6 +37,26 @@
         .results .final-score { font-size: 3em; font-family: 'Fredoka', sans-serif; color: #667eea; margin: 20px 0; }
         .results p { color: #555; margin-bottom: 12px; }
         .badge { display: inline-block; font-size: 3.5em; margin: 8px 0; }
+
+        /* How-To intro screen — shown before question 1, not scored */
+        .howto-card { background: white; color: #333; border-radius: 25px; padding: 35px; margin-bottom: 20px; box-shadow: 0 20px 60px rgba(0,0,0,0.3); }
+        .howto-card h3 { font-family: 'Fredoka', sans-serif; font-size: 1.3em; margin-bottom: 12px; color: #667eea; }
+        .howto-card p { line-height: 1.6; margin-bottom: 16px; color: #444; }
+        .howto-grid { display: flex; gap: 14px; margin-bottom: 18px; flex-wrap: wrap; }
+        .howto-cell { flex: 1 1 120px; background: #f5f7fb; border: 2px solid #ddd; border-radius: 10px; overflow: hidden; }
+        .howto-cell .hc-ref { background: #667eea; color: #fff; font-family: 'Fredoka', sans-serif; font-weight: 700; font-size: 0.8em; padding: 6px 10px; }
+        .howto-cell.locked .hc-ref { background: #555; }
+        .howto-cell .hc-value { padding: 12px 10px; font-family: 'Space Mono', monospace; font-size: 0.95em; color: #333; }
+        .howto-cell input, .howto-cell select { width: 100%; border: none; padding: 12px 10px; font-family: 'Space Mono', monospace; font-size: 0.95em; background: #fff; }
+        .howto-cell input:focus, .howto-cell select:focus { outline: 2px solid #667eea; }
+        .howto-cell input:disabled, .howto-cell select:disabled { color: #333; opacity: 1; -webkit-text-fill-color: #333; background: #fff; }
+        .howto-cell.hc-correct { border-color: #28a745; }
+        .howto-cell.hc-wrong { border-color: #dc3545; }
+        .howto-banner { margin-top: 4px; margin-bottom: 18px; padding: 12px 16px; border-radius: 10px; font-size: 0.9em; font-weight: 700; display: none; }
+        .howto-banner.show { display: block; }
+        .howto-banner.ok { background: #d4edda; color: #155724; }
+        .howto-banner.fail { background: #f8d7da; color: #721c24; }
+        .start-quiz-btn { margin-top: 4px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; border: none; padding: 14px 32px; border-radius: 12px; font-size: 1em; cursor: pointer; font-family: 'Fredoka', sans-serif; box-shadow: 0 6px 18px rgba(0,0,0,0.2); }
     </style>
 </head>
 <body>
@@ -117,7 +137,64 @@
                 </div>`;
         }
         function restart() { currentQuestion = 0; score = 0; streak = 0; renderQuestion(); }
-        renderQuestion();
+        /* How-To intro — a small, ungraded field-check demo shown before the
+           quiz starts, directly rehearsing the "sort by more than one
+           column with Add Level" mechanic that one of the quiz scenarios
+           asks about, so it's not being asked cold. */
+        const HOWTO_SORT_688 = { primaryTarget: 'Town', secondaryTarget: 'Amount Owed' };
+
+        function renderHowtoGrid() {
+            const primaryOptions = ['Customer Name', 'Town', 'Amount Owed', 'Status'];
+            const secondaryOptions = ['Customer Name', 'Amount Owed', 'Status'];
+            const opts = (arr) => `<option value="">Choose a column</option>` + arr.map(o => `<option value="${o}">${o}</option>`).join('');
+            const html = `
+                <div class="howto-cell" id="cell-hf1">
+                    <div class="hc-ref">Sort by</div>
+                    <select id="hf1">${opts(primaryOptions)}</select>
+                </div>
+                <div class="howto-cell" id="cell-hf2">
+                    <div class="hc-ref">Then by</div>
+                    <select id="hf2">${opts(secondaryOptions)}</select>
+                </div>`;
+            document.getElementById('howtoGrid').innerHTML = html;
+        }
+
+        function checkHowto() {
+            const primaryInput = document.getElementById('hf1');
+            const secondaryInput = document.getElementById('hf2');
+            const primaryOk = primaryInput.value === HOWTO_SORT_688.primaryTarget;
+            const secondaryOk = secondaryInput.value === HOWTO_SORT_688.secondaryTarget;
+            document.getElementById('cell-hf1').classList.remove('hc-correct', 'hc-wrong');
+            document.getElementById('cell-hf1').classList.add(primaryOk ? 'hc-correct' : 'hc-wrong');
+            document.getElementById('cell-hf2').classList.remove('hc-correct', 'hc-wrong');
+            document.getElementById('cell-hf2').classList.add(secondaryOk ? 'hc-correct' : 'hc-wrong');
+            primaryInput.disabled = true;
+            secondaryInput.disabled = true;
+            const allOk = primaryOk && secondaryOk;
+            const banner = document.getElementById('howtoBanner');
+            banner.classList.add('show');
+            banner.className = 'howto-banner show ' + (allOk ? 'ok' : 'fail');
+            banner.textContent = allOk
+                ? `Correct — Data → Sort → Add Level is exactly how a second sort column gets added underneath the first.`
+                : `Not yet — Brenda needs Town as the primary sort and Amount Owed as the tie-breaker within each town.`;
+        }
+
+        function renderHowto() {
+            document.getElementById('exerciseCard').innerHTML = `
+                <div class="howto-card">
+                    <h3>🔍 Quick How-To: Sorting by More Than One Column</h3>
+                    <p>One of the scenarios coming up asks how Brenda sorts customers by Town, and then by Amount Owed within each town. The habit: open Data → Sort, pick the first column, then click Add Level to pick a second column for breaking ties. Set up that same two-level sort below, then check your work.</p>
+                    <div class="howto-grid" id="howtoGrid"></div>
+                    <div class="howto-banner" id="howtoBanner"></div>
+                    <button class="start-quiz-btn" id="checkHowtoBtn">Check My Sort</button>
+                    <button class="start-quiz-btn" id="startQuizBtn" style="margin-left:10px;background:linear-gradient(135deg,#28a745,#1e7e34);">Start Quiz →</button>
+                </div>`;
+            renderHowtoGrid();
+            document.getElementById('checkHowtoBtn').addEventListener('click', checkHowto);
+            document.getElementById('startQuizBtn').addEventListener('click', renderQuestion);
+        }
+
+        renderHowto();
     </script>
 </body>
 </html>

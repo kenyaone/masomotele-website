@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Verifying AI-Generated Visuals Before Client Delivery | MTTI Graphic Design</title>
+    <link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Fredoka:wght@500;600&display=swap" rel="stylesheet">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Space Mono', monospace; background: linear-gradient(135deg, #D35400 0%, #8E44AD 100%); min-height: 100vh; padding: 20px; color: #fff; }
+        .container { max-width: 900px; margin: 0 auto; }
+        .header { text-align: center; margin-bottom: 30px; }
+        .header .lesson-tag { display: inline-block; background: rgba(255,255,255,0.2); padding: 6px 16px; border-radius: 999px; font-size: 0.85em; margin-bottom: 12px; }
+        .header h1 { font-family: 'Fredoka', sans-serif; font-size: 2.2em; margin-bottom: 8px; text-shadow: 3px 3px 0 rgba(0,0,0,0.2); }
+        .score-board { background: rgba(255,255,255,0.15); backdrop-filter: blur(10px); border-radius: 20px; padding: 20px; margin-bottom: 20px; display: flex; justify-content: space-around; }
+        .score-item { text-align: center; }
+        .score-item .label { font-size: 0.85em; opacity: 0.9; margin-bottom: 4px; }
+        .score-item .value { font-size: 1.8em; font-weight: bold; font-family: 'Fredoka', sans-serif; }
+        .progress-bar { width: 100%; height: 8px; background: rgba(255,255,255,0.3); border-radius: 10px; margin-bottom: 25px; overflow: hidden; }
+        .progress-fill { height: 100%; background: linear-gradient(90deg, #D35400 0%, #8E44AD 100%); border-radius: 10px; transition: width 0.5s ease; width: 0%; }
+        .exercise-card { background: white; color: #333; border-radius: 25px; padding: 35px; margin-bottom: 20px; box-shadow: 0 20px 60px rgba(0,0,0,0.3); }
+        .scenario { background: linear-gradient(135deg, #fff8e1 0%, #ffecb3 100%); border-left: 5px solid #ffc107; padding: 20px 24px; border-radius: 12px; margin-bottom: 24px; font-size: 0.98em; line-height: 1.55; }
+        .scenario strong { color: #7a5a00; font-family: 'Fredoka', sans-serif; }
+        .question { font-size: 1.15em; margin-bottom: 20px; font-weight: 700; line-height: 1.4; }
+        .options { display: flex; flex-direction: column; gap: 12px; }
+        .option { background: #f5f7fb; border: 2px solid transparent; padding: 16px 20px; border-radius: 12px; cursor: pointer; transition: all 0.2s ease; font-family: 'Space Mono', monospace; font-size: 0.98em; text-align: left; }
+        .option:hover:not(.disabled) { background: #eef1fb; border-color: #D35400; transform: translateX(4px); }
+        .option.correct { background: #d4edda; border-color: #28a745; color: #155724; }
+        .option.wrong { background: #f8d7da; border-color: #dc3545; color: #721c24; }
+        .option.disabled { cursor: not-allowed; opacity: 0.85; }
+        .feedback { margin-top: 22px; padding: 18px 22px; border-radius: 12px; font-size: 0.98em; line-height: 1.5; }
+        .feedback.correct { background: #d4edda; color: #155724; border-left: 4px solid #28a745; }
+        .feedback.wrong { background: #f8d7da; color: #721c24; border-left: 4px solid #dc3545; }
+        .next-btn, .restart-btn { margin-top: 20px; background: linear-gradient(135deg, #D35400 0%, #8E44AD 100%); color: white; border: none; padding: 14px 32px; border-radius: 12px; font-size: 1em; cursor: pointer; font-family: 'Fredoka', sans-serif; box-shadow: 0 6px 18px rgba(0,0,0,0.2); }
+        .results { text-align: center; padding: 25px 15px; }
+        .results h2 { font-family: 'Fredoka', sans-serif; font-size: 2em; margin-bottom: 12px; color: #333; }
+        .results .final-score { font-size: 3em; font-family: 'Fredoka', sans-serif; color: #D35400; margin: 20px 0; }
+        .results p { color: #555; margin-bottom: 12px; }
+        .badge { display: inline-block; font-size: 3.5em; margin: 8px 0; }
+
+        /* How-To intro screen — shown before question 1, not scored */
+        .howto-card { background: white; color: #333; border-radius: 25px; padding: 35px; margin-bottom: 20px; box-shadow: 0 20px 60px rgba(0,0,0,0.3); }
+        .howto-card h3 { font-family: 'Fredoka', sans-serif; font-size: 1.3em; margin-bottom: 12px; color: #D35400; }
+        .howto-card p { line-height: 1.6; margin-bottom: 16px; color: #444; }
+        .howto-checklist { display: flex; flex-direction: column; gap: 10px; margin-bottom: 18px; }
+        .howto-check-item { display: flex; align-items: flex-start; gap: 10px; background: #f5f7fb; border: 2px solid transparent; border-radius: 10px; padding: 12px 16px; }
+        .howto-check-item input[type="checkbox"] { margin-top: 3px; width: 18px; height: 18px; flex-shrink: 0; }
+        .howto-check-item label { font-size: 0.92em; line-height: 1.4; cursor: pointer; }
+        .howto-check-item.hc-ok { border-color: #28a745; background: #eafaf0; }
+        .howto-check-item.hc-bad { border-color: #dc3545; background: #fdeeee; }
+        .howto-banner { margin-top: 4px; margin-bottom: 18px; padding: 12px 16px; border-radius: 10px; font-size: 0.9em; font-weight: 700; display: none; }
+        .howto-banner.show { display: block; }
+        .howto-banner.ok { background: #d4edda; color: #155724; }
+        .howto-banner.fail { background: #f8d7da; color: #721c24; }
+        .start-quiz-btn { margin-top: 4px; background: linear-gradient(135deg, #D35400 0%, #8E44AD 100%); color: white; border: none; padding: 14px 32px; border-radius: 12px; font-size: 1em; cursor: pointer; font-family: 'Fredoka', sans-serif; box-shadow: 0 6px 18px rgba(0,0,0,0.2); }
+        </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <div class="lesson-tag">AI Tools for Graphic Designers · Topic 3 · Quiz</div>
+            <h1>Verifying AI-Generated Visuals Before Client Delivery</h1>
+        </div>
+        <div class="score-board">
+            <div class="score-item"><div class="label">Score</div><div class="value" id="score">0</div></div>
+            <div class="score-item"><div class="label">Question</div><div class="value"><span id="current">1</span>/<span id="total">10</span></div></div>
+            <div class="score-item"><div class="label">Streak</div><div class="value" id="streak">0</div></div>
+        </div>
+        <div class="progress-bar"><div class="progress-fill" id="progress"></div></div>
+        <div class="exercise-card" id="exerciseCard"></div>
+    </div>
+    <script>
+        const exercises = [{"scenario":"Ivy is reviewing an AI concept image for a flyer that includes a small paragraph of decorative background text.","question":"What should she specifically zoom in and check?","options":["Whether the text is real, readable words or garbled nonsense","Whether the file size is small enough to email","Whether the image is in colour or black and white","Whether the AI tool's logo appears in the corner"],"correct":0,"explanation":"Garbled, nonsense lettering is one of the most common AI image mistakes and must be checked before delivery."},{"scenario":"An AI image includes a repeating pattern where some tiles subtly don't line up, and shadows fall inconsistently across the design.","question":"Is this worth catching before delivery?","options":["No, small inconsistencies never matter","Yes, inconsistent details like this are common AI mistakes that look unprofessional once printed large","Only if the client specifically asks about it","No, this is a normal, intentional design style"],"correct":1,"explanation":"Subtle pattern and lighting inconsistencies are a known AI weakness and become obvious at print size, so they should be caught in review."},{"scenario":"An AI-generated illustration bears a strong resemblance to a specific real celebrity's face.","question":"What is the appropriate action?","options":["Use it since it was AI-generated, not a real photo","Avoid using it, as using a real person's likeness without rights or consent creates legal and ethical risk","Use it only in a smaller size","Ask the celebrity for permission after the poster is already printed"],"correct":1,"explanation":"Using a recognisable real person's likeness without rights or consent is a genuine legal and ethical risk, regardless of how the image was produced."},{"scenario":"An AI logo mockup looks suspiciously close to an existing well-known brand's logo.","question":"What is the appropriate action?","options":["Use it for the client since the AI generated it, not a person","Do not use it for the client; recreate an original design instead","Only change the colours slightly and use it","Use it, but don't mention where the concept came from"],"correct":1,"explanation":"A design that closely resembles an existing brand's logo carries real infringement risk and should be replaced with original work."},{"scenario":"A deadline is tight and a colleague suggests skipping the final visual check to save time.","question":"Is this a good idea?","options":["Yes, deadlines matter more than review","No, the final check is still necessary since AI-assisted work still carries full studio and legal responsibility","Yes, but only for small clients","It doesn't matter since the client will catch any issues"],"correct":1,"explanation":"Skipping the final check risks garbled text or copyright issues reaching the client, and the studio remains fully responsible regardless of deadline pressure."},{"scenario":"Ivy is deciding how to talk to a client about a poster concept that used AI tools for early exploration.","question":"Why does being upfront and careful about this matter for the studio?","options":["It doesn't matter at all","Being transparent and careful protects the studio's professional reputation and avoids disputes over AI-related issues","Clients are never interested in how work was produced","It only matters for very large studios"],"correct":1,"explanation":"Being careful and transparent about AI-assisted work helps protect the studio's reputation and avoid future disputes."},{"scenario":"A new intern asks who is responsible if an AI-generated image with a copyright problem accidentally gets sent to a client.","question":"What is the correct answer?","options":["The AI tool's developer, since they built the model","The designer or studio, since AI is a tool used under their professional responsibility, not an excuse","No one, since it was AI-generated","The client, for asking for the work"],"correct":1,"explanation":"The designer and studio remain fully responsible for anything delivered to a client, whether or not AI tools were used to help produce it."}];
+        let currentQuestion = 0, score = 0, streak = 0, answered = false;
+        function updateScoreboard() {
+            document.getElementById('score').textContent = score;
+            document.getElementById('current').textContent = Math.min(currentQuestion + 1, exercises.length);
+            document.getElementById('total').textContent = exercises.length;
+            document.getElementById('streak').textContent = streak;
+            document.getElementById('progress').style.width = ((currentQuestion) / exercises.length) * 100 + '%';
+        }
+        function escapeHtml(s) { return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+        function renderQuestion() {
+            answered = false;
+            const q = exercises[currentQuestion];
+            let html = '';
+            if (q.scenario) html += `<div class="scenario"><strong>Scenario.</strong> ${escapeHtml(q.scenario)}</div>`;
+            html += `<div class="question">${escapeHtml(q.question)}</div>`;
+            html += '<div class="options">';
+            q.options.forEach((o, i) => { html += `<button class="option" onclick="selectAnswer(${i})">${escapeHtml(o)}</button>`; });
+            html += '</div>';
+            document.getElementById('exerciseCard').innerHTML = html;
+            updateScoreboard();
+        }
+        function selectAnswer(i) {
+            if (answered) return;
+            answered = true;
+            const q = exercises[currentQuestion];
+            const btns = document.querySelectorAll('.option');
+            btns.forEach(b => b.classList.add('disabled'));
+            btns[q.correct].classList.add('correct');
+            const right = i === q.correct;
+            if (!right) btns[i].classList.add('wrong');
+            if (right) { score += 10; streak += 1; } else { streak = 0; }
+            const fb = document.createElement('div');
+            fb.className = 'feedback ' + (right ? 'correct' : 'wrong');
+            fb.innerHTML = `<strong>${right ? '&#9989; Correct.' : '&#10060; Not quite.'}</strong><br>${escapeHtml(q.explanation)}`;
+            document.getElementById('exerciseCard').appendChild(fb);
+            const nb = document.createElement('button');
+            nb.className = 'next-btn';
+            nb.textContent = currentQuestion === exercises.length - 1 ? 'See results →' : 'Next scenario →';
+            nb.onclick = nextQuestion;
+            document.getElementById('exerciseCard').appendChild(nb);
+            updateScoreboard();
+        }
+        function nextQuestion() { currentQuestion++; if (currentQuestion >= exercises.length) return showResults(); renderQuestion(); }
+        function showResults() {
+            document.getElementById('progress').style.width = '100%';
+            const total = exercises.length * 10;
+            const pct = Math.round(score / total * 100);
+            if (window.parent) { window.parent.postMessage({type:"mtti_quiz_score", score: score, total: total, percent: pct}, "*"); }
+            let badge = '🌟', msg = 'Excellent work. You have a professional grasp of this lesson.';
+            if (pct < 50) { badge = '🌱'; msg = 'Good first attempt. Review the lesson and try again.'; }
+            else if (pct < 80) { badge = '📚'; msg = 'Solid progress. Review the scenarios you missed and retry.'; }
+            document.getElementById('exerciseCard').innerHTML = `
+                <div class="results">
+                    <span class="badge">${badge}</span>
+                    <h2>Quiz Complete</h2>
+                    <div class="final-score">${score} / ${total}</div>
+                    <p><strong>${pct}%</strong> · Longest streak: ${streak}</p>
+                    <p>${msg}</p>
+                    <button class="restart-btn" onclick="restart()">Try again 🔁</button>
+                </div>`;
+        }
+        function restart() { currentQuestion = 0; score = 0; streak = 0; renderQuestion(); }
+
+        /* How-To intro — a small, ungraded checklist demo shown before the
+           quiz starts, directly rehearsing the pre-delivery zoom-in review
+           habit that the quiz's opening scenarios ask about, so it's not
+           being asked cold. */
+        const HOWTO_CHECKS = [
+            { id: 'chkText', label: 'Zoomed in on any background text — confirmed it is real, readable wording, not garbled nonsense' },
+            { id: 'chkPattern', label: 'Checked repeating patterns and shadows for inconsistencies that would look odd at full print size' },
+            { id: 'chkLikeness', label: 'Confirmed the image does not closely resemble a real person or an existing brand logo' },
+        ];
+
+        function renderHowtoChecklist() {
+            document.getElementById('howtoChecklist').innerHTML = HOWTO_CHECKS.map(c => `
+                <div class="howto-check-item" id="wrap_${c.id}">
+                    <input type="checkbox" id="${c.id}">
+                    <label for="${c.id}">${c.label}</label>
+                </div>`).join('');
+            HOWTO_CHECKS.forEach(c => {
+                document.getElementById(c.id).addEventListener('change', () => {
+                    document.getElementById('howtoBanner').classList.remove('show');
+                });
+            });
+        }
+
+        function checkHowto() {
+            let allOk = true;
+            HOWTO_CHECKS.forEach(c => {
+                const ok = document.getElementById(c.id).checked;
+                if (!ok) allOk = false;
+                const wrap = document.getElementById('wrap_' + c.id);
+                wrap.classList.remove('hc-ok', 'hc-bad');
+                wrap.classList.add(ok ? 'hc-ok' : 'hc-bad');
+            });
+            const banner = document.getElementById('howtoBanner');
+            banner.classList.add('show');
+            banner.className = 'howto-banner show ' + (allOk ? 'ok' : 'fail');
+            banner.textContent = allOk
+                ? '✅ Great — this is exactly the zoom-in review that catches garbled text, odd patterns, or a lookalike logo before a client ever sees them.'
+                : '❌ Not yet — tick off every item first; skipping any one of these is how a problem slips through to a client.';
+        }
+
+        function renderHowto() {
+            document.getElementById('exerciseCard').innerHTML = `
+                <div class="howto-card">
+                    <h3>🔍 Quick How-To: The Pre-Delivery Zoom-In Check</h3>
+                    <p>One of the scenarios coming up is about this exact moment: Ivy is reviewing an AI concept image before it goes to a client. Before delivery, run through this quick zoom-in checklist, then check your review.</p>
+                    <div class="howto-checklist" id="howtoChecklist"></div>
+                    <div class="howto-banner" id="howtoBanner"></div>
+                    <button class="start-quiz-btn" id="checkHowtoBtn">Check My Review</button>
+                    <button class="start-quiz-btn" id="startQuizBtn" style="margin-left:10px;background:linear-gradient(135deg,#28a745,#1e7e34);">Start Quiz →</button>
+                </div>`;
+            renderHowtoChecklist();
+            document.getElementById('checkHowtoBtn').addEventListener('click', checkHowto);
+            document.getElementById('startQuizBtn').addEventListener('click', renderQuestion);
+        }
+
+        renderHowto();
+    </script>
+</body>
+</html>

@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Using AI Chat Tools to Troubleshoot Faults Faster | MTTI CCTV Installation</title>
+<link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Fredoka:wght@500;600&display=swap" rel="stylesheet">
+<style>
+* { margin:0; padding:0; box-sizing:border-box; }
+body { font-family:'Space Mono', monospace; background:linear-gradient(135deg,#134e5e 0%,#71b280 100%); min-height:100vh; padding:20px; color:#fff; }
+.container { max-width:900px; margin:0 auto; }
+.header { text-align:center; margin-bottom:24px; }
+.lesson-tag { display:inline-block; background:rgba(255,255,255,0.2); padding:6px 16px; border-radius:999px; font-size:0.85em; margin-bottom:12px; }
+.header h1 { font-family:'Fredoka', sans-serif; font-size:2em; margin-bottom:6px; text-shadow:3px 3px 0 rgba(0,0,0,0.2); }
+.scenario { background:rgba(255,255,255,0.14); backdrop-filter:blur(10px); border-radius:16px; padding:16px 22px; margin-bottom:20px; border-left:5px solid #ffd54f; font-size:0.95em; line-height:1.55; }
+.task { background:#fff; color:#333; border-radius:20px; padding:24px; margin-bottom:16px; box-shadow:0 14px 40px rgba(0,0,0,0.25); }
+.task-num { display:inline-block; width:28px; height:28px; background:linear-gradient(135deg,#134e5e 0%,#71b280 100%); color:#fff; border-radius:50%; text-align:center; line-height:28px; font-family:'Fredoka', sans-serif; font-weight:600; margin-right:8px; }
+.task h3 { font-family:'Fredoka', sans-serif; font-size:1.05em; display:inline; }
+.options { margin-top:14px; display:flex; flex-direction:column; gap:10px; }
+.option { background:#f5f7fb; border:2px solid transparent; padding:12px 16px; border-radius:10px; cursor:pointer; transition:all 0.2s; font-family:'Space Mono', monospace; font-size:0.92em; text-align:left; }
+.option:hover:not(.disabled) { background:#e8f5e9; border-color:#134e5e; }
+.option.correct { background:#d4edda; border-color:#28a745; color:#155724; }
+.option.wrong { background:#f8d7da; border-color:#dc3545; color:#721c24; }
+.option.disabled { cursor:not-allowed; }
+.feedback { margin-top:14px; padding:12px 16px; border-radius:10px; font-size:0.9em; line-height:1.5; }
+.feedback.correct { background:#d4edda; color:#155724; border-left:4px solid #28a745; }
+.feedback.wrong { background:#f8d7da; color:#721c24; border-left:4px solid #dc3545; }
+.done-banner { text-align:center; padding:20px; color:#fff; font-family:'Fredoka', sans-serif; font-size:1.1em; }
+</style>
+</head>
+<body>
+<div class="container">
+<div class="header"><div class="lesson-tag">Module 6 · Lesson 6.2 · Practical</div><h1>Using AI Chat Tools to Troubleshoot Faults Faster</h1></div>
+<div class="scenario">A SafeView Security Systems client calls Dennis: "the camera picture keeps flickering and sometimes goes completely black for a few seconds, then comes back." Dennis is still at the office and wants a quick first-pass idea of the likely causes before he drives out.</div>
+<div id="tasks"></div>
+<div class="done-banner" id="doneBanner" style="display:none;">✅ Practical complete — you can move to the quiz.</div>
+</div>
+<script>
+const tasks = [{"prompt":"What is a sensible first move for Dennis before driving to the client's site?","options":["Drive out immediately with no plan and figure it out on arrival","Describe the exact symptom to an AI chat tool to get a short first-pass checklist of likely causes to check on site","Tell the client it's probably just an old camera and nothing can be done","Assume it's definitely a broken camera and bring a replacement without checking anything else"],"correct":1,"explanation":"A quick, well-described query to an AI chat tool can give Dennis a useful checklist to bring along, saving time versus arriving with no plan."},{"prompt":"Which description of the fault is most likely to get Dennis a genuinely useful checklist back from the AI tool?","options":["\"Camera broken, help\"","\"Camera picture flickers and drops to black for a few seconds then returns, other cameras on the same DVR are unaffected, nothing was changed recently\"","\"Something is wrong somewhere\"","No description needed, just ask for the fix"],"correct":1,"explanation":"A specific description — symptom, scope (one camera vs others), and recent changes — gives the AI tool enough detail to suggest genuinely relevant causes."},{"prompt":"The AI tool suggests that a failing or underpowered PoE connection is the most likely cause of the flickering. What should Dennis do with this suggestion?","options":["Immediately rewire the client's whole PoE switch without checking anything first","Treat it as one strong possibility to test on site (checking power budget and the cable/connector for that camera), alongside the other checklist items","Tell the client it is certainly the PoE connection before ever visiting the site","Ignore the suggestion completely since AI cannot help with hardware faults"],"correct":1,"explanation":"The AI's suggestion is a useful lead to test on site, not a confirmed diagnosis — Dennis still needs to verify it with proper checks at the property."}];
+function escapeHtml(s){return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
+function render(){
+  const c = document.getElementById('tasks');
+  c.innerHTML = tasks.map((t,i)=>`
+    <div class="task" id="task-${i}">
+      <div><span class="task-num">${i+1}</span><h3>${escapeHtml(t.prompt)}</h3></div>
+      <div class="options">
+        ${t.options.map((o,j)=>`<button class="option" onclick="answer(${i},${j})">${escapeHtml(o)}</button>`).join('')}
+      </div>
+    </div>`).join('');
+}
+function answer(i,j){
+  const task = tasks[i];
+  const el = document.getElementById('task-'+i);
+  const btns = el.querySelectorAll('.option');
+  if (btns[0].classList.contains('disabled')) return;
+  btns.forEach(b=>b.classList.add('disabled'));
+  btns[task.correct].classList.add('correct');
+  const right = j === task.correct;
+  if (!right) btns[j].classList.add('wrong');
+  const fb = document.createElement('div');
+  fb.className = 'feedback ' + (right?'correct':'wrong');
+  fb.innerHTML = '<strong>' + (right?'✅ Correct.':'❌ Not quite.') + '</strong><br>' + escapeHtml(task.explanation);
+  el.appendChild(fb);
+  if (i === tasks.length-1) document.getElementById('doneBanner').style.display='block';
+}
+render();
+</script>
+</body>
+</html>

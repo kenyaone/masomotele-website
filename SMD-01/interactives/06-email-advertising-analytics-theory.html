@@ -1,0 +1,357 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lesson 6.4 — Email & Advertising Analytics (Interactive)</title>
+<style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: 'Segoe UI', -apple-system, sans-serif; line-height: 1.55; color: #1e293b; background: #f8fafc; min-height: 100vh; }
+    .container { max-width: 1100px; margin: 0 auto; padding: 20px; }
+    header { background: linear-gradient(135deg, #2E7D32, #1B5E20); color: #fff; padding: 40px 30px; border-radius: 12px; margin-bottom: 24px; box-shadow: 0 10px 30px rgba(59,130,246,0.25); }
+    header .badge { display: inline-block; background: rgba(255,255,255,0.2); padding: 4px 14px; border-radius: 16px; font-size: 12px; font-weight: bold; letter-spacing: 1px; margin-bottom: 14px; }
+    header h1 { font-size: 34px; margin-bottom: 8px; }
+    header .subtitle { font-size: 17px; opacity: 0.95; margin-bottom: 20px; }
+    .meta-strip { display: flex; flex-wrap: wrap; gap: 12px; }
+    .meta-strip span { background: rgba(255,255,255,0.18); padding: 6px 14px; border-radius: 20px; font-size: 13px; }
+    .toc { background: #fff; border: 1px solid #e2e8f0; border-radius: 10px; padding: 22px 26px; margin-bottom: 22px; }
+    .toc h3 { color: #3b82f6; margin-bottom: 10px; }
+    .toc ol { padding-left: 20px; }
+    .toc a { color: #3b82f6; text-decoration: none; font-weight: 600; }
+    section { background: #fff; border: 1px solid #e2e8f0; border-radius: 10px; padding: 26px 30px; margin-bottom: 22px; }
+    section h2 { color: #3b82f6; font-size: 22px; margin-bottom: 12px; padding-bottom: 8px; border-bottom: 3px solid #3b82f6; }
+    section p { margin-bottom: 12px; }
+    section ul, section ol { padding-left: 22px; margin-bottom: 12px; }
+    .callout { border-left: 5px solid #3b82f6; background: #eff6ff; padding: 14px 18px; margin: 14px 0; border-radius: 4px; }
+    .callout.warn { border-left-color: #dc2626; background: #fef2f2; }
+    .callout.tip { border-left-color: #059669; background: #ecfdf5; }
+    .callout strong { color: #3b82f6; }
+
+    /* ROAS calculator — flagship */
+    .roas-lab { background: #eff6ff; border: 2px solid #3b82f6; border-radius: 10px; padding: 18px; margin: 14px 0; }
+    .roas-lab h4 { color: #1e40af; margin-bottom: 12px; }
+    .roas-row { display: grid; grid-template-columns: 200px 1fr 100px; gap: 12px; align-items: center; margin-bottom: 8px; }
+    @media (max-width: 700px) { .roas-row { grid-template-columns: 1fr; } }
+    .roas-row label { font-size: 13px; font-weight: 600; }
+    .roas-row input { width: 100%; padding: 8px 10px; border: 1.5px solid #cbd5e1; border-radius: 6px; font-size: 14px; }
+    .roas-row .unit { font-size: 12px; color: #64748b; font-family: 'Courier New', monospace; }
+    .roas-out { background: #fff; padding: 14px; border-radius: 8px; margin-top: 14px; display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 10px; }
+    .roas-cell { text-align: center; padding: 10px; border-radius: 6px; background: #f8fafc; }
+    .roas-cell .l { font-size: 11px; color: #64748b; text-transform: uppercase; }
+    .roas-cell .v { font-size: 22px; font-weight: bold; color: #1e40af; margin-top: 2px; }
+    .roas-verdict { margin-top: 12px; padding: 12px 14px; border-radius: 6px; font-weight: 600; }
+    .roas-verdict.green { background: #d1fae5; color: #065f46; }
+    .roas-verdict.amber { background: #fef3c7; color: #78350f; }
+    .roas-verdict.red { background: #fee2e2; color: #991b1b; }
+
+    /* Email report reader */
+    .email-report { background: #ecfdf5; border: 2px solid #059669; border-radius: 10px; padding: 16px; margin: 14px 0; }
+    .email-report h4 { color: #065f46; margin-bottom: 10px; }
+    .email-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(130px, 1fr)); gap: 10px; }
+    .email-cell { background: #fff; padding: 10px 12px; border-radius: 6px; text-align: center; }
+    .email-cell .l { font-size: 11px; color: #065f46; text-transform: uppercase; }
+    .email-cell .v { font-size: 20px; font-weight: bold; color: #059669; margin-top: 2px; }
+    .email-cell .b { font-size: 10px; color: #64748b; margin-top: 2px; }
+
+    /* Quality Score slider */
+    .qs-lab { background: linear-gradient(135deg, #ea4335, #fbbc04); color: #fff; border-radius: 10px; padding: 18px; margin: 14px 0; }
+    .qs-lab h4 { margin-bottom: 12px; }
+    .qs-slider { display: grid; grid-template-columns: 1fr 60px; gap: 16px; align-items: center; margin-bottom: 10px; }
+    .qs-slider input[type=range] { width: 100%; accent-color: #fff; }
+    .qs-slider .num { font-size: 36px; font-weight: bold; text-align: center; }
+    .qs-effect { background: rgba(255,255,255,0.2); padding: 10px 14px; border-radius: 6px; font-size: 13px; }
+    .qs-effect b { display: block; font-size: 15px; margin-top: 4px; }
+
+    table { width: 100%; border-collapse: collapse; margin: 14px 0; font-size: 14px; }
+    th, td { padding: 10px 12px; text-align: left; border: 1px solid #e2e8f0; }
+    th { background: #3b82f6; color: #fff; }
+    tr:nth-child(even) { background: #f8fafc; }
+
+    .quiz-question { background: #fff; border: 2px solid #cbd5e1; border-radius: 10px; padding: 18px; margin: 14px 0; }
+    .quiz-question.correct { border-color: #059669; background: #ecfdf5; }
+    .quiz-question.wrong { border-color: #dc2626; background: #fef2f2; }
+    .quiz-question h4 { margin-bottom: 12px; font-size: 15px; color: #1e293b; }
+    .quiz-question .options label { display: block; padding: 10px 14px; margin-bottom: 6px; background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 6px; cursor: pointer; font-size: 14px; }
+    .quiz-question .options label:hover { background: #eff6ff; }
+    .quiz-question .options input[type="radio"] { margin-right: 10px; }
+    .quiz-question .explanation { display: none; margin-top: 12px; padding: 10px 14px; border-radius: 6px; font-size: 14px; }
+    .quiz-question.correct .explanation { display: block; background: #d1fae5; color: #065f46; border-left: 4px solid #059669; }
+    .quiz-question.wrong .explanation { display: block; background: #fee2e2; color: #991b1b; border-left: 4px solid #dc2626; }
+    .quiz-summary { text-align: center; padding: 30px; background: linear-gradient(135deg, #eff6ff, #dbeafe); border-radius: 10px; margin: 20px 0; display: none; }
+    .quiz-summary.show { display: block; }
+    .quiz-summary .score { font-size: 48px; font-weight: bold; color: #3b82f6; margin-bottom: 8px; }
+    button.btn { background: #3b82f6; color: #fff; border: none; padding: 10px 20px; border-radius: 6px; font-size: 15px; font-weight: 600; cursor: pointer; }
+    button.btn:hover { background: #1e40af; }
+    button.btn.reset { background: #64748b; margin-left: 8px; }
+    footer { text-align: center; color: #64748b; padding: 24px; font-size: 13px; }
+
+    /* MTTI logo stamp */
+    .mtti-logo-stamp {
+        position: fixed; top: 14px; right: 18px; z-index: 999;
+        opacity: 0.88; transition: opacity 0.2s;
+    }
+    .mtti-logo-stamp:hover { opacity: 1; }
+    .mtti-logo-stamp img { width: 56px; height: 56px; border-radius: 50%; box-shadow: 0 2px 8px rgba(0,0,0,0.18); }
+</style>
+</head>
+<body>
+<div class="mtti-logo-stamp">
+    <img src="../../Resources/Logo.jpeg" alt="MTTI" title="Masomotele Technical Training Institute — Start learning, Start earning">
+</div>
+
+<div class="container">
+<header>
+    <div class="badge">LESSON 6.4  ·  ANALYTICS  ·  INTERACTIVE</div>
+    <h1>Email &amp; Advertising Analytics</h1>
+    <div class="subtitle">The language every serious marketer speaks. Email metrics. PPC/CPM/CPA/ROAS. Google Quality Score.</div>
+    <div class="meta-strip"><span><strong>Duration:</strong> ~30 min</span><span><strong>Handbook:</strong> Part 6, §6.4</span></div>
+</header>
+
+<div class="toc">
+    <h3>What you'll do</h3>
+    <ol>
+        <li><a href="#s1">The 5 email metrics</a></li>
+        <li><a href="#s2">Sarah's Mailchimp report (read-along)</a></li>
+        <li><a href="#s3">The 4 ad metrics (PPC/CPM/CPA/ROAS)</a></li>
+        <li><a href="#s4"><strong>Live ROAS calculator</strong></a></li>
+        <li><a href="#s5"><strong>Google Quality Score slider</strong></a></li>
+        <li><a href="#s6">The professional monthly report</a></li>
+        <li><a href="#s7">Self-check quiz</a></li>
+    </ol>
+</div>
+
+<section id="s1">
+    <h2>1. The 5 email metrics</h2>
+    <table>
+        <tr><th>Metric</th><th>What it measures</th><th>Healthy benchmark</th></tr>
+        <tr><td><strong>Open rate</strong></td><td>% who opened the email</td><td>20–40% · below 15% = subject line problem</td></tr>
+        <tr><td><strong>Click rate</strong></td><td>% who clicked ≥ 1 link</td><td>2–5% normal · 10%+ excellent</td></tr>
+        <tr><td><strong>Bounce rate</strong></td><td>Emails that didn't deliver</td><td>Under 2%</td></tr>
+        <tr><td><strong>Unsubscribes</strong></td><td>Left the list</td><td>Under 0.5% per send</td></tr>
+        <tr><td><strong>Total subscribers</strong></td><td>Current list size</td><td>Grow slowly, quality &gt; quantity</td></tr>
+    </table>
+</section>
+
+<section id="s2">
+    <h2>2. Sarah's Mailchimp report</h2>
+    <div class="email-report">
+        <h4>Karibu Kitchen · Weekly menu email</h4>
+        <div class="email-grid">
+            <div class="email-cell"><div class="l">Sent</div><div class="v">85</div></div>
+            <div class="email-cell"><div class="l">Opens</div><div class="v">34</div><div class="b">40% ✓ excellent</div></div>
+            <div class="email-cell"><div class="l">Clicks</div><div class="v">6</div><div class="b">7% ✓ above avg</div></div>
+            <div class="email-cell"><div class="l">Bounces</div><div class="v">1</div><div class="b">1.2% ✓ fine</div></div>
+            <div class="email-cell"><div class="l">Unsubs</div><div class="v">0</div><div class="b">0% ✓ perfect</div></div>
+            <div class="email-cell"><div class="l">Subs</div><div class="v">85</div><div class="b">stable</div></div>
+        </div>
+    </div>
+    <div class="callout tip"><strong>Sarah keeps doing what she's doing.</strong> If open rate had dropped below 15%, she'd rewrite subject lines.</div>
+</section>
+
+<section id="s3">
+    <h2>3. The 4 ad metrics</h2>
+    <table>
+        <tr><th>Metric</th><th>Full name</th><th>Meaning</th></tr>
+        <tr><td><strong>PPC</strong></td><td>Pay Per Click</td><td>Advertiser pays each click. Google/Meta default.</td></tr>
+        <tr><td><strong>CPM</strong></td><td>Cost Per Mille (per 1,000 impressions)</td><td>Used when goal = awareness.</td></tr>
+        <tr><td><strong>CPA</strong></td><td>Cost Per Acquisition</td><td>Cost of gaining ONE customer.</td></tr>
+        <tr><td><strong>ROAS</strong></td><td>Return On Ad Spend</td><td>Revenue ÷ Ad spend</td></tr>
+    </table>
+</section>
+
+<section id="s4">
+    <h2>4. Live ROAS calculator</h2>
+    <p>Enter your numbers. Calculator returns CPA + ROAS + profit + verdict.</p>
+    <div class="roas-lab">
+        <div class="roas-row"><label>Ad spend</label><input type="number" id="rSpend" value="45000"><span class="unit">KES</span></div>
+        <div class="roas-row"><label>Orders (conversions)</label><input type="number" id="rOrders" value="58"><span class="unit">orders</span></div>
+        <div class="roas-row"><label>Average order value</label><input type="number" id="rAOV" value="850"><span class="unit">KES</span></div>
+        <div class="roas-row"><label>Profit margin</label><input type="number" id="rMargin" value="40" min="0" max="100"><span class="unit">%</span></div>
+
+        <div class="roas-out">
+            <div class="roas-cell"><div class="l">Revenue</div><div class="v" id="oRev">—</div></div>
+            <div class="roas-cell"><div class="l">CPA</div><div class="v" id="oCPA">—</div></div>
+            <div class="roas-cell"><div class="l">ROAS</div><div class="v" id="oROAS">—</div></div>
+            <div class="roas-cell"><div class="l">Profit</div><div class="v" id="oProfit">—</div></div>
+        </div>
+        <div class="roas-verdict red" id="rVerdict">—</div>
+    </div>
+    <div class="callout"><strong>Rule of thumb:</strong> healthy CPA &lt; 1/4 of AOV · healthy ROAS ≥ 3× for e-commerce first-purchase. Sarah's 1.1× ROAS looks bad — but combined with lifetime value hits &gt; 3×.</div>
+</section>
+
+<section id="s5">
+    <h2>5. Google Quality Score slider</h2>
+    <p>The hidden number every Google Ads professional lives by. Drag the slider to see the effect.</p>
+    <div class="qs-lab">
+        <h4>Google Quality Score (1–10)</h4>
+        <div class="qs-slider">
+            <input type="range" id="qsSlider" min="1" max="10" value="7">
+            <div class="num" id="qsNum">7</div>
+        </div>
+        <div class="qs-effect" id="qsEffect"></div>
+    </div>
+    <div class="callout"><strong>3 ways to raise Quality Score:</strong>
+        <ol style="margin-top:6px;">
+            <li>Rewrite ad copy to include the EXACT keyword you're bidding on</li>
+            <li>Improve landing page (ad about delivery → land on Delivery page, not Home)</li>
+            <li>Pause underperforming keywords — one bad one drags down the ad group</li>
+        </ol>
+    </div>
+</section>
+
+<section id="s6">
+    <h2>6. Professional monthly report — 5 sections</h2>
+    <ol>
+        <li><strong>Goal this month</strong></li>
+        <li><strong>What was actually achieved</strong> — numbers, not adjectives</li>
+        <li><strong>What worked</strong> — winning ad/platform/content</li>
+        <li><strong>What did NOT work</strong> — and why</li>
+        <li><strong>What changes are planned</strong> next month</li>
+    </ol>
+    <div class="callout warn"><strong>Include actual CPA, ROAS, QS changes, and 2-week trend.</strong> Miss any of these 5 and the client loses trust. Include them every month and they keep paying you.</div>
+</section>
+
+<section id="s7">
+    <h2>7. Self-check quiz</h2>
+
+    <div class="quiz-question" data-correct="C"><h4>1. Healthy email open rate?</h4><div class="options"><label><input type="radio" name="q1" value="A"> A) 2–3%</label><label><input type="radio" name="q1" value="B"> B) 90%+</label><label><input type="radio" name="q1" value="C"> C) 20–40%</label><label><input type="radio" name="q1" value="D"> D) 100%</label></div><div class="explanation">Correct — 20–40% for a small warm list.</div></div>
+
+    <div class="quiz-question" data-correct="A"><h4>2. Under 15% open rate signals…</h4><div class="options"><label><input type="radio" name="q2" value="A"> A) Subject-line problem</label><label><input type="radio" name="q2" value="B"> B) Great success</label><label><input type="radio" name="q2" value="C"> C) The email is too long</label><label><input type="radio" name="q2" value="D"> D) Nothing</label></div><div class="explanation">Correct — rewrite subject lines.</div></div>
+
+    <div class="quiz-question" data-correct="D"><h4>3. ROAS =</h4><div class="options"><label><input type="radio" name="q3" value="A"> A) Reach ÷ Ad spend</label><label><input type="radio" name="q3" value="B"> B) Rate Of Ad Success</label><label><input type="radio" name="q3" value="C"> C) Real Order Ad Score</label><label><input type="radio" name="q3" value="D"> D) Return On Ad Spend (Revenue ÷ Ad spend)</label></div><div class="explanation">Correct — the ratio that matters.</div></div>
+
+    <div class="quiz-question" data-correct="B"><h4>4. CPA =</h4><div class="options"><label><input type="radio" name="q4" value="A"> A) Cost Per Ad</label><label><input type="radio" name="q4" value="B"> B) Cost Per Acquisition</label><label><input type="radio" name="q4" value="C"> C) Click Per Ad</label><label><input type="radio" name="q4" value="D"> D) Cost Per Attention</label></div><div class="explanation">Correct — cost of ONE customer.</div></div>
+
+    <div class="quiz-question" data-correct="C"><h4>5. Healthy CPA for e-commerce?</h4><div class="options"><label><input type="radio" name="q5" value="A"> A) 100% of AOV</label><label><input type="radio" name="q5" value="B"> B) 90% of AOV</label><label><input type="radio" name="q5" value="C"> C) Less than 25% of AOV</label><label><input type="radio" name="q5" value="D"> D) 200% of AOV</label></div><div class="explanation">Correct — leaves room for cost + profit.</div></div>
+
+    <div class="quiz-question" data-correct="A"><h4>6. Google Quality Score range?</h4><div class="options"><label><input type="radio" name="q6" value="A"> A) 1–10</label><label><input type="radio" name="q6" value="B"> B) 0–100</label><label><input type="radio" name="q6" value="C"> C) 1–5</label><label><input type="radio" name="q6" value="D"> D) A–F</label></div><div class="explanation">Correct — Google's hidden 1–10 grade per keyword.</div></div>
+
+    <div class="quiz-question" data-correct="B"><h4>7. Quality Score target?</h4><div class="options"><label><input type="radio" name="q7" value="A"> A) 3+</label><label><input type="radio" name="q7" value="B"> B) 7+</label><label><input type="radio" name="q7" value="C"> C) Any</label><label><input type="radio" name="q7" value="D"> D) 1</label></div><div class="explanation">Correct — 7+ = lower CPCs + higher position.</div></div>
+
+    <div class="quiz-question" data-correct="D"><h4>8. To raise Quality Score…</h4><div class="options"><label><input type="radio" name="q8" value="A"> A) Bid higher</label><label><input type="radio" name="q8" value="B"> B) Add more keywords</label><label><input type="radio" name="q8" value="C"> C) Ignore Google</label><label><input type="radio" name="q8" value="D"> D) Include the keyword in ad copy · improve landing page · pause bad keywords</label></div><div class="explanation">Correct — three specific actions.</div></div>
+
+    <div class="quiz-question" data-correct="C"><h4>9. Monthly report needs how many sections?</h4><div class="options"><label><input type="radio" name="q9" value="A"> A) 1</label><label><input type="radio" name="q9" value="B"> B) 3</label><label><input type="radio" name="q9" value="C"> C) 5</label><label><input type="radio" name="q9" value="D"> D) 20</label></div><div class="explanation">Correct — Goal · Achieved · Worked · Didn't work · Next month.</div></div>
+
+    <div class="quiz-question" data-correct="A"><h4>10. Sarah's Meta ROAS was 1.1×. Was she losing money?</h4><div class="options"><label><input type="radio" name="q10" value="A"> A) No — lifetime value pushed real ROAS above 3×</label><label><input type="radio" name="q10" value="B"> B) Yes</label><label><input type="radio" name="q10" value="C"> C) Break-even</label><label><input type="radio" name="q10" value="D"> D) Can't tell</label></div><div class="explanation">Correct — surface numbers hide LTV.</div></div>
+
+    <div style="margin-top:20px;">
+        <button class="btn" onclick="markQuiz()">Mark my quiz</button>
+        <button class="btn reset" onclick="resetQuiz()">Reset</button>
+    </div>
+    <div class="quiz-summary" id="quizSummary"><div class="score" id="scoreDisplay">0 / 10</div><p id="scoreMessage"></p></div>
+</section>
+
+<footer><p>Lesson 6.4 — Email &amp; Advertising Analytics · MTTI · Handbook Part 6, §6.4</p><p>Module 6 complete. Next: <strong>Module 7 — Content Creation &amp; Design</strong></p></footer>
+</div>
+
+<script>
+function roas() {
+    const spend = +document.getElementById('rSpend').value || 0;
+    const orders = +document.getElementById('rOrders').value || 0;
+    const aov = +document.getElementById('rAOV').value || 0;
+    const margin = +document.getElementById('rMargin').value || 0;
+    const rev = orders * aov;
+    const cpa = orders > 0 ? spend / orders : 0;
+    const roasVal = spend > 0 ? rev / spend : 0;
+    const profit = rev * margin / 100 - spend;
+
+    document.getElementById('oRev').textContent = 'KES ' + rev.toLocaleString();
+    document.getElementById('oCPA').textContent = orders > 0 ? 'KES ' + cpa.toFixed(0) : '—';
+    document.getElementById('oROAS').textContent = roasVal.toFixed(2) + '×';
+    document.getElementById('oProfit').textContent = 'KES ' + Math.round(profit).toLocaleString();
+
+    const v = document.getElementById('rVerdict');
+    if (roasVal >= 3 && profit > 0) { v.className = 'roas-verdict green'; v.textContent = '✓ Healthy first-purchase ROAS + profitable. Scale it.'; }
+    else if (roasVal >= 1 && profit > 0) { v.className = 'roas-verdict amber'; v.textContent = '~ Marginal — profitable this month but factor in LTV before scaling.'; }
+    else if (profit > 0) { v.className = 'roas-verdict amber'; v.textContent = '~ Low ROAS but profit exists via margin. Improve creative/targeting.'; }
+    else { v.className = 'roas-verdict red'; v.textContent = '✗ Losing money on ad spend. Check CPA vs AOV, and creative.'; }
+}
+document.querySelectorAll('.roas-lab input').forEach(el => el.addEventListener('input', roas));
+roas();
+
+function updateQS() {
+    const qs = +document.getElementById('qsSlider').value;
+    document.getElementById('qsNum').textContent = qs;
+    const e = document.getElementById('qsEffect');
+    if (qs >= 8) e.innerHTML = 'Google REWARDS you: lower CPC, higher ad position. <b>You save money AND win the auction more often.</b>';
+    else if (qs >= 6) e.innerHTML = 'Neutral: paying market rate for market position. <b>Room to improve to 8+.</b>';
+    else if (qs >= 4) e.innerHTML = 'Warning: paying MORE per click, appearing lower. <b>Fix ad copy or landing page.</b>';
+    else e.innerHTML = 'Google PUNISHES you: highest CPC, lowest position, sometimes ad doesn\'t show. <b>Pause the keyword, rewrite ad, or change landing page.</b>';
+}
+document.getElementById('qsSlider').addEventListener('input', updateQS);
+updateQS();
+
+function markQuiz() {
+    const qs = document.querySelectorAll('.quiz-question'); let s = 0;
+    qs.forEach((q, i) => { const c = q.dataset.correct; const p = q.querySelector(`input[name="q${i+1}"]:checked`); q.classList.remove('correct','wrong'); if (p && p.value === c) { q.classList.add('correct'); s++; } else if (p) q.classList.add('wrong'); });
+    const su = document.getElementById('quizSummary'); su.classList.add('show');
+    document.getElementById('scoreDisplay').textContent = `${s} / 10`;
+    document.getElementById('scoreMessage').textContent = s === 10 ? 'Perfect. Module 6 done.' : s >= 7 ? 'Strong.' : 'Play with the ROAS calculator more.';
+    su.scrollIntoView({behavior:'smooth',block:'center'});
+}
+function resetQuiz() { document.querySelectorAll('.quiz-question').forEach(q => { q.classList.remove('correct','wrong'); q.querySelectorAll('input[type=radio]').forEach(r => r.checked = false); }); document.getElementById('quizSummary').classList.remove('show'); }
+</script>
+<style id="mtti-paginator-style">
+  section[data-mtti-page] { display: none !important; }
+  section[data-mtti-page].mtti-active { display: block !important; }
+  #mtti-paginator-bar {
+    position: sticky; bottom: 0; left: 0; right: 0;
+    background: #fff; border-top: 2px solid #e2e8f0;
+    padding: 12px 20px; margin-top: 20px;
+    display: flex; align-items: center; justify-content: space-between; gap: 12px;
+    font-family: 'Segoe UI', -apple-system, sans-serif;
+    box-shadow: 0 -4px 16px rgba(0,0,0,0.08);
+    z-index: 100;
+  }
+  #mtti-paginator-bar button {
+    background: #2E7D32; color: #fff; border: none; padding: 10px 18px;
+    border-radius: 8px; font-size: 13px; font-weight: 600; cursor: pointer;
+  }
+  #mtti-paginator-bar button:disabled { background: #cbd5e1; cursor: not-allowed; }
+  #mtti-paginator-bar button.mtti-prev { background: #64748b; }
+  #mtti-paginator-progress { font-size: 12px; color: #64748b; font-weight: 600; }
+</style>
+<script id="mtti-paginator-script">
+(function(){
+  function init(){
+    var sections = Array.prototype.slice.call(document.querySelectorAll('section[id]'));
+    // Only sections that are real content blocks (has an <h2>), skip stray/decorative ones.
+    sections = sections.filter(function(s){ return s.querySelector('h2'); });
+    if (sections.length < 2) return; // nothing to paginate
+
+    sections.forEach(function(s, i){ s.setAttribute('data-mtti-page', i); });
+    var current = 0;
+
+    var bar = document.createElement('div');
+    bar.id = 'mtti-paginator-bar';
+    bar.innerHTML =
+      '<button class="mtti-prev" id="mtti-pg-prev">← Previous</button>' +
+      '<span id="mtti-paginator-progress"></span>' +
+      '<button id="mtti-pg-next">Next →</button>';
+    sections[sections.length - 1].insertAdjacentElement('afterend', bar);
+
+    var prevBtn = bar.querySelector('#mtti-pg-prev');
+    var nextBtn = bar.querySelector('#mtti-pg-next');
+    var progress = bar.querySelector('#mtti-paginator-progress');
+
+    function render(){
+      sections.forEach(function(s, i){ s.classList.toggle('mtti-active', i === current); });
+      prevBtn.disabled = (current === 0);
+      nextBtn.textContent = (current === sections.length - 1) ? 'Done ✓' : 'Next →';
+      progress.textContent = 'Section ' + (current + 1) + ' of ' + sections.length;
+      window.scrollTo(0, 0);
+    }
+    prevBtn.addEventListener('click', function(){ if (current > 0) { current--; render(); } });
+    nextBtn.addEventListener('click', function(){
+      if (current < sections.length - 1) { current++; render(); }
+    });
+    render();
+  }
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', init);
+  } else {
+    init();
+  }
+})();
+</script>
+</body></html>

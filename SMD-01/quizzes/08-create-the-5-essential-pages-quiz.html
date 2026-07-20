@@ -1,0 +1,346 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Create the 5 Essential Pages | MTTI Digital Marketing</title>
+    <link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Fredoka:wght@500;600&display=swap" rel="stylesheet">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Space Mono', monospace;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh; padding: 20px; color: #fff;
+        }
+        .container { max-width: 900px; margin: 0 auto; }
+        .header { text-align: center; margin-bottom: 30px; animation: slideDown 0.6s ease-out; }
+        .header .lesson-tag {
+            display: inline-block; background: rgba(255,255,255,0.2);
+            padding: 6px 16px; border-radius: 999px;
+            font-size: 0.85em; margin-bottom: 12px;
+        }
+        .header h1 {
+            font-family: 'Fredoka', sans-serif; font-size: 2.2em;
+            margin-bottom: 8px; text-shadow: 3px 3px 0 rgba(0,0,0,0.2);
+        }
+        .header p { opacity: 0.95; font-size: 0.95em; }
+        .score-board {
+            background: rgba(255,255,255,0.15); backdrop-filter: blur(10px);
+            border-radius: 20px; padding: 20px; margin-bottom: 20px;
+            display: flex; justify-content: space-around;
+            animation: fadeIn 0.8s ease-out 0.2s both;
+        }
+        .score-item { text-align: center; }
+        .score-item .label { font-size: 0.85em; opacity: 0.9; margin-bottom: 4px; }
+        .score-item .value {
+            font-size: 1.8em; font-weight: bold; font-family: 'Fredoka', sans-serif;
+        }
+        .progress-bar {
+            width: 100%; height: 8px; background: rgba(255,255,255,0.3);
+            border-radius: 10px; margin-bottom: 25px; overflow: hidden;
+        }
+        .progress-fill {
+            height: 100%; background: linear-gradient(90deg, #f093fb 0%, #f5576c 100%);
+            border-radius: 10px; transition: width 0.5s ease; width: 0%;
+        }
+        .exercise-card {
+            background: white; color: #333; border-radius: 25px;
+            padding: 35px; margin-bottom: 20px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            animation: fadeIn 0.6s ease-out both;
+        }
+        .scenario {
+            background: linear-gradient(135deg, #fff8e1 0%, #ffecb3 100%);
+            border-left: 5px solid #ffc107;
+            padding: 20px 24px; border-radius: 12px;
+            margin-bottom: 24px;
+            font-size: 0.98em; line-height: 1.55;
+        }
+        .scenario strong { color: #7a5a00; font-family: 'Fredoka', sans-serif; }
+        .question {
+            font-size: 1.15em; margin-bottom: 20px;
+            font-weight: 700; line-height: 1.4;
+        }
+        .options { display: flex; flex-direction: column; gap: 12px; }
+        .option {
+            background: #f5f7fb; border: 2px solid transparent;
+            padding: 16px 20px; border-radius: 12px;
+            cursor: pointer; transition: all 0.2s ease;
+            font-family: 'Space Mono', monospace; font-size: 0.98em; text-align: left;
+        }
+        .option:hover:not(.disabled) {
+            background: #eef1fb; border-color: #667eea; transform: translateX(4px);
+        }
+        .option.correct { background: #d4edda; border-color: #28a745; color: #155724; }
+        .option.wrong { background: #f8d7da; border-color: #dc3545; color: #721c24; animation: shake 0.4s; }
+        .option.disabled { cursor: not-allowed; opacity: 0.85; }
+        .feedback {
+            margin-top: 22px; padding: 18px 22px; border-radius: 12px;
+            animation: slideUp 0.4s ease-out;
+            font-size: 0.98em; line-height: 1.5;
+        }
+        .feedback.correct { background: #d4edda; color: #155724; border-left: 4px solid #28a745; }
+        .feedback.wrong { background: #f8d7da; color: #721c24; border-left: 4px solid #dc3545; }
+        .feedback strong { font-family: 'Fredoka', sans-serif; }
+        .next-btn, .restart-btn {
+            margin-top: 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white; border: none;
+            padding: 14px 32px; border-radius: 12px;
+            font-size: 1em; cursor: pointer;
+            font-family: 'Fredoka', sans-serif;
+            box-shadow: 0 6px 18px rgba(0,0,0,0.2);
+            transition: transform 0.2s ease;
+        }
+        .next-btn:hover, .restart-btn:hover { transform: scale(1.04); }
+        .results {
+            text-align: center; padding: 25px 15px;
+            animation: bounceIn 0.6s ease-out;
+        }
+        .results h2 {
+            font-family: 'Fredoka', sans-serif; font-size: 2em;
+            margin-bottom: 12px; color: #333;
+        }
+        .results .final-score {
+            font-size: 3em; font-family: 'Fredoka', sans-serif;
+            color: #667eea; margin: 20px 0;
+        }
+        .results p { color: #555; margin-bottom: 12px; }
+        .badge { display: inline-block; font-size: 3.5em; margin: 8px 0; }
+        @keyframes slideDown { from { opacity: 0; transform: translateY(-30px); } to { opacity: 1; transform: translateY(0); } }
+        @keyframes fadeIn { from { opacity: 0; transform: scale(0.96); } to { opacity: 1; transform: scale(1); } }
+        @keyframes slideUp { from { opacity: 0; transform: translateY(15px); } to { opacity: 1; transform: translateY(0); } }
+        @keyframes shake { 0%,100% { transform: translateX(0); } 25% { transform: translateX(-8px); } 75% { transform: translateX(8px); } }
+        @keyframes bounceIn { 0% { opacity: 0; transform: scale(0.4); } 60% { transform: scale(1.05); } 100% { opacity: 1; transform: scale(1); } }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <div class="lesson-tag">Module 8 · Lesson 8.5</div>
+            <h1>Create the 5 Essential Pages</h1>
+            <p>10 Sarah scenarios — build Home, About, Menu, Delivery, Contact in the block editor</p>
+        </div>
+
+        <div class="score-board">
+            <div class="score-item"><div class="label">Score</div><div class="value" id="score">0</div></div>
+            <div class="score-item"><div class="label">Question</div><div class="value"><span id="current">1</span>/<span id="total">10</span></div></div>
+            <div class="score-item"><div class="label">Streak</div><div class="value" id="streak">0</div></div>
+        </div>
+
+        <div class="progress-bar"><div class="progress-fill" id="progress"></div></div>
+
+        <div class="exercise-card" id="exerciseCard"></div>
+    </div>
+
+    <script>
+        const exercises = [
+  {
+    "scenario": "Sarah is planning her Karibu Kitchen site and asks which pages are truly essential before she goes public. Her cousin says one Home page is enough.",
+    "question": "Which set is the five essential pages every small Kenyan business site needs in 2026?",
+    "options": [
+      "Home, Blog, Careers, Investors, Press.",
+      "Home, About, Menu (or Services), Delivery (or How to Order), Contact.",
+      "Home, Login, Signup, Checkout, Terms.",
+      "Home only — extra pages confuse customers."
+    ],
+    "correct": 1,
+    "explanation": "Slide 2 lists the five essential pages — Home, About, Menu/Services, Delivery/How to Order, Contact. Miss any and Sarah loses customers. A Privacy Policy is a sixth required by DPA 2019 and goes in the footer."
+  },
+  {
+    "scenario": "Sarah publishes her five pages but forgets a Privacy Policy. A trainer reminds her she is collecting names, phone numbers, and addresses via WhatsApp orders.",
+    "question": "What is the correct action for a Kenyan business site under the DPA 2019?",
+    "options": [
+      "Ignore it — a Privacy Policy is optional in Kenya.",
+      "Add a Privacy Policy page as a sixth page and link to it from the footer. The DPA 2019 requires it once you collect personal data.",
+      "Combine it with the Contact page.",
+      "Put it inside the About page as a paragraph."
+    ],
+    "correct": 1,
+    "explanation": "The five essential pages (Slide 2) plus a Privacy Policy page — required by Kenya's DPA 2019 for any site collecting personal data — footer-linked. Six pages, not five, once you handle customer data."
+  },
+  {
+    "scenario": "Sarah opens Pages and clicks Add New Page. WordPress asks whether to start with a blank page or a template.",
+    "question": "What is the fastest way to build Sarah's Home page?",
+    "options": [
+      "Start with a blank page and rebuild the layout from scratch.",
+      "Pick the Home template, which comes pre-installed with the Twenty Twenty-Six theme and creates a page pre-populated with the standard hero, features, and footer sections. Sarah then edits the placeholder text and images.",
+      "Copy Nyakinyua Kitchen's HTML source code.",
+      "Skip templates — they are only for beginners."
+    ],
+    "correct": 1,
+    "explanation": "Slide 4 shows the six-choice dialog — blank or one of five templates. Picking the Home template pre-populates the sections from the wireframe. Faster than starting blank."
+  },
+  {
+    "scenario": "Sarah's Home page wireframe shows a top nav, a full-width hero photo with a headline and WhatsApp button, three feature tiles, testimonials, and a footer.",
+    "question": "Which block type does she use for the full-width hero photo with text on top?",
+    "options": [
+      "Paragraph block.",
+      "Cover block — a big full-width image with text on top, perfect for the Home page hero.",
+      "Table block.",
+      "Shortcode block."
+    ],
+    "correct": 1,
+    "explanation": "Slide 6 lists the five block types — Cover, Heading, Paragraph, Buttons, Columns. The Cover block is the right one for a full-width hero image with overlaid text."
+  },
+  {
+    "scenario": "Sarah wants to arrange her Menu page as four side-by-side categories of food with prices.",
+    "question": "Which block type does she use for that layout?",
+    "options": [
+      "Paragraph block only.",
+      "Heading block only.",
+      "Columns block — for arranging content into two, three, or four columns side by side.",
+      "Cover block only."
+    ],
+    "correct": 2,
+    "explanation": "Slide 6 lists the Columns block as the way to lay out content in 2, 3, or 4 columns. Perfect for four food-category columns with prices on the Menu page."
+  },
+  {
+    "scenario": "Sarah has typed her Home page content and is about to click Publish. She wants to know the checklist she should run first.",
+    "question": "Which item is NOT part of the Lesson 8.5 publishing checklist?",
+    "options": [
+      "Title is clear and matches the URL.",
+      "Featured image is set — it appears in social media previews.",
+      "Every button has a real URL, not a placeholder hash sign.",
+      "Convert every image to a PDF before publishing."
+    ],
+    "correct": 3,
+    "explanation": "Slide 7 lists the five checklist items — clear title/URL, featured image set, correct heading levels, real button URLs, and mobile preview looks right. PDFs are not on the checklist."
+  },
+  {
+    "scenario": "Sarah has set the page title to 'Fresh lunch, delivered to your desk'. She uses H2 for the same page title, then H1 for a sub-section.",
+    "question": "Which heading rule is she breaking?",
+    "options": [
+      "Every page must have exactly one H1 heading — the main page heading. H2s are for main sections, H3s for sub-sections. Sarah has inverted the hierarchy.",
+      "Every page must have three H1 headings.",
+      "H1 is only for footers.",
+      "Headings do not matter for SEO."
+    ],
+    "correct": 0,
+    "explanation": "Slide 7 checklist item three — H1 for page title, H2 for main sections, H3 for sub-sections. Only ONE H1 per page. Sarah's inversion breaks the hierarchy Google uses to understand the page."
+  },
+  {
+    "scenario": "Sarah previews her Home page on desktop and it looks great. She is ready to publish.",
+    "question": "What last step does Lesson 8.5 insist on before hitting Publish?",
+    "options": [
+      "Click the mobile phone icon in the top bar and check the mobile preview — 87 per cent of Kenyan customers see the mobile view.",
+      "Only check the tablet view.",
+      "Publish immediately — mobile is not important.",
+      "Print the page as a PDF for review."
+    ],
+    "correct": 0,
+    "explanation": "Slide 7 checklist item five — mobile preview must look right. Kenyan customers see mobile views most of the time (this is stated explicitly in Lesson 8.6 as 87 per cent)."
+  },
+  {
+    "scenario": "Sarah is planning her Contact page and knows she will need a working contact form.",
+    "question": "Which plan matches Lesson 8.5's workflow?",
+    "options": [
+      "Build the form in raw HTML today.",
+      "Add the WhatsApp number as a big button, the physical address, and a Contact Form Seven form that Sarah installs in the next lesson (8.7).",
+      "Skip the contact form entirely.",
+      "Use a Google Form embedded from Sheets."
+    ],
+    "correct": 1,
+    "explanation": "Slide 8 describes the Contact page — WhatsApp button, address, and a Contact Form Seven form that gets installed in Lesson 8.7. That plugin lesson is where the form actually lands."
+  },
+  {
+    "scenario": "Sarah asks how long each page takes to build and how she should plan her afternoon.",
+    "question": "What is the realistic time estimate from Lesson 8.5?",
+    "options": [
+      "Two minutes per page.",
+      "About twenty minutes per page, so a full afternoon of clicking, typing, and previewing for all five pages.",
+      "Two full weeks per page.",
+      "One hour per page but only with an agency."
+    ],
+    "correct": 1,
+    "explanation": "Slide 8 gives the estimate — about 20 minutes per page, a full afternoon for all five. Realistic pacing for a beginner using the block editor."
+  }
+];
+
+        let currentQuestion = 0, score = 0, streak = 0, answered = false;
+
+        function updateScoreboard() {
+            document.getElementById('score').textContent = score;
+            document.getElementById('current').textContent = Math.min(currentQuestion + 1, exercises.length);
+            document.getElementById('total').textContent = exercises.length;
+            document.getElementById('streak').textContent = streak;
+            document.getElementById('progress').style.width = ((currentQuestion) / exercises.length) * 100 + '%';
+        }
+
+        function escapeHtml(s) {
+            return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+        }
+
+        function renderQuestion() {
+            answered = false;
+            const q = exercises[currentQuestion];
+            let html = '';
+            if (q.scenario) {
+                html += `<div class="scenario"><strong>Scenario.</strong> ${escapeHtml(q.scenario)}</div>`;
+            }
+            html += `<div class="question">${escapeHtml(q.question)}</div>`;
+            html += '<div class="options">';
+            q.options.forEach((o, i) => {
+                html += `<button class="option" onclick="selectAnswer(${i})">${escapeHtml(o)}</button>`;
+            });
+            html += '</div>';
+            document.getElementById('exerciseCard').innerHTML = html;
+            updateScoreboard();
+        }
+
+        function selectAnswer(i) {
+            if (answered) return;
+            answered = true;
+            const q = exercises[currentQuestion];
+            const btns = document.querySelectorAll('.option');
+            btns.forEach(b => b.classList.add('disabled'));
+            btns[q.correct].classList.add('correct');
+            const right = i === q.correct;
+            if (!right) btns[i].classList.add('wrong');
+            if (right) { score += 10; streak += 1; } else { streak = 0; }
+            const fb = document.createElement('div');
+            fb.className = 'feedback ' + (right ? 'correct' : 'wrong');
+            fb.innerHTML = `<strong>${right ? '✅ Correct.' : '❌ Not quite.'}</strong><br>${escapeHtml(q.explanation)}`;
+            document.getElementById('exerciseCard').appendChild(fb);
+            const nb = document.createElement('button');
+            nb.className = 'next-btn';
+            nb.textContent = currentQuestion === exercises.length - 1 ? 'See results →' : 'Next scenario →';
+            nb.onclick = nextQuestion;
+            document.getElementById('exerciseCard').appendChild(nb);
+            updateScoreboard();
+        }
+
+        function nextQuestion() {
+            currentQuestion++;
+            if (currentQuestion >= exercises.length) return showResults();
+            renderQuestion();
+        }
+
+        function showResults() {
+            document.getElementById('progress').style.width = '100%';
+            const total = exercises.length * 10;
+            const pct = Math.round(score / total * 100);
+            if (window.parent) { window.parent.postMessage({type:"mtti_quiz_score", score: score, total: total, percent: pct}, "*"); }
+            let badge = '🌟', msg = 'Excellent work. You have a professional grasp of this lesson.';
+            if (pct < 50) { badge = '🌱'; msg = 'Good first attempt. Re-watch the lesson video and try again.'; }
+            else if (pct < 80) { badge = '📚'; msg = 'Solid progress. Review the scenarios you missed and retry.'; }
+            document.getElementById('exerciseCard').innerHTML = `
+                <div class="results">
+                    <span class="badge">${badge}</span>
+                    <h2>Quiz Complete</h2>
+                    <div class="final-score">${score} / ${total}</div>
+                    <p><strong>${pct}%</strong> · Longest streak: ${streak}</p>
+                    <p>${msg}</p>
+                    <button class="restart-btn" onclick="restart()">Try again 🔁</button>
+                </div>`;
+        }
+
+        function restart() {
+            currentQuestion = 0; score = 0; streak = 0;
+            renderQuestion();
+        }
+
+        renderQuestion();
+    </script>
+</body>
+</html>

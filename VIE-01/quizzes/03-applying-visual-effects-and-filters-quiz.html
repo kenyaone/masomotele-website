@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Applying Visual Effects and Filters | MTTI Video Editing</title>
+    <link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Fredoka:wght@500;600&display=swap" rel="stylesheet">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Space Mono', monospace; background: linear-gradient(135deg, #6A11CB 0%, #2575FC 100%); min-height: 100vh; padding: 20px; color: #fff; }
+        .container { max-width: 900px; margin: 0 auto; }
+        .header { text-align: center; margin-bottom: 30px; }
+        .header .lesson-tag { display: inline-block; background: rgba(255,255,255,0.2); padding: 6px 16px; border-radius: 999px; font-size: 0.85em; margin-bottom: 12px; }
+        .header h1 { font-family: 'Fredoka', sans-serif; font-size: 2.2em; margin-bottom: 8px; text-shadow: 3px 3px 0 rgba(0,0,0,0.2); }
+        .score-board { background: rgba(255,255,255,0.15); backdrop-filter: blur(10px); border-radius: 20px; padding: 20px; margin-bottom: 20px; display: flex; justify-content: space-around; }
+        .score-item { text-align: center; }
+        .score-item .label { font-size: 0.85em; opacity: 0.9; margin-bottom: 4px; }
+        .score-item .value { font-size: 1.8em; font-weight: bold; font-family: 'Fredoka', sans-serif; }
+        .progress-bar { width: 100%; height: 8px; background: rgba(255,255,255,0.3); border-radius: 10px; margin-bottom: 25px; overflow: hidden; }
+        .progress-fill { height: 100%; background: linear-gradient(90deg, #f7971e 0%, #ffd200 100%); border-radius: 10px; transition: width 0.5s ease; width: 0%; }
+        .exercise-card { background: white; color: #333; border-radius: 25px; padding: 35px; margin-bottom: 20px; box-shadow: 0 20px 60px rgba(0,0,0,0.3); }
+        .scenario { background: linear-gradient(135deg, #fff8e1 0%, #ffecb3 100%); border-left: 5px solid #ffc107; padding: 20px 24px; border-radius: 12px; margin-bottom: 24px; font-size: 0.98em; line-height: 1.55; }
+        .scenario strong { color: #7a5a00; font-family: 'Fredoka', sans-serif; }
+        .question { font-size: 1.15em; margin-bottom: 20px; font-weight: 700; line-height: 1.4; }
+        .options { display: flex; flex-direction: column; gap: 12px; }
+        .option { background: #f5f7fb; border: 2px solid transparent; padding: 16px 20px; border-radius: 12px; cursor: pointer; transition: all 0.2s ease; font-family: 'Space Mono', monospace; font-size: 0.98em; text-align: left; }
+        .option:hover:not(.disabled) { background: #eef1fb; border-color: #2575FC; transform: translateX(4px); }
+        .option.correct { background: #d4edda; border-color: #28a745; color: #155724; }
+        .option.wrong { background: #f8d7da; border-color: #dc3545; color: #721c24; }
+        .option.disabled { cursor: not-allowed; opacity: 0.85; }
+        .feedback { margin-top: 22px; padding: 18px 22px; border-radius: 12px; font-size: 0.98em; line-height: 1.5; }
+        .feedback.correct { background: #d4edda; color: #155724; border-left: 4px solid #28a745; }
+        .feedback.wrong { background: #f8d7da; color: #721c24; border-left: 4px solid #dc3545; }
+        .next-btn, .restart-btn { margin-top: 20px; background: linear-gradient(135deg, #6A11CB 0%, #2575FC 100%); color: white; border: none; padding: 14px 32px; border-radius: 12px; font-size: 1em; cursor: pointer; font-family: 'Fredoka', sans-serif; box-shadow: 0 6px 18px rgba(0,0,0,0.2); }
+        .results { text-align: center; padding: 25px 15px; }
+        .results h2 { font-family: 'Fredoka', sans-serif; font-size: 2em; margin-bottom: 12px; color: #333; }
+        .results .final-score { font-size: 3em; font-family: 'Fredoka', sans-serif; color: #2575FC; margin: 20px 0; }
+        .results p { color: #555; margin-bottom: 12px; }
+        .badge { display: inline-block; font-size: 3.5em; margin: 8px 0; }
+
+        /* How-To intro screen — shown before question 1, not scored */
+        .howto-card { background: white; color: #333; border-radius: 25px; padding: 35px; margin-bottom: 20px; box-shadow: 0 20px 60px rgba(0,0,0,0.3); }
+        .howto-card h3 { font-family: 'Fredoka', sans-serif; font-size: 1.3em; margin-bottom: 12px; color: #2575FC; }
+        .howto-card p { line-height: 1.6; margin-bottom: 16px; color: #444; }
+        .howto-fields { display: flex; flex-direction: column; gap: 16px; background: #f5f7fb; border-radius: 12px; padding: 18px 20px; margin-bottom: 18px; }
+        .howto-field { display: flex; flex-direction: column; gap: 6px; }
+        .howto-field label { font-weight: 700; font-size: 0.92em; color: #333; }
+        .howto-field input, .howto-field select { font-family: 'Space Mono', monospace; font-size: 0.98em; padding: 10px 12px; border-radius: 8px; border: 2px solid #dfe3ee; background: #fff; color: #333; }
+        .howto-field input:focus, .howto-field select:focus { outline: none; border-color: #2575FC; }
+        .howto-results { display: none; flex-direction: column; gap: 8px; margin-bottom: 18px; }
+        .howto-results.show { display: flex; }
+        .howto-result-row { display: flex; justify-content: space-between; align-items: center; padding: 10px 14px; border-radius: 8px; font-size: 0.9em; gap: 12px; }
+        .howto-result-row.ok { background: #d4edda; color: #155724; }
+        .howto-result-row.fail { background: #f8d7da; color: #721c24; }
+        .howto-banner { margin-top: 4px; margin-bottom: 18px; padding: 12px 16px; border-radius: 10px; font-size: 0.9em; font-weight: 700; display: none; }
+        .howto-banner.show { display: block; }
+        .howto-banner.ok { background: #d4edda; color: #155724; }
+        .howto-banner.fail { background: #f8d7da; color: #721c24; }
+        .start-quiz-btn { margin-top: 4px; background: linear-gradient(135deg, #6A11CB 0%, #2575FC 100%); color: white; border: none; padding: 14px 32px; border-radius: 12px; font-size: 1em; cursor: pointer; font-family: 'Fredoka', sans-serif; box-shadow: 0 6px 18px rgba(0,0,0,0.2); }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <div class="lesson-tag">Unit 23 · Lesson 23.2 · Quiz</div>
+            <h1>Applying Visual Effects and Filters</h1>
+        </div>
+        <div class="score-board">
+            <div class="score-item"><div class="label">Score</div><div class="value" id="score">0</div></div>
+            <div class="score-item"><div class="label">Question</div><div class="value"><span id="current">1</span>/<span id="total">10</span></div></div>
+            <div class="score-item"><div class="label">Streak</div><div class="value" id="streak">0</div></div>
+        </div>
+        <div class="progress-bar"><div class="progress-fill" id="progress"></div></div>
+        <div class="exercise-card" id="exerciseCard"></div>
+    </div>
+    <script>
+        const exercises = [{"scenario":"Otieno's assistant asks him the difference between a filter and an effect in CapCut.","question":"What is the correct distinction?","options":["They are two names for the same tool","A filter adjusts overall color and mood (like Vibrant or Warm); an effect layers a separate stylistic treatment on top (like Glitch or Vignette)","Filters only work on audio","Effects can only be applied to the very first clip in a project"],"correct":1,"explanation":"Filters are everyday color\/mood grading tools, while effects are separate stylistic layers meant for special moments, not constant use."},{"scenario":"Otieno films inside a dim church hall lit only by old fluorescent tubes; the footage looks washed-out and slightly grey-green.","question":"What should Otieno reach for first?","options":["A B&W filter at 100%","A Vibrant filter at a moderate intensity to lift the flat, washed-out color","A Glitch effect to hide the lighting problem","Nothing \u2014 the footage cannot be improved"],"correct":1,"explanation":"A moderate Vibrant filter is the standard fix for dull, flat footage caused by weak or uneven lighting."},{"scenario":"A client asks Otieno to make an already well-lit, vibrant studio promo clip \"pop even more,\" so he pushes the Vibrant filter to 100% and stacks Vignette and Glitch on top.","question":"What is the main risk with this approach?","options":["There is no risk \u2014 more is always better","The clip will likely look overprocessed and unnatural, since it didn't have a real color or flatness problem to begin with","Filters and effects cannot be combined in CapCut","The video file will fail to export"],"correct":1,"explanation":"Stacking heavy filters and effects onto footage that already looks good tends to overprocess it rather than improve it."},{"scenario":"Otieno is grading five different clips that will appear back-to-back in the same shop promo video.","question":"Why should he apply the same filter and intensity across all five clips rather than a different look on each?","options":["It doesn't matter \u2014 viewers never notice","A consistent grade across all clips makes the finished video feel like one coherent piece instead of a mismatched patchwork","Using different filters is illegal under platform rules","CapCut only allows one filter per entire project"],"correct":1,"explanation":"Consistency in grading across clips in the same video is what makes the final edit feel professional and unified."},{"scenario":"Otieno wants to draw the viewer's eye toward a product on a table by softly darkening the edges of the frame, without changing the clip's overall colors.","question":"Which effect fits this goal best?","options":["Vignette","Glitch","VHS","B&W filter"],"correct":0,"explanation":"A Vignette softly darkens the frame's edges to draw focus toward the center, without altering the clip's underlying color grade."},{"scenario":"A client wants a gritty, retro hype-intro moment for a music event teaser, and separately wants a clean, straightforward showcase of shop products for a promo.","question":"Which effect choice fits each clip best?","options":["Glitch\/VHS effects for the hype intro; no extra effect (just a clean filter) for the product showcase","Glitch\/VHS for both, since more style is always better","Neither clip should use any filter or effect","Vignette should replace all filters everywhere"],"correct":0,"explanation":"Stylistic effects like Glitch or VHS suit a hype, retro-feeling intro, while a straightforward product showcase benefits from staying clean and clear so the product is easy to see."}];
+        let currentQuestion = 0, score = 0, streak = 0, answered = false;
+        function updateScoreboard() {
+            document.getElementById('score').textContent = score;
+            document.getElementById('current').textContent = Math.min(currentQuestion + 1, exercises.length);
+            document.getElementById('total').textContent = exercises.length;
+            document.getElementById('streak').textContent = streak;
+            document.getElementById('progress').style.width = ((currentQuestion) / exercises.length) * 100 + '%';
+        }
+        function escapeHtml(s) { return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+        function renderQuestion() {
+            answered = false;
+            const q = exercises[currentQuestion];
+            let html = '';
+            if (q.scenario) html += `<div class="scenario"><strong>Scenario.</strong> ${escapeHtml(q.scenario)}</div>`;
+            html += `<div class="question">${escapeHtml(q.question)}</div>`;
+            html += '<div class="options">';
+            q.options.forEach((o, i) => { html += `<button class="option" onclick="selectAnswer(${i})">${escapeHtml(o)}</button>`; });
+            html += '</div>';
+            document.getElementById('exerciseCard').innerHTML = html;
+            updateScoreboard();
+        }
+        function selectAnswer(i) {
+            if (answered) return;
+            answered = true;
+            const q = exercises[currentQuestion];
+            const btns = document.querySelectorAll('.option');
+            btns.forEach(b => b.classList.add('disabled'));
+            btns[q.correct].classList.add('correct');
+            const right = i === q.correct;
+            if (!right) btns[i].classList.add('wrong');
+            if (right) { score += 10; streak += 1; } else { streak = 0; }
+            const fb = document.createElement('div');
+            fb.className = 'feedback ' + (right ? 'correct' : 'wrong');
+            fb.innerHTML = `<strong>${right ? '&#9989; Correct.' : '&#10060; Not quite.'}</strong><br>${escapeHtml(q.explanation)}`;
+            document.getElementById('exerciseCard').appendChild(fb);
+            const nb = document.createElement('button');
+            nb.className = 'next-btn';
+            nb.textContent = currentQuestion === exercises.length - 1 ? 'See results →' : 'Next scenario →';
+            nb.onclick = nextQuestion;
+            document.getElementById('exerciseCard').appendChild(nb);
+            updateScoreboard();
+        }
+        function nextQuestion() { currentQuestion++; if (currentQuestion >= exercises.length) return showResults(); renderQuestion(); }
+        function showResults() {
+            document.getElementById('progress').style.width = '100%';
+            const total = exercises.length * 10;
+            const pct = Math.round(score / total * 100);
+            if (window.parent) { window.parent.postMessage({type:"mtti_quiz_score", score: score, total: total, percent: pct}, "*"); }
+            let badge = '🌟', msg = 'Excellent work. Otieno-level editing instincts.';
+            if (pct < 50) { badge = '🌱'; msg = 'Good first attempt. Review the lesson and try again.'; }
+            else if (pct < 80) { badge = '📚'; msg = 'Solid progress. Review the scenarios you missed and retry.'; }
+            document.getElementById('exerciseCard').innerHTML = `
+                <div class="results">
+                    <span class="badge">${badge}</span>
+                    <h2>Quiz Complete</h2>
+                    <div class="final-score">${score} / ${total}</div>
+                    <p><strong>${pct}%</strong> &middot; Longest streak: ${streak}</p>
+                    <p>${msg}</p>
+                    <button class="restart-btn" onclick="restart()">Try again &#128257;</button>
+                </div>`;
+        }
+        function restart() { currentQuestion = 0; score = 0; streak = 0; renderQuestion(); }
+
+        /* How-To intro — a small, ungraded field-check demo shown before the
+           quiz starts, directly rehearsing the "pick/enter the right setting"
+           mechanic that one of the quiz scenarios asks about, so it's not
+           being asked cold. */
+        const HOWTO_FIELDS = [{id:'filter_choice', label:'Filter to reach for first', type:'select', options:['None','Vibrant','B&W','Glitch']}, {id:'filter_intensity', label:'Intensity (%)', type:'number', placeholder:'e.g. 50'}];
+        const HOWTO_RULES = [{field:'filter_choice', operator:'eq', value:'Vibrant', label:'Vibrant is the standard fix for dull, flat, poorly-lit footage'}, {field:'filter_intensity', operator:'gte', value:30, label:'At least 30% — enough to actually lift the flat color'}, {field:'filter_intensity', operator:'lte', value:70, label:'At most 70% — moderate, not pushed to an extreme'}];
+
+        function escHtmlH(s) { return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+
+        function howtoFieldHtml(f) {
+            if (f.type === 'select') {
+                return `<div class="howto-field"><label for="hf_${f.id}">${escHtmlH(f.label)}</label><select id="hf_${f.id}">${(f.options||[]).map(o=>`<option value="${escHtmlH(o)}">${escHtmlH(o)}</option>`).join('')}</select></div>`;
+            }
+            return `<div class="howto-field"><label for="hf_${f.id}">${escHtmlH(f.label)}</label><input type="number" step="0.1" id="hf_${f.id}" placeholder="${escHtmlH(f.placeholder||'')}"></div>`;
+        }
+
+        function collectHowtoValues() {
+            const vals = {};
+            HOWTO_FIELDS.forEach(f => {
+                const el = document.getElementById('hf_' + f.id);
+                if (!el) return;
+                vals[f.id] = f.type === 'number' ? parseFloat(el.value) : el.value;
+            });
+            return vals;
+        }
+
+        function applyHowtoOp(val, op, target) {
+            switch (op) {
+                case 'eq': return val == target;
+                case 'gte': return !isNaN(parseFloat(val)) && parseFloat(val) >= target;
+                case 'lte': return !isNaN(parseFloat(val)) && parseFloat(val) <= target;
+                default: return false;
+            }
+        }
+
+        function checkHowto() {
+            const vals = collectHowtoValues();
+            const rows = HOWTO_RULES.map(r => {
+                const ok = applyHowtoOp(vals[r.field], r.operator, r.value);
+                return `<div class="howto-result-row ${ok?'ok':'fail'}"><span>${escHtmlH(r.label)}</span><span>${ok?'✅':'❌'}</span></div>`;
+            }).join('');
+            const allOk = HOWTO_RULES.every(r => applyHowtoOp(vals[r.field], r.operator, r.value));
+            const box = document.getElementById('howtoResults');
+            box.classList.add('show');
+            box.innerHTML = rows;
+            const banner = document.getElementById('howtoBanner');
+            banner.classList.add('show');
+            banner.className = 'howto-banner show ' + (allOk ? 'ok' : 'fail');
+            banner.textContent = allOk
+                ? '✅ Right call — Vibrant at a moderate intensity is exactly the standard fix here.'
+                : '❌ Not quite — reach for Vibrant, and keep the intensity moderate (roughly 30-70%), not off or maxed out.';
+        }
+
+        function renderHowto() {
+            document.getElementById('exerciseCard').innerHTML = `
+                <div class="howto-card">
+                    <h3>🔍 Quick How-To: Fixing Washed-Out Footage</h3>
+                    <p>One of the scenarios coming up asks about exactly this fix: color-correcting dim, flat-looking footage. Otieno is now grading a school assembly hall clip lit only by dim ceiling lights &mdash; the footage looks flat and slightly grey-green, just like the church hall clip in the quiz. Pick the filter and set an intensity below, then check your choices.</p>
+                    <div class="howto-fields" id="howtoFields"></div>
+                    <div class="howto-results" id="howtoResults"></div>
+                    <div class="howto-banner" id="howtoBanner"></div>
+                    <button class="start-quiz-btn" id="checkHowtoBtn">Check My Settings</button>
+                    <button class="start-quiz-btn" id="startQuizBtn" style="margin-left:10px;background:linear-gradient(135deg,#28a745,#1e7e34);">Start Quiz →</button>
+                </div>`;
+            document.getElementById('howtoFields').innerHTML = HOWTO_FIELDS.map(howtoFieldHtml).join('');
+            document.getElementById('checkHowtoBtn').addEventListener('click', checkHowto);
+            document.getElementById('startQuizBtn').addEventListener('click', renderQuestion);
+        }
+
+        renderHowto();
+    </script>
+</body>
+</html>

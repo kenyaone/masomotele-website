@@ -3,67 +3,116 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Formatting Text | MTTI Computer Applications</title>
+<title>Formatting Text — Practical | MTTI Computer Applications</title>
 <link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Fredoka:wght@500;600&display=swap" rel="stylesheet">
 <style>
 * { margin:0; padding:0; box-sizing:border-box; }
-body { font-family:'Space Mono', monospace; background:linear-gradient(135deg,#387633 0%,#259BD7 100%); min-height:100vh; padding:20px; color:#fff; }
+body { font-family:'Space Mono', monospace; background:linear-gradient(135deg,#1565C0 0%,#0D47A1 100%); min-height:100vh; padding:20px; color:#fff; }
 .container { max-width:900px; margin:0 auto; }
-.header { text-align:center; margin-bottom:24px; }
-.lesson-tag { display:inline-block; background:rgba(255,255,255,0.2); padding:6px 16px; border-radius:999px; font-size:0.85em; margin-bottom:12px; }
-.header h1 { font-family:'Fredoka', sans-serif; font-size:2em; margin-bottom:6px; text-shadow:3px 3px 0 rgba(0,0,0,0.2); }
-.scenario { background:rgba(255,255,255,0.14); backdrop-filter:blur(10px); border-radius:16px; padding:16px 22px; margin-bottom:20px; border-left:5px solid #ffd54f; font-size:0.95em; line-height:1.55; }
-.task { background:#fff; color:#333; border-radius:20px; padding:24px; margin-bottom:16px; box-shadow:0 14px 40px rgba(0,0,0,0.25); }
-.task-num { display:inline-block; width:28px; height:28px; background:linear-gradient(135deg,#387633 0%,#259BD7 100%); color:#fff; border-radius:50%; text-align:center; line-height:28px; font-family:'Fredoka', sans-serif; font-weight:600; margin-right:8px; }
-.task h3 { font-family:'Fredoka', sans-serif; font-size:1.05em; display:inline; }
-.options { margin-top:14px; display:flex; flex-direction:column; gap:10px; }
-.option { background:#f5f7fb; border:2px solid transparent; padding:12px 16px; border-radius:10px; cursor:pointer; transition:all 0.2s; font-family:'Space Mono', monospace; font-size:0.92em; text-align:left; }
-.option:hover:not(.disabled) { background:#e8f5e9; border-color:#387633; }
-.option.correct { background:#d4edda; border-color:#28a745; color:#155724; }
-.option.wrong { background:#f8d7da; border-color:#dc3545; color:#721c24; }
-.option.disabled { cursor:not-allowed; }
-.feedback { margin-top:14px; padding:12px 16px; border-radius:10px; font-size:0.9em; line-height:1.5; }
-.feedback.correct { background:#d4edda; color:#155724; border-left:4px solid #28a745; }
-.feedback.wrong { background:#f8d7da; color:#721c24; border-left:4px solid #dc3545; }
-.done-banner { text-align:center; padding:20px; color:#fff; font-family:'Fredoka', sans-serif; font-size:1.1em; }
+.header { text-align:center; margin-bottom:18px; }
+.lesson-tag { display:inline-block; background:rgba(255,255,255,0.2); padding:6px 16px; border-radius:999px; font-size:0.85em; margin-bottom:10px; }
+.header h1 { font-family:'Fredoka', sans-serif; font-size:1.8em; margin-bottom:4px; text-shadow:2px 2px 0 rgba(0,0,0,0.2); }
+.brief { background:rgba(255,255,255,0.12); backdrop-filter:blur(10px); border-radius:14px; padding:14px 20px; margin-bottom:16px; border-left:5px solid #ffd54f; font-size:0.92em; line-height:1.5; }
+.studio { background:#fff; color:#333; border-radius:18px; padding:16px; box-shadow:0 20px 60px rgba(0,0,0,0.3); }
+.toolbar { display:flex; gap:6px; flex-wrap:wrap; margin-bottom:12px; padding-bottom:12px; border-bottom:2px solid #f0f0f0; }
+.tool-btn { background:#f5f7fb; border:2px solid transparent; padding:8px 12px; border-radius:8px; cursor:pointer; font-family:'Space Mono', monospace; font-size:0.9em; font-weight:700; color:#444; min-width:34px; }
+.tool-btn:hover { background:#eef1fb; }
+.tool-btn.active { background:#1565C0; color:#fff; border-color:#0D47A1; }
+.tool-sep { width:1px; background:#e0e0e0; margin:2px 6px; }
+.tool-select { padding:8px; border-radius:8px; border:2px solid #e0e0e0; font-family:'Space Mono', monospace; font-size:0.85em; }
+.doc-page { min-height:280px; background:#fdfdfd; border:1px solid #ddd; border-radius:8px; padding:24px; font-size:16px; line-height:1.6; outline:none; }
+.doc-page:focus { border-color:#1565C0; box-shadow:0 0 0 3px rgba(21,101,192,0.12); }
+.check-btn { margin-top:14px; width:100%; background:linear-gradient(135deg,#1565C0 0%,#0D47A1 100%); color:#fff; border:none; padding:12px; border-radius:10px; font-weight:700; font-size:0.95em; cursor:pointer; font-family:'Fredoka', sans-serif; }
+.check-list { list-style:none; margin-top:14px; display:flex; flex-direction:column; gap:6px; }
+.check-item { display:flex; align-items:center; gap:8px; padding:8px 12px; border-radius:8px; font-size:0.85em; background:#f5f7fb; border:1.5px solid #e0e0e0; }
+.check-item.ok { background:#d4edda; border-color:#28a745; color:#155724; }
+.check-item.fail { background:#f8d7da; border-color:#dc3545; color:#721c24; }
+.check-icon { font-weight:800; }
 </style>
 </head>
 <body>
 <div class="container">
-<div class="header"><div class="lesson-tag">Module 1 · Lesson 1.2 · Practical</div><h1>Formatting Text</h1></div>
-<div class="scenario">Brenda is formatting the Amani Stationers weekly price list: a centred bold heading, and prices that need to stand out.</div>
-<div id="tasks"></div>
-<div class="done-banner" id="doneBanner" style="display:none;">✅ Practical complete — you can move to the quiz.</div>
+<div class="header">
+<div class="lesson-tag">Module 1 · Lesson 1.2 · Practical</div>
+<h1>Formatting Text — Practical</h1>
+</div>
+<div class="brief">Brenda is confirming a supplier order for Amani Stationers and wants the key details to stand out. In the paragraph below, select the item name and make it <strong>bold</strong>, select the delivery day and make it <em>italic</em>, then select the amount owed and apply <u>underline</u> — three different emphases for three different kinds of information.</div>
+<div class="studio">
+<div class="toolbar" id="toolbar"></div>
+<div class="doc-page" id="docPage" contenteditable="true"><p>Please confirm the order for A4 Paper reaches Amani Stationers by Friday, total KES 3,500.</p></div>
+<button class="check-btn" id="checkBtn">Check My Work ✓</button>
+<ul class="check-list" id="checkList"></ul>
+</div>
 </div>
 <script>
-const tasks = [{"prompt":"Brenda wants \"AMANI STATIONERS \u2014 WEEKLY PRICE LIST\" centred at the top of the page. Which tool does that?","options":["Bold","Centre alignment","Underline","Font colour"],"correct":1,"explanation":"Centre alignment positions the whole line in the middle of the page width \u2014 exactly what a shop-notice heading needs."},{"prompt":"She wants every price (e.g. \"KES 50\") to stand out at a glance without changing its colour. What is the best single choice?","options":["Bold","Italic","Underline","A larger page margin"],"correct":0,"explanation":"Bold is the standard way to make a number scannable at a glance \u2014 it does not slow reading the way underline or italic can for short numeric text."},{"prompt":"Brenda selected a whole paragraph by accident when she only wanted one word bolded. What is the quickest way to select just that one word instead?","options":["Triple-click it","Double-click it","Click once anywhere on the page","Press Ctrl+A"],"correct":1,"explanation":"Double-click selects exactly one word; triple-click selects the whole paragraph; Ctrl+A selects the entire document."}];
-function escapeHtml(s){return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
-function render(){
-  const c = document.getElementById('tasks');
-  c.innerHTML = tasks.map((t,i)=>`
-    <div class="task" id="task-${i}">
-      <div><span class="task-num">${i+1}</span><h3>${escapeHtml(t.prompt)}</h3></div>
-      <div class="options">
-        ${t.options.map((o,j)=>`<button class="option" onclick="answer(${i},${j})">${escapeHtml(o)}</button>`).join('')}
-      </div>
-    </div>`).join('');
+/* MTTI_TextSim v1 — lightweight in-browser word-processor practice widget.
+   Not real MS Word: a simplified contenteditable document teaching the same
+   core moves (select text, apply formatting, build lists) using document.
+   execCommand, which every evergreen browser still supports for this exact
+   basic-formatting use case. No native dialogs (prompt/alert/confirm) — the
+   iframe sandbox (allow-scripts allow-forms allow-popups, no allow-modals)
+   silently blocks those. */
+class MTTI_TextSim {
+    constructor(cfg) { this.cfg = cfg; }
+    render(rootId) {
+        this.root = document.getElementById(rootId);
+        this.toolbar = document.getElementById('toolbar');
+        this.doc = document.getElementById('docPage');
+        this.checkList = document.getElementById('checkList');
+        this.renderToolbar();
+        document.getElementById('checkBtn').addEventListener('click', () => this.evaluateChecks());
+    }
+    renderToolbar() {
+        const btns = [
+            {cmd:'bold', icon:'𝐁', label:'Bold'},
+            {cmd:'italic', icon:'𝑰', label:'Italic'},
+            {cmd:'underline', icon:'U̲', label:'Underline'},
+            {sep:true},
+            {cmd:'justifyLeft', icon:'⬅', label:'Left'},
+            {cmd:'justifyCenter', icon:'↔', label:'Center'},
+            {cmd:'justifyRight', icon:'➡', label:'Right'},
+            {sep:true},
+            {cmd:'insertUnorderedList', icon:'•≡', label:'Bullets'},
+            {cmd:'insertOrderedList', icon:'1≡', label:'Numbered'},
+        ];
+        this.toolbar.innerHTML = btns.map(b => b.sep
+            ? '<div class="tool-sep"></div>'
+            : `<button class="tool-btn" data-cmd="${b.cmd}" title="${b.label}">${b.icon}</button>`
+        ).join('') + `
+            <select class="tool-select" id="fontSizeSel">
+                <option value="3">Normal</option>
+                <option value="5">Heading</option>
+                <option value="1">Small</option>
+            </select>`;
+        this.toolbar.querySelectorAll('.tool-btn').forEach(b => {
+            b.addEventListener('mousedown', e => e.preventDefault());
+            b.addEventListener('click', () => { this.doc.focus(); document.execCommand(b.dataset.cmd, false, null); });
+        });
+        document.getElementById('fontSizeSel').addEventListener('change', e => {
+            this.doc.focus(); document.execCommand('fontSize', false, e.target.value);
+        });
+    }
+    evaluateChecks() {
+        const html = this.doc.innerHTML;
+        const text = this.doc.innerText || '';
+        const results = this.cfg.checks.map(c => {
+            let pass = false;
+            if (c.type === 'contains_text') pass = text.toLowerCase().includes(c.value.toLowerCase());
+            else if (c.type === 'has_bold') pass = /<b>|<strong>|font-weight:\s*bold/i.test(html);
+            else if (c.type === 'has_italic') pass = /<i>|<em>/i.test(html);
+            else if (c.type === 'has_underline') pass = /<u>/i.test(html);
+            else if (c.type === 'has_list') pass = c.ordered ? /<ol/i.test(html) : /<ul/i.test(html);
+            else if (c.type === 'has_alignment') pass = new RegExp('text-align:\\s*' + c.value, 'i').test(html);
+            else if (c.type === 'min_word_count') pass = text.trim().split(/\s+/).filter(Boolean).length >= c.min;
+            return { label: c.label, pass };
+        });
+        this.checkList.innerHTML = results.map(r =>
+            `<li class="check-item ${r.pass?'ok':'fail'}"><span class="check-icon">${r.pass?'✓':'✗'}</span> ${r.label}</li>`
+        ).join('');
+    }
 }
-function answer(i,j){
-  const task = tasks[i];
-  const el = document.getElementById('task-'+i);
-  const btns = el.querySelectorAll('.option');
-  if (btns[0].classList.contains('disabled')) return;
-  btns.forEach(b=>b.classList.add('disabled'));
-  btns[task.correct].classList.add('correct');
-  const right = j === task.correct;
-  if (!right) btns[j].classList.add('wrong');
-  const fb = document.createElement('div');
-  fb.className = 'feedback ' + (right?'correct':'wrong');
-  fb.innerHTML = '<strong>' + (right?'✅ Correct.':'❌ Not quite.') + '</strong><br>' + escapeHtml(task.explanation);
-  el.appendChild(fb);
-  if (i === tasks.length-1) document.getElementById('doneBanner').style.display='block';
-}
-render();
+const CONFIG = {"checks":[{"type":"has_bold","label":"Bold applied somewhere in the paragraph"},{"type":"has_italic","label":"Italic applied somewhere in the paragraph"},{"type":"has_underline","label":"Underline applied somewhere in the paragraph"}]};
+new MTTI_TextSim(CONFIG).render('root');
 </script>
 </body>
 </html>

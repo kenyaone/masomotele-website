@@ -3,67 +3,171 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Speaker Notes and Delivery | MTTI Computer Applications</title>
+<title>Speaker Notes and Delivery — Practical | MTTI Computer Applications</title>
 <link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Fredoka:wght@500;600&display=swap" rel="stylesheet">
 <style>
 * { margin:0; padding:0; box-sizing:border-box; }
-body { font-family:'Space Mono', monospace; background:linear-gradient(135deg,#387633 0%,#259BD7 100%); min-height:100vh; padding:20px; color:#fff; }
-.container { max-width:900px; margin:0 auto; }
-.header { text-align:center; margin-bottom:24px; }
-.lesson-tag { display:inline-block; background:rgba(255,255,255,0.2); padding:6px 16px; border-radius:999px; font-size:0.85em; margin-bottom:12px; }
-.header h1 { font-family:'Fredoka', sans-serif; font-size:2em; margin-bottom:6px; text-shadow:3px 3px 0 rgba(0,0,0,0.2); }
-.scenario { background:rgba(255,255,255,0.14); backdrop-filter:blur(10px); border-radius:16px; padding:16px 22px; margin-bottom:20px; border-left:5px solid #ffd54f; font-size:0.95em; line-height:1.55; }
-.task { background:#fff; color:#333; border-radius:20px; padding:24px; margin-bottom:16px; box-shadow:0 14px 40px rgba(0,0,0,0.25); }
-.task-num { display:inline-block; width:28px; height:28px; background:linear-gradient(135deg,#387633 0%,#259BD7 100%); color:#fff; border-radius:50%; text-align:center; line-height:28px; font-family:'Fredoka', sans-serif; font-weight:600; margin-right:8px; }
-.task h3 { font-family:'Fredoka', sans-serif; font-size:1.05em; display:inline; }
-.options { margin-top:14px; display:flex; flex-direction:column; gap:10px; }
-.option { background:#f5f7fb; border:2px solid transparent; padding:12px 16px; border-radius:10px; cursor:pointer; transition:all 0.2s; font-family:'Space Mono', monospace; font-size:0.92em; text-align:left; }
-.option:hover:not(.disabled) { background:#e8f5e9; border-color:#387633; }
-.option.correct { background:#d4edda; border-color:#28a745; color:#155724; }
-.option.wrong { background:#f8d7da; border-color:#dc3545; color:#721c24; }
-.option.disabled { cursor:not-allowed; }
-.feedback { margin-top:14px; padding:12px 16px; border-radius:10px; font-size:0.9em; line-height:1.5; }
-.feedback.correct { background:#d4edda; color:#155724; border-left:4px solid #28a745; }
-.feedback.wrong { background:#f8d7da; color:#721c24; border-left:4px solid #dc3545; }
-.done-banner { text-align:center; padding:20px; color:#fff; font-family:'Fredoka', sans-serif; font-size:1.1em; }
+body { font-family:'Space Mono', monospace; background:linear-gradient(135deg,#E65100 0%,#BF360C 100%); min-height:100vh; padding:20px; color:#fff; }
+.container { max-width:1000px; margin:0 auto; }
+.header { text-align:center; margin-bottom:18px; }
+.lesson-tag { display:inline-block; background:rgba(255,255,255,0.2); padding:6px 16px; border-radius:999px; font-size:0.85em; margin-bottom:10px; }
+.header h1 { font-family:'Fredoka', sans-serif; font-size:1.8em; margin-bottom:4px; text-shadow:2px 2px 0 rgba(0,0,0,0.2); }
+.brief { background:rgba(255,255,255,0.12); backdrop-filter:blur(10px); border-radius:14px; padding:14px 20px; margin-bottom:16px; border-left:5px solid #ffd54f; font-size:0.92em; line-height:1.5; }
+.studio { background:#fff; color:#333; border-radius:18px; padding:16px; box-shadow:0 20px 60px rgba(0,0,0,0.3); }
+.toolbar { display:flex; gap:8px; flex-wrap:wrap; margin-bottom:12px; padding-bottom:12px; border-bottom:2px solid #f0f0f0; align-items:center; }
+.tool-btn { background:#f5f7fb; border:2px solid transparent; padding:8px 12px; border-radius:8px; cursor:pointer; font-family:'Space Mono', monospace; font-size:0.85em; font-weight:700; color:#444; }
+.tool-btn:hover { background:#eef1fb; }
+.tool-select { padding:7px 10px; border-radius:8px; border:2px solid #e0e0e0; font-family:'Space Mono', monospace; font-size:0.85em; }
+.slide-wrap { border:2px solid #ddd; border-radius:8px; overflow:hidden; }
+.slide { position:relative; width:100%; aspect-ratio:16/9; background:#ffffff; overflow:hidden; }
+.slide-el { position:absolute; cursor:move; border:1px dashed transparent; padding:4px; }
+.slide-el:hover, .slide-el.selected { border-color:#E65100; }
+.slide-el[data-type=text] { font-family:'Fredoka', sans-serif; }
+.slide-el[data-type=media] { background:repeating-linear-gradient(45deg,#eee,#eee 10px,#f7f7f7 10px,#f7f7f7 20px); border:2px dashed #bbb; display:flex; align-items:center; justify-content:center; color:#888; font-size:0.8em; }
+.notes-row { margin-top:10px; }
+.notes-row label { font-weight:700; font-size:0.85em; color:#555; display:block; margin-bottom:4px; }
+.notes-row textarea { width:100%; min-height:60px; padding:8px; border:1.5px solid #ccc; border-radius:8px; font-family:inherit; font-size:0.85em; }
+.check-btn { margin-top:14px; width:100%; background:linear-gradient(135deg,#E65100 0%,#BF360C 100%); color:#fff; border:none; padding:12px; border-radius:10px; font-weight:700; font-size:0.95em; cursor:pointer; font-family:'Fredoka', sans-serif; }
+.check-list { list-style:none; margin-top:14px; display:flex; flex-direction:column; gap:6px; }
+.check-item { display:flex; align-items:center; gap:8px; padding:8px 12px; border-radius:8px; font-size:0.85em; background:#f5f7fb; border:1.5px solid #e0e0e0; }
+.check-item.ok { background:#d4edda; border-color:#28a745; color:#155724; }
+.check-item.fail { background:#f8d7da; border-color:#dc3545; color:#721c24; }
+.check-icon { font-weight:800; }
 </style>
 </head>
 <body>
 <div class="container">
-<div class="header"><div class="lesson-tag">Module 3 · Lesson 3.5 · Practical</div><h1>Speaker Notes and Delivery</h1></div>
-<div class="scenario">Brenda has 5 minutes to pitch to the paper supplier and wants to rehearse and use notes without the audience seeing them.</div>
-<div id="tasks"></div>
-<div class="done-banner" id="doneBanner" style="display:none;">✅ Practical complete — you can move to the quiz.</div>
+<div class="header">
+<div class="lesson-tag">Module 3 · Lesson 3.5 · Practical</div>
+<h1>Speaker Notes and Delivery — Practical</h1>
+</div>
+<div class="brief">Brenda has 5 minutes to pitch to the paper supplier and needs a prompt for this slide that only she will see. Add a title text box reading <strong>"Why Partner With Amani Stationers"</strong>, then write real <strong>Speaker Notes</strong> (at least 15 words) explaining what Brenda will actually say out loud while this slide is on screen — not just a repeat of the slide text.</div>
+<div class="studio">
+<div class="toolbar" id="toolbar"></div>
+<div class="slide-wrap"><div class="slide" id="slide"></div></div>
+<div class="notes-row">
+    <label>🗒️ Speaker Notes</label>
+    <textarea id="notesBox" placeholder="What will you say while this slide is on screen?"></textarea>
+</div>
+<button class="check-btn" id="checkBtn">Check My Work ✓</button>
+<ul class="check-list" id="checkList"></ul>
+</div>
 </div>
 <script>
-const tasks = [{"prompt":"Brenda wants to remember to mention a specific statistic while presenting, without it appearing on the slide itself for the audience to see. Where should this go?","options":["Directly on the slide, in small text","In the Speaker Notes","In the slide title","Nowhere, she should memorise everything"],"correct":1,"explanation":"Speaker Notes are private to the presenter and never shown to the audience, exactly suited to a reminder like this."},{"prompt":"Brenda wants to see her notes and the next slide while presenting, without the audience seeing any of that.","options":["Normal view during the live presentation","Presenter View","Slide Sorter view","Reading view"],"correct":1,"explanation":"Presenter View splits the display \u2014 presenter sees notes/next-slide/timer privately, audience sees only the current slide full-screen."},{"prompt":"Brenda has exactly 5 minutes and worries she is spending too long on the early slides. What tool helps her check this in practice?","options":["Rehearse Timings","Design Ideas","SmartArt","Trim Video"],"correct":0,"explanation":"Rehearse Timings records actual time spent per slide during a practice run, showing exactly where a presenter is running long."}];
-function escapeHtml(s){return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
-function render(){
-  const c = document.getElementById('tasks');
-  c.innerHTML = tasks.map((t,i)=>`
-    <div class="task" id="task-${i}">
-      <div><span class="task-num">${i+1}</span><h3>${escapeHtml(t.prompt)}</h3></div>
-      <div class="options">
-        ${t.options.map((o,j)=>`<button class="option" onclick="answer(${i},${j})">${escapeHtml(o)}</button>`).join('')}
-      </div>
-    </div>`).join('');
+/* MTTI_SlideSim v1 — lightweight in-browser slide-editor practice widget.
+   Not real PowerPoint: a simplified single-slide canvas with draggable text
+   boxes and media placeholders, a background/theme picker, a transition
+   selector, and a speaker-notes field — the real moves, not just MCQs about
+   them. No native dialogs — the iframe sandbox blocks prompt/alert/confirm,
+   so all editing happens via the toolbar + inline element controls. */
+class MTTI_SlideSim {
+    constructor(cfg) {
+        this.cfg = cfg;
+        this.elements = (cfg.seed || []).map((s, i) => Object.assign({ id: i+1 }, s));
+        this.idSeq = this.elements.length + 1;
+        this.selectedId = null;
+        this.bg = cfg.defaultBg || '#ffffff';
+        this.transition = 'None';
+        this.exported = false;
+    }
+    render(rootId) {
+        this.slide = document.getElementById('slide');
+        this.toolbar = document.getElementById('toolbar');
+        this.notesBox = document.getElementById('notesBox');
+        this.checkList = document.getElementById('checkList');
+        this.renderToolbar();
+        this.renderSlide();
+        document.getElementById('checkBtn').addEventListener('click', () => this.evaluateChecks());
+    }
+    renderToolbar() {
+        this.toolbar.innerHTML = `
+            <button class="tool-btn" id="addTextBtn">+ Text Box</button>
+            <button class="tool-btn" id="addMediaBtn">+ Media Placeholder</button>
+            <input type="color" id="bgPicker" value="${this.bg}" title="Slide background / theme color" style="width:40px;height:36px;border:none;border-radius:8px;cursor:pointer;">
+            <select class="tool-select" id="transitionSel">
+                <option ${this.transition==='None'?'selected':''}>None</option>
+                <option ${this.transition==='Fade'?'selected':''}>Fade</option>
+                <option ${this.transition==='Push'?'selected':''}>Push</option>
+                <option ${this.transition==='Wipe'?'selected':''}>Wipe</option>
+            </select>
+            <button class="tool-btn" id="exportBtn">⬇ Export / Share</button>`;
+        document.getElementById('addTextBtn').addEventListener('click', () => {
+            this.elements.push({ id:this.idSeq++, type:'text', x:10, y:10, w:60, h:15, text:'New text', fontSize:20, color:'#222222' });
+            this.selectedId = this.elements[this.elements.length-1].id;
+            this.renderSlide();
+        });
+        document.getElementById('addMediaBtn').addEventListener('click', () => {
+            this.elements.push({ id:this.idSeq++, type:'media', x:20, y:30, w:40, h:35, label:'Image / Media' });
+            this.selectedId = this.elements[this.elements.length-1].id;
+            this.renderSlide();
+        });
+        document.getElementById('bgPicker').addEventListener('input', e => { this.bg = e.target.value; this.renderSlide(); });
+        document.getElementById('transitionSel').addEventListener('change', e => { this.transition = e.target.value; });
+        document.getElementById('exportBtn').addEventListener('click', () => {
+            this.exported = true;
+            const b = document.getElementById('exportBtn');
+            b.textContent = '✅ Exported';
+        });
+    }
+    renderSlide() {
+        this.slide.style.background = this.bg;
+        this.slide.innerHTML = '';
+        this.elements.forEach(el => {
+            const div = document.createElement('div');
+            div.className = 'slide-el' + (el.id===this.selectedId ? ' selected' : '');
+            div.dataset.type = el.type;
+            div.style.left = el.x + '%'; div.style.top = el.y + '%';
+            div.style.width = el.w + '%'; div.style.height = el.h + '%';
+            if (el.type === 'text') {
+                div.style.fontSize = el.fontSize + 'px';
+                div.style.color = el.color;
+                div.contentEditable = 'true';
+                div.textContent = el.text;
+                div.addEventListener('input', () => { el.text = div.textContent; });
+            } else {
+                div.textContent = el.label;
+            }
+            div.addEventListener('mousedown', e => this.startDrag(e, el));
+            div.addEventListener('click', () => { this.selectedId = el.id; this.renderSlide(); });
+            this.slide.appendChild(div);
+        });
+    }
+    startDrag(e, el) {
+        e.stopPropagation();
+        this.selectedId = el.id;
+        const rect = this.slide.getBoundingClientRect();
+        const move = (ev) => {
+            const px = ev.clientX ?? (ev.touches && ev.touches[0].clientX);
+            const py = ev.clientY ?? (ev.touches && ev.touches[0].clientY);
+            if (px == null) return;
+            el.x = Math.max(0, Math.min(90, ((px - rect.left) / rect.width) * 100));
+            el.y = Math.max(0, Math.min(90, ((py - rect.top) / rect.height) * 100));
+            this.renderSlide();
+        };
+        const up = () => { window.removeEventListener('mousemove', move); window.removeEventListener('mouseup', up); };
+        window.addEventListener('mousemove', move);
+        window.addEventListener('mouseup', up);
+    }
+    evaluateChecks() {
+        const notes = this.notesBox.value || '';
+        const results = this.cfg.checks.map(c => {
+            let pass = false;
+            if (c.type === 'has_text_containing') pass = this.elements.some(el => el.type==='text' && el.text.toLowerCase().includes(c.value.toLowerCase()));
+            else if (c.type === 'min_text_boxes') pass = this.elements.filter(el => el.type==='text').length >= c.min;
+            else if (c.type === 'has_media') pass = this.elements.some(el => el.type==='media');
+            else if (c.type === 'background_changed') pass = this.bg.toLowerCase() !== (this.cfg.defaultBg||'#ffffff').toLowerCase();
+            else if (c.type === 'transition_set') pass = this.transition !== 'None';
+            else if (c.type === 'has_speaker_notes') pass = notes.trim().length >= (c.minLength || 10);
+            else if (c.type === 'exported') pass = this.exported;
+            return { label: c.label, pass };
+        });
+        this.checkList.innerHTML = results.map(r =>
+            `<li class="check-item ${r.pass?'ok':'fail'}"><span class="check-icon">${r.pass?'✓':'✗'}</span> ${r.label}</li>`
+        ).join('');
+    }
 }
-function answer(i,j){
-  const task = tasks[i];
-  const el = document.getElementById('task-'+i);
-  const btns = el.querySelectorAll('.option');
-  if (btns[0].classList.contains('disabled')) return;
-  btns.forEach(b=>b.classList.add('disabled'));
-  btns[task.correct].classList.add('correct');
-  const right = j === task.correct;
-  if (!right) btns[j].classList.add('wrong');
-  const fb = document.createElement('div');
-  fb.className = 'feedback ' + (right?'correct':'wrong');
-  fb.innerHTML = '<strong>' + (right?'✅ Correct.':'❌ Not quite.') + '</strong><br>' + escapeHtml(task.explanation);
-  el.appendChild(fb);
-  if (i === tasks.length-1) document.getElementById('doneBanner').style.display='block';
-}
-render();
+const CONFIG = {"defaultBg":"#ffffff","seed":[],"checks":[{"type":"has_text_containing","value":"Amani Stationers","label":"A title text box mentions \"Amani Stationers\""},{"type":"has_speaker_notes","minLength":80,"label":"Speaker notes are at least roughly 15 words long"}]};
+new MTTI_SlideSim(CONFIG).render('root');
 </script>
 </body>
 </html>

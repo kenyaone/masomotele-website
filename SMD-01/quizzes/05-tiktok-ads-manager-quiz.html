@@ -1,0 +1,346 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TikTok Ads Manager | MTTI Digital Marketing</title>
+    <link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Fredoka:wght@500;600&display=swap" rel="stylesheet">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Space Mono', monospace;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh; padding: 20px; color: #fff;
+        }
+        .container { max-width: 900px; margin: 0 auto; }
+        .header { text-align: center; margin-bottom: 30px; animation: slideDown 0.6s ease-out; }
+        .header .lesson-tag {
+            display: inline-block; background: rgba(255,255,255,0.2);
+            padding: 6px 16px; border-radius: 999px;
+            font-size: 0.85em; margin-bottom: 12px;
+        }
+        .header h1 {
+            font-family: 'Fredoka', sans-serif; font-size: 2.2em;
+            margin-bottom: 8px; text-shadow: 3px 3px 0 rgba(0,0,0,0.2);
+        }
+        .header p { opacity: 0.95; font-size: 0.95em; }
+        .score-board {
+            background: rgba(255,255,255,0.15); backdrop-filter: blur(10px);
+            border-radius: 20px; padding: 20px; margin-bottom: 20px;
+            display: flex; justify-content: space-around;
+            animation: fadeIn 0.8s ease-out 0.2s both;
+        }
+        .score-item { text-align: center; }
+        .score-item .label { font-size: 0.85em; opacity: 0.9; margin-bottom: 4px; }
+        .score-item .value {
+            font-size: 1.8em; font-weight: bold; font-family: 'Fredoka', sans-serif;
+        }
+        .progress-bar {
+            width: 100%; height: 8px; background: rgba(255,255,255,0.3);
+            border-radius: 10px; margin-bottom: 25px; overflow: hidden;
+        }
+        .progress-fill {
+            height: 100%; background: linear-gradient(90deg, #f093fb 0%, #f5576c 100%);
+            border-radius: 10px; transition: width 0.5s ease; width: 0%;
+        }
+        .exercise-card {
+            background: white; color: #333; border-radius: 25px;
+            padding: 35px; margin-bottom: 20px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            animation: fadeIn 0.6s ease-out both;
+        }
+        .scenario {
+            background: linear-gradient(135deg, #fff8e1 0%, #ffecb3 100%);
+            border-left: 5px solid #ffc107;
+            padding: 20px 24px; border-radius: 12px;
+            margin-bottom: 24px;
+            font-size: 0.98em; line-height: 1.55;
+        }
+        .scenario strong { color: #7a5a00; font-family: 'Fredoka', sans-serif; }
+        .question {
+            font-size: 1.15em; margin-bottom: 20px;
+            font-weight: 700; line-height: 1.4;
+        }
+        .options { display: flex; flex-direction: column; gap: 12px; }
+        .option {
+            background: #f5f7fb; border: 2px solid transparent;
+            padding: 16px 20px; border-radius: 12px;
+            cursor: pointer; transition: all 0.2s ease;
+            font-family: 'Space Mono', monospace; font-size: 0.98em; text-align: left;
+        }
+        .option:hover:not(.disabled) {
+            background: #eef1fb; border-color: #667eea; transform: translateX(4px);
+        }
+        .option.correct { background: #d4edda; border-color: #28a745; color: #155724; }
+        .option.wrong { background: #f8d7da; border-color: #dc3545; color: #721c24; animation: shake 0.4s; }
+        .option.disabled { cursor: not-allowed; opacity: 0.85; }
+        .feedback {
+            margin-top: 22px; padding: 18px 22px; border-radius: 12px;
+            animation: slideUp 0.4s ease-out;
+            font-size: 0.98em; line-height: 1.5;
+        }
+        .feedback.correct { background: #d4edda; color: #155724; border-left: 4px solid #28a745; }
+        .feedback.wrong { background: #f8d7da; color: #721c24; border-left: 4px solid #dc3545; }
+        .feedback strong { font-family: 'Fredoka', sans-serif; }
+        .next-btn, .restart-btn {
+            margin-top: 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white; border: none;
+            padding: 14px 32px; border-radius: 12px;
+            font-size: 1em; cursor: pointer;
+            font-family: 'Fredoka', sans-serif;
+            box-shadow: 0 6px 18px rgba(0,0,0,0.2);
+            transition: transform 0.2s ease;
+        }
+        .next-btn:hover, .restart-btn:hover { transform: scale(1.04); }
+        .results {
+            text-align: center; padding: 25px 15px;
+            animation: bounceIn 0.6s ease-out;
+        }
+        .results h2 {
+            font-family: 'Fredoka', sans-serif; font-size: 2em;
+            margin-bottom: 12px; color: #333;
+        }
+        .results .final-score {
+            font-size: 3em; font-family: 'Fredoka', sans-serif;
+            color: #667eea; margin: 20px 0;
+        }
+        .results p { color: #555; margin-bottom: 12px; }
+        .badge { display: inline-block; font-size: 3.5em; margin: 8px 0; }
+        @keyframes slideDown { from { opacity: 0; transform: translateY(-30px); } to { opacity: 1; transform: translateY(0); } }
+        @keyframes fadeIn { from { opacity: 0; transform: scale(0.96); } to { opacity: 1; transform: scale(1); } }
+        @keyframes slideUp { from { opacity: 0; transform: translateY(15px); } to { opacity: 1; transform: translateY(0); } }
+        @keyframes shake { 0%,100% { transform: translateX(0); } 25% { transform: translateX(-8px); } 75% { transform: translateX(8px); } }
+        @keyframes bounceIn { 0% { opacity: 0; transform: scale(0.4); } 60% { transform: scale(1.05); } 100% { opacity: 1; transform: scale(1); } }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <div class="lesson-tag">Module 5 · Lesson 5.6</div>
+            <h1>TikTok Ads Manager</h1>
+            <p>10 Chapa Fitness scenarios — Spark Ads, the seven creative non-negotiables, and the Pixel plus Events API</p>
+        </div>
+
+        <div class="score-board">
+            <div class="score-item"><div class="label">Score</div><div class="value" id="score">0</div></div>
+            <div class="score-item"><div class="label">Question</div><div class="value"><span id="current">1</span>/<span id="total">10</span></div></div>
+            <div class="score-item"><div class="label">Streak</div><div class="value" id="streak">0</div></div>
+        </div>
+
+        <div class="progress-bar"><div class="progress-fill" id="progress"></div></div>
+
+        <div class="exercise-card" id="exerciseCard"></div>
+    </div>
+
+    <script>
+        const exercises = [
+  {
+    "scenario": "Brian Otieno is 24, runs Chapa Fitness on Shopify selling home-workout apparel from KES 1,200 per set, has 8,000 organic TikTok followers, averages 40 sales a week from that organic reach, and has a monthly ad budget of KES 25,000. He wants to double his weekly sales without losing the native, low-production feel that got him the followers in the first place.",
+    "question": "What is the single most important rule about TikTok creative that separates it from Meta and LinkedIn?",
+    "options": [
+      "Studio-quality production always wins on TikTok.",
+      "On TikTok, ads that look like ads FAIL. Creative must look native, like a creator on a phone, not a polished commercial. Ignore this and every non-negotiable that follows and the ads flop, no matter how big the budget.",
+      "Vertical video is optional on TikTok.",
+      "TikTok users prefer silent, subtitled video."
+    ],
+    "correct": 1,
+    "explanation": "Slide 1 of §5.6 sets the whole lesson up with this rule: on TikTok, ads that look like ads FAIL. Slide 5's fourth non-negotiable — native, not polished — is the reason Brian must keep the phone-first, creator-style feel that built his 8,000 organic followers."
+  },
+  {
+    "scenario": "Brian is used to Meta Ads Manager and knows Campaign, Ad Set, Ad. He opens TikTok Ads Manager and sees slightly different words.",
+    "question": "What is TikTok's three-level structure, and how does it map to Meta?",
+    "options": [
+      "TikTok has four levels — Account, Campaign, Ad Group, Ad.",
+      "Level 1 Campaign (objective, campaign budget). Level 2 Ad Group (audience, placement, schedule, budget, bidding — the same as Meta's \"Ad Set\", just renamed). Level 3 Ad (creative). Knowing Meta means Brian already knows 80% of TikTok Ads.",
+      "TikTok has only one level — everything sits together.",
+      "TikTok reverses the order — Ad, Ad Group, Campaign."
+    ],
+    "correct": 1,
+    "explanation": "Slide 3 of §5.6: TikTok has three levels — Campaign, Ad Group, Ad — identical in concept to Meta but with \"Ad Group\" instead of \"Ad Set\". The lesson calls out that Meta knowledge transfers directly, so Brian starts 80% of the way there."
+  },
+  {
+    "scenario": "Brian is picking his campaign objective. Every sale is a Shopify checkout event. TikTok lists Reach, Traffic, Video Views, Community Interaction, Lead Generation, App Promotion, Website Conversions, and Product Sales.",
+    "question": "Which objective should he pick, and why?",
+    "options": [
+      "Reach — because unique users seen is what matters.",
+      "Video Views — because TikTok is video-first.",
+      "Product Sales — because it is optimised for e-commerce catalogue events, which is exactly what a Shopify checkout is.",
+      "Community Interaction — because Brian wants more followers."
+    ],
+    "correct": 2,
+    "explanation": "Slide 4 of §5.6 lists TikTok's eight objectives. For Chapa Fitness — an e-commerce store on Shopify — the correct match is Product Sales, which optimises for catalogue events (ViewContent, AddToCart, InitiateCheckout, CompletePayment). Website Conversions is close but Product Sales is the more specific e-commerce objective."
+  },
+  {
+    "scenario": "Brian is designing his first paid TikTok creative and wants a checklist that matches the platform's specific rules.",
+    "question": "Which list matches the seven creative non-negotiables from Slide 5?",
+    "options": [
+      "1080p landscape, no sound, 60-second cut, studio lighting, tagline overlay, brand logo watermark, closing card.",
+      "Vertical 9:16, sound-on, hook in the first 3 seconds, native (not polished) style, trending audio from the Creative Center, text overlays for context, clear on-screen CTA.",
+      "Square 1:1, muted playback, slow 15-second build-up, corporate voiceover, no captions, no CTA.",
+      "Landscape 16:9, licensed jingle, cinematic slow-motion, luxury brand voice, product-only frames."
+    ],
+    "correct": 1,
+    "explanation": "Slide 5 of §5.6 lists the seven non-negotiables in this exact order: vertical 9:16, sound-on (88% of TikTok users watch with sound), hook in first 3 seconds, native not polished, trending audio (via Creative Center), text overlays for context, clear on-screen CTA (\"Shop Now\", \"Sign Up\", \"Learn More\"). Miss any one and the ad flops."
+  },
+  {
+    "scenario": "Brian wonders how important sound really is on TikTok. He is thinking of shipping silent, subtitled cuts \"in case people are watching on the bus\".",
+    "question": "What does TikTok's own data (cited in Lesson 5.6) say about this?",
+    "options": [
+      "80% of TikTok viewers watch on mute.",
+      "88% of TikTok users watch with sound on. Silent-film-style cuts do NOT work on TikTok — sound-on is non-negotiable number two.",
+      "TikTok automatically mutes all ads.",
+      "Sound only matters after the first minute."
+    ],
+    "correct": 1,
+    "explanation": "Slide 5 of §5.6, non-negotiable two, is sound-on — with the specific statistic that TikTok's own data shows 88% of users watch with sound. This flips the Instagram Feed assumption on its head (Feed is often muted). On TikTok, plan the audio; do not just plan the visuals."
+  },
+  {
+    "scenario": "Brian has three organic videos that each already passed 10,000 views: one testing the elasticity of his shorts, one showing customer testimonials, one showing a delivery unboxing. He wants to run them as paid ads but keep their existing likes, comments, and shares because the social proof is what makes them work.",
+    "question": "Which TikTok ad format was built for this exact use case?",
+    "options": [
+      "Spark Ads — boost an existing organic post (yours or a creator's with permission) as a paid ad. The post keeps its original likes, comments, and shares. Native authenticity produces 2-3x higher engagement than traditional produced ad creative.",
+      "Brand Takeover — replaces every organic post with an ad.",
+      "TopView — a paid ad only, no organic base allowed.",
+      "In-Feed Ads — but only if you delete the original post first."
+    ],
+    "correct": 0,
+    "explanation": "Slide 6 of §5.6 calls Spark Ads TikTok's killer feature. A Spark Ad boosts an existing organic post as paid — keeps the likes, comments, shares intact — because it IS organic content. Brian's three 10k-view videos are perfect Spark Ad candidates. Engagement is 2-3x higher than produced ad creative because the ad IS the content that already worked."
+  },
+  {
+    "scenario": "Brian wants to track what visitors do on his Shopify store after clicking a TikTok ad — page views, add-to-cart, checkout initiated, and purchases.",
+    "question": "What is the recommended tracking setup for Chapa Fitness, per Slide 7 of §5.6?",
+    "options": [
+      "Just the TikTok Pixel — server-side tracking is only for enterprises.",
+      "TikTok Pixel (browser JavaScript that records ViewContent, AddToCart, InitiateCheckout, CompletePayment) PAIRED WITH the Events API (server-side event stream from Shopify direct to TikTok). Shopify installs both with one click. Do this BEFORE spending KES 1 on ads.",
+      "Google Analytics only — TikTok reads it directly.",
+      "Manual reconciliation — export Shopify CSVs weekly."
+    ],
+    "correct": 1,
+    "explanation": "Slide 7 of §5.6: since 2022, TikTok recommends Pixel + Events API together. The Pixel is browser-side and can be blocked by cookie restrictions; the Events API is server-side and captures events even when cookies are blocked. Together they give the most complete data. Shopify installs both automatically with a one-click integration. This must happen BEFORE any ad spend, or Brian has no data to learn from."
+  },
+  {
+    "scenario": "Brian sets up his first campaign. Objective: Product Sales. Ad Group: Kenya, age 16-28, interests fitness and streetwear, KES 500/day for 2 weeks. Ads: three Spark Ads boosting his three best organic videos. Total planned spend KES 7,000 of his KES 25,000 monthly budget.",
+    "question": "What is the professional read on this setup?",
+    "options": [
+      "The audience is too narrow — he should target ages 8-60.",
+      "The Spark Ads route is a mistake — build new studio creative instead.",
+      "It is textbook §5.6: right objective for e-commerce (Product Sales), right audience for Gen-Z streetwear, right creative approach (three Spark Ads riding proven organic content), and a spend cap (KES 7,000 of KES 25,000) that leaves room to scale winners or test a fourth Spark Ad if needed.",
+      "He should skip the Ad Group and put every setting on the Ad level."
+    ],
+    "correct": 2,
+    "explanation": "Slide 8 of §5.6 gives this exact setup as Brian's model first campaign — a direct parallel to Sarah's Meta first campaign in §5.4. Product Sales objective, age 16-28 (matches his 16-28 customer base), Spark Ads on proven organic content, and a scale-if-it-works / test-if-it-does-not budget discipline."
+  },
+  {
+    "scenario": "Brian's mother watches a slick TV commercial and tells him \"That is how ads should look — hire a proper agency for TikTok.\" Brian is tempted.",
+    "question": "Why is that specifically wrong for TikTok, based on Lesson 5.6?",
+    "options": [
+      "It is right — Brian should hire the agency immediately.",
+      "TV-style polish is exactly what TikTok users scroll past. Non-negotiable four (native, not polished) states creative must look like a creator on a phone. TV-agency production signals \"ad\" and gets ignored. The specific insight is that Spark Ads — boosted organic posts — outperform produced ad creative by 2-3x precisely because they do not look like ads.",
+      "TV agencies charge too much money.",
+      "Brian's mother is not the target audience."
+    ],
+    "correct": 1,
+    "explanation": "Slide 5 of §5.6 non-negotiable four is \"native, not polished\". Slide 6 reinforces this: Spark Ads win 2-3x higher engagement because they ARE organic content, not because they mimic organic content. Applying TV-commercial polish to TikTok breaks non-negotiable four and burns Brian's KES 25,000 monthly budget for nothing."
+  },
+  {
+    "scenario": "A trainee summarises Lesson 5.6 in one line: \"TikTok has four levels, no Pixel, no Spark Ads, and works best with landscape studio ads.\"",
+    "question": "How many of those four claims are correct?",
+    "options": [
+      "All four.",
+      "Two — the levels and Pixel parts.",
+      "Zero — every claim is wrong.",
+      "One — only the studio ads part."
+    ],
+    "correct": 2,
+    "explanation": "Every claim is wrong. TikTok has THREE levels — Campaign, Ad Group, Ad (Slide 3). TikTok DOES have a Pixel (Slide 7). Spark Ads are TikTok's KILLER feature (Slide 6). And creative must be VERTICAL 9:16 and NATIVE, not landscape studio (Slide 5). This question tests every headline fact of §5.6."
+  }
+];
+
+        let currentQuestion = 0, score = 0, streak = 0, answered = false;
+
+        function updateScoreboard() {
+            document.getElementById('score').textContent = score;
+            document.getElementById('current').textContent = Math.min(currentQuestion + 1, exercises.length);
+            document.getElementById('total').textContent = exercises.length;
+            document.getElementById('streak').textContent = streak;
+            document.getElementById('progress').style.width = ((currentQuestion) / exercises.length) * 100 + '%';
+        }
+
+        function escapeHtml(s) {
+            return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+        }
+
+        function renderQuestion() {
+            answered = false;
+            const q = exercises[currentQuestion];
+            let html = '';
+            if (q.scenario) {
+                html += `<div class="scenario"><strong>Scenario.</strong> ${escapeHtml(q.scenario)}</div>`;
+            }
+            html += `<div class="question">${escapeHtml(q.question)}</div>`;
+            html += '<div class="options">';
+            q.options.forEach((o, i) => {
+                html += `<button class="option" onclick="selectAnswer(${i})">${escapeHtml(o)}</button>`;
+            });
+            html += '</div>';
+            document.getElementById('exerciseCard').innerHTML = html;
+            updateScoreboard();
+        }
+
+        function selectAnswer(i) {
+            if (answered) return;
+            answered = true;
+            const q = exercises[currentQuestion];
+            const btns = document.querySelectorAll('.option');
+            btns.forEach(b => b.classList.add('disabled'));
+            btns[q.correct].classList.add('correct');
+            const right = i === q.correct;
+            if (!right) btns[i].classList.add('wrong');
+            if (right) { score += 10; streak += 1; } else { streak = 0; }
+            const fb = document.createElement('div');
+            fb.className = 'feedback ' + (right ? 'correct' : 'wrong');
+            fb.innerHTML = `<strong>${right ? '✅ Correct.' : '❌ Not quite.'}</strong><br>${escapeHtml(q.explanation)}`;
+            document.getElementById('exerciseCard').appendChild(fb);
+            const nb = document.createElement('button');
+            nb.className = 'next-btn';
+            nb.textContent = currentQuestion === exercises.length - 1 ? 'See results →' : 'Next scenario →';
+            nb.onclick = nextQuestion;
+            document.getElementById('exerciseCard').appendChild(nb);
+            updateScoreboard();
+        }
+
+        function nextQuestion() {
+            currentQuestion++;
+            if (currentQuestion >= exercises.length) return showResults();
+            renderQuestion();
+        }
+
+        function showResults() {
+            document.getElementById('progress').style.width = '100%';
+            const total = exercises.length * 10;
+            const pct = Math.round(score / total * 100);
+            if (window.parent) { window.parent.postMessage({type:"mtti_quiz_score", score: score, total: total, percent: pct}, "*"); }
+            let badge = '🌟', msg = 'Excellent work. You have a professional grasp of this lesson.';
+            if (pct < 50) { badge = '🌱'; msg = 'Good first attempt. Re-watch the lesson video and try again.'; }
+            else if (pct < 80) { badge = '📚'; msg = 'Solid progress. Review the scenarios you missed and retry.'; }
+            document.getElementById('exerciseCard').innerHTML = `
+                <div class="results">
+                    <span class="badge">${badge}</span>
+                    <h2>Quiz Complete</h2>
+                    <div class="final-score">${score} / ${total}</div>
+                    <p><strong>${pct}%</strong> · Longest streak: ${streak}</p>
+                    <p>${msg}</p>
+                    <button class="restart-btn" onclick="restart()">Try again 🔁</button>
+                </div>`;
+        }
+
+        function restart() {
+            currentQuestion = 0; score = 0; streak = 0;
+            renderQuestion();
+        }
+
+        renderQuestion();
+    </script>
+</body>
+</html>

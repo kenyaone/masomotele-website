@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cleaning and Drying Procedures | MTTI Mobile Repair</title>
+    <link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Fredoka:wght@500;600&display=swap" rel="stylesheet">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Space Mono', monospace; background: linear-gradient(135deg, #5E35B1 0%, #8E24AA 100%); min-height: 100vh; padding: 20px; color: #fff; }
+        .container { max-width: 900px; margin: 0 auto; }
+        .header { text-align: center; margin-bottom: 30px; }
+        .header .lesson-tag { display: inline-block; background: rgba(255,255,255,0.2); padding: 6px 16px; border-radius: 999px; font-size: 0.85em; margin-bottom: 12px; }
+        .header h1 { font-family: 'Fredoka', sans-serif; font-size: 2.2em; margin-bottom: 8px; text-shadow: 3px 3px 0 rgba(0,0,0,0.2); }
+        .score-board { background: rgba(255,255,255,0.15); backdrop-filter: blur(10px); border-radius: 20px; padding: 20px; margin-bottom: 20px; display: flex; justify-content: space-around; }
+        .score-item { text-align: center; }
+        .score-item .label { font-size: 0.85em; opacity: 0.9; margin-bottom: 4px; }
+        .score-item .value { font-size: 1.8em; font-weight: bold; font-family: 'Fredoka', sans-serif; }
+        .progress-bar { width: 100%; height: 8px; background: rgba(255,255,255,0.3); border-radius: 10px; margin-bottom: 25px; overflow: hidden; }
+        .progress-fill { height: 100%; background: linear-gradient(90deg, #f093fb 0%, #f5576c 100%); border-radius: 10px; transition: width 0.5s ease; width: 0%; }
+        .exercise-card { background: white; color: #333; border-radius: 25px; padding: 35px; margin-bottom: 20px; box-shadow: 0 20px 60px rgba(0,0,0,0.3); }
+        .scenario { background: linear-gradient(135deg, #fff8e1 0%, #ffecb3 100%); border-left: 5px solid #ffc107; padding: 20px 24px; border-radius: 12px; margin-bottom: 24px; font-size: 0.98em; line-height: 1.55; }
+        .scenario strong { color: #7a5a00; font-family: 'Fredoka', sans-serif; }
+        .question { font-size: 1.15em; margin-bottom: 20px; font-weight: 700; line-height: 1.4; }
+        .options { display: flex; flex-direction: column; gap: 12px; }
+        .option { background: #f5f7fb; border: 2px solid transparent; padding: 16px 20px; border-radius: 12px; cursor: pointer; transition: all 0.2s ease; font-family: 'Space Mono', monospace; font-size: 0.98em; text-align: left; }
+        .option:hover:not(.disabled) { background: #eef1fb; border-color: #5E35B1; transform: translateX(4px); }
+        .option.correct { background: #d4edda; border-color: #28a745; color: #155724; }
+        .option.wrong { background: #f8d7da; border-color: #dc3545; color: #721c24; }
+        .option.disabled { cursor: not-allowed; opacity: 0.85; }
+        .feedback { margin-top: 22px; padding: 18px 22px; border-radius: 12px; font-size: 0.98em; line-height: 1.5; }
+        .feedback.correct { background: #d4edda; color: #155724; border-left: 4px solid #28a745; }
+        .feedback.wrong { background: #f8d7da; color: #721c24; border-left: 4px solid #dc3545; }
+        .next-btn, .restart-btn { margin-top: 20px; background: linear-gradient(135deg, #5E35B1 0%, #8E24AA 100%); color: white; border: none; padding: 14px 32px; border-radius: 12px; font-size: 1em; cursor: pointer; font-family: 'Fredoka', sans-serif; box-shadow: 0 6px 18px rgba(0,0,0,0.2); }
+        .results { text-align: center; padding: 25px 15px; }
+        .results h2 { font-family: 'Fredoka', sans-serif; font-size: 2em; margin-bottom: 12px; color: #333; }
+        .results .final-score { font-size: 3em; font-family: 'Fredoka', sans-serif; color: #5E35B1; margin: 20px 0; }
+        .results p { color: #555; margin-bottom: 12px; }
+        .badge { display: inline-block; font-size: 3.5em; margin: 8px 0; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <div class="lesson-tag">MOR-01 &middot; Topic 2 &middot; Quiz</div>
+            <h1>Cleaning and Drying Procedures</h1>
+        </div>
+        <div class="score-board">
+            <div class="score-item"><div class="label">Score</div><div class="value" id="score">0</div></div>
+            <div class="score-item"><div class="label">Question</div><div class="value"><span id="current">1</span>/<span id="total">10</span></div></div>
+            <div class="score-item"><div class="label">Streak</div><div class="value" id="streak">0</div></div>
+        </div>
+        <div class="progress-bar"><div class="progress-fill" id="progress"></div></div>
+        <div class="exercise-card" id="exerciseCard"></div>
+    </div>
+    <script>
+        const exercises = [{"scenario":"Purity is about to open a water-damaged phone at QuickFix Phone Repairs to begin cleaning it.","question":"What is the very first physical step she should take, before removing any screws?","options":["Start scrubbing the visible corrosion immediately","Disconnect the battery connector from the board so no power reaches it while she works","Plug it in to see how much charge remains","Spray water on the corrosion to loosen it"],"correct":1,"explanation":"Disconnecting the battery first removes the power source, making it safe to clean the board without risk of a short circuit."},{"scenario":"Purity has a bottle of 70% rubbing alcohol and a bottle of 99% isopropyl alcohol on her bench.","question":"Which should she use to clean corrosion off the board, and why?","options":["The 70% rubbing alcohol, because it's cheaper","The 99% isopropyl alcohol, because its lower water content lets it evaporate quickly without leaving a conductive residue","Either one works exactly the same way","Neither, plain water is safer"],"correct":1,"explanation":"Higher-concentration IPA has much less water, so it evaporates fast and leaves no conductive residue, unlike lower-concentration alcohol."},{"scenario":"Purity needs to scrub corrosion off small connector pins without scratching the board or bending the pins.","question":"What tool is most appropriate for this?","options":["A stiff wire brush","A soft, anti-static brush","A metal screwdriver tip","Sandpaper"],"correct":1,"explanation":"A soft anti-static brush lifts corrosion gently without scratching delicate board traces or bending fine connector pins."},{"scenario":"A customer insists that leaving their phone in a bag of rice for two days will fully dry it out.","question":"How should Purity respond to this belief?","options":["Agree completely, rice is the industry standard","Explain that rice grains are too large to draw moisture from tiny gaps and connectors, and better methods exist","Say rice makes the phone charge faster","Say it doesn't matter what method is used"],"correct":1,"explanation":"Rice cannot properly reach or dry out tiny internal gaps and connectors — it is a myth, not a reliable drying method."},{"scenario":"Purity places a cleaned phone board into a sealed container with silica gel desiccant packs.","question":"Roughly how long should it stay there for effective drying?","options":["About 5 minutes","At least 24–48 hours","Exactly 10 seconds","It should never be removed"],"correct":1,"explanation":"Silica gel desiccant needs sustained time — typically at least 24 to 48 hours — to properly draw out trapped moisture."},{"scenario":"A junior colleague wants to speed up drying by aiming a heat gun directly at the phone's battery.","question":"Why should Purity stop him?","options":["It would make the phone lighter","A damaged battery exposed to direct heat can swell, leak, or even catch fire","Heat guns are too expensive to use casually","It has no real risk at all"],"correct":1,"explanation":"Direct heat on a potentially damaged lithium battery is dangerous — it can cause swelling, leaking or fire."},{"scenario":"While disassembling the phone, Purity keeps every screw in a labelled tray matching its original position.","question":"Why does this matter for a water-damage repair?","options":["It has no real benefit, screws are all interchangeable","Phone screws vary in length, and using the wrong one in the wrong hole can crack the board during reassembly","It makes the repair take longer on purpose","It is only needed for very old phone models"],"correct":1,"explanation":"Screws of different lengths are used in different spots; mismatching them can damage the board when reassembling."},{"scenario":"Purity has a badly corroded board with deposits reaching into small gaps around a connector.","question":"What extra cleaning method could help beyond a manual brush and IPA?","options":["Soaking the whole board in tap water overnight","Using an ultrasonic cleaner filled with isopropyl alcohol","Scrubbing harder with a metal tool","Leaving it exposed to direct sunlight"],"correct":1,"explanation":"An ultrasonic cleaner with IPA can reach into small gaps and thoroughly clean corrosion that a brush alone might miss."}];
+        let currentQuestion = 0, score = 0, streak = 0, answered = false;
+        function updateScoreboard() {
+            document.getElementById('score').textContent = score;
+            document.getElementById('current').textContent = Math.min(currentQuestion + 1, exercises.length);
+            document.getElementById('total').textContent = exercises.length;
+            document.getElementById('streak').textContent = streak;
+            document.getElementById('progress').style.width = ((currentQuestion) / exercises.length) * 100 + '%';
+        }
+        function escapeHtml(s) { return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+        function renderQuestion() {
+            answered = false;
+            const q = exercises[currentQuestion];
+            let html = '';
+            if (q.scenario) html += `<div class="scenario"><strong>Scenario.</strong> ${escapeHtml(q.scenario)}</div>`;
+            html += `<div class="question">${escapeHtml(q.question)}</div>`;
+            html += '<div class="options">';
+            q.options.forEach((o, i) => { html += `<button class="option" onclick="selectAnswer(${i})">${escapeHtml(o)}</button>`; });
+            html += '</div>';
+            document.getElementById('exerciseCard').innerHTML = html;
+            updateScoreboard();
+        }
+        function selectAnswer(i) {
+            if (answered) return;
+            answered = true;
+            const q = exercises[currentQuestion];
+            const btns = document.querySelectorAll('.option');
+            btns.forEach(b => b.classList.add('disabled'));
+            btns[q.correct].classList.add('correct');
+            const right = i === q.correct;
+            if (!right) btns[i].classList.add('wrong');
+            if (right) { score += 10; streak += 1; } else { streak = 0; }
+            const fb = document.createElement('div');
+            fb.className = 'feedback ' + (right ? 'correct' : 'wrong');
+            fb.innerHTML = `<strong>${right ? '&#9989; Correct.' : '&#10060; Not quite.'}</strong><br>${escapeHtml(q.explanation)}`;
+            document.getElementById('exerciseCard').appendChild(fb);
+            const nb = document.createElement('button');
+            nb.className = 'next-btn';
+            nb.textContent = currentQuestion === exercises.length - 1 ? 'See results →' : 'Next scenario →';
+            nb.onclick = nextQuestion;
+            document.getElementById('exerciseCard').appendChild(nb);
+            updateScoreboard();
+        }
+        function nextQuestion() { currentQuestion++; if (currentQuestion >= exercises.length) return showResults(); renderQuestion(); }
+        function showResults() {
+            document.getElementById('progress').style.width = '100%';
+            const total = exercises.length * 10;
+            const pct = Math.round(score / total * 100);
+            if (window.parent) { window.parent.postMessage({type:"mtti_quiz_score", score: score, total: total, percent: pct}, "*"); }
+            let badge = '🌟', msg = 'Excellent work. You have a professional grasp of this lesson.';
+            if (pct < 50) { badge = '🌱'; msg = 'Good first attempt. Review the lesson and try again.'; }
+            else if (pct < 80) { badge = '📚'; msg = 'Solid progress. Review the scenarios you missed and retry.'; }
+            document.getElementById('exerciseCard').innerHTML = `
+                <div class="results">
+                    <span class="badge">${badge}</span>
+                    <h2>Quiz Complete</h2>
+                    <div class="final-score">${score} / ${total}</div>
+                    <p><strong>${pct}%</strong> &middot; Longest streak: ${streak}</p>
+                    <p>${msg}</p>
+                    <button class="restart-btn" onclick="restart()">Try again 🔁</button>
+                </div>`;
+        }
+        function restart() { currentQuestion = 0; score = 0; streak = 0; renderQuestion(); }
+        renderQuestion();
+    </script>
+</body>
+</html>

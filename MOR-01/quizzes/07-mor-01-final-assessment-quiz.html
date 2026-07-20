@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>MOR-01 Final Assessment | MTTI Mobile Repair</title>
+<link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Fredoka:wght@500;600&display=swap" rel="stylesheet">
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body { font-family: 'Space Mono', monospace; background: linear-gradient(135deg, #E65100 0%, #BF360C 100%); min-height: 100vh; padding: 20px; color: #fff; }
+.container { max-width: 900px; margin: 0 auto; }
+.header { text-align: center; margin-bottom: 30px; }
+.header .lesson-tag { display: inline-block; background: rgba(255,255,255,0.2); padding: 6px 16px; border-radius: 999px; font-size: 0.85em; margin-bottom: 12px; }
+.header h1 { font-family: 'Fredoka', sans-serif; font-size: 2.2em; margin-bottom: 8px; text-shadow: 3px 3px 0 rgba(0,0,0,0.2); }
+.score-board { background: rgba(255,255,255,0.15); backdrop-filter: blur(10px); border-radius: 20px; padding: 20px; margin-bottom: 20px; display: flex; justify-content: space-around; }
+.score-item { text-align: center; }
+.score-item .label { font-size: 0.85em; opacity: 0.9; margin-bottom: 4px; }
+.score-item .value { font-size: 1.8em; font-weight: bold; font-family: 'Fredoka', sans-serif; }
+.progress-bar { width: 100%; height: 8px; background: rgba(255,255,255,0.3); border-radius: 10px; margin-bottom: 25px; overflow: hidden; }
+.progress-fill { height: 100%; background: linear-gradient(90deg, #FFD54F 0%, #FFA726 100%); border-radius: 10px; transition: width 0.5s ease; width: 0%; }
+.exercise-card { background: white; color: #333; border-radius: 25px; padding: 35px; margin-bottom: 20px; box-shadow: 0 20px 60px rgba(0,0,0,0.3); }
+.scenario { background: linear-gradient(135deg, #fff3e0 0%, #ffe0b2 100%); border-left: 5px solid #e65100; padding: 20px 24px; border-radius: 12px; margin-bottom: 24px; font-size: 0.98em; line-height: 1.55; }
+.scenario strong { color: #bf360c; font-family: 'Fredoka', sans-serif; }
+.question { font-size: 1.15em; margin-bottom: 20px; font-weight: 700; line-height: 1.4; }
+.options { display: flex; flex-direction: column; gap: 12px; }
+.option { background: #f5f7fb; border: 2px solid transparent; padding: 16px 20px; border-radius: 12px; cursor: pointer; transition: all 0.2s ease; font-family: 'Space Mono', monospace; font-size: 0.98em; text-align: left; }
+.option:hover:not(.disabled) { background: #eef1fb; border-color: #e65100; transform: translateX(4px); }
+.option.correct { background: #d4edda; border-color: #28a745; color: #155724; }
+.option.wrong { background: #f8d7da; border-color: #dc3545; color: #721c24; }
+.option.disabled { cursor: not-allowed; opacity: 0.85; }
+.feedback { margin-top: 22px; padding: 18px 22px; border-radius: 12px; font-size: 0.98em; line-height: 1.5; }
+.feedback.correct { background: #d4edda; color: #155724; border-left: 4px solid #28a745; }
+.feedback.wrong { background: #f8d7da; color: #721c24; border-left: 4px solid #dc3545; }
+.next-btn, .restart-btn { margin-top: 20px; background: linear-gradient(135deg, #e65100 0%, #bf360c 100%); color: white; border: none; padding: 14px 32px; border-radius: 12px; font-size: 1em; cursor: pointer; font-family: 'Fredoka', sans-serif; box-shadow: 0 6px 18px rgba(0,0,0,0.2); }
+.results { text-align: center; padding: 25px 15px; }
+.results h2 { font-family: 'Fredoka', sans-serif; font-size: 2em; margin-bottom: 12px; color: #333; }
+.results .final-score { font-size: 3em; font-family: 'Fredoka', sans-serif; color: #bf360c; margin: 20px 0; }
+.results p { color: #555; margin-bottom: 12px; }
+.badge { display: inline-block; font-size: 3.5em; margin: 8px 0; }
+</style>
+</head>
+<body>
+<div class="container">
+<div class="header">
+<div class="lesson-tag">MOR-01 &middot; Final Assessment</div>
+<h1>Mobile Repair &mdash; Final Assessment</h1>
+</div>
+<div class="score-board">
+<div class="score-item"><div class="label">Score</div><div class="value" id="score">0</div></div>
+<div class="score-item"><div class="label">Question</div><div class="value"><span id="current">1</span>/<span id="total">18</span></div></div>
+<div class="score-item"><div class="label">Streak</div><div class="value" id="streak">0</div></div>
+</div>
+<div class="progress-bar"><div class="progress-fill" id="progress"></div></div>
+<div class="exercise-card" id="exerciseCard"></div>
+</div>
+<script>
+const exercises = [{"scenario":"Purity is opening a smartphone for the first time and wants to understand what's inside.","question":"Which of these is a main internal component she should expect to find?","options":["The logic board, connected to the screen assembly, battery, and charging port","Only a battery, nothing else","A single sealed unit with no separate parts","Parts that vary randomly with no consistent layout"],"correct":0,"explanation":"Smartphones share a common set of core components (logic board, screen assembly, battery, charging port) that connect together."},{"scenario":"Purity is setting up her repair bench for the first time.","question":"What belongs in her essential toolkit?","options":["Screwdriver sets, spudgers, a heat gun/hot air station, and suction cups","Only a hammer and pliers","No tools are needed for phone repair","Kitchen utensils work just as well"],"correct":0,"explanation":"These are the standard essential tools for safely opening and working on modern smartphones."},{"scenario":"Purity is about to touch a phone's logic board without any precautions.","question":"What risk should concern her?","options":["Electrostatic discharge (ESD) silently damaging the board","The board catching fire immediately","Nothing, boards can't be damaged this way","Only physical drops matter, never static"],"correct":0,"explanation":"ESD can silently damage sensitive components, which is why anti-static precautions matter even without visible impact."},{"scenario":"A customer's phone has a cracked screen, but touch input still works fine.","question":"What does this suggest?","options":["Likely a glass-only crack, not necessarily a damaged LCD/digitizer","The whole phone must be replaced","The battery is definitely damaged","This means the charging port is broken"],"correct":0,"explanation":"Working touch input with cracked glass suggests the damage may be surface-level rather than affecting the digitizer/LCD."},{"scenario":"Purity is replacing a cracked screen.","question":"What's an important safety step in the general procedure?","options":["Disconnecting the battery before disconnecting the screen connector","Leaving the battery connected throughout the repair","Skipping power-off since it saves time","Reassembling before testing anything"],"correct":0,"explanation":"Disconnecting the battery before working near other connectors reduces the risk of a short circuit during repair."},{"scenario":"Purity notices a customer's battery is visibly swollen.","question":"What should she do?","options":["Handle it carefully, avoid puncturing it, and dispose of it properly \u2014 not in regular trash","Puncture it to check if it still works","Throw it in the regular trash bin","Ignore the swelling and reinstall it"],"correct":0,"explanation":"A swollen battery is a safety hazard \u2014 it must be handled carefully and disposed of through proper channels, not regular trash."},{"scenario":"A customer's phone won't charge at all.","question":"What should Purity check first, before assuming the charging port itself is broken?","options":["The cable and charger \u2014 a simple visual and continuity check before opening the phone","Immediately replace the logic board","Assume the phone is unrepairable","Replace the screen instead"],"correct":0,"explanation":"Ruling out a faulty cable/charger first avoids unnecessary disassembly for what might be a simple external issue."},{"scenario":"Purity is replacing a charging port/flex assembly.","question":"What's a common mistake to avoid?","options":["Forcing a connector into place or losing tiny screws","Using the correct replacement part","Testing the port after replacement","Taking photos during disassembly"],"correct":0,"explanation":"Forcing connectors and losing tiny screws are common, avoidable mistakes during this kind of repair."},{"scenario":"A customer's phone has a fault that seems to be at the board/component level, beyond basic part-swapping.","question":"What should Purity do if it's beyond her current skill level?","options":["Recognize the limit and refer it to a specialist rather than risk further damage","Attempt it anyway regardless of her skill level","Tell the customer nothing can be done","Guess and hope it works out"],"correct":0,"explanation":"Knowing when to refer a repair beyond your skill level protects the customer's device from further damage."},{"scenario":"A customer's phone freezes often and some apps crash.","question":"What's a reasonable first step before assuming hardware failure?","options":["Consider whether a factory reset is an appropriate first step for a software-pattern fault","Immediately replace the logic board","Assume it's unrepairable","Replace the screen"],"correct":0,"explanation":"Freezing/crashing often points to software issues, where a factory reset is a reasonable first troubleshooting step."},{"scenario":"Purity needs to reinstall firmware on a phone that won't boot properly.","question":"What should she be cautious about during flashing?","options":["Using the correct firmware version and ensuring a stable connection/power to avoid bricking the device","Using any firmware version available","Disconnecting power mid-flash to save time","Skipping firmware version checks entirely"],"correct":0,"explanation":"Using the wrong firmware or losing power/connection mid-flash risks permanently bricking the device."},{"scenario":"A repair Purity is about to perform risks data loss.","question":"What should she do beforehand?","options":["Try to back up the data, or clearly warn the customer about the risk first","Proceed without mentioning anything to the customer","Assume data loss never happens","Refuse to do any repair with any data risk"],"correct":0,"explanation":"Backing up data (or clearly warning the customer) before a risky repair is a basic professional responsibility."},{"scenario":"A customer brings in a phone that fell in water yesterday and still powers on.","question":"What should Purity do first?","options":["Check the water-damage indicator and corrosion signs before powering it on further, since immediate use risks a short circuit","Charge it fully right away to test it","Power it on repeatedly to check functions","Assume water damage never causes real harm"],"correct":0,"explanation":"Powering on a wet device can cause a short circuit \u2014 checking indicators and corrosion signs comes first."},{"scenario":"Purity is cleaning corrosion from a water-damaged phone.","question":"What's the recommended approach, versus a common myth?","options":["Clean with isopropyl alcohol and use controlled drying/desiccant \u2014 the rice method is a myth","Submerge it fully in rice for a week, which reliably fixes all water damage","Use any household liquid to clean it","Dry it with a hair dryer on high heat"],"correct":0,"explanation":"Isopropyl alcohol cleaning and controlled/desiccant drying are effective; the popular rice method is not reliable."},{"scenario":"After cleaning a water-damaged phone, Purity wants to make sure it's safe to reassemble fully.","question":"What should she do next?","options":["Methodically test components (battery, charging, screen, buttons) before full reassembly","Reassemble immediately without testing anything","Assume it's fine since it looks dry","Skip testing to save time"],"correct":0,"explanation":"Testing components before full reassembly catches remaining faults early, before the phone is fully closed up."},{"scenario":"A customer describes a vague symptom: \"my phone gets hot and the battery dies fast.\"","question":"What's a reasonable use of AI here?","options":["Feeding the description to an AI assistant for a first-pass list of likely causes to investigate","Trusting the AI's diagnosis completely with no further checking","Refusing to use any tools to help narrow down the issue","Only using AI to write receipts"],"correct":0,"explanation":"AI can help generate an initial list of likely causes from a vague symptom, which Purity then investigates further."},{"scenario":"Purity needs to confirm whether a specific replacement screen model is compatible with a customer's exact phone variant.","question":"How can AI help here?","options":["Using AI tools for a quick parts-lookup/compatibility check before ordering the part","Never checking compatibility at all","Ordering any part with a similar name","Assuming all parts are universally compatible"],"correct":0,"explanation":"AI-assisted parts lookup can quickly help confirm compatibility, saving wasted orders and repair time."},{"scenario":"An AI assistant suggests a specific repair step for a fault Purity hasn't handled before.","question":"What should she do before performing it?","options":["Cross-check the AI's suggestion against a real service manual or trusted source first","Perform the step immediately without checking anything","Ignore all AI suggestions permanently","Ask the customer to perform the repair instead"],"correct":0,"explanation":"Acting on an unverified AI suggestion risks destroying a customer's device \u2014 cross-checking against a trusted source is essential first."}];
+let currentQuestion = 0, score = 0, streak = 0, answered = false;
+function updateScoreboard() {
+    document.getElementById('score').textContent = score;
+    document.getElementById('current').textContent = Math.min(currentQuestion + 1, exercises.length);
+    document.getElementById('total').textContent = exercises.length;
+    document.getElementById('streak').textContent = streak;
+    document.getElementById('progress').style.width = ((currentQuestion) / exercises.length) * 100 + '%';
+}
+function escapeHtml(s) { return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+function renderQuestion() {
+    answered = false;
+    const q = exercises[currentQuestion];
+    let html = '';
+    if (q.scenario) html += `<div class="scenario"><strong>Scenario.</strong> ${escapeHtml(q.scenario)}</div>`;
+    html += `<div class="question">${escapeHtml(q.question)}</div>`;
+    html += '<div class="options">';
+    q.options.forEach((o, i) => { html += `<button class="option" onclick="selectAnswer(${i})">${escapeHtml(o)}</button>`; });
+    html += '</div>';
+    document.getElementById('exerciseCard').innerHTML = html;
+    updateScoreboard();
+}
+function selectAnswer(i) {
+    if (answered) return;
+    answered = true;
+    const q = exercises[currentQuestion];
+    const btns = document.querySelectorAll('.option');
+    btns.forEach(b => b.classList.add('disabled'));
+    btns[q.correct].classList.add('correct');
+    const right = i === q.correct;
+    if (!right) btns[i].classList.add('wrong');
+    if (right) { score += 10; streak += 1; } else { streak = 0; }
+    const fb = document.createElement('div');
+    fb.className = 'feedback ' + (right ? 'correct' : 'wrong');
+    fb.innerHTML = `<strong>${right ? '✅ Correct.' : '❌ Not quite.'}</strong><br>${escapeHtml(q.explanation)}`;
+    document.getElementById('exerciseCard').appendChild(fb);
+    const nb = document.createElement('button');
+    nb.className = 'next-btn';
+    nb.textContent = currentQuestion === exercises.length - 1 ? 'See results →' : 'Next question →';
+    nb.onclick = nextQuestion;
+    document.getElementById('exerciseCard').appendChild(nb);
+    updateScoreboard();
+}
+function nextQuestion() { currentQuestion++; if (currentQuestion >= exercises.length) return showResults(); renderQuestion(); }
+function showResults() {
+    document.getElementById('progress').style.width = '100%';
+    const total = exercises.length * 10;
+    const pct = Math.round(score / total * 100);
+    if (window.parent) { window.parent.postMessage({type:"mtti_quiz_score", score: score, total: total, percent: pct}, "*"); }
+    let badge = '🌟', msg = 'Excellent work. You have a solid grasp of mobile repair fundamentals.';
+    if (pct < 50) { badge = '🌱'; msg = 'Good first attempt. Review the units and try again.'; }
+    else if (pct < 80) { badge = '📚'; msg = 'Solid progress. Review the questions you missed and retry.'; }
+    document.getElementById('exerciseCard').innerHTML = `
+        <div class="results">
+            <span class="badge">${badge}</span>
+            <h2>Final Assessment Complete</h2>
+            <div class="final-score">${score} / ${total}</div>
+            <p><strong>${pct}%</strong> · Longest streak: ${streak}</p>
+            <p>${msg}</p>
+            <button class="restart-btn" onclick="restart()">Try again 🔁</button>
+        </div>`;
+}
+function restart() { currentQuestion = 0; score = 0; streak = 0; renderQuestion(); }
+renderQuestion();
+</script>
+</body>
+</html>

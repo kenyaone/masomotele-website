@@ -1,0 +1,232 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Illustration Techniques in CorelDraw | MTTI Graphic Design</title>
+    <link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Fredoka:wght@500;600&display=swap" rel="stylesheet">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Space Mono', monospace; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); min-height: 100vh; padding: 20px; color: #fff; }
+        .container { max-width: 900px; margin: 0 auto; }
+        .header { text-align: center; margin-bottom: 30px; }
+        .header .lesson-tag { display: inline-block; background: rgba(255,255,255,0.2); padding: 6px 16px; border-radius: 999px; font-size: 0.85em; margin-bottom: 12px; }
+        .header h1 { font-family: 'Fredoka', sans-serif; font-size: 2.2em; margin-bottom: 8px; text-shadow: 3px 3px 0 rgba(0,0,0,0.2); }
+        .score-board { background: rgba(255,255,255,0.15); backdrop-filter: blur(10px); border-radius: 20px; padding: 20px; margin-bottom: 20px; display: flex; justify-content: space-around; }
+        .score-item { text-align: center; }
+        .score-item .label { font-size: 0.85em; opacity: 0.9; margin-bottom: 4px; }
+        .score-item .value { font-size: 1.8em; font-weight: bold; font-family: 'Fredoka', sans-serif; }
+        .progress-bar { width: 100%; height: 8px; background: rgba(255,255,255,0.3); border-radius: 10px; margin-bottom: 25px; overflow: hidden; }
+        .progress-fill { height: 100%; background: linear-gradient(90deg, #f093fb 0%, #f5576c 100%); border-radius: 10px; transition: width 0.5s ease; width: 0%; }
+        .exercise-card { background: white; color: #333; border-radius: 25px; padding: 35px; margin-bottom: 20px; box-shadow: 0 20px 60px rgba(0,0,0,0.3); }
+        .scenario { background: linear-gradient(135deg, #fff8e1 0%, #ffecb3 100%); border-left: 5px solid #ffc107; padding: 20px 24px; border-radius: 12px; margin-bottom: 24px; font-size: 0.98em; line-height: 1.55; }
+        .scenario strong { color: #7a5a00; font-family: 'Fredoka', sans-serif; }
+        .question { font-size: 1.15em; margin-bottom: 20px; font-weight: 700; line-height: 1.4; }
+        .options { display: flex; flex-direction: column; gap: 12px; }
+        .option { background: #f5f7fb; border: 2px solid transparent; padding: 16px 20px; border-radius: 12px; cursor: pointer; transition: all 0.2s ease; font-family: 'Space Mono', monospace; font-size: 0.98em; text-align: left; }
+        .option:hover:not(.disabled) { background: #eef1fb; border-color: #667eea; transform: translateX(4px); }
+        .option.correct { background: #d4edda; border-color: #28a745; color: #155724; }
+        .option.wrong { background: #f8d7da; border-color: #dc3545; color: #721c24; }
+        .option.disabled { cursor: not-allowed; opacity: 0.85; }
+        .feedback { margin-top: 22px; padding: 18px 22px; border-radius: 12px; font-size: 0.98em; line-height: 1.5; }
+        .feedback.correct { background: #d4edda; color: #155724; border-left: 4px solid #28a745; }
+        .feedback.wrong { background: #f8d7da; color: #721c24; border-left: 4px solid #dc3545; }
+        .next-btn, .restart-btn { margin-top: 20px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; border: none; padding: 14px 32px; border-radius: 12px; font-size: 1em; cursor: pointer; font-family: 'Fredoka', sans-serif; box-shadow: 0 6px 18px rgba(0,0,0,0.2); }
+        .results { text-align: center; padding: 25px 15px; }
+        .results h2 { font-family: 'Fredoka', sans-serif; font-size: 2em; margin-bottom: 12px; color: #333; }
+        .results .final-score { font-size: 3em; font-family: 'Fredoka', sans-serif; color: #667eea; margin: 20px 0; }
+        .results p { color: #555; margin-bottom: 12px; }
+        .badge { display: inline-block; font-size: 3.5em; margin: 8px 0; }
+
+        /* How-To intro screen — shown before question 1, not scored */
+        .howto-card { background: white; color: #333; border-radius: 25px; padding: 35px; margin-bottom: 20px; box-shadow: 0 20px 60px rgba(0,0,0,0.3); }
+        .howto-card h3 { font-family: 'Fredoka', sans-serif; font-size: 1.3em; margin-bottom: 12px; color: #667eea; }
+        .howto-card p { line-height: 1.6; margin-bottom: 16px; color: #444; }
+        .howto-field-group { margin-bottom: 18px; }
+        .howto-field { margin-bottom: 16px; }
+        .howto-field label { display: block; font-weight: 700; margin-bottom: 6px; color: #333; font-size: 0.92em; }
+        .howto-field select, .howto-field input[type="text"] { width: 100%; padding: 10px 12px; border-radius: 8px; border: 2px solid #ddd; font-family: 'Space Mono', monospace; font-size: 0.95em; background: #f5f7fb; }
+        .howto-field.hf-correct select, .howto-field.hf-correct input[type="text"] { border-color: #28a745; background: #f0fff4; }
+        .howto-field.hf-wrong select, .howto-field.hf-wrong input[type="text"] { border-color: #dc3545; background: #fff5f5; }
+        .howto-checkbox-row { display: flex; align-items: flex-start; gap: 10px; }
+        .howto-checkbox-row input[type="checkbox"] { margin-top: 3px; width: 18px; height: 18px; flex-shrink: 0; }
+        .howto-checkbox-row label { font-weight: 700; color: #333; font-size: 0.92em; line-height: 1.4; }
+        .howto-field.hf-correct .howto-checkbox-row label { color: #155724; }
+        .howto-field.hf-wrong .howto-checkbox-row label { color: #721c24; }
+        .howto-banner { margin-top: 4px; margin-bottom: 18px; padding: 12px 16px; border-radius: 10px; font-size: 0.9em; font-weight: 700; display: none; }
+        .howto-banner.show { display: block; }
+        .howto-banner.ok { background: #d4edda; color: #155724; }
+        .howto-banner.fail { background: #f8d7da; color: #721c24; }
+        .start-quiz-btn { margin-top: 4px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; border: none; padding: 14px 32px; border-radius: 12px; font-size: 1em; cursor: pointer; font-family: 'Fredoka', sans-serif; box-shadow: 0 6px 18px rgba(0,0,0,0.2); }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <div class="lesson-tag">Branding & Illustration · CorelDraw Illustration · Quiz</div>
+            <h1>Illustration Techniques in CorelDraw</h1>
+        </div>
+        <div class="score-board">
+            <div class="score-item"><div class="label">Score</div><div class="value" id="score">0</div></div>
+            <div class="score-item"><div class="label">Question</div><div class="value"><span id="current">1</span>/<span id="total">10</span></div></div>
+            <div class="score-item"><div class="label">Streak</div><div class="value" id="streak">0</div></div>
+        </div>
+        <div class="progress-bar"><div class="progress-fill" id="progress"></div></div>
+        <div class="exercise-card" id="exerciseCard"></div>
+    </div>
+    <script>
+        const exercises = [{"scenario":"Ivy has a client's scanned pencil sketch of a mascot and wants a quick vector starting point rather than redrawing it from nothing.","question":"Which CorelDraw tool is designed for this?","options":["The Blend tool","PowerTRACE, which converts a bitmap image into editable vector shapes","The Envelope tool","The Perspective tool"],"correct":1,"explanation":"PowerTRACE is CorelDraw's dedicated tool for tracing bitmap images, such as scans or photos, into vector artwork."},{"scenario":"Ivy runs PowerTRACE on a busy, low-contrast photo full of background clutter.","question":"What is the most likely outcome?","options":["A perfectly clean trace needing no further work","A messy trace picking up unwanted detail, likely needing manual clean-up afterward","PowerTRACE will refuse to open the file","The image will automatically become text"],"correct":1,"explanation":"Cluttered, low-contrast source images trace poorly; PowerTRACE works best on clear, high-contrast references."},{"scenario":"Ivy needs a simple teacup icon and decides to build it from a circle, an ellipse, and a rectangle rather than drawing it stroke by stroke freehand.","question":"Why is this generally a good approach in CorelDraw?","options":["Basic shapes are usually faster to build, cleaner, and easier to edit than freehand curves","Freehand drawing is always faster than using shapes","Basic shapes cannot be combined or reshaped","Icons must never use more than one shape"],"correct":0,"explanation":"Combining and reshaping simple vector shapes is typically more reliable and editable than freehand illustration for icon-style artwork."},{"scenario":"Ivy applies a drop shadow to a finished icon, then adds three more overlapping shadow and contour effects because she thinks more is better.","question":"What is the likely result?","options":["The icon looks noticeably more professional with every added effect","The icon likely looks cluttered and less professional, since heavy stacked effects usually hurt a simple design rather than help it","Effects have no visual impact at all","The file will fail to export"],"correct":1,"explanation":"Restraint with effects like drop shadow and contour keeps a simple illustration looking clean; overusing them tends to clutter the design."},{"scenario":"After applying one soft drop shadow to the coffee cup icon, Ivy pauses and asks herself whether it actually improves the design.","question":"What professional habit does this represent?","options":["Applying an effect and then honestly evaluating whether it improves the design, removing it if it doesn't","Always keeping every effect regardless of the result","Never using any effects under any circumstances","Asking the client to decide on every single visual detail"],"correct":0,"explanation":"Checking whether an effect genuinely helps, and removing it if not, is the professional way to use effects like drop shadow and contour."},{"scenario":"Ivy is deciding whether to trace a scanned sketch with PowerTRACE or rebuild the icon entirely from basic shapes.","question":"What generally determines the better choice?","options":["It never matters, both approaches are identical","Whether the source sketch is clean and detailed enough to trace well, versus needing a simpler shape-based rebuild","Whichever tool has a more colourful icon","The time of day the sketch was drawn"],"correct":1,"explanation":"A clear, well-drawn sketch traces well with PowerTRACE; a rough or unclear sketch is often better rebuilt from clean basic shapes."},{"scenario":"A client asks for their icon set to include a subtle contour effect adding a slight outline depth, used consistently but lightly across all icons.","question":"Is this a reasonable use of the contour effect?","options":["No, contour should never be used","Yes, a light, consistent contour effect applied tastefully can add subtle depth without cluttering the icons","Only drop shadow is ever acceptable, never contour","Contour can only be applied to text, never icons"],"correct":1,"explanation":"Used lightly and consistently, contour is a reasonable finishing effect; the key is restraint and consistency, not avoiding it altogether."}];
+        let currentQuestion = 0, score = 0, streak = 0, answered = false;
+        function updateScoreboard() {
+            document.getElementById('score').textContent = score;
+            document.getElementById('current').textContent = Math.min(currentQuestion + 1, exercises.length);
+            document.getElementById('total').textContent = exercises.length;
+            document.getElementById('streak').textContent = streak;
+            document.getElementById('progress').style.width = ((currentQuestion) / exercises.length) * 100 + '%';
+        }
+        function escapeHtml(s) { return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+        function renderQuestion() {
+            answered = false;
+            const q = exercises[currentQuestion];
+            let html = '';
+            if (q.scenario) html += `<div class="scenario"><strong>Scenario.</strong> ${escapeHtml(q.scenario)}</div>`;
+            html += `<div class="question">${escapeHtml(q.question)}</div>`;
+            html += '<div class="options">';
+            q.options.forEach((o, i) => { html += `<button class="option" onclick="selectAnswer(${i})">${escapeHtml(o)}</button>`; });
+            html += '</div>';
+            document.getElementById('exerciseCard').innerHTML = html;
+            updateScoreboard();
+        }
+        function selectAnswer(i) {
+            if (answered) return;
+            answered = true;
+            const q = exercises[currentQuestion];
+            const btns = document.querySelectorAll('.option');
+            btns.forEach(b => b.classList.add('disabled'));
+            btns[q.correct].classList.add('correct');
+            const right = i === q.correct;
+            if (!right) btns[i].classList.add('wrong');
+            if (right) { score += 10; streak += 1; } else { streak = 0; }
+            const fb = document.createElement('div');
+            fb.className = 'feedback ' + (right ? 'correct' : 'wrong');
+            fb.innerHTML = `<strong>${right ? '✅ Correct.' : '❌ Not quite.'}</strong><br>${escapeHtml(q.explanation)}`;
+            document.getElementById('exerciseCard').appendChild(fb);
+            const nb = document.createElement('button');
+            nb.className = 'next-btn';
+            nb.textContent = currentQuestion === exercises.length - 1 ? 'See results →' : 'Next scenario →';
+            nb.onclick = nextQuestion;
+            document.getElementById('exerciseCard').appendChild(nb);
+            updateScoreboard();
+        }
+        function nextQuestion() { currentQuestion++; if (currentQuestion >= exercises.length) return showResults(); renderQuestion(); }
+        function showResults() {
+            document.getElementById('progress').style.width = '100%';
+            const total = exercises.length * 10;
+            const pct = Math.round(score / total * 100);
+            if (window.parent) { window.parent.postMessage({type:"mtti_quiz_score", score: score, total: total, percent: pct}, "*"); }
+            let badge = '🌟', msg = 'Excellent work. You have a professional grasp of this lesson.';
+            if (pct < 50) { badge = '🌱'; msg = 'Good first attempt. Review the lesson and try again.'; }
+            else if (pct < 80) { badge = '📚'; msg = 'Solid progress. Review the scenarios you missed and retry.'; }
+            document.getElementById('exerciseCard').innerHTML = `
+                <div class="results">
+                    <span class="badge">${badge}</span>
+                    <h2>Quiz Complete</h2>
+                    <div class="final-score">${score} / ${total}</div>
+                    <p><strong>${pct}%</strong> · Longest streak: ${streak}</p>
+                    <p>${msg}</p>
+                    <button class="restart-btn" onclick="restart()">Try again 🔁</button>
+                </div>`;
+        }
+        function restart() { currentQuestion = 0; score = 0; streak = 0; renderQuestion(); }
+
+        /* How-To intro — a small, ungraded field-check demo shown before the
+           quiz starts, directly rehearsing the "apply an effect, then pause and evaluate before piling on more" restraint habit
+           that one of the quiz scenarios asks about, so it is not being asked cold. */
+        const HOWTO_TITLE = "🔍 Quick How-To: Apply, Then Evaluate";
+        const HOWTO_INTRO = "Ivy has just applied a drop shadow to a finished coffee-cup icon for Chapa Design Studio and is tempted to keep stacking more effects on top. One of the scenarios coming up asks about exactly this habit. Practice it below: keep the effect choice restrained, confirm you paused to evaluate it, then check your work.";
+        const HOWTO_CHECK_LABEL = "Check My Effect Choice";
+        const HOWTO_OK_MSG = "✅ That is the professional habit - apply one restrained effect, then evaluate before piling on more. Four stacked effects usually looks cluttered rather than richer.";
+        const HOWTO_FAIL_MSG = "❌ Not yet - stick with a single restrained effect (drop shadow only) and confirm you paused to evaluate it before adding more.";
+        const HOWTO_FIELDS = [
+            { id: 'effectsApplied', type: 'select', label: 'Effects applied to the icon so far:', options: [
+                { value: 'single', label: 'Drop shadow only' },
+                { value: 'stacked', label: 'Drop shadow + Contour + Bevel + Emboss (4 stacked effects)' }
+            ], defaultValue: 'stacked', rule: { op: 'eq', value: 'single' } },
+            { id: 'evaluatedCheck', type: 'checkbox', label: 'I paused and honestly checked whether this effect actually improves the icon before adding anything else', rule: { op: 'checked' } }
+        ];
+        function escHtmlH(s) { return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+
+        function howtoFieldHtml(f) {
+            if (f.type === 'checkbox') {
+                return `<div class="howto-field" id="howtoField-${f.id}">
+                    <div class="howto-checkbox-row">
+                        <input type="checkbox" id="hf-${f.id}">
+                        <label for="hf-${f.id}">${escHtmlH(f.label)}</label>
+                    </div>
+                </div>`;
+            }
+            if (f.type === 'select') {
+                const opts = f.options.map(o => `<option value="${escHtmlH(o.value)}"${o.value === f.defaultValue ? ' selected' : ''}>${escHtmlH(o.label)}</option>`).join('');
+                return `<div class="howto-field" id="howtoField-${f.id}">
+                    <label for="hf-${f.id}">${escHtmlH(f.label)}</label>
+                    <select id="hf-${f.id}">${opts}</select>
+                </div>`;
+            }
+            return `<div class="howto-field" id="howtoField-${f.id}">
+                <label for="hf-${f.id}">${escHtmlH(f.label)}</label>
+                <input type="text" id="hf-${f.id}" value="${escHtmlH(f.defaultValue || '')}">
+            </div>`;
+        }
+
+        function renderHowtoFields() {
+            document.getElementById('howtoFields').innerHTML = HOWTO_FIELDS.map(howtoFieldHtml).join('');
+        }
+
+        function howtoFieldValue(f) {
+            const el = document.getElementById('hf-' + f.id);
+            if (f.type === 'checkbox') return el.checked;
+            return el.value;
+        }
+
+        function howtoFieldPasses(f) {
+            const v = howtoFieldValue(f);
+            if (f.rule.op === 'checked') return v === true;
+            if (f.rule.op === 'eq') return v === f.rule.value;
+            if (f.rule.op === 'regex') return f.rule.value.test(v);
+            return false;
+        }
+
+        function checkHowtoFields() {
+            let allOk = true;
+            HOWTO_FIELDS.forEach(f => {
+                const ok = howtoFieldPasses(f);
+                if (!ok) allOk = false;
+                const wrap = document.getElementById('howtoField-' + f.id);
+                wrap.classList.remove('hf-correct', 'hf-wrong');
+                wrap.classList.add(ok ? 'hf-correct' : 'hf-wrong');
+            });
+            const banner = document.getElementById('howtoBanner');
+            banner.classList.add('show');
+            banner.className = 'howto-banner show ' + (allOk ? 'ok' : 'fail');
+            banner.textContent = allOk ? HOWTO_OK_MSG : HOWTO_FAIL_MSG;
+        }
+
+        function renderHowto() {
+            document.getElementById('exerciseCard').innerHTML = `
+                <div class="howto-card">
+                    <h3>${HOWTO_TITLE}</h3>
+                    <p>${HOWTO_INTRO}</p>
+                    <div class="howto-field-group" id="howtoFields"></div>
+                    <div class="howto-banner" id="howtoBanner"></div>
+                    <button class="start-quiz-btn" id="checkHowtoBtn">${HOWTO_CHECK_LABEL}</button>
+                    <button class="start-quiz-btn" id="startQuizBtn" style="margin-left:10px;background:linear-gradient(135deg,#28a745,#1e7e34);">Start Quiz →</button>
+                </div>`;
+            renderHowtoFields();
+            document.getElementById('checkHowtoBtn').addEventListener('click', checkHowtoFields);
+            document.getElementById('startQuizBtn').addEventListener('click', renderQuestion);
+        }
+
+        renderHowto();
+    </script>
+</body>
+</html>

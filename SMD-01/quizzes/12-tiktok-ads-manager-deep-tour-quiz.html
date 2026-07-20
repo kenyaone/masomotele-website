@@ -1,0 +1,346 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TikTok Ads Manager — Deep Tour | MTTI Digital Marketing</title>
+    <link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Fredoka:wght@500;600&display=swap" rel="stylesheet">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Space Mono', monospace;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh; padding: 20px; color: #fff;
+        }
+        .container { max-width: 900px; margin: 0 auto; }
+        .header { text-align: center; margin-bottom: 30px; animation: slideDown 0.6s ease-out; }
+        .header .lesson-tag {
+            display: inline-block; background: rgba(255,255,255,0.2);
+            padding: 6px 16px; border-radius: 999px;
+            font-size: 0.85em; margin-bottom: 12px;
+        }
+        .header h1 {
+            font-family: 'Fredoka', sans-serif; font-size: 2.2em;
+            margin-bottom: 8px; text-shadow: 3px 3px 0 rgba(0,0,0,0.2);
+        }
+        .header p { opacity: 0.95; font-size: 0.95em; }
+        .score-board {
+            background: rgba(255,255,255,0.15); backdrop-filter: blur(10px);
+            border-radius: 20px; padding: 20px; margin-bottom: 20px;
+            display: flex; justify-content: space-around;
+            animation: fadeIn 0.8s ease-out 0.2s both;
+        }
+        .score-item { text-align: center; }
+        .score-item .label { font-size: 0.85em; opacity: 0.9; margin-bottom: 4px; }
+        .score-item .value {
+            font-size: 1.8em; font-weight: bold; font-family: 'Fredoka', sans-serif;
+        }
+        .progress-bar {
+            width: 100%; height: 8px; background: rgba(255,255,255,0.3);
+            border-radius: 10px; margin-bottom: 25px; overflow: hidden;
+        }
+        .progress-fill {
+            height: 100%; background: linear-gradient(90deg, #f093fb 0%, #f5576c 100%);
+            border-radius: 10px; transition: width 0.5s ease; width: 0%;
+        }
+        .exercise-card {
+            background: white; color: #333; border-radius: 25px;
+            padding: 35px; margin-bottom: 20px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            animation: fadeIn 0.6s ease-out both;
+        }
+        .scenario {
+            background: linear-gradient(135deg, #fff8e1 0%, #ffecb3 100%);
+            border-left: 5px solid #ffc107;
+            padding: 20px 24px; border-radius: 12px;
+            margin-bottom: 24px;
+            font-size: 0.98em; line-height: 1.55;
+        }
+        .scenario strong { color: #7a5a00; font-family: 'Fredoka', sans-serif; }
+        .question {
+            font-size: 1.15em; margin-bottom: 20px;
+            font-weight: 700; line-height: 1.4;
+        }
+        .options { display: flex; flex-direction: column; gap: 12px; }
+        .option {
+            background: #f5f7fb; border: 2px solid transparent;
+            padding: 16px 20px; border-radius: 12px;
+            cursor: pointer; transition: all 0.2s ease;
+            font-family: 'Space Mono', monospace; font-size: 0.98em; text-align: left;
+        }
+        .option:hover:not(.disabled) {
+            background: #eef1fb; border-color: #667eea; transform: translateX(4px);
+        }
+        .option.correct { background: #d4edda; border-color: #28a745; color: #155724; }
+        .option.wrong { background: #f8d7da; border-color: #dc3545; color: #721c24; animation: shake 0.4s; }
+        .option.disabled { cursor: not-allowed; opacity: 0.85; }
+        .feedback {
+            margin-top: 22px; padding: 18px 22px; border-radius: 12px;
+            animation: slideUp 0.4s ease-out;
+            font-size: 0.98em; line-height: 1.5;
+        }
+        .feedback.correct { background: #d4edda; color: #155724; border-left: 4px solid #28a745; }
+        .feedback.wrong { background: #f8d7da; color: #721c24; border-left: 4px solid #dc3545; }
+        .feedback strong { font-family: 'Fredoka', sans-serif; }
+        .next-btn, .restart-btn {
+            margin-top: 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white; border: none;
+            padding: 14px 32px; border-radius: 12px;
+            font-size: 1em; cursor: pointer;
+            font-family: 'Fredoka', sans-serif;
+            box-shadow: 0 6px 18px rgba(0,0,0,0.2);
+            transition: transform 0.2s ease;
+        }
+        .next-btn:hover, .restart-btn:hover { transform: scale(1.04); }
+        .results {
+            text-align: center; padding: 25px 15px;
+            animation: bounceIn 0.6s ease-out;
+        }
+        .results h2 {
+            font-family: 'Fredoka', sans-serif; font-size: 2em;
+            margin-bottom: 12px; color: #333;
+        }
+        .results .final-score {
+            font-size: 3em; font-family: 'Fredoka', sans-serif;
+            color: #667eea; margin: 20px 0;
+        }
+        .results p { color: #555; margin-bottom: 12px; }
+        .badge { display: inline-block; font-size: 3.5em; margin: 8px 0; }
+        @keyframes slideDown { from { opacity: 0; transform: translateY(-30px); } to { opacity: 1; transform: translateY(0); } }
+        @keyframes fadeIn { from { opacity: 0; transform: scale(0.96); } to { opacity: 1; transform: scale(1); } }
+        @keyframes slideUp { from { opacity: 0; transform: translateY(15px); } to { opacity: 1; transform: translateY(0); } }
+        @keyframes shake { 0%,100% { transform: translateX(0); } 25% { transform: translateX(-8px); } 75% { transform: translateX(8px); } }
+        @keyframes bounceIn { 0% { opacity: 0; transform: scale(0.4); } 60% { transform: scale(1.05); } 100% { opacity: 1; transform: scale(1); } }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <div class="lesson-tag">Module 12 · Lesson 12.1</div>
+            <h1>TikTok Ads Manager — Deep Tour</h1>
+            <p>10 Brian Otieno scenarios — Business Centre, roles, assets, currency, attribution</p>
+        </div>
+
+        <div class="score-board">
+            <div class="score-item"><div class="label">Score</div><div class="value" id="score">0</div></div>
+            <div class="score-item"><div class="label">Question</div><div class="value"><span id="current">1</span>/<span id="total">10</span></div></div>
+            <div class="score-item"><div class="label">Streak</div><div class="value" id="streak">0</div></div>
+        </div>
+
+        <div class="progress-bar"><div class="progress-fill" id="progress"></div></div>
+
+        <div class="exercise-card" id="exerciseCard"></div>
+    </div>
+
+    <script>
+        const exercises = [
+  {
+    "scenario": "Brian has been running Chapa Fitness TikTok ads from a plain Business account he created inside the TikTok app. His freelance video editor needs to help build ads, and Brian is nervous about sharing his personal TikTok password.",
+    "question": "What should Brian do?",
+    "options": [
+      "Keep going on the plain in-app Business account and share his personal TikTok password with the editor.",
+      "Set up a TikTok Business Centre at business.tiktok.com. The Business Centre OWNS the ad account, pixel, catalogue, and linked TikTok account — Brian stays Admin, the editor is added as Operator on the ad account only, and no passwords are shared.",
+      "Delete the ad account and only run organic TikTok.",
+      "Give the editor Brian's phone number and TikTok verification codes each morning."
+    ],
+    "correct": 1,
+    "explanation": "Slide 2 of §12.1 explains the graduation from a plain Business account to a proper Business Centre at business.tiktok.com. The Business Centre is a container owned by the business, with named users, per-asset permissions, and full logging. Never share personal credentials."
+  },
+  {
+    "scenario": "Brian is deciding what role to give three people inside his Chapa Fitness Business Centre: himself (owner), his freelance video editor (builds campaigns), and his accountant (needs to see spend but not change anything).",
+    "question": "What roles should he assign, applying least privilege?",
+    "options": [
+      "Everyone Admin — simpler.",
+      "Brian = Admin. Video editor = Operator on the ad account. Accountant = Analyst.",
+      "Everyone Operator, including himself.",
+      "Editor = Admin. Accountant = Operator. Brian = Analyst on his own business."
+    ],
+    "correct": 1,
+    "explanation": "Slide 4 of §12.1 lists the three TikTok Business Centre roles: Admin (full control, reserved for owner + true partners), Operator (day-to-day work on assigned assets), Analyst (view-only). Roles are assigned per asset and follow least privilege."
+  },
+  {
+    "scenario": "Brian's freelance video editor needs to upload creative and build ads, but Brian does not want her to be able to see raw customer data captured by the TikTok pixel.",
+    "question": "How does TikTok Business Centre let him do this?",
+    "options": [
+      "It is impossible — anyone who can edit ads also sees pixel data.",
+      "The pixel is a separate Business Centre asset with its own permission slider. Brian grants the editor Operator on the ad account and \"no access\" on the pixel. She can build ads without ever seeing the raw pixel event stream.",
+      "Brian must give her Admin.",
+      "The editor must be removed from Business Centre entirely."
+    ],
+    "correct": 1,
+    "explanation": "Slide 5 of §12.1 covers advanced Business Centre settings. Pixel + Event permissions are granted separately from the ad account — a core least-privilege pattern. The editor can build ads without touching customer pixel data."
+  },
+  {
+    "scenario": "Brian opens the ad account settings inside his new Chapa Fitness Business Centre and looks for KES as a currency option. He cannot find it.",
+    "question": "Why, and what should he do?",
+    "options": [
+      "It is a bug — KES will appear if he refreshes.",
+      "TikTok Ads Manager for Kenya only offers USD as an ad account currency. Brian sets USD, tops up the account via a card or an M-Pesa-to-Visa conversion, and converts to KES internally for reporting.",
+      "He must move Chapa Fitness's business registration to the United States.",
+      "He should pick GBP instead."
+    ],
+    "correct": 1,
+    "explanation": "Slide 6 of §12.1 is explicit: TikTok Ads Manager for Kenya only offers USD. Top-ups happen via card or M-Pesa-to-Visa conversion, and all Ads Manager reports are USD. Internal KES reporting is a manual conversion."
+  },
+  {
+    "scenario": "Brian is asked to choose an attribution window for his Chapa Fitness campaigns. TikTok offers 1-day click, 7-day click, 28-day click, and each with an optional 1-day view.",
+    "question": "What is the professional default the lesson recommends?",
+    "options": [
+      "28-day click + 7-day view — always the widest window.",
+      "7-day click + 1-day view — the professional default. Balances credit accuracy against including assists.",
+      "1-day click only — the tightest possible.",
+      "It does not matter — TikTok uses the same window for everything."
+    ],
+    "correct": 1,
+    "explanation": "Slide 6 of §12.1 recommends 7-day click + 1-day view as the professional default. Longer windows inflate credited conversions with assists; tighter windows undercount TikTok's contribution. Set once and do not change mid-campaign — reporting continuity depends on it."
+  },
+  {
+    "scenario": "Two weeks into a Chapa Fitness campaign, Brian changes the attribution window from 7-day click + 1-day view to 28-day click + 1-day view because his boss wants \"better ROAS numbers\".",
+    "question": "What is the correct professional response?",
+    "options": [
+      "Well done — bigger numbers are always better.",
+      "Mistake. Changing attribution mid-campaign resets reporting continuity and inflates credited conversions without changing real revenue. The window must be picked once and left alone — reporting must reflect reality, not vanity metrics.",
+      "It does not matter because TikTok recalculates old data automatically.",
+      "He should also switch to 28-day view for maximum credit."
+    ],
+    "correct": 1,
+    "explanation": "Slide 6 of §12.1 warns: do not change attribution mid-campaign — reporting resets. Wider windows credit more indirect assists but do not improve real revenue. This is exactly the kind of misuse a professional should push back on."
+  },
+  {
+    "scenario": "Brian is about to launch Spark Ads (see Lesson 12.3) but the option is greyed out. He checks his Business Centre settings.",
+    "question": "What is the most likely cause?",
+    "options": [
+      "Spark Ads is not available in Kenya.",
+      "Post authorisation is switched off in Business Centre. It is the Business Centre switch that unlocks Spark Ads — turning it on lets Brian promote his own organic videos (and creator videos with an authorisation code) as paid ads.",
+      "He needs to buy a Spark Ads add-on.",
+      "His ad account balance is under USD 1,000."
+    ],
+    "correct": 1,
+    "explanation": "Slide 5 of §12.1 lists post authorisation as one of the four advanced Business Centre settings beginners miss. Without it turned on, Spark Ads cannot run — no organic video can be promoted."
+  },
+  {
+    "scenario": "Brian wants his Chapa Fitness Business Centre to survive if his personal TikTok is disabled tomorrow.",
+    "question": "What is the most important step to guarantee this?",
+    "options": [
+      "Nothing — Business Centre cannot survive without his personal TikTok.",
+      "Add at least one other trusted Admin, ensure both admins have two-factor authentication enabled, and complete Business Centre verification. The Business Centre is owned by the business — as long as one Admin can sign in, the ad account, pixel, catalogue, and creative history continue.",
+      "Print the personal TikTok password and post it home.",
+      "Delete his personal TikTok to prove it does not matter."
+    ],
+    "correct": 1,
+    "explanation": "Slide 8 of §12.1 gives \"ownership\" as reason #1 for Business Centre. The safeguard is at least one other Admin, plus 2FA on every Admin. This is the same pattern as Meta Business Manager — see Lesson 11.1."
+  },
+  {
+    "scenario": "A trainee asks: \"Why bother uploading the Chapa Fitness product catalogue at the Business Centre level instead of inside the ad account?\"",
+    "question": "What is the correct answer?",
+    "options": [
+      "There is no difference — TikTok stores them the same way.",
+      "Business Centre catalogues are reusable across every ad account inside the Business Centre. Upload once at the container level and any current or future ad account can run Product Sales or catalogue-based ads on it — no re-upload, one source of truth.",
+      "Ad-account-level catalogues are cheaper to run.",
+      "TikTok forbids catalogues inside ad accounts."
+    ],
+    "correct": 1,
+    "explanation": "Slide 5 of §12.1 covers Business Centre assets. The catalogue is a shared asset — upload once, reuse across every ad account under the Business Centre. Cleaner ownership, one source of truth."
+  },
+  {
+    "scenario": "A trainee summarises Lesson 12.1 in one line: \"TikTok Business Centre has six permission roles, the pixel permission is bundled with the ad account, and Kenyan advertisers can pick KES as a currency.\"",
+    "question": "How many of those three claims are correct?",
+    "options": [
+      "All three.",
+      "Two — the pixel and currency parts.",
+      "Zero — every claim is wrong.",
+      "One — only the roles part."
+    ],
+    "correct": 2,
+    "explanation": "Every claim is wrong. TikTok Business Centre has THREE roles — Admin, Operator, Analyst (Slide 4), not six. The pixel is a SEPARATE asset with its own permission slider, not bundled with the ad account (Slide 5). And TikTok Ads Manager for Kenya offers ONLY USD, not KES (Slide 6)."
+  }
+];
+
+        let currentQuestion = 0, score = 0, streak = 0, answered = false;
+
+        function updateScoreboard() {
+            document.getElementById('score').textContent = score;
+            document.getElementById('current').textContent = Math.min(currentQuestion + 1, exercises.length);
+            document.getElementById('total').textContent = exercises.length;
+            document.getElementById('streak').textContent = streak;
+            document.getElementById('progress').style.width = ((currentQuestion) / exercises.length) * 100 + '%';
+        }
+
+        function escapeHtml(s) {
+            return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+        }
+
+        function renderQuestion() {
+            answered = false;
+            const q = exercises[currentQuestion];
+            let html = '';
+            if (q.scenario) {
+                html += `<div class="scenario"><strong>Scenario.</strong> ${escapeHtml(q.scenario)}</div>`;
+            }
+            html += `<div class="question">${escapeHtml(q.question)}</div>`;
+            html += '<div class="options">';
+            q.options.forEach((o, i) => {
+                html += `<button class="option" onclick="selectAnswer(${i})">${escapeHtml(o)}</button>`;
+            });
+            html += '</div>';
+            document.getElementById('exerciseCard').innerHTML = html;
+            updateScoreboard();
+        }
+
+        function selectAnswer(i) {
+            if (answered) return;
+            answered = true;
+            const q = exercises[currentQuestion];
+            const btns = document.querySelectorAll('.option');
+            btns.forEach(b => b.classList.add('disabled'));
+            btns[q.correct].classList.add('correct');
+            const right = i === q.correct;
+            if (!right) btns[i].classList.add('wrong');
+            if (right) { score += 10; streak += 1; } else { streak = 0; }
+            const fb = document.createElement('div');
+            fb.className = 'feedback ' + (right ? 'correct' : 'wrong');
+            fb.innerHTML = `<strong>${right ? '✅ Correct.' : '❌ Not quite.'}</strong><br>${escapeHtml(q.explanation)}`;
+            document.getElementById('exerciseCard').appendChild(fb);
+            const nb = document.createElement('button');
+            nb.className = 'next-btn';
+            nb.textContent = currentQuestion === exercises.length - 1 ? 'See results →' : 'Next scenario →';
+            nb.onclick = nextQuestion;
+            document.getElementById('exerciseCard').appendChild(nb);
+            updateScoreboard();
+        }
+
+        function nextQuestion() {
+            currentQuestion++;
+            if (currentQuestion >= exercises.length) return showResults();
+            renderQuestion();
+        }
+
+        function showResults() {
+            document.getElementById('progress').style.width = '100%';
+            const total = exercises.length * 10;
+            const pct = Math.round(score / total * 100);
+            if (window.parent) { window.parent.postMessage({type:"mtti_quiz_score", score: score, total: total, percent: pct}, "*"); }
+            let badge = '🌟', msg = 'Excellent work. You have a professional grasp of this lesson.';
+            if (pct < 50) { badge = '🌱'; msg = 'Good first attempt. Re-watch the lesson video and try again.'; }
+            else if (pct < 80) { badge = '📚'; msg = 'Solid progress. Review the scenarios you missed and retry.'; }
+            document.getElementById('exerciseCard').innerHTML = `
+                <div class="results">
+                    <span class="badge">${badge}</span>
+                    <h2>Quiz Complete</h2>
+                    <div class="final-score">${score} / ${total}</div>
+                    <p><strong>${pct}%</strong> · Longest streak: ${streak}</p>
+                    <p>${msg}</p>
+                    <button class="restart-btn" onclick="restart()">Try again 🔁</button>
+                </div>`;
+        }
+
+        function restart() {
+            currentQuestion = 0; score = 0; streak = 0;
+            renderQuestion();
+        }
+
+        renderQuestion();
+    </script>
+</body>
+</html>

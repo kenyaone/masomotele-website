@@ -1,0 +1,346 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WordPress Dashboard Tour | MTTI Digital Marketing</title>
+    <link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Fredoka:wght@500;600&display=swap" rel="stylesheet">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Space Mono', monospace;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh; padding: 20px; color: #fff;
+        }
+        .container { max-width: 900px; margin: 0 auto; }
+        .header { text-align: center; margin-bottom: 30px; animation: slideDown 0.6s ease-out; }
+        .header .lesson-tag {
+            display: inline-block; background: rgba(255,255,255,0.2);
+            padding: 6px 16px; border-radius: 999px;
+            font-size: 0.85em; margin-bottom: 12px;
+        }
+        .header h1 {
+            font-family: 'Fredoka', sans-serif; font-size: 2.2em;
+            margin-bottom: 8px; text-shadow: 3px 3px 0 rgba(0,0,0,0.2);
+        }
+        .header p { opacity: 0.95; font-size: 0.95em; }
+        .score-board {
+            background: rgba(255,255,255,0.15); backdrop-filter: blur(10px);
+            border-radius: 20px; padding: 20px; margin-bottom: 20px;
+            display: flex; justify-content: space-around;
+            animation: fadeIn 0.8s ease-out 0.2s both;
+        }
+        .score-item { text-align: center; }
+        .score-item .label { font-size: 0.85em; opacity: 0.9; margin-bottom: 4px; }
+        .score-item .value {
+            font-size: 1.8em; font-weight: bold; font-family: 'Fredoka', sans-serif;
+        }
+        .progress-bar {
+            width: 100%; height: 8px; background: rgba(255,255,255,0.3);
+            border-radius: 10px; margin-bottom: 25px; overflow: hidden;
+        }
+        .progress-fill {
+            height: 100%; background: linear-gradient(90deg, #f093fb 0%, #f5576c 100%);
+            border-radius: 10px; transition: width 0.5s ease; width: 0%;
+        }
+        .exercise-card {
+            background: white; color: #333; border-radius: 25px;
+            padding: 35px; margin-bottom: 20px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            animation: fadeIn 0.6s ease-out both;
+        }
+        .scenario {
+            background: linear-gradient(135deg, #fff8e1 0%, #ffecb3 100%);
+            border-left: 5px solid #ffc107;
+            padding: 20px 24px; border-radius: 12px;
+            margin-bottom: 24px;
+            font-size: 0.98em; line-height: 1.55;
+        }
+        .scenario strong { color: #7a5a00; font-family: 'Fredoka', sans-serif; }
+        .question {
+            font-size: 1.15em; margin-bottom: 20px;
+            font-weight: 700; line-height: 1.4;
+        }
+        .options { display: flex; flex-direction: column; gap: 12px; }
+        .option {
+            background: #f5f7fb; border: 2px solid transparent;
+            padding: 16px 20px; border-radius: 12px;
+            cursor: pointer; transition: all 0.2s ease;
+            font-family: 'Space Mono', monospace; font-size: 0.98em; text-align: left;
+        }
+        .option:hover:not(.disabled) {
+            background: #eef1fb; border-color: #667eea; transform: translateX(4px);
+        }
+        .option.correct { background: #d4edda; border-color: #28a745; color: #155724; }
+        .option.wrong { background: #f8d7da; border-color: #dc3545; color: #721c24; animation: shake 0.4s; }
+        .option.disabled { cursor: not-allowed; opacity: 0.85; }
+        .feedback {
+            margin-top: 22px; padding: 18px 22px; border-radius: 12px;
+            animation: slideUp 0.4s ease-out;
+            font-size: 0.98em; line-height: 1.5;
+        }
+        .feedback.correct { background: #d4edda; color: #155724; border-left: 4px solid #28a745; }
+        .feedback.wrong { background: #f8d7da; color: #721c24; border-left: 4px solid #dc3545; }
+        .feedback strong { font-family: 'Fredoka', sans-serif; }
+        .next-btn, .restart-btn {
+            margin-top: 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white; border: none;
+            padding: 14px 32px; border-radius: 12px;
+            font-size: 1em; cursor: pointer;
+            font-family: 'Fredoka', sans-serif;
+            box-shadow: 0 6px 18px rgba(0,0,0,0.2);
+            transition: transform 0.2s ease;
+        }
+        .next-btn:hover, .restart-btn:hover { transform: scale(1.04); }
+        .results {
+            text-align: center; padding: 25px 15px;
+            animation: bounceIn 0.6s ease-out;
+        }
+        .results h2 {
+            font-family: 'Fredoka', sans-serif; font-size: 2em;
+            margin-bottom: 12px; color: #333;
+        }
+        .results .final-score {
+            font-size: 3em; font-family: 'Fredoka', sans-serif;
+            color: #667eea; margin: 20px 0;
+        }
+        .results p { color: #555; margin-bottom: 12px; }
+        .badge { display: inline-block; font-size: 3.5em; margin: 8px 0; }
+        @keyframes slideDown { from { opacity: 0; transform: translateY(-30px); } to { opacity: 1; transform: translateY(0); } }
+        @keyframes fadeIn { from { opacity: 0; transform: scale(0.96); } to { opacity: 1; transform: scale(1); } }
+        @keyframes slideUp { from { opacity: 0; transform: translateY(15px); } to { opacity: 1; transform: translateY(0); } }
+        @keyframes shake { 0%,100% { transform: translateX(0); } 25% { transform: translateX(-8px); } 75% { transform: translateX(8px); } }
+        @keyframes bounceIn { 0% { opacity: 0; transform: scale(0.4); } 60% { transform: scale(1.05); } 100% { opacity: 1; transform: scale(1); } }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <div class="lesson-tag">Module 8 · Lesson 8.4</div>
+            <h1>WordPress Dashboard Tour</h1>
+            <p>10 Sarah scenarios — login, sidebar map, and the screens she will use most</p>
+        </div>
+
+        <div class="score-board">
+            <div class="score-item"><div class="label">Score</div><div class="value" id="score">0</div></div>
+            <div class="score-item"><div class="label">Question</div><div class="value"><span id="current">1</span>/<span id="total">10</span></div></div>
+            <div class="score-item"><div class="label">Streak</div><div class="value" id="streak">0</div></div>
+        </div>
+
+        <div class="progress-bar"><div class="progress-fill" id="progress"></div></div>
+
+        <div class="exercise-card" id="exerciseCard"></div>
+    </div>
+
+    <script>
+        const exercises = [
+  {
+    "scenario": "Sarah opens Studio and wants to log in to the WordPress admin area for Karibu Kitchen for the first time.",
+    "question": "How does she get to wp-admin?",
+    "options": [
+      "Open her browser and guess the login URL.",
+      "In Studio, click the WP Admin button on her Karibu Kitchen site card. The login page opens in the browser. Enter the admin username and the password Studio auto-generated in Lesson 8.3.",
+      "Reinstall Studio.",
+      "Ask Automattic support to log her in."
+    ],
+    "correct": 1,
+    "explanation": "Slide 2 describes the login flow — click WP Admin on the site card in Studio, then enter the auto-generated credentials from Lesson 8.3."
+  },
+  {
+    "scenario": "Sarah lands on the Dashboard home for the first time. She sees several widgets and asks what each is for.",
+    "question": "Which set of widgets matches the four listed in Lesson 8.4?",
+    "options": [
+      "At a Glance, Activity, Quick Draft, WordPress Events and News.",
+      "Orders, Inventory, Customers, Suppliers.",
+      "Ads, Analytics, Revenue, Campaigns.",
+      "Payments, Refunds, Chargebacks, Fees."
+    ],
+    "correct": 0,
+    "explanation": "Slide 3 names the four Dashboard home widgets — At a Glance, Activity, Quick Draft, and WordPress Events and News. The Dashboard's main purpose is to reassure you nothing is broken."
+  },
+  {
+    "scenario": "Sarah is intimidated by the left sidebar with all its menus. She wants a simple mental model of what it is.",
+    "question": "What is the accurate description from Lesson 8.4?",
+    "options": [
+      "The sidebar is only a decoration.",
+      "The left sidebar is the map of WordPress — every serious task lives inside one of the ten menus: Dashboard, Posts, Media, Pages, Comments, Appearance, Plugins, Users, Tools, Settings.",
+      "The sidebar only holds Settings.",
+      "The sidebar is where you write blog posts directly."
+    ],
+    "correct": 1,
+    "explanation": "Slide 4 calls the sidebar the map of WordPress and lists all ten menus. Every trainee should learn where each one lives because they will use every one."
+  },
+  {
+    "scenario": "Sarah wants to build the Home, About, Menu, Delivery, and Contact pages for Karibu Kitchen. She asks whether these should be Posts or Pages.",
+    "question": "Which answer is correct?",
+    "options": [
+      "Posts — they are dated blog entries.",
+      "Pages — they are STATIC entries at fixed URLs, unlike Posts which are dated blog articles in chronological order.",
+      "Neither — they should be Comments.",
+      "Both — put them in Posts and Pages."
+    ],
+    "correct": 1,
+    "explanation": "Slide 5 explains the Pages vs Posts distinction — Pages are static and live at fixed URLs. Sarah's five essential pages are all Pages, not Posts. Blog articles come later as Posts."
+  },
+  {
+    "scenario": "Sarah clicks Pages in the sidebar and asks which button starts a new page for Home.",
+    "question": "Which button does she click?",
+    "options": [
+      "Add New Post in the sidebar.",
+      "The Add New Page button in the top left of the Pages screen.",
+      "The Comments menu.",
+      "The Users menu."
+    ],
+    "correct": 1,
+    "explanation": "Slide 6 describes the Pages screen — the Add New Page button is in the top left. That is where new page creation starts."
+  },
+  {
+    "scenario": "Sarah opens Appearance and sees Twenty Twenty-Six marked as Active. She asks whether she must keep this theme.",
+    "question": "What does Lesson 8.4 say about the default theme and what comes next?",
+    "options": [
+      "Twenty Twenty-Six is the only allowed theme.",
+      "Twenty Twenty-Six is the default. In Lesson 8.6 we install Astra, a professional theme popular in Kenyan agencies.",
+      "Sarah must delete Twenty Twenty-Six immediately.",
+      "Themes cannot be changed once installed."
+    ],
+    "correct": 1,
+    "explanation": "Slide 7 explains that Twenty Twenty-Six is the WordPress default. In Lesson 8.6 Sarah will install Astra, which is popular with Kenyan agencies."
+  },
+  {
+    "scenario": "Sarah sees Akismet Anti-spam already installed under Plugins and asks whether she needs to remove it.",
+    "question": "What is the guidance in Lesson 8.4?",
+    "options": [
+      "Delete Akismet — it is malware.",
+      "Akismet is free anti-spam and worth keeping. Hello Dolly you can ignore.",
+      "Akismet must be paid for before use.",
+      "Akismet cannot be removed."
+    ],
+    "correct": 1,
+    "explanation": "Slide 8 mentions the pre-installed plugins — Akismet Anti-spam is worth keeping, Hello Dolly can be ignored. In Lesson 8.7 Sarah adds the three essential plugins."
+  },
+  {
+    "scenario": "Sarah wants to know which sidebar screens she will actually use most often in the next four lessons.",
+    "question": "Which trio does Lesson 8.4 highlight?",
+    "options": [
+      "Pages, Appearance, and Plugins.",
+      "Comments, Users, and Tools.",
+      "Settings, Media, and Posts.",
+      "Dashboard, Dashboard, and Dashboard."
+    ],
+    "correct": 0,
+    "explanation": "Slide 9 wrap-up highlights the specific screens Sarah will use most — Pages (for the five essential pages), Appearance (for the theme), and Plugins (for the essentials)."
+  },
+  {
+    "scenario": "Sarah asks whether the block-based Site Editor at the bottom of Appearance is something she needs to learn right now.",
+    "question": "What does Lesson 8.4 say?",
+    "options": [
+      "It is mandatory — she must master it before Lesson 8.5.",
+      "The Editor at the bottom is the block-based site editor — she can safely ignore it for now.",
+      "It replaces the block editor she uses on pages.",
+      "It only works on Mac."
+    ],
+    "correct": 1,
+    "explanation": "Slide 7 says the Editor can be safely ignored for now. Sarah focuses on the Customiser, Menus, and Widgets instead."
+  },
+  {
+    "scenario": "Sarah wants to see how many pages and posts her site currently has at a quick glance without clicking through menus.",
+    "question": "Which Dashboard widget shows that?",
+    "options": [
+      "Activity.",
+      "Quick Draft.",
+      "At a Glance — it shows how many posts, pages, and comments your site has.",
+      "WordPress Events and News."
+    ],
+    "correct": 2,
+    "explanation": "Slide 3 describes At a Glance as the widget that shows counts of posts, pages, and comments. Activity shows recent posts and comments, but not counts."
+  }
+];
+
+        let currentQuestion = 0, score = 0, streak = 0, answered = false;
+
+        function updateScoreboard() {
+            document.getElementById('score').textContent = score;
+            document.getElementById('current').textContent = Math.min(currentQuestion + 1, exercises.length);
+            document.getElementById('total').textContent = exercises.length;
+            document.getElementById('streak').textContent = streak;
+            document.getElementById('progress').style.width = ((currentQuestion) / exercises.length) * 100 + '%';
+        }
+
+        function escapeHtml(s) {
+            return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+        }
+
+        function renderQuestion() {
+            answered = false;
+            const q = exercises[currentQuestion];
+            let html = '';
+            if (q.scenario) {
+                html += `<div class="scenario"><strong>Scenario.</strong> ${escapeHtml(q.scenario)}</div>`;
+            }
+            html += `<div class="question">${escapeHtml(q.question)}</div>`;
+            html += '<div class="options">';
+            q.options.forEach((o, i) => {
+                html += `<button class="option" onclick="selectAnswer(${i})">${escapeHtml(o)}</button>`;
+            });
+            html += '</div>';
+            document.getElementById('exerciseCard').innerHTML = html;
+            updateScoreboard();
+        }
+
+        function selectAnswer(i) {
+            if (answered) return;
+            answered = true;
+            const q = exercises[currentQuestion];
+            const btns = document.querySelectorAll('.option');
+            btns.forEach(b => b.classList.add('disabled'));
+            btns[q.correct].classList.add('correct');
+            const right = i === q.correct;
+            if (!right) btns[i].classList.add('wrong');
+            if (right) { score += 10; streak += 1; } else { streak = 0; }
+            const fb = document.createElement('div');
+            fb.className = 'feedback ' + (right ? 'correct' : 'wrong');
+            fb.innerHTML = `<strong>${right ? '✅ Correct.' : '❌ Not quite.'}</strong><br>${escapeHtml(q.explanation)}`;
+            document.getElementById('exerciseCard').appendChild(fb);
+            const nb = document.createElement('button');
+            nb.className = 'next-btn';
+            nb.textContent = currentQuestion === exercises.length - 1 ? 'See results →' : 'Next scenario →';
+            nb.onclick = nextQuestion;
+            document.getElementById('exerciseCard').appendChild(nb);
+            updateScoreboard();
+        }
+
+        function nextQuestion() {
+            currentQuestion++;
+            if (currentQuestion >= exercises.length) return showResults();
+            renderQuestion();
+        }
+
+        function showResults() {
+            document.getElementById('progress').style.width = '100%';
+            const total = exercises.length * 10;
+            const pct = Math.round(score / total * 100);
+            if (window.parent) { window.parent.postMessage({type:"mtti_quiz_score", score: score, total: total, percent: pct}, "*"); }
+            let badge = '🌟', msg = 'Excellent work. You have a professional grasp of this lesson.';
+            if (pct < 50) { badge = '🌱'; msg = 'Good first attempt. Re-watch the lesson video and try again.'; }
+            else if (pct < 80) { badge = '📚'; msg = 'Solid progress. Review the scenarios you missed and retry.'; }
+            document.getElementById('exerciseCard').innerHTML = `
+                <div class="results">
+                    <span class="badge">${badge}</span>
+                    <h2>Quiz Complete</h2>
+                    <div class="final-score">${score} / ${total}</div>
+                    <p><strong>${pct}%</strong> · Longest streak: ${streak}</p>
+                    <p>${msg}</p>
+                    <button class="restart-btn" onclick="restart()">Try again 🔁</button>
+                </div>`;
+        }
+
+        function restart() {
+            currentQuestion = 0; score = 0; streak = 0;
+            renderQuestion();
+        }
+
+        renderQuestion();
+    </script>
+</body>
+</html>

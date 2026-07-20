@@ -1,0 +1,346 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Channel Setup and Branding | MTTI Digital Marketing</title>
+    <link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Fredoka:wght@500;600&display=swap" rel="stylesheet">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Space Mono', monospace;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh; padding: 20px; color: #fff;
+        }
+        .container { max-width: 900px; margin: 0 auto; }
+        .header { text-align: center; margin-bottom: 30px; animation: slideDown 0.6s ease-out; }
+        .header .lesson-tag {
+            display: inline-block; background: rgba(255,255,255,0.2);
+            padding: 6px 16px; border-radius: 999px;
+            font-size: 0.85em; margin-bottom: 12px;
+        }
+        .header h1 {
+            font-family: 'Fredoka', sans-serif; font-size: 2.2em;
+            margin-bottom: 8px; text-shadow: 3px 3px 0 rgba(0,0,0,0.2);
+        }
+        .header p { opacity: 0.95; font-size: 0.95em; }
+        .score-board {
+            background: rgba(255,255,255,0.15); backdrop-filter: blur(10px);
+            border-radius: 20px; padding: 20px; margin-bottom: 20px;
+            display: flex; justify-content: space-around;
+            animation: fadeIn 0.8s ease-out 0.2s both;
+        }
+        .score-item { text-align: center; }
+        .score-item .label { font-size: 0.85em; opacity: 0.9; margin-bottom: 4px; }
+        .score-item .value {
+            font-size: 1.8em; font-weight: bold; font-family: 'Fredoka', sans-serif;
+        }
+        .progress-bar {
+            width: 100%; height: 8px; background: rgba(255,255,255,0.3);
+            border-radius: 10px; margin-bottom: 25px; overflow: hidden;
+        }
+        .progress-fill {
+            height: 100%; background: linear-gradient(90deg, #f093fb 0%, #f5576c 100%);
+            border-radius: 10px; transition: width 0.5s ease; width: 0%;
+        }
+        .exercise-card {
+            background: white; color: #333; border-radius: 25px;
+            padding: 35px; margin-bottom: 20px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            animation: fadeIn 0.6s ease-out both;
+        }
+        .scenario {
+            background: linear-gradient(135deg, #fff8e1 0%, #ffecb3 100%);
+            border-left: 5px solid #ffc107;
+            padding: 20px 24px; border-radius: 12px;
+            margin-bottom: 24px;
+            font-size: 0.98em; line-height: 1.55;
+        }
+        .scenario strong { color: #7a5a00; font-family: 'Fredoka', sans-serif; }
+        .question {
+            font-size: 1.15em; margin-bottom: 20px;
+            font-weight: 700; line-height: 1.4;
+        }
+        .options { display: flex; flex-direction: column; gap: 12px; }
+        .option {
+            background: #f5f7fb; border: 2px solid transparent;
+            padding: 16px 20px; border-radius: 12px;
+            cursor: pointer; transition: all 0.2s ease;
+            font-family: 'Space Mono', monospace; font-size: 0.98em; text-align: left;
+        }
+        .option:hover:not(.disabled) {
+            background: #eef1fb; border-color: #667eea; transform: translateX(4px);
+        }
+        .option.correct { background: #d4edda; border-color: #28a745; color: #155724; }
+        .option.wrong { background: #f8d7da; border-color: #dc3545; color: #721c24; animation: shake 0.4s; }
+        .option.disabled { cursor: not-allowed; opacity: 0.85; }
+        .feedback {
+            margin-top: 22px; padding: 18px 22px; border-radius: 12px;
+            animation: slideUp 0.4s ease-out;
+            font-size: 0.98em; line-height: 1.5;
+        }
+        .feedback.correct { background: #d4edda; color: #155724; border-left: 4px solid #28a745; }
+        .feedback.wrong { background: #f8d7da; color: #721c24; border-left: 4px solid #dc3545; }
+        .feedback strong { font-family: 'Fredoka', sans-serif; }
+        .next-btn, .restart-btn {
+            margin-top: 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white; border: none;
+            padding: 14px 32px; border-radius: 12px;
+            font-size: 1em; cursor: pointer;
+            font-family: 'Fredoka', sans-serif;
+            box-shadow: 0 6px 18px rgba(0,0,0,0.2);
+            transition: transform 0.2s ease;
+        }
+        .next-btn:hover, .restart-btn:hover { transform: scale(1.04); }
+        .results {
+            text-align: center; padding: 25px 15px;
+            animation: bounceIn 0.6s ease-out;
+        }
+        .results h2 {
+            font-family: 'Fredoka', sans-serif; font-size: 2em;
+            margin-bottom: 12px; color: #333;
+        }
+        .results .final-score {
+            font-size: 3em; font-family: 'Fredoka', sans-serif;
+            color: #667eea; margin: 20px 0;
+        }
+        .results p { color: #555; margin-bottom: 12px; }
+        .badge { display: inline-block; font-size: 3.5em; margin: 8px 0; }
+        @keyframes slideDown { from { opacity: 0; transform: translateY(-30px); } to { opacity: 1; transform: translateY(0); } }
+        @keyframes fadeIn { from { opacity: 0; transform: scale(0.96); } to { opacity: 1; transform: scale(1); } }
+        @keyframes slideUp { from { opacity: 0; transform: translateY(15px); } to { opacity: 1; transform: translateY(0); } }
+        @keyframes shake { 0%,100% { transform: translateX(0); } 25% { transform: translateX(-8px); } 75% { transform: translateX(8px); } }
+        @keyframes bounceIn { 0% { opacity: 0; transform: scale(0.4); } 60% { transform: scale(1.05); } 100% { opacity: 1; transform: scale(1); } }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <div class="lesson-tag">Module 13 · Lesson 13.2</div>
+            <h1>Channel Setup and Branding</h1>
+            <p>10 Sarah Chebet scenarios — Brand account, art, About tab, playlists, trailer</p>
+        </div>
+
+        <div class="score-board">
+            <div class="score-item"><div class="label">Score</div><div class="value" id="score">0</div></div>
+            <div class="score-item"><div class="label">Question</div><div class="value"><span id="current">1</span>/<span id="total">10</span></div></div>
+            <div class="score-item"><div class="label">Streak</div><div class="value" id="streak">0</div></div>
+        </div>
+
+        <div class="progress-bar"><div class="progress-fill" id="progress"></div></div>
+
+        <div class="exercise-card" id="exerciseCard"></div>
+    </div>
+
+    <script>
+        const exercises = [
+  {
+    "scenario": "Sarah wants to create the Karibu Kitchen YouTube channel. Her cousin says: \"Just use your personal Gmail — it's faster.\"",
+    "question": "What is the professional recommendation?",
+    "options": [
+      "Use the personal Gmail — Brand accounts are for big companies.",
+      "Create a Brand account under Sarah's karibukitchen.co.ke Workspace. Brand accounts are separate identities that support multiple named managers, survive a personal Google suspension, and allow clean ownership transfer — same principle as Meta Business Manager.",
+      "Set up 10 personal Gmails and rotate them.",
+      "Only large companies can use Brand accounts."
+    ],
+    "correct": 1,
+    "explanation": "Slide 2 of §13.2: Brand accounts are the YouTube equivalent of Meta Business Manager. The business owns the channel, not one person. Multiple managers, no password sharing, survives a single personal Google being disabled."
+  },
+  {
+    "scenario": "Sarah's designer uploads a channel banner at 1546×423 pixels because \"that's the safe area\".",
+    "question": "What went wrong, and what are the correct dimensions?",
+    "options": [
+      "Nothing — 1546×423 is the correct upload size.",
+      "Upload size is 2560×1440 pixels — the SAFE AREA within it is 1546×423. Uploading only the safe area means the banner will look correct on mobile but broken/pixelated on desktop and TV. Upload the full 2560×1440 and design so key elements sit within the centred 1546×423 safe zone.",
+      "The correct size is 800×800.",
+      "There is no safe area on YouTube."
+    ],
+    "correct": 1,
+    "explanation": "Slide 3 of §13.2: 2560×1440 upload, 1546×423 mobile safe area within it. Both numbers matter. Uploading only the safe area breaks desktop and TV rendering."
+  },
+  {
+    "scenario": "Sarah has her stacked logo lockup — the words \"Karibu Kitchen — Hot Lunch Delivered in 30 Minutes\" on a maroon background — and uses it as the 800×800 profile picture. On mobile it appears as a tiny illegible smudge.",
+    "question": "What is the fix?",
+    "options": [
+      "Increase the profile picture size to 2000×2000.",
+      "The profile picture must be the logo MARK only — a symbol that reads at circular thumbnail size. Stacked wordmark lockups always fail here. Save the full lockup for the channel banner and the website; use just the mark (e.g. a stylised pot or the initials KK on maroon) as the profile picture.",
+      "Use text-only on white — it works better.",
+      "Skip the profile picture entirely."
+    ],
+    "correct": 1,
+    "explanation": "Slide 4 of §13.2: profile picture is 800×800, PNG, and gets cropped to a small circle. Stacked lockups become unreadable. Use the mark only."
+  },
+  {
+    "scenario": "Sarah's About tab currently reads: \"Welcome to my little channel where I post random stuff!\" She wonders why her channel is not appearing in YouTube Search when people type \"lunch delivery Eldoret\".",
+    "question": "What is the correct fix?",
+    "options": [
+      "Delete the About tab entirely.",
+      "Rewrite as a 200-400 word keyword-loaded description that front-loads Karibu Kitchen, Eldoret, Kenyan lunch, and 30-minute delivery. Add business email, set country to Kenya, and add links to website, Instagram, and WhatsApp. The About tab is SEO-load-bearing text that tells YouTube what the channel is about.",
+      "Buy backlinks to the channel.",
+      "The About tab does not affect Search."
+    ],
+    "correct": 1,
+    "explanation": "Slide 5 of §13.2: About tab is where YouTube's algorithm learns what your channel is about. Vague, keyword-free text is a wasted opportunity. Front-load the location and category keywords."
+  },
+  {
+    "scenario": "Sarah creates 18 playlists on day one — one for every possible topic she might ever cover. Half are empty. Viewers land on the channel homepage and see rows of empty shelves.",
+    "question": "What is the professional rule?",
+    "options": [
+      "18 playlists is fine — variety is good.",
+      "3 to 5 core playlists for a starting channel. Empty or thin playlists look amateur and give viewers no browsable structure. Sarah's correct set is three: Fresh Recipes, Delivery Diaries, Behind the Kitchen. Add more only when each has at least 3-4 videos.",
+      "Only one playlist — everything goes in it.",
+      "50 playlists is the target."
+    ],
+    "correct": 1,
+    "explanation": "Slide 6 of §13.2: playlists are the structuring layer. 3-5 core playlists for a starter. Not 15. Not 1. Playlists also rank in Search on their own and power the Suggested queue."
+  },
+  {
+    "scenario": "Sarah wants a channel trailer. She wonders if it should be one of her existing 3-minute ugali tutorials.",
+    "question": "What is the correct format for a channel trailer?",
+    "options": [
+      "Yes — reuse the ugali tutorial as the trailer.",
+      "No. The trailer is a 30-90 second pitch for the CHANNEL itself, not for a single tutorial. It should introduce Sarah, name the brand and location, name what viewers get for subscribing, and end with one clear CTA. Refresh every 6 months as the channel grows.",
+      "The trailer must be 15 minutes long.",
+      "Only paid channels can have trailers."
+    ],
+    "correct": 1,
+    "explanation": "Slide 7 of §13.2: the trailer auto-plays for not-yet-subscribed viewers on the channel homepage. 30-90 seconds. One CTA. Refresh every 6 months."
+  },
+  {
+    "scenario": "Sarah's cousin will help post short-form clips and reply to comments. Sarah does not want to share her personal Google password.",
+    "question": "What is the correct professional setup?",
+    "options": [
+      "Share the Google password in the family WhatsApp group.",
+      "Because the channel is a Brand account, Sarah adds her cousin as a named Manager. He signs in with his own Google, works on the Karibu Kitchen channel, and can be removed at any time with one click. No password sharing — same discipline as Meta Business Manager.",
+      "Only the Owner can ever touch a Brand-account channel.",
+      "Sarah must create a separate YouTube channel just for her cousin."
+    ],
+    "correct": 1,
+    "explanation": "Slide 2 + Slide 8 of §13.2: Brand accounts support multiple named managers. Sarah = Owner. Cousin = Manager. No password sharing, ever. When he leaves, one click removes access."
+  },
+  {
+    "scenario": "Sarah's Instagram is @karibu-kitchen and her TikTok is @karibu_kitchen. She is about to claim a random YouTube handle @karibukitchenchef2026.",
+    "question": "What is the correct principle?",
+    "options": [
+      "Different handle per platform is fine.",
+      "Claim @karibu-kitchen on YouTube to match Instagram and TikTok. Handle consistency across platforms saves advertising budget for the life of the brand — one handle to promote in every ad, on the packaging, and on the WhatsApp business card. Inconsistent handles fragment the brand.",
+      "YouTube handles cannot use hyphens.",
+      "Sarah should change her Instagram and TikTok to match a random YouTube handle."
+    ],
+    "correct": 1,
+    "explanation": "Slide 4 of §13.2: consistent handles across platforms save advertising budget for the whole life of the brand. Sarah picks @karibu-kitchen to match her existing handles."
+  },
+  {
+    "scenario": "Sarah asks whether the channel keywords field (the deprecated one, hidden in Channel Settings) is worth filling in.",
+    "question": "What is the professional call?",
+    "options": [
+      "Do not fill it — it is deprecated so it will hurt SEO.",
+      "Fill it. Channel keywords are technically deprecated as a strong ranking signal but still visible to YouTube's classifier. 15-20 relevant terms — Karibu Kitchen, Eldoret lunch delivery, Kenyan cooking, ugali tutorial — cost nothing to add and provide a small classification signal. Do not stuff.",
+      "Only paid channels can access the keywords field.",
+      "Keywords are the #1 ranking signal on YouTube."
+    ],
+    "correct": 1,
+    "explanation": "Slide 8 of §13.2: keywords are deprecated as a strong ranking signal but still readable by YouTube's classifier. Filling with 15-20 relevant, honest terms costs nothing and provides a small signal. Do not keyword-stuff."
+  },
+  {
+    "scenario": "A trainee summarises Lesson 13.2 in one line: \"Channel art is 800×800, personal Gmail is fine for any brand, and a starting channel needs 20 playlists.\"",
+    "question": "How many of those three claims are correct?",
+    "options": [
+      "All three.",
+      "Two — the art and playlist parts.",
+      "Zero — every claim is wrong.",
+      "One — only the Gmail part."
+    ],
+    "correct": 2,
+    "explanation": "Every claim is wrong. Channel art is 2560×1440 with a 1546×423 safe area, not 800×800 (that is the profile picture) — Slide 3-4. A business should use a Brand account, not a personal Gmail — Slide 2. Starting channels need 3-5 core playlists, not 20 — Slide 6."
+  }
+];
+
+        let currentQuestion = 0, score = 0, streak = 0, answered = false;
+
+        function updateScoreboard() {
+            document.getElementById('score').textContent = score;
+            document.getElementById('current').textContent = Math.min(currentQuestion + 1, exercises.length);
+            document.getElementById('total').textContent = exercises.length;
+            document.getElementById('streak').textContent = streak;
+            document.getElementById('progress').style.width = ((currentQuestion) / exercises.length) * 100 + '%';
+        }
+
+        function escapeHtml(s) {
+            return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+        }
+
+        function renderQuestion() {
+            answered = false;
+            const q = exercises[currentQuestion];
+            let html = '';
+            if (q.scenario) {
+                html += `<div class="scenario"><strong>Scenario.</strong> ${escapeHtml(q.scenario)}</div>`;
+            }
+            html += `<div class="question">${escapeHtml(q.question)}</div>`;
+            html += '<div class="options">';
+            q.options.forEach((o, i) => {
+                html += `<button class="option" onclick="selectAnswer(${i})">${escapeHtml(o)}</button>`;
+            });
+            html += '</div>';
+            document.getElementById('exerciseCard').innerHTML = html;
+            updateScoreboard();
+        }
+
+        function selectAnswer(i) {
+            if (answered) return;
+            answered = true;
+            const q = exercises[currentQuestion];
+            const btns = document.querySelectorAll('.option');
+            btns.forEach(b => b.classList.add('disabled'));
+            btns[q.correct].classList.add('correct');
+            const right = i === q.correct;
+            if (!right) btns[i].classList.add('wrong');
+            if (right) { score += 10; streak += 1; } else { streak = 0; }
+            const fb = document.createElement('div');
+            fb.className = 'feedback ' + (right ? 'correct' : 'wrong');
+            fb.innerHTML = `<strong>${right ? '✅ Correct.' : '❌ Not quite.'}</strong><br>${escapeHtml(q.explanation)}`;
+            document.getElementById('exerciseCard').appendChild(fb);
+            const nb = document.createElement('button');
+            nb.className = 'next-btn';
+            nb.textContent = currentQuestion === exercises.length - 1 ? 'See results →' : 'Next scenario →';
+            nb.onclick = nextQuestion;
+            document.getElementById('exerciseCard').appendChild(nb);
+            updateScoreboard();
+        }
+
+        function nextQuestion() {
+            currentQuestion++;
+            if (currentQuestion >= exercises.length) return showResults();
+            renderQuestion();
+        }
+
+        function showResults() {
+            document.getElementById('progress').style.width = '100%';
+            const total = exercises.length * 10;
+            const pct = Math.round(score / total * 100);
+            if (window.parent) { window.parent.postMessage({type:"mtti_quiz_score", score: score, total: total, percent: pct}, "*"); }
+            let badge = '🌟', msg = 'Excellent work. You have a professional grasp of this lesson.';
+            if (pct < 50) { badge = '🌱'; msg = 'Good first attempt. Re-watch the lesson video and try again.'; }
+            else if (pct < 80) { badge = '📚'; msg = 'Solid progress. Review the scenarios you missed and retry.'; }
+            document.getElementById('exerciseCard').innerHTML = `
+                <div class="results">
+                    <span class="badge">${badge}</span>
+                    <h2>Quiz Complete</h2>
+                    <div class="final-score">${score} / ${total}</div>
+                    <p><strong>${pct}%</strong> · Longest streak: ${streak}</p>
+                    <p>${msg}</p>
+                    <button class="restart-btn" onclick="restart()">Try again 🔁</button>
+                </div>`;
+        }
+
+        function restart() {
+            currentQuestion = 0; score = 0; streak = 0;
+            renderQuestion();
+        }
+
+        renderQuestion();
+    </script>
+</body>
+</html>

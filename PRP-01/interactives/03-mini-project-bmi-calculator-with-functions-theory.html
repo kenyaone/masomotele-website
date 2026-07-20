@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Mini-Project: BMI Calculator with Functions | MTTI Programming Principles</title>
+<link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Fredoka:wght@500;600&display=swap" rel="stylesheet">
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body {
+    font-family: 'Space Mono', monospace;
+    background: linear-gradient(135deg, #2E7D32 0%, #1565C0 100%);
+    min-height: 100vh; padding: 20px; color: #fff;
+}
+.container { max-width: 900px; margin: 0 auto; }
+.header { text-align: center; margin-bottom: 26px; }
+.lesson-tag { display: inline-block; background: rgba(255,255,255,0.2); padding: 6px 16px; border-radius: 999px; font-size: 0.85em; margin-bottom: 12px; }
+.header h1 { font-family: 'Fredoka', sans-serif; font-size: 2.1em; margin-bottom: 8px; text-shadow: 3px 3px 0 rgba(0,0,0,0.2); }
+.task {
+    background: white; color: #333; border-radius: 22px;
+    padding: 26px; margin-bottom: 20px;
+    box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+}
+.task h2 { font-family: 'Fredoka', sans-serif; font-size: 1.3em; margin-bottom: 14px; display: flex; align-items: center; }
+.task-num {
+    display: inline-block; width: 30px; height: 30px;
+    background: linear-gradient(135deg, #2E7D32 0%, #1565C0 100%);
+    color: white; border-radius: 50%; text-align: center; line-height: 30px;
+    font-family: 'Fredoka', sans-serif; font-weight: 600; margin-right: 10px; flex-shrink: 0; font-size: 0.75em;
+}
+.section-body { color: #444; font-size: 0.98em; line-height: 1.7; }
+.section-body p { margin-bottom: 12px; }
+.section-body strong { color: #1B5E20; }
+.section-body ul, .section-body ol { margin: 10px 0 14px 22px; }
+.section-body li { margin-bottom: 6px; }
+.code-block {
+    background: #1e1e2e; color: #cdd6f4; border-radius: 10px;
+    padding: 16px 18px; margin-top: 10px; overflow-x: auto;
+    font-family: 'Courier New', monospace; font-size: 0.88em; line-height: 1.6;
+}
+</style>
+</head>
+<body>
+<div class="container">
+    <div class="header">
+        <div class="lesson-tag">Functions and Modularity · Mini-Project: BMI Calculator with Functions</div>
+        <h1>Mini-Project: BMI Calculator with Functions</h1>
+    </div>
+    <div class="task"><h2><span class="task-num">1</span>Breaking a Task Into Functions</h2><div class="section-body"><p>Real programs are built from many small functions, each responsible for one clear task, rather than one giant block of code. A BMI (Body Mass Index) calculator naturally splits into two jobs: <strong>calculating</strong> the BMI number, and <strong>categorizing</strong> what that number means.</p></div></div><div class="task"><h2><span class="task-num">2</span>Using One Function&#039;s Result in Another</h2><div class="section-body"><p>The value returned by one function can be passed straight into another — this is exactly how small functions combine into a bigger program.</p><pre class="code-block"><code>def calculate_bmi(weight, height):
+    return weight / (height ** 2)
+
+def get_bmi_category(bmi):
+    if bmi &lt; 18.5:
+        return &quot;Underweight&quot;
+    elif bmi &lt; 25:
+        return &quot;Normal&quot;
+    else:
+        return &quot;Overweight&quot;
+
+weight = 65
+height = 1.7
+bmi = calculate_bmi(weight, height)
+category = get_bmi_category(bmi)
+print(&quot;BMI:&quot;, round(bmi, 1))
+print(&quot;Category:&quot;, category)</code></pre></div></div><div class="task"><h2><span class="task-num">3</span>A New Built-in: round()</h2><div class="section-body"><p><code>round(value, digits)</code> rounds a number to the given number of decimal places — useful for displaying calculation results cleanly, as in <code>round(bmi, 1)</code> above.</p></div></div>
+</div>
+</body>
+</html>

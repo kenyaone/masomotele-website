@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>How a Network 'Learns' — Training and Weights, in Plain Terms (Lesson) | MTTI Artificial Intelligence</title>
+<link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Fredoka:wght@500;600&display=swap" rel="stylesheet">
+<style>
+* { margin:0; padding:0; box-sizing:border-box; }
+body { font-family:'Space Mono', monospace; background:linear-gradient(135deg,#134E5E 0%,#71B280 100%); min-height:100vh; padding:20px; color:#fff; }
+.container { max-width:820px; margin:0 auto; }
+.header { text-align:center; margin-bottom:24px; }
+.lesson-tag { display:inline-block; background:rgba(255,255,255,0.2); padding:6px 16px; border-radius:999px; font-size:0.85em; margin-bottom:12px; }
+.header h1 { font-family:'Fredoka', sans-serif; font-size:2em; margin-bottom:6px; text-shadow:3px 3px 0 rgba(0,0,0,0.2); }
+.card { background:#fff; color:#333; border-radius:22px; padding:32px; margin-bottom:20px; box-shadow:0 20px 60px rgba(0,0,0,0.3); }
+.section { margin-bottom:26px; }
+.section:last-child { margin-bottom:0; }
+.section h2 { font-family:'Fredoka', sans-serif; font-size:1.2em; margin-bottom:10px; color:#134E5E; }
+.section .body { line-height:1.65; font-size:0.98em; }
+.section .body p { margin-bottom:10px; }
+.section .body code { background:#f5f7fb; padding:2px 6px; border-radius:4px; font-size:0.92em; }
+.loop { background:#f5f7fb; border-radius:12px; padding:16px; margin:12px 0; font-size:0.92em; text-align:center; color:#444; line-height:1.9; }
+.keypoint { background:#fff8e1; border-left:4px solid #ffc107; padding:12px 16px; border-radius:8px; margin-top:12px; font-size:0.92em; }
+</style>
+</head>
+<body>
+<div class="container">
+<div class="header"><div class="lesson-tag">Neural Networks &amp; Deep Learning · Topic 2 of 3</div><h1>How a Network "Learns" — Training and Weights, in Plain Terms</h1></div>
+<div class="card">
+<div class="section">
+<h2>1. A Network Starts Out Knowing Nothing</h2>
+<div class="body">
+<p>When a network is first built, its weights — the "how much each input matters" dials from the previous topic — are essentially set at random. Left as they are, the network's guesses would be little better than a coin toss.</p>
+<p>Say Rafiki Insights is building a tool to flag which savings-group members are at risk of stopping their contributions. Fresh out of the box, the network has no idea which signals (missed meetings, falling deposit amounts, and so on) actually matter. It has to be <strong>trained</strong> before it is any use to a client.</p>
+</div>
+</div>
+<div class="section">
+<h2>2. The Feedback Loop: Guess, Compare, Adjust</h2>
+<div class="body">
+<p>Training means repeatedly showing the network examples where the correct answer is already known, and letting it improve from its mistakes. The loop looks like this:</p>
+<div class="loop">1. Network makes a <strong>guess</strong> ("this member looks likely to stop saving")<br>2. That guess is <strong>compared</strong> to what actually happened (did they stop, or not?)<br>3. The gap between the guess and reality shows the network <strong>how wrong</strong> it was<br>4. Its weights are <strong>nudged</strong> slightly, in whatever direction would have made that guess less wrong<br>5. Repeat with the next example</div>
+<p>Notice there is no formula needed to understand this — it is the same feedback loop a person uses when learning any new skill: try, see how it went, adjust slightly, try again. The network does the same thing, just automatically and very fast.</p>
+</div>
+</div>
+<div class="section">
+<h2>3. Why It Has to Repeat, Over and Over</h2>
+<div class="body">
+<p>One correction barely moves the needle. It is only after this guess-compare-adjust loop repeats across hundreds, thousands, or millions of past examples that the weights settle into values that make consistently good guesses. Each pass nudges things a little closer to "less wrong."</p>
+<p>This is also why the quality of the training examples matters so much: if Rafiki Insights only had a handful of past cases, or the recorded outcomes were unreliable, the network would have very little to learn from, and the training loop could not do its job properly.</p>
+</div>
+<div class="keypoint"><strong>Key Point.</strong> Training is not a single step — it is a repeated feedback loop: guess, compare to the correct answer, nudge the weights to be less wrong, and repeat, across many examples, until the network's guesses become reliably good.</div>
+</div>
+</div>
+</div>
+</body>
+</html>

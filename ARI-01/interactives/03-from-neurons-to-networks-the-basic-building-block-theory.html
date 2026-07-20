@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>From Neurons to Networks: The Basic Building Block (Lesson) | MTTI Artificial Intelligence</title>
+<link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Fredoka:wght@500;600&display=swap" rel="stylesheet">
+<style>
+* { margin:0; padding:0; box-sizing:border-box; }
+body { font-family:'Space Mono', monospace; background:linear-gradient(135deg,#1E3C72 0%,#2A5298 100%); min-height:100vh; padding:20px; color:#fff; }
+.container { max-width:820px; margin:0 auto; }
+.header { text-align:center; margin-bottom:24px; }
+.lesson-tag { display:inline-block; background:rgba(255,255,255,0.2); padding:6px 16px; border-radius:999px; font-size:0.85em; margin-bottom:12px; }
+.header h1 { font-family:'Fredoka', sans-serif; font-size:2em; margin-bottom:6px; text-shadow:3px 3px 0 rgba(0,0,0,0.2); }
+.card { background:#fff; color:#333; border-radius:22px; padding:32px; margin-bottom:20px; box-shadow:0 20px 60px rgba(0,0,0,0.3); }
+.section { margin-bottom:26px; }
+.section:last-child { margin-bottom:0; }
+.section h2 { font-family:'Fredoka', sans-serif; font-size:1.2em; margin-bottom:10px; color:#2A5298; }
+.section .body { line-height:1.65; font-size:0.98em; }
+.section .body p { margin-bottom:10px; }
+.section .body code { background:#f5f7fb; padding:2px 6px; border-radius:4px; font-size:0.92em; }
+.diagram { background:#f5f7fb; border-radius:12px; padding:16px; margin:12px 0; font-size:0.9em; text-align:center; color:#444; line-height:1.8; }
+.keypoint { background:#fff8e1; border-left:4px solid #ffc107; padding:12px 16px; border-radius:8px; margin-top:12px; font-size:0.92em; }
+</style>
+</head>
+<body>
+<div class="container">
+<div class="header"><div class="lesson-tag">Neural Networks &amp; Deep Learning · Topic 1 of 3</div><h1>From Neurons to Networks: The Basic Building Block</h1></div>
+<div class="card">
+<div class="section">
+<h2>1. A Loose, Brain-Inspired Idea</h2>
+<div class="body">
+<p>Real brain cells (neurons) receive signals from other cells, and if enough signal builds up, they "fire" a signal onward. Decades ago, researchers borrowed this rough idea as inspiration for a piece of software — not to copy the brain exactly, but to build something that takes in several signals and decides what to pass on.</p>
+<p>That's all an "artificial neuron" is: a small calculation, sitting on a computer, with no biology involved. Brian doesn't need to know anything about actual brain cells to understand it — the name is just a nod to where the idea started.</p>
+</div>
+</div>
+<div class="section">
+<h2>2. What's Inside One Artificial Neuron</h2>
+<div class="body">
+<p>Picture a neuron deciding whether to flag a sale as "worth restocking fast" for one of Rafiki Insights' retail clients. It looks at a few signals — say, how many units sold this week, how many days of stock are left, and how often the item was searched for on the client's shop app.</p>
+<div class="diagram">input 1 (units sold) → weight → ⎫<br>input 2 (days of stock left) → weight → ⎬ → sum it all up → simple rule → output<br>input 3 (times searched) → weight → ⎭</div>
+<p>Each input gets its own <strong>weight</strong> — just a number that says how much that particular input should matter. A weight is not fixed forever; it is a dial the network can turn up or down. The neuron adds up all the weighted inputs, then runs the total through a simple rule (for example, "if the total passes a certain point, output a strong signal; otherwise output a weak one") to produce one output number.</p>
+</div>
+</div>
+<div class="section">
+<h2>3. Stacking Neurons Into Layers, and Layers Into a Network</h2>
+<div class="body">
+<p>One neuron on its own can only notice one simple pattern. The real power comes from using many neurons side by side, arranged in <strong>layers</strong>:</p>
+<ul style="margin:8px 0 8px 20px; line-height:1.7;">
+<li><strong>Input layer</strong> — where the raw signals enter (units sold, stock left, searches, and so on)</li>
+<li><strong>Hidden layer(s)</strong> — layers of neurons in between, each one combining the outputs of the previous layer into new, slightly more useful signals</li>
+<li><strong>Output layer</strong> — the final neuron(s) that produce the answer we actually care about, like "restock urgently: yes/no"</li>
+</ul>
+<p>The output of every neuron in one layer becomes an input into the neurons in the next layer. Stack enough of these layers together, each combining what came before, and the whole structure — a <strong>neural network</strong> — can pick up on far richer combinations of signals than any single neuron could alone.</p>
+</div>
+<div class="keypoint"><strong>Key Point.</strong> One neuron = weighted inputs, summed up, passed through a simple rule. A network is just many of these neurons wired together in layers, each layer building on the last.</div>
+</div>
+</div>
+</div>
+</body>
+</html>

@@ -37,6 +37,24 @@
         .results .final-score { font-size: 3em; font-family: 'Fredoka', sans-serif; color: #667eea; margin: 20px 0; }
         .results p { color: #555; margin-bottom: 12px; }
         .badge { display: inline-block; font-size: 3.5em; margin: 8px 0; }
+
+        /* How-To intro screen — shown before question 1, not scored */
+        .howto-card { background: white; color: #333; border-radius: 25px; padding: 35px; margin-bottom: 20px; box-shadow: 0 20px 60px rgba(0,0,0,0.3); }
+        .howto-card h3 { font-family: 'Fredoka', sans-serif; font-size: 1.3em; margin-bottom: 12px; color: #667eea; }
+        .howto-card p { line-height: 1.6; margin-bottom: 16px; color: #444; }
+        .howto-field { margin-bottom: 18px; }
+        .howto-field label { display: block; font-weight: 700; margin-bottom: 6px; color: #333; font-size: 0.95em; }
+        .howto-field input[type="number"] { font-family: 'Space Mono', monospace; font-size: 0.98em; padding: 10px 12px; border-radius: 8px; border: 2px solid #ddd; width: 100%; max-width: 260px; }
+        .howto-field.howto-checkbox label { display: flex; align-items: center; gap: 8px; cursor: pointer; }
+        .howto-field.howto-checkbox input[type="checkbox"] { width: 18px; height: 18px; }
+        .howto-fmark { display: block; margin-top: 6px; font-size: 0.9em; font-weight: 700; }
+        .howto-fmark.ok { color: #155724; }
+        .howto-fmark.fail { color: #721c24; }
+        .howto-banner { margin-top: 4px; margin-bottom: 18px; padding: 12px 16px; border-radius: 10px; font-size: 0.9em; font-weight: 700; display: none; }
+        .howto-banner.show { display: block; }
+        .howto-banner.ok { background: #d4edda; color: #155724; }
+        .howto-banner.fail { background: #f8d7da; color: #721c24; }
+        .start-quiz-btn { margin-top: 4px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; border: none; padding: 14px 32px; border-radius: 12px; font-size: 1em; cursor: pointer; font-family: 'Fredoka', sans-serif; box-shadow: 0 6px 18px rgba(0,0,0,0.2); }
     </style>
 </head>
 <body>
@@ -117,7 +135,59 @@
                 </div>`;
         }
         function restart() { currentQuestion = 0; score = 0; streak = 0; renderQuestion(); }
-        renderQuestion();
+
+        /* How-To intro — a small, ungraded field-check demo shown before
+           the quiz starts, directly rehearsing the "trim a long video
+           down to just the relevant seconds using PowerPoint's own Trim
+           Video tool" mechanic that one of the quiz scenarios asks about,
+           so it's not being asked cold. */
+        function checkHowto() {
+            const trimLength = parseFloat(document.getElementById('howtoTrimLength').value);
+            const usedTool = document.getElementById('howtoNoExtraSoftware').checked;
+            const lengthOk = trimLength <= 15;
+
+            const lengthMark = document.getElementById('howtoTrimLengthMark');
+            lengthMark.textContent = lengthOk ? '✅ Trimmed down to the relevant seconds' : '❌ Still too long — trim it down to about 15 seconds or less';
+            lengthMark.className = 'howto-fmark ' + (lengthOk ? 'ok' : 'fail');
+
+            const toolMark = document.getElementById('howtoToolMark');
+            toolMark.textContent = usedTool ? '✅ Trim Video is the right built-in tool for this' : '❌ Use PowerPoint\'s own Trim Video tool — no extra software needed';
+            toolMark.className = 'howto-fmark ' + (usedTool ? 'ok' : 'fail');
+
+            const allOk = lengthOk && usedTool;
+            const banner = document.getElementById('howtoBanner');
+            banner.classList.add('show');
+            banner.className = 'howto-banner show ' + (allOk ? 'ok' : 'fail');
+            banner.textContent = allOk
+                ? '✅ Both checks pass — this clip is ready to drop into the pitch.'
+                : '❌ Not yet — fix the flagged setting(s) above, then check again.';
+        }
+
+        function renderHowto() {
+            document.getElementById('exerciseCard').innerHTML = `
+                <div class="howto-card">
+                    <h3>🔍 Quick How-To: Trimming a Video Clip</h3>
+                    <p>One of the scenarios coming up is about cutting a long shop-tour video down before it goes on a slide — Kevin needs to trim a much longer clip to just the relevant seconds using PowerPoint's own Trim Video tool, no extra software required. Try it here: set the trimmed clip length and confirm you used the built-in tool, then check your settings.</p>
+                    <div class="howto-field">
+                        <label for="howtoTrimLength">Trimmed clip length (seconds)</label>
+                        <input type="number" id="howtoTrimLength" value="90" min="1" max="120">
+                        <span class="howto-fmark" id="howtoTrimLengthMark"></span>
+                    </div>
+                    <div class="howto-field howto-checkbox">
+                        <label for="howtoNoExtraSoftware"><input type="checkbox" id="howtoNoExtraSoftware"> Used PowerPoint's own Trim Video tool (no extra software)</label>
+                        <span class="howto-fmark" id="howtoToolMark"></span>
+                    </div>
+                    <div class="howto-banner" id="howtoBanner"></div>
+                    <button class="start-quiz-btn" id="checkHowtoBtn">Check My Settings</button>
+                    <button class="start-quiz-btn" id="startQuizBtn" style="margin-left:10px;background:linear-gradient(135deg,#28a745,#1e7e34);">Start Quiz →</button>
+                </div>`;
+            document.getElementById('checkHowtoBtn').addEventListener('click', checkHowto);
+            document.getElementById('startQuizBtn').addEventListener('click', renderQuestion);
+        }
+
+        renderHowto();
+
+        renderHowto();
     </script>
 </body>
 </html>

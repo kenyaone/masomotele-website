@@ -1,0 +1,346 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Meta Pixel + Conversions API | MTTI Digital Marketing</title>
+    <link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Fredoka:wght@500;600&display=swap" rel="stylesheet">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Space Mono', monospace;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh; padding: 20px; color: #fff;
+        }
+        .container { max-width: 900px; margin: 0 auto; }
+        .header { text-align: center; margin-bottom: 30px; animation: slideDown 0.6s ease-out; }
+        .header .lesson-tag {
+            display: inline-block; background: rgba(255,255,255,0.2);
+            padding: 6px 16px; border-radius: 999px;
+            font-size: 0.85em; margin-bottom: 12px;
+        }
+        .header h1 {
+            font-family: 'Fredoka', sans-serif; font-size: 2.2em;
+            margin-bottom: 8px; text-shadow: 3px 3px 0 rgba(0,0,0,0.2);
+        }
+        .header p { opacity: 0.95; font-size: 0.95em; }
+        .score-board {
+            background: rgba(255,255,255,0.15); backdrop-filter: blur(10px);
+            border-radius: 20px; padding: 20px; margin-bottom: 20px;
+            display: flex; justify-content: space-around;
+            animation: fadeIn 0.8s ease-out 0.2s both;
+        }
+        .score-item { text-align: center; }
+        .score-item .label { font-size: 0.85em; opacity: 0.9; margin-bottom: 4px; }
+        .score-item .value {
+            font-size: 1.8em; font-weight: bold; font-family: 'Fredoka', sans-serif;
+        }
+        .progress-bar {
+            width: 100%; height: 8px; background: rgba(255,255,255,0.3);
+            border-radius: 10px; margin-bottom: 25px; overflow: hidden;
+        }
+        .progress-fill {
+            height: 100%; background: linear-gradient(90deg, #f093fb 0%, #f5576c 100%);
+            border-radius: 10px; transition: width 0.5s ease; width: 0%;
+        }
+        .exercise-card {
+            background: white; color: #333; border-radius: 25px;
+            padding: 35px; margin-bottom: 20px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            animation: fadeIn 0.6s ease-out both;
+        }
+        .scenario {
+            background: linear-gradient(135deg, #fff8e1 0%, #ffecb3 100%);
+            border-left: 5px solid #ffc107;
+            padding: 20px 24px; border-radius: 12px;
+            margin-bottom: 24px;
+            font-size: 0.98em; line-height: 1.55;
+        }
+        .scenario strong { color: #7a5a00; font-family: 'Fredoka', sans-serif; }
+        .question {
+            font-size: 1.15em; margin-bottom: 20px;
+            font-weight: 700; line-height: 1.4;
+        }
+        .options { display: flex; flex-direction: column; gap: 12px; }
+        .option {
+            background: #f5f7fb; border: 2px solid transparent;
+            padding: 16px 20px; border-radius: 12px;
+            cursor: pointer; transition: all 0.2s ease;
+            font-family: 'Space Mono', monospace; font-size: 0.98em; text-align: left;
+        }
+        .option:hover:not(.disabled) {
+            background: #eef1fb; border-color: #667eea; transform: translateX(4px);
+        }
+        .option.correct { background: #d4edda; border-color: #28a745; color: #155724; }
+        .option.wrong { background: #f8d7da; border-color: #dc3545; color: #721c24; animation: shake 0.4s; }
+        .option.disabled { cursor: not-allowed; opacity: 0.85; }
+        .feedback {
+            margin-top: 22px; padding: 18px 22px; border-radius: 12px;
+            animation: slideUp 0.4s ease-out;
+            font-size: 0.98em; line-height: 1.5;
+        }
+        .feedback.correct { background: #d4edda; color: #155724; border-left: 4px solid #28a745; }
+        .feedback.wrong { background: #f8d7da; color: #721c24; border-left: 4px solid #dc3545; }
+        .feedback strong { font-family: 'Fredoka', sans-serif; }
+        .next-btn, .restart-btn {
+            margin-top: 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white; border: none;
+            padding: 14px 32px; border-radius: 12px;
+            font-size: 1em; cursor: pointer;
+            font-family: 'Fredoka', sans-serif;
+            box-shadow: 0 6px 18px rgba(0,0,0,0.2);
+            transition: transform 0.2s ease;
+        }
+        .next-btn:hover, .restart-btn:hover { transform: scale(1.04); }
+        .results {
+            text-align: center; padding: 25px 15px;
+            animation: bounceIn 0.6s ease-out;
+        }
+        .results h2 {
+            font-family: 'Fredoka', sans-serif; font-size: 2em;
+            margin-bottom: 12px; color: #333;
+        }
+        .results .final-score {
+            font-size: 3em; font-family: 'Fredoka', sans-serif;
+            color: #667eea; margin: 20px 0;
+        }
+        .results p { color: #555; margin-bottom: 12px; }
+        .badge { display: inline-block; font-size: 3.5em; margin: 8px 0; }
+        @keyframes slideDown { from { opacity: 0; transform: translateY(-30px); } to { opacity: 1; transform: translateY(0); } }
+        @keyframes fadeIn { from { opacity: 0; transform: scale(0.96); } to { opacity: 1; transform: scale(1); } }
+        @keyframes slideUp { from { opacity: 0; transform: translateY(15px); } to { opacity: 1; transform: translateY(0); } }
+        @keyframes shake { 0%,100% { transform: translateX(0); } 25% { transform: translateX(-8px); } 75% { transform: translateX(8px); } }
+        @keyframes bounceIn { 0% { opacity: 0; transform: scale(0.4); } 60% { transform: scale(1.05); } 100% { opacity: 1; transform: scale(1); } }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <div class="lesson-tag">Module 11 · Lesson 11.2</div>
+            <h1>Meta Pixel + Conversions API</h1>
+            <p>10 Sarah Chebet scenarios — Pixel, CAPI, standard events, EMQ, Kenya DPA 2019</p>
+        </div>
+
+        <div class="score-board">
+            <div class="score-item"><div class="label">Score</div><div class="value" id="score">0</div></div>
+            <div class="score-item"><div class="label">Question</div><div class="value"><span id="current">1</span>/<span id="total">10</span></div></div>
+            <div class="score-item"><div class="label">Streak</div><div class="value" id="streak">0</div></div>
+        </div>
+
+        <div class="progress-bar"><div class="progress-fill" id="progress"></div></div>
+
+        <div class="exercise-card" id="exerciseCard"></div>
+    </div>
+
+    <script>
+        const exercises = [
+  {
+    "scenario": "Sarah's first Meta campaign ran for two weeks with no Pixel installed. Meta Ads Manager reports 340 clicks and KES 5,600 spent, but Sarah has no idea how many of those clicks turned into orders.",
+    "question": "What does the Meta Pixel do that would have fixed this?",
+    "options": [
+      "The Pixel is a Facebook badge for your website — it does not affect ads.",
+      "The Pixel is a tiny JavaScript on every page that fires events to Meta — PageView, ViewContent, AddToCart, Purchase with value + currency — so Meta can attribute conversions back to the ad the visitor clicked.",
+      "The Pixel is a Facebook photo filter.",
+      "The Pixel is a plugin that automatically increases ad spend."
+    ],
+    "correct": 1,
+    "explanation": "Slide 2 of §11.2 explains the Pixel: a tiny JavaScript that fires events (PageView, AddToCart, Purchase, etc.) to Meta as visitors move through the site. Meta stitches those events to a Facebook/Instagram user and reports them in Events Manager — that is how you learn a Reels ad drove 7 purchases at KES 400 each."
+  },
+  {
+    "scenario": "Sarah installed the Pixel three months ago and it worked well until April this year. Now her reported conversions dropped by nearly 40% even though sales in her WhatsApp inbox stayed the same.",
+    "question": "What is the most likely cause?",
+    "options": [
+      "The Pixel is broken and must be reinstalled.",
+      "iOS 14.5+ App Tracking Transparency (April 2021) lets iPhone users block the client-side Pixel with one tap. Around 80% of iPhone users opt out. The fix is the Conversions API (CAPI) — server-side event sending that cannot be blocked by ATT or ad blockers.",
+      "Meta changed its currency.",
+      "Sarah has too many customers."
+    ],
+    "correct": 1,
+    "explanation": "Slide 3 of §11.2 covers the iOS 14.5 App Tracking Transparency change. Pixel-only setups lose 30-40% of conversion signal on iPhone traffic. CAPI runs server-side, cannot be blocked, and — together with the Pixel — restores near-complete coverage."
+  },
+  {
+    "scenario": "Sarah's WordPress site fires events named PageView, ViewContent, AddToCart, InitiateCheckout, AddPaymentInfo, and Purchase.",
+    "question": "What are these called in Meta's tracking vocabulary?",
+    "options": [
+      "Custom events.",
+      "Standard events — Meta recognises 17 of them by exact name, which unlocks all of its built-in optimisation (Sales, Conversions, Advantage+ Shopping).",
+      "Boost events.",
+      "Legacy events."
+    ],
+    "correct": 1,
+    "explanation": "Slide 4 of §11.2 lists the six most important of the 17 standard events. Standard-event naming unlocks Meta's built-in optimisation — no manual mapping required. Anything Meta does not have a template for goes as a custom event (e.g. \"clicked WhatsApp button\")."
+  },
+  {
+    "scenario": "Sarah's Events Manager shows an Event Match Quality of 5.4 for the Purchase event. Her Meta rep tells her the score is \"too low\" for good optimisation.",
+    "question": "What does EMQ measure, and how does Sarah raise it above 8?",
+    "options": [
+      "EMQ measures pixel image quality — she should upload a higher resolution photo.",
+      "EMQ measures how well Meta can match each event to a real user profile. She raises it by sending extra parameters — hashed email, hashed phone, first name, last name, city, external ID, IP, user-agent. Each extra parameter is worth roughly +0.5 EMQ points.",
+      "EMQ is a random number — ignore it.",
+      "EMQ measures cost per click."
+    ],
+    "correct": 1,
+    "explanation": "Slide 5 of §11.2 defines Event Match Quality (0-10). Below 6.5, Meta cannot optimise well. Above 8, campaigns fly. Adding hashed email + hashed phone + city commonly lands EMQ at 9+. Every extra parameter helps — always hash PII first."
+  },
+  {
+    "scenario": "Sarah runs karibukitchen.co.ke on WordPress + WooCommerce and wants the Pixel installed today.",
+    "question": "What is the correct fast install path?",
+    "options": [
+      "Hire a full-stack developer to write custom Pixel code from scratch.",
+      "In Events Manager create a data set → note the 15-digit Pixel ID → install the PixelYourSite (or official Meta) WordPress plugin → paste the ID → enable the WooCommerce integration → save. Ten minutes.",
+      "Copy raw Pixel code into every page's HTML manually, one page at a time.",
+      "Move the whole site off WordPress first."
+    ],
+    "correct": 1,
+    "explanation": "Slide 6 of §11.2 walks through the WordPress install. A WooCommerce-aware Pixel plugin auto-fires PageView, ViewContent, AddToCart, InitiateCheckout, AddPaymentInfo, and Purchase on the correct pages, without custom code. Ten-minute install, standard practice."
+  },
+  {
+    "scenario": "Sarah launches her Pixel install and moves straight to a new campaign, without ever opening Meta Pixel Helper. A week later she realises the Purchase event has never fired — she has no purchase attribution at all.",
+    "question": "What should she have done between install and campaign launch?",
+    "options": [
+      "Nothing extra — Meta verifies installs automatically.",
+      "Install the Meta Pixel Helper Chrome extension, walk the full purchase flow (homepage → menu item → cart → checkout → thank-you page), and confirm all six standard events fire with the correct parameters BEFORE trusting Events Manager data.",
+      "Send Meta an email asking them to verify.",
+      "Delete the Pixel and start over."
+    ],
+    "correct": 1,
+    "explanation": "Slide 7 of §11.2 covers Pixel Helper verification. Every install must be walked end-to-end before campaigns launch. Skipping this step is one of the most common mistakes and — as Sarah found — leaves you optimising ads for the wrong signal."
+  },
+  {
+    "scenario": "Sarah's cookie banner has an \"Accept all\" button but no \"Reject\" option, and there is no way for a visitor to withdraw consent after they click Accept.",
+    "question": "Does this comply with the Kenya Data Protection Act 2019?",
+    "options": [
+      "Yes — Accept-only banners are fine under Kenyan law.",
+      "No. DPA 2019 requires informed consent (which means a genuine option to reject), a privacy policy naming data processors like Meta, and an ongoing right to withdraw consent. Sarah must add a Reject button, a settings-based withdrawal mechanism, and a privacy policy that names Meta.",
+      "Yes — as long as she is in Eldoret rather than Nairobi.",
+      "Only if the site is in Kiswahili."
+    ],
+    "correct": 1,
+    "explanation": "Slide 8 of §11.2 covers the three DPA 2019 obligations: (1) informed consent banner with accept/reject, (2) a privacy policy naming processors, (3) an ongoing right to withdraw. Accept-only banners are non-compliant. The Office of the Data Protection Commissioner can fine breaches up to KES 5,000,000."
+  },
+  {
+    "scenario": "Sarah is deciding what data to send with each Pixel event. Her options are: raw email + raw phone; hashed email + hashed phone; nothing extra at all.",
+    "question": "What is the correct choice, and why?",
+    "options": [
+      "Send nothing extra — the fewer parameters the better.",
+      "Send hashed email + hashed phone (plus city, IP, user-agent). Hashed values raise Event Match Quality above 8, and hashing is what makes the transfer DPA 2019 compliant. Sending raw email/phone breaks both Meta's terms and the DPA.",
+      "Send raw email + raw phone — Meta matches better.",
+      "Send only the ad account ID."
+    ],
+    "correct": 1,
+    "explanation": "Slide 5 + Slide 8 of §11.2: hashed PII raises EMQ dramatically, and hashing is a legal + terms requirement. Meta's Business Manager customer-list tools hash with SHA-256 by default; any manual pipeline must do the same before upload."
+  },
+  {
+    "scenario": "Sarah's e-commerce checkout has a custom feature she wants to track: a WhatsApp button that lets returning customers reorder their favourite meal in one tap. Meta has no standard event for this.",
+    "question": "What should she use, and how should she name it?",
+    "options": [
+      "Use PageView — it is close enough.",
+      "Use a custom event with a clear descriptive name (e.g. \"reorder_via_whatsapp\") sent from her website or via CAPI. Custom events cover anything Meta does not have a standard template for, and can still be used as conversion events in campaigns.",
+      "Skip tracking that button entirely.",
+      "Use Purchase — every click counts as a sale."
+    ],
+    "correct": 1,
+    "explanation": "Slide 4 of §11.2 explains: 17 standard events cover most flows, and custom events cover the rest. \"reorder_via_whatsapp\" is a fair custom event name — clear, snake_case, descriptive. Custom events can still be picked as conversion optimisation targets and used in Custom audiences."
+  },
+  {
+    "scenario": "A trainee summarises Lesson 11.2 in one line: \"The Pixel is server-side, the CAPI is client-side, EMQ above 4 is the target, and Kenya DPA 2019 does not apply to trackers.\"",
+    "question": "How many of those four claims are correct?",
+    "options": [
+      "All four.",
+      "Two — the EMQ and DPA parts.",
+      "Zero — every claim is wrong.",
+      "One — only the Pixel part."
+    ],
+    "correct": 2,
+    "explanation": "Every claim is wrong. The PIXEL is client-side (runs in the browser). CAPI is SERVER-side (Slide 3). EMQ target is ABOVE 8, not above 4 (Slide 5). And Kenya DPA 2019 explicitly covers IP + browser fingerprint as personal data — trackers absolutely do fall under DPA 2019 (Slide 8)."
+  }
+];
+
+        let currentQuestion = 0, score = 0, streak = 0, answered = false;
+
+        function updateScoreboard() {
+            document.getElementById('score').textContent = score;
+            document.getElementById('current').textContent = Math.min(currentQuestion + 1, exercises.length);
+            document.getElementById('total').textContent = exercises.length;
+            document.getElementById('streak').textContent = streak;
+            document.getElementById('progress').style.width = ((currentQuestion) / exercises.length) * 100 + '%';
+        }
+
+        function escapeHtml(s) {
+            return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+        }
+
+        function renderQuestion() {
+            answered = false;
+            const q = exercises[currentQuestion];
+            let html = '';
+            if (q.scenario) {
+                html += `<div class="scenario"><strong>Scenario.</strong> ${escapeHtml(q.scenario)}</div>`;
+            }
+            html += `<div class="question">${escapeHtml(q.question)}</div>`;
+            html += '<div class="options">';
+            q.options.forEach((o, i) => {
+                html += `<button class="option" onclick="selectAnswer(${i})">${escapeHtml(o)}</button>`;
+            });
+            html += '</div>';
+            document.getElementById('exerciseCard').innerHTML = html;
+            updateScoreboard();
+        }
+
+        function selectAnswer(i) {
+            if (answered) return;
+            answered = true;
+            const q = exercises[currentQuestion];
+            const btns = document.querySelectorAll('.option');
+            btns.forEach(b => b.classList.add('disabled'));
+            btns[q.correct].classList.add('correct');
+            const right = i === q.correct;
+            if (!right) btns[i].classList.add('wrong');
+            if (right) { score += 10; streak += 1; } else { streak = 0; }
+            const fb = document.createElement('div');
+            fb.className = 'feedback ' + (right ? 'correct' : 'wrong');
+            fb.innerHTML = `<strong>${right ? '✅ Correct.' : '❌ Not quite.'}</strong><br>${escapeHtml(q.explanation)}`;
+            document.getElementById('exerciseCard').appendChild(fb);
+            const nb = document.createElement('button');
+            nb.className = 'next-btn';
+            nb.textContent = currentQuestion === exercises.length - 1 ? 'See results →' : 'Next scenario →';
+            nb.onclick = nextQuestion;
+            document.getElementById('exerciseCard').appendChild(nb);
+            updateScoreboard();
+        }
+
+        function nextQuestion() {
+            currentQuestion++;
+            if (currentQuestion >= exercises.length) return showResults();
+            renderQuestion();
+        }
+
+        function showResults() {
+            document.getElementById('progress').style.width = '100%';
+            const total = exercises.length * 10;
+            const pct = Math.round(score / total * 100);
+            if (window.parent) { window.parent.postMessage({type:"mtti_quiz_score", score: score, total: total, percent: pct}, "*"); }
+            let badge = '🌟', msg = 'Excellent work. You have a professional grasp of this lesson.';
+            if (pct < 50) { badge = '🌱'; msg = 'Good first attempt. Re-watch the lesson video and try again.'; }
+            else if (pct < 80) { badge = '📚'; msg = 'Solid progress. Review the scenarios you missed and retry.'; }
+            document.getElementById('exerciseCard').innerHTML = `
+                <div class="results">
+                    <span class="badge">${badge}</span>
+                    <h2>Quiz Complete</h2>
+                    <div class="final-score">${score} / ${total}</div>
+                    <p><strong>${pct}%</strong> · Longest streak: ${streak}</p>
+                    <p>${msg}</p>
+                    <button class="restart-btn" onclick="restart()">Try again 🔁</button>
+                </div>`;
+        }
+
+        function restart() {
+            currentQuestion = 0; score = 0; streak = 0;
+            renderQuestion();
+        }
+
+        renderQuestion();
+    </script>
+</body>
+</html>

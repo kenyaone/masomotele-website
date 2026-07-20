@@ -1,0 +1,334 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Compatibility Across Devices and Platforms — Practical | MTTI Video Editing</title>
+<link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Fredoka:wght@500;600&display=swap" rel="stylesheet">
+<style>
+* { margin:0; padding:0; box-sizing:border-box; }
+body { font-family:'Space Mono', monospace; background:linear-gradient(135deg,#1a1a2e 0%,#6A11CB 100%); min-height:100vh; padding:18px; color:#fff; }
+.container { max-width:760px; margin:0 auto; }
+.header { text-align:center; margin-bottom:14px; }
+.header .tag { display:inline-block; background:rgba(255,255,255,0.2); padding:6px 16px; border-radius:999px; font-size:0.82em; margin-bottom:8px; }
+.header h1 { font-family:'Fredoka', sans-serif; font-size:1.55em; text-shadow:2px 2px 0 rgba(0,0,0,0.2); }
+.brief { background:rgba(255,255,255,0.12); backdrop-filter:blur(10px); border-radius:14px; padding:13px 18px; margin-bottom:14px; border-left:5px solid #ffd54f; font-size:0.88em; line-height:1.5; }
+
+/* App shell — the actual visual "this is CapCut / Canva Video" chrome */
+.app-shell { background:#15151f; border-radius:16px; overflow:hidden; box-shadow:0 20px 60px rgba(0,0,0,0.4); border:1px solid #2a2a3d; }
+.app-shell.theme-canva { background:#faf9ff; border-color:#e2d9ff; }
+.app-titlebar { display:flex; align-items:center; justify-content:space-between; padding:9px 14px; background:#0f0f18; border-bottom:1px solid #2a2a3d; }
+.theme-canva .app-titlebar { background:#8B3DFF; border-color:#7429e6; }
+.app-badge { display:flex; align-items:center; gap:7px; font-family:'Fredoka', sans-serif; font-weight:600; font-size:0.9em; color:#fff; }
+.app-badge .dot { width:8px; height:8px; border-radius:50%; background:#FE2C55; }
+.theme-canva .app-badge .dot { background:#fff; }
+.app-project { font-size:0.75em; color:#8a8aa3; }
+.theme-canva .app-project { color:#eee4ff; }
+
+/* Preview pane */
+.preview-wrap { padding:16px 16px 0; display:flex; justify-content:center; }
+.preview-pane { position:relative; width:100%; max-width:230px; aspect-ratio:9/16; background:linear-gradient(160deg,#2a2a45,#1a1a2e); border-radius:10px; overflow:hidden; display:flex; align-items:center; justify-content:center; border:2px solid #33334d; cursor:pointer; }
+.preview-pane.wide { max-width:420px; aspect-ratio:16/9; }
+.theme-canva .preview-pane { background:linear-gradient(160deg,#f0eaff,#e2d4ff); border-color:#d4bfff; }
+.preview-play { font-size:2.4em; opacity:0.85; transition:transform 0.15s ease; }
+.preview-pane:active .preview-play { transform:scale(0.85); }
+.preview-time { position:absolute; bottom:8px; right:10px; font-size:0.7em; background:rgba(0,0,0,0.5); padding:2px 7px; border-radius:6px; color:#fff; }
+.preview-hint { position:absolute; inset:0; background:rgba(0,0,0,0.82); color:#fff; display:flex; align-items:center; justify-content:center; text-align:center; padding:16px; font-size:0.78em; line-height:1.5; opacity:0; pointer-events:none; transition:opacity 0.2s ease; }
+.preview-hint.show { opacity:1; }
+.theme-canva .preview-time { background:rgba(139,61,255,0.55); }
+
+/* Toolbar — decorative, grounds the "which app" feel with real menu terms */
+.toolbar { display:flex; gap:6px; overflow-x:auto; padding:12px 16px; }
+.toolbar::-webkit-scrollbar { display:none; }
+.tool-pill { flex-shrink:0; display:flex; flex-direction:column; align-items:center; gap:3px; background:#1f1f30; border:1px solid #33334d; color:#c7c7dd; padding:8px 12px; border-radius:10px; font-size:0.7em; white-space:nowrap; }
+.theme-canva .tool-pill { background:#f2edff; border-color:#dcc9ff; color:#5b2a99; }
+.tool-pill .ic { font-size:1.3em; }
+
+/* Timeline */
+.timeline-wrap { padding:4px 16px 16px; }
+.timeline-label { font-size:0.72em; color:#8a8aa3; margin-bottom:6px; text-transform:uppercase; letter-spacing:.05em; }
+.theme-canva .timeline-label { color:#8a5cc9; }
+.timeline-track { display:flex; align-items:stretch; gap:4px; background:#0f0f18; border-radius:10px; padding:8px; overflow-x:auto; }
+.theme-canva .timeline-track { background:#efe8ff; }
+.clip-block { flex-shrink:0; min-width:64px; border-radius:7px; padding:8px 8px 6px; display:flex; flex-direction:column; justify-content:space-between; font-size:0.68em; color:#fff; position:relative; }
+.clip-block .clip-label { font-weight:700; line-height:1.25; }
+.clip-block .clip-dur { opacity:0.85; margin-top:3px; }
+.clip-move { display:flex; gap:3px; margin-top:5px; }
+.clip-move button { flex:1; background:rgba(0,0,0,0.25); border:none; color:#fff; border-radius:4px; padding:2px 0; cursor:pointer; font-size:0.85em; }
+.clip-move button:disabled { opacity:0.3; cursor:not-allowed; }
+.clip-block.correct-pos { outline:2px solid #22c55e; }
+.clip-block.wrong-pos { outline:2px solid #ef4444; }
+
+/* Inspector panel (fields-mode tasks) — styled like a bottom settings sheet */
+.inspector { background:#fff; color:#1e1e2e; border-radius:16px; padding:18px 20px; margin-top:14px; box-shadow:0 20px 60px rgba(0,0,0,0.35); }
+.inspector-head { display:flex; align-items:center; gap:8px; margin-bottom:12px; font-family:'Fredoka', sans-serif; font-weight:600; color:#6A11CB; font-size:1em; }
+.field { margin-bottom:13px; }
+.field label { display:block; font-size:0.83em; color:#4a4a68; margin-bottom:5px; font-weight:700; }
+.field input[type=text], .field input[type=number], .field select { width:100%; background:#f5f3fb; border:2px solid #e0d9f5; color:#1e1e2e; padding:9px 11px; border-radius:8px; font-size:0.92em; font-family:'Space Mono', monospace; }
+.field input:focus, .field select:focus { outline:none; border-color:#6A11CB; }
+.field .checkbox-row { display:flex; align-items:center; gap:8px; }
+.field .checkbox-row input { width:auto; }
+
+.check-btn { margin-top:6px; width:100%; background:linear-gradient(135deg,#6A11CB 0%,#2575FC 100%); color:#fff; border:none; padding:12px; border-radius:10px; font-weight:700; font-size:0.95em; cursor:pointer; font-family:'Fredoka', sans-serif; }
+.results { margin-top:14px; display:none; }
+.results.show { display:block; }
+.result-summary { padding:12px 16px; border-radius:10px; margin-bottom:10px; font-weight:700; font-size:0.88em; }
+.result-summary.ok { background:#d4edda; color:#155724; }
+.result-summary.fail { background:#f8d7da; color:#721c24; }
+.result-row { display:flex; justify-content:space-between; gap:10px; padding:7px 11px; border-radius:6px; font-size:0.82em; margin-bottom:4px; background:#f5f3fb; }
+.result-row.ok { border-left:3px solid #22c55e; }
+.result-row.fail { border-left:3px solid #ef4444; }
+
+.final-q { background:#fff; color:#1e1e2e; border-radius:16px; padding:18px 20px; margin-top:14px; box-shadow:0 20px 60px rgba(0,0,0,0.35); display:none; }
+.final-q.show { display:block; }
+.final-q h4 { font-size:0.98em; margin-bottom:12px; color:#1e1e2e; font-family:'Fredoka', sans-serif; }
+.options { display:flex; flex-direction:column; gap:9px; }
+.option { background:#f5f3fb; border:2px solid transparent; padding:12px 15px; border-radius:10px; cursor:pointer; font-size:0.9em; text-align:left; color:#333; font-family:'Space Mono', monospace; }
+.option:hover:not(.disabled) { background:#ece3fb; border-color:#6A11CB; }
+.option.correct { background:#d4edda; border-color:#28a745; color:#155724; }
+.option.wrong { background:#f8d7da; border-color:#dc3545; color:#721c24; }
+.option.disabled { cursor:not-allowed; }
+.feedback { margin-top:14px; padding:14px 16px; border-radius:10px; font-size:0.88em; line-height:1.5; }
+.feedback.correct { background:#d4edda; color:#155724; border-left:4px solid #28a745; }
+.feedback.wrong { background:#f8d7da; color:#721c24; border-left:4px solid #dc3545; }
+.result-banner { margin-top:14px; padding:12px 16px; border-radius:10px; font-size:0.88em; font-weight:700; display:none; text-align:center; }
+.result-banner.show { display:block; }
+.result-banner.ok { background:#d4edda; color:#155724; }
+.result-banner.fail { background:#f8d7da; color:#721c24; }
+
+@media screen and (max-width:480px) {
+  .preview-pane { max-width:170px; }
+  .preview-pane.wide { max-width:280px; }
+  .inspector, .final-q { padding:15px 14px; }
+}
+</style>
+</head>
+<body>
+<div class="container">
+<div class="header"><div class="tag">Unit 27 · Topic 3 · Practical</div><h1>Compatibility Across Devices and Platforms — Practical</h1></div>
+<div class="brief">A church client says the wedding highlight reel Otieno exported from Canva Video won&#039;t play on the groom&#039;s grandmother&#039;s older Android phone, and separately, a shop&#039;s Reels upload got rejected by Instagram for the wrong orientation. Enter the export settings Otieno is reviewing in Canva Video to resolve both complaints.</div>
+
+<div class="app-shell" id="appShell">
+  <div class="app-titlebar">
+    <div class="app-badge"><span class="dot"></span><span id="appName"></span></div>
+    <div class="app-project" id="appProject"></div>
+  </div>
+  <div class="preview-wrap"><div class="preview-pane" id="previewPane"><span class="preview-play">▶</span><span class="preview-time" id="previewTime"></span><div class="preview-hint" id="previewHint">🎬 This is a simulated preview — there's no real video file here. Complete the task below using the timeline and settings, not this button.</div></div></div>
+  <div class="toolbar" id="toolbar"></div>
+  <div class="timeline-wrap">
+    <div class="timeline-label">Timeline</div>
+    <div class="timeline-track" id="timelineTrack"></div>
+  </div>
+</div>
+
+<div class="inspector" id="inspector" style="display:none;">
+  <div class="inspector-head"><span>⚙️</span><span id="inspectorTitle">Clip Settings</span></div>
+  <div id="fieldsWrap"></div>
+  <button class="check-btn" id="checkFieldsBtn">Check My Settings ✓</button>
+  <div class="results" id="results"></div>
+</div>
+
+<div id="reorderCheckWrap" style="display:none;">
+  <button class="check-btn" id="checkOrderBtn" style="margin-top:14px;">Check My Timeline ✓</button>
+  <div class="result-banner" id="resultBanner"></div>
+</div>
+
+<div class="final-q" id="finalQ">
+  <h4 id="finalText"></h4>
+  <div class="options" id="finalOptions"></div>
+</div>
+
+</div>
+<script>
+/* MTTI_TimelineSim v1 — lightweight, visually-authentic CapCut/Canva-Video-
+   style practice widget: a real app-shell (title bar, preview pane, toolbar,
+   colored timeline clips) wrapping one of two task mechanics:
+     - taskType 'reorder': the timeline clips themselves are the exercise —
+       student arranges them into the correct sequence with left/right
+       arrow buttons (no drag-and-drop — more reliable on touch, and the
+       iframe sandbox has no allow-modals so native dialogs are never used
+       anywhere in this engine).
+     - taskType 'fields': the timeline is illustrative context; the actual
+       task is numeric/select fields in the Inspector panel below, checked
+       against RULES (same proven field/rule-checking logic as the earlier
+       generic DiagnosticSim engine), then a final scenario-reasoning MCQ.
+*/
+const CONFIG = {"app":"Canva Video","projectName":"Client Exports \u2014 Compatibility Check","aspect":"16:9","taskType":"fields","inspectorTitle":"Download Settings","tools":[{"icon":"\ud83d\udcd0","label":"Resize"},{"icon":"\ud83d\udd24","label":"Text"},{"icon":"\ud83d\udd0a","label":"Audio"},{"icon":"\u2b07\ufe0f","label":"Download"}],"clips":[{"id":"wedding","label":"Wedding Highlight","duration":96},{"id":"shopreel","label":"Shop Reel","duration":15}],"fields":[{"id":"export_codec","label":"Codec the wedding video was originally exported with","type":"select","options":["H.264","H.265","ProRes"]},{"id":"export_container","label":"Container used for the wedding video export","type":"select","options":[".mp4",".mov",".avi"]},{"id":"reels_aspect_ratio","label":"Aspect ratio the shop's Reels clip was exported in","type":"select","options":["16:9 landscape","9:16 vertical","1:1 square"]},{"id":"used_named_preset","label":"A \"Reels/TikTok\" named export preset was used for the shop clip","type":"checkbox"}],"rules":[{"field":"export_codec","operator":"eq","value":"H.264","label":"Re-export uses H.264 for maximum compatibility with older Android devices"},{"field":"export_container","operator":"eq","value":".mp4","label":"MP4 container chosen \u2014 safest for playback across devices and platforms"},{"field":"reels_aspect_ratio","operator":"eq","value":"9:16 vertical","label":"Reels clip corrected to vertical 9:16, matching what Instagram Reels expects"},{"field":"used_named_preset","operator":"checked","value":true,"label":"Using the named Reels/TikTok export preset to lock in the right settings"}],"final":{"text":"After Otieno confirms the grandmother's phone is an older budget Android and the original wedding export was H.265 in MP4, what is the single most likely fix for the \"won't play\" complaint?","options":["Re-export the same video in H.264 instead of H.265, keeping the MP4 container \u2014 older Android hardware is far more likely to support H.264 decoding","Rename the file from .mp4 to .mov and resend the exact same video","Nothing can be done \u2014 older Android phones can never play any exported video","Increase the resolution to 4K so the phone has more detail to decode"],"answer":0,"explanation":"H.265 hardware decoding support is inconsistent on older/budget Android devices, while H.264 is almost universally supported. Re-exporting in H.264 (same MP4 container) is the direct, targeted fix for this specific playback complaint \u2014 renaming the container or raising resolution would not address the actual codec incompatibility."}};
+
+function escHtml(s) { return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+
+function renderShell() {
+    const theme = CONFIG.app === 'Canva Video' ? 'theme-canva' : '';
+    if (theme) document.getElementById('appShell').classList.add(theme);
+    document.getElementById('appName').textContent = CONFIG.app || 'CapCut';
+    document.getElementById('appProject').textContent = CONFIG.projectName || '';
+    const wide = CONFIG.aspect === '16:9';
+    const pane = document.getElementById('previewPane');
+    if (wide) pane.classList.add('wide');
+    const totalDur = (CONFIG.clips || []).reduce((s, c) => s + (c.duration || 0), 0);
+    document.getElementById('previewTime').textContent = '0:00 / ' + fmtTime(totalDur);
+
+    document.getElementById('toolbar').innerHTML = (CONFIG.tools || []).map(t =>
+        `<div class="tool-pill"><span class="ic">${t.icon}</span><span>${escHtml(t.label)}</span></div>`
+    ).join('');
+
+    let hintTimer = null;
+    document.getElementById('previewPane').addEventListener('click', () => {
+        const hint = document.getElementById('previewHint');
+        hint.classList.add('show');
+        clearTimeout(hintTimer);
+        hintTimer = setTimeout(() => hint.classList.remove('show'), 3200);
+    });
+}
+
+function fmtTime(sec) {
+    sec = Math.round(sec || 0);
+    const m = Math.floor(sec / 60), s = sec % 60;
+    return m + ':' + String(s).padStart(2, '0');
+}
+
+const CLIP_COLORS = ['#6A11CB', '#2575FC', '#E65100', '#00897B', '#C2185B', '#5D4037', '#00838F'];
+
+/* ---------- Reorder mode ---------- */
+let order = [];
+function clipById(id) { return CONFIG.clips.find(c => c.id === id); }
+
+function renderTimeline(marks) {
+    order.forEach((id, i) => {}); // no-op, order already holds current sequence
+    document.getElementById('timelineTrack').innerHTML = order.map((id, i) => {
+        const c = clipById(id);
+        const cls = marks ? (marks[i] ? 'correct-pos' : 'wrong-pos') : '';
+        const color = CLIP_COLORS[i % CLIP_COLORS.length];
+        const width = Math.max(64, (c.duration || 3) * 6);
+        return `<div class="clip-block ${cls}" style="background:${color};width:${width}px;">
+            <div class="clip-label">${escHtml(c.label)}</div>
+            <div class="clip-dur">${fmtTime(c.duration || 0)}</div>
+            ${CONFIG.taskType === 'reorder' ? `<div class="clip-move">
+                <button data-dir="left" data-id="${id}" ${i===0?'disabled':''}>◀</button>
+                <button data-dir="right" data-id="${id}" ${i===order.length-1?'disabled':''}>▶</button>
+            </div>` : ''}
+        </div>`;
+    }).join('');
+    if (CONFIG.taskType === 'reorder') {
+        document.querySelectorAll('.clip-move button').forEach(btn => {
+            btn.addEventListener('click', () => moveClip(btn.dataset.id, btn.dataset.dir));
+        });
+    }
+}
+
+function moveClip(id, dir) {
+    const i = order.indexOf(id);
+    const j = dir === 'left' ? i - 1 : i + 1;
+    if (j < 0 || j >= order.length) return;
+    [order[i], order[j]] = [order[j], order[i]];
+    renderTimeline();
+    document.getElementById('resultBanner').classList.remove('show');
+}
+
+function checkOrder() {
+    const correct = CONFIG.correctOrder;
+    const marks = order.map((id, i) => id === correct[i]);
+    renderTimeline(marks);
+    const allOk = marks.every(m => m);
+    const banner = document.getElementById('resultBanner');
+    banner.classList.add('show');
+    banner.className = 'result-banner show ' + (allOk ? 'ok' : 'fail');
+    banner.textContent = allOk
+        ? '✅ Correct sequence! That\'s exactly the right timeline order.'
+        : '❌ Not quite the right order — green clips are in the right place, red ones need to move.';
+    if (allOk) showFinal();
+}
+
+/* ---------- Fields mode (adapted from the proven DiagnosticSim engine) --- */
+function fieldHtml(f) {
+    if (f.type === 'select') {
+        return `<div class="field"><label>${escHtml(f.label)}</label><select id="f_${f.id}">${(f.options||[]).map(o=>`<option value="${escHtml(o)}">${escHtml(o)}</option>`).join('')}</select></div>`;
+    }
+    if (f.type === 'checkbox') {
+        return `<div class="field checkbox-row"><input type="checkbox" id="f_${f.id}"><label for="f_${f.id}">${escHtml(f.label)}</label></div>`;
+    }
+    return `<div class="field"><label>${escHtml(f.label)}</label><input type="${f.type==='number'?'number':'text'}" id="f_${f.id}" placeholder="${escHtml(f.placeholder||'')}"></div>`;
+}
+
+function collectValues() {
+    const vals = {};
+    (CONFIG.fields || []).forEach(f => {
+        const el = document.getElementById('f_' + f.id);
+        if (!el) return;
+        vals[f.id] = f.type === 'checkbox' ? el.checked : (f.type === 'number' ? parseFloat(el.value) : el.value);
+    });
+    return vals;
+}
+
+function applyOp(val, op, target) {
+    switch (op) {
+        case 'eq': return val == target;
+        case 'neq': return val != target;
+        case 'gte': return parseFloat(val) >= target;
+        case 'lte': return parseFloat(val) <= target;
+        case 'gt': return parseFloat(val) > target;
+        case 'lt': return parseFloat(val) < target;
+        case 'checked': return val === true;
+        case 'unchecked': return val === false;
+        default: return false;
+    }
+}
+
+function checkFields() {
+    const vals = collectValues();
+    const rows = (CONFIG.rules || []).map(r => {
+        const ok = applyOp(vals[r.field], r.operator, r.value);
+        return `<div class="result-row ${ok?'ok':'fail'}"><span>${escHtml(r.label)}</span><span>${ok?'✅':'❌'}</span></div>`;
+    }).join('');
+    const allOk = (CONFIG.rules || []).every(r => applyOp(vals[r.field], r.operator, r.value));
+    const box = document.getElementById('results');
+    box.classList.add('show');
+    box.innerHTML = `<div class="result-summary ${allOk?'ok':'fail'}">${allOk ? '✅ All checks look right!' : '❌ Some values still need adjusting.'}</div>` + rows;
+    if (allOk) showFinal();
+}
+
+/* ---------- Final scenario question (shared) ---------- */
+function showFinal() {
+    const f = CONFIG.final;
+    if (!f) return;
+    const box = document.getElementById('finalQ');
+    box.classList.add('show');
+    document.getElementById('finalText').textContent = f.text;
+    document.getElementById('finalOptions').innerHTML = f.options.map((o, j) =>
+        `<button class="option" onclick="selectFinal(${j})">${escHtml(o)}</button>`
+    ).join('');
+    box.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+}
+
+function selectFinal(j) {
+    const f = CONFIG.final;
+    const btns = document.querySelectorAll('#finalOptions .option');
+    if (btns[0].classList.contains('disabled')) return;
+    btns.forEach(b => b.classList.add('disabled'));
+    btns[f.answer].classList.add('correct');
+    const right = j === f.answer;
+    if (!right) btns[j].classList.add('wrong');
+    const fb = document.createElement('div');
+    fb.className = 'feedback ' + (right ? 'correct' : 'wrong');
+    fb.innerHTML = '<strong>' + (right ? '✅ Correct.' : '❌ Not quite.') + '</strong><br>' + escHtml(f.explanation);
+    document.getElementById('finalQ').appendChild(fb);
+}
+
+/* ---------- Init ---------- */
+renderShell();
+if (CONFIG.taskType === 'reorder') {
+    order = CONFIG.clips.map(c => c.id);
+    renderTimeline();
+    document.getElementById('reorderCheckWrap').style.display = 'block';
+    document.getElementById('checkOrderBtn').addEventListener('click', checkOrder);
+} else {
+    order = CONFIG.clips.map(c => c.id);
+    renderTimeline(); // illustrative, non-interactive
+    document.getElementById('inspector').style.display = 'block';
+    document.getElementById('inspectorTitle').textContent = CONFIG.inspectorTitle || 'Clip Settings';
+    document.getElementById('fieldsWrap').innerHTML = (CONFIG.fields || []).map(fieldHtml).join('');
+    document.getElementById('checkFieldsBtn').addEventListener('click', checkFields);
+}
+</script>
+</body>
+</html>

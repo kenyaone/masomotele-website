@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>VIE-01 Final Assessment | MTTI Video Editing</title>
+<link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Fredoka:wght@500;600&display=swap" rel="stylesheet">
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body { font-family: 'Space Mono', monospace; background: linear-gradient(135deg, #1a1a2e 0%, #6A11CB 100%); min-height: 100vh; padding: 20px; color: #fff; }
+.container { max-width: 900px; margin: 0 auto; }
+.header { text-align: center; margin-bottom: 30px; }
+.header .lesson-tag { display: inline-block; background: rgba(255,255,255,0.2); padding: 6px 16px; border-radius: 999px; font-size: 0.85em; margin-bottom: 12px; }
+.header h1 { font-family: 'Fredoka', sans-serif; font-size: 2.2em; margin-bottom: 8px; text-shadow: 3px 3px 0 rgba(0,0,0,0.2); }
+.score-board { background: rgba(255,255,255,0.15); backdrop-filter: blur(10px); border-radius: 20px; padding: 20px; margin-bottom: 20px; display: flex; justify-content: space-around; }
+.score-item { text-align: center; }
+.score-item .label { font-size: 0.85em; opacity: 0.9; margin-bottom: 4px; }
+.score-item .value { font-size: 1.8em; font-weight: bold; font-family: 'Fredoka', sans-serif; }
+.progress-bar { width: 100%; height: 8px; background: rgba(255,255,255,0.3); border-radius: 10px; margin-bottom: 25px; overflow: hidden; }
+.progress-fill { height: 100%; background: linear-gradient(90deg, #f7971e 0%, #ffd200 100%); border-radius: 10px; transition: width 0.5s ease; width: 0%; }
+.exercise-card { background: white; color: #333; border-radius: 25px; padding: 35px; margin-bottom: 20px; box-shadow: 0 20px 60px rgba(0,0,0,0.3); }
+.scenario { background: linear-gradient(135deg, #fff8e1 0%, #ffecb3 100%); border-left: 5px solid #ffc107; padding: 20px 24px; border-radius: 12px; margin-bottom: 24px; font-size: 0.98em; line-height: 1.55; }
+.scenario strong { color: #7a5a00; font-family: 'Fredoka', sans-serif; }
+.question { font-size: 1.15em; margin-bottom: 20px; font-weight: 700; line-height: 1.4; }
+.options { display: flex; flex-direction: column; gap: 12px; }
+.option { background: #f5f7fb; border: 2px solid transparent; padding: 16px 20px; border-radius: 12px; cursor: pointer; transition: all 0.2s ease; font-family: 'Space Mono', monospace; font-size: 0.98em; text-align: left; }
+.option:hover:not(.disabled) { background: #eef6fb; border-color: #6A11CB; transform: translateX(4px); }
+.option.correct { background: #d4edda; border-color: #28a745; color: #155724; }
+.option.wrong { background: #f8d7da; border-color: #dc3545; color: #721c24; }
+.option.disabled { cursor: not-allowed; opacity: 0.85; }
+.feedback { margin-top: 22px; padding: 18px 22px; border-radius: 12px; font-size: 0.98em; line-height: 1.5; }
+.feedback.correct { background: #d4edda; color: #155724; border-left: 4px solid #28a745; }
+.feedback.wrong { background: #f8d7da; color: #721c24; border-left: 4px solid #dc3545; }
+.next-btn, .restart-btn { margin-top: 20px; background: linear-gradient(135deg, #1a1a2e 0%, #6A11CB 100%); color: white; border: none; padding: 14px 32px; border-radius: 12px; font-size: 1em; cursor: pointer; font-family: 'Fredoka', sans-serif; box-shadow: 0 6px 18px rgba(0,0,0,0.2); }
+.results { text-align: center; padding: 25px 15px; }
+.results h2 { font-family: 'Fredoka', sans-serif; font-size: 2em; margin-bottom: 12px; color: #333; }
+.results .final-score { font-size: 3em; font-family: 'Fredoka', sans-serif; color: #6A11CB; margin: 20px 0; }
+.results p { color: #555; margin-bottom: 12px; }
+.badge { display: inline-block; font-size: 3.5em; margin: 8px 0; }
+</style>
+</head>
+<body>
+<div class="container">
+<div class="header">
+<div class="lesson-tag">Final Assessment · Quiz</div>
+<h1>VIE-01 Final Assessment</h1>
+</div>
+<div class="score-board">
+<div class="score-item"><div class="label">Score</div><div class="value" id="score">0</div></div>
+<div class="score-item"><div class="label">Question</div><div class="value"><span id="current">1</span>/<span id="total">23</span></div></div>
+<div class="score-item"><div class="label">Streak</div><div class="value" id="streak">0</div></div>
+</div>
+<div class="progress-bar"><div class="progress-fill" id="progress"></div></div>
+<div class="exercise-card" id="exerciseCard"></div>
+</div>
+<script>
+const exercises = [{"scenario":"Otieno imports a client's raw wedding footage into a new CapCut project before doing anything else.","question":"What should he set up first when creating the project?","options":["The correct aspect ratio and frame rate for the final destination (e.g. 9:16 for Reels)","Nothing \u2014 aspect ratio can always be fixed after exporting","The export filename only","The background music track, before any video is imported"],"correct":0,"explanation":"Setting the right aspect ratio and frame rate at project creation avoids painful re-cropping and frame-rate mismatches later."},{"scenario":"Otieno has dozens of clips from a full day of event filming and needs to find the right ones quickly while editing.","question":"What habit from the Importing and Organizing unit helps here?","options":["Organizing clips into labelled bins/folders by scene as soon as they're imported","Leaving every clip unsorted in one long list","Deleting clips he doesn't recognize immediately","Renaming all clips to random numbers"],"correct":0,"explanation":"Organizing footage into labelled bins right after import is what makes a large, multi-clip project manageable."},{"scenario":"Otieno has a 42-second raw clip but only needs a specific 15-second segment for an Instagram Reel.","question":"What is the correct tool/approach?","options":["Split/trim the clip to set precise in and out points around the 15-second segment he needs","Play the whole 42 seconds and hope viewers skip ahead","Delete the entire clip and re-film it","Speed up the whole clip to 15 seconds"],"correct":0,"explanation":"Trimming with precise in/out points is exactly how a longer clip is reduced to the exact segment needed."},{"scenario":"Otieno wants to insert a new clip into the middle of his timeline without overwriting the footage already there.","question":"Which edit mode should he use?","options":["Insert (not Overwrite), so later clips shift to make room","Overwrite, so the new clip replaces what's already there","Ripple delete, since he's not removing anything","None \u2014 new clips can only go at the very end"],"correct":0,"explanation":"Insert mode pushes existing clips later on the timeline to make room, unlike Overwrite which replaces footage in place."},{"scenario":"Otieno adds a small logo watermark clip that should stay visible on top of his main footage throughout a promo video.","question":"What editing concept does this rely on?","options":["Multi-track layering, with the watermark on an overlay track above the main video track","Deleting the main video track entirely","Exporting the watermark as a separate file","Changing the video's aspect ratio"],"correct":0,"explanation":"An overlay/PIP track sitting above the main video track is how a watermark or reaction clip stays visible over the primary footage."},{"scenario":"Otieno is cutting between two completely different scenes (the ceremony ending, the reception starting) in a wedding highlight reel.","question":"What is a natural transition choice here, versus a plain hard Cut?","options":["A Fade or Dissolve, signalling a clear scene change","A Zoom transition on every single cut in the video, for consistency","No transition of any kind should ever be used","Only Slide transitions, regardless of context"],"correct":0,"explanation":"Fades/dissolves are a common, natural way to mark a clear break between distinct scenes, unlike a hard cut which suits continuous action."},{"scenario":"A shop-promo clip Otieno filmed looks dull and flat, lacking punch.","question":"What's a reasonable next step?","options":["Apply a filter/effect at a tasteful intensity that matches the mood, without overdoing it","Apply the strongest possible filter at maximum intensity regardless of how it looks","Never apply any filter to any clip","Replace the clip's audio track instead of touching the visuals"],"correct":0,"explanation":"Effects and filters should be chosen and dialed in to fit the scene's needs \u2014 not maxed out indiscriminately."},{"scenario":"Otieno adds an animated \"Order Now! \ud83d\udcde\" call-to-action text to a promo reel.","question":"What should he check about this text overlay?","options":["That its on-screen duration and animation give viewers enough time to actually read it","That it appears for less than half a second so it doesn't distract anyone","That it's placed directly over the client's face at all times","That it uses no animation at all, ever"],"correct":0,"explanation":"A CTA text overlay only works if it's on screen long enough, and positioned so it can actually be read."},{"scenario":"A clip Otieno shot indoors under yellow tungsten lighting looks too warm/orange and slightly underexposed.","question":"What color-correction adjustments address this?","options":["Correct the white balance/temperature toward cooler, and raise the exposure","Increase the warmth further and lower the exposure even more","Only change the frame rate, since that's what affects color","Delete the clip since lighting problems cannot be corrected"],"correct":0,"explanation":"Cooling the white balance offsets the orange cast, and raising exposure corrects underexposure \u2014 addressing the actual described problem."},{"scenario":"Otieno wants a consistent \"warm golden-hour\" look across every clip in a wedding highlight reel.","question":"What approach fits this goal?","options":["Apply the same color filter/preset at a consistent intensity across all the clips","Apply a different random filter to each clip","Avoid color grading entirely since consistency doesn't matter","Only color-grade the very last clip in the video"],"correct":0,"explanation":"Consistency across a video comes from applying the same preset/intensity across clips, not varying it randomly."},{"scenario":"Otieno shot a promo with two different cameras at different times of day, and the shots don't visually match.","question":"What should he do before finishing the edit?","options":["Adjust exposure/color temperature on the mismatched shots so they align with a reference shot","Leave the mismatch as-is since viewers won't notice","Delete all footage from one of the two cameras","Convert every shot to black and white to hide the mismatch"],"correct":0,"explanation":"Matching shots for consistency means adjusting the outlying clips' exposure/color to align with a chosen reference look."},{"scenario":"Otieno has a 20-second music track that needs to fit a 12-second reel and end cleanly rather than cutting off abruptly.","question":"What should he do to the music track?","options":["Trim it to 12 seconds and add a fade-out before the end","Leave all 20 seconds in, even though the video is shorter","Speed up the music track to match instead of trimming it","Delete the music track entirely since trimming isn't possible"],"correct":0,"explanation":"Trimming to the video's length and adding a fade-out avoids an abrupt, jarring cutoff."},{"scenario":"Otieno recorded a voice-over separately from the video of a client speaking, and the audio doesn't quite match the lip movement.","question":"What should he adjust?","options":["Nudge the audio track's sync offset until it lines up with the video","Re-shoot the entire video instead of adjusting audio","Delete the voice-over and use no audio at all","Only adjust the video's playback speed, never the audio"],"correct":0,"explanation":"A sync offset adjustment on the audio track is the direct fix for an audio/video timing mismatch."},{"scenario":"A clip has background music too loud over Otieno's narration, with some background hiss audible.","question":"What should he do?","options":["Lower the music's relative volume so narration is clearly audible, and apply noise reduction to reduce the hiss","Raise the music volume even further","Mute the narration instead of adjusting the music","Ignore the hiss since noise reduction tools don't exist"],"correct":0,"explanation":"Balancing relative volume levels and applying noise reduction directly addresses both problems described."},{"scenario":"Otieno finishes an edit shot at a mix of frame rates and needs to choose export settings.","question":"What should guide his resolution and frame rate choice?","options":["What fits the source footage quality and the destination platform's requirements","Always the lowest resolution available, regardless of source quality","Frame rate never matters for export, only resolution does","Whatever settings are fastest to export, regardless of the result"],"correct":0,"explanation":"Export resolution and frame rate should be chosen to suit both the source footage and where the video will be viewed."},{"scenario":"A client wants a small file size to send over WhatsApp, while another wants the best quality for a YouTube upload.","question":"How should Otieno's export settings differ between these two?","options":["Lower bitrate/quality and smaller file size for WhatsApp; higher bitrate/quality for YouTube","Identical settings for both, since export options don't matter","Always use the smallest possible file size regardless of the destination","Always use the highest possible bitrate regardless of the destination"],"correct":0,"explanation":"Export settings should be tailored to the destination's actual constraints \u2014 small/fast for messaging apps, higher quality for platforms like YouTube."},{"scenario":"Otieno needs one finished edit to go out as an Instagram Reel, a YouTube upload, and a WhatsApp Status.","question":"What differs across these three exports?","options":["Aspect ratio, maximum duration, and target file size, tailored to each platform's constraints","Nothing \u2014 one single export file always works everywhere","Only the video's title needs to change between platforms","Only the audio track needs to change between platforms"],"correct":0,"explanation":"Each platform has its own aspect ratio, duration, and file-size expectations that the export should be tailored to."},{"scenario":"A client sends Otieno footage and asks what the difference is between the file's container (like MP4/MOV) and its codec (like H.264/H.265).","question":"What's the correct distinction?","options":["The container is the file wrapper/format; the codec is how the video data inside it is compressed/encoded","They are exactly the same thing with different names","The codec only affects audio, never video","The container determines the frame rate, and the codec determines the resolution"],"correct":0,"explanation":"Container and codec are distinct: the container is the wrapper format, the codec is the compression method for the video data inside it."},{"scenario":"Otieno needs to email a client a small preview file without destroying quality too much.","question":"What should he adjust to hit a target file size?","options":["The compression level/bitrate, balanced against an acceptable quality floor","The video's title text only","The project's frame rate, which has no effect on file size","Nothing can be done \u2014 file size cannot be controlled"],"correct":0,"explanation":"Compression/bitrate is the main lever for balancing file size against acceptable quality."},{"scenario":"A client says a finished video won't play properly on their older Android phone.","question":"What's a reasonable fix?","options":["Re-export using a more broadly compatible format/codec/resolution combination","Tell the client to buy a new phone","Assume nothing can be done about compatibility","Increase the resolution to the maximum possible, regardless of compatibility"],"correct":0,"explanation":"Compatibility issues are commonly resolved by choosing a more widely-supported format/codec/resolution combination."},{"scenario":"CapCut's Auto Captions generate subtitles for a client testimonial video, but a couple of names are misheard/misspelled.","question":"What must Otieno do before publishing?","options":["Review and correct the auto-generated captions before exporting","Publish the auto-captions exactly as generated, since AI is always accurate","Delete all captions rather than review them","Ignore the captions entirely, since they don't matter"],"correct":0,"explanation":"Auto-generated captions must always be reviewed and corrected \u2014 AI transcription can mishear words and names."},{"scenario":"Otieno uses Auto Reframe to convert a 16:9 interview into a 9:16 Reel, but the AI crop sometimes cuts off part of the subject's face.","question":"What should he do before exporting?","options":["Check the reframed result frame-by-frame and manually correct any bad crops","Trust the auto-reframe result completely without checking it","Avoid using Auto Reframe or any 9:16 content ever","Only check the very first frame of the video"],"correct":0,"explanation":"Auto-reframe results should be checked throughout the video, since the AI's crop can occasionally miss important content like part of a face."},{"scenario":"An AI tool suggests an auto-generated background music track or auto-color-grade that doesn't match what the client actually wants.","question":"What's the correct professional response?","options":["Review the AI's suggestion and adjust it to match the client's actual needs, rather than accepting it blindly","Deliver the AI's suggestion exactly as generated, since it's always right","Refuse to use any AI-assisted tools ever again","Tell the client their preferences are wrong"],"correct":0,"explanation":"AI suggestions are a starting point to be reviewed and adjusted, never a final answer to be trusted blindly."}];
+let currentQuestion = 0, score = 0, streak = 0, answered = false;
+function updateScoreboard() {
+    document.getElementById('score').textContent = score;
+    document.getElementById('current').textContent = Math.min(currentQuestion + 1, exercises.length);
+    document.getElementById('total').textContent = exercises.length;
+    document.getElementById('streak').textContent = streak;
+    document.getElementById('progress').style.width = ((currentQuestion) / exercises.length) * 100 + '%';
+}
+function escapeHtml(s) { return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+function renderQuestion() {
+    answered = false;
+    const q = exercises[currentQuestion];
+    let html = '';
+    if (q.scenario) html += `<div class="scenario"><strong>Scenario.</strong> ${escapeHtml(q.scenario)}</div>`;
+    html += `<div class="question">${escapeHtml(q.question)}</div>`;
+    html += '<div class="options">';
+    q.options.forEach((o, i) => { html += `<button class="option" onclick="selectAnswer(${i})">${escapeHtml(o)}</button>`; });
+    html += '</div>';
+    document.getElementById('exerciseCard').innerHTML = html;
+    updateScoreboard();
+}
+function selectAnswer(i) {
+    if (answered) return;
+    answered = true;
+    const q = exercises[currentQuestion];
+    const btns = document.querySelectorAll('.option');
+    btns.forEach(b => b.classList.add('disabled'));
+    btns[q.correct].classList.add('correct');
+    const right = i === q.correct;
+    if (!right) btns[i].classList.add('wrong');
+    if (right) { score += 10; streak += 1; } else { streak = 0; }
+    const fb = document.createElement('div');
+    fb.className = 'feedback ' + (right ? 'correct' : 'wrong');
+    fb.innerHTML = `<strong>${right ? '&#9989; Correct.' : '&#10060; Not quite.'}</strong><br>${escapeHtml(q.explanation)}`;
+    document.getElementById('exerciseCard').appendChild(fb);
+    const nb = document.createElement('button');
+    nb.className = 'next-btn';
+    nb.textContent = currentQuestion === exercises.length - 1 ? 'See results →' : 'Next scenario →';
+    nb.onclick = nextQuestion;
+    document.getElementById('exerciseCard').appendChild(nb);
+    updateScoreboard();
+}
+function nextQuestion() { currentQuestion++; if (currentQuestion >= exercises.length) return showResults(); renderQuestion(); }
+function showResults() {
+    document.getElementById('progress').style.width = '100%';
+    const total = exercises.length * 10;
+    const pct = Math.round(score / total * 100);
+    if (window.parent) { window.parent.postMessage({type:"mtti_quiz_score", score: score, total: total, percent: pct}, "*"); }
+    let badge = '🌟', msg = 'Excellent work. Otieno-level editing know-how.';
+    if (pct < 50) { badge = '🌱'; msg = 'Good first attempt. Review the lessons and try again.'; }
+    else if (pct < 80) { badge = '📚'; msg = 'Solid progress. Review the scenarios you missed and retry.'; }
+    document.getElementById('exerciseCard').innerHTML = `
+        <div class="results">
+            <span class="badge">${badge}</span>
+            <h2>Quiz Complete</h2>
+            <div class="final-score">${score} / ${total}</div>
+            <p><strong>${pct}%</strong> · Longest streak: ${streak}</p>
+            <p>${msg}</p>
+            <button class="restart-btn" onclick="restart()">Try again 🔁</button>
+        </div>`;
+}
+function restart() { currentQuestion = 0; score = 0; streak = 0; renderQuestion(); }
+renderQuestion();
+</script>
+</body>
+</html>

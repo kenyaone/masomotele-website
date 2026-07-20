@@ -1,0 +1,400 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Default Parameters and Keyword Arguments — Quiz</title>
+    <link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Fredoka:wght@500;600&display=swap" rel="stylesheet">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Space Mono', monospace;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh; padding: 20px; color: #fff;
+        }
+        .container { max-width: 900px; margin: 0 auto; }
+        .header { text-align: center; margin-bottom: 30px; animation: slideDown 0.6s ease-out; }
+        .header .lesson-tag {
+            display: inline-block; background: rgba(255,255,255,0.2);
+            padding: 6px 16px; border-radius: 999px;
+            font-size: 0.85em; margin-bottom: 12px;
+        }
+        .header h1 {
+            font-family: 'Fredoka', sans-serif; font-size: 2.2em;
+            margin-bottom: 8px; text-shadow: 3px 3px 0 rgba(0,0,0,0.2);
+        }
+        .header p { opacity: 0.95; font-size: 0.95em; }
+        .score-board {
+            background: rgba(255,255,255,0.15); backdrop-filter: blur(10px);
+            border-radius: 20px; padding: 20px; margin-bottom: 20px;
+            display: flex; justify-content: space-around;
+            animation: fadeIn 0.8s ease-out 0.2s both;
+        }
+        .score-item { text-align: center; }
+        .score-item .label { font-size: 0.85em; opacity: 0.9; margin-bottom: 4px; }
+        .score-item .value {
+            font-size: 1.8em; font-weight: bold; font-family: 'Fredoka', sans-serif;
+        }
+        .progress-bar {
+            width: 100%; height: 8px; background: rgba(255,255,255,0.3);
+            border-radius: 10px; margin-bottom: 25px; overflow: hidden;
+        }
+        .progress-fill {
+            height: 100%; background: linear-gradient(90deg, #f093fb 0%, #f5576c 100%);
+            border-radius: 10px; transition: width 0.5s ease; width: 0%;
+        }
+        .exercise-card {
+            background: white; color: #333; border-radius: 25px;
+            padding: 35px; margin-bottom: 20px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            animation: fadeIn 0.6s ease-out both;
+        }
+        .scenario {
+            background: linear-gradient(135deg, #fff8e1 0%, #ffecb3 100%);
+            border-left: 5px solid #ffc107;
+            padding: 20px 24px; border-radius: 12px;
+            margin-bottom: 24px;
+            font-size: 0.98em; line-height: 1.55;
+        }
+        .scenario strong { color: #7a5a00; font-family: 'Fredoka', sans-serif; }
+        .question {
+            font-size: 1.15em; margin-bottom: 20px;
+            font-weight: 700; line-height: 1.4;
+        }
+        .options { display: flex; flex-direction: column; gap: 12px; }
+        .option {
+            background: #f5f7fb; border: 2px solid transparent;
+            padding: 16px 20px; border-radius: 12px;
+            cursor: pointer; transition: all 0.2s ease;
+            font-family: 'Space Mono', monospace; font-size: 0.98em; text-align: left;
+        }
+        .option:hover:not(.disabled) {
+            background: #eef1fb; border-color: #667eea; transform: translateX(4px);
+        }
+        .option.correct { background: #d4edda; border-color: #28a745; color: #155724; }
+        .option.wrong { background: #f8d7da; border-color: #dc3545; color: #721c24; animation: shake 0.4s; }
+        .option.disabled { cursor: not-allowed; opacity: 0.85; }
+        .feedback {
+            margin-top: 22px; padding: 18px 22px; border-radius: 12px;
+            animation: slideUp 0.4s ease-out;
+            font-size: 0.98em; line-height: 1.5;
+        }
+        .feedback.correct { background: #d4edda; color: #155724; border-left: 4px solid #28a745; }
+        .feedback.wrong { background: #f8d7da; color: #721c24; border-left: 4px solid #dc3545; }
+        .feedback strong { font-family: 'Fredoka', sans-serif; }
+        .next-btn, .restart-btn {
+            margin-top: 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white; border: none;
+            padding: 14px 32px; border-radius: 12px;
+            font-size: 1em; cursor: pointer;
+            font-family: 'Fredoka', sans-serif;
+            box-shadow: 0 6px 18px rgba(0,0,0,0.2);
+            transition: transform 0.2s ease;
+        }
+        .next-btn:hover, .restart-btn:hover { transform: scale(1.04); }
+        .results {
+            text-align: center; padding: 25px 15px;
+            animation: bounceIn 0.6s ease-out;
+        }
+        .results h2 {
+            font-family: 'Fredoka', sans-serif; font-size: 2em;
+            margin-bottom: 12px; color: #333;
+        }
+        .results .final-score {
+            font-size: 3em; font-family: 'Fredoka', sans-serif;
+            color: #667eea; margin: 20px 0;
+        }
+        .results p { color: #555; margin-bottom: 12px; }
+        .badge { display: inline-block; font-size: 3.5em; margin: 8px 0; }
+        @keyframes slideDown { from { opacity: 0; transform: translateY(-30px); } to { opacity: 1; transform: translateY(0); } }
+        @keyframes fadeIn { from { opacity: 0; transform: scale(0.96); } to { opacity: 1; transform: scale(1); } }
+        @keyframes slideUp { from { opacity: 0; transform: translateY(15px); } to { opacity: 1; transform: translateY(0); } }
+        @keyframes shake { 0%,100% { transform: translateX(0); } 25% { transform: translateX(-8px); } 75% { transform: translateX(8px); } }
+        @keyframes bounceIn { 0% { opacity: 0; transform: scale(0.4); } 60% { transform: scale(1.05); } 100% { opacity: 1; transform: scale(1); } }
+
+        /* How-To intro screen — shown before question 1, not scored */
+        .howto-card { background: white; color: #333; border-radius: 25px; padding: 35px; margin-bottom: 20px; box-shadow: 0 20px 60px rgba(0,0,0,0.3); }
+        .howto-card h3 { font-family: 'Fredoka', sans-serif; font-size: 1.3em; margin-bottom: 12px; color: #667eea; }
+        .howto-card p { line-height: 1.6; margin-bottom: 16px; color: #444; }
+        .howto-code { background: #0f0f18; color: #e6e6e6; font-family: 'Space Mono', monospace; font-size: 0.85em; padding: 14px 16px; border-radius: 10px; margin-bottom: 18px; white-space: pre; overflow-x: auto; }
+        .howto-field { margin-bottom: 16px; }
+        .howto-field label { display: block; font-weight: 700; margin-bottom: 6px; color: #333; }
+        .howto-field select { width: 100%; padding: 10px 12px; border-radius: 8px; border: 2px solid #ddd; font-family: 'Space Mono', monospace; font-size: 0.95em; background: #f5f7fb; }
+        .howto-field-result { margin-top: 6px; font-size: 0.9em; font-weight: 700; display: none; }
+        .howto-field-result.show { display: block; }
+        .howto-field-result.ok { color: #155724; }
+        .howto-field-result.fail { color: #721c24; }
+        .howto-banner { margin-top: 4px; margin-bottom: 18px; padding: 12px 16px; border-radius: 10px; font-size: 0.9em; font-weight: 700; display: none; }
+        .howto-banner.show { display: block; }
+        .howto-banner.ok { background: #d4edda; color: #155724; }
+        .howto-banner.fail { background: #f8d7da; color: #721c24; }
+        .start-quiz-btn { margin-top: 4px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; border: none; padding: 14px 32px; border-radius: 12px; font-size: 1em; cursor: pointer; font-family: 'Fredoka', sans-serif; box-shadow: 0 6px 18px rgba(0,0,0,0.2); }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <div class="lesson-tag">Module 1 · Lesson 1.1 · Quiz</div>
+            <h1>How the Web Works</h1>
+            <p></p>
+        </div>
+
+        <div class="score-board">
+            <div class="score-item"><div class="label">Score</div><div class="value" id="score">0</div></div>
+            <div class="score-item"><div class="label">Question</div><div class="value"><span id="current">1</span>/<span id="total">10</span></div></div>
+            <div class="score-item"><div class="label">Streak</div><div class="value" id="streak">0</div></div>
+        </div>
+
+        <div class="progress-bar"><div class="progress-fill" id="progress"></div></div>
+
+        <div class="exercise-card" id="exerciseCard"></div>
+    </div>
+
+    <script>
+        const exercises = [
+    {
+        "id": "q1",
+        "text": "What is a default parameter value?",
+        "options": [
+            "A value that is always ignored",
+            "A fallback value used automatically when the caller doesn't supply that argument",
+            "The first argument in every function",
+            "A value that can never be changed"
+        ],
+        "answer": 1,
+        "explanation": "A default value is used only when the corresponding argument is omitted from the call."
+    },
+    {
+        "id": "q2",
+        "text": "Given def greet(name, greeting=\"Hello\"):, what does greet(\"Amina\") print?",
+        "options": [
+            "Hello, Amina!",
+            "An error, since greeting was not supplied",
+            "None, Amina!",
+            "Amina, Hello!"
+        ],
+        "answer": 0,
+        "explanation": "greeting defaults to \"Hello\" since it was not supplied in the call."
+    },
+    {
+        "id": "q3",
+        "text": "What is a keyword argument?",
+        "options": [
+            "An argument passed by naming the parameter directly, e.g. name=\"Brian\"",
+            "A special Python reserved word",
+            "An argument that must be a string",
+            "The same thing as a default parameter"
+        ],
+        "answer": 0,
+        "explanation": "A keyword argument names the parameter explicitly in the call, e.g. greet(name=\"Brian\")."
+    },
+    {
+        "id": "q4",
+        "text": "Does the order of keyword arguments in a call matter?",
+        "options": [
+            "Yes, they must always match the definition order",
+            "No \u2014 naming them means order does not matter",
+            "Only for the first argument",
+            "Keyword arguments are not allowed in Python"
+        ],
+        "answer": 1,
+        "explanation": "Because keyword arguments are matched by name, not position, their order in the call is flexible."
+    },
+    {
+        "id": "q5",
+        "text": "Why are default parameters useful?",
+        "options": [
+            "They make a parameter optional, with a sensible fallback if not provided",
+            "They are required by Python for every function",
+            "They prevent a function from being called more than once",
+            "They automatically print the function's result"
+        ],
+        "answer": 0,
+        "explanation": "Defaults let callers skip arguments that usually have the same value, simplifying most calls."
+    },
+    {
+        "id": "q6",
+        "text": "Given def enroll(student_name, course=\"Computer Applications\"):, what does enroll(\"Brian\", \"Nursing Assistant\") do?",
+        "options": [
+            "Uses the default course, ignoring \"Nursing Assistant\"",
+            "Overrides the default, enrolling Brian in Nursing Assistant",
+            "Raises an error, since course already has a default",
+            "Enrolls two separate students"
+        ],
+        "answer": 1,
+        "explanation": "Supplying a second argument overrides the default value for that call."
+    }
+];
+
+        let currentQuestion = 0, score = 0, streak = 0, answered = false;
+
+        function updateScoreboard() {
+            document.getElementById('score').textContent = score;
+            document.getElementById('current').textContent = Math.min(currentQuestion + 1, exercises.length);
+            document.getElementById('total').textContent = exercises.length;
+            document.getElementById('streak').textContent = streak;
+            document.getElementById('progress').style.width = ((currentQuestion) / exercises.length) * 100 + '%';
+        }
+
+        function escapeHtml(s) {
+            return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+        }
+
+        function renderQuestion() {
+            answered = false;
+            const q = exercises[currentQuestion];
+            let html = '';
+            if (q.scenario) {
+                html += `<div class="scenario"><strong>Scenario.</strong> ${escapeHtml(q.scenario)}</div>`;
+            }
+            html += `<div class="question">${escapeHtml(q.text)}</div>`;
+            html += '<div class="options">';
+            q.options.forEach((o, i) => {
+                html += `<button class="option" onclick="selectAnswer(${i})">${escapeHtml(o)}</button>`;
+            });
+            html += '</div>';
+            document.getElementById('exerciseCard').innerHTML = html;
+            updateScoreboard();
+        }
+
+        function selectAnswer(i) {
+            if (answered) return;
+            answered = true;
+            const q = exercises[currentQuestion];
+            const btns = document.querySelectorAll('.option');
+            btns.forEach(b => b.classList.add('disabled'));
+            btns[q.answer].classList.add('correct');
+            const right = i === q.answer;
+            if (!right) btns[i].classList.add('wrong');
+            if (right) { score += 10; streak += 1; } else { streak = 0; }
+            const fb = document.createElement('div');
+            fb.className = 'feedback ' + (right ? 'correct' : 'wrong');
+            fb.innerHTML = `<strong>${right ? '✅ Correct.' : '❌ Not quite.'}</strong><br>${escapeHtml(q.explanation)}`;
+            document.getElementById('exerciseCard').appendChild(fb);
+            const nb = document.createElement('button');
+            nb.className = 'next-btn';
+            nb.textContent = currentQuestion === exercises.length - 1 ? 'See results →' : 'Next scenario →';
+            nb.onclick = nextQuestion;
+            document.getElementById('exerciseCard').appendChild(nb);
+            updateScoreboard();
+        }
+
+        function nextQuestion() {
+            currentQuestion++;
+            if (currentQuestion >= exercises.length) return showResults();
+            renderQuestion();
+        }
+
+        function showResults() {
+            document.getElementById('progress').style.width = '100%';
+            const total = exercises.length * 10;
+            const pct = Math.round(score / total * 100);
+            if (window.parent) { window.parent.postMessage({type:"mtti_quiz_score", score: score, total: total, percent: pct}, "*"); }
+            let badge = '🌟', msg = 'Excellent work. You have a professional grasp of this lesson.';
+            if (pct < 50) { badge = '🌱'; msg = 'Good first attempt. Re-watch the lesson video and try again.'; }
+            else if (pct < 80) { badge = '📚'; msg = 'Solid progress. Review the scenarios you missed and retry.'; }
+            document.getElementById('exerciseCard').innerHTML = `
+                <div class="results">
+                    <span class="badge">${badge}</span>
+                    <h2>Quiz Complete</h2>
+                    <div class="final-score">${score} / ${total}</div>
+                    <p><strong>${pct}%</strong> · Longest streak: ${streak}</p>
+                    <p>${msg}</p>
+                    <button class="restart-btn" onclick="restart()">Try again 🔁</button>
+                </div>`;
+        }
+
+        function restart() {
+            currentQuestion = 0; score = 0; streak = 0;
+            renderQuestion();
+        }
+
+
+        /* How-To intro — a small, ungraded field-check demo shown before
+           the quiz starts, rehearsing how a default parameter behaves when
+           omitted vs. when a value is supplied for it, since the quiz asks
+           students to trace exactly that behavior. */
+        const HOWTO_CODE_1508 = `def book_class(student, level="Beginner"):
+    print(student + " enrolled in " + level + " level")`;
+
+        const HOWTO_FIELDS = [
+            {
+                id: 'hf1',
+                label: 'Call 1 -- book_class("Amina")  ->  what does it print?',
+                options: [
+                    'Amina enrolled in Beginner level',
+                    'Amina enrolled in None level',
+                    'Error -- level was not supplied',
+                    'Beginner enrolled in Amina level'
+                ],
+                correct: 0
+            },
+            {
+                id: 'hf2',
+                label: 'Call 2 -- book_class("Brian", "Advanced")  ->  what does it print?',
+                options: [
+                    'Brian enrolled in Advanced level',
+                    'Brian enrolled in Beginner level',
+                    'Error -- cannot override a default',
+                    'Advanced enrolled in Brian level'
+                ],
+                correct: 0
+            }
+        ];
+
+        function escHtmlH(s) { return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+
+        function renderHowtoFields(results) {
+            document.getElementById('howtoFields').innerHTML = HOWTO_FIELDS.map(f => {
+                const r = results ? results[f.id] : null;
+                const cls = r ? ('show ' + (r.ok ? 'ok' : 'fail')) : '';
+                const msg = r ? (r.ok ? 'Correct.' : 'Not quite -- try again.') : '';
+                return `<div class="howto-field">
+                    <label for="${f.id}">${escHtmlH(f.label)}</label>
+                    <select id="${f.id}">${f.options.map((o, i) => `<option value="${i}">${escHtmlH(o)}</option>`).join('')}</select>
+                    <div class="howto-field-result ${cls}">${msg}</div>
+                </div>`;
+            }).join('');
+        }
+
+        function checkHowtoFields() {
+            const results = {};
+            let allOk = true;
+            HOWTO_FIELDS.forEach(f => {
+                const val = parseInt(document.getElementById(f.id).value, 10);
+                const ok = val === f.correct;
+                results[f.id] = { ok: ok };
+                if (!ok) allOk = false;
+            });
+            renderHowtoFields(results);
+            const banner = document.getElementById('howtoBanner');
+            banner.classList.add('show');
+            banner.className = 'howto-banner show ' + (allOk ? 'ok' : 'fail');
+            banner.textContent = allOk
+                ? 'Correct on both -- you can now predict what a default parameter call will print.'
+                : 'Not yet -- check which argument was actually supplied for each call, then re-select.';
+        }
+
+        function renderHowto() {
+            document.getElementById('exerciseCard').innerHTML = `
+                <div class="howto-card">
+                    <h3>Quick How-To: Tracing a Default Parameter Call</h3>
+                    <p>A default value is used automatically only when the caller leaves that argument out -- but it is overridden the moment a value is supplied for it. Read the function below, then predict what each call actually prints.</p>
+                    <div class="howto-code">${escHtmlH(HOWTO_CODE_1508)}</div>
+                    <div id="howtoFields"></div>
+                    <div class="howto-banner" id="howtoBanner"></div>
+                    <button class="start-quiz-btn" id="checkHowtoBtn">Check My Answers</button>
+                    <button class="start-quiz-btn" id="startQuizBtn" style="margin-left:10px;background:linear-gradient(135deg,#28a745,#1e7e34);">Start Quiz &rarr;</button>
+                </div>`;
+            renderHowtoFields();
+            document.getElementById('checkHowtoBtn').addEventListener('click', checkHowtoFields);
+            document.getElementById('startQuizBtn').addEventListener('click', renderQuestion);
+        }
+
+        renderHowto();
+
+        renderHowto();
+    </script>
+</body>
+</html>

@@ -1,0 +1,346 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Creative Formats | MTTI Digital Marketing</title>
+    <link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Fredoka:wght@500;600&display=swap" rel="stylesheet">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Space Mono', monospace;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh; padding: 20px; color: #fff;
+        }
+        .container { max-width: 900px; margin: 0 auto; }
+        .header { text-align: center; margin-bottom: 30px; animation: slideDown 0.6s ease-out; }
+        .header .lesson-tag {
+            display: inline-block; background: rgba(255,255,255,0.2);
+            padding: 6px 16px; border-radius: 999px;
+            font-size: 0.85em; margin-bottom: 12px;
+        }
+        .header h1 {
+            font-family: 'Fredoka', sans-serif; font-size: 2.2em;
+            margin-bottom: 8px; text-shadow: 3px 3px 0 rgba(0,0,0,0.2);
+        }
+        .header p { opacity: 0.95; font-size: 0.95em; }
+        .score-board {
+            background: rgba(255,255,255,0.15); backdrop-filter: blur(10px);
+            border-radius: 20px; padding: 20px; margin-bottom: 20px;
+            display: flex; justify-content: space-around;
+            animation: fadeIn 0.8s ease-out 0.2s both;
+        }
+        .score-item { text-align: center; }
+        .score-item .label { font-size: 0.85em; opacity: 0.9; margin-bottom: 4px; }
+        .score-item .value {
+            font-size: 1.8em; font-weight: bold; font-family: 'Fredoka', sans-serif;
+        }
+        .progress-bar {
+            width: 100%; height: 8px; background: rgba(255,255,255,0.3);
+            border-radius: 10px; margin-bottom: 25px; overflow: hidden;
+        }
+        .progress-fill {
+            height: 100%; background: linear-gradient(90deg, #f093fb 0%, #f5576c 100%);
+            border-radius: 10px; transition: width 0.5s ease; width: 0%;
+        }
+        .exercise-card {
+            background: white; color: #333; border-radius: 25px;
+            padding: 35px; margin-bottom: 20px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            animation: fadeIn 0.6s ease-out both;
+        }
+        .scenario {
+            background: linear-gradient(135deg, #fff8e1 0%, #ffecb3 100%);
+            border-left: 5px solid #ffc107;
+            padding: 20px 24px; border-radius: 12px;
+            margin-bottom: 24px;
+            font-size: 0.98em; line-height: 1.55;
+        }
+        .scenario strong { color: #7a5a00; font-family: 'Fredoka', sans-serif; }
+        .question {
+            font-size: 1.15em; margin-bottom: 20px;
+            font-weight: 700; line-height: 1.4;
+        }
+        .options { display: flex; flex-direction: column; gap: 12px; }
+        .option {
+            background: #f5f7fb; border: 2px solid transparent;
+            padding: 16px 20px; border-radius: 12px;
+            cursor: pointer; transition: all 0.2s ease;
+            font-family: 'Space Mono', monospace; font-size: 0.98em; text-align: left;
+        }
+        .option:hover:not(.disabled) {
+            background: #eef1fb; border-color: #667eea; transform: translateX(4px);
+        }
+        .option.correct { background: #d4edda; border-color: #28a745; color: #155724; }
+        .option.wrong { background: #f8d7da; border-color: #dc3545; color: #721c24; animation: shake 0.4s; }
+        .option.disabled { cursor: not-allowed; opacity: 0.85; }
+        .feedback {
+            margin-top: 22px; padding: 18px 22px; border-radius: 12px;
+            animation: slideUp 0.4s ease-out;
+            font-size: 0.98em; line-height: 1.5;
+        }
+        .feedback.correct { background: #d4edda; color: #155724; border-left: 4px solid #28a745; }
+        .feedback.wrong { background: #f8d7da; color: #721c24; border-left: 4px solid #dc3545; }
+        .feedback strong { font-family: 'Fredoka', sans-serif; }
+        .next-btn, .restart-btn {
+            margin-top: 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white; border: none;
+            padding: 14px 32px; border-radius: 12px;
+            font-size: 1em; cursor: pointer;
+            font-family: 'Fredoka', sans-serif;
+            box-shadow: 0 6px 18px rgba(0,0,0,0.2);
+            transition: transform 0.2s ease;
+        }
+        .next-btn:hover, .restart-btn:hover { transform: scale(1.04); }
+        .results {
+            text-align: center; padding: 25px 15px;
+            animation: bounceIn 0.6s ease-out;
+        }
+        .results h2 {
+            font-family: 'Fredoka', sans-serif; font-size: 2em;
+            margin-bottom: 12px; color: #333;
+        }
+        .results .final-score {
+            font-size: 3em; font-family: 'Fredoka', sans-serif;
+            color: #667eea; margin: 20px 0;
+        }
+        .results p { color: #555; margin-bottom: 12px; }
+        .badge { display: inline-block; font-size: 3.5em; margin: 8px 0; }
+        @keyframes slideDown { from { opacity: 0; transform: translateY(-30px); } to { opacity: 1; transform: translateY(0); } }
+        @keyframes fadeIn { from { opacity: 0; transform: scale(0.96); } to { opacity: 1; transform: scale(1); } }
+        @keyframes slideUp { from { opacity: 0; transform: translateY(15px); } to { opacity: 1; transform: translateY(0); } }
+        @keyframes shake { 0%,100% { transform: translateX(0); } 25% { transform: translateX(-8px); } 75% { transform: translateX(8px); } }
+        @keyframes bounceIn { 0% { opacity: 0; transform: scale(0.4); } 60% { transform: scale(1.05); } 100% { opacity: 1; transform: scale(1); } }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <div class="lesson-tag">Module 11 · Lesson 11.4</div>
+            <h1>Creative Formats</h1>
+            <p>10 scenarios — Sarah's carousel + video, Brian's Reels + Stories, and Meta's safe zones</p>
+        </div>
+
+        <div class="score-board">
+            <div class="score-item"><div class="label">Score</div><div class="value" id="score">0</div></div>
+            <div class="score-item"><div class="label">Question</div><div class="value"><span id="current">1</span>/<span id="total">10</span></div></div>
+            <div class="score-item"><div class="label">Streak</div><div class="value" id="streak">0</div></div>
+        </div>
+
+        <div class="progress-bar"><div class="progress-fill" id="progress"></div></div>
+
+        <div class="exercise-card" id="exerciseCard"></div>
+    </div>
+
+    <script>
+        const exercises = [
+  {
+    "scenario": "Sarah's Karibu Kitchen has six lunch items she wants to show in a single ad, each with its own photo, its own headline, and its own WhatsApp deep link.",
+    "question": "Which of Meta's six creative formats does she pick?",
+    "options": [
+      "Single Video — put all six items in one 30-second cut.",
+      "Carousel — 2-10 swipeable cards, each with its own image, headline, and link. Meta auto-shows the top-performing card first per viewer.",
+      "Reels — vertical video is always best.",
+      "Stories — because Sarah runs promotions."
+    ],
+    "correct": 1,
+    "explanation": "Slide 3 of §11.4: Carousel is the highest-performing format for anything with multiple items — menu, product catalogue, service tiers. Six cards, six click opportunities, six independent tests running inside one ad."
+  },
+  {
+    "scenario": "Brian of Chapa Fitness runs the same product image as a Feed video ad (landscape 1:1) and as a Reels ad (vertical 9:16) to the same 18-24 year old Kenyan audience. Feed CTR is 1.1%. Reels CTR is 3.2%.",
+    "question": "What is the correct professional read?",
+    "options": [
+      "Feed video is broken — reinstall the ad.",
+      "Gen-Z lives inside Reels. Vertical 9:16, hook on frame one, price card by 8 seconds, CTA by 12 seconds is the Reels formula. Brian's 3x CTR lift is typical for this audience — Reels is his primary format, not a supporting one.",
+      "The audience is different — 18-24 year olds are not on Facebook.",
+      "Reels are only for dance videos."
+    ],
+    "correct": 1,
+    "explanation": "Slide 5 of §11.4: Reels is Brian's format because Chapa Fitness sells to 18-24 year olds. That audience lives inside Instagram Reels, Facebook Reels, and the Reels Overlay. The 3.2% vs 1.1% CTR gap is the format winning, not the message."
+  },
+  {
+    "scenario": "Brian wants to run a 6-hour urgency ad announcing his hoodie drop ends at midnight tonight.",
+    "question": "Which format is best-fit, and why?",
+    "options": [
+      "Instant Experience — it opens a full-screen article.",
+      "Stories — vertical 9:16, 15 seconds, ephemeral (disappear after 24 hours). Stories are Meta's urgency format, and they cost about 20% less per click than Feed placements because Meta has excess Stories inventory.",
+      "Carousel — 10 photos of the hoodie.",
+      "Single Image — the safest choice."
+    ],
+    "correct": 1,
+    "explanation": "Slide 6 of §11.4: Stories are the urgency format — ephemeral, vertical, 15 seconds. Perfect for flash sales, drops, and event promotion. Meta has more Stories inventory than demand, so CPC is roughly 20% cheaper than Feed."
+  },
+  {
+    "scenario": "Sarah writes 240 characters of primary text for her feed ad. On mobile it gets truncated to \"See More\" and viewers do not click through.",
+    "question": "What is Meta's safe zone for primary text, and how should she design?",
+    "options": [
+      "500 characters — Meta never truncates.",
+      "125 characters — the safe zone before Meta shows \"See More\" on mobile. Design so the key message plus the CTA land within the first 125 characters. Extra copy can follow but should not be load-bearing.",
+      "25 characters — one short sentence only.",
+      "1,000 characters — the longer the better."
+    ],
+    "correct": 1,
+    "explanation": "Slide 7 of §11.4: primary text safe zone is 125 characters. Headline is 40 characters. Description is 30 characters. Design every ad to fit inside those limits — over 80% of impressions land on mobile, where truncation kills click-through rate."
+  },
+  {
+    "scenario": "Sarah's headline reads \"Fresh lunch delivered across Eldoret CBD, Kapsoya, Elgon View, and Racecourse in under thirty minutes\" — 105 characters.",
+    "question": "What is wrong, and how does she fix it?",
+    "options": [
+      "Nothing is wrong — headline can be any length.",
+      "Meta's headline safe zone is 40 characters — Sarah's 105-character version will crop. She rewrites as \"Lunch delivered in 30 minutes\" (30 chars) and moves the neighbourhoods into the description or the ad targeting.",
+      "The headline should be 200 characters.",
+      "She should paste it into the CTA button."
+    ],
+    "correct": 1,
+    "explanation": "Slide 7 of §11.4: headline safe zone is 40 characters. Anything past 40 gets cropped, especially on mobile. \"Lunch delivered in 30 minutes\" is a clean 30 characters — punchy, on-brand, inside the limit."
+  },
+  {
+    "scenario": "Brian's Reels ad has his logo tucked into the top-left corner and a \"Shop Now\" caption at the very bottom of the frame.",
+    "question": "What safe-zone rule is he breaking?",
+    "options": [
+      "None — corners are the safest place.",
+      "Top 10% of a Reel gets covered by the Instagram profile chip. Bottom 10% gets covered by the caption + CTA button. Any important element in those zones will be hidden. Design so every key visual sits within the middle 80% of the frame vertically.",
+      "Only landscape Reels have safe zones.",
+      "Bottom 50% is always hidden."
+    ],
+    "correct": 1,
+    "explanation": "Slide 7 of §11.4: Reels and Stories have vertical safe zones — top 10% is covered by the profile chip, bottom 10% by the caption + CTA. Keep key elements in the middle 80%. Brian's logo and CTA are both outside the safe zone."
+  },
+  {
+    "scenario": "Brian is choosing a format for his hoodie e-commerce with a proper catalogue feed. He wants the highest ROAS format Meta offers.",
+    "question": "What is the best-fit combination?",
+    "options": [
+      "Single Image on Facebook Feed only.",
+      "Collection + Instant Experience — hero image or video plus a 4-tile product grid that opens a full-screen shop page inside the Facebook/Instagram app. Combined with Advantage+ Shopping, it is Meta's highest-ROAS combination for a business with a real product feed.",
+      "Stories only.",
+      "Messenger ads only."
+    ],
+    "correct": 1,
+    "explanation": "Slide 4 + Slide 8 of §11.4: Collection + Instant Experience is the format for catalogue-driven e-commerce. Instant Experience loads in ~0.5 sec because it never leaves the app. Collection + Advantage+ Shopping is the highest-ROAS combo for businesses with a real product feed."
+  },
+  {
+    "scenario": "Sarah has one product photo of a lunch plate. She wants Meta to auto-generate variations for different placements without her editing anything manually.",
+    "question": "What is the Meta feature that does this?",
+    "options": [
+      "Advantage+ Creative — she uploads one image (or one video) and Meta auto-generates variations for aspect ratio, crop, background music, and text overlay. Enable it inside the ad and Meta handles the rest.",
+      "Boost Post — always the answer.",
+      "Meta Pixel Helper.",
+      "There is no such feature."
+    ],
+    "correct": 0,
+    "explanation": "Slide 8 of §11.4: Advantage+ Creative is Meta's newest creative superpower. One asset in, many auto-variations out. Turn it on inside the ad — Meta figures out which variation works best on which placement. Works for both static and video."
+  },
+  {
+    "scenario": "Sarah's first Module-11 Meta campaign has objective Sales, and she is picking creative for two ad sets — cold prospecting and retargeting.",
+    "question": "What is a strong format pairing?",
+    "options": [
+      "Same Single Image on both — simpler is always better.",
+      "Cold prospecting: Single Video or Carousel showing the brand story and menu variety. Retargeting: Collection or Reels showing specific items the visitor already looked at, with an offer or urgency angle. Different message, different format, per audience temperature.",
+      "Stories only, on both.",
+      "Instant Experience on both."
+    ],
+    "correct": 1,
+    "explanation": "Slide 8 of §11.4: format follows objective AND audience temperature. Cold audiences need brand story and variety (Video or Carousel). Warm audiences need specific product + urgency (Collection or Reels). Never run the same asset across every ad set — the temperatures need different messages."
+  },
+  {
+    "scenario": "A trainee summarises Lesson 11.4 in one line: \"Meta has three creative formats, Reels ads are limited to 5 seconds, and the primary text safe zone is 500 characters.\"",
+    "question": "How many of those three claims are correct?",
+    "options": [
+      "All three.",
+      "Two — the Reels and safe zone parts.",
+      "Zero — every claim is wrong.",
+      "One — only the formats part."
+    ],
+    "correct": 2,
+    "explanation": "Every claim is wrong. Meta has SIX creative formats — Single Image, Single Video, Carousel, Collection, Reels, Stories (Slide 2-6). Reels ads run 15 to 60 seconds, not 5 (Slide 5). And primary text safe zone is 125 characters, not 500 (Slide 7)."
+  }
+];
+
+        let currentQuestion = 0, score = 0, streak = 0, answered = false;
+
+        function updateScoreboard() {
+            document.getElementById('score').textContent = score;
+            document.getElementById('current').textContent = Math.min(currentQuestion + 1, exercises.length);
+            document.getElementById('total').textContent = exercises.length;
+            document.getElementById('streak').textContent = streak;
+            document.getElementById('progress').style.width = ((currentQuestion) / exercises.length) * 100 + '%';
+        }
+
+        function escapeHtml(s) {
+            return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+        }
+
+        function renderQuestion() {
+            answered = false;
+            const q = exercises[currentQuestion];
+            let html = '';
+            if (q.scenario) {
+                html += `<div class="scenario"><strong>Scenario.</strong> ${escapeHtml(q.scenario)}</div>`;
+            }
+            html += `<div class="question">${escapeHtml(q.question)}</div>`;
+            html += '<div class="options">';
+            q.options.forEach((o, i) => {
+                html += `<button class="option" onclick="selectAnswer(${i})">${escapeHtml(o)}</button>`;
+            });
+            html += '</div>';
+            document.getElementById('exerciseCard').innerHTML = html;
+            updateScoreboard();
+        }
+
+        function selectAnswer(i) {
+            if (answered) return;
+            answered = true;
+            const q = exercises[currentQuestion];
+            const btns = document.querySelectorAll('.option');
+            btns.forEach(b => b.classList.add('disabled'));
+            btns[q.correct].classList.add('correct');
+            const right = i === q.correct;
+            if (!right) btns[i].classList.add('wrong');
+            if (right) { score += 10; streak += 1; } else { streak = 0; }
+            const fb = document.createElement('div');
+            fb.className = 'feedback ' + (right ? 'correct' : 'wrong');
+            fb.innerHTML = `<strong>${right ? '✅ Correct.' : '❌ Not quite.'}</strong><br>${escapeHtml(q.explanation)}`;
+            document.getElementById('exerciseCard').appendChild(fb);
+            const nb = document.createElement('button');
+            nb.className = 'next-btn';
+            nb.textContent = currentQuestion === exercises.length - 1 ? 'See results →' : 'Next scenario →';
+            nb.onclick = nextQuestion;
+            document.getElementById('exerciseCard').appendChild(nb);
+            updateScoreboard();
+        }
+
+        function nextQuestion() {
+            currentQuestion++;
+            if (currentQuestion >= exercises.length) return showResults();
+            renderQuestion();
+        }
+
+        function showResults() {
+            document.getElementById('progress').style.width = '100%';
+            const total = exercises.length * 10;
+            const pct = Math.round(score / total * 100);
+            if (window.parent) { window.parent.postMessage({type:"mtti_quiz_score", score: score, total: total, percent: pct}, "*"); }
+            let badge = '🌟', msg = 'Excellent work. You have a professional grasp of this lesson.';
+            if (pct < 50) { badge = '🌱'; msg = 'Good first attempt. Re-watch the lesson video and try again.'; }
+            else if (pct < 80) { badge = '📚'; msg = 'Solid progress. Review the scenarios you missed and retry.'; }
+            document.getElementById('exerciseCard').innerHTML = `
+                <div class="results">
+                    <span class="badge">${badge}</span>
+                    <h2>Quiz Complete</h2>
+                    <div class="final-score">${score} / ${total}</div>
+                    <p><strong>${pct}%</strong> · Longest streak: ${streak}</p>
+                    <p>${msg}</p>
+                    <button class="restart-btn" onclick="restart()">Try again 🔁</button>
+                </div>`;
+        }
+
+        function restart() {
+            currentQuestion = 0; score = 0; streak = 0;
+            renderQuestion();
+        }
+
+        renderQuestion();
+    </script>
+</body>
+</html>

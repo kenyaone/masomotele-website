@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>GRD-01 Final Assessment | MTTI Graphic Design</title>
+<link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Fredoka:wght@500;600&display=swap" rel="stylesheet">
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body { font-family: 'Space Mono', monospace; background: linear-gradient(135deg, #6A1B9A 0%, #4A148C 100%); min-height: 100vh; padding: 20px; color: #fff; }
+.container { max-width: 900px; margin: 0 auto; }
+.header { text-align: center; margin-bottom: 30px; }
+.header .lesson-tag { display: inline-block; background: rgba(255,255,255,0.2); padding: 6px 16px; border-radius: 999px; font-size: 0.85em; margin-bottom: 12px; }
+.header h1 { font-family: 'Fredoka', sans-serif; font-size: 2.2em; margin-bottom: 8px; text-shadow: 3px 3px 0 rgba(0,0,0,0.2); }
+.score-board { background: rgba(255,255,255,0.15); backdrop-filter: blur(10px); border-radius: 20px; padding: 20px; margin-bottom: 20px; display: flex; justify-content: space-around; }
+.score-item { text-align: center; }
+.score-item .label { font-size: 0.85em; opacity: 0.9; margin-bottom: 4px; }
+.score-item .value { font-size: 1.8em; font-weight: bold; font-family: 'Fredoka', sans-serif; }
+.progress-bar { width: 100%; height: 8px; background: rgba(255,255,255,0.3); border-radius: 10px; margin-bottom: 25px; overflow: hidden; }
+.progress-fill { height: 100%; background: linear-gradient(90deg, #f093fb 0%, #f5576c 100%); border-radius: 10px; transition: width 0.5s ease; width: 0%; }
+.exercise-card { background: white; color: #333; border-radius: 25px; padding: 35px; margin-bottom: 20px; box-shadow: 0 20px 60px rgba(0,0,0,0.3); }
+.scenario { background: linear-gradient(135deg, #f3e5f5 0%, #e1bee7 100%); border-left: 5px solid #8e24aa; padding: 20px 24px; border-radius: 12px; margin-bottom: 24px; font-size: 0.98em; line-height: 1.55; }
+.scenario strong { color: #4A148C; font-family: 'Fredoka', sans-serif; }
+.question { font-size: 1.15em; margin-bottom: 20px; font-weight: 700; line-height: 1.4; }
+.options { display: flex; flex-direction: column; gap: 12px; }
+.option { background: #f5f7fb; border: 2px solid transparent; padding: 16px 20px; border-radius: 12px; cursor: pointer; transition: all 0.2s ease; font-family: 'Space Mono', monospace; font-size: 0.98em; text-align: left; }
+.option:hover:not(.disabled) { background: #eef1fb; border-color: #8e24aa; transform: translateX(4px); }
+.option.correct { background: #d4edda; border-color: #28a745; color: #155724; }
+.option.wrong { background: #f8d7da; border-color: #dc3545; color: #721c24; }
+.option.disabled { cursor: not-allowed; opacity: 0.85; }
+.feedback { margin-top: 22px; padding: 18px 22px; border-radius: 12px; font-size: 0.98em; line-height: 1.5; }
+.feedback.correct { background: #d4edda; color: #155724; border-left: 4px solid #28a745; }
+.feedback.wrong { background: #f8d7da; color: #721c24; border-left: 4px solid #dc3545; }
+.next-btn, .restart-btn { margin-top: 20px; background: linear-gradient(135deg, #8e24aa 0%, #4A148C 100%); color: white; border: none; padding: 14px 32px; border-radius: 12px; font-size: 1em; cursor: pointer; font-family: 'Fredoka', sans-serif; box-shadow: 0 6px 18px rgba(0,0,0,0.2); }
+.results { text-align: center; padding: 25px 15px; }
+.results h2 { font-family: 'Fredoka', sans-serif; font-size: 2em; margin-bottom: 12px; color: #333; }
+.results .final-score { font-size: 3em; font-family: 'Fredoka', sans-serif; color: #4A148C; margin: 20px 0; }
+.results p { color: #555; margin-bottom: 12px; }
+.badge { display: inline-block; font-size: 3.5em; margin: 8px 0; }
+</style>
+</head>
+<body>
+<div class="container">
+<div class="header">
+<div class="lesson-tag">GRD-01 &middot; Final Assessment</div>
+<h1>Graphic Design &mdash; Final Assessment</h1>
+</div>
+<div class="score-board">
+<div class="score-item"><div class="label">Score</div><div class="value" id="score">0</div></div>
+<div class="score-item"><div class="label">Question</div><div class="value"><span id="current">1</span>/<span id="total">15</span></div></div>
+<div class="score-item"><div class="label">Streak</div><div class="value" id="streak">0</div></div>
+</div>
+<div class="progress-bar"><div class="progress-fill" id="progress"></div></div>
+<div class="exercise-card" id="exerciseCard"></div>
+</div>
+<script>
+const exercises = [{"scenario":"Ivy is pairing a heading font with a body font for a client flyer.","question":"What matters most when pairing fonts?","options":["Using as many decorative fonts as possible","Choosing fonts that contrast enough to look intentional but don't clash or hurt readability","Always using the same font for everything","Picking fonts at random"],"correct":1,"explanation":"Good pairing balances contrast with harmony \u2014 enough difference to distinguish heading from body, without clashing."},{"scenario":"A client's poster uses 6 different fonts and 5 different sizes with no clear pattern.","question":"What's the likely problem?","options":["Nothing, more variety is always better","It lacks a clear typographic hierarchy, making it hard to know what to look at first","The poster needs more colors instead","The client should use fewer words"],"correct":1,"explanation":"Without a deliberate hierarchy (size/weight guiding the eye), a design reads as cluttered rather than organized."},{"scenario":"Ivy needs light text to stay readable over a busy photo background.","question":"What color-theory principle is most relevant?","options":["Using as many colors as possible","Sufficient contrast between text and background","Matching the text color exactly to the background","Avoiding all bright colors"],"correct":1,"explanation":"Contrast between foreground text and background is what keeps text legible, especially over busy or photographic backgrounds."},{"scenario":"Chapa Design Studio is building brand materials for a new client.","question":"Why build a small, consistent color palette (primary/secondary/accent) rather than using whatever colors look nice each time?","options":["It's required by CorelDraw","Consistency across materials builds recognition of the brand over time","Random colors are always more creative","Clients prefer no color at all"],"correct":1,"explanation":"A consistent, limited palette applied across materials is what makes a brand instantly recognizable."},{"scenario":"Ivy is laying out a flyer and wants elements to feel aligned and organized rather than scattered.","question":"What technique helps most?","options":["Placing elements randomly for variety","Using a simple grid/columns to align elements consistently","Using only text, no images","Filling every inch of space with content"],"correct":1,"explanation":"A grid system keeps elements aligned and creates visual order, even in a simple flyer."},{"scenario":"A layout needs to guide the viewer's eye: read the headline first, then the offer, then the contact info.","question":"What's this called?","options":["Visual hierarchy","Color correction","File compression","Bezier editing"],"correct":0,"explanation":"Visual hierarchy uses size, position and whitespace to control the order in which a viewer notices things."},{"scenario":"Ivy opens CorelDraw for the first time and wants to know why it's used for this kind of work rather than a photo-editing tool.","question":"What's the key distinction?","options":["CorelDraw is vector-first, ideal for scalable logos/illustrations, unlike raster/pixel-based photo tools","CorelDraw only edits photographs","There is no real difference","CorelDraw cannot be used for print work"],"correct":0,"explanation":"CorelDraw is a vector-first tool, well suited to logos and illustrations that need to scale cleanly to any size."},{"scenario":"Ivy draws a custom curved shape and needs to refine specific points along its path.","question":"Which CorelDraw tool/concept applies?","options":["The Bezier/Pen tool and node editing","The Text tool only","PowerTRACE only","The Align & Distribute docker only"],"correct":0,"explanation":"The Bezier/Pen tool draws custom vector paths, and node editing lets you refine individual points along that path."},{"scenario":"Ivy is about to export a poster that will be sent to a commercial printer.","question":"What should the export use?","options":["RGB color, low resolution, no bleed","CMYK color, high resolution, with bleed","Any settings, printers adjust everything automatically","A password-protected file only"],"correct":1,"explanation":"Print work needs CMYK color, high resolution, and bleed margins \u2014 RGB/web-style exports are for screens, not print."},{"scenario":"A client wants a small, simple logo that must work equally well on a tiny business card and a huge storefront sign.","question":"What's the key design principle here?","options":["The logo must be highly detailed and complex","The logo must be simple and scalable so it reproduces well at any size","The logo should only exist at one fixed size","Complexity always looks more professional"],"correct":1,"explanation":"Scalability and simplicity are essential \u2014 an overly complex logo breaks down at small sizes or in single-color print."},{"scenario":"Chapa Design Studio delivers a logo, brand fonts, and a color palette together as one package to a client.","question":"What is this package called, and why does it matter?","options":["A brand identity kit \u2014 it keeps every future client material visually consistent","A random assortment with no real purpose","A single-use file with no future value","A backup file only"],"correct":0,"explanation":"A brand identity kit bundles the logo, fonts and colors so all future materials stay visually consistent."},{"scenario":"Ivy has a low-resolution photo reference she wants to convert into a clean vector illustration in CorelDraw.","question":"What CorelDraw feature helps with this?","options":["PowerTRACE, to trace the reference image into vector shapes","The spell-checker","The mail merge tool","Nothing \u2014 CorelDraw cannot use reference images"],"correct":0,"explanation":"PowerTRACE converts a raster reference image into editable vector shapes, a common illustration starting point."},{"scenario":"Ivy uses an AI image tool to generate a few mood-board ideas before starting a logo concept in CorelDraw.","question":"What's the appropriate way to treat this AI output?","options":["As the final deliverable to send the client directly","As a starting point for inspiration, refined into the real design afterward","As something that should never be shown to anyone","As a replacement for learning CorelDraw"],"correct":1,"explanation":"AI-generated concepts are a useful starting point, not a substitute for the actual designed, refined deliverable."},{"scenario":"Ivy uses an AI tool to remove the background from a client-supplied product photo.","question":"Is this a reasonable use of AI in a small design shop?","options":["No, background removal must always be done manually","Yes \u2014 cleaning up supplied assets like this is a common, practical real-world AI use","This is illegal in graphic design","This only works with CorelDraw's built-in AI"],"correct":1,"explanation":"AI-assisted background removal and image cleanup is a common, legitimate time-saver for real design work."},{"scenario":"Before sending an AI-generated illustration to a paying client, Ivy checks it closely.","question":"What should she check for?","options":["Nothing, AI output is always client-ready","Garbled details, inconsistent elements, and any copyright/likeness concerns","Only the file size","Whether the AI used CorelDraw"],"correct":1,"explanation":"AI-generated visuals can contain subtle errors or rights issues \u2014 verifying before client delivery is essential."}];
+let currentQuestion = 0, score = 0, streak = 0, answered = false;
+function updateScoreboard() {
+    document.getElementById('score').textContent = score;
+    document.getElementById('current').textContent = Math.min(currentQuestion + 1, exercises.length);
+    document.getElementById('total').textContent = exercises.length;
+    document.getElementById('streak').textContent = streak;
+    document.getElementById('progress').style.width = ((currentQuestion) / exercises.length) * 100 + '%';
+}
+function escapeHtml(s) { return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+function renderQuestion() {
+    answered = false;
+    const q = exercises[currentQuestion];
+    let html = '';
+    if (q.scenario) html += `<div class="scenario"><strong>Scenario.</strong> ${escapeHtml(q.scenario)}</div>`;
+    html += `<div class="question">${escapeHtml(q.question)}</div>`;
+    html += '<div class="options">';
+    q.options.forEach((o, i) => { html += `<button class="option" onclick="selectAnswer(${i})">${escapeHtml(o)}</button>`; });
+    html += '</div>';
+    document.getElementById('exerciseCard').innerHTML = html;
+    updateScoreboard();
+}
+function selectAnswer(i) {
+    if (answered) return;
+    answered = true;
+    const q = exercises[currentQuestion];
+    const btns = document.querySelectorAll('.option');
+    btns.forEach(b => b.classList.add('disabled'));
+    btns[q.correct].classList.add('correct');
+    const right = i === q.correct;
+    if (!right) btns[i].classList.add('wrong');
+    if (right) { score += 10; streak += 1; } else { streak = 0; }
+    const fb = document.createElement('div');
+    fb.className = 'feedback ' + (right ? 'correct' : 'wrong');
+    fb.innerHTML = `<strong>${right ? '✅ Correct.' : '❌ Not quite.'}</strong><br>${escapeHtml(q.explanation)}`;
+    document.getElementById('exerciseCard').appendChild(fb);
+    const nb = document.createElement('button');
+    nb.className = 'next-btn';
+    nb.textContent = currentQuestion === exercises.length - 1 ? 'See results →' : 'Next question →';
+    nb.onclick = nextQuestion;
+    document.getElementById('exerciseCard').appendChild(nb);
+    updateScoreboard();
+}
+function nextQuestion() { currentQuestion++; if (currentQuestion >= exercises.length) return showResults(); renderQuestion(); }
+function showResults() {
+    document.getElementById('progress').style.width = '100%';
+    const total = exercises.length * 10;
+    const pct = Math.round(score / total * 100);
+    if (window.parent) { window.parent.postMessage({type:"mtti_quiz_score", score: score, total: total, percent: pct}, "*"); }
+    let badge = '🌟', msg = 'Excellent work. You have a solid grasp of graphic design and CorelDraw fundamentals.';
+    if (pct < 50) { badge = '🌱'; msg = 'Good first attempt. Review the units and try again.'; }
+    else if (pct < 80) { badge = '📚'; msg = 'Solid progress. Review the questions you missed and retry.'; }
+    document.getElementById('exerciseCard').innerHTML = `
+        <div class="results">
+            <span class="badge">${badge}</span>
+            <h2>Final Assessment Complete</h2>
+            <div class="final-score">${score} / ${total}</div>
+            <p><strong>${pct}%</strong> · Longest streak: ${streak}</p>
+            <p>${msg}</p>
+            <button class="restart-btn" onclick="restart()">Try again 🔁</button>
+        </div>`;
+}
+function restart() { currentQuestion = 0; score = 0; streak = 0; renderQuestion(); }
+renderQuestion();
+</script>
+</body>
+</html>

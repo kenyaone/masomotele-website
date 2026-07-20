@@ -1,0 +1,346 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Meta Ads Manager | MTTI Digital Marketing</title>
+    <link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Fredoka:wght@500;600&display=swap" rel="stylesheet">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Space Mono', monospace;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh; padding: 20px; color: #fff;
+        }
+        .container { max-width: 900px; margin: 0 auto; }
+        .header { text-align: center; margin-bottom: 30px; animation: slideDown 0.6s ease-out; }
+        .header .lesson-tag {
+            display: inline-block; background: rgba(255,255,255,0.2);
+            padding: 6px 16px; border-radius: 999px;
+            font-size: 0.85em; margin-bottom: 12px;
+        }
+        .header h1 {
+            font-family: 'Fredoka', sans-serif; font-size: 2.2em;
+            margin-bottom: 8px; text-shadow: 3px 3px 0 rgba(0,0,0,0.2);
+        }
+        .header p { opacity: 0.95; font-size: 0.95em; }
+        .score-board {
+            background: rgba(255,255,255,0.15); backdrop-filter: blur(10px);
+            border-radius: 20px; padding: 20px; margin-bottom: 20px;
+            display: flex; justify-content: space-around;
+            animation: fadeIn 0.8s ease-out 0.2s both;
+        }
+        .score-item { text-align: center; }
+        .score-item .label { font-size: 0.85em; opacity: 0.9; margin-bottom: 4px; }
+        .score-item .value {
+            font-size: 1.8em; font-weight: bold; font-family: 'Fredoka', sans-serif;
+        }
+        .progress-bar {
+            width: 100%; height: 8px; background: rgba(255,255,255,0.3);
+            border-radius: 10px; margin-bottom: 25px; overflow: hidden;
+        }
+        .progress-fill {
+            height: 100%; background: linear-gradient(90deg, #f093fb 0%, #f5576c 100%);
+            border-radius: 10px; transition: width 0.5s ease; width: 0%;
+        }
+        .exercise-card {
+            background: white; color: #333; border-radius: 25px;
+            padding: 35px; margin-bottom: 20px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            animation: fadeIn 0.6s ease-out both;
+        }
+        .scenario {
+            background: linear-gradient(135deg, #fff8e1 0%, #ffecb3 100%);
+            border-left: 5px solid #ffc107;
+            padding: 20px 24px; border-radius: 12px;
+            margin-bottom: 24px;
+            font-size: 0.98em; line-height: 1.55;
+        }
+        .scenario strong { color: #7a5a00; font-family: 'Fredoka', sans-serif; }
+        .question {
+            font-size: 1.15em; margin-bottom: 20px;
+            font-weight: 700; line-height: 1.4;
+        }
+        .options { display: flex; flex-direction: column; gap: 12px; }
+        .option {
+            background: #f5f7fb; border: 2px solid transparent;
+            padding: 16px 20px; border-radius: 12px;
+            cursor: pointer; transition: all 0.2s ease;
+            font-family: 'Space Mono', monospace; font-size: 0.98em; text-align: left;
+        }
+        .option:hover:not(.disabled) {
+            background: #eef1fb; border-color: #667eea; transform: translateX(4px);
+        }
+        .option.correct { background: #d4edda; border-color: #28a745; color: #155724; }
+        .option.wrong { background: #f8d7da; border-color: #dc3545; color: #721c24; animation: shake 0.4s; }
+        .option.disabled { cursor: not-allowed; opacity: 0.85; }
+        .feedback {
+            margin-top: 22px; padding: 18px 22px; border-radius: 12px;
+            animation: slideUp 0.4s ease-out;
+            font-size: 0.98em; line-height: 1.5;
+        }
+        .feedback.correct { background: #d4edda; color: #155724; border-left: 4px solid #28a745; }
+        .feedback.wrong { background: #f8d7da; color: #721c24; border-left: 4px solid #dc3545; }
+        .feedback strong { font-family: 'Fredoka', sans-serif; }
+        .next-btn, .restart-btn {
+            margin-top: 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white; border: none;
+            padding: 14px 32px; border-radius: 12px;
+            font-size: 1em; cursor: pointer;
+            font-family: 'Fredoka', sans-serif;
+            box-shadow: 0 6px 18px rgba(0,0,0,0.2);
+            transition: transform 0.2s ease;
+        }
+        .next-btn:hover, .restart-btn:hover { transform: scale(1.04); }
+        .results {
+            text-align: center; padding: 25px 15px;
+            animation: bounceIn 0.6s ease-out;
+        }
+        .results h2 {
+            font-family: 'Fredoka', sans-serif; font-size: 2em;
+            margin-bottom: 12px; color: #333;
+        }
+        .results .final-score {
+            font-size: 3em; font-family: 'Fredoka', sans-serif;
+            color: #667eea; margin: 20px 0;
+        }
+        .results p { color: #555; margin-bottom: 12px; }
+        .badge { display: inline-block; font-size: 3.5em; margin: 8px 0; }
+        @keyframes slideDown { from { opacity: 0; transform: translateY(-30px); } to { opacity: 1; transform: translateY(0); } }
+        @keyframes fadeIn { from { opacity: 0; transform: scale(0.96); } to { opacity: 1; transform: scale(1); } }
+        @keyframes slideUp { from { opacity: 0; transform: translateY(15px); } to { opacity: 1; transform: translateY(0); } }
+        @keyframes shake { 0%,100% { transform: translateX(0); } 25% { transform: translateX(-8px); } 75% { transform: translateX(8px); } }
+        @keyframes bounceIn { 0% { opacity: 0; transform: scale(0.4); } 60% { transform: scale(1.05); } 100% { opacity: 1; transform: scale(1); } }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <div class="lesson-tag">Module 5 · Lesson 5.4</div>
+            <h1>Meta Ads Manager</h1>
+            <p>10 Sarah Chebet scenarios — three levels, ODAX objectives, and the Learning Phase</p>
+        </div>
+
+        <div class="score-board">
+            <div class="score-item"><div class="label">Score</div><div class="value" id="score">0</div></div>
+            <div class="score-item"><div class="label">Question</div><div class="value"><span id="current">1</span>/<span id="total">10</span></div></div>
+            <div class="score-item"><div class="label">Streak</div><div class="value" id="streak">0</div></div>
+        </div>
+
+        <div class="progress-bar"><div class="progress-fill" id="progress"></div></div>
+
+        <div class="exercise-card" id="exerciseCard"></div>
+    </div>
+
+    <script>
+        const exercises = [
+  {
+    "scenario": "Sarah opens Meta Ads Manager for the first time and gets confused about where to put settings. She sets her audience at the campaign level, her objective at the ad set, and her budget at the ad. Nothing saves properly.",
+    "question": "What is the correct three-level hierarchy, and what belongs at each level?",
+    "options": [
+      "Ad · Campaign · Ad Set, in that order — Meta arranges automatically.",
+      "Campaign — objective. Ad Set — who you target, where the ads appear, when they run, and how much you bid. Ad — the actual creative (image, video, headline, button).",
+      "There is only one level in Meta — everything sits together.",
+      "Campaign — creative. Ad Set — objective. Ad — audience."
+    ],
+    "correct": 1,
+    "explanation": "Slide 2 of §5.4 is explicit: Campaign holds the objective, Ad Set holds who/where/when/how-much (audience, placements, schedule, budget, bid), and Ad holds the creative. Every beginner mistake in Meta Ads comes from putting a setting at the wrong level."
+  },
+  {
+    "scenario": "Sarah wants Karibu Kitchen's first campaign to drive direct WhatsApp orders. She sees ODAX objectives labelled Awareness, Traffic, Engagement, Leads, App Promotion, Sales.",
+    "question": "Which ODAX objective should she choose, and why?",
+    "options": [
+      "Awareness — because Sarah wants people to know Karibu Kitchen exists.",
+      "Engagement — because likes and shares are the goal.",
+      "Sales — because it optimises for purchases, add-to-carts, and other conversions, which is exactly what a direct-response delivery order is.",
+      "App Promotion — because Sarah takes orders on WhatsApp, which is an app."
+    ],
+    "correct": 2,
+    "explanation": "Slide 3 of §5.4 lists the six ODAX objectives (introduced in 2022, down from 11). \"Sales\" is the direct-response objective for purchases and conversions — the right pick for Sarah's delivery orders. App Promotion is for app installs, not for buying via an app. Awareness and Engagement optimise for impressions and interactions, not sales."
+  },
+  {
+    "scenario": "Sarah has three sources she can target from: (a) Meta's data about women 25-50 in Eldoret CBD interested in food and family, (b) the 30 subscriber emails she just uploaded from Mailchimp, and (c) a new set of tens of thousands of people Meta finds who \"resemble\" those 30 subscribers.",
+    "question": "How should Sarah label these three audience types?",
+    "options": [
+      "(a) Custom · (b) Core · (c) Retargeted.",
+      "(a) Core Audience · (b) Custom Audience · (c) Lookalike Audience.",
+      "(a) Lookalike · (b) Core · (c) Custom.",
+      "All three are called \"Advantage Plus Audiences\"."
+    ],
+    "correct": 1,
+    "explanation": "Slide 4 of §5.4 defines the three: Core (Meta's own data — demographics, interests, behaviours), Custom (data YOU provide — customer list, Pixel visitors, engagers), and Lookalike (new people Meta finds who resemble a source). Sarah uses all three in her first campaign."
+  },
+  {
+    "scenario": "Sarah's first campaign is running. She is agonising over whether to hand-pick placements (Instagram Feed only? Facebook Reels only?) or let Meta decide.",
+    "question": "What does Lesson 5.4 recommend for a beginner in her position?",
+    "options": [
+      "Hand-pick every placement — beginners should control everything manually.",
+      "Use Advantage Plus Placements. Meta chooses automatically across Facebook Feed, Reels, Stories, Instagram Feed, Reels, Stories, Explore, Messenger, Audience Network. Within two weeks the algorithm learns her food photos work best on Instagram Feed and Facebook Reels and shifts 70% of budget there — no manual work.",
+      "Only run on Audience Network — it is the cheapest.",
+      "Turn off all placements and use email instead."
+    ],
+    "correct": 1,
+    "explanation": "Slide 5 of §5.4: for beginners, Advantage Plus Placements. Meta redistributes budget automatically to whichever surface converts best for Sarah's specific creative. Sarah's example shows 70% of budget flowing to Instagram Feed and Facebook Reels within two weeks — earned by the algorithm, not by manual work."
+  },
+  {
+    "scenario": "Sarah is writing the primary text for her first Meta ad. She has 240 characters of clever copy she loves. She is worried about it getting cut off on mobile.",
+    "question": "What are the Meta ad copy limits she should design to?",
+    "options": [
+      "Primary text 500 characters, headline 100, description 90 — no cropping ever.",
+      "Primary text 125-character safe zone before Meta shows the \"See More\" cut, headline 40 characters, description 30 characters. Design the important message inside those limits.",
+      "There are no limits — copy can be any length.",
+      "Primary text 25 characters, headline 200, description 500."
+    ],
+    "correct": 1,
+    "explanation": "The strict Meta ad copy safe zones are: primary text 125 characters (before the \"See More\" truncation on mobile), headline 40 characters, description 30 characters. These are the professional guidelines Sarah should design to — anything past those limits risks being hidden or cropped, especially on mobile where 80%+ of impressions land."
+  },
+  {
+    "scenario": "Sarah launches her first campaign and after three days panics — the cost per purchase is jumping around wildly, from KES 200 one hour to KES 900 the next. She wants to switch it off.",
+    "question": "What is happening, and what should she do?",
+    "options": [
+      "The ad is broken — switch it off immediately.",
+      "The ad set is in the Learning Phase. New ad sets need about 50 conversion events per week for Meta's algorithm to stabilise. Below 50 events, results swing wildly. Sarah should NOT judge or switch off a new campaign until it exits Learning — that is measured in conversion events, not calendar days.",
+      "Meta is charging her twice — she should demand a refund.",
+      "She should immediately double the budget to escape learning."
+    ],
+    "correct": 1,
+    "explanation": "Slide 7 of §5.4 introduces the Learning Phase: new ad sets need ~50 conversion events per week to stabilise. Below 50, cost per result swings wildly — exactly what Sarah is seeing. The professional discipline is to wait until the ad set exits Learning before making judgement calls. This is one of the most common mistakes new advertisers make."
+  },
+  {
+    "scenario": "Sarah's daily budget is KES 400, seven days a week, for two weeks.",
+    "question": "What is the total spend, and how does that fit her Lesson 5.1 allocation?",
+    "options": [
+      "KES 400 total — daily budgets do not multiply.",
+      "KES 5,600 total (KES 400 x 14 days), which sits comfortably within her KES 9,000 Meta allocation (60% of KES 15,000) from Lesson 5.1. It leaves KES 3,400 in the Meta bucket for the second half of the month.",
+      "KES 12,000 — the budget doubles automatically.",
+      "KES 400 x 30 = KES 12,000, which is over her Meta allocation."
+    ],
+    "correct": 1,
+    "explanation": "Slide 7 of §5.4 walks through the maths exactly this way: KES 400/day x 14 days = KES 5,600, well within the KES 9,000 Meta bucket from Lesson 5.1's 60/30/10 split. Daily budgets are simpler than lifetime budgets for beginners because you always know the daily cap."
+  },
+  {
+    "scenario": "Sarah's ad-level creative decisions: she wants to show three different lunch photos in one ad so a viewer can swipe through them.",
+    "question": "Which of Meta's six ad formats is she describing?",
+    "options": [
+      "Single Image — because it is technically many single images.",
+      "Carousel — two to ten swipeable cards, great for multiple menu items.",
+      "Collection — a hero image plus a grid of product tiles.",
+      "Instant Experience — a full-screen mobile experience."
+    ],
+    "correct": 1,
+    "explanation": "Slide 6 of §5.4 lists Meta's six ad formats (Single Image/Video, Carousel, Collection, Instant Experience, Reels, Stories). Swipeable multiple cards = Carousel, 2-10 cards. Collection is a hero plus product grid, Instant Experience is a full-screen story, Reels/Stories are vertical video formats."
+  },
+  {
+    "scenario": "Sarah's final first-campaign setup is: Campaign objective Sales; Ad Set location Eldoret CBD + Kapsoya + Elgon View + Racecourse, age 25-50, interests food + family + cooking, Advantage Plus placements, KES 400/day; Ad Level three creatives — a lunch photo (headline \"Lunch delivered to your desk in thirty minutes\", CTA Order Now to WhatsApp), a dinner photo, and a three-card carousel.",
+    "question": "What is the correct professional read on this setup?",
+    "options": [
+      "It is over-engineered — Sarah should launch a single ad only.",
+      "It is textbook: correct objective at the Campaign level, correct audience/placements/budget at the Ad Set, and three creatives at the Ad level so Meta can learn which one wins. Sarah does not have to guess — Meta's algorithm figures out the winner as data comes in.",
+      "The audience is too narrow — she should target all of Kenya.",
+      "She should switch off Advantage Plus and hand-pick every placement."
+    ],
+    "correct": 1,
+    "explanation": "Slide 8 of §5.4 gives this exact setup as the model first campaign. Objective at Campaign, targeting at Ad Set, three creatives at Ad — the whole point is that three creatives let Meta A/B-test them so the algorithm identifies the winner. Widening the audience to \"all Kenya\" would collapse the geo-fencing advantage from §5.3."
+  },
+  {
+    "scenario": "A trainee summarises Lesson 5.4 in one line: \"Meta has four levels, twelve objectives, and one audience type — set everything at the ad level.\"",
+    "question": "How many of those three claims are correct?",
+    "options": [
+      "All three.",
+      "Two — the objectives and audience parts.",
+      "Zero — every claim is wrong.",
+      "One — only the levels part."
+    ],
+    "correct": 2,
+    "explanation": "Every claim is wrong. Meta has THREE levels (not four): Campaign, Ad Set, Ad (Slide 2). It has SIX ODAX objectives (not twelve) — Awareness, Traffic, Engagement, Leads, App Promotion, Sales (Slide 3). It has THREE audience types (not one): Core, Custom, Lookalike (Slide 4). And settings go at their correct levels — not all at the ad level (Slide 2)."
+  }
+];
+
+        let currentQuestion = 0, score = 0, streak = 0, answered = false;
+
+        function updateScoreboard() {
+            document.getElementById('score').textContent = score;
+            document.getElementById('current').textContent = Math.min(currentQuestion + 1, exercises.length);
+            document.getElementById('total').textContent = exercises.length;
+            document.getElementById('streak').textContent = streak;
+            document.getElementById('progress').style.width = ((currentQuestion) / exercises.length) * 100 + '%';
+        }
+
+        function escapeHtml(s) {
+            return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+        }
+
+        function renderQuestion() {
+            answered = false;
+            const q = exercises[currentQuestion];
+            let html = '';
+            if (q.scenario) {
+                html += `<div class="scenario"><strong>Scenario.</strong> ${escapeHtml(q.scenario)}</div>`;
+            }
+            html += `<div class="question">${escapeHtml(q.question)}</div>`;
+            html += '<div class="options">';
+            q.options.forEach((o, i) => {
+                html += `<button class="option" onclick="selectAnswer(${i})">${escapeHtml(o)}</button>`;
+            });
+            html += '</div>';
+            document.getElementById('exerciseCard').innerHTML = html;
+            updateScoreboard();
+        }
+
+        function selectAnswer(i) {
+            if (answered) return;
+            answered = true;
+            const q = exercises[currentQuestion];
+            const btns = document.querySelectorAll('.option');
+            btns.forEach(b => b.classList.add('disabled'));
+            btns[q.correct].classList.add('correct');
+            const right = i === q.correct;
+            if (!right) btns[i].classList.add('wrong');
+            if (right) { score += 10; streak += 1; } else { streak = 0; }
+            const fb = document.createElement('div');
+            fb.className = 'feedback ' + (right ? 'correct' : 'wrong');
+            fb.innerHTML = `<strong>${right ? '✅ Correct.' : '❌ Not quite.'}</strong><br>${escapeHtml(q.explanation)}`;
+            document.getElementById('exerciseCard').appendChild(fb);
+            const nb = document.createElement('button');
+            nb.className = 'next-btn';
+            nb.textContent = currentQuestion === exercises.length - 1 ? 'See results →' : 'Next scenario →';
+            nb.onclick = nextQuestion;
+            document.getElementById('exerciseCard').appendChild(nb);
+            updateScoreboard();
+        }
+
+        function nextQuestion() {
+            currentQuestion++;
+            if (currentQuestion >= exercises.length) return showResults();
+            renderQuestion();
+        }
+
+        function showResults() {
+            document.getElementById('progress').style.width = '100%';
+            const total = exercises.length * 10;
+            const pct = Math.round(score / total * 100);
+            if (window.parent) { window.parent.postMessage({type:"mtti_quiz_score", score: score, total: total, percent: pct}, "*"); }
+            let badge = '🌟', msg = 'Excellent work. You have a professional grasp of this lesson.';
+            if (pct < 50) { badge = '🌱'; msg = 'Good first attempt. Re-watch the lesson video and try again.'; }
+            else if (pct < 80) { badge = '📚'; msg = 'Solid progress. Review the scenarios you missed and retry.'; }
+            document.getElementById('exerciseCard').innerHTML = `
+                <div class="results">
+                    <span class="badge">${badge}</span>
+                    <h2>Quiz Complete</h2>
+                    <div class="final-score">${score} / ${total}</div>
+                    <p><strong>${pct}%</strong> · Longest streak: ${streak}</p>
+                    <p>${msg}</p>
+                    <button class="restart-btn" onclick="restart()">Try again 🔁</button>
+                </div>`;
+        }
+
+        function restart() {
+            currentQuestion = 0; score = 0; streak = 0;
+            renderQuestion();
+        }
+
+        renderQuestion();
+    </script>
+</body>
+</html>

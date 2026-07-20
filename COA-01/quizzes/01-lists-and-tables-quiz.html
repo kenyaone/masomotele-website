@@ -37,7 +37,24 @@
         .results .final-score { font-size: 3em; font-family: 'Fredoka', sans-serif; color: #667eea; margin: 20px 0; }
         .results p { color: #555; margin-bottom: 12px; }
         .badge { display: inline-block; font-size: 3.5em; margin: 8px 0; }
-    </style>
+
+        /* How-To intro screen — shown before question 1, not scored */
+        .howto-card { background: white; color: #333; border-radius: 25px; padding: 35px; margin-bottom: 20px; box-shadow: 0 20px 60px rgba(0,0,0,0.3); }
+        .howto-card h3 { font-family: 'Fredoka', sans-serif; font-size: 1.3em; margin-bottom: 12px; color: #667eea; }
+        .howto-card p { line-height: 1.6; margin-bottom: 16px; color: #444; }
+        .howto-timeline { display: flex; gap: 6px; background: #2b2740; border-radius: 12px; padding: 12px; margin-bottom: 18px; overflow-x: auto; }
+        .howto-clip { flex-shrink: 0; min-width: 100px; border-radius: 8px; padding: 10px 10px 8px; display: flex; flex-direction: column; justify-content: space-between; font-size: 0.78em; color: #fff; }
+        .howto-clip .hc-label { font-weight: 700; }
+        .howto-clip .hc-move { display: flex; gap: 4px; margin-top: 6px; }
+        .howto-clip .hc-move button { flex: 1; background: rgba(0,0,0,0.25); border: none; color: #fff; border-radius: 5px; padding: 3px 0; cursor: pointer; font-size: 0.95em; }
+        .howto-clip .hc-move button:disabled { opacity: 0.3; cursor: not-allowed; }
+        .howto-clip.hc-correct { outline: 3px solid #28a745; }
+        .howto-clip.hc-wrong { outline: 3px solid #dc3545; }
+        .howto-banner { margin-top: 4px; margin-bottom: 18px; padding: 12px 16px; border-radius: 10px; font-size: 0.9em; font-weight: 700; display: none; }
+        .howto-banner.show { display: block; }
+        .howto-banner.ok { background: #d4edda; color: #155724; }
+        .howto-banner.fail { background: #f8d7da; color: #721c24; }
+        .start-quiz-btn { margin-top: 4px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; border: none; padding: 14px 32px; border-radius: 12px; font-size: 1em; cursor: pointer; font-family: 'Fredoka', sans-serif; box-shadow: 0 6px 18px rgba(0,0,0,0.2); }    </style>
 </head>
 <body>
     <div class="container">
@@ -117,7 +134,75 @@
                 </div>`;
         }
         function restart() { currentQuestion = 0; score = 0; streak = 0; renderQuestion(); }
-        renderQuestion();
+        /* How-To intro — a small, ungraded reorder demo shown before the
+           quiz starts, directly rehearsing the "insert a new table column
+           exactly where it's needed" mechanic that one of the quiz
+           scenarios asks about, so it's not being asked cold. */
+        const HOWTO_CLIPS = [
+            { id: 'c1', label: 'Item', color: '#6A11CB' },
+            { id: 'c2', label: 'Unit Price', color: '#00897B' },
+            { id: 'c3', label: 'Quantity', color: '#2575FC' },
+            { id: 'c4', label: 'Reorder Level', color: '#E65100' },
+        ];
+        const HOWTO_CORRECT = ['c1', 'c2', 'c3', 'c4'];
+        let howtoOrder = ['c1', 'c3', 'c2', 'c4']; // Unit Price landed after Quantity -- the mistake to fix
+
+        function escHtmlH(s) { return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+        function howtoClipById(id) { return HOWTO_CLIPS.find(c => c.id === id); }
+
+        function renderHowtoTimeline(marks) {
+            document.getElementById('howtoTimeline').innerHTML = howtoOrder.map((id, i) => {
+                const c = howtoClipById(id);
+                const cls = marks ? (marks[i] ? 'hc-correct' : 'hc-wrong') : '';
+                return `<div class="howto-clip ${cls}" style="background:${c.color};">
+                    <div class="hc-label">${escHtmlH(c.label)}</div>
+                    <div class="hc-move">
+                        <button data-dir="left" data-id="${id}" ${i===0?'disabled':''}>&#9664;</button>
+                        <button data-dir="right" data-id="${id}" ${i===howtoOrder.length-1?'disabled':''}>&#9654;</button>
+                    </div>
+                </div>`;
+            }).join('');
+            document.querySelectorAll('.hc-move button').forEach(btn => {
+                btn.addEventListener('click', () => moveHowtoClip(btn.dataset.id, btn.dataset.dir));
+            });
+        }
+
+        function moveHowtoClip(id, dir) {
+            const i = howtoOrder.indexOf(id);
+            const j = dir === 'left' ? i - 1 : i + 1;
+            if (j < 0 || j >= howtoOrder.length) return;
+            [howtoOrder[i], howtoOrder[j]] = [howtoOrder[j], howtoOrder[i]];
+            renderHowtoTimeline();
+            document.getElementById('howtoBanner').classList.remove('show');
+        }
+
+        function checkHowto() {
+            const marks = howtoOrder.map((id, i) => id === HOWTO_CORRECT[i]);
+            renderHowtoTimeline(marks);
+            const allOk = marks.every(m => m);
+            const banner = document.getElementById('howtoBanner');
+            banner.classList.add('show');
+            banner.className = 'howto-banner show ' + (allOk ? 'ok' : 'fail');
+            banner.textContent = allOk
+                ? "Fixed -- that's exactly how Insert Column places a new column right where you need it."
+                : "Not quite yet -- keep using the arrows until Unit Price sits right after Item.";
+        }
+
+        function renderHowto() {
+            document.getElementById('exerciseCard').innerHTML = `
+                <div class="howto-card">
+                    <h3>&#128269; Quick How-To: Inserting a Table Column</h3>
+                    <p>One of the scenarios coming up asks about this exact situation: Kevin needs to insert a new "Unit Price" column between "Item" and "Quantity" in the stock table. Here's the fix -- right-click an existing column and choose Insert Column, and it lands exactly where you clicked. Try arranging these four columns into the right order, then check your work.</p>
+                    <div class="howto-timeline" id="howtoTimeline"></div>
+                    <div class="howto-banner" id="howtoBanner"></div>
+                    <button class="start-quiz-btn" id="checkHowtoBtn">Check My Order</button>
+                    <button class="start-quiz-btn" id="startQuizBtn" style="margin-left:10px;background:linear-gradient(135deg,#28a745,#1e7e34);">Start Quiz &rarr;</button>
+                </div>`;
+            renderHowtoTimeline();
+            document.getElementById('checkHowtoBtn').addEventListener('click', checkHowto);
+            document.getElementById('startQuizBtn').addEventListener('click', renderQuestion);
+        }
+        renderHowto();
     </script>
 </body>
 </html>

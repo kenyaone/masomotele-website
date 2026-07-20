@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>From Chatbots to Language Models — What's Actually Happening (Lesson) | MTTI Artificial Intelligence</title>
+<link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Fredoka:wght@500;600&display=swap" rel="stylesheet">
+<style>
+* { margin:0; padding:0; box-sizing:border-box; }
+body { font-family:'Space Mono', monospace; background:linear-gradient(135deg,#2E7D32 0%,#1565C0 100%); min-height:100vh; padding:20px; color:#fff; }
+.container { max-width:820px; margin:0 auto; }
+.header { text-align:center; margin-bottom:24px; }
+.lesson-tag { display:inline-block; background:rgba(255,255,255,0.2); padding:6px 16px; border-radius:999px; font-size:0.85em; margin-bottom:12px; }
+.header h1 { font-family:'Fredoka', sans-serif; font-size:2em; margin-bottom:6px; text-shadow:3px 3px 0 rgba(0,0,0,0.2); }
+.card { background:#fff; color:#333; border-radius:22px; padding:32px; margin-bottom:20px; box-shadow:0 20px 60px rgba(0,0,0,0.3); }
+.section { margin-bottom:26px; }
+.section:last-child { margin-bottom:0; }
+.section h2 { font-family:'Fredoka', sans-serif; font-size:1.2em; margin-bottom:10px; color:#1565C0; }
+.section .body { line-height:1.65; font-size:0.98em; }
+.section .body p { margin-bottom:10px; }
+.section .body code { background:#f5f7fb; padding:2px 6px; border-radius:4px; font-size:0.92em; }
+.keypoint { background:#fff8e1; border-left:4px solid #ffc107; padding:12px 16px; border-radius:8px; margin-top:12px; font-size:0.92em; }
+</style>
+</head>
+<body>
+<div class="container">
+<div class="header"><div class="lesson-tag">Natural Language Processing · Topic 2 · Lesson</div><h1>From Chatbots to Language Models — What's Actually Happening</h1></div>
+<div class="card">
+<div class="section"><h2>1. What a "Language Model" Actually Is</h2><div class="body">
+<p>The AI chat assistant Brian types into is built on something called a <strong>language model</strong>. It is created by having a system read through an enormous amount of existing text — articles, books, websites, conversations — and learn statistical patterns in how words tend to follow one another. It doesn't store facts in a neat lookup table the way a spreadsheet does. It learns tendencies: given the words so far, what tends to come next.</p>
+<p>So when Brian types a prompt like "Summarise this client's biggest complaint in one sentence," he isn't asking a colleague who "knows" the client. He's giving the model a starting point, and its job is to continue in a way that statistically resembles the huge pile of text it learned from.</p>
+</div></div>
+<div class="section"><h2>2. Predicting the Next Word, Over and Over</h2><div class="body">
+<p>Here is the part that surprises most people: the model does not compose a whole reply as one finished thought. It looks at everything typed so far, works out which single word (or word-piece) is most likely to come next, adds it, and then repeats the entire process again to choose the next one — one small step at a time, until it decides to stop.</p>
+<p>This happens so fast that a reply feels instant and fluid, almost like a conversation. But underneath, it is one word-guess after another, each guess shaped by the patterns the model learned, not by the model "thinking out" the full answer in advance.</p>
+</div></div>
+<div class="section"><h2>3. Why This Looks Like Conversation But Isn't Understanding</h2><div class="body">
+<p>Because the training text included so much confident, well-structured human writing, the model has learned to reproduce that same fluent, confident style. That is why replies can sound so natural. But the tool has no beliefs, doesn't know whether something is true, and has no goals of its own — it is an extremely sophisticated pattern predictor, not a mind weighing up facts.</p>
+<div class="keypoint"><strong>Key Point.</strong> Think of a language model as an extremely good autocomplete: it predicts likely words based on learned patterns, not because it knows or believes anything. Fluent phrasing is a sign of good pattern-matching, not proof that the content is correct.</div>
+</div></div>
+</div>
+</div>
+</body>
+</html>

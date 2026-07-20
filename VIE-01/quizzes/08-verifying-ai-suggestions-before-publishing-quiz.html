@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Verifying AI Suggestions Before Publishing | MTTI Video Editing</title>
+    <link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Fredoka:wght@500;600&display=swap" rel="stylesheet">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Space Mono', monospace; background: linear-gradient(135deg, #4527a0 0%, #1a237e 100%); min-height: 100vh; padding: 20px; color: #fff; }
+        .container { max-width: 900px; margin: 0 auto; }
+        .header { text-align: center; margin-bottom: 30px; }
+        .header .lesson-tag { display: inline-block; background: rgba(255,255,255,0.2); padding: 6px 16px; border-radius: 999px; font-size: 0.85em; margin-bottom: 12px; }
+        .header h1 { font-family: 'Fredoka', sans-serif; font-size: 2.2em; margin-bottom: 8px; text-shadow: 3px 3px 0 rgba(0,0,0,0.2); }
+        .score-board { background: rgba(255,255,255,0.15); backdrop-filter: blur(10px); border-radius: 20px; padding: 20px; margin-bottom: 20px; display: flex; justify-content: space-around; }
+        .score-item { text-align: center; }
+        .score-item .label { font-size: 0.85em; opacity: 0.9; margin-bottom: 4px; }
+        .score-item .value { font-size: 1.8em; font-weight: bold; font-family: 'Fredoka', sans-serif; }
+        .progress-bar { width: 100%; height: 8px; background: rgba(255,255,255,0.3); border-radius: 10px; margin-bottom: 25px; overflow: hidden; }
+        .progress-fill { height: 100%; background: linear-gradient(90deg, #f7971e 0%, #ffd200 100%); border-radius: 10px; transition: width 0.5s ease; width: 0%; }
+        .exercise-card { background: white; color: #333; border-radius: 25px; padding: 35px; margin-bottom: 20px; box-shadow: 0 20px 60px rgba(0,0,0,0.3); }
+        .scenario { background: linear-gradient(135deg, #fff8e1 0%, #ffecb3 100%); border-left: 5px solid #ffc107; padding: 20px 24px; border-radius: 12px; margin-bottom: 24px; font-size: 0.98em; line-height: 1.55; }
+        .scenario strong { color: #7a5a00; font-family: 'Fredoka', sans-serif; }
+        .question { font-size: 1.15em; margin-bottom: 20px; font-weight: 700; line-height: 1.4; }
+        .options { display: flex; flex-direction: column; gap: 12px; }
+        .option { background: #f5f7fb; border: 2px solid transparent; padding: 16px 20px; border-radius: 12px; cursor: pointer; transition: all 0.2s ease; font-family: 'Space Mono', monospace; font-size: 0.98em; text-align: left; }
+        .option:hover:not(.disabled) { background: #ede7f6; border-color: #4527a0; transform: translateX(4px); }
+        .option.correct { background: #d4edda; border-color: #28a745; color: #155724; }
+        .option.wrong { background: #f8d7da; border-color: #dc3545; color: #721c24; }
+        .option.disabled { cursor: not-allowed; opacity: 0.85; }
+        .feedback { margin-top: 22px; padding: 18px 22px; border-radius: 12px; font-size: 0.98em; line-height: 1.5; }
+        .feedback.correct { background: #d4edda; color: #155724; border-left: 4px solid #28a745; }
+        .feedback.wrong { background: #f8d7da; color: #721c24; border-left: 4px solid #dc3545; }
+        .next-btn, .restart-btn { margin-top: 20px; background: linear-gradient(135deg, #4527a0 0%, #1a237e 100%); color: white; border: none; padding: 14px 32px; border-radius: 12px; font-size: 1em; cursor: pointer; font-family: 'Fredoka', sans-serif; box-shadow: 0 6px 18px rgba(0,0,0,0.2); }
+        .results { text-align: center; padding: 25px 15px; }
+        .results h2 { font-family: 'Fredoka', sans-serif; font-size: 2em; margin-bottom: 12px; color: #333; }
+        .results .final-score { font-size: 3em; font-family: 'Fredoka', sans-serif; color: #4527a0; margin: 20px 0; }
+        .results p { color: #555; margin-bottom: 12px; }
+        .badge { display: inline-block; font-size: 3.5em; margin: 8px 0; }
+        /* How-To intro screen — shown before question 1, not scored */
+        .howto-card { background: white; color: #333; border-radius: 25px; padding: 35px; margin-bottom: 20px; box-shadow: 0 20px 60px rgba(0,0,0,0.3); }
+        .howto-card h3 { font-family: 'Fredoka', sans-serif; font-size: 1.3em; margin-bottom: 12px; color: #4527a0; }
+        .howto-card p { line-height: 1.6; margin-bottom: 16px; color: #444; }
+        .howto-field { margin-bottom: 16px; }
+        .howto-field label { display: block; font-size: 0.92em; margin-bottom: 6px; font-weight: 700; color: #333; line-height: 1.4; }
+        .howto-field select, .howto-field input[type="number"], .howto-field input[type="text"] { width: 100%; background: #f5f7fb; border: 2px solid #e0e4ef; padding: 10px 12px; border-radius: 8px; font-size: 0.95em; font-family: 'Space Mono', monospace; color: #333; }
+        .howto-field select:focus, .howto-field input:focus { outline: none; border-color: #4527a0; }
+        .howto-results { margin-top: 4px; }
+        .howto-result-row { display: flex; justify-content: space-between; gap: 10px; padding: 10px 14px; border-radius: 8px; font-size: 0.88em; margin-bottom: 6px; background: #f5f7fb; }
+        .howto-result-row.ok { border-left: 3px solid #28a745; }
+        .howto-result-row.fail { border-left: 3px solid #dc3545; }
+        .howto-banner { margin-top: 4px; margin-bottom: 18px; padding: 12px 16px; border-radius: 10px; font-size: 0.9em; font-weight: 700; display: none; }
+        .howto-banner.show { display: block; }
+        .howto-banner.ok { background: #d4edda; color: #155724; }
+        .howto-banner.fail { background: #f8d7da; color: #721c24; }
+        .start-quiz-btn { margin-top: 4px; background: linear-gradient(135deg, #4527a0 0%, #1a237e 100%); color: white; border: none; padding: 14px 32px; border-radius: 12px; font-size: 1em; cursor: pointer; font-family: 'Fredoka', sans-serif; box-shadow: 0 6px 18px rgba(0,0,0,0.2); }
+        .howto-field.howto-checkbox-row { display: flex; align-items: flex-start; gap: 10px; }
+        .howto-field.howto-checkbox-row input { width: auto; margin-top: 3px; }
+        .howto-field.howto-checkbox-row label { margin-bottom: 0; font-weight: 400; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <div class="lesson-tag">Unit 194 · Lesson 3 · Quiz</div>
+            <h1>Verifying AI Suggestions Before Publishing</h1>
+        </div>
+        <div class="score-board">
+            <div class="score-item"><div class="label">Score</div><div class="value" id="score">0</div></div>
+            <div class="score-item"><div class="label">Question</div><div class="value"><span id="current">1</span>/<span id="total">10</span></div></div>
+            <div class="score-item"><div class="label">Streak</div><div class="value" id="streak">0</div></div>
+        </div>
+        <div class="progress-bar"><div class="progress-fill" id="progress"></div></div>
+        <div class="exercise-card" id="exerciseCard"></div>
+    </div>
+    <script>
+        const exercises = [{"scenario":"Across auto captions, auto reframe, AI music suggestions, and auto colour grading, Otieno notices the same underlying limitation every time.","question":"What is that shared limitation?","options":["Each AI tool is completely random and never produces usable results","Every AI suggestion is a statistical best guess made with no real knowledge of the specific client's brand or brief, so none of them are guaranteed correct","AI tools only fail on videos longer than one minute","Only free tools like CapCut and Canva have this limitation; paid software never does"],"correct":1,"explanation":"The common thread across every AI feature in this unit is that the tool guesses based on patterns, with no actual knowledge of the specific client or brief \u2014 making review necessary regardless of which tool is used."},{"scenario":"Otieno accepts an AI suggestion into a finished video without checking it against what the client asked for.","question":"What is really happening in that moment?","options":["Nothing important \u2014 accepting a default is not really a decision","Otieno is effectively making a creative decision on the client's behalf, since an unreviewed AI suggestion becomes part of the delivered video either way","The AI takes full responsibility for the outcome once its suggestion is used","This only matters if the client specifically asks whether AI was used"],"correct":1,"explanation":"Whether reviewed or not, an accepted AI suggestion ends up in the final video \u2014 so skipping the review is itself a decision, just an unexamined one."},{"scenario":"Otieno builds a short checklist to run through before exporting any AI-assisted edit: captions accurate, crop keeps subjects\/graphics in frame, music matches the brief, colour grade matches brand colours.","question":"What should Otieno do if one item on that checklist comes back as a 'no'?","options":["Export anyway, since the checklist is just a formality","Treat it as exactly what the check is there to catch, and adjust that specific element to match the brief before re-checking and exporting","Restart the entire project from scratch","Blame the AI tool publicly and switch software"],"correct":1,"explanation":"A checklist failure is the system working as intended \u2014 it flags a specific, fixable mismatch that should be corrected before the edit is considered export-ready."},{"scenario":"A client explicitly asks for upbeat, warm, on-brand energy, but Canva's AI suggests a somber piano track and a cool-toned colour grade.","question":"Why is exporting with the AI's suggestion as-is the wrong call here?","options":["Because AI-suggested music and colour grades are always technically broken","Because the AI's suggestion actively conflicts with the client's explicit brief, and the AI has no way of knowing or caring what the client actually asked for","Because Canva's Video editor cannot legally auto-suggest music","Because every auto colour grade is always incorrect regardless of the brief"],"correct":1,"explanation":"The suggestion isn't technically broken \u2014 it simply doesn't match what this specific client asked for, and the AI has no awareness of that brief, which is exactly why a human check is required."},{"scenario":"A client later asks Otieno why a delivered video's music and colours did not match what they had requested.","question":"Which response reflects the right professional standard?","options":["\"The AI suggested it, so it's not really my responsibility\"","\"You're right, I should have checked the AI's suggestions against your brief before sending it \u2014 I'll fix it\"","\"AI tools are always correct, so the video is actually fine as delivered\"","\"I'll stop using AI tools entirely going forward\""],"correct":1,"explanation":"AI never carries responsibility for what gets delivered \u2014 Otieno does. Owning the miss and fixing it is the right response; blaming the tool or abandoning useful tools entirely are not."},{"scenario":"Looking back across auto-captions, auto-reframe, and AI-suggested music\/colour, Otieno wants one rule to guide every future AI-assisted edit at Eldoret Reels Studio.","question":"Which rule best captures the lesson of this whole unit?","options":["Avoid AI editing tools altogether to prevent any possible errors","Use AI tools for speed, but always verify every AI suggestion against the actual footage and the client's brief before export \u2014 AI is the starting point, Otieno's judgement is the final answer","Trust whichever AI suggestion looks the most polished, regardless of the brief","Only check AI suggestions when a client specifically requests a review"],"correct":1,"explanation":"The unit's throughline is healthy skepticism, not rejection: AI tools are genuinely useful for speed, but every suggestion still needs a human check against the real footage and the client's actual brief before anything is published."}];
+        let currentQuestion = 0, score = 0, streak = 0, answered = false;
+        function updateScoreboard() {
+            document.getElementById('score').textContent = score;
+            document.getElementById('current').textContent = Math.min(currentQuestion + 1, exercises.length);
+            document.getElementById('total').textContent = exercises.length;
+            document.getElementById('streak').textContent = streak;
+            document.getElementById('progress').style.width = ((currentQuestion) / exercises.length) * 100 + '%';
+        }
+        function escapeHtml(s) { return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+        function renderQuestion() {
+            answered = false;
+            const q = exercises[currentQuestion];
+            let html = '';
+            if (q.scenario) html += `<div class="scenario"><strong>Scenario.</strong> ${escapeHtml(q.scenario)}</div>`;
+            html += `<div class="question">${escapeHtml(q.question)}</div>`;
+            html += '<div class="options">';
+            q.options.forEach((o, i) => { html += `<button class="option" onclick="selectAnswer(${i})">${escapeHtml(o)}</button>`; });
+            html += '</div>';
+            document.getElementById('exerciseCard').innerHTML = html;
+            updateScoreboard();
+        }
+        function selectAnswer(i) {
+            if (answered) return;
+            answered = true;
+            const q = exercises[currentQuestion];
+            const btns = document.querySelectorAll('.option');
+            btns.forEach(b => b.classList.add('disabled'));
+            btns[q.correct].classList.add('correct');
+            const right = i === q.correct;
+            if (!right) btns[i].classList.add('wrong');
+            if (right) { score += 10; streak += 1; } else { streak = 0; }
+            const fb = document.createElement('div');
+            fb.className = 'feedback ' + (right ? 'correct' : 'wrong');
+            fb.innerHTML = `<strong>${right ? '&#9989; Correct.' : '&#10060; Not quite.'}</strong><br>${escapeHtml(q.explanation)}`;
+            document.getElementById('exerciseCard').appendChild(fb);
+            const nb = document.createElement('button');
+            nb.className = 'next-btn';
+            nb.textContent = currentQuestion === exercises.length - 1 ? 'See results →' : 'Next scenario →';
+            nb.onclick = nextQuestion;
+            document.getElementById('exerciseCard').appendChild(nb);
+            updateScoreboard();
+        }
+        function nextQuestion() { currentQuestion++; if (currentQuestion >= exercises.length) return showResults(); renderQuestion(); }
+        function showResults() {
+            document.getElementById('progress').style.width = '100%';
+            const total = exercises.length * 10;
+            const pct = Math.round(score / total * 100);
+            if (window.parent) { window.parent.postMessage({type:"mtti_quiz_score", score: score, total: total, percent: pct}, "*"); }
+            let badge = '🌟', msg = 'Excellent work. Otieno-level AI-editing judgement.';
+            if (pct < 50) { badge = '🌱'; msg = 'Good first attempt. Review the lesson and try again.'; }
+            else if (pct < 80) { badge = '📚'; msg = 'Solid progress. Review the scenarios you missed and retry.'; }
+            document.getElementById('exerciseCard').innerHTML = `
+                <div class="results">
+                    <span class="badge">${badge}</span>
+                    <h2>Quiz Complete</h2>
+                    <div class="final-score">${score} / ${total}</div>
+                    <p><strong>${pct}%</strong> &middot; Longest streak: ${streak}</p>
+                    <p>${msg}</p>
+                    <button class="restart-btn" onclick="restart()">Try again &#128257;</button>
+                </div>`;
+        }
+        function restart() { currentQuestion = 0; score = 0; streak = 0; renderQuestion(); }
+        /* How-To intro — a small, ungraded field-check demo shown before the
+           quiz starts, directly rehearsing this quiz's most procedural
+           mechanic so it isn't asked cold in question form. */
+        function escHtmlH(s) { return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+        const HOWTO_CHECKS = [
+            { id: 'captions', label: 'Captions checked against the actual audio (wording + on-screen timing)' },
+            { id: 'crop', label: 'Crop/reframe checked so subjects and on-screen graphics stay in frame the whole way through' },
+            { id: 'music', label: "AI-suggested music checked against the client's brief (mood, genre, energy)" },
+            { id: 'color', label: "AI auto colour grade checked against the shop's real brand colours" },
+        ];
+
+        function howtoCheckHtml(c) {
+            return `<div class="howto-field howto-checkbox-row"><input type="checkbox" id="hf_${c.id}"><label for="hf_${c.id}">${escHtmlH(c.label)}</label></div>`;
+        }
+
+        function checkHowto() {
+            const rows = HOWTO_CHECKS.map(c => {
+                const ok = document.getElementById('hf_' + c.id).checked;
+                return `<div class="howto-result-row ${ok?'ok':'fail'}"><span>${escHtmlH(c.label)}</span><span>${ok?'✅':'❌'}</span></div>`;
+            }).join('');
+            const allOk = HOWTO_CHECKS.every(c => document.getElementById('hf_' + c.id).checked);
+            document.getElementById('howtoResults').innerHTML = rows;
+            const banner = document.getElementById('howtoBanner');
+            banner.classList.add('show');
+            banner.className = 'howto-banner show ' + (allOk ? 'ok' : 'fail');
+            banner.textContent = allOk
+                ? "✅ Full checklist complete — that's exactly the habit this quiz is testing."
+                : '❌ Not every item is checked yet — tick each one you would genuinely verify before export.';
+        }
+
+        function renderHowto() {
+            document.getElementById('exerciseCard').innerHTML = `
+                <div class="howto-card">
+                    <h3>🔍 Quick How-To: Running the Pre-Export AI Checklist</h3>
+                    <p>Every scenario in this unit reinforces the same habit: before any AI-assisted edit ships, Otieno runs a short checklist to catch mismatches between what the AI produced and what the client actually asked for. Try running that checklist yourself on a fresh AI-assisted edit below.</p>
+                    <div id="howtoFieldsWrap">${HOWTO_CHECKS.map(howtoCheckHtml).join('')}</div>
+                    <div class="howto-results" id="howtoResults"></div>
+                    <div class="howto-banner" id="howtoBanner"></div>
+                    <button class="start-quiz-btn" id="checkHowtoBtn">Check My Review</button>
+                    <button class="start-quiz-btn" id="startQuizBtn" style="margin-left:10px;background:linear-gradient(135deg,#28a745,#1e7e34);">Start Quiz →</button>
+                </div>`;
+            document.getElementById('checkHowtoBtn').addEventListener('click', checkHowto);
+            document.getElementById('startQuizBtn').addEventListener('click', renderQuestion);
+        }
+
+        renderHowto();
+    </script>
+</body>
+</html>

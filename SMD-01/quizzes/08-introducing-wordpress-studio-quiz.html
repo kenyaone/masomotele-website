@@ -1,0 +1,346 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Introducing WordPress Studio | MTTI Digital Marketing</title>
+    <link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Fredoka:wght@500;600&display=swap" rel="stylesheet">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Space Mono', monospace;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh; padding: 20px; color: #fff;
+        }
+        .container { max-width: 900px; margin: 0 auto; }
+        .header { text-align: center; margin-bottom: 30px; animation: slideDown 0.6s ease-out; }
+        .header .lesson-tag {
+            display: inline-block; background: rgba(255,255,255,0.2);
+            padding: 6px 16px; border-radius: 999px;
+            font-size: 0.85em; margin-bottom: 12px;
+        }
+        .header h1 {
+            font-family: 'Fredoka', sans-serif; font-size: 2.2em;
+            margin-bottom: 8px; text-shadow: 3px 3px 0 rgba(0,0,0,0.2);
+        }
+        .header p { opacity: 0.95; font-size: 0.95em; }
+        .score-board {
+            background: rgba(255,255,255,0.15); backdrop-filter: blur(10px);
+            border-radius: 20px; padding: 20px; margin-bottom: 20px;
+            display: flex; justify-content: space-around;
+            animation: fadeIn 0.8s ease-out 0.2s both;
+        }
+        .score-item { text-align: center; }
+        .score-item .label { font-size: 0.85em; opacity: 0.9; margin-bottom: 4px; }
+        .score-item .value {
+            font-size: 1.8em; font-weight: bold; font-family: 'Fredoka', sans-serif;
+        }
+        .progress-bar {
+            width: 100%; height: 8px; background: rgba(255,255,255,0.3);
+            border-radius: 10px; margin-bottom: 25px; overflow: hidden;
+        }
+        .progress-fill {
+            height: 100%; background: linear-gradient(90deg, #f093fb 0%, #f5576c 100%);
+            border-radius: 10px; transition: width 0.5s ease; width: 0%;
+        }
+        .exercise-card {
+            background: white; color: #333; border-radius: 25px;
+            padding: 35px; margin-bottom: 20px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            animation: fadeIn 0.6s ease-out both;
+        }
+        .scenario {
+            background: linear-gradient(135deg, #fff8e1 0%, #ffecb3 100%);
+            border-left: 5px solid #ffc107;
+            padding: 20px 24px; border-radius: 12px;
+            margin-bottom: 24px;
+            font-size: 0.98em; line-height: 1.55;
+        }
+        .scenario strong { color: #7a5a00; font-family: 'Fredoka', sans-serif; }
+        .question {
+            font-size: 1.15em; margin-bottom: 20px;
+            font-weight: 700; line-height: 1.4;
+        }
+        .options { display: flex; flex-direction: column; gap: 12px; }
+        .option {
+            background: #f5f7fb; border: 2px solid transparent;
+            padding: 16px 20px; border-radius: 12px;
+            cursor: pointer; transition: all 0.2s ease;
+            font-family: 'Space Mono', monospace; font-size: 0.98em; text-align: left;
+        }
+        .option:hover:not(.disabled) {
+            background: #eef1fb; border-color: #667eea; transform: translateX(4px);
+        }
+        .option.correct { background: #d4edda; border-color: #28a745; color: #155724; }
+        .option.wrong { background: #f8d7da; border-color: #dc3545; color: #721c24; animation: shake 0.4s; }
+        .option.disabled { cursor: not-allowed; opacity: 0.85; }
+        .feedback {
+            margin-top: 22px; padding: 18px 22px; border-radius: 12px;
+            animation: slideUp 0.4s ease-out;
+            font-size: 0.98em; line-height: 1.5;
+        }
+        .feedback.correct { background: #d4edda; color: #155724; border-left: 4px solid #28a745; }
+        .feedback.wrong { background: #f8d7da; color: #721c24; border-left: 4px solid #dc3545; }
+        .feedback strong { font-family: 'Fredoka', sans-serif; }
+        .next-btn, .restart-btn {
+            margin-top: 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white; border: none;
+            padding: 14px 32px; border-radius: 12px;
+            font-size: 1em; cursor: pointer;
+            font-family: 'Fredoka', sans-serif;
+            box-shadow: 0 6px 18px rgba(0,0,0,0.2);
+            transition: transform 0.2s ease;
+        }
+        .next-btn:hover, .restart-btn:hover { transform: scale(1.04); }
+        .results {
+            text-align: center; padding: 25px 15px;
+            animation: bounceIn 0.6s ease-out;
+        }
+        .results h2 {
+            font-family: 'Fredoka', sans-serif; font-size: 2em;
+            margin-bottom: 12px; color: #333;
+        }
+        .results .final-score {
+            font-size: 3em; font-family: 'Fredoka', sans-serif;
+            color: #667eea; margin: 20px 0;
+        }
+        .results p { color: #555; margin-bottom: 12px; }
+        .badge { display: inline-block; font-size: 3.5em; margin: 8px 0; }
+        @keyframes slideDown { from { opacity: 0; transform: translateY(-30px); } to { opacity: 1; transform: translateY(0); } }
+        @keyframes fadeIn { from { opacity: 0; transform: scale(0.96); } to { opacity: 1; transform: scale(1); } }
+        @keyframes slideUp { from { opacity: 0; transform: translateY(15px); } to { opacity: 1; transform: translateY(0); } }
+        @keyframes shake { 0%,100% { transform: translateX(0); } 25% { transform: translateX(-8px); } 75% { transform: translateX(8px); } }
+        @keyframes bounceIn { 0% { opacity: 0; transform: scale(0.4); } 60% { transform: scale(1.05); } 100% { opacity: 1; transform: scale(1); } }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <div class="lesson-tag">Module 8 · Lesson 8.2</div>
+            <h1>Introducing WordPress Studio</h1>
+            <p>10 Sarah scenarios — why WordPress, why local, why Studio</p>
+        </div>
+
+        <div class="score-board">
+            <div class="score-item"><div class="label">Score</div><div class="value" id="score">0</div></div>
+            <div class="score-item"><div class="label">Question</div><div class="value"><span id="current">1</span>/<span id="total">10</span></div></div>
+            <div class="score-item"><div class="label">Streak</div><div class="value" id="streak">0</div></div>
+        </div>
+
+        <div class="progress-bar"><div class="progress-fill" id="progress"></div></div>
+
+        <div class="exercise-card" id="exerciseCard"></div>
+    </div>
+
+    <script>
+        const exercises = [
+  {
+    "scenario": "Sarah's cousin tells her WordPress is dying and she should use a drag-and-drop site builder instead. Sarah is worried she is choosing a technology employers no longer care about.",
+    "question": "What is the honest 2026 answer you should give Sarah?",
+    "options": [
+      "Her cousin is right — WordPress is on its way out.",
+      "WordPress powers about 43 per cent of the web in 2026, and over 60 per cent of Kenyan digital marketing job listings still expect WordPress skills, so learning it is a direct career investment.",
+      "WordPress only matters for blogs and is useless for a restaurant.",
+      "Employers only care about hand-coded HTML sites."
+    ],
+    "correct": 1,
+    "explanation": "Slide 2 of Lesson 8.2 is explicit — WordPress runs 43 per cent of the internet in 2026 and over 60 per cent of Kenyan digital marketing job listings require WordPress. Learning WordPress is not nostalgia, it is employability."
+  },
+  {
+    "scenario": "Sarah asks: 'Which of the three ways to run WordPress should I use for Karibu Kitchen while I am still learning?' She lists them as (a) wordpress.com hosted, (b) self-hosted on HostPinnacle, or (c) local development on her own laptop.",
+    "question": "Which answer is correct for a beginner in Module 8?",
+    "options": [
+      "Option (a) — wordpress.com hosted, so the site is public immediately.",
+      "Option (b) — self-hosted on HostPinnacle, so she pays for hosting before she has customers.",
+      "Option (c) — local development on her laptop, which is the professional workflow used in Module 8.",
+      "None — she should hand-code the site in HTML instead."
+    ],
+    "correct": 2,
+    "explanation": "Slide 3 lists three ways to run WordPress and explicitly calls local development the professional workflow — this is what Module 8 teaches. Hosted and self-hosted come later once the site is ready to go live."
+  },
+  {
+    "scenario": "Sarah asks why every serious Kenyan developer builds locally first instead of just starting on the live domain.",
+    "question": "Which set of reasons matches the four given in Lesson 8.2?",
+    "options": [
+      "Cost, safety, speed, and offline access.",
+      "It is a legal requirement of the Kenya DPA 2019.",
+      "Google ranks local sites higher than hosted sites.",
+      "It is the only way to install plugins."
+    ],
+    "correct": 0,
+    "explanation": "Slide 4 lists the four reasons — cost (local WordPress is free), safety (breaking your laptop does not break a paying customer's site), speed (loads instantly), and offline (Kenyan internet is not always reliable)."
+  },
+  {
+    "scenario": "Sarah has heard of a tool called LocalWP from an older tutorial on YouTube. She asks whether she should install LocalWP or WordPress Studio for the Karibu Kitchen build.",
+    "question": "What should you tell her?",
+    "options": [
+      "Install LocalWP — it is still the industry standard.",
+      "Install both and compare.",
+      "Install WordPress Studio. LocalWP is no longer actively maintained. Studio is the free desktop app from Automattic that replaced it and is now the current professional standard.",
+      "Install XAMPP instead — it is faster than either."
+    ],
+    "correct": 2,
+    "explanation": "Slide 5 and Slide 8 are explicit — LocalWP has been discontinued and Studio, built by Automattic, is the current standard. Studio was released in 2024 to replace LocalWP."
+  },
+  {
+    "scenario": "Sarah wants her sister Wangari, who is in Nakuru, to review the Karibu Kitchen site from her phone before it goes live. Sarah has no hosting yet and does not want to pay KES 2,000 a month for hosting she is not ready for.",
+    "question": "Which Studio feature solves this problem?",
+    "options": [
+      "The Themes screen.",
+      "The Demo Sites feature — one click publishes the local site to a temporary public URL like karibu-kitchen.demo.wpstudio.online, which Wangari can open on her phone.",
+      "The Widgets menu.",
+      "The Users screen."
+    ],
+    "correct": 1,
+    "explanation": "Slide 6 calls Demo Sites the killer Studio feature — one click publishes the local site to a temporary public URL. This saves Sarah the KES 2,000/month hosting bill while she is still learning."
+  },
+  {
+    "scenario": "A classmate suggests Sarah use Docker with a WordPress container instead of Studio because 'that is what real developers use'.",
+    "question": "What is the accurate response for a beginner in this course?",
+    "options": [
+      "Docker is the only professional option — switch immediately.",
+      "Docker is powerful but overkill for a beginner. For Kenyan trainees in this course, Studio is the answer — it is free, official, and works without configuring Apache, MySQL, or PHP yourself.",
+      "Docker is banned in Kenya.",
+      "Docker cannot run WordPress at all."
+    ],
+    "correct": 1,
+    "explanation": "Slide 8 lists Docker as powerful but overkill for beginners — reserve it for advanced developers. Studio remains the recommended answer for every trainee in this course."
+  },
+  {
+    "scenario": "Sarah is planning her Module 8 timeline. She wants to know what she will actually have built by the end of the six lessons.",
+    "question": "Which outcome matches what Module 8 delivers?",
+    "options": [
+      "A hand-coded HTML site with no CMS.",
+      "A Facebook page only, with no website.",
+      "A real portfolio-worthy WordPress site for Karibu Kitchen with Studio installed, dashboard understood, five essential pages built, a customised theme, and essential plugins installed.",
+      "A live e-commerce store with Stripe and PayPal integration."
+    ],
+    "correct": 2,
+    "explanation": "Slide 7 lists exactly what Module 8 delivers — Studio installed (8.3), dashboard tour (8.4), five essential pages (8.5), theme customised (8.6), and essential plugins (8.7). A real portfolio site."
+  },
+  {
+    "scenario": "Sarah worries that Studio 'is just a demo' — she wants a real WordPress environment with every feature the live version has.",
+    "question": "Which statement about Studio is accurate?",
+    "options": [
+      "Studio is only a demo with limited features.",
+      "Studio runs a real, complete WordPress installation with every feature the live version has — not a demo, not a preview.",
+      "Studio only supports one plugin at a time.",
+      "Studio cannot install themes."
+    ],
+    "correct": 1,
+    "explanation": "Slide 5 says explicitly — Studio is a real, complete WordPress installation. Not a demo. Not a preview. Every feature the live version has."
+  },
+  {
+    "scenario": "Sarah is considering XAMPP or MAMP because a friend recommended them for local WordPress.",
+    "question": "What is the correct guidance from Lesson 8.2?",
+    "options": [
+      "XAMPP and MAMP are the current best choice.",
+      "They are older tools that require you to configure Apache, MySQL, and PHP yourself — painful and unnecessary when Studio does it for you. Skip them.",
+      "They are illegal to use in Kenya.",
+      "They can only run on Mac computers."
+    ],
+    "correct": 1,
+    "explanation": "Slide 8 lists XAMPP and MAMP as older tools that require manual configuration of Apache, MySQL, and PHP. Painful. Skip them. Studio does all this automatically."
+  },
+  {
+    "scenario": "Sarah asks: 'If everything I do is on my laptop, how do customers ever see the Karibu Kitchen site?' She is confused about how local development eventually becomes a real live website.",
+    "question": "Which explanation is correct for the Module 8 workflow?",
+    "options": [
+      "Local sites never go live — Sarah must rebuild the whole site on hosting later.",
+      "Studio publishes to a demo URL for previewing during the build, and later Sarah can push the finished site to real hosting when she is ready to go public.",
+      "Local WordPress is automatically indexed by Google.",
+      "The laptop must remain on 24 hours a day for customers to visit."
+    ],
+    "correct": 1,
+    "explanation": "The Module 8 workflow uses Studio's Demo Sites for previews during the build (Slide 6), and the finished site later moves to real hosting when Sarah is ready — that is why we build locally first (Slide 4)."
+  }
+];
+
+        let currentQuestion = 0, score = 0, streak = 0, answered = false;
+
+        function updateScoreboard() {
+            document.getElementById('score').textContent = score;
+            document.getElementById('current').textContent = Math.min(currentQuestion + 1, exercises.length);
+            document.getElementById('total').textContent = exercises.length;
+            document.getElementById('streak').textContent = streak;
+            document.getElementById('progress').style.width = ((currentQuestion) / exercises.length) * 100 + '%';
+        }
+
+        function escapeHtml(s) {
+            return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+        }
+
+        function renderQuestion() {
+            answered = false;
+            const q = exercises[currentQuestion];
+            let html = '';
+            if (q.scenario) {
+                html += `<div class="scenario"><strong>Scenario.</strong> ${escapeHtml(q.scenario)}</div>`;
+            }
+            html += `<div class="question">${escapeHtml(q.question)}</div>`;
+            html += '<div class="options">';
+            q.options.forEach((o, i) => {
+                html += `<button class="option" onclick="selectAnswer(${i})">${escapeHtml(o)}</button>`;
+            });
+            html += '</div>';
+            document.getElementById('exerciseCard').innerHTML = html;
+            updateScoreboard();
+        }
+
+        function selectAnswer(i) {
+            if (answered) return;
+            answered = true;
+            const q = exercises[currentQuestion];
+            const btns = document.querySelectorAll('.option');
+            btns.forEach(b => b.classList.add('disabled'));
+            btns[q.correct].classList.add('correct');
+            const right = i === q.correct;
+            if (!right) btns[i].classList.add('wrong');
+            if (right) { score += 10; streak += 1; } else { streak = 0; }
+            const fb = document.createElement('div');
+            fb.className = 'feedback ' + (right ? 'correct' : 'wrong');
+            fb.innerHTML = `<strong>${right ? '✅ Correct.' : '❌ Not quite.'}</strong><br>${escapeHtml(q.explanation)}`;
+            document.getElementById('exerciseCard').appendChild(fb);
+            const nb = document.createElement('button');
+            nb.className = 'next-btn';
+            nb.textContent = currentQuestion === exercises.length - 1 ? 'See results →' : 'Next scenario →';
+            nb.onclick = nextQuestion;
+            document.getElementById('exerciseCard').appendChild(nb);
+            updateScoreboard();
+        }
+
+        function nextQuestion() {
+            currentQuestion++;
+            if (currentQuestion >= exercises.length) return showResults();
+            renderQuestion();
+        }
+
+        function showResults() {
+            document.getElementById('progress').style.width = '100%';
+            const total = exercises.length * 10;
+            const pct = Math.round(score / total * 100);
+            if (window.parent) { window.parent.postMessage({type:"mtti_quiz_score", score: score, total: total, percent: pct}, "*"); }
+            let badge = '🌟', msg = 'Excellent work. You have a professional grasp of this lesson.';
+            if (pct < 50) { badge = '🌱'; msg = 'Good first attempt. Re-watch the lesson video and try again.'; }
+            else if (pct < 80) { badge = '📚'; msg = 'Solid progress. Review the scenarios you missed and retry.'; }
+            document.getElementById('exerciseCard').innerHTML = `
+                <div class="results">
+                    <span class="badge">${badge}</span>
+                    <h2>Quiz Complete</h2>
+                    <div class="final-score">${score} / ${total}</div>
+                    <p><strong>${pct}%</strong> · Longest streak: ${streak}</p>
+                    <p>${msg}</p>
+                    <button class="restart-btn" onclick="restart()">Try again 🔁</button>
+                </div>`;
+        }
+
+        function restart() {
+            currentQuestion = 0; score = 0; streak = 0;
+            renderQuestion();
+        }
+
+        renderQuestion();
+    </script>
+</body>
+</html>

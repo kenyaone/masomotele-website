@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Importing Media into CapCut and Canva Video | MTTI Video Editing</title>
+    <link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Fredoka:wght@500;600&display=swap" rel="stylesheet">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Space Mono', monospace; background: linear-gradient(135deg, #1A0B3D 0%, #0D47A1 100%); min-height: 100vh; padding: 20px; color: #fff; }
+        .container { max-width: 900px; margin: 0 auto; }
+        .header { text-align: center; margin-bottom: 30px; }
+        .header .lesson-tag { display: inline-block; background: rgba(255,255,255,0.2); padding: 6px 16px; border-radius: 999px; font-size: 0.85em; margin-bottom: 12px; }
+        .header h1 { font-family: 'Fredoka', sans-serif; font-size: 2.2em; margin-bottom: 8px; text-shadow: 3px 3px 0 rgba(0,0,0,0.2); }
+        .score-board { background: rgba(255,255,255,0.15); backdrop-filter: blur(10px); border-radius: 20px; padding: 20px; margin-bottom: 20px; display: flex; justify-content: space-around; }
+        .score-item { text-align: center; }
+        .score-item .label { font-size: 0.85em; opacity: 0.9; margin-bottom: 4px; }
+        .score-item .value { font-size: 1.8em; font-weight: bold; font-family: 'Fredoka', sans-serif; }
+        .progress-bar { width: 100%; height: 8px; background: rgba(255,255,255,0.3); border-radius: 10px; margin-bottom: 25px; overflow: hidden; }
+        .progress-fill { height: 100%; background: linear-gradient(90deg, #f7971e 0%, #ffd200 100%); border-radius: 10px; transition: width 0.5s ease; width: 0%; }
+        .exercise-card { background: white; color: #333; border-radius: 25px; padding: 35px; margin-bottom: 20px; box-shadow: 0 20px 60px rgba(0,0,0,0.3); }
+        .scenario { background: linear-gradient(135deg, #fff8e1 0%, #ffecb3 100%); border-left: 5px solid #ffc107; padding: 20px 24px; border-radius: 12px; margin-bottom: 24px; font-size: 0.98em; line-height: 1.55; }
+        .scenario strong { color: #7a5a00; font-family: 'Fredoka', sans-serif; }
+        .question { font-size: 1.15em; margin-bottom: 20px; font-weight: 700; line-height: 1.4; }
+        .options { display: flex; flex-direction: column; gap: 12px; }
+        .option { background: #f5f7fb; border: 2px solid transparent; padding: 16px 20px; border-radius: 12px; cursor: pointer; transition: all 0.2s ease; font-family: 'Space Mono', monospace; font-size: 0.98em; text-align: left; }
+        .option:hover:not(.disabled) { background: #eef2fb; border-color: #0D47A1; transform: translateX(4px); }
+        .option.correct { background: #d4edda; border-color: #28a745; color: #155724; }
+        .option.wrong { background: #f8d7da; border-color: #dc3545; color: #721c24; }
+        .option.disabled { cursor: not-allowed; opacity: 0.85; }
+        .feedback { margin-top: 22px; padding: 18px 22px; border-radius: 12px; font-size: 0.98em; line-height: 1.5; }
+        .feedback.correct { background: #d4edda; color: #155724; border-left: 4px solid #28a745; }
+        .feedback.wrong { background: #f8d7da; color: #721c24; border-left: 4px solid #dc3545; }
+        .next-btn, .restart-btn { margin-top: 20px; background: linear-gradient(135deg, #1A0B3D 0%, #0D47A1 100%); color: white; border: none; padding: 14px 32px; border-radius: 12px; font-size: 1em; cursor: pointer; font-family: 'Fredoka', sans-serif; box-shadow: 0 6px 18px rgba(0,0,0,0.2); }
+        .results { text-align: center; padding: 25px 15px; }
+        .results h2 { font-family: 'Fredoka', sans-serif; font-size: 2em; margin-bottom: 12px; color: #333; }
+        .results .final-score { font-size: 3em; font-family: 'Fredoka', sans-serif; color: #0D47A1; margin: 20px 0; }
+        .results p { color: #555; margin-bottom: 12px; }
+        .badge { display: inline-block; font-size: 3.5em; margin: 8px 0; }
+
+        /* How-To intro screen — shown before question 1, not scored */
+        .howto-card { background: white; color: #333; border-radius: 25px; padding: 35px; margin-bottom: 20px; box-shadow: 0 20px 60px rgba(0,0,0,0.3); }
+        .howto-card h3 { font-family: 'Fredoka', sans-serif; font-size: 1.3em; margin-bottom: 12px; color: #0D47A1; }
+        .howto-card p { line-height: 1.6; margin-bottom: 16px; color: #444; }
+        .howto-timeline { display: flex; gap: 6px; background: #0f0f18; border-radius: 12px; padding: 12px; margin-bottom: 18px; overflow-x: auto; }
+        .howto-clip { flex-shrink: 0; min-width: 78px; border-radius: 8px; padding: 10px 10px 8px; display: flex; flex-direction: column; justify-content: space-between; font-size: 0.78em; color: #fff; }
+        .howto-clip .hc-label { font-weight: 700; }
+        .howto-clip .hc-move { display: flex; gap: 4px; margin-top: 6px; }
+        .howto-clip .hc-move button { flex: 1; background: rgba(0,0,0,0.25); border: none; color: #fff; border-radius: 5px; padding: 3px 0; cursor: pointer; font-size: 0.95em; }
+        .howto-clip .hc-move button:disabled { opacity: 0.3; cursor: not-allowed; }
+        .howto-clip.hc-correct { outline: 3px solid #28a745; }
+        .howto-clip.hc-wrong { outline: 3px solid #dc3545; }
+        .howto-banner { margin-top: 4px; margin-bottom: 18px; padding: 12px 16px; border-radius: 10px; font-size: 0.9em; font-weight: 700; display: none; }
+        .howto-banner.show { display: block; }
+        .howto-banner.ok { background: #d4edda; color: #155724; }
+        .howto-banner.fail { background: #f8d7da; color: #721c24; }
+        .start-quiz-btn { margin-top: 4px; background: linear-gradient(135deg, #1A0B3D 0%, #0D47A1 100%); color: white; border: none; padding: 14px 32px; border-radius: 12px; font-size: 1em; cursor: pointer; font-family: 'Fredoka', sans-serif; box-shadow: 0 6px 18px rgba(0,0,0,0.2); }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <div class="lesson-tag">Unit 21 · Topic 1 · Quiz</div>
+            <h1>Importing Media into CapCut and Canva Video</h1>
+        </div>
+        <div class="score-board">
+            <div class="score-item"><div class="label">Score</div><div class="value" id="score">0</div></div>
+            <div class="score-item"><div class="label">Question</div><div class="value"><span id="current">1</span>/<span id="total">10</span></div></div>
+            <div class="score-item"><div class="label">Streak</div><div class="value" id="streak">0</div></div>
+        </div>
+        <div class="progress-bar"><div class="progress-fill" id="progress"></div></div>
+        <div class="exercise-card" id="exerciseCard"></div>
+    </div>
+    <script>
+        const exercises = [{"scenario":"A client forwards Otieno her wedding footage over WhatsApp instead of sending the original files.","question":"What is the main risk of importing this WhatsApp-forwarded copy directly into the project?","options":["There is no risk \u2014 WhatsApp video is identical to the original","WhatsApp automatically compresses video, so the imported copy will be lower quality than the original file","CapCut cannot open videos sent through WhatsApp at all","WhatsApp videos import at the wrong aspect ratio automatically"],"correct":1,"explanation":"WhatsApp compresses video during sending, so a forwarded copy is a lower-quality source than the client's original file \u2014 worth requesting directly when quality matters."},{"scenario":"Otieno opens CapCut and taps \"New Project\" to start a new shop promo.","question":"What does CapCut show him next, and what should he do?","options":["A blank timeline with no way to add footage","The phone's Gallery/Albums tab, where he selects the clips he wants to bring in","A prompt to type in a video file name manually","An empty project that opens straight to the export screen"],"correct":1,"explanation":"Tapping New Project takes Otieno straight to the Gallery/Albums tab \u2014 selecting clips there is how footage gets imported into CapCut."},{"scenario":"In the Gallery grid, Otieno taps five clips in the specific order he wants them to appear in the final video, then taps \"Add.\"","question":"What happens to the clips on the timeline?","options":["They land on the timeline in alphabetical order by filename","They land on the timeline in the order Otieno tapped them","CapCut always sorts them by file size","They are placed in a random order every time"],"correct":1,"explanation":"CapCut numbers clips by tap order in the Gallery grid, and \"Add\" brings them onto the timeline in that same selection order."},{"scenario":"Otieno is editing a bigger job on his laptop using Canva Video rather than his phone.","question":"Where does footage come in from on Canva Video, compared to CapCut's Gallery tab?","options":["Canva Video cannot import outside footage at all","The Uploads tab, where files can be dragged in from a laptop folder or a connected Google Drive","Canva Video only accepts footage recorded live inside the app","Footage must be emailed to Canva support first"],"correct":1,"explanation":"Canva Video's Uploads tab is the equivalent of CapCut's Gallery \u2014 footage is dragged in from a computer folder or Google Drive, then dragged onto the timeline."},{"scenario":"After importing 12 clips for the shop promo, Otieno notices two of them landed in the wrong order on the timeline.","question":"What is the correct fix, without re-importing anything?","options":["Delete the whole project and start the import over from scratch","Drag the two clips along the timeline into the correct positions","This cannot be fixed once clips are imported","Re-install CapCut and try again"],"correct":1,"explanation":"Clip order on the timeline can simply be adjusted by dragging clips into place \u2014 there's no need to redo the import."},{"scenario":"A new employee at Eldoret Reels Studio tries to import footage on a borrowed phone, but the CapCut Gallery tab appears completely empty.","question":"What is the most likely cause?","options":["CapCut only works on the original owner's phone","CapCut was never given permission to access the phone's photos and videos","The footage was recorded in the wrong aspect ratio","The phone's battery is too low to show the Gallery"],"correct":1,"explanation":"If CapCut isn't granted Gallery/photo access permission, the Gallery tab has nothing to show, which is a common cause of an apparently empty import screen."},{"scenario":"Otieno finishes importing all clips for a promo video and is about to start editing.","question":"What quick check is worth doing right after import, before editing further?","options":["Nothing \u2014 imported clips are always in the correct order automatically","Scroll through the timeline to confirm clips landed in the right order and none were imported twice","Immediately export the video to check quality","Delete the original footage from the phone to save space"],"correct":1,"explanation":"A quick post-import check of the timeline catches order mix-ups or accidental duplicate imports before time is spent editing around them."}];
+        let currentQuestion = 0, score = 0, streak = 0, answered = false;
+        function updateScoreboard() {
+            document.getElementById('score').textContent = score;
+            document.getElementById('current').textContent = Math.min(currentQuestion + 1, exercises.length);
+            document.getElementById('total').textContent = exercises.length;
+            document.getElementById('streak').textContent = streak;
+            document.getElementById('progress').style.width = ((currentQuestion) / exercises.length) * 100 + '%';
+        }
+        function escapeHtml(s) { return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+        function renderQuestion() {
+            answered = false;
+            const q = exercises[currentQuestion];
+            let html = '';
+            if (q.scenario) html += `<div class="scenario"><strong>Scenario.</strong> ${escapeHtml(q.scenario)}</div>`;
+            html += `<div class="question">${escapeHtml(q.question)}</div>`;
+            html += '<div class="options">';
+            q.options.forEach((o, i) => { html += `<button class="option" onclick="selectAnswer(${i})">${escapeHtml(o)}</button>`; });
+            html += '</div>';
+            document.getElementById('exerciseCard').innerHTML = html;
+            updateScoreboard();
+        }
+        function selectAnswer(i) {
+            if (answered) return;
+            answered = true;
+            const q = exercises[currentQuestion];
+            const btns = document.querySelectorAll('.option');
+            btns.forEach(b => b.classList.add('disabled'));
+            btns[q.correct].classList.add('correct');
+            const right = i === q.correct;
+            if (!right) btns[i].classList.add('wrong');
+            if (right) { score += 10; streak += 1; } else { streak = 0; }
+            const fb = document.createElement('div');
+            fb.className = 'feedback ' + (right ? 'correct' : 'wrong');
+            fb.innerHTML = `<strong>${right ? '&#9989; Correct.' : '&#10060; Not quite.'}</strong><br>${escapeHtml(q.explanation)}`;
+            document.getElementById('exerciseCard').appendChild(fb);
+            const nb = document.createElement('button');
+            nb.className = 'next-btn';
+            nb.textContent = currentQuestion === exercises.length - 1 ? 'See results →' : 'Next scenario →';
+            nb.onclick = nextQuestion;
+            document.getElementById('exerciseCard').appendChild(nb);
+            updateScoreboard();
+        }
+        function nextQuestion() { currentQuestion++; if (currentQuestion >= exercises.length) return showResults(); renderQuestion(); }
+        function showResults() {
+            document.getElementById('progress').style.width = '100%';
+            const total = exercises.length * 10;
+            const pct = Math.round(score / total * 100);
+            if (window.parent) { window.parent.postMessage({type:"mtti_quiz_score", score: score, total: total, percent: pct}, "*"); }
+            let badge = '\u{1F31F}', msg = 'Excellent work. Otieno-level footage-handling know-how.';
+            if (pct < 50) { badge = '\u{1F331}'; msg = 'Good first attempt. Review the lesson and try again.'; }
+            else if (pct < 80) { badge = '\u{1F4DA}'; msg = 'Solid progress. Review the scenarios you missed and retry.'; }
+            document.getElementById('exerciseCard').innerHTML = `
+                <div class="results">
+                    <span class="badge">${badge}</span>
+                    <h2>Quiz Complete</h2>
+                    <div class="final-score">${score} / ${total}</div>
+                    <p><strong>${pct}%</strong> &middot; Longest streak: ${streak}</p>
+                    <p>${msg}</p>
+                    <button class="restart-btn" onclick="restart()">Try again &#128257;</button>
+                </div>`;
+        }
+        function restart() { currentQuestion = 0; score = 0; streak = 0; renderQuestion(); }
+
+        /* How-To intro — a small, ungraded reorder demo shown before the
+           quiz starts, directly rehearsing the "drag a clip into place to
+           fix its order" mechanic that one of the quiz scenarios asks
+           about, so it's not being asked cold. */
+        const HOWTO_CLIPS = [
+            { id: 'h1', label: 'Shop Front', color: '#6A11CB' },
+            { id: 'h2', label: 'Owner Talking', color: '#2575FC' },
+            { id: 'h3', label: 'Product Rack', color: '#E65100' },
+            { id: 'h4', label: 'Till Point', color: '#00897B' },
+        ];
+        const HOWTO_CORRECT = ['h1', 'h2', 'h3', 'h4'];
+        let howtoOrder = ['h1', 'h3', 'h2', 'h4']; // two clips start swapped, same as the quiz scenario describes
+
+        function escHtmlH(s) { return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+        function howtoClipById(id) { return HOWTO_CLIPS.find(c => c.id === id); }
+
+        function renderHowtoTimeline(marks) {
+            document.getElementById('howtoTimeline').innerHTML = howtoOrder.map((id, i) => {
+                const c = howtoClipById(id);
+                const cls = marks ? (marks[i] ? 'hc-correct' : 'hc-wrong') : '';
+                return `<div class="howto-clip ${cls}" style="background:${c.color};">
+                    <div class="hc-label">${escHtmlH(c.label)}</div>
+                    <div class="hc-move">
+                        <button data-dir="left" data-id="${id}" ${i===0?'disabled':''}>◀</button>
+                        <button data-dir="right" data-id="${id}" ${i===howtoOrder.length-1?'disabled':''}>▶</button>
+                    </div>
+                </div>`;
+            }).join('');
+            document.querySelectorAll('.hc-move button').forEach(btn => {
+                btn.addEventListener('click', () => moveHowtoClip(btn.dataset.id, btn.dataset.dir));
+            });
+        }
+
+        function moveHowtoClip(id, dir) {
+            const i = howtoOrder.indexOf(id);
+            const j = dir === 'left' ? i - 1 : i + 1;
+            if (j < 0 || j >= howtoOrder.length) return;
+            [howtoOrder[i], howtoOrder[j]] = [howtoOrder[j], howtoOrder[i]];
+            renderHowtoTimeline();
+            document.getElementById('howtoBanner').classList.remove('show');
+        }
+
+        function checkHowto() {
+            const marks = howtoOrder.map((id, i) => id === HOWTO_CORRECT[i]);
+            renderHowtoTimeline(marks);
+            const allOk = marks.every(m => m);
+            const banner = document.getElementById('howtoBanner');
+            banner.classList.add('show');
+            banner.className = 'howto-banner show ' + (allOk ? 'ok' : 'fail');
+            banner.textContent = allOk
+                ? '✅ Fixed — that\'s exactly how it works on the real timeline, no re-importing needed.'
+                : '❌ Not quite yet — keep using ◀▶ to swap the two out-of-order clips.';
+        }
+
+        function renderHowto() {
+            document.getElementById('exerciseCard').innerHTML = `
+                <div class="howto-card">
+                    <h3>🔍 Quick How-To: Fixing Clip Order</h3>
+                    <p>One of the scenarios coming up asks about this exact situation: after importing footage, two clips land in the wrong order on the timeline. Here's the fix — <strong>press and hold a clip, then drag it left or right to its new position</strong> (below, use ◀▶ instead of dragging). Try reordering these four clips into the right sequence, then check your work.</p>
+                    <div class="howto-timeline" id="howtoTimeline"></div>
+                    <div class="howto-banner" id="howtoBanner"></div>
+                    <button class="start-quiz-btn" id="checkHowtoBtn">Check My Order</button>
+                    <button class="start-quiz-btn" id="startQuizBtn" style="margin-left:10px;background:linear-gradient(135deg,#28a745,#1e7e34);">Start Quiz →</button>
+                </div>`;
+            renderHowtoTimeline();
+            document.getElementById('checkHowtoBtn').addEventListener('click', checkHowto);
+            document.getElementById('startQuizBtn').addEventListener('click', renderQuestion);
+        }
+
+        renderHowto();
+    </script>
+</body>
+</html>

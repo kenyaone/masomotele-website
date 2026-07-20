@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AI Background Removal and Auto-Reframe (Lesson) | MTTI Video Editing</title>
+<link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Fredoka:wght@500;600&display=swap" rel="stylesheet">
+<style>
+* { margin:0; padding:0; box-sizing:border-box; }
+body { font-family:'Space Mono', monospace; background:linear-gradient(135deg,#6A11CB 0%,#2575FC 100%); min-height:100vh; padding:20px; color:#fff; }
+.container { max-width:820px; margin:0 auto; }
+.header { text-align:center; margin-bottom:24px; }
+.lesson-tag { display:inline-block; background:rgba(255,255,255,0.2); padding:6px 16px; border-radius:999px; font-size:0.85em; margin-bottom:12px; }
+.header h1 { font-family:'Fredoka', sans-serif; font-size:2em; margin-bottom:6px; text-shadow:3px 3px 0 rgba(0,0,0,0.2); }
+.card { background:#fff; color:#333; border-radius:22px; padding:32px; margin-bottom:20px; box-shadow:0 20px 60px rgba(0,0,0,0.3); }
+.section { margin-bottom:26px; }
+.section:last-child { margin-bottom:0; }
+.section h2 { font-family:'Fredoka', sans-serif; font-size:1.2em; margin-bottom:10px; color:#6A11CB; }
+.section .body { line-height:1.65; font-size:0.98em; }
+.section .body p { margin-bottom:10px; }
+.section .body code { background:#f5f7fb; padding:2px 6px; border-radius:4px; font-size:0.92em; }
+.keypoint { background:#fff8e1; border-left:4px solid #ffc107; padding:12px 16px; border-radius:8px; margin-top:12px; font-size:0.92em; }
+</style>
+</head>
+<body>
+<div class="container">
+<div class="header"><div class="lesson-tag">Unit 194 · Lesson 2</div><h1>AI Background Removal and Auto-Reframe</h1></div>
+<div class="card"><div class="section"><h2>How Background Remover Works (and Fails)</h2><div class="body"><p>CapCut's Background Remover uses an AI segmentation model to separate a subject &mdash; usually a person &mdash; from whatever is behind them, frame by frame, so Otieno can drop in a new background or place the subject on an overlay/PIP track. It works well on a clean, well-lit shot with a subject that clearly stands out from the background.</p><p>It struggles with fine detail and movement: loose hair strands, motion blur during quick movement, and a subject wearing colours or patterns close to the background colour all confuse the AI's edge detection, leaving a flickering or torn-looking outline around the subject.</p></div></div><div class="section"><h2>How Auto Reframe Decides the Crop</h2><div class="body"><p>Auto Reframe takes a horizontal 16:9 clip &mdash; like a landscape-orientation church-event interview &mdash; and automatically produces a vertical 9:16 version for Reels or TikTok by detecting the main subject (usually via face or motion tracking) and keeping a crop window centred on that subject as it moves.</p><p>The AI is tracking one thing at a time. If a second person leans into frame, if the subject turns their head suddenly, or if an on-screen graphic (a lower-third caption, a shop's contact details, a price card) appears in a part of the frame the AI is not tracking, the automatic crop can cut off half a face or push that graphic partly or fully outside the vertical frame &mdash; without any warning that it has done so.</p></div></div><div class="section"><h2>Frame-by-Frame Verification</h2><div class="body"><p>Because the AI's tracking mistakes are usually momentary &mdash; a bad crop for two or three seconds around a scene change, a quick head turn, or the exact moment a graphic appears &mdash; a quick glance at the first and last frame of a reframed clip is not enough. Otieno needs to scrub through the whole reframed timeline, paying close attention at every shot change and every moment a graphic appears on screen, and manually adjust the crop keyframe wherever the AI got it wrong.</p><p>The same applies to Background Remover results: play the clip back at full speed and check the subject's outline, especially around hair and fast movement, before compositing it into the final edit.</p></div><div class="keypoint"><strong>Key Point.</strong> AI reframing and background removal are tracking guesses, not guaranteed-correct crops. Always scrub the reframed timeline frame-by-frame &mdash; especially at scene changes and wherever an on-screen graphic appears &mdash; and manually fix any crop that cuts off a face or important graphic before export.</div></div></div>
+</div>
+</body>
+</html>

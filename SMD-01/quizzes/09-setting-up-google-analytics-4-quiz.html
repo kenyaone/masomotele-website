@@ -1,0 +1,346 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Setting Up Google Analytics 4 | MTTI Digital Marketing</title>
+    <link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Fredoka:wght@500;600&display=swap" rel="stylesheet">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Space Mono', monospace;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh; padding: 20px; color: #fff;
+        }
+        .container { max-width: 900px; margin: 0 auto; }
+        .header { text-align: center; margin-bottom: 30px; animation: slideDown 0.6s ease-out; }
+        .header .lesson-tag {
+            display: inline-block; background: rgba(255,255,255,0.2);
+            padding: 6px 16px; border-radius: 999px;
+            font-size: 0.85em; margin-bottom: 12px;
+        }
+        .header h1 {
+            font-family: 'Fredoka', sans-serif; font-size: 2.2em;
+            margin-bottom: 8px; text-shadow: 3px 3px 0 rgba(0,0,0,0.2);
+        }
+        .header p { opacity: 0.95; font-size: 0.95em; }
+        .score-board {
+            background: rgba(255,255,255,0.15); backdrop-filter: blur(10px);
+            border-radius: 20px; padding: 20px; margin-bottom: 20px;
+            display: flex; justify-content: space-around;
+            animation: fadeIn 0.8s ease-out 0.2s both;
+        }
+        .score-item { text-align: center; }
+        .score-item .label { font-size: 0.85em; opacity: 0.9; margin-bottom: 4px; }
+        .score-item .value {
+            font-size: 1.8em; font-weight: bold; font-family: 'Fredoka', sans-serif;
+        }
+        .progress-bar {
+            width: 100%; height: 8px; background: rgba(255,255,255,0.3);
+            border-radius: 10px; margin-bottom: 25px; overflow: hidden;
+        }
+        .progress-fill {
+            height: 100%; background: linear-gradient(90deg, #f093fb 0%, #f5576c 100%);
+            border-radius: 10px; transition: width 0.5s ease; width: 0%;
+        }
+        .exercise-card {
+            background: white; color: #333; border-radius: 25px;
+            padding: 35px; margin-bottom: 20px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            animation: fadeIn 0.6s ease-out both;
+        }
+        .scenario {
+            background: linear-gradient(135deg, #fff8e1 0%, #ffecb3 100%);
+            border-left: 5px solid #ffc107;
+            padding: 20px 24px; border-radius: 12px;
+            margin-bottom: 24px;
+            font-size: 0.98em; line-height: 1.55;
+        }
+        .scenario strong { color: #7a5a00; font-family: 'Fredoka', sans-serif; }
+        .question {
+            font-size: 1.15em; margin-bottom: 20px;
+            font-weight: 700; line-height: 1.4;
+        }
+        .options { display: flex; flex-direction: column; gap: 12px; }
+        .option {
+            background: #f5f7fb; border: 2px solid transparent;
+            padding: 16px 20px; border-radius: 12px;
+            cursor: pointer; transition: all 0.2s ease;
+            font-family: 'Space Mono', monospace; font-size: 0.98em; text-align: left;
+        }
+        .option:hover:not(.disabled) {
+            background: #eef1fb; border-color: #667eea; transform: translateX(4px);
+        }
+        .option.correct { background: #d4edda; border-color: #28a745; color: #155724; }
+        .option.wrong { background: #f8d7da; border-color: #dc3545; color: #721c24; animation: shake 0.4s; }
+        .option.disabled { cursor: not-allowed; opacity: 0.85; }
+        .feedback {
+            margin-top: 22px; padding: 18px 22px; border-radius: 12px;
+            animation: slideUp 0.4s ease-out;
+            font-size: 0.98em; line-height: 1.5;
+        }
+        .feedback.correct { background: #d4edda; color: #155724; border-left: 4px solid #28a745; }
+        .feedback.wrong { background: #f8d7da; color: #721c24; border-left: 4px solid #dc3545; }
+        .feedback strong { font-family: 'Fredoka', sans-serif; }
+        .next-btn, .restart-btn {
+            margin-top: 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white; border: none;
+            padding: 14px 32px; border-radius: 12px;
+            font-size: 1em; cursor: pointer;
+            font-family: 'Fredoka', sans-serif;
+            box-shadow: 0 6px 18px rgba(0,0,0,0.2);
+            transition: transform 0.2s ease;
+        }
+        .next-btn:hover, .restart-btn:hover { transform: scale(1.04); }
+        .results {
+            text-align: center; padding: 25px 15px;
+            animation: bounceIn 0.6s ease-out;
+        }
+        .results h2 {
+            font-family: 'Fredoka', sans-serif; font-size: 2em;
+            margin-bottom: 12px; color: #333;
+        }
+        .results .final-score {
+            font-size: 3em; font-family: 'Fredoka', sans-serif;
+            color: #667eea; margin: 20px 0;
+        }
+        .results p { color: #555; margin-bottom: 12px; }
+        .badge { display: inline-block; font-size: 3.5em; margin: 8px 0; }
+        @keyframes slideDown { from { opacity: 0; transform: translateY(-30px); } to { opacity: 1; transform: translateY(0); } }
+        @keyframes fadeIn { from { opacity: 0; transform: scale(0.96); } to { opacity: 1; transform: scale(1); } }
+        @keyframes slideUp { from { opacity: 0; transform: translateY(15px); } to { opacity: 1; transform: translateY(0); } }
+        @keyframes shake { 0%,100% { transform: translateX(0); } 25% { transform: translateX(-8px); } 75% { transform: translateX(8px); } }
+        @keyframes bounceIn { 0% { opacity: 0; transform: scale(0.4); } 60% { transform: scale(1.05); } 100% { opacity: 1; transform: scale(1); } }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <div class="lesson-tag">Module 9 · Lesson 9.7</div>
+            <h1>Setting Up Google Analytics 4</h1>
+            <p>10 Sarah scenarios — GA4 property, MonsterInsights, Real-time, Key Events, Kenya DPA 2019</p>
+        </div>
+
+        <div class="score-board">
+            <div class="score-item"><div class="label">Score</div><div class="value" id="score">0</div></div>
+            <div class="score-item"><div class="label">Question</div><div class="value"><span id="current">1</span>/<span id="total">10</span></div></div>
+            <div class="score-item"><div class="label">Streak</div><div class="value" id="streak">0</div></div>
+        </div>
+
+        <div class="progress-bar"><div class="progress-fill" id="progress"></div></div>
+
+        <div class="exercise-card" id="exerciseCard"></div>
+    </div>
+
+    <script>
+        const exercises = [
+  {
+    "scenario": "Sarah asks what GA4 measures that Search Console does not.",
+    "question": "Which set matches Lesson 9.7?",
+    "options": [
+      "Number of impressions in Google search.",
+      "WHO the visitors are (location, device, language, first-time vs returning), WHERE they arrived from (Google, Facebook, direct, email), WHICH pages they view, HOW LONG they stay, and WHETHER they perform key actions (WhatsApp click, form submit, Contact page reached) — this last one is conversion tracking, the whole point of GA4.",
+      "Crawl errors and indexing coverage.",
+      "Robots.txt content."
+    ],
+    "correct": 1,
+    "explanation": "Slide 2 lists the five things GA4 measures. Search Console is Google's view of your ranking; GA4 is the visitor-behaviour view. Both matter, and they answer different questions."
+  },
+  {
+    "scenario": "Sarah opens analytics.google.com and starts creating her GA4 property for karibukitchen.co.ke.",
+    "question": "Which settings sequence matches Lesson 9.7?",
+    "options": [
+      "Account name (reuse Google Ads name), Property name Karibu Kitchen, Timezone Nairobi GMT+3, Currency Kenyan Shilling, Business category restaurant/hospitality, Business objectives generate leads and drive online sales, Data collection accept defaults.",
+      "Timezone New York GMT-5, Currency USD, Business category tech.",
+      "Skip every setting and click Save.",
+      "Account name random, Property name empty, Timezone UTC, Currency Bitcoin."
+    ],
+    "correct": 0,
+    "explanation": "Slide 3 lists all five setup steps exactly — Nairobi timezone, KES currency, restaurant/hospitality, leads and online sales objectives, defaults for data collection."
+  },
+  {
+    "scenario": "Sarah's site collects visitor data — IP, device, location, browsing behaviour, and via forms, names and phone numbers. Under Kenya's Data Protection Act 2019 she has specific obligations.",
+    "question": "Which combination is required for her GA4 setup?",
+    "options": [
+      "Ignore consent because GA4 is free.",
+      "Show a consent banner asking visitors before non-essential tracking, enable IP anonymisation on the GA4 property, set an appropriate data retention period, publish a Privacy Policy explaining what is collected and why. Consent must be freely given, specific, informed, and unambiguous.",
+      "Collect data secretly.",
+      "Only Kenyans over 30 need consent."
+    ],
+    "correct": 1,
+    "explanation": "Kenya's DPA 2019 requires informed consent for non-essential tracking, plus IP anonymisation, appropriate retention, and a Privacy Policy. GA4 exposes all three settings — trainees must configure them, not accept blind defaults."
+  },
+  {
+    "scenario": "Sarah is choosing a data retention period for her GA4 property.",
+    "question": "What is the professional guidance under Kenya's DPA 2019?",
+    "options": [
+      "Retain forever.",
+      "Pick the shortest retention that still meets your reporting needs — usually 14 months for user and event data. DPA 2019 requires that personal data is kept no longer than necessary.",
+      "Retain zero days — measurement becomes impossible.",
+      "Retention has no relationship to DPA 2019."
+    ],
+    "correct": 1,
+    "explanation": "Kenya's DPA 2019 principle of storage limitation — personal data should be kept only for as long as necessary for the purpose. GA4's default 2-month or user-configured 14-month retention window is appropriate. Avoid infinite retention."
+  },
+  {
+    "scenario": "Sarah does not want to hand-paste GA4 code into every WordPress page.",
+    "question": "How does Lesson 9.7 solve this?",
+    "options": [
+      "Use FTP to add a script tag to every file.",
+      "Sarah installed MonsterInsights in Lesson 8.7. In wp-admin, Insights > Settings > Connect MonsterInsights, sign in with the same Google account, grant permission, pick the Karibu Kitchen property, Save. The tracking code is now installed on every page automatically. No developer needed.",
+      "Hand-code every page in HTML.",
+      "Skip GA4 entirely."
+    ],
+    "correct": 1,
+    "explanation": "Slide 4 describes the MonsterInsights connection — Insights > Settings > Connect > Grant > Pick property > Save. Auto-tags every page. This is why we installed MonsterInsights in 8.7."
+  },
+  {
+    "scenario": "Sarah completes the MonsterInsights setup and assumes tracking works. Her trainer says: verify first.",
+    "question": "How does she verify?",
+    "options": [
+      "Wait 30 days and hope.",
+      "Open two browser tabs. Tab one: GA4 Real-time report. Tab two: Sarah's live site. Refresh the site. Wait 10 seconds. Switch back to GA4. USERS IN LAST 30 MINUTES should show 1 (that is Sarah). If not, MonsterInsights is not connected correctly — fix before moving on.",
+      "Refresh GA4 500 times.",
+      "Email Google support."
+    ],
+    "correct": 1,
+    "explanation": "Slide 5 is explicit — every professional verifies with Real-time before assuming tracking works. Never assume. Two tabs, one refresh, one number."
+  },
+  {
+    "scenario": "Sarah wants to know what Real-time is actually useful for beyond one-time verification.",
+    "question": "Which use case matches Lesson 9.7?",
+    "options": [
+      "Nothing — Real-time is a demo feature.",
+      "On the day of a new campaign launch, opening Real-time confirms the traffic is landing where it should — users, top countries (mostly Kenya, some Uganda), top pages, and event count by name.",
+      "Only for engineers, not marketers.",
+      "Only for measuring server load."
+    ],
+    "correct": 1,
+    "explanation": "Slide 6 lists Real-time's ongoing use — every professional opens it on the day of a new campaign launch to confirm live traffic is landing correctly."
+  },
+  {
+    "scenario": "Sarah asks which specific events she should track for Karibu Kitchen beyond page views.",
+    "question": "Which two Key Events does Lesson 9.7 name?",
+    "options": [
+      "Time zone change and browser update.",
+      "WhatsApp button click (every time a visitor taps the WhatsApp CTA) and Form submit (every Contact Form 7 submission). Mark both as Key Events in GA4 — Key Events are what used to be called conversions.",
+      "Mouse scroll and keyboard press only.",
+      "Page load and page unload only."
+    ],
+    "correct": 1,
+    "explanation": "Slide 7 names the two Key Events every professional GA4 setup includes — WhatsApp click and form submit. They tell you how many actual leads or sales your site produces."
+  },
+  {
+    "scenario": "Sarah wants a monthly report card she can review to know if her site is working.",
+    "question": "Which seven-number set matches Lesson 9.7's monthly report?",
+    "options": [
+      "Total users, total sessions, average session duration, bounce rate, number of key events, top traffic source, top-viewed page.",
+      "Total tweets, total retweets, total likes, total shares, total DMs, total followers, total impressions.",
+      "Total downloads, total refunds, total subscriptions, total cancellations, total complaints, total praise, total press mentions.",
+      "Total server errors, total 404s, total 500s, total 301s, total 302s, total 200s, total 403s."
+    ],
+    "correct": 0,
+    "explanation": "Slide 8 lists Sarah's seven monthly numbers — users, sessions, session duration, bounce rate, key events, top traffic source, top page. Combined with Search Console she has the full picture: search to landing to converting."
+  },
+  {
+    "scenario": "Sarah's classmate says: 'GA4 replaces Search Console — pick one.'",
+    "question": "What is the correct answer for Sarah's stack?",
+    "options": [
+      "The classmate is right.",
+      "Both are free and both are complementary. Search Console = Google's view (search rankings, impressions, queries, indexing). GA4 = visitor-behaviour view (who arrived, where from, what they did, what they converted on). Together they give the complete picture.",
+      "GA4 is banned in Kenya.",
+      "Search Console is banned in Kenya."
+    ],
+    "correct": 1,
+    "explanation": "Slide 9 wrap-up — combined with Search Console from 9.6, GA4 gives Sarah the complete picture of what customers do from Google search to landing to converting."
+  }
+];
+
+        let currentQuestion = 0, score = 0, streak = 0, answered = false;
+
+        function updateScoreboard() {
+            document.getElementById('score').textContent = score;
+            document.getElementById('current').textContent = Math.min(currentQuestion + 1, exercises.length);
+            document.getElementById('total').textContent = exercises.length;
+            document.getElementById('streak').textContent = streak;
+            document.getElementById('progress').style.width = ((currentQuestion) / exercises.length) * 100 + '%';
+        }
+
+        function escapeHtml(s) {
+            return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+        }
+
+        function renderQuestion() {
+            answered = false;
+            const q = exercises[currentQuestion];
+            let html = '';
+            if (q.scenario) {
+                html += `<div class="scenario"><strong>Scenario.</strong> ${escapeHtml(q.scenario)}</div>`;
+            }
+            html += `<div class="question">${escapeHtml(q.question)}</div>`;
+            html += '<div class="options">';
+            q.options.forEach((o, i) => {
+                html += `<button class="option" onclick="selectAnswer(${i})">${escapeHtml(o)}</button>`;
+            });
+            html += '</div>';
+            document.getElementById('exerciseCard').innerHTML = html;
+            updateScoreboard();
+        }
+
+        function selectAnswer(i) {
+            if (answered) return;
+            answered = true;
+            const q = exercises[currentQuestion];
+            const btns = document.querySelectorAll('.option');
+            btns.forEach(b => b.classList.add('disabled'));
+            btns[q.correct].classList.add('correct');
+            const right = i === q.correct;
+            if (!right) btns[i].classList.add('wrong');
+            if (right) { score += 10; streak += 1; } else { streak = 0; }
+            const fb = document.createElement('div');
+            fb.className = 'feedback ' + (right ? 'correct' : 'wrong');
+            fb.innerHTML = `<strong>${right ? '✅ Correct.' : '❌ Not quite.'}</strong><br>${escapeHtml(q.explanation)}`;
+            document.getElementById('exerciseCard').appendChild(fb);
+            const nb = document.createElement('button');
+            nb.className = 'next-btn';
+            nb.textContent = currentQuestion === exercises.length - 1 ? 'See results →' : 'Next scenario →';
+            nb.onclick = nextQuestion;
+            document.getElementById('exerciseCard').appendChild(nb);
+            updateScoreboard();
+        }
+
+        function nextQuestion() {
+            currentQuestion++;
+            if (currentQuestion >= exercises.length) return showResults();
+            renderQuestion();
+        }
+
+        function showResults() {
+            document.getElementById('progress').style.width = '100%';
+            const total = exercises.length * 10;
+            const pct = Math.round(score / total * 100);
+            if (window.parent) { window.parent.postMessage({type:"mtti_quiz_score", score: score, total: total, percent: pct}, "*"); }
+            let badge = '🌟', msg = 'Excellent work. You have a professional grasp of this lesson.';
+            if (pct < 50) { badge = '🌱'; msg = 'Good first attempt. Re-watch the lesson video and try again.'; }
+            else if (pct < 80) { badge = '📚'; msg = 'Solid progress. Review the scenarios you missed and retry.'; }
+            document.getElementById('exerciseCard').innerHTML = `
+                <div class="results">
+                    <span class="badge">${badge}</span>
+                    <h2>Quiz Complete</h2>
+                    <div class="final-score">${score} / ${total}</div>
+                    <p><strong>${pct}%</strong> · Longest streak: ${streak}</p>
+                    <p>${msg}</p>
+                    <button class="restart-btn" onclick="restart()">Try again 🔁</button>
+                </div>`;
+        }
+
+        function restart() {
+            currentQuestion = 0; score = 0; streak = 0;
+            renderQuestion();
+        }
+
+        renderQuestion();
+    </script>
+</body>
+</html>

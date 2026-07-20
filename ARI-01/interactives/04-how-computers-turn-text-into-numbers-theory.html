@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>How Computers Turn Text Into Numbers (Lesson) | MTTI Artificial Intelligence</title>
+<link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Fredoka:wght@500;600&display=swap" rel="stylesheet">
+<style>
+* { margin:0; padding:0; box-sizing:border-box; }
+body { font-family:'Space Mono', monospace; background:linear-gradient(135deg,#2E7D32 0%,#1565C0 100%); min-height:100vh; padding:20px; color:#fff; }
+.container { max-width:820px; margin:0 auto; }
+.header { text-align:center; margin-bottom:24px; }
+.lesson-tag { display:inline-block; background:rgba(255,255,255,0.2); padding:6px 16px; border-radius:999px; font-size:0.85em; margin-bottom:12px; }
+.header h1 { font-family:'Fredoka', sans-serif; font-size:2em; margin-bottom:6px; text-shadow:3px 3px 0 rgba(0,0,0,0.2); }
+.card { background:#fff; color:#333; border-radius:22px; padding:32px; margin-bottom:20px; box-shadow:0 20px 60px rgba(0,0,0,0.3); }
+.section { margin-bottom:26px; }
+.section:last-child { margin-bottom:0; }
+.section h2 { font-family:'Fredoka', sans-serif; font-size:1.2em; margin-bottom:10px; color:#1565C0; }
+.section .body { line-height:1.65; font-size:0.98em; }
+.section .body p { margin-bottom:10px; }
+.section .body code { background:#f5f7fb; padding:2px 6px; border-radius:4px; font-size:0.92em; }
+.keypoint { background:#fff8e1; border-left:4px solid #ffc107; padding:12px 16px; border-radius:8px; margin-top:12px; font-size:0.92em; }
+</style>
+</head>
+<body>
+<div class="container">
+<div class="header"><div class="lesson-tag">Natural Language Processing · Topic 1 · Lesson</div><h1>How Computers Turn Text Into Numbers</h1></div>
+<div class="card">
+<div class="section"><h2>1. Computers Only Speak Numbers</h2><div class="body">
+<p>At Rafiki Insights, Brian spends a lot of his week reading through messy, real-world text — customer feedback forms, WhatsApp complaints forwarded by a client, open-ended survey answers. To Brian, that text is full of meaning. To a computer, it is meaningless until it is converted into numbers.</p>
+<p>Underneath every app, website, and AI tool, a computer is only ever doing one thing: storing and comparing numbers. It has no built-in sense of what a word like "delayed" or "excellent" means. So before an AI writing tool, spell-checker, or chatbot can do anything useful with a sentence, that sentence has to be translated into a numeric form the computer can actually handle. That translation step is what this topic is about.</p>
+</div></div>
+<div class="section"><h2>2. Breaking Text Into Tokens</h2><div class="body">
+<p>The first step in that translation is called <strong>tokenization</strong> — chopping a piece of text into smaller pieces called <strong>tokens</strong>. A token is often a whole word, but it can also be a piece of a word, a punctuation mark, or even a single character, depending on the tool.</p>
+<p>Say a client comment reads: <code>"The Eldoret branch delivery was late again."</code> A tokenizer might split this into pieces like <code>The</code>, <code>Eldoret</code>, <code>branch</code>, <code>delivery</code>, <code>was</code>, <code>late</code>, <code>again</code>, <code>.</code> — each one becomes a separate token. Unusual or rare words are sometimes broken into smaller sub-word chunks, which is how tools cope with names, slang, or spelling variations they haven't seen written out in full before.</p>
+<p>Every possible token a system knows about is listed in a giant internal dictionary, and each one is assigned an ID number. So the sentence above stops being a sentence at all, from the computer's point of view — it becomes a short list of ID numbers.</p>
+</div></div>
+<div class="section"><h2>3. From Tokens to Meaning-Carrying Numbers</h2><div class="body">
+<p>A plain ID number on its own doesn't capture any meaning — it's just a lookup index, like a page number in a dictionary. So the next step converts each token into a longer list of numbers called a <strong>vector</strong>, sometimes called an "embedding". The exact numbers are learned by the system from huge amounts of text, and they're built so that words used in similar ways end up with similar-looking vectors.</p>
+<p>For Rafiki Insights' work, this is the part that actually matters day to day: it's why a tool can treat "invoice" and "receipt" as closely related, or notice that "Eldoret" and "Nairobi" both behave like place names, even though none of that was explicitly programmed in — it emerged purely from patterns in the numbers.</p>
+<div class="keypoint"><strong>Key Point.</strong> Tokenization plus vectors is the invisible first step behind everything from spell-check to AI chat assistants: turn text into tokens, turn tokens into numbers that capture patterns of use, and only then can the computer start "working with language" at all.</div>
+</div></div>
+</div>
+</div>
+</body>
+</html>

@@ -37,6 +37,21 @@
         .results .final-score { font-size: 3em; font-family: 'Fredoka', sans-serif; color: #667eea; margin: 20px 0; }
         .results p { color: #555; margin-bottom: 12px; }
         .badge { display: inline-block; font-size: 3.5em; margin: 8px 0; }
+        /* How-To intro screen — shown before question 1, not scored */
+        .howto-card { background: white; color: #333; border-radius: 25px; padding: 35px; margin-bottom: 20px; box-shadow: 0 20px 60px rgba(0,0,0,0.3); }
+        .howto-card h3 { font-family: 'Fredoka', sans-serif; font-size: 1.3em; margin-bottom: 12px; color: #667eea; }
+        .howto-card p { line-height: 1.6; margin-bottom: 16px; color: #444; }
+        .howto-field-group { margin-bottom: 18px; }
+        .howto-field { background: #f5f7fb; border: 2px solid transparent; border-radius: 12px; padding: 16px 20px; margin-bottom: 14px; }
+        .howto-field label { display: block; font-weight: 700; margin-bottom: 8px; color: #333; font-size: 0.95em; }
+        .howto-field input, .howto-field select { width: 100%; padding: 10px 12px; border-radius: 8px; border: 2px solid #ccc; font-family: 'Space Mono', monospace; font-size: 1em; background: #fff; color: #333; }
+        .howto-field.hf-correct { border-color: #28a745; background: #eafaf0; }
+        .howto-field.hf-wrong { border-color: #dc3545; background: #fdecea; }
+        .howto-banner { margin-top: 4px; margin-bottom: 18px; padding: 12px 16px; border-radius: 10px; font-size: 0.9em; font-weight: 700; display: none; }
+        .howto-banner.show { display: block; }
+        .howto-banner.ok { background: #d4edda; color: #155724; }
+        .howto-banner.fail { background: #f8d7da; color: #721c24; }
+        .start-quiz-btn { margin-top: 4px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; border: none; padding: 14px 32px; border-radius: 12px; font-size: 1em; cursor: pointer; font-family: 'Fredoka', sans-serif; box-shadow: 0 6px 18px rgba(0,0,0,0.2); }
     </style>
 </head>
 <body>
@@ -117,7 +132,73 @@
                 </div>`;
         }
         function restart() { currentQuestion = 0; score = 0; streak = 0; renderQuestion(); }
-        renderQuestion();
+
+        /* How-To intro — a small, ungraded field-check demo shown before
+           the quiz starts, directly rehearsing the "pick the right export
+           format" mechanic that one of the quiz scenarios asks about, so
+           it's not being asked cold. */
+        const HOWTO_FIELDS = [
+            { id: 'exportFormat', label: 'Format to export before emailing the deck', type: 'select', value: 'pptx', options: [['pptx','.pptx (original PowerPoint file)'],['pdf','PDF'],['video','Video (MP4)'],['dotx','.dotx (template)']] }
+        ];
+        const HOWTO_RULES = [
+            { id: 'exportFormat', op: 'eq', target: 'pdf' }
+        ];
+        const HOWTO_OK_MSG = "Right call — PDF opens on any device without PowerPoint installed, and it's not meant to be edited, which is exactly what Kevin needs here.";
+        const HOWTO_FAIL_MSG = "Not quite — think about what opens without PowerPoint installed and isn't meant to be edited, then check again.";
+        function applyHowtoOp(op, value, target) {
+            if (op === 'eq') return value === target;
+            if (op === 'gte') return value >= target;
+            if (op === 'lte') return value <= target;
+            return false;
+        }
+        function escHtmlH(s) { return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+        function renderHowtoFields(marks) {
+            document.getElementById('howtoFields').innerHTML = HOWTO_FIELDS.map(f => {
+                const cls = marks ? (marks[f.id] ? 'hf-correct' : 'hf-wrong') : '';
+                let control;
+                if (f.type === 'select') {
+                    const opts = f.options.map(o => `<option value="${o[0]}" ${o[0]===f.value?'selected':''}>${escHtmlH(o[1])}</option>`).join('');
+                    control = `<select id="in-${f.id}">${opts}</select>`;
+                } else {
+                    control = `<input type="number" id="in-${f.id}" value="${f.value}">`;
+                }
+                return `<div class="howto-field ${cls}" id="hf-${f.id}">
+                    <label for="in-${f.id}">${escHtmlH(f.label)}</label>
+                    ${control}
+                </div>`;
+            }).join('');
+        }
+        function checkHowto() {
+            const marks = {};
+            HOWTO_FIELDS.forEach(f => {
+                const el = document.getElementById('in-' + f.id);
+                const val = f.type === 'select' ? el.value : Number(el.value);
+                const rule = HOWTO_RULES.find(r => r.id === f.id);
+                marks[f.id] = rule ? applyHowtoOp(rule.op, val, rule.target) : false;
+            });
+            renderHowtoFields(marks);
+            const allOk = Object.keys(marks).every(k => marks[k]);
+            const banner = document.getElementById('howtoBanner');
+            banner.classList.add('show');
+            banner.className = 'howto-banner show ' + (allOk ? 'ok' : 'fail');
+            banner.textContent = allOk ? HOWTO_OK_MSG : HOWTO_FAIL_MSG;
+        }
+        function renderHowto() {
+            document.getElementById('exerciseCard').innerHTML = `
+                <div class="howto-card">
+                    <h3>🔍 Quick How-To: Choosing an Export Format</h3>
+                    <p>One of the scenarios coming up asks about this exact situation: Kevin needs to email the finished deck to a supplier who only has a phone and no PowerPoint app installed, and just needs to read it before the meeting — not edit it. Pick the export format that works on any device without PowerPoint, then check your choice.</p>
+                    <div class="howto-field-group" id="howtoFields"></div>
+                    <div class="howto-banner" id="howtoBanner"></div>
+                    <button class="start-quiz-btn" id="checkHowtoBtn">Check My Export Choice</button>
+                    <button class="start-quiz-btn" id="startQuizBtn" style="margin-left:10px;background:linear-gradient(135deg,#28a745,#1e7e34);">Start Quiz →</button>
+                </div>`;
+            renderHowtoFields();
+            document.getElementById('checkHowtoBtn').addEventListener('click', checkHowto);
+            document.getElementById('startQuizBtn').addEventListener('click', renderQuestion);
+        }
+
+        renderHowto();
     </script>
 </body>
 </html>

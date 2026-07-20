@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Compression and File Size Trade-offs (Lesson) | MTTI Video Editing</title>
+<link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Fredoka:wght@500;600&display=swap" rel="stylesheet">
+<style>
+* { margin:0; padding:0; box-sizing:border-box; }
+body { font-family:'Space Mono', monospace; background:linear-gradient(135deg,#6A11CB 0%,#2575FC 100%); min-height:100vh; padding:20px; color:#fff; }
+.container { max-width:820px; margin:0 auto; }
+.header { text-align:center; margin-bottom:24px; }
+.lesson-tag { display:inline-block; background:rgba(255,255,255,0.2); padding:6px 16px; border-radius:999px; font-size:0.85em; margin-bottom:12px; }
+.header h1 { font-family:'Fredoka', sans-serif; font-size:2em; margin-bottom:6px; text-shadow:3px 3px 0 rgba(0,0,0,0.2); }
+.card { background:#fff; color:#333; border-radius:22px; padding:32px; margin-bottom:20px; box-shadow:0 20px 60px rgba(0,0,0,0.3); }
+.section { margin-bottom:26px; }
+.section:last-child { margin-bottom:0; }
+.section h2 { font-family:'Fredoka', sans-serif; font-size:1.2em; margin-bottom:10px; color:#6A11CB; }
+.section .body { line-height:1.65; font-size:0.98em; }
+.section .body p { margin-bottom:10px; }
+.section .body code { background:#f5f7fb; padding:2px 6px; border-radius:4px; font-size:0.92em; }
+.keypoint { background:#fff8e1; border-left:4px solid #ffc107; padding:12px 16px; border-radius:8px; margin-top:12px; font-size:0.92em; }
+</style>
+</head>
+<body>
+<div class="container">
+<div class="header"><div class="lesson-tag">Module 4 · Lesson 4.2</div><h1>Compression and File Size Trade-offs</h1></div>
+<div class="card"><div class="section"><h2>What Bitrate Controls</h2><div class="body"><p>Bitrate is how much video data is used per second of playback, usually measured in megabits per second (Mbps). A higher bitrate keeps more picture detail and produces a cleaner image, especially in motion or fine texture (like beadwork at a wedding or fabric at a shop shoot), but the trade-off is a larger file. A lower bitrate shrinks the file but starts to show compression artefacts &mdash; blockiness, smudged detail, banding in skies or plain backgrounds &mdash; once pushed too far.</p></div></div><div class="section"><h2>Estimating File Size</h2><div class="body"><p>File size roughly follows a simple relationship: <code>file size (megabits) &asymp; bitrate (Mbps) &times; duration (seconds)</code>, then divided by 8 to convert megabits to megabytes. A 60-second clip exported at 8 Mbps is roughly (8 &times; 60) &divide; 8 = 60 MB. Dropping the bitrate to 4 Mbps for the same 60 seconds roughly halves that to about 30 MB &mdash; useful maths when Otieno needs to hit a specific size limit, like a client's email attachment cap or a WhatsApp Status upload limit.</p></div></div><div class="section"><h2>Hitting a Target Size Without Ruining Quality</h2><div class="body"><p>When a client needs a small preview file &mdash; say, emailing a 90-second highlight teaser and staying under a 25 MB inbox limit &mdash; Otieno works backward: target size &times; 8 &divide; duration gives the maximum bitrate he can use. In CapCut and Canva Video, export quality presets (Low/Medium/High, or a resolution + quality slider) roughly control this bitrate. Dropping resolution (e.g. exporting at 720p instead of 1080p) also shrinks file size at a given visual quality level, often with less visible damage than simply crushing the bitrate at full resolution.</p><p>There is a quality floor below which compression artefacts become obviously distracting to the client &mdash; blocky faces, muddy skin tones, smeared text overlays. Otieno's job is to find the smallest file that still clears that floor, not the smallest file possible.</p></div><div class="keypoint"><strong>Key Point.</strong> Estimate first, export second: target size &times; 8 &divide; duration (seconds) = the bitrate ceiling to aim for. If hitting that bitrate would drop below an acceptable quality floor, reduce resolution or trim duration instead of crushing quality further.</div></div></div>
+</div>
+</body>
+</html>

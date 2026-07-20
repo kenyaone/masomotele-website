@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Building Layouts in CorelDraw | MTTI Graphic Design</title>
+    <link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Fredoka:wght@500;600&display=swap" rel="stylesheet">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Space Mono', monospace; background: linear-gradient(135deg, #047857 0%, #0369a1 100%); min-height: 100vh; padding: 20px; color: #fff; }
+        .container { max-width: 900px; margin: 0 auto; }
+        .header { text-align: center; margin-bottom: 30px; }
+        .header .lesson-tag { display: inline-block; background: rgba(255,255,255,0.2); padding: 6px 16px; border-radius: 999px; font-size: 0.85em; margin-bottom: 12px; }
+        .header h1 { font-family: 'Fredoka', sans-serif; font-size: 2.2em; margin-bottom: 8px; text-shadow: 3px 3px 0 rgba(0,0,0,0.2); }
+        .score-board { background: rgba(255,255,255,0.15); backdrop-filter: blur(10px); border-radius: 20px; padding: 20px; margin-bottom: 20px; display: flex; justify-content: space-around; }
+        .score-item { text-align: center; }
+        .score-item .label { font-size: 0.85em; opacity: 0.9; margin-bottom: 4px; }
+        .score-item .value { font-size: 1.8em; font-weight: bold; font-family: 'Fredoka', sans-serif; }
+        .progress-bar { width: 100%; height: 8px; background: rgba(255,255,255,0.3); border-radius: 10px; margin-bottom: 25px; overflow: hidden; }
+        .progress-fill { height: 100%; background: linear-gradient(90deg, #f093fb 0%, #f5576c 100%); border-radius: 10px; transition: width 0.5s ease; width: 0%; }
+        .exercise-card { background: white; color: #333; border-radius: 25px; padding: 35px; margin-bottom: 20px; box-shadow: 0 20px 60px rgba(0,0,0,0.3); }
+        .scenario { background: linear-gradient(135deg, #fff8e1 0%, #ffecb3 100%); border-left: 5px solid #ffc107; padding: 20px 24px; border-radius: 12px; margin-bottom: 24px; font-size: 0.98em; line-height: 1.55; }
+        .scenario strong { color: #7a5a00; font-family: 'Fredoka', sans-serif; }
+        .question { font-size: 1.15em; margin-bottom: 20px; font-weight: 700; line-height: 1.4; }
+        .options { display: flex; flex-direction: column; gap: 12px; }
+        .option { background: #f5f7fb; border: 2px solid transparent; padding: 16px 20px; border-radius: 12px; cursor: pointer; transition: all 0.2s ease; font-family: 'Space Mono', monospace; font-size: 0.98em; text-align: left; }
+        .option:hover:not(.disabled) { background: #eef1fb; border-color: #047857; transform: translateX(4px); }
+        .option.correct { background: #d4edda; border-color: #28a745; color: #155724; }
+        .option.wrong { background: #f8d7da; border-color: #dc3545; color: #721c24; }
+        .option.disabled { cursor: not-allowed; opacity: 0.85; }
+        .feedback { margin-top: 22px; padding: 18px 22px; border-radius: 12px; font-size: 0.98em; line-height: 1.5; }
+        .feedback.correct { background: #d4edda; color: #155724; border-left: 4px solid #28a745; }
+        .feedback.wrong { background: #f8d7da; color: #721c24; border-left: 4px solid #dc3545; }
+        .next-btn, .restart-btn { margin-top: 20px; background: linear-gradient(135deg, #047857 0%, #0369a1 100%); color: white; border: none; padding: 14px 32px; border-radius: 12px; font-size: 1em; cursor: pointer; font-family: 'Fredoka', sans-serif; box-shadow: 0 6px 18px rgba(0,0,0,0.2); }
+        .results { text-align: center; padding: 25px 15px; }
+        .results h2 { font-family: 'Fredoka', sans-serif; font-size: 2em; margin-bottom: 12px; color: #333; }
+        .results .final-score { font-size: 3em; font-family: 'Fredoka', sans-serif; color: #047857; margin: 20px 0; }
+        .results p { color: #555; margin-bottom: 12px; }
+        .badge { display: inline-block; font-size: 3.5em; margin: 8px 0; }
+        /* How-To intro screen — shown before question 1, not scored */
+        .howto-card { background: white; color: #333; border-radius: 25px; padding: 35px; margin-bottom: 20px; box-shadow: 0 20px 60px rgba(0,0,0,0.3); }
+        .howto-card h3 { font-family: 'Fredoka', sans-serif; font-size: 1.3em; margin-bottom: 12px; color: #047857; }
+        .howto-card p { line-height: 1.6; margin-bottom: 16px; color: #444; }
+        .howto-fields { display: flex; flex-direction: column; gap: 14px; margin-bottom: 18px; }
+        .howto-field { background: #f5f7fb; border-radius: 12px; padding: 14px 18px; display: flex; align-items: center; gap: 14px; }
+        .howto-field label { font-weight: 700; font-size: 0.95em; flex: 1; }
+        .howto-field input { width: 90px; padding: 8px 10px; border-radius: 8px; border: 2px solid #ccd6f0; font-family: 'Space Mono', monospace; font-size: 1em; text-align: center; }
+        .howto-field input.hf-correct { border-color: #28a745; background: #d4edda; }
+        .howto-field input.hf-wrong { border-color: #dc3545; background: #f8d7da; }
+        .howto-field .hf-status { font-size: 0.85em; font-weight: 700; min-width: 60px; text-align: right; }
+        .howto-banner { margin-top: 4px; margin-bottom: 18px; padding: 12px 16px; border-radius: 10px; font-size: 0.9em; font-weight: 700; display: none; }
+        .howto-banner.show { display: block; }
+        .howto-banner.ok { background: #d4edda; color: #155724; }
+        .howto-banner.fail { background: #f8d7da; color: #721c24; }
+        .start-quiz-btn { margin-top: 4px; background: linear-gradient(135deg, #047857 0%, #0369a1 100%); color: white; border: none; padding: 14px 32px; border-radius: 12px; font-size: 1em; cursor: pointer; font-family: 'Fredoka', sans-serif; box-shadow: 0 6px 18px rgba(0,0,0,0.2); }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <div class="lesson-tag">Module 3 · Lesson 3.3 · Quiz</div>
+            <h1>Building Layouts in CorelDraw</h1>
+        </div>
+        <div class="score-board">
+            <div class="score-item"><div class="label">Score</div><div class="value" id="score">0</div></div>
+            <div class="score-item"><div class="label">Question</div><div class="value"><span id="current">1</span>/<span id="total">10</span></div></div>
+            <div class="score-item"><div class="label">Streak</div><div class="value" id="streak">0</div></div>
+        </div>
+        <div class="progress-bar"><div class="progress-fill" id="progress"></div></div>
+        <div class="exercise-card" id="exerciseCard"></div>
+    </div>
+    <script>
+        const exercises = [{"scenario":"Ivy wants elements in her CorelDraw file to snap consistently to a repeatable structure as she builds the flyer.","question":"What should she enable?","options":["Only the color palette","Guides and the document grid","The outline\/wireframe view only","Nothing — she should place everything by eye"],"correct":1,"explanation":"Guides and the document grid give CorelDraw a precise structure to snap objects to, replacing manual eyeballing."},{"scenario":"Ivy needs three business-card logos evenly spaced and aligned across the page for a Chapa Design Studio print job.","question":"Which CorelDraw feature handles this precisely?","options":["Print Preview","The Zoom tool","The Align & Distribute panel","Undo history"],"correct":2,"explanation":"Align & Distribute snaps objects to a shared edge or center and can space several objects evenly and precisely."},{"scenario":"The flyer Ivy is designing will be professionally printed and trimmed to size afterward.","question":"What should she configure in Page Setup to avoid white slivers appearing at the trimmed edge?","options":["Layer opacity","Font kerning","Bleed","Screen resolution only"],"correct":2,"explanation":"Bleed extends the artwork past the trim edge, so a slightly off cut still lands within printed content rather than exposing blank paper."},{"scenario":"Ivy sets up a horizontal guide at the vertical center of her page before placing any content.","question":"What is the main purpose of this guide?","options":["It automatically centers every object placed near it with no action needed","A visual reference line to help align elements consistently, without appearing in the final print","It changes the page's print color profile","It deletes any object that crosses it"],"correct":1,"explanation":"Guides are non-printing reference lines used purely to help align content consistently as it is placed."},{"scenario":"Ivy selects five icons and wants equal horizontal spacing between them without manually measuring each gap.","question":"What should she use?","options":["The text tool","Manual dragging, adjusted repeatedly by eye","Distribute spacing, part of the Align & Distribute panel","Increasing the canvas size"],"correct":2,"explanation":"The Distribute options calculate and apply mathematically equal spacing between selected objects automatically."},{"scenario":"The print shop Chapa Design Studio uses asks Ivy for a 3mm bleed and a 5mm safety margin on her flyer file.","question":"Why is this distinction important?","options":["Bleed and margin mean exactly the same thing","Bleed is only relevant for on-screen digital designs","Margins apply only to text, never to images","Bleed extends artwork past the trim edge for a clean cut, while the safety margin keeps key content away from where trimming might occur"],"correct":3,"explanation":"Bleed and safety margin serve different, complementary purposes: one prevents blank edges after trimming, the other protects important content from being cut off."},{"scenario":"Ivy turns on CorelDraw's document grid before placing her flyer's columns and text blocks.","question":"What benefit does this give her?","options":["It changes the file format automatically","It removes the need for any guides at all","A visible, consistent reference for spacing and alignment while she builds the layout","It automatically finalises the design for print"],"correct":2,"explanation":"The document grid provides a consistent visual reference for alignment and spacing as content is added, working alongside guides rather than replacing them."},{"scenario":"Ivy has aligned several objects on her flyer by eye, but they still look slightly off from one another.","question":"What is the more reliable approach in CorelDraw?","options":["Reduce the zoom level and try again by eye","Convert all the objects to bitmaps","Keep nudging them manually until it looks right","Use Align & Distribute to snap them to a shared edge or center precisely"],"correct":3,"explanation":"Align & Distribute removes the guesswork of eyeballing by snapping selected objects to an exact shared edge or center."}];
+        let currentQuestion = 0, score = 0, streak = 0, answered = false;
+        function updateScoreboard() {
+            document.getElementById('score').textContent = score;
+            document.getElementById('current').textContent = Math.min(currentQuestion + 1, exercises.length);
+            document.getElementById('total').textContent = exercises.length;
+            document.getElementById('streak').textContent = streak;
+            document.getElementById('progress').style.width = ((currentQuestion) / exercises.length) * 100 + '%';
+        }
+        function escapeHtml(s) { return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+        function renderQuestion() {
+            answered = false;
+            const q = exercises[currentQuestion];
+            let html = '';
+            if (q.scenario) html += `<div class="scenario"><strong>Scenario.</strong> ${escapeHtml(q.scenario)}</div>`;
+            html += `<div class="question">${escapeHtml(q.question)}</div>`;
+            html += '<div class="options">';
+            q.options.forEach((o, i) => { html += `<button class="option" onclick="selectAnswer(${i})">${escapeHtml(o)}</button>`; });
+            html += '</div>';
+            document.getElementById('exerciseCard').innerHTML = html;
+            updateScoreboard();
+        }
+        function selectAnswer(i) {
+            if (answered) return;
+            answered = true;
+            const q = exercises[currentQuestion];
+            const btns = document.querySelectorAll('.option');
+            btns.forEach(b => b.classList.add('disabled'));
+            btns[q.correct].classList.add('correct');
+            const right = i === q.correct;
+            if (!right) btns[i].classList.add('wrong');
+            if (right) { score += 10; streak += 1; } else { streak = 0; }
+            const fb = document.createElement('div');
+            fb.className = 'feedback ' + (right ? 'correct' : 'wrong');
+            fb.innerHTML = `<strong>${right ? '✅ Correct.' : '❌ Not quite.'}</strong><br>${escapeHtml(q.explanation)}`;
+            document.getElementById('exerciseCard').appendChild(fb);
+            const nb = document.createElement('button');
+            nb.className = 'next-btn';
+            nb.textContent = currentQuestion === exercises.length - 1 ? 'See results →' : 'Next scenario →';
+            nb.onclick = nextQuestion;
+            document.getElementById('exerciseCard').appendChild(nb);
+            updateScoreboard();
+        }
+        function nextQuestion() { currentQuestion++; if (currentQuestion >= exercises.length) return showResults(); renderQuestion(); }
+        function showResults() {
+            document.getElementById('progress').style.width = '100%';
+            const total = exercises.length * 10;
+            const pct = Math.round(score / total * 100);
+            if (window.parent) { window.parent.postMessage({type:"mtti_quiz_score", score: score, total: total, percent: pct}, "*"); }
+            let badge = '🌟', msg = 'Excellent work. You have a professional grasp of this lesson.';
+            if (pct < 50) { badge = '🌱'; msg = 'Good first attempt. Review the lesson and try again.'; }
+            else if (pct < 80) { badge = '📚'; msg = 'Solid progress. Review the scenarios you missed and retry.'; }
+            document.getElementById('exerciseCard').innerHTML = `
+                <div class="results">
+                    <span class="badge">${badge}</span>
+                    <h2>Quiz Complete</h2>
+                    <div class="final-score">${score} / ${total}</div>
+                    <p><strong>${pct}%</strong> · Longest streak: ${streak}</p>
+                    <p>${msg}</p>
+                    <button class="restart-btn" onclick="restart()">Try again 🔁</button>
+                </div>`;
+        }
+        function restart() { currentQuestion = 0; score = 0; streak = 0; renderQuestion(); }
+        /* How-To intro — a small, ungraded field-check demo shown before the
+           quiz starts, directly rehearsing the "stop eyeballing, use Align
+           & Distribute to snap objects to a shared edge" mechanic that one
+           of the quiz scenarios asks about, so it is not being asked cold. */
+        const HOWTO_FIELDS = [
+            { id: 'howtoLogoBTop', label: 'Logo B — Top position (mm)', placeholder: 'e.g. 40', min: 39, max: 41 },
+            { id: 'howtoLogoCTop', label: 'Logo C — Top position (mm)', placeholder: 'e.g. 40', min: 39, max: 41 },
+        ];
+
+        function checkHowtoField(rule) {
+            const el = document.getElementById(rule.id);
+            const raw = el.value.trim();
+            if (raw === '' || isNaN(Number(raw))) return null;
+            const v = Number(raw);
+            return v >= rule.min && v <= rule.max;
+        }
+
+        function checkHowto() {
+            let allOk = true, allAnswered = true;
+            HOWTO_FIELDS.forEach(rule => {
+                const ok = checkHowtoField(rule);
+                const el = document.getElementById(rule.id);
+                const status = document.getElementById(rule.id + '_status');
+                el.classList.remove('hf-correct', 'hf-wrong');
+                if (ok === null) { allAnswered = false; status.textContent = ''; return; }
+                el.classList.add(ok ? 'hf-correct' : 'hf-wrong');
+                status.textContent = ok ? '✅ aligned' : '❌ off edge';
+                if (!ok) allOk = false;
+            });
+            const banner = document.getElementById('howtoBanner');
+            banner.classList.add('show');
+            if (!allAnswered) {
+                banner.className = 'howto-banner show fail';
+                banner.textContent = '❌ Enter a Top position for both logos first, then check.';
+                return;
+            }
+            banner.className = 'howto-banner show ' + (allOk ? 'ok' : 'fail');
+            banner.textContent = allOk
+                ? '✅ Snapped — that is the shared edge Align & Distribute would give you automatically.'
+                : '❌ Not quite — Logo A already sits at 40mm from the top; match that exactly, do not just eyeball it.';
+        }
+
+        function renderHowto() {
+            document.getElementById('exerciseCard').innerHTML = `
+                <div class="howto-card">
+                    <h3>🔍 Quick How-To: Align & Distribute, Not Eyeballing</h3>
+                    <p>One of the scenarios coming up asks about this exact situation: three business-card logos for Chapa Design Studio were placed by eye and still look slightly off from one another. Logo A already sits precisely on the guide at 40mm from the top edge. Give Logo B and Logo C the same Top position below — the same result Align & Distribute would snap them to precisely — then check your work.</p>
+                    <div class="howto-fields" id="howtoFields"></div>
+                    <div class="howto-banner" id="howtoBanner"></div>
+                    <button class="start-quiz-btn" id="checkHowtoBtn">Check My Alignment</button>
+                    <button class="start-quiz-btn" id="startQuizBtn" style="margin-left:10px;background:linear-gradient(135deg,#28a745,#1e7e34);">Start Quiz →</button>
+                </div>`;
+            document.getElementById('howtoFields').innerHTML = HOWTO_FIELDS.map(f => `
+                <div class="howto-field">
+                    <label for="${f.id}">${f.label}</label>
+                    <input type="number" id="${f.id}" placeholder="${f.placeholder}">
+                    <span class="hf-status" id="${f.id}_status"></span>
+                </div>`).join('');
+            document.getElementById('checkHowtoBtn').addEventListener('click', checkHowto);
+            document.getElementById('startQuizBtn').addEventListener('click', renderQuestion);
+        }
+        renderHowto();
+    </script>
+</body>
+</html>

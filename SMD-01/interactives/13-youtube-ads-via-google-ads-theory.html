@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lesson 13.5 — YouTube Ads via Google Ads</title>
+<style>
+* { margin:0; padding:0; box-sizing:border-box; }
+body { font-family:'Segoe UI', -apple-system, sans-serif; line-height:1.6; color:#1e293b; background:#f8fafc; }
+.container { max-width:1000px; margin:0 auto; padding:20px; }
+header { background:linear-gradient(135deg,#b91c1c,#7f1d1d); color:#fff; padding:36px 30px; border-radius:12px; margin-bottom:22px; box-shadow:0 10px 30px rgba(185,28,28,0.25); }
+header .badge { display:inline-block; background:rgba(255,255,255,0.2); padding:4px 14px; border-radius:16px; font-size:12px; font-weight:bold; letter-spacing:1px; margin-bottom:12px; }
+header h1 { font-size:30px; margin-bottom:8px; }
+header .subtitle { font-size:16px; opacity:0.95; }
+section { background:#fff; border:1px solid #e2e8f0; border-radius:10px; padding:24px 28px; margin-bottom:20px; }
+section h2 { color:#b91c1c; font-size:21px; margin-bottom:12px; padding-bottom:8px; border-bottom:3px solid #b91c1c; }
+section h3 { color:#0f172a; font-size:16px; margin:16px 0 8px; }
+section p { margin-bottom:12px; }
+section ul, section ol { padding-left:22px; margin-bottom:12px; }
+section li { margin-bottom:5px; }
+.callout { border-left:5px solid #b91c1c; background:#fef2f2; padding:14px 18px; margin:14px 0; border-radius:4px; }
+.callout.tip { border-left-color:#059669; background:#ecfdf5; }
+.callout.warn { border-left-color:#d97706; background:#fffbeb; }
+.callout strong { color:#7f1d1d; }
+.callout.tip strong { color:#065f46; }
+.callout.warn strong { color:#92400e; }
+.sarah-card { background:linear-gradient(135deg,#fef3c7,#fde68a); border-radius:10px; padding:16px 20px; display:flex; gap:14px; align-items:flex-start; margin:14px 0; }
+.sarah-avatar { width:52px; height:52px; border-radius:50%; background:#d97706; color:#fff; display:flex; align-items:center; justify-content:center; font-size:22px; font-weight:bold; flex-shrink:0; }
+.sarah-card p { color:#78350f; margin:0; font-size:14px; }
+table { width:100%; border-collapse:collapse; margin:14px 0; font-size:13.5px; }
+th { background:#fef2f2; color:#7f1d1d; padding:9px 10px; text-align:left; border:1px solid #fecaca; }
+td { padding:9px 10px; border:1px solid #e2e8f0; }
+tr:nth-child(even) td { background:#f8fafc; }
+.format-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(210px,1fr)); gap:12px; margin:14px 0; }
+.format-card { background:#f8fafc; border:2px solid #e2e8f0; border-radius:10px; padding:14px 16px; }
+.format-card h4 { color:#b91c1c; font-size:14.5px; margin-bottom:6px; }
+.format-card p { font-size:13px; color:#475569; margin:0; }
+</style>
+</head>
+<body>
+<div class="container">
+
+<header>
+    <div class="badge">MODULE 13 · YOUTUBE MARKETING · LESSON 13.5</div>
+    <h1>YouTube Ads via Google Ads</h1>
+    <div class="subtitle">Where video advertising on YouTube actually lives, how it's set up, and how Sarah spends her KES 15,000/month</div>
+</header>
+
+<section>
+    <h2>1. The rule beginners break</h2>
+    <p>The single most common beginner mistake: opening YouTube Studio and looking for a "Boost this video" button. <strong>It doesn't exist there.</strong> YouTube video advertising is bought and managed entirely through <strong>Google Ads</strong>, at <code>ads.google.com</code> — a completely separate platform from YouTube Studio.</p>
+    <div class="callout">
+        <strong>Remember this distinction:</strong> YouTube Studio is where you manage your channel and organic uploads. Google Ads is where you spend money to have a video shown to people who haven't chosen to watch it yet. They share your Google account, but they are two different tools with two different purposes.
+    </div>
+</section>
+
+<section>
+    <h2>2. The Video campaign type, and the ad formats inside it</h2>
+    <p>Inside Google Ads, you create a new campaign and choose <strong>Video</strong> as the campaign type. From there, a video campaign can run several different ad formats — each suited to a different goal:</p>
+    <div class="format-grid">
+        <div class="format-card">
+            <h4>Skippable in-stream</h4>
+            <p>Plays before/during another video; viewer can skip after 5 seconds. You only pay if they watch 30s or interact. Good for consideration.</p>
+        </div>
+        <div class="format-card">
+            <h4>Non-skippable in-stream</h4>
+            <p>Up to 15 seconds, cannot be skipped. Guarantees the full message is seen — good for pure awareness, but pricier per view.</p>
+        </div>
+        <div class="format-card">
+            <h4>In-feed video ads</h4>
+            <p>Shown in YouTube search results and the homepage feed, styled like a normal video thumbnail. Viewer chooses to click — good for consideration.</p>
+        </div>
+        <div class="format-card">
+            <h4>Bumper ads</h4>
+            <p>Exactly 6 seconds, non-skippable. Built for quick, memorable awareness at a low cost per impression.</p>
+        </div>
+    </div>
+    <div class="callout tip">
+        <strong>Kenyan-business rule of thumb:</strong> with a small monthly budget like Sarah's, skippable in-stream is usually the best starting format — you only pay when someone actually watches, so a tight budget stretches further than a non-skippable, pay-regardless format.
+    </div>
+</section>
+
+<section>
+    <h2>3. The targeting wizard, step by step</h2>
+    <p>After picking the format, Google Ads walks you through targeting — the same wizard for every video campaign:</p>
+    <ol>
+        <li><strong>Locations</strong> — for a Kenyan small business, this is locked to Kenya (or even narrower, e.g. Eldoret + a radius), not left worldwide by default.</li>
+        <li><strong>Languages</strong> — typically English and/or Swahili, matching how your audience actually searches and watches.</li>
+        <li><strong>Demographics</strong> — age range, gender, parental status, household income band. A common starting range for a general local business is <strong>ages 18–55</strong>, refined later using performance data.</li>
+        <li><strong>Audience segments</strong> — interests and "in-market" categories (people actively researching things like "restaurants" or "food delivery"), or your own remarketing list of past website visitors.</li>
+    </ol>
+    <div class="callout warn">
+        <strong>Common mistake:</strong> leaving location targeting on its broad default. An Eldoret restaurant advertising to all of Kenya (or worse, left un-set to a country at all) burns budget on viewers who could never become customers.</p>
+    </div>
+</section>
+
+<section>
+    <h2>4. Budget: how KES is actually spent</h2>
+    <p>Google Ads video campaigns are usually billed on a <strong>CPV (cost-per-view)</strong> basis for in-stream formats — you're charged only when someone watches 30 seconds (or the whole ad, if shorter) or interacts with it, not simply for it being shown.</p>
+    <ul>
+        <li><strong>Average daily budget</strong> — you set this in KES; Google Ads paces spending across the day and month, and may spend somewhat more on a strong day and less on a slow one, balancing out over the billing cycle.</li>
+        <li><strong>Maximum CPV bid</strong> — the most you're willing to pay per qualifying view; a higher bid can win more competitive auctions but spends your budget on fewer total views.</li>
+    </ul>
+    <div class="callout tip">
+        <strong>Worked example:</strong> a KES 15,000 monthly budget is roughly KES 500/day. At a modest CPV of around KES 2–4 in a smaller market like Eldoret, that's very roughly 125–250 views per day — enough for a focused local campaign, not a national one.
+    </div>
+</section>
+
+<section>
+    <h2>5. Objective → format mapping</h2>
+    <p>Google Ads asks for a campaign <strong>objective</strong> before you pick a format — matching the two correctly makes the campaign far more effective for the money spent.</p>
+    <table>
+        <tr><th>Objective</th><th>Best-fit format</th><th>Why</th></tr>
+        <tr><td>Brand awareness &amp; reach</td><td>Bumper ads, non-skippable in-stream</td><td>Guarantees the full (short) message is seen by as many people as possible.</td></tr>
+        <tr><td>Consideration (drive interest)</td><td>Skippable in-stream, in-feed</td><td>Viewer opts in by watching or clicking, signalling real interest — and you only pay for that engagement.</td></tr>
+        <tr><td>Action (drive orders/visits)</td><td>Skippable in-stream with a strong call-to-action + link</td><td>Combines a watched ad with a direct next step, like "Order on WhatsApp".</td></tr>
+    </table>
+</section>
+
+<section>
+    <h2>6. Sarah's KES 15,000/month plan — self-check</h2>
+    <div class="sarah-card">
+        <div class="sarah-avatar">S</div>
+        <div>
+            <p><strong>Sarah Chebet — Karibu Kitchen, Eldoret.</strong> Sarah wants more dinner-delivery orders from Kapsoya, Elgon View and Racecourse, using her existing KES 15,000/month digital budget. Before opening the Practical simulator, work through this yourself:</p>
+        </div>
+    </div>
+    <ol>
+        <li>Which campaign type does she choose in Google Ads? <em>(Video)</em></li>
+        <li>Which format fits her small budget and "drive orders" objective best? <em>(Skippable in-stream, so she only pays for real engagement.)</em></li>
+        <li>How should she set Locations? <em>(Eldoret and the specific delivery estates, not all of Kenya.)</em></li>
+        <li>Roughly what daily budget does KES 15,000/month work out to? <em>(About KES 500/day.)</em></li>
+    </ol>
+    <div class="callout">
+        <strong>Next:</strong> open the Practical for this topic to actually build this campaign step by step in the simulator, then take the Quiz to check your understanding before moving on to Local Pack + Google Business Profile.
+    </div>
+</section>
+
+</div>
+</body>
+</html>

@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Choosing Resolution and Frame Rate for Export | MTTI Video Editing</title>
+    <link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Fredoka:wght@500;600&display=swap" rel="stylesheet">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Space Mono', monospace; background: linear-gradient(135deg, #2b0a4a 0%, #1b3a8c 100%); min-height: 100vh; padding: 20px; color: #fff; }
+        .container { max-width: 900px; margin: 0 auto; }
+        .header { text-align: center; margin-bottom: 30px; }
+        .header .lesson-tag { display: inline-block; background: rgba(255,255,255,0.2); padding: 6px 16px; border-radius: 999px; font-size: 0.85em; margin-bottom: 12px; }
+        .header h1 { font-family: 'Fredoka', sans-serif; font-size: 2.2em; margin-bottom: 8px; text-shadow: 3px 3px 0 rgba(0,0,0,0.2); }
+        .score-board { background: rgba(255,255,255,0.15); backdrop-filter: blur(10px); border-radius: 20px; padding: 20px; margin-bottom: 20px; display: flex; justify-content: space-around; }
+        .score-item { text-align: center; }
+        .score-item .label { font-size: 0.85em; opacity: 0.9; margin-bottom: 4px; }
+        .score-item .value { font-size: 1.8em; font-weight: bold; font-family: 'Fredoka', sans-serif; }
+        .progress-bar { width: 100%; height: 8px; background: rgba(255,255,255,0.3); border-radius: 10px; margin-bottom: 25px; overflow: hidden; }
+        .progress-fill { height: 100%; background: linear-gradient(90deg, #f7971e 0%, #ffd200 100%); border-radius: 10px; transition: width 0.5s ease; width: 0%; }
+        .exercise-card { background: white; color: #333; border-radius: 25px; padding: 35px; margin-bottom: 20px; box-shadow: 0 20px 60px rgba(0,0,0,0.3); }
+        .scenario { background: linear-gradient(135deg, #fff8e1 0%, #ffecb3 100%); border-left: 5px solid #ffc107; padding: 20px 24px; border-radius: 12px; margin-bottom: 24px; font-size: 0.98em; line-height: 1.55; }
+        .scenario strong { color: #7a5a00; font-family: 'Fredoka', sans-serif; }
+        .question { font-size: 1.15em; margin-bottom: 20px; font-weight: 700; line-height: 1.4; }
+        .options { display: flex; flex-direction: column; gap: 12px; }
+        .option { background: #f5f7fb; border: 2px solid transparent; padding: 16px 20px; border-radius: 12px; cursor: pointer; transition: all 0.2s ease; font-family: 'Space Mono', monospace; font-size: 0.98em; text-align: left; }
+        .option:hover:not(.disabled) { background: #eef1fb; border-color: #2b0a4a; transform: translateX(4px); }
+        .option.correct { background: #d4edda; border-color: #28a745; color: #155724; }
+        .option.wrong { background: #f8d7da; border-color: #dc3545; color: #721c24; }
+        .option.disabled { cursor: not-allowed; opacity: 0.85; }
+        .feedback { margin-top: 22px; padding: 18px 22px; border-radius: 12px; font-size: 0.98em; line-height: 1.5; }
+        .feedback.correct { background: #d4edda; color: #155724; border-left: 4px solid #28a745; }
+        .feedback.wrong { background: #f8d7da; color: #721c24; border-left: 4px solid #dc3545; }
+        .next-btn, .restart-btn { margin-top: 20px; background: linear-gradient(135deg, #2b0a4a 0%, #1b3a8c 100%); color: white; border: none; padding: 14px 32px; border-radius: 12px; font-size: 1em; cursor: pointer; font-family: 'Fredoka', sans-serif; box-shadow: 0 6px 18px rgba(0,0,0,0.2); }
+        .results { text-align: center; padding: 25px 15px; }
+        .results h2 { font-family: 'Fredoka', sans-serif; font-size: 2em; margin-bottom: 12px; color: #333; }
+        .results .final-score { font-size: 3em; font-family: 'Fredoka', sans-serif; color: #2b0a4a; margin: 20px 0; }
+        .results p { color: #555; margin-bottom: 12px; }
+        .badge { display: inline-block; font-size: 3.5em; margin: 8px 0; }
+
+        /* How-To intro screen — shown before question 1, not scored */
+        .howto-card { background: white; color: #333; border-radius: 25px; padding: 35px; margin-bottom: 20px; box-shadow: 0 20px 60px rgba(0,0,0,0.3); }
+        .howto-card h3 { font-family: 'Fredoka', sans-serif; font-size: 1.3em; margin-bottom: 12px; color: #2b0a4a; }
+        .howto-card p { line-height: 1.6; margin-bottom: 16px; color: #444; }
+        .howto-fields { display: flex; flex-direction: column; gap: 14px; background: #f5f7fb; border-radius: 12px; padding: 18px; margin-bottom: 18px; }
+        .howto-field-row { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
+        .howto-field-label { flex: 0 0 210px; font-weight: 700; font-size: 0.92em; }
+        .howto-field-input { flex: 1; min-width: 140px; padding: 9px 12px; border-radius: 8px; border: 2px solid #ccc; font-family: 'Space Mono', monospace; font-size: 0.95em; background: #fff; color: #333; }
+        .howto-field-input:focus { outline: none; border-color: #2b0a4a; }
+        .howto-field-result { width: 26px; text-align: center; font-size: 1.15em; }
+        .howto-banner { margin-top: 4px; margin-bottom: 18px; padding: 12px 16px; border-radius: 10px; font-size: 0.9em; font-weight: 700; display: none; }
+        .howto-banner.show { display: block; }
+        .howto-banner.ok { background: #d4edda; color: #155724; }
+        .howto-banner.fail { background: #f8d7da; color: #721c24; }
+        .start-quiz-btn { margin-top: 4px; background: linear-gradient(135deg, #2b0a4a 0%, #1b3a8c 100%); color: white; border: none; padding: 14px 32px; border-radius: 12px; font-size: 1em; cursor: pointer; font-family: 'Fredoka', sans-serif; box-shadow: 0 6px 18px rgba(0,0,0,0.2); }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <div class="lesson-tag">Exporting & Rendering · Lesson 1 · Quiz</div>
+            <h1>Choosing Resolution and Frame Rate for Export</h1>
+        </div>
+        <div class="score-board">
+            <div class="score-item"><div class="label">Score</div><div class="value" id="score">0</div></div>
+            <div class="score-item"><div class="label">Question</div><div class="value"><span id="current">1</span>/<span id="total">10</span></div></div>
+            <div class="score-item"><div class="label">Streak</div><div class="value" id="streak">0</div></div>
+        </div>
+        <div class="progress-bar"><div class="progress-fill" id="progress"></div></div>
+        <div class="exercise-card" id="exerciseCard"></div>
+    </div>
+    <script>
+        const exercises = [{"scenario":"Otieno filmed a client's shop promo at 1080p on his phone, then in CapCut's export screen set the export resolution to 4K.","question":"What actually happens to the exported file?","options":["The file becomes genuinely sharper 4K footage","The file is upscaled from 1080p \u2014 it gets bigger and slower to render but does not gain real extra detail","CapCut refuses to export because 4K exceeds the source","Frame rate automatically drops to compensate"],"correct":1,"explanation":"Setting export resolution above the source resolution just upscales the existing 1080p detail \u2014 the file grows larger and takes longer to render without becoming genuinely sharper."},{"scenario":"Otieno is deciding what frame rate to export a wedding highlight reel at, after filming the whole event at a steady 30fps.","question":"What is the safest default export frame rate choice here?","options":["60fps, since higher is always better","24fps, for no particular reason","30fps, matching what was actually captured","Frame rate does not need to be set on export"],"correct":2,"explanation":"Matching the export frame rate to the source (30fps) avoids introducing judder or wasted smoothness that the original footage never actually had."},{"scenario":"Otieno wants to add a slow-motion effect to a football match clip for a client's highlight reel.","question":"What should he do differently when filming this clip, compared to normal footage?","options":["Film at a lower frame rate like 24fps, so slow motion looks smoother","Film at a higher frame rate like 60fps, so there are more frames to stretch across the slowed-down clip","Frame rate has no effect on slow motion quality","Only resolution affects how smooth slow motion looks"],"correct":1,"explanation":"Slow motion works by stretching existing frames over a longer duration \u2014 filming at a higher frame rate like 60fps gives more frames to work with, so the slowed result stays smooth instead of looking choppy."},{"scenario":"A client asks Otieno why his exported promo video, upscaled to 4K from 1080p source footage, doesn't look any sharper than the 1080p version.","question":"What is the best explanation Otieno can give?","options":["4K exports always look worse than 1080p","Upscaling to a higher resolution than the source just stretches the existing pixels \u2014 it doesn't add detail that was never captured in the first place","The client's screen must be broken","CapCut always exports at the wrong resolution by default"],"correct":1,"explanation":"Resolution can't be manufactured after the fact \u2014 upscaling stretches existing pixel data across more pixels, which increases file size but does not add genuine extra sharpness."},{"scenario":"Otieno is exporting a corporate interview clip that was filmed at 24fps for a deliberate cinematic feel.","question":"What export frame rate keeps that intended look intact?","options":["60fps, to make it extra smooth","30fps, since it's the most common default","24fps, matching the source and preserving the cinematic motion feel","Any frame rate works identically"],"correct":2,"explanation":"Since the cinematic feel comes specifically from the 24fps capture, exporting at that same 24fps preserves the intended motion look; converting to 30fps or 60fps would alter it."},{"scenario":"Otieno has two clips shot at different frame rates \u2014 one at 24fps and one at 60fps \u2014 that need to sit next to each other in the same timeline before a single export.","question":"What is a sound approach before exporting the combined edit?","options":["Ignore the mismatch \u2014 export frame rate never matters when mixing clips","Pick one project\/export frame rate deliberately (matching the majority of footage or the creative intent) so the mixed clips play back consistently","Always default to the lowest of the two frame rates automatically","Export each clip completely separately with no shared export settings"],"correct":1,"explanation":"When mixing footage shot at different frame rates, deliberately choosing one export frame rate for the whole timeline keeps playback consistent, rather than leaving it to chance."},{"scenario":"Otieno is training himself to avoid wasting time on unnecessary render settings before every export.","question":"What is the best general rule of thumb for setting export resolution and frame rate?","options":["Always export at the maximum resolution and frame rate CapCut allows, regardless of source","Match export resolution and frame rate to the source footage by default, only deviating deliberately for a platform requirement or a specific creative reason like slow motion","Resolution and frame rate settings never actually affect the final file","Always downscale everything to save time, regardless of destination"],"correct":1,"explanation":"The safest and most efficient habit is matching export settings to what was actually captured, and only changing them on purpose \u2014 for a platform's requirements or a specific creative goal \u2014 rather than by default or by accident."}];
+        let currentQuestion = 0, score = 0, streak = 0, answered = false;
+        function updateScoreboard() {
+            document.getElementById('score').textContent = score;
+            document.getElementById('current').textContent = Math.min(currentQuestion + 1, exercises.length);
+            document.getElementById('total').textContent = exercises.length;
+            document.getElementById('streak').textContent = streak;
+            document.getElementById('progress').style.width = ((currentQuestion) / exercises.length) * 100 + '%';
+        }
+        function escapeHtml(s) { return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+        function renderQuestion() {
+            answered = false;
+            const q = exercises[currentQuestion];
+            let html = '';
+            if (q.scenario) html += `<div class="scenario"><strong>Scenario.</strong> ${escapeHtml(q.scenario)}</div>`;
+            html += `<div class="question">${escapeHtml(q.question)}</div>`;
+            html += '<div class="options">';
+            q.options.forEach((o, i) => { html += `<button class="option" onclick="selectAnswer(${i})">${escapeHtml(o)}</button>`; });
+            html += '</div>';
+            document.getElementById('exerciseCard').innerHTML = html;
+            updateScoreboard();
+        }
+        function selectAnswer(i) {
+            if (answered) return;
+            answered = true;
+            const q = exercises[currentQuestion];
+            const btns = document.querySelectorAll('.option');
+            btns.forEach(b => b.classList.add('disabled'));
+            btns[q.correct].classList.add('correct');
+            const right = i === q.correct;
+            if (!right) btns[i].classList.add('wrong');
+            if (right) { score += 10; streak += 1; } else { streak = 0; }
+            const fb = document.createElement('div');
+            fb.className = 'feedback ' + (right ? 'correct' : 'wrong');
+            fb.innerHTML = `<strong>${right ? '&#9989; Correct.' : '&#10060; Not quite.'}</strong><br>${escapeHtml(q.explanation)}`;
+            document.getElementById('exerciseCard').appendChild(fb);
+            const nb = document.createElement('button');
+            nb.className = 'next-btn';
+            nb.textContent = currentQuestion === exercises.length - 1 ? 'See results →' : 'Next scenario →';
+            nb.onclick = nextQuestion;
+            document.getElementById('exerciseCard').appendChild(nb);
+            updateScoreboard();
+        }
+        function nextQuestion() { currentQuestion++; if (currentQuestion >= exercises.length) return showResults(); renderQuestion(); }
+        function showResults() {
+            document.getElementById('progress').style.width = '100%';
+            const total = exercises.length * 10;
+            const pct = Math.round(score / total * 100);
+            if (window.parent) { window.parent.postMessage({type:"mtti_quiz_score", score: score, total: total, percent: pct}, "*"); }
+            let badge = '🌟', msg = 'Excellent work. Otieno-level export know-how.';
+            if (pct < 50) { badge = '🌱'; msg = 'Good first attempt. Review the lesson and try again.'; }
+            else if (pct < 80) { badge = '📚'; msg = 'Solid progress. Review the scenarios you missed and retry.'; }
+            document.getElementById('exerciseCard').innerHTML = `
+                <div class="results">
+                    <span class="badge">${badge}</span>
+                    <h2>Quiz Complete</h2>
+                    <div class="final-score">${score} / ${total}</div>
+                    <p><strong>${pct}%</strong> &middot; Longest streak: ${streak}</p>
+                    <p>${msg}</p>
+                    <button class="restart-btn" onclick="restart()">Try again &#128257;</button>
+                </div>`;
+        }
+        function restart() { currentQuestion = 0; score = 0; streak = 0; renderQuestion(); }
+
+        /* How-To intro — a small, ungraded field-check demo shown before
+           the quiz starts, directly rehearsing the export-setting mechanic
+           that one of the quiz scenarios asks about, so it's not being
+           asked cold. */
+        const HOWTO_FIELDS = [
+            { id: 'howtoRes', label: 'Export Resolution', type: 'select', options: ['720p', '1080p', '4K'], start: '4K' },
+            { id: 'howtoFps', label: 'Export Frame Rate', type: 'select', options: ['24fps', '30fps', '60fps'], start: '60fps' }
+        ];
+        const HOWTO_RULES = [
+            { id: 'howtoRes', op: 'eq', target: '1080p' },
+            { id: 'howtoFps', op: 'eq', target: '30fps' }
+        ];
+
+        function renderHowtoFields() {
+            document.getElementById('howtoFields').innerHTML = HOWTO_FIELDS.map(f => {
+                if (f.type === 'select') {
+                    const opts = f.options.map(o => `<option value="${o}" ${o === f.start ? 'selected' : ''}>${o}</option>`).join('');
+                    return `<div class="howto-field-row"><label class="howto-field-label" for="${f.id}">${f.label}</label><select class="howto-field-input" id="${f.id}">${opts}</select><span class="howto-field-result" id="${f.id}_result"></span></div>`;
+                }
+                return `<div class="howto-field-row"><label class="howto-field-label" for="${f.id}">${f.label}</label><input class="howto-field-input" type="number" id="${f.id}" value="${f.start}"><span class="howto-field-result" id="${f.id}_result"></span></div>`;
+            }).join('');
+        }
+
+        function applyHowtoOp(op, val, target) {
+            if (op === 'eq') return String(val) === String(target);
+            if (op === 'lte') return parseFloat(val) <= parseFloat(target);
+            if (op === 'gte') return parseFloat(val) >= parseFloat(target);
+            return false;
+        }
+
+        function checkHowto() {
+            let allOk = true;
+            HOWTO_RULES.forEach(r => {
+                const el = document.getElementById(r.id);
+                const ok = applyHowtoOp(r.op, el.value, r.target);
+                if (!ok) allOk = false;
+                const resultEl = document.getElementById(r.id + '_result');
+                resultEl.textContent = ok ? '✅' : '❌';
+            });
+            const banner = document.getElementById('howtoBanner');
+            banner.classList.add('show');
+            banner.className = 'howto-banner show ' + (allOk ? 'ok' : 'fail');
+            banner.textContent = allOk
+                ? '✅ Nailed it — that\'s exactly the setting to use here.'
+                : '❌ Not quite yet — adjust the highlighted field(s) and check again.';
+        }
+
+        function renderHowto() {
+            document.getElementById('exerciseCard').innerHTML = `
+                <div class="howto-card">
+                    <h3>🔍 Quick How-To: Matching Export Settings to Your Source</h3>
+                    <p>One of the scenarios coming up asks about exactly this. Otieno just finished filming a farewell shoot at <strong>1080p, 30fps</strong> on his phone and is about to export. The safe default is to match the export settings to what was actually captured, not to crank them up for no reason. Set the two fields below to what he should actually export at, then check your work.</p>
+                    <div class="howto-fields" id="howtoFields"></div>
+                    <div class="howto-banner" id="howtoBanner"></div>
+                    <button class="start-quiz-btn" id="checkHowtoBtn">Check My Settings</button>
+                    <button class="start-quiz-btn" id="startQuizBtn" style="margin-left:10px;background:linear-gradient(135deg,#28a745,#1e7e34);">Start Quiz →</button>
+                </div>`;
+            renderHowtoFields();
+            document.getElementById('checkHowtoBtn').addEventListener('click', checkHowto);
+            document.getElementById('startQuizBtn').addEventListener('click', renderQuestion);
+        }
+
+        renderHowto();
+    </script>
+</body>
+</html>

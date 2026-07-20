@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Limits of NLP Tools: Hallucination and Context Loss (Lesson) | MTTI Artificial Intelligence</title>
+<link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Fredoka:wght@500;600&display=swap" rel="stylesheet">
+<style>
+* { margin:0; padding:0; box-sizing:border-box; }
+body { font-family:'Space Mono', monospace; background:linear-gradient(135deg,#2E7D32 0%,#1565C0 100%); min-height:100vh; padding:20px; color:#fff; }
+.container { max-width:820px; margin:0 auto; }
+.header { text-align:center; margin-bottom:24px; }
+.lesson-tag { display:inline-block; background:rgba(255,255,255,0.2); padding:6px 16px; border-radius:999px; font-size:0.85em; margin-bottom:12px; }
+.header h1 { font-family:'Fredoka', sans-serif; font-size:2em; margin-bottom:6px; text-shadow:3px 3px 0 rgba(0,0,0,0.2); }
+.card { background:#fff; color:#333; border-radius:22px; padding:32px; margin-bottom:20px; box-shadow:0 20px 60px rgba(0,0,0,0.3); }
+.section { margin-bottom:26px; }
+.section:last-child { margin-bottom:0; }
+.section h2 { font-family:'Fredoka', sans-serif; font-size:1.2em; margin-bottom:10px; color:#1565C0; }
+.section .body { line-height:1.65; font-size:0.98em; }
+.section .body p { margin-bottom:10px; }
+.section .body code { background:#f5f7fb; padding:2px 6px; border-radius:4px; font-size:0.92em; }
+.keypoint { background:#fff8e1; border-left:4px solid #ffc107; padding:12px 16px; border-radius:8px; margin-top:12px; font-size:0.92em; }
+</style>
+</head>
+<body>
+<div class="container">
+<div class="header"><div class="lesson-tag">Natural Language Processing · Topic 3 · Lesson</div><h1>Limits of NLP Tools: Hallucination and Context Loss</h1></div>
+<div class="card">
+<div class="section"><h2>1. What "Hallucination" Means</h2><div class="body">
+<p>Sometimes an AI chat assistant states something fluently and confidently that is simply wrong or entirely made up. In the field, this is called a <strong>hallucination</strong>. It might be a fabricated statistic, a report title that doesn't exist, or an incorrect date — delivered in exactly the same confident tone as a correct answer.</p>
+<p>This happens because the tool is predicting plausible-sounding text based on learned patterns, not checking a verified database of facts. If there's no strongly-patterned correct answer available from what it learned, it still produces something fluent — and that fluent-sounding answer can simply be wrong. If Brian asks an assistant for "the average small-business loan default rate in Kenya" and gets back a precise-looking percentage, that number may be entirely fabricated, even though it reads convincingly.</p>
+</div></div>
+<div class="section"><h2>2. Losing Track in Long Conversations</h2><div class="body">
+<p>These tools only "keep in mind" a limited amount of the recent conversation. In a long back-and-forth, details mentioned much earlier can get dropped, or the tool can end up contradicting something it was told before — not out of dishonesty, but because it is re-generating its reply based on what's still visible to it, not from a lasting memory of everything ever said.</p>
+<p>For example, Brian might tell an assistant early in a long session that "the client's fiscal year ends in June." Forty messages later, in the middle of an unrelated request, the assistant might quietly assume a different year-end. That's context loss, not a lie.</p>
+</div></div>
+<div class="section"><h2>3. Brian's Rule: Verify Before It Goes Into a Client Report</h2><div class="body">
+<p>Because of both hallucination and context loss, any specific fact, figure, date, or name an AI tool generates needs to be checked against a real, checkable source before Rafiki Insights uses it in client-facing material. The tool is a useful drafting partner — not a verified source of truth.</p>
+<div class="keypoint"><strong>Key Point.</strong> Fluent and confident is not the same as correct. Before anything factual from an AI tool goes into a client report, Brian checks it against a real source first.</div>
+</div></div>
+</div>
+</div>
+</body>
+</html>

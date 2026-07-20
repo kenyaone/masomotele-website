@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Understanding Errors and Exceptions | MTTI Programming Principles</title>
+<link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Fredoka:wght@500;600&display=swap" rel="stylesheet">
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body {
+    font-family: 'Space Mono', monospace;
+    background: linear-gradient(135deg, #2E7D32 0%, #1565C0 100%);
+    min-height: 100vh; padding: 20px; color: #fff;
+}
+.container { max-width: 900px; margin: 0 auto; }
+.header { text-align: center; margin-bottom: 26px; }
+.lesson-tag { display: inline-block; background: rgba(255,255,255,0.2); padding: 6px 16px; border-radius: 999px; font-size: 0.85em; margin-bottom: 12px; }
+.header h1 { font-family: 'Fredoka', sans-serif; font-size: 2.1em; margin-bottom: 8px; text-shadow: 3px 3px 0 rgba(0,0,0,0.2); }
+.task {
+    background: white; color: #333; border-radius: 22px;
+    padding: 26px; margin-bottom: 20px;
+    box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+}
+.task h2 { font-family: 'Fredoka', sans-serif; font-size: 1.3em; margin-bottom: 14px; display: flex; align-items: center; }
+.task-num {
+    display: inline-block; width: 30px; height: 30px;
+    background: linear-gradient(135deg, #2E7D32 0%, #1565C0 100%);
+    color: white; border-radius: 50%; text-align: center; line-height: 30px;
+    font-family: 'Fredoka', sans-serif; font-weight: 600; margin-right: 10px; flex-shrink: 0; font-size: 0.75em;
+}
+.section-body { color: #444; font-size: 0.98em; line-height: 1.7; }
+.section-body p { margin-bottom: 12px; }
+.section-body strong { color: #1B5E20; }
+.section-body ul, .section-body ol { margin: 10px 0 14px 22px; }
+.section-body li { margin-bottom: 6px; }
+.code-block {
+    background: #1e1e2e; color: #cdd6f4; border-radius: 10px;
+    padding: 16px 18px; margin-top: 10px; overflow-x: auto;
+    font-family: 'Courier New', monospace; font-size: 0.88em; line-height: 1.6;
+}
+</style>
+</head>
+<body>
+<div class="container">
+    <div class="header">
+        <div class="lesson-tag">Error Handling and File I/O · Understanding Errors and Exceptions</div>
+        <h1>Understanding Errors and Exceptions</h1>
+    </div>
+    <div class="task"><h2><span class="task-num">1</span>Syntax Errors vs Runtime Errors</h2><div class="section-body"><p>A <strong>syntax error</strong> means Python couldn't even understand your code — it happens before the program runs at all (like a missing colon). A <strong>runtime error</strong>, or <strong>exception</strong>, happens while the code is executing, when something goes wrong that Python couldn't have caught in advance.</p></div></div><div class="task"><h2><span class="task-num">2</span>Common Built-in Exceptions</h2><div class="section-body"><p>Python has many built-in exception types for different problems: <code>ValueError</code> (a value is the wrong kind, e.g. converting text that isn't a number), <code>ZeroDivisionError</code> (dividing by zero), and <code>TypeError</code> (an operation used on the wrong data type).</p><pre class="code-block"><code>print(5 / 0)          # ZeroDivisionError: division by zero
+age = int(&quot;twenty&quot;)   # ValueError: invalid literal for int()
+result = &quot;5&quot; + 5       # TypeError: can only concatenate str to str</code></pre></div></div><div class="task"><h2><span class="task-num">3</span>A Simple Guard: Checking Before Acting</h2><div class="section-body"><p>The simplest way to avoid a foreseeable error is to check for it first with an if statement, before the risky operation runs. This works for simple, predictable cases — the next lesson introduces a more general tool for handling errors.</p><pre class="code-block"><code>a = 10
+b = 0
+if b != 0:
+    print(a / b)
+else:
+    print(&quot;Cannot divide by zero&quot;)</code></pre></div></div>
+</div>
+</body>
+</html>

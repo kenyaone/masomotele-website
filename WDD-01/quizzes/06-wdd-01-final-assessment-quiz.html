@@ -1,21 +1,442 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>WDD-01 Final Assessment (Interactive) | MTTI Web Design</title>
-<style>
-* {box-sizing:border-box;margin:0;padding:0;}
-body {font-family:'Segoe UI',-apple-system,sans-serif;line-height:1.6;color:#1e293b;background:#f8fafc;padding:40px 20px;}
-.container {max-width:760px;margin:0 auto;background:#fff;border-radius:16px;padding:40px;box-shadow:0 10px 30px rgba(0,0,0,0.06);text-align:center;}
-h1 {font-size:1.6em;margin-bottom:12px;}
-p {color:#475569;}
-</style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WDD-01 Final Assessment</title>
+    <link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Fredoka:wght@500;600&display=swap" rel="stylesheet">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Space Mono', monospace;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh; padding: 20px; color: #fff;
+        }
+        .container { max-width: 900px; margin: 0 auto; }
+        .header { text-align: center; margin-bottom: 30px; animation: slideDown 0.6s ease-out; }
+        .header .lesson-tag {
+            display: inline-block; background: rgba(255,255,255,0.2);
+            padding: 6px 16px; border-radius: 999px;
+            font-size: 0.85em; margin-bottom: 12px;
+        }
+        .header h1 {
+            font-family: 'Fredoka', sans-serif; font-size: 2.2em;
+            margin-bottom: 8px; text-shadow: 3px 3px 0 rgba(0,0,0,0.2);
+        }
+        .header p { opacity: 0.95; font-size: 0.95em; }
+        .score-board {
+            background: rgba(255,255,255,0.15); backdrop-filter: blur(10px);
+            border-radius: 20px; padding: 20px; margin-bottom: 20px;
+            display: flex; justify-content: space-around;
+            animation: fadeIn 0.8s ease-out 0.2s both;
+        }
+        .score-item { text-align: center; }
+        .score-item .label { font-size: 0.85em; opacity: 0.9; margin-bottom: 4px; }
+        .score-item .value {
+            font-size: 1.8em; font-weight: bold; font-family: 'Fredoka', sans-serif;
+        }
+        .progress-bar {
+            width: 100%; height: 8px; background: rgba(255,255,255,0.3);
+            border-radius: 10px; margin-bottom: 25px; overflow: hidden;
+        }
+        .progress-fill {
+            height: 100%; background: linear-gradient(90deg, #f093fb 0%, #f5576c 100%);
+            border-radius: 10px; transition: width 0.5s ease; width: 0%;
+        }
+        .exercise-card {
+            background: white; color: #333; border-radius: 25px;
+            padding: 35px; margin-bottom: 20px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            animation: fadeIn 0.6s ease-out both;
+        }
+        .scenario {
+            background: linear-gradient(135deg, #fff8e1 0%, #ffecb3 100%);
+            border-left: 5px solid #ffc107;
+            padding: 20px 24px; border-radius: 12px;
+            margin-bottom: 24px;
+            font-size: 0.98em; line-height: 1.55;
+        }
+        .scenario strong { color: #7a5a00; font-family: 'Fredoka', sans-serif; }
+        .question {
+            font-size: 1.15em; margin-bottom: 20px;
+            font-weight: 700; line-height: 1.4;
+        }
+        .options { display: flex; flex-direction: column; gap: 12px; }
+        .option {
+            background: #f5f7fb; border: 2px solid transparent;
+            padding: 16px 20px; border-radius: 12px;
+            cursor: pointer; transition: all 0.2s ease;
+            font-family: 'Space Mono', monospace; font-size: 0.98em; text-align: left;
+        }
+        .option:hover:not(.disabled) {
+            background: #eef1fb; border-color: #667eea; transform: translateX(4px);
+        }
+        .option.correct { background: #d4edda; border-color: #28a745; color: #155724; }
+        .option.wrong { background: #f8d7da; border-color: #dc3545; color: #721c24; animation: shake 0.4s; }
+        .option.disabled { cursor: not-allowed; opacity: 0.85; }
+        .feedback {
+            margin-top: 22px; padding: 18px 22px; border-radius: 12px;
+            animation: slideUp 0.4s ease-out;
+            font-size: 0.98em; line-height: 1.5;
+        }
+        .feedback.correct { background: #d4edda; color: #155724; border-left: 4px solid #28a745; }
+        .feedback.wrong { background: #f8d7da; color: #721c24; border-left: 4px solid #dc3545; }
+        .feedback strong { font-family: 'Fredoka', sans-serif; }
+        .next-btn, .restart-btn {
+            margin-top: 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white; border: none;
+            padding: 14px 32px; border-radius: 12px;
+            font-size: 1em; cursor: pointer;
+            font-family: 'Fredoka', sans-serif;
+            box-shadow: 0 6px 18px rgba(0,0,0,0.2);
+            transition: transform 0.2s ease;
+        }
+        .next-btn:hover, .restart-btn:hover { transform: scale(1.04); }
+        .results {
+            text-align: center; padding: 25px 15px;
+            animation: bounceIn 0.6s ease-out;
+        }
+        .results h2 {
+            font-family: 'Fredoka', sans-serif; font-size: 2em;
+            margin-bottom: 12px; color: #333;
+        }
+        .results .final-score {
+            font-size: 3em; font-family: 'Fredoka', sans-serif;
+            color: #667eea; margin: 20px 0;
+        }
+        .results p { color: #555; margin-bottom: 12px; }
+        .badge { display: inline-block; font-size: 3.5em; margin: 8px 0; }
+        @keyframes slideDown { from { opacity: 0; transform: translateY(-30px); } to { opacity: 1; transform: translateY(0); } }
+        @keyframes fadeIn { from { opacity: 0; transform: scale(0.96); } to { opacity: 1; transform: scale(1); } }
+        @keyframes slideUp { from { opacity: 0; transform: translateY(15px); } to { opacity: 1; transform: translateY(0); } }
+        @keyframes shake { 0%,100% { transform: translateX(0); } 25% { transform: translateX(-8px); } 75% { transform: translateX(8px); } }
+        @keyframes bounceIn { 0% { opacity: 0; transform: scale(0.4); } 60% { transform: scale(1.05); } 100% { opacity: 1; transform: scale(1); } }
+    </style>
 </head>
 <body>
-<div class="container">
-<h1>WDD-01 Final Assessment</h1>
-<p>The full theory lesson for this topic is coming soon.</p>
-</div>
+    <div class="container">
+        <div class="header">
+            <div class="lesson-tag">Module 1 · Lesson 1.1 · Quiz</div>
+            <h1>How the Web Works</h1>
+            <p></p>
+        </div>
+
+        <div class="score-board">
+            <div class="score-item"><div class="label">Score</div><div class="value" id="score">0</div></div>
+            <div class="score-item"><div class="label">Question</div><div class="value"><span id="current">1</span>/<span id="total">10</span></div></div>
+            <div class="score-item"><div class="label">Streak</div><div class="value" id="streak">0</div></div>
+        </div>
+
+        <div class="progress-bar"><div class="progress-fill" id="progress"></div></div>
+
+        <div class="exercise-card" id="exerciseCard"></div>
+    </div>
+
+    <script>
+        const exercises = [
+    {
+        "id": "q1",
+        "text": "What is the purpose of DNS when you type a website address into your browser?",
+        "options": [
+            "It encrypts the connection",
+            "It translates the domain name into an IP address",
+            "It compresses the HTML file",
+            "It validates your HTML"
+        ],
+        "answer": 1,
+        "explanation": "DNS resolves a human-readable domain name into the numeric IP address the browser needs to actually connect to a server."
+    },
+    {
+        "id": "q2",
+        "text": "Why should you add alt text to an img element?",
+        "options": [
+            "It changes the image's file size",
+            "It provides a text alternative for screen readers and when the image fails to load",
+            "It makes the image load faster",
+            "It's required by every browser to display the image"
+        ],
+        "answer": 1,
+        "explanation": "Alt text describes the image for screen-reader users and displays as a fallback if the image cannot load \u2014 it has no effect on load speed or file size."
+    },
+    {
+        "id": "q3",
+        "text": "Why is it important to associate a <label> with its <input> in an HTML form?",
+        "options": [
+            "It is purely decorative",
+            "It improves accessibility and lets clicking the label focus the input",
+            "It is required for the form to submit",
+            "It changes the input's data type"
+        ],
+        "answer": 1,
+        "explanation": "A properly associated label is read out by screen readers and expands the clickable/tappable area for the input, which matters for both accessibility and usability."
+    },
+    {
+        "id": "q4",
+        "text": "What is one practical benefit of validating your HTML?",
+        "options": [
+            "It automatically improves page speed",
+            "It catches structural mistakes that can cause unpredictable rendering across browsers",
+            "It removes the need for CSS",
+            "It encrypts the page content"
+        ],
+        "answer": 1,
+        "explanation": "Invalid HTML (like unclosed tags or incorrect nesting) can render inconsistently between browsers \u2014 validation catches these mistakes early."
+    },
+    {
+        "id": "q5",
+        "text": "In the CSS box model, which property adds space INSIDE an element's border, between the border and the content?",
+        "options": [
+            "margin",
+            "padding",
+            "border-spacing",
+            "gap"
+        ],
+        "answer": 1,
+        "explanation": "Padding sits between the content and the border, inside the element. Margin is the space outside the border, between elements."
+    },
+    {
+        "id": "q6",
+        "text": "You need to lay out a page with distinct rows AND columns that align together, like a photo gallery grid. Which CSS layout tool is generally the better fit?",
+        "options": [
+            "Flexbox",
+            "CSS Grid",
+            "Float",
+            "Table layout"
+        ],
+        "answer": 1,
+        "explanation": "Grid is built for two-dimensional layouts (rows and columns together); Flexbox is generally better suited to one-dimensional layouts along a single axis."
+    },
+    {
+        "id": "q7",
+        "text": "What does a 'mobile-first' approach to media queries mean?",
+        "options": [
+            "Only mobile devices are supported",
+            "Base styles target small screens, with media queries adding styles for larger screens",
+            "Desktop styles are written first, then overridden for mobile",
+            "It means using vw units exclusively"
+        ],
+        "answer": 1,
+        "explanation": "Mobile-first means your unqualified CSS rules are the small-screen baseline, and min-width media queries progressively add complexity for larger viewports."
+    },
+    {
+        "id": "q8",
+        "text": "What is one advantage of using CSS custom properties (variables) in a growing stylesheet?",
+        "options": [
+            "They make the CSS file load faster over the network",
+            "Changing a value in one place updates every rule that uses it",
+            "They replace the need for a box model",
+            "They are required for responsive design to work"
+        ],
+        "answer": 1,
+        "explanation": "Custom properties centralize a value (like a brand colour) so updating it in one place cascades everywhere it's used \u2014 a real maintainability win as a project grows."
+    },
+    {
+        "id": "q9",
+        "text": "Which of these is a valid reason to prefer const over var when declaring a variable you won't reassign?",
+        "options": [
+            "const is faster to type",
+            "const prevents the variable from being accidentally reassigned, catching bugs earlier",
+            "const variables are automatically global",
+            "var no longer works in modern browsers"
+        ],
+        "answer": 1,
+        "explanation": "const signals intent and causes an error if the variable is accidentally reassigned later, which catches a class of bugs before they cause problems."
+    },
+    {
+        "id": "q10",
+        "text": "A variable declared inside a function with let is generally NOT accessible...",
+        "options": [
+            "...anywhere in the same function",
+            "...outside that function, due to scope",
+            "...within the same block",
+            "...to other statements in the same function"
+        ],
+        "answer": 1,
+        "explanation": "Variables declared inside a function are scoped to that function (and its blocks) \u2014 they aren't visible to code outside it."
+    },
+    {
+        "id": "q11",
+        "text": "What does document.querySelector('.card') do?",
+        "options": [
+            "Creates a new element with the class 'card'",
+            "Selects and returns the first element in the page matching the CSS class 'card'",
+            "Deletes all elements with the class 'card'",
+            "Applies the 'card' CSS class to the whole document"
+        ],
+        "answer": 1,
+        "explanation": "querySelector returns the first matching element for the given CSS selector \u2014 it reads the DOM, it does not create, delete, or apply anything."
+    },
+    {
+        "id": "q12",
+        "text": "What is the purpose of event.preventDefault() inside a form's submit event handler?",
+        "options": [
+            "It deletes the form from the page",
+            "It stops the browser's default action, e.g. reloading the page on submit",
+            "It clears all input values",
+            "It prevents the event listener from ever running again"
+        ],
+        "answer": 1,
+        "explanation": "preventDefault() stops the browser's built-in behaviour for that event (like a full page reload on form submit) so your own JavaScript can handle it instead."
+    },
+    {
+        "id": "q13",
+        "text": "Why does working with the Fetch API typically involve async/await or .then()?",
+        "options": [
+            "Because fetch always fails on the first attempt",
+            "Because fetch is asynchronous \u2014 the response is not available immediately",
+            "Because fetch only works with images",
+            "Because it is required by CSS"
+        ],
+        "answer": 1,
+        "explanation": "Fetch returns a Promise because the network request takes time to complete \u2014 async/await or .then() lets your code wait for that response without blocking everything else."
+    },
+    {
+        "id": "q14",
+        "text": "In Git, what does git commit do that git add does not?",
+        "options": [
+            "It uploads your code to GitHub",
+            "It saves a snapshot of your staged changes to the project's history",
+            "It deletes old versions of your files",
+            "It creates a new branch automatically"
+        ],
+        "answer": 1,
+        "explanation": "git add stages changes for the next commit; git commit actually records those staged changes as a permanent snapshot in the local history. Pushing to GitHub is a separate step (git push)."
+    },
+    {
+        "id": "q15",
+        "text": "What is a key limitation of GitHub Pages as a hosting option?",
+        "options": [
+            "It cannot host HTML at all",
+            "It only serves static files \u2014 no server-side code like PHP can run there",
+            "It requires a paid GitHub account",
+            "It only works for private repositories"
+        ],
+        "answer": 1,
+        "explanation": "GitHub Pages serves static files (HTML/CSS/JS) directly \u2014 it has no server-side runtime, so PHP, databases, or other backend code cannot run there."
+    },
+    {
+        "id": "q16",
+        "text": "Which of these is a genuine, measurable way to improve a page's load performance?",
+        "options": [
+            "Adding more images without optimizing them",
+            "Compressing and properly sizing images before uploading them",
+            "Removing all CSS",
+            "Using inline styles everywhere instead of a stylesheet"
+        ],
+        "answer": 1,
+        "explanation": "Unoptimized images are one of the most common causes of slow page loads \u2014 compressing and correctly sizing them is one of the highest-impact, easiest performance wins."
+    },
+    {
+        "id": "q17",
+        "text": "Why does a vague prompt like 'make a button' typically produce less useful AI-generated code than a detailed one?",
+        "options": [
+            "Vague prompts always cause errors",
+            "The AI has to guess at requirements like styling, behaviour, and context it was not given",
+            "AI assistants can only respond to exact code syntax",
+            "Vague prompts are automatically rejected by AI tools"
+        ],
+        "answer": 1,
+        "explanation": "Without details on styling, behaviour, and context, an AI assistant fills the gaps with generic guesses \u2014 the more relevant context you provide, the more useful the result."
+    },
+    {
+        "id": "q18",
+        "text": "Why is it important to review and understand AI-generated code before shipping it, rather than trusting it outright?",
+        "options": [
+            "AI-generated code is always slower",
+            "AI can produce code that looks correct but contains bugs, security issues, or does not fit the actual requirement",
+            "AI-generated code cannot be edited afterward",
+            "It is a legal requirement in every country"
+        ],
+        "answer": 1,
+        "explanation": "AI-generated code can be confidently wrong \u2014 syntactically valid and plausible-looking while still containing real bugs or security issues, so it needs the same scrutiny as any other code before shipping."
+    }
+];
+
+        let currentQuestion = 0, score = 0, streak = 0, answered = false;
+
+        function updateScoreboard() {
+            document.getElementById('score').textContent = score;
+            document.getElementById('current').textContent = Math.min(currentQuestion + 1, exercises.length);
+            document.getElementById('total').textContent = exercises.length;
+            document.getElementById('streak').textContent = streak;
+            document.getElementById('progress').style.width = ((currentQuestion) / exercises.length) * 100 + '%';
+        }
+
+        function escapeHtml(s) {
+            return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+        }
+
+        function renderQuestion() {
+            answered = false;
+            const q = exercises[currentQuestion];
+            let html = '';
+            if (q.scenario) {
+                html += `<div class="scenario"><strong>Scenario.</strong> ${escapeHtml(q.scenario)}</div>`;
+            }
+            html += `<div class="question">${escapeHtml(q.text)}</div>`;
+            html += '<div class="options">';
+            q.options.forEach((o, i) => {
+                html += `<button class="option" onclick="selectAnswer(${i})">${escapeHtml(o)}</button>`;
+            });
+            html += '</div>';
+            document.getElementById('exerciseCard').innerHTML = html;
+            updateScoreboard();
+        }
+
+        function selectAnswer(i) {
+            if (answered) return;
+            answered = true;
+            const q = exercises[currentQuestion];
+            const btns = document.querySelectorAll('.option');
+            btns.forEach(b => b.classList.add('disabled'));
+            btns[q.answer].classList.add('correct');
+            const right = i === q.answer;
+            if (!right) btns[i].classList.add('wrong');
+            if (right) { score += 10; streak += 1; } else { streak = 0; }
+            const fb = document.createElement('div');
+            fb.className = 'feedback ' + (right ? 'correct' : 'wrong');
+            fb.innerHTML = `<strong>${right ? '✅ Correct.' : '❌ Not quite.'}</strong><br>${escapeHtml(q.explanation)}`;
+            document.getElementById('exerciseCard').appendChild(fb);
+            const nb = document.createElement('button');
+            nb.className = 'next-btn';
+            nb.textContent = currentQuestion === exercises.length - 1 ? 'See results →' : 'Next scenario →';
+            nb.onclick = nextQuestion;
+            document.getElementById('exerciseCard').appendChild(nb);
+            updateScoreboard();
+        }
+
+        function nextQuestion() {
+            currentQuestion++;
+            if (currentQuestion >= exercises.length) return showResults();
+            renderQuestion();
+        }
+
+        function showResults() {
+            document.getElementById('progress').style.width = '100%';
+            const total = exercises.length * 10;
+            const pct = Math.round(score / total * 100);
+            if (window.parent) { window.parent.postMessage({type:"mtti_quiz_score", score: score, total: total, percent: pct}, "*"); }
+            let badge = '🌟', msg = 'Excellent work. You have a professional grasp of this lesson.';
+            if (pct < 50) { badge = '🌱'; msg = 'Good first attempt. Re-watch the lesson video and try again.'; }
+            else if (pct < 80) { badge = '📚'; msg = 'Solid progress. Review the scenarios you missed and retry.'; }
+            document.getElementById('exerciseCard').innerHTML = `
+                <div class="results">
+                    <span class="badge">${badge}</span>
+                    <h2>Quiz Complete</h2>
+                    <div class="final-score">${score} / ${total}</div>
+                    <p><strong>${pct}%</strong> · Longest streak: ${streak}</p>
+                    <p>${msg}</p>
+                    <button class="restart-btn" onclick="restart()">Try again 🔁</button>
+                </div>`;
+        }
+
+        function restart() {
+            currentQuestion = 0; score = 0; streak = 0;
+            renderQuestion();
+        }
+
+        renderQuestion();
+    </script>
 </body>
 </html>

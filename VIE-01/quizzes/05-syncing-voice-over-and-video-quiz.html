@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Syncing Voice-Over and Video | MTTI Video Editing</title>
+    <link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Fredoka:wght@500;600&display=swap" rel="stylesheet">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Space Mono', monospace; background: linear-gradient(135deg, #2b0b5e 0%, #1a1a4b 100%); min-height: 100vh; padding: 20px; color: #fff; }
+        .container { max-width: 900px; margin: 0 auto; }
+        .header { text-align: center; margin-bottom: 30px; }
+        .header .lesson-tag { display: inline-block; background: rgba(255,255,255,0.2); padding: 6px 16px; border-radius: 999px; font-size: 0.85em; margin-bottom: 12px; }
+        .header h1 { font-family: 'Fredoka', sans-serif; font-size: 2.2em; margin-bottom: 8px; text-shadow: 3px 3px 0 rgba(0,0,0,0.2); }
+        .score-board { background: rgba(255,255,255,0.15); backdrop-filter: blur(10px); border-radius: 20px; padding: 20px; margin-bottom: 20px; display: flex; justify-content: space-around; }
+        .score-item { text-align: center; }
+        .score-item .label { font-size: 0.85em; opacity: 0.9; margin-bottom: 4px; }
+        .score-item .value { font-size: 1.8em; font-weight: bold; font-family: 'Fredoka', sans-serif; }
+        .progress-bar { width: 100%; height: 8px; background: rgba(255,255,255,0.3); border-radius: 10px; margin-bottom: 25px; overflow: hidden; }
+        .progress-fill { height: 100%; background: linear-gradient(90deg, #f7971e 0%, #ffd200 100%); border-radius: 10px; transition: width 0.5s ease; width: 0%; }
+        .exercise-card { background: white; color: #333; border-radius: 25px; padding: 35px; margin-bottom: 20px; box-shadow: 0 20px 60px rgba(0,0,0,0.3); }
+        .scenario { background: linear-gradient(135deg, #fff8e1 0%, #ffecb3 100%); border-left: 5px solid #ffc107; padding: 20px 24px; border-radius: 12px; margin-bottom: 24px; font-size: 0.98em; line-height: 1.55; }
+        .scenario strong { color: #7a5a00; font-family: 'Fredoka', sans-serif; }
+        .question { font-size: 1.15em; margin-bottom: 20px; font-weight: 700; line-height: 1.4; }
+        .options { display: flex; flex-direction: column; gap: 12px; }
+        .option { background: #f5f7fb; border: 2px solid transparent; padding: 16px 20px; border-radius: 12px; cursor: pointer; transition: all 0.2s ease; font-family: 'Space Mono', monospace; font-size: 0.98em; text-align: left; }
+        .option:hover:not(.disabled) { background: #eef1fb; border-color: #2b0b5e; transform: translateX(4px); }
+        .option.correct { background: #d4edda; border-color: #28a745; color: #155724; }
+        .option.wrong { background: #f8d7da; border-color: #dc3545; color: #721c24; }
+        .option.disabled { cursor: not-allowed; opacity: 0.85; }
+        .feedback { margin-top: 22px; padding: 18px 22px; border-radius: 12px; font-size: 0.98em; line-height: 1.5; }
+        .feedback.correct { background: #d4edda; color: #155724; border-left: 4px solid #28a745; }
+        .feedback.wrong { background: #f8d7da; color: #721c24; border-left: 4px solid #dc3545; }
+        .next-btn, .restart-btn { margin-top: 20px; background: linear-gradient(135deg, #2b0b5e 0%, #1a1a4b 100%); color: white; border: none; padding: 14px 32px; border-radius: 12px; font-size: 1em; cursor: pointer; font-family: 'Fredoka', sans-serif; box-shadow: 0 6px 18px rgba(0,0,0,0.2); }
+        .results { text-align: center; padding: 25px 15px; }
+        .results h2 { font-family: 'Fredoka', sans-serif; font-size: 2em; margin-bottom: 12px; color: #333; }
+        .results .final-score { font-size: 3em; font-family: 'Fredoka', sans-serif; color: #2b0b5e; margin: 20px 0; }
+        .results p { color: #555; margin-bottom: 12px; }
+        .badge { display: inline-block; font-size: 3.5em; margin: 8px 0; }
+    
+        /* How-To intro screen — shown before question 1, not scored */
+        .howto-card { background: white; color: #333; border-radius: 25px; padding: 35px; margin-bottom: 20px; box-shadow: 0 20px 60px rgba(0,0,0,0.3); }
+        .howto-card h3 { font-family: 'Fredoka', sans-serif; font-size: 1.3em; margin-bottom: 12px; color: #2b0b5e; }
+        .howto-card p { line-height: 1.6; margin-bottom: 16px; color: #444; }
+        .howto-fields { display: flex; flex-direction: column; gap: 16px; margin-bottom: 18px; }
+        .howto-field { background: #f5f7fb; border-radius: 12px; padding: 16px 18px; }
+        .howto-field label { display: block; font-weight: 700; margin-bottom: 8px; color: #333; font-family: 'Fredoka', sans-serif; }
+        .howto-field .hf-hint { font-size: 0.82em; color: #777; margin-bottom: 8px; }
+        .howto-field input { width: 100%; max-width: 220px; padding: 10px 14px; border-radius: 8px; border: 2px solid #ccc; font-family: 'Space Mono', monospace; font-size: 1em; }
+        .howto-field input.hf-correct { border-color: #28a745; background: #d4edda; }
+        .howto-field input.hf-wrong { border-color: #dc3545; background: #f8d7da; }
+        .howto-field .hf-result { margin-top: 8px; font-size: 0.85em; font-weight: 700; min-height: 1.1em; }
+        .howto-field .hf-result.ok { color: #155724; }
+        .howto-field .hf-result.fail { color: #721c24; }
+        .howto-banner { margin-top: 4px; margin-bottom: 18px; padding: 12px 16px; border-radius: 10px; font-size: 0.9em; font-weight: 700; display: none; }
+        .howto-banner.show { display: block; }
+        .howto-banner.ok { background: #d4edda; color: #155724; }
+        .howto-banner.fail { background: #f8d7da; color: #721c24; }
+        .start-quiz-btn { margin-top: 4px; background: linear-gradient(135deg, #2b0b5e 0%, #1a1a4b 100%); color: white; border: none; padding: 14px 32px; border-radius: 12px; font-size: 1em; cursor: pointer; font-family: 'Fredoka', sans-serif; box-shadow: 0 6px 18px rgba(0,0,0,0.2); }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <div class="lesson-tag">Audio Editing · Topic 2 · Quiz</div>
+            <h1>Syncing Voice-Over and Video</h1>
+        </div>
+        <div class="score-board">
+            <div class="score-item"><div class="label">Score</div><div class="value" id="score">0</div></div>
+            <div class="score-item"><div class="label">Question</div><div class="value"><span id="current">1</span>/<span id="total">10</span></div></div>
+            <div class="score-item"><div class="label">Streak</div><div class="value" id="streak">0</div></div>
+        </div>
+        <div class="progress-bar"><div class="progress-fill" id="progress"></div></div>
+        <div class="exercise-card" id="exerciseCard"></div>
+    </div>
+    <script>
+        const exercises = [{"scenario":"Otieno scrubs the timeline and notices the client's mouth opens to speak a full half-second before any sound plays.","question":"How would this mismatch be described, and which way should the audio clip move to fix it?","options":["The audio lags \u2014 it should be moved earlier (left) so it catches up with the already-moving lips","The audio leads \u2014 it should be moved later (right)","This is not actually a sync problem","The video should be moved instead of the audio"],"correct":0,"explanation":"If the lips move before any sound is heard, the audio is arriving late (lagging), so it needs to be dragged earlier\/left to catch up with the lip movement that already happened."},{"scenario":"Scrubbing a different clip, Otieno hears the client's voice a beat before their lips actually start moving.","question":"What is this mismatch called, and how should the audio be corrected?","options":["The audio lags \u2014 move it earlier (left)","The audio leads \u2014 move it later (right) so it lines up with the lips instead of arriving early","No correction is needed since sound and video are separate tracks","Only the video can be moved to fix sync, never the audio"],"correct":1,"explanation":"Sound arriving before the lips move means the audio is leading; nudging it later (right) delays it to line up with when the lips actually move."},{"scenario":"Otieno wants a precise, visual way to confirm his sync fix rather than just eyeballing the waveform's start.","question":"What is the most reliable marker to use?","options":["The loudest moment in the background music","A plosive consonant like \"p\" or \"b\", where the lips visibly snap shut at that exact instant","The very first frame of the video clip","Whichever frame looks the brightest"],"correct":1,"explanation":"A plosive sound gives a sharp, visible lip-closure moment that can be matched precisely against the corresponding spike in the audio waveform."},{"scenario":"Otieno fixes sync perfectly at the start of a 90-second interview clip, but by the end the voice has drifted noticeably out of time with the lips again.","question":"What does this drift most likely indicate?","options":["The two recordings are running at a very slightly different speed, so sync needs to be checked at several points across the clip, not just once at the start","Drift like this is unavoidable and cannot be fixed","The client simply spoke faster near the end of the interview","Only the video needs a fade-out to fix this"],"correct":0,"explanation":"A single fixed offset only guarantees sync at one point in time; gradual drift across a long clip points to a small speed mismatch between the two recordings that needs re-checking (and possibly retiming) at multiple points."},{"scenario":"Otieno tries to fix a sync issue by dragging the audio clip a rough, eyeballed distance without zooming in on the timeline.","question":"What is the risk of nudging sync this way instead of zooming in and checking in milliseconds or frames?","options":["There is no risk \u2014 sync only ever needs a rough estimate","He may overshoot or undershoot the correct offset, leaving a small but still noticeable mismatch","Zooming the timeline in CapCut or Canva is not possible","Audio clips can only be moved in whole-second increments"],"correct":1,"explanation":"A rough, un-zoomed drag makes it easy to land a little too early or too late; zooming in and nudging by exact milliseconds or frames gives a precise, reliably correct sync."},{"scenario":"A client's on-location audio for a testimonial was ruined by traffic noise, so Otieno re-records the same lines cleanly at home before syncing it back to the original video.","question":"Why is a sync step necessary at all in this situation?","options":["It isn't necessary \u2014 any voice-over will automatically line up with the original footage","Because the replacement lines were recorded separately from the camera, they won't naturally match the client's lip movements until manually nudged into place","Re-recorded audio always plays faster than the original, so no sync is needed, only trimming","Sync only matters for music tracks, not spoken voice-overs"],"correct":1,"explanation":"A voice-over recorded away from the camera has no built-in timing relationship to the footage, so it has to be manually nudged into alignment with the lips before it will look correct."}];
+        let currentQuestion = 0, score = 0, streak = 0, answered = false;
+        function updateScoreboard() {
+            document.getElementById('score').textContent = score;
+            document.getElementById('current').textContent = Math.min(currentQuestion + 1, exercises.length);
+            document.getElementById('total').textContent = exercises.length;
+            document.getElementById('streak').textContent = streak;
+            document.getElementById('progress').style.width = ((currentQuestion) / exercises.length) * 100 + '%';
+        }
+        function escapeHtml(s) { return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+        function renderQuestion() {
+            answered = false;
+            const q = exercises[currentQuestion];
+            let html = '';
+            if (q.scenario) html += `<div class="scenario"><strong>Scenario.</strong> ${escapeHtml(q.scenario)}</div>`;
+            html += `<div class="question">${escapeHtml(q.question)}</div>`;
+            html += '<div class="options">';
+            q.options.forEach((o, i) => { html += `<button class="option" onclick="selectAnswer(${i})">${escapeHtml(o)}</button>`; });
+            html += '</div>';
+            document.getElementById('exerciseCard').innerHTML = html;
+            updateScoreboard();
+        }
+        function selectAnswer(i) {
+            if (answered) return;
+            answered = true;
+            const q = exercises[currentQuestion];
+            const btns = document.querySelectorAll('.option');
+            btns.forEach(b => b.classList.add('disabled'));
+            btns[q.correct].classList.add('correct');
+            const right = i === q.correct;
+            if (!right) btns[i].classList.add('wrong');
+            if (right) { score += 10; streak += 1; } else { streak = 0; }
+            const fb = document.createElement('div');
+            fb.className = 'feedback ' + (right ? 'correct' : 'wrong');
+            fb.innerHTML = `<strong>${right ? '&#9989; Correct.' : '&#10060; Not quite.'}</strong><br>${escapeHtml(q.explanation)}`;
+            document.getElementById('exerciseCard').appendChild(fb);
+            const nb = document.createElement('button');
+            nb.className = 'next-btn';
+            nb.textContent = currentQuestion === exercises.length - 1 ? 'See results →' : 'Next scenario →';
+            nb.onclick = nextQuestion;
+            document.getElementById('exerciseCard').appendChild(nb);
+            updateScoreboard();
+        }
+        function nextQuestion() { currentQuestion++; if (currentQuestion >= exercises.length) return showResults(); renderQuestion(); }
+        function showResults() {
+            document.getElementById('progress').style.width = '100%';
+            const total = exercises.length * 10;
+            const pct = Math.round(score / total * 100);
+            if (window.parent) { window.parent.postMessage({type:"mtti_quiz_score", score: score, total: total, percent: pct}, "*"); }
+            let badge = '🌟', msg = 'Excellent work. Otieno-level audio-editing know-how.';
+            if (pct < 50) { badge = '🌱'; msg = 'Good first attempt. Review the lesson and try again.'; }
+            else if (pct < 80) { badge = '📚'; msg = 'Solid progress. Review the scenarios you missed and retry.'; }
+            document.getElementById('exerciseCard').innerHTML = `
+                <div class="results">
+                    <span class="badge">${badge}</span>
+                    <h2>Quiz Complete</h2>
+                    <div class="final-score">${score} / ${total}</div>
+                    <p><strong>${pct}%</strong> &middot; Longest streak: ${streak}</p>
+                    <p>${msg}</p>
+                    <button class="restart-btn" onclick="restart()">Try again &#128257;</button>
+                </div>`;
+        }
+        function restart() { currentQuestion = 0; score = 0; streak = 0; renderQuestion(); }
+        
+        /* How-To intro — a small, ungraded field-check demo shown before the
+           quiz starts, directly rehearsing the mechanic one of the quiz
+           scenarios asks about, so it's not being asked cold. */
+        const HOWTO_FIELDS = [
+            { id: 'offset', label: 'Offset to apply (ms)', hint: 'Negative = move audio earlier/left. Positive = move it later/right.', placeholder: 'e.g. -200', okText: 'Correct direction and amount — the audio now lands right on the lip movement instead of lagging behind.', failText: 'Not synced yet — the audio is arriving late, so the offset needs to be negative (earlier/left) and match the 350ms gap.' },
+        ];
+        const HOWTO_RULES = {
+            offset: {op:'eq',value:-350},
+        };
+
+        function howtoApplyOp(op, actual, rule) {
+            if (op === 'eq') return Math.abs(actual - rule.value) < 0.001;
+            if (op === 'gte') return actual >= rule.value;
+            if (op === 'lte') return actual <= rule.value;
+            if (op === 'range') return actual >= rule.min && actual <= rule.max;
+            return false;
+        }
+
+        function checkHowto() {
+            let allOk = true;
+            HOWTO_FIELDS.forEach(f => {
+                const input = document.getElementById('howto_' + f.id);
+                const raw = input.value.trim();
+                const val = parseFloat(raw);
+                const rule = HOWTO_RULES[f.id];
+                const ok = raw !== '' && !isNaN(val) && howtoApplyOp(rule.op, val, rule);
+                input.classList.remove('hf-correct', 'hf-wrong');
+                input.classList.add(ok ? 'hf-correct' : 'hf-wrong');
+                const resultEl = document.getElementById('howto_result_' + f.id);
+                resultEl.className = 'hf-result ' + (ok ? 'ok' : 'fail');
+                resultEl.textContent = (ok ? '✅ ' : '❌ ') + (ok ? f.okText : f.failText);
+                if (!ok) allOk = false;
+            });
+            const banner = document.getElementById('howtoBanner');
+            banner.classList.add('show');
+            banner.className = 'howto-banner show ' + (allOk ? 'ok' : 'fail');
+            banner.textContent = allOk ? '✅ Fixed — moving the clip 350ms earlier catches the audio up to the lips, exactly like the real timeline drag.' : '❌ Not yet — the voice is lagging behind the lips, so it needs to move earlier (a negative offset) by 350ms.';
+        }
+
+        function renderHowto() {
+            const fieldsHtml = HOWTO_FIELDS.map(f => `
+                <div class="howto-field">
+                    <label for="howto_${f.id}">${f.label}</label>
+                    <div class="hf-hint">${f.hint}</div>
+                    <input type="number" step="any" id="howto_${f.id}" placeholder="${f.placeholder}">
+                    <div class="hf-result" id="howto_result_${f.id}"></div>
+                </div>`).join('');
+            document.getElementById('exerciseCard').innerHTML = `
+                <div class="howto-card">
+                    <h3>🔍 Quick How-To: Fixing a Sync Offset</h3>
+                    <p>One of the scenarios coming up asks about nudging an audio clip into sync. Here's the mechanic: zoom into the timeline and drag the audio clip left (earlier) or right (later) by the exact gap you measure (below, just type a signed number of milliseconds instead of dragging — negative moves it earlier/left, positive moves it later/right). On a new interview clip, Otieno scrubs the timeline and the interviewee's lips move a beat before any sound plays — the waveform shows the voice arriving about <strong>350ms</strong> too late. Enter the offset needed to fix it, then check your work.</p>
+                    <div class="howto-fields">${fieldsHtml}</div>
+                    <div class="howto-banner" id="howtoBanner"></div>
+                    <button class="start-quiz-btn" id="checkHowtoBtn">Check My Settings</button>
+                    <button class="start-quiz-btn" id="startQuizBtn" style="margin-left:10px;background:linear-gradient(135deg,#28a745,#1e7e34);">Start Quiz →</button>
+                </div>`;
+            document.getElementById('checkHowtoBtn').addEventListener('click', checkHowto);
+            document.getElementById('startQuizBtn').addEventListener('click', renderQuestion);
+        }
+
+        renderHowto();
+    </script>
+</body>
+</html>

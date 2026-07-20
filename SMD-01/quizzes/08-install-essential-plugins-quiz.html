@@ -1,0 +1,346 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Install Essential Plugins | MTTI Digital Marketing</title>
+    <link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Fredoka:wght@500;600&display=swap" rel="stylesheet">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Space Mono', monospace;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh; padding: 20px; color: #fff;
+        }
+        .container { max-width: 900px; margin: 0 auto; }
+        .header { text-align: center; margin-bottom: 30px; animation: slideDown 0.6s ease-out; }
+        .header .lesson-tag {
+            display: inline-block; background: rgba(255,255,255,0.2);
+            padding: 6px 16px; border-radius: 999px;
+            font-size: 0.85em; margin-bottom: 12px;
+        }
+        .header h1 {
+            font-family: 'Fredoka', sans-serif; font-size: 2.2em;
+            margin-bottom: 8px; text-shadow: 3px 3px 0 rgba(0,0,0,0.2);
+        }
+        .header p { opacity: 0.95; font-size: 0.95em; }
+        .score-board {
+            background: rgba(255,255,255,0.15); backdrop-filter: blur(10px);
+            border-radius: 20px; padding: 20px; margin-bottom: 20px;
+            display: flex; justify-content: space-around;
+            animation: fadeIn 0.8s ease-out 0.2s both;
+        }
+        .score-item { text-align: center; }
+        .score-item .label { font-size: 0.85em; opacity: 0.9; margin-bottom: 4px; }
+        .score-item .value {
+            font-size: 1.8em; font-weight: bold; font-family: 'Fredoka', sans-serif;
+        }
+        .progress-bar {
+            width: 100%; height: 8px; background: rgba(255,255,255,0.3);
+            border-radius: 10px; margin-bottom: 25px; overflow: hidden;
+        }
+        .progress-fill {
+            height: 100%; background: linear-gradient(90deg, #f093fb 0%, #f5576c 100%);
+            border-radius: 10px; transition: width 0.5s ease; width: 0%;
+        }
+        .exercise-card {
+            background: white; color: #333; border-radius: 25px;
+            padding: 35px; margin-bottom: 20px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            animation: fadeIn 0.6s ease-out both;
+        }
+        .scenario {
+            background: linear-gradient(135deg, #fff8e1 0%, #ffecb3 100%);
+            border-left: 5px solid #ffc107;
+            padding: 20px 24px; border-radius: 12px;
+            margin-bottom: 24px;
+            font-size: 0.98em; line-height: 1.55;
+        }
+        .scenario strong { color: #7a5a00; font-family: 'Fredoka', sans-serif; }
+        .question {
+            font-size: 1.15em; margin-bottom: 20px;
+            font-weight: 700; line-height: 1.4;
+        }
+        .options { display: flex; flex-direction: column; gap: 12px; }
+        .option {
+            background: #f5f7fb; border: 2px solid transparent;
+            padding: 16px 20px; border-radius: 12px;
+            cursor: pointer; transition: all 0.2s ease;
+            font-family: 'Space Mono', monospace; font-size: 0.98em; text-align: left;
+        }
+        .option:hover:not(.disabled) {
+            background: #eef1fb; border-color: #667eea; transform: translateX(4px);
+        }
+        .option.correct { background: #d4edda; border-color: #28a745; color: #155724; }
+        .option.wrong { background: #f8d7da; border-color: #dc3545; color: #721c24; animation: shake 0.4s; }
+        .option.disabled { cursor: not-allowed; opacity: 0.85; }
+        .feedback {
+            margin-top: 22px; padding: 18px 22px; border-radius: 12px;
+            animation: slideUp 0.4s ease-out;
+            font-size: 0.98em; line-height: 1.5;
+        }
+        .feedback.correct { background: #d4edda; color: #155724; border-left: 4px solid #28a745; }
+        .feedback.wrong { background: #f8d7da; color: #721c24; border-left: 4px solid #dc3545; }
+        .feedback strong { font-family: 'Fredoka', sans-serif; }
+        .next-btn, .restart-btn {
+            margin-top: 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white; border: none;
+            padding: 14px 32px; border-radius: 12px;
+            font-size: 1em; cursor: pointer;
+            font-family: 'Fredoka', sans-serif;
+            box-shadow: 0 6px 18px rgba(0,0,0,0.2);
+            transition: transform 0.2s ease;
+        }
+        .next-btn:hover, .restart-btn:hover { transform: scale(1.04); }
+        .results {
+            text-align: center; padding: 25px 15px;
+            animation: bounceIn 0.6s ease-out;
+        }
+        .results h2 {
+            font-family: 'Fredoka', sans-serif; font-size: 2em;
+            margin-bottom: 12px; color: #333;
+        }
+        .results .final-score {
+            font-size: 3em; font-family: 'Fredoka', sans-serif;
+            color: #667eea; margin: 20px 0;
+        }
+        .results p { color: #555; margin-bottom: 12px; }
+        .badge { display: inline-block; font-size: 3.5em; margin: 8px 0; }
+        @keyframes slideDown { from { opacity: 0; transform: translateY(-30px); } to { opacity: 1; transform: translateY(0); } }
+        @keyframes fadeIn { from { opacity: 0; transform: scale(0.96); } to { opacity: 1; transform: scale(1); } }
+        @keyframes slideUp { from { opacity: 0; transform: translateY(15px); } to { opacity: 1; transform: translateY(0); } }
+        @keyframes shake { 0%,100% { transform: translateX(0); } 25% { transform: translateX(-8px); } 75% { transform: translateX(8px); } }
+        @keyframes bounceIn { 0% { opacity: 0; transform: scale(0.4); } 60% { transform: scale(1.05); } 100% { opacity: 1; transform: scale(1); } }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <div class="lesson-tag">Module 8 · Lesson 8.7</div>
+            <h1>Install Essential Plugins</h1>
+            <p>10 Sarah scenarios — Contact Form 7, Yoast SEO, MonsterInsights</p>
+        </div>
+
+        <div class="score-board">
+            <div class="score-item"><div class="label">Score</div><div class="value" id="score">0</div></div>
+            <div class="score-item"><div class="label">Question</div><div class="value"><span id="current">1</span>/<span id="total">10</span></div></div>
+            <div class="score-item"><div class="label">Streak</div><div class="value" id="streak">0</div></div>
+        </div>
+
+        <div class="progress-bar"><div class="progress-fill" id="progress"></div></div>
+
+        <div class="exercise-card" id="exerciseCard"></div>
+    </div>
+
+    <script>
+        const exercises = [
+  {
+    "scenario": "Sarah has heard she can install any of 60,000+ free plugins. She is tempted to try 20 of them to see what sticks.",
+    "question": "What is the professional rule from Lesson 8.7?",
+    "options": [
+      "Install every plugin you can find — more features are always better.",
+      "Install ONLY plugins you actually use. Every plugin adds a slight slowdown and a possible security vulnerability. Delete plugins you have stopped using and update active ones at least monthly.",
+      "Never install any plugins.",
+      "Plugins can only be installed via FTP."
+    ],
+    "correct": 1,
+    "explanation": "Slide 2 lays out the plugin discipline — every plugin slows the site slightly and adds a security risk. Install only what you use, delete what you stopped using, update monthly."
+  },
+  {
+    "scenario": "Sarah asks for the three essential plugins every professional Kenyan business WordPress site needs in 2026.",
+    "question": "Which trio matches Lesson 8.7?",
+    "options": [
+      "WooCommerce, Elementor, Slider Revolution.",
+      "Contact Form 7 (contact page), Yoast SEO (search rankings), MonsterInsights (Google Analytics 4 without code).",
+      "Jetpack, Akismet, Hello Dolly.",
+      "Rank Math, Wordfence, UpdraftPlus."
+    ],
+    "correct": 1,
+    "explanation": "Slide 3 names the three essentials — Contact Form 7 (5M installs), Yoast SEO (10M installs), MonsterInsights (3M installs). Note: for a real production site you also add Security (Wordfence), Backup (UpdraftPlus), and Performance (WP Rocket), but Lesson 8.7's three are the starting set."
+  },
+  {
+    "scenario": "Sarah asks whether she needs to install Contact Form 7, Yoast, and MonsterInsights one at a time in separate sessions.",
+    "question": "What is the workflow in Lesson 8.7?",
+    "options": [
+      "Wait 24 hours between each install.",
+      "Open Plugins > Add New Plugin. Search Contact Form 7, Install, Activate. Repeat for Yoast SEO. Repeat for MonsterInsights. Total under five minutes.",
+      "Buy a hosting plan for each plugin.",
+      "Install via FTP only."
+    ],
+    "correct": 1,
+    "explanation": "Slide 4 describes the workflow — install all three in one sitting via Plugins > Add New Plugin. Total time under 5 minutes. The Plugins list will then show 5 active plugins including Akismet and Hello Dolly."
+  },
+  {
+    "scenario": "Sarah installs Contact Form 7 and sees a default form. She wants to embed it on her Contact page.",
+    "question": "What is the correct step?",
+    "options": [
+      "Rewrite the form in HTML by hand.",
+      "Copy the shortcode from the Contact menu — it looks like [contact-form-7 id=... title=...] — and paste it into the Contact page in the block editor. Send a test message to confirm the email arrives.",
+      "Email each visitor a Word document form.",
+      "Delete Contact Form 7 and use WhatsApp only."
+    ],
+    "correct": 1,
+    "explanation": "Slide 5 describes Contact Form 7 setup — copy the shortcode, paste it into the Contact page, send a test message, confirm the email arrives. Always test before assuming it works."
+  },
+  {
+    "scenario": "Sarah opens the Home page editor and sees Yoast's purple box below the content area. She wants to set the focus keyphrase, SEO title, and meta description correctly.",
+    "question": "Which set matches Lesson 8.7 for Sarah's Home page?",
+    "options": [
+      "Focus keyphrase: 'artisan lunch'. SEO title: 'Home'. Meta description: 'Welcome'.",
+      "Focus keyphrase: 'lunch delivery Eldoret'. SEO title: 'Lunch Delivery Eldoret - Karibu Kitchen' (52 chars). Meta description: 'Fresh lunch delivered to Eldoret CBD in thirty minutes. Order by twelve, eat by one.' (148 chars).",
+      "Focus keyphrase: 'food'. SEO title: 'Karibu'. Meta description: 'Food'.",
+      "Focus keyphrase: any random word. SEO title: 200 characters. Meta description: 500 characters."
+    ],
+    "correct": 1,
+    "explanation": "Slide 6 sets Sarah's Yoast fields exactly — focus keyphrase 'lunch delivery Eldoret', SEO title 52 characters (within the 60 max), meta description 148 characters (within the 140-160 sweet spot)."
+  },
+  {
+    "scenario": "Sarah is worried an SEO title of 78 characters looks fine in the editor.",
+    "question": "What is the rule?",
+    "options": [
+      "Google shows the whole title regardless of length.",
+      "SEO titles should be between about 50 and 60 characters — Google cuts off after about 60. Sarah's 78-character title will be truncated in search results.",
+      "SEO titles must be exactly 200 characters.",
+      "SEO titles cannot contain the brand name."
+    ],
+    "correct": 1,
+    "explanation": "Slide 6 says Sarah's title is 52 characters, and the guidance is 50-60 max (Google cuts off around 60). A 78-character title gets truncated with an ellipsis in the SERP."
+  },
+  {
+    "scenario": "Sarah writes a 210-character meta description because she 'wants to say more'.",
+    "question": "What is the correct length range?",
+    "options": [
+      "Exactly 500 characters.",
+      "Between 140 and 160 characters. Sarah's 210-character description will be truncated by Google in search results.",
+      "Between 5 and 20 characters.",
+      "Any length is fine."
+    ],
+    "correct": 1,
+    "explanation": "Slide 6 shows Sarah's 148-character meta description as 'just right' within the 140-160 sweet spot. Longer descriptions get truncated by Google in the search snippet."
+  },
+  {
+    "scenario": "Sarah opens Insights (MonsterInsights) and starts the setup wizard.",
+    "question": "Which sequence matches Lesson 8.7?",
+    "options": [
+      "Choose category Business Website, click Connect MonsterInsights, sign in with the same Google account, choose the Karibu Kitchen property, accept recommended settings, finish.",
+      "Enter a Kenyan ID number and pay a licence fee.",
+      "Manually paste GA4 code into every page.",
+      "Skip MonsterInsights and use Facebook Pixel instead."
+    ],
+    "correct": 0,
+    "explanation": "Slide 7 walks through the exact four-step wizard — category (Business Website), connect Google, pick the Karibu Kitchen property, accept defaults. Analytics data flows in within 24 hours."
+  },
+  {
+    "scenario": "Sarah wants to know what her completed Karibu Kitchen site actually has at the end of Module 8.",
+    "question": "Which description matches Slide 8?",
+    "options": [
+      "One Facebook page and no website.",
+      "Five pages built and published, Astra installed and customised in maroon and gold, three plugins active (Contact Form 7, Yoast SEO, MonsterInsights), a working contact form, SEO configured on every page, GA4 measuring visits, and a public URL via Studio's Share Demo Site.",
+      "A hand-coded HTML site with no plugins.",
+      "An empty WordPress install with no theme."
+    ],
+    "correct": 1,
+    "explanation": "Slide 8 lists the finished-state checklist — five pages, Astra with brand colours, three plugins, working contact form, SEO on every page, GA4 tracking, and a shareable public URL. Portfolio-quality in 4-6 hours."
+  },
+  {
+    "scenario": "Sarah's classmate installs 12 plugins in one day 'just to be safe'. Within a week the site slows to a crawl and gets a security warning.",
+    "question": "Which of the plugin rules from Slide 2 did the classmate ignore?",
+    "options": [
+      "Install ONLY plugins you actually use — every plugin slightly slows the site and adds a possible security vulnerability.",
+      "Only install plugins from paid vendors.",
+      "Install as many plugins as you can find.",
+      "Never update plugins."
+    ],
+    "correct": 0,
+    "explanation": "Slide 2 warns that every plugin slows the site slightly and adds a possible security vulnerability. The rule of thumb is to install only what you use. Twelve unresearched plugins is exactly the anti-pattern."
+  }
+];
+
+        let currentQuestion = 0, score = 0, streak = 0, answered = false;
+
+        function updateScoreboard() {
+            document.getElementById('score').textContent = score;
+            document.getElementById('current').textContent = Math.min(currentQuestion + 1, exercises.length);
+            document.getElementById('total').textContent = exercises.length;
+            document.getElementById('streak').textContent = streak;
+            document.getElementById('progress').style.width = ((currentQuestion) / exercises.length) * 100 + '%';
+        }
+
+        function escapeHtml(s) {
+            return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+        }
+
+        function renderQuestion() {
+            answered = false;
+            const q = exercises[currentQuestion];
+            let html = '';
+            if (q.scenario) {
+                html += `<div class="scenario"><strong>Scenario.</strong> ${escapeHtml(q.scenario)}</div>`;
+            }
+            html += `<div class="question">${escapeHtml(q.question)}</div>`;
+            html += '<div class="options">';
+            q.options.forEach((o, i) => {
+                html += `<button class="option" onclick="selectAnswer(${i})">${escapeHtml(o)}</button>`;
+            });
+            html += '</div>';
+            document.getElementById('exerciseCard').innerHTML = html;
+            updateScoreboard();
+        }
+
+        function selectAnswer(i) {
+            if (answered) return;
+            answered = true;
+            const q = exercises[currentQuestion];
+            const btns = document.querySelectorAll('.option');
+            btns.forEach(b => b.classList.add('disabled'));
+            btns[q.correct].classList.add('correct');
+            const right = i === q.correct;
+            if (!right) btns[i].classList.add('wrong');
+            if (right) { score += 10; streak += 1; } else { streak = 0; }
+            const fb = document.createElement('div');
+            fb.className = 'feedback ' + (right ? 'correct' : 'wrong');
+            fb.innerHTML = `<strong>${right ? '✅ Correct.' : '❌ Not quite.'}</strong><br>${escapeHtml(q.explanation)}`;
+            document.getElementById('exerciseCard').appendChild(fb);
+            const nb = document.createElement('button');
+            nb.className = 'next-btn';
+            nb.textContent = currentQuestion === exercises.length - 1 ? 'See results →' : 'Next scenario →';
+            nb.onclick = nextQuestion;
+            document.getElementById('exerciseCard').appendChild(nb);
+            updateScoreboard();
+        }
+
+        function nextQuestion() {
+            currentQuestion++;
+            if (currentQuestion >= exercises.length) return showResults();
+            renderQuestion();
+        }
+
+        function showResults() {
+            document.getElementById('progress').style.width = '100%';
+            const total = exercises.length * 10;
+            const pct = Math.round(score / total * 100);
+            if (window.parent) { window.parent.postMessage({type:"mtti_quiz_score", score: score, total: total, percent: pct}, "*"); }
+            let badge = '🌟', msg = 'Excellent work. You have a professional grasp of this lesson.';
+            if (pct < 50) { badge = '🌱'; msg = 'Good first attempt. Re-watch the lesson video and try again.'; }
+            else if (pct < 80) { badge = '📚'; msg = 'Solid progress. Review the scenarios you missed and retry.'; }
+            document.getElementById('exerciseCard').innerHTML = `
+                <div class="results">
+                    <span class="badge">${badge}</span>
+                    <h2>Quiz Complete</h2>
+                    <div class="final-score">${score} / ${total}</div>
+                    <p><strong>${pct}%</strong> · Longest streak: ${streak}</p>
+                    <p>${msg}</p>
+                    <button class="restart-btn" onclick="restart()">Try again 🔁</button>
+                </div>`;
+        }
+
+        function restart() {
+            currentQuestion = 0; score = 0; streak = 0;
+            renderQuestion();
+        }
+
+        renderQuestion();
+    </script>
+</body>
+</html>

@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>How a Computer 'Sees' an Image (Lesson) | MTTI Artificial Intelligence</title>
+<link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Fredoka:wght@500;600&display=swap" rel="stylesheet">
+<style>
+* { margin:0; padding:0; box-sizing:border-box; }
+body { font-family:'Space Mono', monospace; background:linear-gradient(135deg,#1565C0 0%,#0D47A1 100%); min-height:100vh; padding:20px; color:#fff; }
+.container { max-width:820px; margin:0 auto; }
+.header { text-align:center; margin-bottom:24px; }
+.lesson-tag { display:inline-block; background:rgba(255,255,255,0.2); padding:6px 16px; border-radius:999px; font-size:0.85em; margin-bottom:12px; }
+.header h1 { font-family:'Fredoka', sans-serif; font-size:2em; margin-bottom:6px; text-shadow:3px 3px 0 rgba(0,0,0,0.2); }
+.card { background:#fff; color:#333; border-radius:22px; padding:32px; margin-bottom:20px; box-shadow:0 20px 60px rgba(0,0,0,0.3); }
+.section { margin-bottom:26px; }
+.section:last-child { margin-bottom:0; }
+.section h2 { font-family:'Fredoka', sans-serif; font-size:1.2em; margin-bottom:10px; color:#0D47A1; }
+.section .body { line-height:1.65; font-size:0.98em; }
+.section .body p { margin-bottom:10px; }
+.section .body code { background:#f5f7fb; padding:2px 6px; border-radius:4px; font-size:0.92em; }
+.keypoint { background:#fff8e1; border-left:4px solid #ffc107; padding:12px 16px; border-radius:8px; margin-top:12px; font-size:0.92em; }
+</style>
+</head>
+<body>
+<div class="container">
+<div class="header"><div class="lesson-tag">Module 5 · Lesson 5.1</div><h1>How a Computer 'Sees' an Image</h1></div>
+<div class="card">
+<div class="section"><h2>A Picture Is Really Just Numbers</h2><div class="body"><p>When Brian, a junior analyst at Rafiki Insights in Eldoret, opens a photo on his laptop, he sees a shopfront, a face, or a number plate. The computer never sees any of that. It only sees a grid of tiny squares called <code>pixels</code>, and every single pixel is stored as a number (or a small set of numbers for colour: one each for red, green and blue, usually from 0 to 255).</p><p>A small black-and-white photo might be a grid of, say, 100 rows by 100 columns — 10,000 numbers in total, each one saying "how bright is this exact spot." A colour photo is the same idea, just with three numbers per pixel instead of one. Zoom in far enough on any digital photo and this is exactly what you would find: a mosaic of numeric values, nothing more.</p></div></div>
+<div class="section"><h2>Looking for Patterns, Not "Seeing" Like a Person</h2><div class="body"><p>Because all a computer vision system has to work with is this grid of numbers, it cannot "recognise" a car the way a human instantly does. Instead, it looks for mathematical patterns in how those numbers change across the grid: a sudden jump in brightness between neighbouring pixels usually marks an <code>edge</code> (like the outline of a number plate against a car bumper); a cluster of similarly-coloured pixels might form a <code>shape</code> (like a rectangle); and combinations of edges and shapes can be matched against patterns the system has learned before.</p><p>This is why a computer vision tool can be confused by things a person would never be confused by — a photo taken in low light, at a strange angle, or with something partly blocking the object — because those situations change the numbers in ways that no longer match the patterns it expects.</p></div>
+<div class="keypoint"><strong>Key Point.</strong> A computer vision system does not "see" a scene — it processes a grid of pixel numbers, hunting for edges, shapes and patterns in that grid. Everything else (recognising a number plate, a face, a product) is built on top of this basic numeric view.</div></div>
+<div class="section"><h2>From Pixels to Meaning</h2><div class="body"><p>On its own, a single pixel value tells you almost nothing. It is only when thousands of pixel values are looked at together — where the edges are, how they connect into shapes, how those shapes are arranged — that a computer vision system can start producing something useful: "this looks like a number plate," or "this looks like a gap on a shelf." Every computer vision task Brian will meet in later lessons, from simple classification to full object detection, starts from exactly this same numeric grid.</p></div></div>
+</div>
+</div>
+</body>
+</html>

@@ -37,7 +37,25 @@
         .results .final-score { font-size: 3em; font-family: 'Fredoka', sans-serif; color: #667eea; margin: 20px 0; }
         .results p { color: #555; margin-bottom: 12px; }
         .badge { display: inline-block; font-size: 3.5em; margin: 8px 0; }
-    </style>
+
+        /* How-To intro screen — shown before question 1, not scored */
+        .howto-card { background: white; color: #333; border-radius: 25px; padding: 35px; margin-bottom: 20px; box-shadow: 0 20px 60px rgba(0,0,0,0.3); }
+        .howto-card h3 { font-family: 'Fredoka', sans-serif; font-size: 1.3em; margin-bottom: 12px; color: #667eea; }
+        .howto-card p { line-height: 1.6; margin-bottom: 16px; color: #444; }
+        .howto-fields { display: flex; flex-direction: column; gap: 14px; margin-bottom: 18px; }
+        .howto-field { background: #f5f7fb; border-radius: 12px; padding: 14px 18px; border: 2px solid transparent; }
+        .howto-field label { display: block; font-weight: 700; margin-bottom: 8px; color: #333; }
+        .howto-field select, .howto-field input[type="text"] { width: 100%; padding: 10px 12px; border-radius: 8px; border: 2px solid #ccd3e0; font-family: 'Space Mono', monospace; font-size: 0.95em; background: #fff; }
+        .howto-field .hf-result { margin-top: 8px; font-size: 0.85em; font-weight: 700; display: none; }
+        .howto-field.hf-pass { border-color: #28a745; }
+        .howto-field.hf-pass .hf-result { display: block; color: #155724; }
+        .howto-field.hf-fail { border-color: #dc3545; }
+        .howto-field.hf-fail .hf-result { display: block; color: #721c24; }
+        .howto-banner { margin-top: 4px; margin-bottom: 18px; padding: 12px 16px; border-radius: 10px; font-size: 0.9em; font-weight: 700; display: none; }
+        .howto-banner.show { display: block; }
+        .howto-banner.ok { background: #d4edda; color: #155724; }
+        .howto-banner.fail { background: #f8d7da; color: #721c24; }
+        .start-quiz-btn { margin-top: 4px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; border: none; padding: 14px 32px; border-radius: 12px; font-size: 1em; cursor: pointer; font-family: 'Fredoka', sans-serif; box-shadow: 0 6px 18px rgba(0,0,0,0.2); }    </style>
 </head>
 <body>
     <div class="container">
@@ -117,7 +135,73 @@
                 </div>`;
         }
         function restart() { currentQuestion = 0; score = 0; streak = 0; renderQuestion(); }
-        renderQuestion();
+        /* How-To intro — a small, ungraded field-check demo shown before the
+           quiz starts, directly rehearsing the "use Save As with a new file
+           name, without overwriting the original" mechanic that one of the
+           quiz scenarios asks about, so it's not being asked cold. */
+        const HOWTO_FIELDS = [
+            { id: 'howtoCmd', type: 'select', label: "Which command should Kevin use to start next month's list from this month's file?", options: [ { value: '', text: 'Choose a command...' }, { value: 'ctrls', text: 'Ctrl+S (Save)' }, { value: 'saveas', text: 'File > Save As' } ], op: 'eq', target: 'saveas' },
+            { id: 'howtoName', type: 'text', label: 'New file name to type in the Save As box', placeholder: 'e.g. July-PriceList', op: 'diff', target: 'june-pricelist' },
+        ];
+
+        function escHtmlH(s) { return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+
+        function applyOp(op, value, target) {
+            if (op === 'eq') return value === target;
+            if (op === 'diff') return value.trim() !== '' && value.trim().toLowerCase() !== target;
+            return false;
+        }
+
+        function renderHowtoFields() {
+            document.getElementById('howtoFields').innerHTML = HOWTO_FIELDS.map(f => {
+                let control = '';
+                if (f.type === 'select') {
+                    control = `<select id="${f.id}">${f.options.map(o => `<option value="${escHtmlH(o.value)}">${escHtmlH(o.text)}</option>`).join('')}</select>`;
+                } else {
+                    control = `<input type="text" id="${f.id}" placeholder="${escHtmlH(f.placeholder || '')}">`;
+                }
+                return `<div class="howto-field" id="wrap-${f.id}">
+                    <label for="${f.id}">${escHtmlH(f.label)}</label>
+                    ${control}
+                    <div class="hf-result" id="res-${f.id}"></div>
+                </div>`;
+            }).join('');
+        }
+
+        function checkHowtoFields() {
+            let allOk = true;
+            HOWTO_FIELDS.forEach(f => {
+                const el = document.getElementById(f.id);
+                const value = el.value;
+                const ok = applyOp(f.op, value, f.target);
+                if (!ok) allOk = false;
+                const wrap = document.getElementById('wrap-' + f.id);
+                wrap.className = 'howto-field ' + (ok ? 'hf-pass' : 'hf-fail');
+                document.getElementById('res-' + f.id).textContent = ok ? "Correct." : "Try again.";
+            });
+            const banner = document.getElementById('howtoBanner');
+            banner.classList.add('show');
+            banner.className = 'howto-banner show ' + (allOk ? 'ok' : 'fail');
+            banner.textContent = allOk
+                ? "That's exactly it -- Save As with a new name keeps this month's file untouched."
+                : "Not quite yet -- pick Save As, and type a file name different from this month's.";
+        }
+
+        function renderHowto() {
+            document.getElementById('exerciseCard').innerHTML = `
+                <div class="howto-card">
+                    <h3>&#128269; Quick How-To: Save As Without Overwriting</h3>
+                    <p>One of the scenarios coming up asks about this exact situation: Brenda wants next month's price list to start from this month's file, without overwriting it. Here's the fix -- open File &gt; Save As, then type a new file name before saving. Try it below with this month's price list, then check your work.</p>
+                    <div class="howto-fields" id="howtoFields"></div>
+                    <div class="howto-banner" id="howtoBanner"></div>
+                    <button class="start-quiz-btn" id="checkHowtoBtn">Check My Save As</button>
+                    <button class="start-quiz-btn" id="startQuizBtn" style="margin-left:10px;background:linear-gradient(135deg,#28a745,#1e7e34);">Start Quiz &rarr;</button>
+                </div>`;
+            renderHowtoFields();
+            document.getElementById('checkHowtoBtn').addEventListener('click', checkHowtoFields);
+            document.getElementById('startQuizBtn').addEventListener('click', renderQuestion);
+        }
+        renderHowto();
     </script>
 </body>
 </html>

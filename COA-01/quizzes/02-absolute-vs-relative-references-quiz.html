@@ -37,6 +37,24 @@
         .results .final-score { font-size: 3em; font-family: 'Fredoka', sans-serif; color: #667eea; margin: 20px 0; }
         .results p { color: #555; margin-bottom: 12px; }
         .badge { display: inline-block; font-size: 3.5em; margin: 8px 0; }
+    
+        /* How-To intro screen — shown before question 1, not scored */
+        .howto-card { background: white; color: #333; border-radius: 25px; padding: 35px; margin-bottom: 20px; box-shadow: 0 20px 60px rgba(0,0,0,0.3); }
+        .howto-card h3 { font-family: 'Fredoka', sans-serif; font-size: 1.3em; margin-bottom: 12px; color: #667eea; }
+        .howto-card p { line-height: 1.6; margin-bottom: 16px; color: #444; }
+        .howto-fields { display: flex; flex-direction: column; gap: 16px; margin-bottom: 18px; }
+        .howto-field { background: #f5f7fb; border-radius: 12px; padding: 16px 18px; }
+        .howto-field label { display: block; font-weight: 700; margin-bottom: 8px; color: #333; line-height: 1.4; }
+        .howto-field select, .howto-field input[type="text"] { width: 100%; padding: 10px 12px; border-radius: 8px; border: 2px solid #ddd; font-family: 'Space Mono', monospace; font-size: 0.95em; background: #fff; color: #333; }
+        .howto-field .hc-check-row { display: flex; align-items: center; gap: 10px; }
+        .howto-field .hc-check-row input[type="checkbox"] { width: 20px; height: 20px; }
+        .howto-field.hc-correct { outline: 3px solid #28a745; }
+        .howto-field.hc-wrong { outline: 3px solid #dc3545; }
+        .howto-banner { margin-top: 4px; margin-bottom: 18px; padding: 12px 16px; border-radius: 10px; font-size: 0.9em; font-weight: 700; display: none; }
+        .howto-banner.show { display: block; }
+        .howto-banner.ok { background: #d4edda; color: #155724; }
+        .howto-banner.fail { background: #f8d7da; color: #721c24; }
+        .start-quiz-btn { margin-top: 4px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; border: none; padding: 14px 32px; border-radius: 12px; font-size: 1em; cursor: pointer; font-family: 'Fredoka', sans-serif; box-shadow: 0 6px 18px rgba(0,0,0,0.2); }
     </style>
 </head>
 <body>
@@ -117,7 +135,74 @@
                 </div>`;
         }
         function restart() { currentQuestion = 0; score = 0; streak = 0; renderQuestion(); }
-        renderQuestion();
+        const HOWTO_TITLE = 'Quick How-To: Locking a Reference';
+        const HOWTO_INTRO = 'Two of the scenarios coming up are about exactly this: Brenda has a single tax-rate cell (B2) that a formula must reference, and that reference must never shift no matter where the formula is copied. Pick the correct way to write that reference, then pick the key that helps type it quickly, and check your work.';
+        const HOWTO_CHECK_LABEL = 'Check My Reference';
+        const HOWTO_OK_MSG = 'Correct — dollar signs on both the column and the row lock a reference completely, and F4 is the shortcut that cycles through those forms while typing a formula.';
+        const HOWTO_FAIL_MSG = 'Not yet — a reference that must never move needs dollar signs on both the column and the row, and there is a single function key that toggles reference types.';
+        const HOWTO_FIELDS = [
+            { id: 'howtoRefFormat', kind: 'select', label: 'The tax-rate cell is B2. A formula will be copied down many rows, and the tax-rate reference must never shift. How should B2 be written inside that formula?', options: [
+                { value: '', label: 'Choose a reference format...' },
+                { value: 'B2', label: 'B2' },
+                { value: '$B$2', label: '$B$2' },
+                { value: 'B$2', label: 'B$2' },
+                { value: '$B2', label: '$B2' }
+            ], rule: { op: 'eq', target: '$B$2' } },
+            { id: 'howtoRefKey', kind: 'select', label: 'Kevin wants to add those dollar signs quickly while typing the formula, instead of typing each $ by hand. Which key cycles a selected reference through its relative, absolute, and mixed forms?', options: [
+                { value: '', label: 'Choose a key...' },
+                { value: 'F1', label: 'F1' },
+                { value: 'F4', label: 'F4' },
+                { value: 'CtrlZ', label: 'Ctrl+Z' },
+                { value: 'Tab', label: 'Tab' }
+            ], rule: { op: 'eq', target: 'F4' } }
+        ];
+        function escHtmlH(s) { return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+        function applyOp(op, val, target) {
+            if (op === 'eq') return val === target;
+            if (op === 'checked') return val === true;
+            return false;
+        }
+        function renderHowtoFields(marks) {
+            document.getElementById('howtoFields').innerHTML = HOWTO_FIELDS.map((f, i) => {
+                const cls = marks ? (marks[i] ? 'hc-correct' : 'hc-wrong') : '';
+                let control = '';
+                if (f.kind === 'select') {
+                    control = `<select id="${f.id}">` + f.options.map(o => `<option value="${escHtmlH(o.value)}">${escHtmlH(o.label)}</option>`).join('') + `</select>`;
+                } else if (f.kind === 'checkbox') {
+                    control = `<div class="hc-check-row"><input type="checkbox" id="${f.id}"><span>${escHtmlH(f.checkboxLabel)}</span></div>`;
+                }
+                return `<div class="howto-field ${cls}"><label>${escHtmlH(f.label)}</label>${control}</div>`;
+            }).join('');
+        }
+        function checkHowto() {
+            const marks = HOWTO_FIELDS.map(f => {
+                const el = document.getElementById(f.id);
+                const val = f.kind === 'checkbox' ? el.checked : el.value;
+                return applyOp(f.rule.op, val, f.rule.target);
+            });
+            renderHowtoFields(marks);
+            const allOk = marks.every(m => m);
+            const banner = document.getElementById('howtoBanner');
+            banner.classList.add('show');
+            banner.className = 'howto-banner show ' + (allOk ? 'ok' : 'fail');
+            banner.textContent = allOk ? HOWTO_OK_MSG : HOWTO_FAIL_MSG;
+        }
+        function renderHowto() {
+            document.getElementById('exerciseCard').innerHTML = `
+                <div class="howto-card">
+                    <h3>${HOWTO_TITLE}</h3>
+                    <p>${HOWTO_INTRO}</p>
+                    <div class="howto-fields" id="howtoFields"></div>
+                    <div class="howto-banner" id="howtoBanner"></div>
+                    <button class="start-quiz-btn" id="checkHowtoBtn">${HOWTO_CHECK_LABEL}</button>
+                    <button class="start-quiz-btn" id="startQuizBtn" style="margin-left:10px;background:linear-gradient(135deg,#28a745,#1e7e34);">Start Quiz &rarr;</button>
+                </div>`;
+            renderHowtoFields();
+            document.getElementById('checkHowtoBtn').addEventListener('click', checkHowto);
+            document.getElementById('startQuizBtn').addEventListener('click', renderQuestion);
+        }
+
+        renderHowto();
     </script>
 </body>
 </html>

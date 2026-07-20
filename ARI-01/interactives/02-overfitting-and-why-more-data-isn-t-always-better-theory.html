@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Overfitting and Why More Data Isn't Always Better (Lesson) | MTTI Artificial Intelligence</title>
+<link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Fredoka:wght@500;600&display=swap" rel="stylesheet">
+<style>
+* { margin:0; padding:0; box-sizing:border-box; }
+body { font-family:'Space Mono', monospace; background:linear-gradient(135deg,#311B92 0%,#0288D1 100%); min-height:100vh; padding:20px; color:#fff; }
+.container { max-width:820px; margin:0 auto; }
+.header { text-align:center; margin-bottom:24px; }
+.lesson-tag { display:inline-block; background:rgba(255,255,255,0.2); padding:6px 16px; border-radius:999px; font-size:0.85em; margin-bottom:12px; }
+.header h1 { font-family:'Fredoka', sans-serif; font-size:2em; margin-bottom:6px; text-shadow:3px 3px 0 rgba(0,0,0,0.2); }
+.card { background:#fff; color:#333; border-radius:22px; padding:32px; margin-bottom:20px; box-shadow:0 20px 60px rgba(0,0,0,0.3); }
+.section { margin-bottom:26px; }
+.section:last-child { margin-bottom:0; }
+.section h2 { font-family:'Fredoka', sans-serif; font-size:1.2em; margin-bottom:10px; color:#0288D1; }
+.section .body { line-height:1.65; font-size:0.98em; }
+.section .body p { margin-bottom:10px; }
+.section .body code { background:#f5f7fb; padding:2px 6px; border-radius:4px; font-size:0.92em; }
+.keypoint { background:#fff8e1; border-left:4px solid #ffc107; padding:12px 16px; border-radius:8px; margin-top:12px; font-size:0.92em; }
+</style>
+</head>
+<body>
+<div class="container">
+<div class="header"><div class="lesson-tag">Module 2 · Topic 2.3</div><h1>Overfitting and Why More Data Isn't Always Better</h1></div>
+<div class="card"><div class="section"><h2>What Overfitting Looks Like</h2><div class="body"><p><strong>Overfitting</strong> happens when a model learns the training data too closely — memorizing its specific quirks and coincidences rather than the genuine underlying pattern. It is similar to a student who memorizes the exact answers to last year's exam questions word for word, instead of understanding the underlying topic: that student will score perfectly if the exact same questions repeat, but will struggle the moment the questions change even slightly. Brian once built an overly complex model using only six months of sales data from a single Rafiki Insights client, a bakery, and it fit every tiny fluctuation in that specific dataset almost perfectly.</p></div></div><div class="section"><h2>Why an Overfit Model Fails in the Real World</h2><div class="body"><p>The real test of a model is not how well it explains the data it was trained on, but how well it performs on new data it has never seen. An overfit model has learned noise and coincidences specific to its training set, rather than the genuine, general relationship between features and outcomes. When Brian later tested his bakery model against a different bakery client's sales, it performed poorly — the patterns it had "learned" were really just quirks of the first bakery's specific data, not something that generalized.</p></div><div class="keypoint"><strong>Key Point.</strong> A model's real test is not how well it explains the data it was trained on — it is how well it predicts data it has never seen before. Diverse, accurate data usually beats raw volume for building a model that generalizes.</div></div><div class="section"><h2>Quality and Diversity Beat Raw Volume</h2><div class="body"><p>A natural instinct is to fix a struggling model by feeding it more data. But if that additional data is simply more of the same narrow slice — for example, more months from that same single bakery — it will not fix overfitting, because it still fails to represent the variety of situations the model will actually face. What helps far more is diverse, representative, and accurate data: examples covering different clients, different seasons, and different circumstances. A smaller but genuinely diverse and clean dataset will often produce a more reliable model than a huge but narrow, repetitive one.</p></div></div></div>
+</div>
+</body>
+</html>

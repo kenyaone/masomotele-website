@@ -1,0 +1,346 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Trend-jacking + the 3-Second Hook | MTTI Digital Marketing</title>
+    <link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Fredoka:wght@500;600&display=swap" rel="stylesheet">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Space Mono', monospace;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh; padding: 20px; color: #fff;
+        }
+        .container { max-width: 900px; margin: 0 auto; }
+        .header { text-align: center; margin-bottom: 30px; animation: slideDown 0.6s ease-out; }
+        .header .lesson-tag {
+            display: inline-block; background: rgba(255,255,255,0.2);
+            padding: 6px 16px; border-radius: 999px;
+            font-size: 0.85em; margin-bottom: 12px;
+        }
+        .header h1 {
+            font-family: 'Fredoka', sans-serif; font-size: 2.2em;
+            margin-bottom: 8px; text-shadow: 3px 3px 0 rgba(0,0,0,0.2);
+        }
+        .header p { opacity: 0.95; font-size: 0.95em; }
+        .score-board {
+            background: rgba(255,255,255,0.15); backdrop-filter: blur(10px);
+            border-radius: 20px; padding: 20px; margin-bottom: 20px;
+            display: flex; justify-content: space-around;
+            animation: fadeIn 0.8s ease-out 0.2s both;
+        }
+        .score-item { text-align: center; }
+        .score-item .label { font-size: 0.85em; opacity: 0.9; margin-bottom: 4px; }
+        .score-item .value {
+            font-size: 1.8em; font-weight: bold; font-family: 'Fredoka', sans-serif;
+        }
+        .progress-bar {
+            width: 100%; height: 8px; background: rgba(255,255,255,0.3);
+            border-radius: 10px; margin-bottom: 25px; overflow: hidden;
+        }
+        .progress-fill {
+            height: 100%; background: linear-gradient(90deg, #f093fb 0%, #f5576c 100%);
+            border-radius: 10px; transition: width 0.5s ease; width: 0%;
+        }
+        .exercise-card {
+            background: white; color: #333; border-radius: 25px;
+            padding: 35px; margin-bottom: 20px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            animation: fadeIn 0.6s ease-out both;
+        }
+        .scenario {
+            background: linear-gradient(135deg, #fff8e1 0%, #ffecb3 100%);
+            border-left: 5px solid #ffc107;
+            padding: 20px 24px; border-radius: 12px;
+            margin-bottom: 24px;
+            font-size: 0.98em; line-height: 1.55;
+        }
+        .scenario strong { color: #7a5a00; font-family: 'Fredoka', sans-serif; }
+        .question {
+            font-size: 1.15em; margin-bottom: 20px;
+            font-weight: 700; line-height: 1.4;
+        }
+        .options { display: flex; flex-direction: column; gap: 12px; }
+        .option {
+            background: #f5f7fb; border: 2px solid transparent;
+            padding: 16px 20px; border-radius: 12px;
+            cursor: pointer; transition: all 0.2s ease;
+            font-family: 'Space Mono', monospace; font-size: 0.98em; text-align: left;
+        }
+        .option:hover:not(.disabled) {
+            background: #eef1fb; border-color: #667eea; transform: translateX(4px);
+        }
+        .option.correct { background: #d4edda; border-color: #28a745; color: #155724; }
+        .option.wrong { background: #f8d7da; border-color: #dc3545; color: #721c24; animation: shake 0.4s; }
+        .option.disabled { cursor: not-allowed; opacity: 0.85; }
+        .feedback {
+            margin-top: 22px; padding: 18px 22px; border-radius: 12px;
+            animation: slideUp 0.4s ease-out;
+            font-size: 0.98em; line-height: 1.5;
+        }
+        .feedback.correct { background: #d4edda; color: #155724; border-left: 4px solid #28a745; }
+        .feedback.wrong { background: #f8d7da; color: #721c24; border-left: 4px solid #dc3545; }
+        .feedback strong { font-family: 'Fredoka', sans-serif; }
+        .next-btn, .restart-btn {
+            margin-top: 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white; border: none;
+            padding: 14px 32px; border-radius: 12px;
+            font-size: 1em; cursor: pointer;
+            font-family: 'Fredoka', sans-serif;
+            box-shadow: 0 6px 18px rgba(0,0,0,0.2);
+            transition: transform 0.2s ease;
+        }
+        .next-btn:hover, .restart-btn:hover { transform: scale(1.04); }
+        .results {
+            text-align: center; padding: 25px 15px;
+            animation: bounceIn 0.6s ease-out;
+        }
+        .results h2 {
+            font-family: 'Fredoka', sans-serif; font-size: 2em;
+            margin-bottom: 12px; color: #333;
+        }
+        .results .final-score {
+            font-size: 3em; font-family: 'Fredoka', sans-serif;
+            color: #667eea; margin: 20px 0;
+        }
+        .results p { color: #555; margin-bottom: 12px; }
+        .badge { display: inline-block; font-size: 3.5em; margin: 8px 0; }
+        @keyframes slideDown { from { opacity: 0; transform: translateY(-30px); } to { opacity: 1; transform: translateY(0); } }
+        @keyframes fadeIn { from { opacity: 0; transform: scale(0.96); } to { opacity: 1; transform: scale(1); } }
+        @keyframes slideUp { from { opacity: 0; transform: translateY(15px); } to { opacity: 1; transform: translateY(0); } }
+        @keyframes shake { 0%,100% { transform: translateX(0); } 25% { transform: translateX(-8px); } 75% { transform: translateX(8px); } }
+        @keyframes bounceIn { 0% { opacity: 0; transform: scale(0.4); } 60% { transform: scale(1.05); } 100% { opacity: 1; transform: scale(1); } }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <div class="lesson-tag">Module 12 · Lesson 12.4</div>
+            <h1>Trend-jacking + the 3-Second Hook</h1>
+            <p>10 Brian Otieno scenarios (Sarah cameo) — Creative Center, trend-jacking, hooks, arcs</p>
+        </div>
+
+        <div class="score-board">
+            <div class="score-item"><div class="label">Score</div><div class="value" id="score">0</div></div>
+            <div class="score-item"><div class="label">Question</div><div class="value"><span id="current">1</span>/<span id="total">10</span></div></div>
+            <div class="score-item"><div class="label">Streak</div><div class="value" id="streak">0</div></div>
+        </div>
+
+        <div class="progress-bar"><div class="progress-fill" id="progress"></div></div>
+
+        <div class="exercise-card" id="exerciseCard"></div>
+    </div>
+
+    <script>
+        const exercises = [
+  {
+    "scenario": "Brian scrolls his TikTok For You feed to find what is trending in fitness this week. His feed is 60% cars and 40% fitness because that is what HE watches.",
+    "question": "Why is the For You feed a poor trend-research tool, and what should he use instead?",
+    "options": [
+      "For You is perfect — every professional uses it exclusively.",
+      "For You is personalised to Brian's own watch history — biased and non-representative. The professional source is TikTok Creative Center at ads.tiktok.com/business/creativecenter — a neutral, Kenya-filterable, daily-updated trend intelligence platform for advertisers.",
+      "He should use Instagram Reels instead.",
+      "He should ask his followers on WhatsApp."
+    ],
+    "correct": 1,
+    "explanation": "Slide 2 of §12.4 explains the three windows: For You (personal, biased), Discovery (neutral but shallow), and Creative Center (professional, filterable). Amateurs stop at For You. Professionals plan Sundays in Creative Center."
+  },
+  {
+    "scenario": "Brian opens TikTok Creative Center for the first time. He is overwhelmed and clicks around randomly.",
+    "question": "Which three tabs should he master?",
+    "options": [
+      "Ads · Billing · Settings.",
+      "Trends (songs · hashtags · creators · videos), Inspiration (top-performing ads by objective), and Insights (audience data by country, age, interest).",
+      "Chat · Notifications · Messages.",
+      "Music · Filters · Effects only."
+    ],
+    "correct": 1,
+    "explanation": "Slide 3 of §12.4 lists the three tabs: Trends for what is rising, Inspiration for top-performing ads to study, Insights for audience data. These three tabs are TikTok's own trend intelligence for advertisers."
+  },
+  {
+    "scenario": "Brian sees a trending Kenyan sound viral for \"when your matatu tout gives you exact change\". He decides to trend-jack it. He uploads a still photo of a Chapa Fitness shorts pack with the Chapa Fitness logo pasted over the sound.",
+    "question": "What is the mistake, and what would proper trend-jacking look like?",
+    "options": [
+      "No mistake — logos on sounds always work.",
+      "Real trend-jacking is a TWO-STEP SWAP: preserve the format (sound + rhythm + transitions) and swap only the context. Brian should keep the sound and the surprise-reveal timing, and swap the matatu-tout context for \"when you find shorts that survive leg-day AND a matatu ride\". Same sound, same beats, Chapa Fitness context.",
+      "He should have used his personal photo.",
+      "He should have played the sound backwards."
+    ],
+    "correct": 1,
+    "explanation": "Slide 4 of §12.4 defines real trend-jacking: preserve the format, swap the context. A logo over a trending sound is a corporate ad in a costume — viewers smell it and swipe. The whole point is native-ness."
+  },
+  {
+    "scenario": "Brian is writing the opening line for a new Chapa Fitness video. TikTok users swipe away in under three seconds if the hook does not land.",
+    "question": "Which set of hook types should he choose from?",
+    "options": [
+      "Weather, sports scores, greeting, and thanks.",
+      "The four hook types from Slide 5: the question, the contradiction, the stakes, and the curiosity gap.",
+      "The single \"corporate greeting\" hook.",
+      "TikTok does not need hooks — videos always play to the end."
+    ],
+    "correct": 1,
+    "explanation": "Slide 5 of §12.4 gives the four hook types every Chapa Fitness video should be built on. Each is a promise the rest of the video must keep. Miss the hook = ad dies in 3 seconds."
+  },
+  {
+    "scenario": "Brian films a 30-second Chapa Fitness video. He needs a structure that keeps viewers to the CTA at the end.",
+    "question": "What is the professional 30-second arc?",
+    "options": [
+      "30 seconds of logo animations.",
+      "0-3s hook → 3-15s product story → 15-25s proof (testimonial or before/after) → 25-30s on-screen CTA.",
+      "0-25s corporate intro → 25-30s product mention.",
+      "30 seconds of the CEO speaking to camera."
+    ],
+    "correct": 1,
+    "explanation": "Slide 6 of §12.4 gives the 30-second arc. Structure keeps videos from wandering; wandering videos lose retention; lost retention kills reach. This is the professional's default template."
+  },
+  {
+    "scenario": "Brian films his video with the trending sound as the primary track and Chapa Fitness voiceover on top. He is unsure whether to also add on-screen captions.",
+    "question": "What is the correct choice?",
+    "options": [
+      "No captions — TikTok's auto-captions handle everything.",
+      "Yes, burn in on-brand captions using CapCut or similar. Auto-captions are inconsistent in wording, timing, and style. Burnt-in captions match Brian's brand font, colour, and timing every time — and cover the placements that auto-mute videos.",
+      "Captions only in Kiswahili.",
+      "Voiceover only — captions look cheap."
+    ],
+    "correct": 1,
+    "explanation": "Slide 7 of §12.4 covers sound-on with burnt-in captions. 88% watch with sound but some placements auto-mute. Burnt-in captions ensure consistent branding and accessibility on every impression."
+  },
+  {
+    "scenario": "Sarah of Karibu Kitchen (a lunch delivery kitchen in Kapsoya, Eldoret) asks Brian whether trend-jacking on TikTok can work for her non-fashion, food business.",
+    "question": "How should Brian answer, using the cameo example?",
+    "options": [
+      "Trend-jacking is only for fashion brands like Chapa Fitness — food cannot join.",
+      "Yes. Sarah trend-jacked an outfit-reveal transition sound and swapped it for a menu reveal — three transitions on the sound, each showing a different plate, then WhatsApp screenshots as proof, ending with a CTA. 52,000 organic views. Any small business willing to sit in Creative Center for 30 minutes on a Sunday can do it.",
+      "Only if she opens a fashion line first.",
+      "Sarah should quit TikTok."
+    ],
+    "correct": 1,
+    "explanation": "Slide 8 of §12.4 is the Sarah cameo. The rule of trend-jacking is preserve format, swap context — Karibu Kitchen's plates fit an outfit-reveal transition just as well as an outfit does. Different industry, same mechanic."
+  },
+  {
+    "scenario": "Brian's Spark Ad candidate video has a 0-3-second hook of \"Welcome to Chapa Fitness, we make training gear\".",
+    "question": "What is wrong, and what would a stronger hook be?",
+    "options": [
+      "Nothing wrong — always introduce the brand first.",
+      "This is a corporate intro, not a hook. It makes no promise, creates no curiosity, sets no stakes. Replace with one of the four hook types — e.g. the question: \"Why do most training shorts rip in 3 weeks?\" — which promises information the viewer must stay for.",
+      "The hook is fine — add more logo animations.",
+      "Replace with a company mission statement."
+    ],
+    "correct": 1,
+    "explanation": "Slide 5 of §12.4 explains hooks as promises. Corporate intros make no promise and give viewers nothing to stay for. The question hook (or contradiction, stakes, curiosity gap) creates a specific reason to keep watching."
+  },
+  {
+    "scenario": "Brian and Sarah both use TikTok Creative Center. Brian checks a trend on Friday night and posts on Sunday. Sarah checks the same trend on Sunday evening.",
+    "question": "What is the professional planning cadence the lesson recommends?",
+    "options": [
+      "Once per quarter is fine.",
+      "A Sunday-evening planning session in Creative Center — 30 minutes to scan trending sounds and hashtags, identify what fits the brand, and storyboard for the week. Do it every week — trends age in days.",
+      "Only during Kenyan public holidays.",
+      "Trend-planning is for agencies only."
+    ],
+    "correct": 1,
+    "explanation": "Slide 2 and Slide 3 of §12.4 both call out Sunday-evening Creative Center sessions as the professional cadence. TikTok trends age in days, not weeks. A weekly rhythm keeps the content pipeline fresh."
+  },
+  {
+    "scenario": "A trainee summarises Lesson 12.4 in one line: \"The For You feed is the best trend research tool, trend-jacking is putting your logo on any trending sound, and there is only one hook type — the greeting.\"",
+    "question": "How many of those three claims are correct?",
+    "options": [
+      "All three.",
+      "Two — the trend-jacking and hook parts.",
+      "Zero — every claim is wrong.",
+      "One — only the greeting-hook part."
+    ],
+    "correct": 2,
+    "explanation": "Every claim is wrong. The professional trend source is CREATIVE CENTER, not For You (Slide 2). Trend-jacking is preserve format + swap context, NOT logo-on-trending-sound (Slide 4). And there are FOUR hook types — question, contradiction, stakes, curiosity gap — none of them is \"greeting\" (Slide 5)."
+  }
+];
+
+        let currentQuestion = 0, score = 0, streak = 0, answered = false;
+
+        function updateScoreboard() {
+            document.getElementById('score').textContent = score;
+            document.getElementById('current').textContent = Math.min(currentQuestion + 1, exercises.length);
+            document.getElementById('total').textContent = exercises.length;
+            document.getElementById('streak').textContent = streak;
+            document.getElementById('progress').style.width = ((currentQuestion) / exercises.length) * 100 + '%';
+        }
+
+        function escapeHtml(s) {
+            return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+        }
+
+        function renderQuestion() {
+            answered = false;
+            const q = exercises[currentQuestion];
+            let html = '';
+            if (q.scenario) {
+                html += `<div class="scenario"><strong>Scenario.</strong> ${escapeHtml(q.scenario)}</div>`;
+            }
+            html += `<div class="question">${escapeHtml(q.question)}</div>`;
+            html += '<div class="options">';
+            q.options.forEach((o, i) => {
+                html += `<button class="option" onclick="selectAnswer(${i})">${escapeHtml(o)}</button>`;
+            });
+            html += '</div>';
+            document.getElementById('exerciseCard').innerHTML = html;
+            updateScoreboard();
+        }
+
+        function selectAnswer(i) {
+            if (answered) return;
+            answered = true;
+            const q = exercises[currentQuestion];
+            const btns = document.querySelectorAll('.option');
+            btns.forEach(b => b.classList.add('disabled'));
+            btns[q.correct].classList.add('correct');
+            const right = i === q.correct;
+            if (!right) btns[i].classList.add('wrong');
+            if (right) { score += 10; streak += 1; } else { streak = 0; }
+            const fb = document.createElement('div');
+            fb.className = 'feedback ' + (right ? 'correct' : 'wrong');
+            fb.innerHTML = `<strong>${right ? '✅ Correct.' : '❌ Not quite.'}</strong><br>${escapeHtml(q.explanation)}`;
+            document.getElementById('exerciseCard').appendChild(fb);
+            const nb = document.createElement('button');
+            nb.className = 'next-btn';
+            nb.textContent = currentQuestion === exercises.length - 1 ? 'See results →' : 'Next scenario →';
+            nb.onclick = nextQuestion;
+            document.getElementById('exerciseCard').appendChild(nb);
+            updateScoreboard();
+        }
+
+        function nextQuestion() {
+            currentQuestion++;
+            if (currentQuestion >= exercises.length) return showResults();
+            renderQuestion();
+        }
+
+        function showResults() {
+            document.getElementById('progress').style.width = '100%';
+            const total = exercises.length * 10;
+            const pct = Math.round(score / total * 100);
+            if (window.parent) { window.parent.postMessage({type:"mtti_quiz_score", score: score, total: total, percent: pct}, "*"); }
+            let badge = '🌟', msg = 'Excellent work. You have a professional grasp of this lesson.';
+            if (pct < 50) { badge = '🌱'; msg = 'Good first attempt. Re-watch the lesson video and try again.'; }
+            else if (pct < 80) { badge = '📚'; msg = 'Solid progress. Review the scenarios you missed and retry.'; }
+            document.getElementById('exerciseCard').innerHTML = `
+                <div class="results">
+                    <span class="badge">${badge}</span>
+                    <h2>Quiz Complete</h2>
+                    <div class="final-score">${score} / ${total}</div>
+                    <p><strong>${pct}%</strong> · Longest streak: ${streak}</p>
+                    <p>${msg}</p>
+                    <button class="restart-btn" onclick="restart()">Try again 🔁</button>
+                </div>`;
+        }
+
+        function restart() {
+            currentQuestion = 0; score = 0; streak = 0;
+            renderQuestion();
+        }
+
+        renderQuestion();
+    </script>
+</body>
+</html>

@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Mini-Project: Simple Student Record System | MTTI Programming Principles</title>
+<link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Fredoka:wght@500;600&display=swap" rel="stylesheet">
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body {
+    font-family: 'Space Mono', monospace;
+    background: linear-gradient(135deg, #2E7D32 0%, #1565C0 100%);
+    min-height: 100vh; padding: 20px; color: #fff;
+}
+.container { max-width: 900px; margin: 0 auto; }
+.header { text-align: center; margin-bottom: 26px; }
+.lesson-tag { display: inline-block; background: rgba(255,255,255,0.2); padding: 6px 16px; border-radius: 999px; font-size: 0.85em; margin-bottom: 12px; }
+.header h1 { font-family: 'Fredoka', sans-serif; font-size: 2.1em; margin-bottom: 8px; text-shadow: 3px 3px 0 rgba(0,0,0,0.2); }
+.task {
+    background: white; color: #333; border-radius: 22px;
+    padding: 26px; margin-bottom: 20px;
+    box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+}
+.task h2 { font-family: 'Fredoka', sans-serif; font-size: 1.3em; margin-bottom: 14px; display: flex; align-items: center; }
+.task-num {
+    display: inline-block; width: 30px; height: 30px;
+    background: linear-gradient(135deg, #2E7D32 0%, #1565C0 100%);
+    color: white; border-radius: 50%; text-align: center; line-height: 30px;
+    font-family: 'Fredoka', sans-serif; font-weight: 600; margin-right: 10px; flex-shrink: 0; font-size: 0.75em;
+}
+.section-body { color: #444; font-size: 0.98em; line-height: 1.7; }
+.section-body p { margin-bottom: 12px; }
+.section-body strong { color: #1B5E20; }
+.section-body ul, .section-body ol { margin: 10px 0 14px 22px; }
+.section-body li { margin-bottom: 6px; }
+.code-block {
+    background: #1e1e2e; color: #cdd6f4; border-radius: 10px;
+    padding: 16px 18px; margin-top: 10px; overflow-x: auto;
+    font-family: 'Courier New', monospace; font-size: 0.88em; line-height: 1.6;
+}
+</style>
+</head>
+<body>
+<div class="container">
+    <div class="header">
+        <div class="lesson-tag">Data Structures · Mini-Project: Simple Student Record System</div>
+        <h1>Mini-Project: Simple Student Record System</h1>
+    </div>
+    <div class="task"><h2><span class="task-num">1</span>A List of Dictionaries</h2><div class="section-body"><p>Lists and dictionaries combine naturally: a <strong>list of dictionaries</strong> represents multiple records, each with the same set of fields — very close to how a table of student records would actually be modeled.</p><pre class="code-block"><code>students = [
+    {&quot;name&quot;: &quot;Amina&quot;, &quot;score&quot;: 82},
+    {&quot;name&quot;: &quot;Brian&quot;, &quot;score&quot;: 55},
+    {&quot;name&quot;: &quot;Cynthia&quot;, &quot;score&quot;: 91}
+]</code></pre></div></div><div class="task"><h2><span class="task-num">2</span>Looping Through Records</h2><div class="section-body"><p>A for-in loop over this list gives you one dictionary per pass, and you access each record's fields with the usual key lookup.</p><pre class="code-block"><code>for student in students:
+    print(student[&quot;name&quot;], &quot;-&quot;, student[&quot;score&quot;])</code></pre></div></div><div class="task"><h2><span class="task-num">3</span>Aggregating a Field Across All Records</h2><div class="section-body"><p>Combining a loop with the accumulator pattern from Unit 2 lets you compute a summary across every record — such as an average score.</p><pre class="code-block"><code>total = 0
+for student in students:
+    total += student[&quot;score&quot;]
+average = total / len(students)
+print(&quot;Average score:&quot;, round(average, 1))</code></pre></div></div>
+</div>
+</body>
+</html>

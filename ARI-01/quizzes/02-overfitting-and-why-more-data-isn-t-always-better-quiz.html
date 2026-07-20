@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Overfitting and Why More Data Isn't Always Better | MTTI Artificial Intelligence</title>
+    <link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Fredoka:wght@500;600&display=swap" rel="stylesheet">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+body { font-family: 'Space Mono', monospace; background: linear-gradient(135deg, #4527A0 0%, #6A1B9A 100%); min-height: 100vh; padding: 20px; color: #fff; }
+.container { max-width: 900px; margin: 0 auto; }
+.header { text-align: center; margin-bottom: 30px; }
+.header .lesson-tag { display: inline-block; background: rgba(255,255,255,0.2); padding: 6px 16px; border-radius: 999px; font-size: 0.85em; margin-bottom: 12px; }
+.header h1 { font-family: 'Fredoka', sans-serif; font-size: 2.2em; margin-bottom: 8px; text-shadow: 3px 3px 0 rgba(0,0,0,0.2); }
+.score-board { background: rgba(255,255,255,0.15); backdrop-filter: blur(10px); border-radius: 20px; padding: 20px; margin-bottom: 20px; display: flex; justify-content: space-around; }
+.score-item { text-align: center; }
+.score-item .label { font-size: 0.85em; opacity: 0.9; margin-bottom: 4px; }
+.score-item .value { font-size: 1.8em; font-weight: bold; font-family: 'Fredoka', sans-serif; }
+.progress-bar { width: 100%; height: 8px; background: rgba(255,255,255,0.3); border-radius: 10px; margin-bottom: 25px; overflow: hidden; }
+.progress-fill { height: 100%; background: linear-gradient(90deg, #f093fb 0%, #f5576c 100%); border-radius: 10px; transition: width 0.5s ease; width: 0%; }
+.exercise-card { background: white; color: #333; border-radius: 25px; padding: 35px; margin-bottom: 20px; box-shadow: 0 20px 60px rgba(0,0,0,0.3); }
+.scenario { background: linear-gradient(135deg, #fff8e1 0%, #ffecb3 100%); border-left: 5px solid #ffc107; padding: 20px 24px; border-radius: 12px; margin-bottom: 24px; font-size: 0.98em; line-height: 1.55; }
+.scenario strong { color: #7a5a00; font-family: 'Fredoka', sans-serif; }
+.question { font-size: 1.15em; margin-bottom: 20px; font-weight: 700; line-height: 1.4; }
+.options { display: flex; flex-direction: column; gap: 12px; }
+.option { background: #f5f7fb; border: 2px solid transparent; padding: 16px 20px; border-radius: 12px; cursor: pointer; transition: all 0.2s ease; font-family: 'Space Mono', monospace; font-size: 0.98em; text-align: left; }
+.option:hover:not(.disabled) { background: #f3e5f5; border-color: #6A1B9A; transform: translateX(4px); }
+.option.correct { background: #d4edda; border-color: #28a745; color: #155724; }
+.option.wrong { background: #f8d7da; border-color: #dc3545; color: #721c24; }
+.option.disabled { cursor: not-allowed; opacity: 0.85; }
+.feedback { margin-top: 22px; padding: 18px 22px; border-radius: 12px; font-size: 0.98em; line-height: 1.5; }
+.feedback.correct { background: #d4edda; color: #155724; border-left: 4px solid #28a745; }
+.feedback.wrong { background: #f8d7da; color: #721c24; border-left: 4px solid #dc3545; }
+.next-btn, .restart-btn { margin-top: 20px; background: linear-gradient(135deg, #4527A0 0%, #6A1B9A 100%); color: white; border: none; padding: 14px 32px; border-radius: 12px; font-size: 1em; cursor: pointer; font-family: 'Fredoka', sans-serif; box-shadow: 0 6px 18px rgba(0,0,0,0.2); }
+.results { text-align: center; padding: 25px 15px; }
+.results h2 { font-family: 'Fredoka', sans-serif; font-size: 2em; margin-bottom: 12px; color: #333; }
+.results .final-score { font-size: 3em; font-family: 'Fredoka', sans-serif; color: #6A1B9A; margin: 20px 0; }
+.results p { color: #555; margin-bottom: 12px; }
+.badge { display: inline-block; font-size: 3.5em; margin: 8px 0; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <div class="lesson-tag">Module 2 · Topic 2.3 · Quiz</div>
+            <h1>Overfitting and Why More Data Isn't Always Better</h1>
+        </div>
+        <div class="score-board">
+            <div class="score-item"><div class="label">Score</div><div class="value" id="score">0</div></div>
+            <div class="score-item"><div class="label">Question</div><div class="value"><span id="current">1</span>/<span id="total">10</span></div></div>
+            <div class="score-item"><div class="label">Streak</div><div class="value" id="streak">0</div></div>
+        </div>
+        <div class="progress-bar"><div class="progress-fill" id="progress"></div></div>
+        <div class="exercise-card" id="exerciseCard"></div>
+    </div>
+    <script>
+        const exercises = [{"scenario":"Brian's model for a bakery client scores 99% accuracy on the exact months of data it was trained on, but only 55% accuracy when tested on the following month's real sales.","question":"What does this gap most likely indicate?","options":["The model is performing exactly as expected","The model has likely overfit to the training data rather than learning general patterns","The following month simply had unusual weather","The gap is meaningless and can be ignored"],"correct":1,"explanation":"A large drop in performance from training data to new, unseen data is the classic sign of overfitting."},{"scenario":"A client suggests fixing a poorly generalizing model by adding six more months of data, all from the exact same single store and season.","question":"Is this likely to solve the overfitting problem?","options":["Yes, any additional data fixes overfitting","Not necessarily \u2014 more of the same narrow kind of data does not add the variety needed to generalize better","Yes, but only if it is added in a spreadsheet rather than a database","No additional data of any kind ever helps"],"correct":1,"explanation":"Overfitting is often about the lack of diversity and representativeness in training data, not the raw quantity \u2014 more of the same narrow data does not fix it."},{"scenario":"Brian compares two models: Model A trained on a huge amount of data from one single client, and Model B trained on a smaller but carefully cleaned dataset spanning ten different clients.","question":"Which model is more likely to generalize well to a brand-new client?","options":["Model A, because it has more raw data","Model B, because diverse, representative data usually generalizes better than a large but narrow dataset","Both will generalize identically regardless of diversity","Neither model can generalize to a new client under any circumstances"],"correct":1,"explanation":"Diverse and representative training data typically produces a model that generalizes better to new situations than a larger but narrow dataset."},{"scenario":"A junior colleague at Rafiki Insights says a model that scores perfectly on its training data must be the best possible model.","question":"How should Brian respond?","options":["Agree completely \u2014 perfect training performance is the only measure that matters","Explain that perfect training performance can actually be a warning sign of overfitting, and that performance on new, unseen data matters more","Suggest deleting the training data entirely","Suggest ignoring the training data and using only the labels"],"correct":1,"explanation":"A model that performs perfectly on training data may simply be memorizing it. The real measure of quality is performance on new, unseen data."},{"scenario":"Brian is asked why a very complex model fit a small, narrow dataset extremely tightly, capturing even random fluctuations in it.","question":"What is this behavior an example of?","options":["Good generalization","Overfitting \u2014 the model has learned noise and coincidences specific to that dataset","Underfitting","A sign the model needs no further testing"],"correct":1,"explanation":"Fitting even random fluctuations and noise in a training dataset, rather than the genuine underlying pattern, is a textbook description of overfitting."},{"scenario":"A client wants to know whether investing in a much bigger dataset from the exact same narrow source is worth it, versus spending effort collecting a smaller but more varied dataset.","question":"What is generally the better investment, based on what determines model quality?","options":["Always the bigger dataset, regardless of its variety","Generally the more varied dataset, since diversity and quality typically matter more than raw volume alone","Neither investment affects model quality","Only the number of rows matters, never their content"],"correct":1,"explanation":"Data quality and diversity typically matter more than sheer volume \u2014 a smaller but more representative dataset usually produces a more reliable model."},{"scenario":"Brian's overfit bakery model performed poorly on a second bakery's data. He is deciding what to do next.","question":"Which next step best addresses the underlying problem?","options":["Simply retrain on more data from the exact same first bakery","Gather training data spanning multiple bakeries and situations, so the model learns patterns that generalize rather than memorizing one case","Give up on machine learning for this type of business question entirely","Reduce the amount of data used even further, with no other changes"],"correct":1,"explanation":"Addressing overfitting generally requires more diverse, representative training data \u2014 not simply more of the same narrow example \u2014 so the model learns patterns that hold across different situations."},{"scenario":"A colleague argues that since 'more data is always better' is a common saying, Rafiki Insights should always prioritize collecting the largest dataset possible, regardless of source.","question":"Is this reasoning sound, based on what was covered?","options":["Yes, raw volume is always the single most important factor","Not entirely \u2014 quality and diversity of the data matter at least as much as, and often more than, raw volume","No, smaller datasets are always better regardless of content","The size of a dataset has no effect on anything"],"correct":1,"explanation":"While enough data matters, quality and diversity are often more important than raw volume alone \u2014 a large but narrow or noisy dataset can still produce an overfit, unreliable model."}];
+        let currentQuestion = 0, score = 0, streak = 0, answered = false;
+function updateScoreboard() {
+    document.getElementById('score').textContent = score;
+    document.getElementById('current').textContent = Math.min(currentQuestion + 1, exercises.length);
+    document.getElementById('total').textContent = exercises.length;
+    document.getElementById('streak').textContent = streak;
+    document.getElementById('progress').style.width = ((currentQuestion) / exercises.length) * 100 + '%';
+}
+function escapeHtml(s) { return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+function renderQuestion() {
+    answered = false;
+    const q = exercises[currentQuestion];
+    let html = '';
+    if (q.scenario) html += `<div class="scenario"><strong>Scenario.</strong> ${escapeHtml(q.scenario)}</div>`;
+    html += `<div class="question">${escapeHtml(q.question)}</div>`;
+    html += '<div class="options">';
+    q.options.forEach((o, i) => { html += `<button class="option" onclick="selectAnswer(${i})">${escapeHtml(o)}</button>`; });
+    html += '</div>';
+    document.getElementById('exerciseCard').innerHTML = html;
+    updateScoreboard();
+}
+function selectAnswer(i) {
+    if (answered) return;
+    answered = true;
+    const q = exercises[currentQuestion];
+    const btns = document.querySelectorAll('.option');
+    btns.forEach(b => b.classList.add('disabled'));
+    btns[q.correct].classList.add('correct');
+    const right = i === q.correct;
+    if (!right) btns[i].classList.add('wrong');
+    if (right) { score += 10; streak += 1; } else { streak = 0; }
+    const fb = document.createElement('div');
+    fb.className = 'feedback ' + (right ? 'correct' : 'wrong');
+    fb.innerHTML = `<strong>${right ? '✅ Correct.' : '❌ Not quite.'}</strong><br>${escapeHtml(q.explanation)}`;
+    document.getElementById('exerciseCard').appendChild(fb);
+    const nb = document.createElement('button');
+    nb.className = 'next-btn';
+    nb.textContent = currentQuestion === exercises.length - 1 ? 'See results →' : 'Next scenario →';
+    nb.onclick = nextQuestion;
+    document.getElementById('exerciseCard').appendChild(nb);
+    updateScoreboard();
+}
+function nextQuestion() { currentQuestion++; if (currentQuestion >= exercises.length) return showResults(); renderQuestion(); }
+function showResults() {
+    document.getElementById('progress').style.width = '100%';
+    const total = exercises.length * 10;
+    const pct = Math.round(score / total * 100);
+    if (window.parent) { window.parent.postMessage({type:"mtti_quiz_score", score: score, total: total, percent: pct}, "*"); }
+    let badge = '🌟', msg = 'Excellent work. You have a professional grasp of this topic.';
+    if (pct < 50) { badge = '🌱'; msg = 'Good first attempt. Review the lesson and try again.'; }
+    else if (pct < 80) { badge = '📚'; msg = 'Solid progress. Review the scenarios you missed and retry.'; }
+    document.getElementById('exerciseCard').innerHTML = `
+        <div class="results">
+            <span class="badge">${badge}</span>
+            <h2>Quiz Complete</h2>
+            <div class="final-score">${score} / ${total}</div>
+            <p><strong>${pct}%</strong> · Longest streak: ${streak}</p>
+            <p>${msg}</p>
+            <button class="restart-btn" onclick="restart()">Try again 🔁</button>
+        </div>`;
+}
+function restart() { currentQuestion = 0; score = 0; streak = 0; renderQuestion(); }
+renderQuestion();
+    </script>
+</body>
+</html>

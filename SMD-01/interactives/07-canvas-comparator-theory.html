@@ -1,0 +1,639 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lesson 7.4 — Canvas Comparator (Interactive)</title>
+<style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+        font-family: 'Segoe UI', -apple-system, sans-serif;
+        line-height: 1.6;
+        color: #0f172a;
+        background: #eff9ff;
+        min-height: 100vh;
+    }
+    .container { max-width: 1200px; margin: 0 auto; padding: 20px; }
+    header {
+        background: linear-gradient(135deg, #2E7D32, #1B5E20);
+        color: #062230;
+        padding: 40px 30px;
+        border-radius: 12px;
+        margin-bottom: 24px;
+        box-shadow: 0 10px 30px rgba(79,172,254,0.30);
+    }
+    header .badge {
+        display: inline-block;
+        background: rgba(255,255,255,0.35);
+        padding: 4px 14px;
+        border-radius: 16px;
+        font-size: 12px;
+        font-weight: bold;
+        letter-spacing: 1px;
+        margin-bottom: 14px;
+        color: #062230;
+    }
+    header h1 { font-size: 34px; margin-bottom: 8px; color: #062230; }
+    header .subtitle { font-size: 17px; opacity: 0.85; margin-bottom: 20px; }
+    .meta-strip { display: flex; flex-wrap: wrap; gap: 12px; }
+    .meta-strip span {
+        background: rgba(255,255,255,0.35);
+        padding: 6px 14px;
+        border-radius: 20px;
+        font-size: 13px;
+        color: #062230;
+    }
+    .toc {
+        background: #fff;
+        border: 1px solid #bae6fd;
+        border-radius: 10px;
+        padding: 22px 26px;
+        margin-bottom: 22px;
+    }
+    .toc h3 { color: #0369a1; margin-bottom: 10px; }
+    .toc ol { padding-left: 20px; }
+    .toc a { color: #0369a1; text-decoration: none; font-weight: 600; }
+    section {
+        background: #fff;
+        border: 1px solid #bae6fd;
+        border-radius: 10px;
+        padding: 26px 30px;
+        margin-bottom: 22px;
+    }
+    section h2 {
+        color: #0369a1;
+        font-size: 22px;
+        margin-bottom: 12px;
+        padding-bottom: 8px;
+        border-bottom: 3px solid #4facfe;
+    }
+    section h3 { color: #0f172a; font-size: 17px; margin: 18px 0 8px; }
+    section p { margin-bottom: 12px; }
+    section ul, section ol { padding-left: 22px; margin-bottom: 12px; }
+    .callout {
+        border-left: 5px solid #4facfe;
+        background: #eff9ff;
+        padding: 14px 18px;
+        margin: 14px 0;
+        border-radius: 4px;
+    }
+    .callout.warn { border-left-color: #dc2626; background: #fef2f2; }
+    .callout.tip { border-left-color: #059669; background: #ecfdf5; }
+    .callout strong { color: #0369a1; }
+    .callout.warn strong { color: #dc2626; }
+    .callout.tip strong { color: #059669; }
+
+    /* Canvas comparator */
+    .canvas-grid {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 16px;
+        margin: 20px 0;
+        align-items: end;
+    }
+    .canvas-cell {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 8px;
+    }
+    .canvas-frame {
+        background: linear-gradient(135deg, #e0f2fe, #f0f9ff);
+        border: 2px solid #7dd3fc;
+        border-radius: 8px;
+        position: relative;
+        overflow: hidden;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 12px;
+        font-weight: 600;
+        color: #0369a1;
+        transition: all 0.3s;
+    }
+    .canvas-frame:hover { border-color: #0284c7; }
+    .canvas-frame.hi { border-color: #059669; background: linear-gradient(135deg,#d1fae5,#ecfdf5); }
+    .canvas-frame.lo { border-color: #dc2626; background: linear-gradient(135deg,#fee2e2,#fef2f2); opacity: 0.85; }
+    .canvas-label {
+        text-align: center;
+        font-size: 12px;
+        color: #334155;
+    }
+    .canvas-label b { display: block; color: #0369a1; font-size: 13px; }
+    .canvas-label .dim { color: #64748b; font-size: 11px; }
+    .verdict-tag {
+        margin-top: 4px;
+        display: inline-block;
+        padding: 2px 8px;
+        border-radius: 10px;
+        font-size: 10px;
+        font-weight: bold;
+        letter-spacing: 0.5px;
+        background: #e2e8f0;
+        color: #475569;
+    }
+    .canvas-frame.hi + .canvas-label .verdict-tag { background: #d1fae5; color: #065f46; }
+    .canvas-frame.lo + .canvas-label .verdict-tag { background: #fee2e2; color: #991b1b; }
+
+    /* Orientation picker */
+    .picker { display: flex; flex-wrap: wrap; gap: 12px; margin: 14px 0 6px; }
+    .picker button {
+        background: #fff;
+        border: 2px solid #bae6fd;
+        border-radius: 8px;
+        padding: 12px 18px;
+        cursor: pointer;
+        font-weight: 600;
+        color: #0369a1;
+        display: inline-flex;
+        align-items: center;
+        gap: 10px;
+        font-size: 14px;
+        transition: all 0.2s;
+    }
+    .picker button:hover { border-color: #4facfe; }
+    .picker button.active { background: linear-gradient(135deg,#4facfe,#00f2fe); color: #062230; border-color: #0284c7; }
+    .picker .swatch {
+        background: #4facfe;
+        border-radius: 3px;
+        display: inline-block;
+    }
+    .picker .swatch.sq { width: 20px; height: 20px; }
+    .picker .swatch.port { width: 14px; height: 24px; }
+    .picker .swatch.land { width: 26px; height: 15px; }
+
+    /* Matcher quiz */
+    .matcher {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+        gap: 12px;
+        margin: 14px 0;
+    }
+    .match-row {
+        background: #f0f9ff;
+        border: 2px solid #bae6fd;
+        border-radius: 8px;
+        padding: 12px 14px;
+        transition: border-color 0.3s;
+    }
+    .match-row.correct { border-color: #059669; background: #ecfdf5; }
+    .match-row.wrong { border-color: #dc2626; background: #fef2f2; }
+    .match-row .platform { font-weight: 700; color: #0369a1; margin-bottom: 6px; font-size: 14px; }
+    .match-row select {
+        width: 100%;
+        padding: 8px 10px;
+        border: 1.5px solid #bae6fd;
+        border-radius: 6px;
+        font-size: 13px;
+        background: #fff;
+    }
+
+    button.btn {
+        background: linear-gradient(135deg,#4facfe,#00f2fe);
+        color: #062230;
+        border: none;
+        padding: 10px 22px;
+        border-radius: 6px;
+        font-size: 15px;
+        font-weight: 700;
+        cursor: pointer;
+    }
+    button.btn:hover { opacity: 0.92; }
+    button.btn.reset { background: #64748b; color: #fff; margin-left: 8px; }
+
+    .quiz-summary {
+        text-align: center;
+        padding: 30px;
+        background: linear-gradient(135deg, #e0f2fe 0%, #ccfbf1 100%);
+        border-radius: 10px;
+        margin: 20px 0;
+        display: none;
+    }
+    .quiz-summary.show { display: block; }
+    .quiz-summary .score {
+        font-size: 48px;
+        font-weight: bold;
+        background: linear-gradient(135deg,#4facfe,#00f2fe);
+        -webkit-background-clip: text;
+        background-clip: text;
+        color: transparent;
+        margin-bottom: 8px;
+    }
+
+    .ratio-table {
+        width: 100%;
+        border-collapse: collapse;
+        margin: 14px 0;
+        font-size: 14px;
+    }
+    .ratio-table th, .ratio-table td {
+        padding: 10px 12px;
+        text-align: left;
+        border: 1px solid #bae6fd;
+    }
+    .ratio-table th { background: linear-gradient(135deg,#4facfe,#00f2fe); color: #062230; }
+    .ratio-table tr:nth-child(even) { background: #f0f9ff; }
+
+    footer { text-align: center; color: #64748b; padding: 24px; font-size: 13px; }
+    @media (max-width: 800px) {
+        .canvas-grid { grid-template-columns: repeat(2, 1fr); }
+        header h1 { font-size: 26px; }
+    }
+
+    /* MTTI logo stamp */
+    .mtti-logo-stamp {
+        position: fixed; top: 14px; right: 18px; z-index: 999;
+        opacity: 0.88; transition: opacity 0.2s;
+    }
+    .mtti-logo-stamp:hover { opacity: 1; }
+    .mtti-logo-stamp img { width: 56px; height: 56px; border-radius: 50%; box-shadow: 0 2px 8px rgba(0,0,0,0.18); }
+</style>
+</head>
+<body>
+<div class="mtti-logo-stamp">
+    <img src="../../Resources/Logo.jpeg" alt="MTTI" title="Masomotele Technical Training Institute — Start learning, Start earning">
+</div>
+
+<div class="container">
+
+<header>
+    <div class="badge">LESSON 7.4  ·  CONTENT &amp; DESIGN  ·  INTERACTIVE</div>
+    <h1>Canvas Comparator</h1>
+    <div class="subtitle">Six platform canvases at scale — plus a crop simulator that shows what happens when Sarah picks the wrong size</div>
+    <div class="meta-strip">
+        <span><strong>Duration:</strong> ~25 min interactive</span>
+        <span><strong>Level:</strong> Foundation</span>
+        <span><strong>Prerequisite:</strong> Lessons 7.2–7.3</span>
+        <span><strong>Handbook:</strong> Part 7, §7.4</span>
+    </div>
+</header>
+
+<div class="toc">
+    <h3>What you'll do in this lesson</h3>
+    <ol>
+        <li><a href="#s1">The 6 platform canvases at scale</a></li>
+        <li><a href="#s2">Orientation-to-platform crop simulator</a></li>
+        <li><a href="#s3">Three ratios that dominate mobile</a></li>
+        <li><a href="#s4">Safe-zone rule</a></li>
+        <li><a href="#s5">Platform-to-size matcher (auto-marked)</a></li>
+    </ol>
+</div>
+
+<section id="s1">
+    <h2>1. The 6 platform canvases at scale</h2>
+    <p>Each rectangle below is drawn to <em>scale</em> against the others. Notice how a Meta feed square is completely different from a Meta Story, and how the LinkedIn 1200×627 landscape sits alongside the YouTube 1280×720 thumbnail.</p>
+
+    <div class="canvas-grid" id="canvasGrid">
+        <div class="canvas-cell">
+            <div class="canvas-frame" data-plat="meta-feed" data-w="1080" data-h="1080" style="width:120px; height:120px;">1080×1080</div>
+            <div class="canvas-label">
+                <b>Meta feed post</b>
+                <span class="dim">1080 × 1080 · 1:1 square</span>
+                <span class="verdict-tag">DEFAULT</span>
+            </div>
+        </div>
+
+        <div class="canvas-cell">
+            <div class="canvas-frame" data-plat="meta-story" data-w="1080" data-h="1920" style="width:68px; height:120px;">1080×1920</div>
+            <div class="canvas-label">
+                <b>Meta Story</b>
+                <span class="dim">1080 × 1920 · 9:16 portrait</span>
+                <span class="verdict-tag">FULL SCREEN</span>
+            </div>
+        </div>
+
+        <div class="canvas-cell">
+            <div class="canvas-frame" data-plat="ig-reel" data-w="1080" data-h="1920" style="width:68px; height:120px;">1080×1920</div>
+            <div class="canvas-label">
+                <b>Instagram Reel</b>
+                <span class="dim">1080 × 1920 · 9:16 portrait</span>
+                <span class="verdict-tag">FULL SCREEN</span>
+            </div>
+        </div>
+
+        <div class="canvas-cell">
+            <div class="canvas-frame" data-plat="li-feed" data-w="1200" data-h="627" style="width:170px; height:89px;">1200×627</div>
+            <div class="canvas-label">
+                <b>LinkedIn feed</b>
+                <span class="dim">1200 × 627 · 1.91:1</span>
+                <span class="verdict-tag">LANDSCAPE</span>
+            </div>
+        </div>
+
+        <div class="canvas-cell">
+            <div class="canvas-frame" data-plat="yt-thumb" data-w="1280" data-h="720" style="width:170px; height:96px;">1280×720</div>
+            <div class="canvas-label">
+                <b>YouTube thumbnail</b>
+                <span class="dim">1280 × 720 · 16:9</span>
+                <span class="verdict-tag">LANDSCAPE</span>
+            </div>
+        </div>
+
+        <div class="canvas-cell">
+            <div class="canvas-frame" data-plat="tiktok" data-w="1080" data-h="1920" style="width:68px; height:120px;">1080×1920</div>
+            <div class="canvas-label">
+                <b>TikTok</b>
+                <span class="dim">1080 × 1920 · 9:16 portrait</span>
+                <span class="verdict-tag">FULL SCREEN</span>
+            </div>
+        </div>
+    </div>
+
+    <div class="callout tip">
+        <strong>Notice the pattern:</strong> four out of six modern canvases are vertical 9:16. Two are landscape. Only one is square. In 2026, mobile-first means <em>portrait-first</em>. Sarah shoots every dish in portrait so the same asset survives Reels, Stories, and TikTok without re-shooting.
+    </div>
+    <div class="callout warn">
+        <strong>Legacy trap:</strong> older Canva templates still ship at 800 × 800 or 1200 × 1200. Upgrade to 1080 × 1080 minimum — anything smaller looks fuzzy on 2026 Kenyan smartphones which routinely run at 2340 × 1080 native resolution.
+    </div>
+</section>
+
+<section id="s2">
+    <h2>2. Orientation-to-platform simulator</h2>
+    <p>Pick a design orientation — the tool highlights which canvases <span style="color:#059669;font-weight:600;">accept it natively</span> and which will <span style="color:#dc2626;font-weight:600;">crop</span> or <span style="color:#dc2626;font-weight:600;">pillarbox</span> your artwork.</p>
+
+    <div class="picker" id="orient">
+        <button class="active" data-orient="square"><span class="swatch sq"></span> Square (1:1)</button>
+        <button data-orient="portrait"><span class="swatch port"></span> Portrait (9:16)</button>
+        <button data-orient="landscape"><span class="swatch land"></span> Landscape (16:9 / 1.91:1)</button>
+    </div>
+
+    <div id="simMsg" class="callout" style="margin-top:6px;">
+        <strong>Square (1:1):</strong> accepted natively by Meta feed. Meta / Instagram / TikTok Story canvases will pillarbox (grey bars top and bottom). LinkedIn and YouTube will center-crop the sides — logos in the corners get cut off.
+    </div>
+
+    <div class="callout warn">
+        <strong>Sarah's mistake:</strong> she posted a beautiful landscape food photo to her Instagram Story. Instagram cropped it to the vertical safe zone — the plate disappeared, only the tablecloth remained. Total waste. Pick the canvas <em>before</em> you design.
+    </div>
+</section>
+
+<section id="s3">
+    <h2>3. Three ratios that dominate mobile</h2>
+    <p>Instead of memorising 6+ pixel sizes, memorise the three ratios that cover 95% of paid work:</p>
+    <table class="ratio-table">
+        <tr><th>Ratio</th><th>Best for</th><th>Sarah's use case</th></tr>
+        <tr><td><strong>1:1</strong> square</td><td>Meta feed, Instagram feed</td><td>Menu cards, price posters</td></tr>
+        <tr><td><strong>9:16</strong> portrait</td><td>Stories, Reels, TikTok, Shorts, WhatsApp Status</td><td>Behind-the-scenes cooking, customer greetings, delivery-driver clips</td></tr>
+        <tr><td><strong>16:9 / 1.91:1</strong> landscape</td><td>YouTube thumbnails, LinkedIn, some Facebook link posts</td><td>Recipe tutorial thumbnails, blog banners</td></tr>
+    </table>
+    <div class="callout tip">
+        <strong>Never design for 4:3 or 3:2.</strong> Those are print ratios. In 2026 nobody prints anything, and every social crop will destroy them.
+    </div>
+
+    <h3>Extra sizes worth memorising</h3>
+    <ul>
+        <li><strong>Instagram profile picture:</strong> 320 × 320 uploaded, displayed as a 170 px circle — keep faces centred.</li>
+        <li><strong>Facebook Page cover:</strong> 820 × 312 on desktop, cropped to ~640 × 360 on mobile — put the logo dead-centre.</li>
+        <li><strong>X (Twitter) post image:</strong> 1200 × 675 preferred; header 1500 × 500.</li>
+        <li><strong>Pinterest Pin:</strong> 1000 × 1500 vertical (2:3) — the only major platform where taller-than-16:9 still wins.</li>
+        <li><strong>YouTube channel banner:</strong> 2560 × 1440 with a 1546 × 423 safe zone in the middle.</li>
+    </ul>
+</section>
+
+<section id="s4">
+    <h2>4. The safe-zone rule</h2>
+    <p>Every platform crops differently on different devices. Protect critical content (logo, price, CTA, phone number) by leaving a <strong>safe zone</strong> — no critical content in the outer band.</p>
+    <ul>
+        <li><strong>Feed posts (1:1):</strong> keep 50 px in from every edge.</li>
+        <li><strong>Stories &amp; Reels (9:16):</strong> keep the top 220 px and bottom 320 px free of critical content — Instagram places its username, buttons, and caption there.</li>
+        <li><strong>LinkedIn feed (1200×627):</strong> the ends get cropped on mobile — centre your subject.</li>
+        <li><strong>YouTube thumbnail (1280×720):</strong> the bottom-right corner is often covered by the duration overlay — put your face and logo top-left.</li>
+    </ul>
+    <div class="callout tip">
+        <strong>Practical shortcut:</strong> In Canva, drop a rectangle guide sized to the safe zone, set it to 20% opacity, then design inside it. Delete the guide before exporting.
+    </div>
+
+    <h3>Sarah's three-template system</h3>
+    <p>Sarah standardises on three Canva templates for the whole business — no more accidental wrong-size uploads:</p>
+    <ol>
+        <li><strong>Instagram Feed Square</strong> — 1080 × 1080. Menu cards, price posters, quote tiles.</li>
+        <li><strong>Meta Story / Reel Vertical</strong> — 1080 × 1920. Reels, Stories, WhatsApp Status, TikTok — one asset, four surfaces.</li>
+        <li><strong>Facebook Feed Landscape</strong> — 1200 × 630 (close enough to LinkedIn 1200×627 for both). Link posts, blog banners, LinkedIn re-shares.</li>
+    </ol>
+    <div class="callout warn">
+        <strong>Free-plan workaround:</strong> Canva's <em>Magic Resize</em> is Pro-only. On the free plan, Sarah duplicates the design and manually re-frames — 5 minutes per asset. Batch on Sunday and it doesn't slow her week.
+    </div>
+</section>
+
+<section id="s5">
+    <h2>5. Platform-to-size matcher (auto-marked)</h2>
+    <p>Six platforms. Six correct sizes. Match them without peeking above.</p>
+
+    <div class="matcher" id="matcher">
+        <div class="match-row" data-correct="1080x1080">
+            <div class="platform">Meta feed post</div>
+            <select name="m1">
+                <option value="">— pick a size —</option>
+                <option value="1080x1080">1080 × 1080 (1:1)</option>
+                <option value="1080x1920">1080 × 1920 (9:16)</option>
+                <option value="1200x627">1200 × 627 (1.91:1)</option>
+                <option value="1280x720">1280 × 720 (16:9)</option>
+                <option value="820x312">820 × 312 (Facebook cover)</option>
+                <option value="1500x500">1500 × 500 (X header)</option>
+            </select>
+        </div>
+
+        <div class="match-row" data-correct="1080x1920">
+            <div class="platform">Meta Story / Instagram Reel</div>
+            <select name="m2">
+                <option value="">— pick a size —</option>
+                <option value="1080x1080">1080 × 1080 (1:1)</option>
+                <option value="1080x1920">1080 × 1920 (9:16)</option>
+                <option value="1200x627">1200 × 627 (1.91:1)</option>
+                <option value="1280x720">1280 × 720 (16:9)</option>
+                <option value="820x312">820 × 312 (Facebook cover)</option>
+                <option value="1500x500">1500 × 500 (X header)</option>
+            </select>
+        </div>
+
+        <div class="match-row" data-correct="1200x627">
+            <div class="platform">LinkedIn feed image</div>
+            <select name="m3">
+                <option value="">— pick a size —</option>
+                <option value="1080x1080">1080 × 1080 (1:1)</option>
+                <option value="1080x1920">1080 × 1920 (9:16)</option>
+                <option value="1200x627">1200 × 627 (1.91:1)</option>
+                <option value="1280x720">1280 × 720 (16:9)</option>
+                <option value="820x312">820 × 312 (Facebook cover)</option>
+                <option value="1500x500">1500 × 500 (X header)</option>
+            </select>
+        </div>
+
+        <div class="match-row" data-correct="1280x720">
+            <div class="platform">YouTube thumbnail</div>
+            <select name="m4">
+                <option value="">— pick a size —</option>
+                <option value="1080x1080">1080 × 1080 (1:1)</option>
+                <option value="1080x1920">1080 × 1920 (9:16)</option>
+                <option value="1200x627">1200 × 627 (1.91:1)</option>
+                <option value="1280x720">1280 × 720 (16:9)</option>
+                <option value="820x312">820 × 312 (Facebook cover)</option>
+                <option value="1500x500">1500 × 500 (X header)</option>
+            </select>
+        </div>
+
+        <div class="match-row" data-correct="1080x1920">
+            <div class="platform">TikTok short video</div>
+            <select name="m5">
+                <option value="">— pick a size —</option>
+                <option value="1080x1080">1080 × 1080 (1:1)</option>
+                <option value="1080x1920">1080 × 1920 (9:16)</option>
+                <option value="1200x627">1200 × 627 (1.91:1)</option>
+                <option value="1280x720">1280 × 720 (16:9)</option>
+                <option value="820x312">820 × 312 (Facebook cover)</option>
+                <option value="1500x500">1500 × 500 (X header)</option>
+            </select>
+        </div>
+
+        <div class="match-row" data-correct="820x312">
+            <div class="platform">Facebook Page cover photo</div>
+            <select name="m6">
+                <option value="">— pick a size —</option>
+                <option value="1080x1080">1080 × 1080 (1:1)</option>
+                <option value="1080x1920">1080 × 1920 (9:16)</option>
+                <option value="1200x627">1200 × 627 (1.91:1)</option>
+                <option value="1280x720">1280 × 720 (16:9)</option>
+                <option value="820x312">820 × 312 (Facebook cover)</option>
+                <option value="1500x500">1500 × 500 (X header)</option>
+            </select>
+        </div>
+    </div>
+
+    <div style="margin-top: 16px;">
+        <button class="btn" onclick="markMatcher()">Mark my answers</button>
+        <button class="btn reset" onclick="resetMatcher()">Reset</button>
+    </div>
+
+    <div class="quiz-summary" id="mSum">
+        <div class="score" id="mScore">0 / 6</div>
+        <p id="mMsg"></p>
+    </div>
+</section>
+
+<footer>
+    <p>Lesson 7.4 — Platform-Specific Design Sizes · Masomotele Technical Training Institute · Handbook Part 7, §7.4</p>
+    <p>Next: <strong>Lesson 7.5 — Content Planning</strong></p>
+</footer>
+
+</div>
+
+<script>
+const ORIENT_MSG = {
+    square: '<strong>Square (1:1):</strong> Accepted natively by <span style="color:#059669;">Meta feed</span>. <span style="color:#dc2626;">Meta / Instagram / TikTok Story canvases will pillarbox</span> (grey bars top and bottom). <span style="color:#dc2626;">LinkedIn and YouTube will center-crop the sides</span> — logos in the corners get cut off. Best for menu cards and price posters.',
+    portrait: '<strong>Portrait (9:16):</strong> Accepted natively by <span style="color:#059669;">Meta Story, Instagram Reel, TikTok</span>. <span style="color:#dc2626;">Meta feed will crop top and bottom aggressively</span> to fit its 4:5 max. <span style="color:#dc2626;">LinkedIn / YouTube will pillarbox with black bars either side</span>. Best format for 2026 — one shoot fills 3 platforms.',
+    landscape: '<strong>Landscape (16:9 / 1.91:1):</strong> Accepted natively by <span style="color:#059669;">LinkedIn feed and YouTube thumbnails</span>. <span style="color:#dc2626;">Meta feed will letterbox</span> with grey bars top and bottom. <span style="color:#dc2626;">Stories / Reels / TikTok will crop the sides brutally</span> — this is exactly what happened to Sarah&apos;s lunch photo.'
+};
+
+function setSim(orient) {
+    document.getElementById('simMsg').innerHTML = ORIENT_MSG[orient];
+    const NATIVE = {
+        square: ['meta-feed'],
+        portrait: ['meta-story','ig-reel','tiktok'],
+        landscape: ['li-feed','yt-thumb']
+    };
+    const nat = NATIVE[orient];
+    document.querySelectorAll('#canvasGrid .canvas-frame').forEach(f => {
+        f.classList.remove('hi','lo');
+        if (nat.includes(f.dataset.plat)) f.classList.add('hi');
+        else f.classList.add('lo');
+    });
+}
+
+document.querySelectorAll('#orient button').forEach(b => {
+    b.addEventListener('click', () => {
+        document.querySelectorAll('#orient button').forEach(x => x.classList.remove('active'));
+        b.classList.add('active');
+        setSim(b.dataset.orient);
+    });
+});
+setSim('square');
+
+function markMatcher() {
+    const rows = document.querySelectorAll('.match-row');
+    let score = 0;
+    rows.forEach((r, i) => {
+        const sel = r.querySelector('select');
+        r.classList.remove('correct','wrong');
+        if (sel.value === r.dataset.correct) { r.classList.add('correct'); score++; }
+        else r.classList.add('wrong');
+    });
+    document.getElementById('mScore').textContent = score + ' / 6';
+    const msg = document.getElementById('mMsg');
+    if (score === 6) msg.textContent = 'Perfect. You have the six most-used canvases memorised.';
+    else if (score >= 4) msg.textContent = 'Solid. Review the incorrect rows and re-do the picker.';
+    else msg.textContent = 'Revisit sections 1 and 3. These are non-negotiable numbers for a paid design job.';
+    document.getElementById('mSum').classList.add('show');
+    document.getElementById('mSum').scrollIntoView({ behavior: 'smooth', block: 'center' });
+}
+function resetMatcher() {
+    document.querySelectorAll('.match-row').forEach(r => {
+        r.classList.remove('correct','wrong');
+        r.querySelector('select').value = '';
+    });
+    document.getElementById('mSum').classList.remove('show');
+}
+</script>
+<style id="mtti-paginator-style">
+  section[data-mtti-page] { display: none !important; }
+  section[data-mtti-page].mtti-active { display: block !important; }
+  #mtti-paginator-bar {
+    position: sticky; bottom: 0; left: 0; right: 0;
+    background: #fff; border-top: 2px solid #e2e8f0;
+    padding: 12px 20px; margin-top: 20px;
+    display: flex; align-items: center; justify-content: space-between; gap: 12px;
+    font-family: 'Segoe UI', -apple-system, sans-serif;
+    box-shadow: 0 -4px 16px rgba(0,0,0,0.08);
+    z-index: 100;
+  }
+  #mtti-paginator-bar button {
+    background: #2E7D32; color: #fff; border: none; padding: 10px 18px;
+    border-radius: 8px; font-size: 13px; font-weight: 600; cursor: pointer;
+  }
+  #mtti-paginator-bar button:disabled { background: #cbd5e1; cursor: not-allowed; }
+  #mtti-paginator-bar button.mtti-prev { background: #64748b; }
+  #mtti-paginator-progress { font-size: 12px; color: #64748b; font-weight: 600; }
+</style>
+<script id="mtti-paginator-script">
+(function(){
+  function init(){
+    var sections = Array.prototype.slice.call(document.querySelectorAll('section[id]'));
+    // Only sections that are real content blocks (has an <h2>), skip stray/decorative ones.
+    sections = sections.filter(function(s){ return s.querySelector('h2'); });
+    if (sections.length < 2) return; // nothing to paginate
+
+    sections.forEach(function(s, i){ s.setAttribute('data-mtti-page', i); });
+    var current = 0;
+
+    var bar = document.createElement('div');
+    bar.id = 'mtti-paginator-bar';
+    bar.innerHTML =
+      '<button class="mtti-prev" id="mtti-pg-prev">← Previous</button>' +
+      '<span id="mtti-paginator-progress"></span>' +
+      '<button id="mtti-pg-next">Next →</button>';
+    sections[sections.length - 1].insertAdjacentElement('afterend', bar);
+
+    var prevBtn = bar.querySelector('#mtti-pg-prev');
+    var nextBtn = bar.querySelector('#mtti-pg-next');
+    var progress = bar.querySelector('#mtti-paginator-progress');
+
+    function render(){
+      sections.forEach(function(s, i){ s.classList.toggle('mtti-active', i === current); });
+      prevBtn.disabled = (current === 0);
+      nextBtn.textContent = (current === sections.length - 1) ? 'Done ✓' : 'Next →';
+      progress.textContent = 'Section ' + (current + 1) + ' of ' + sections.length;
+      window.scrollTo(0, 0);
+    }
+    prevBtn.addEventListener('click', function(){ if (current > 0) { current--; render(); } });
+    nextBtn.addEventListener('click', function(){
+      if (current < sections.length - 1) { current++; render(); }
+    });
+    render();
+  }
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', init);
+  } else {
+    init();
+  }
+})();
+</script>
+</body>
+</html>

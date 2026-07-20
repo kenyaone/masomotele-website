@@ -1,0 +1,346 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>YouTube SEO | MTTI Digital Marketing</title>
+    <link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Fredoka:wght@500;600&display=swap" rel="stylesheet">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Space Mono', monospace;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh; padding: 20px; color: #fff;
+        }
+        .container { max-width: 900px; margin: 0 auto; }
+        .header { text-align: center; margin-bottom: 30px; animation: slideDown 0.6s ease-out; }
+        .header .lesson-tag {
+            display: inline-block; background: rgba(255,255,255,0.2);
+            padding: 6px 16px; border-radius: 999px;
+            font-size: 0.85em; margin-bottom: 12px;
+        }
+        .header h1 {
+            font-family: 'Fredoka', sans-serif; font-size: 2.2em;
+            margin-bottom: 8px; text-shadow: 3px 3px 0 rgba(0,0,0,0.2);
+        }
+        .header p { opacity: 0.95; font-size: 0.95em; }
+        .score-board {
+            background: rgba(255,255,255,0.15); backdrop-filter: blur(10px);
+            border-radius: 20px; padding: 20px; margin-bottom: 20px;
+            display: flex; justify-content: space-around;
+            animation: fadeIn 0.8s ease-out 0.2s both;
+        }
+        .score-item { text-align: center; }
+        .score-item .label { font-size: 0.85em; opacity: 0.9; margin-bottom: 4px; }
+        .score-item .value {
+            font-size: 1.8em; font-weight: bold; font-family: 'Fredoka', sans-serif;
+        }
+        .progress-bar {
+            width: 100%; height: 8px; background: rgba(255,255,255,0.3);
+            border-radius: 10px; margin-bottom: 25px; overflow: hidden;
+        }
+        .progress-fill {
+            height: 100%; background: linear-gradient(90deg, #f093fb 0%, #f5576c 100%);
+            border-radius: 10px; transition: width 0.5s ease; width: 0%;
+        }
+        .exercise-card {
+            background: white; color: #333; border-radius: 25px;
+            padding: 35px; margin-bottom: 20px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            animation: fadeIn 0.6s ease-out both;
+        }
+        .scenario {
+            background: linear-gradient(135deg, #fff8e1 0%, #ffecb3 100%);
+            border-left: 5px solid #ffc107;
+            padding: 20px 24px; border-radius: 12px;
+            margin-bottom: 24px;
+            font-size: 0.98em; line-height: 1.55;
+        }
+        .scenario strong { color: #7a5a00; font-family: 'Fredoka', sans-serif; }
+        .question {
+            font-size: 1.15em; margin-bottom: 20px;
+            font-weight: 700; line-height: 1.4;
+        }
+        .options { display: flex; flex-direction: column; gap: 12px; }
+        .option {
+            background: #f5f7fb; border: 2px solid transparent;
+            padding: 16px 20px; border-radius: 12px;
+            cursor: pointer; transition: all 0.2s ease;
+            font-family: 'Space Mono', monospace; font-size: 0.98em; text-align: left;
+        }
+        .option:hover:not(.disabled) {
+            background: #eef1fb; border-color: #667eea; transform: translateX(4px);
+        }
+        .option.correct { background: #d4edda; border-color: #28a745; color: #155724; }
+        .option.wrong { background: #f8d7da; border-color: #dc3545; color: #721c24; animation: shake 0.4s; }
+        .option.disabled { cursor: not-allowed; opacity: 0.85; }
+        .feedback {
+            margin-top: 22px; padding: 18px 22px; border-radius: 12px;
+            animation: slideUp 0.4s ease-out;
+            font-size: 0.98em; line-height: 1.5;
+        }
+        .feedback.correct { background: #d4edda; color: #155724; border-left: 4px solid #28a745; }
+        .feedback.wrong { background: #f8d7da; color: #721c24; border-left: 4px solid #dc3545; }
+        .feedback strong { font-family: 'Fredoka', sans-serif; }
+        .next-btn, .restart-btn {
+            margin-top: 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white; border: none;
+            padding: 14px 32px; border-radius: 12px;
+            font-size: 1em; cursor: pointer;
+            font-family: 'Fredoka', sans-serif;
+            box-shadow: 0 6px 18px rgba(0,0,0,0.2);
+            transition: transform 0.2s ease;
+        }
+        .next-btn:hover, .restart-btn:hover { transform: scale(1.04); }
+        .results {
+            text-align: center; padding: 25px 15px;
+            animation: bounceIn 0.6s ease-out;
+        }
+        .results h2 {
+            font-family: 'Fredoka', sans-serif; font-size: 2em;
+            margin-bottom: 12px; color: #333;
+        }
+        .results .final-score {
+            font-size: 3em; font-family: 'Fredoka', sans-serif;
+            color: #667eea; margin: 20px 0;
+        }
+        .results p { color: #555; margin-bottom: 12px; }
+        .badge { display: inline-block; font-size: 3.5em; margin: 8px 0; }
+        @keyframes slideDown { from { opacity: 0; transform: translateY(-30px); } to { opacity: 1; transform: translateY(0); } }
+        @keyframes fadeIn { from { opacity: 0; transform: scale(0.96); } to { opacity: 1; transform: scale(1); } }
+        @keyframes slideUp { from { opacity: 0; transform: translateY(15px); } to { opacity: 1; transform: translateY(0); } }
+        @keyframes shake { 0%,100% { transform: translateX(0); } 25% { transform: translateX(-8px); } 75% { transform: translateX(8px); } }
+        @keyframes bounceIn { 0% { opacity: 0; transform: scale(0.4); } 60% { transform: scale(1.05); } 100% { opacity: 1; transform: scale(1); } }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <div class="lesson-tag">Module 13 · Lesson 13.3</div>
+            <h1>YouTube SEO</h1>
+            <p>10 Sarah Chebet scenarios — titles, descriptions, tags, thumbnails, chapters, end screens</p>
+        </div>
+
+        <div class="score-board">
+            <div class="score-item"><div class="label">Score</div><div class="value" id="score">0</div></div>
+            <div class="score-item"><div class="label">Question</div><div class="value"><span id="current">1</span>/<span id="total">10</span></div></div>
+            <div class="score-item"><div class="label">Streak</div><div class="value" id="streak">0</div></div>
+        </div>
+
+        <div class="progress-bar"><div class="progress-fill" id="progress"></div></div>
+
+        <div class="exercise-card" id="exerciseCard"></div>
+    </div>
+
+    <script>
+        const exercises = [
+  {
+    "scenario": "Sarah is planning her next Karibu Kitchen video and asks: \"What's the first thing I should do — write the script?\"",
+    "question": "What is the correct first step in a professional YouTube publishing workflow?",
+    "options": [
+      "Write the full script before doing anything else.",
+      "Keyword research first — YouTube Search suggest for real-query auto-complete, TubeBuddy or vidIQ free tier for volume/competition overlay, and Google Trends switched to YouTube data source. Pick the primary keyword BEFORE writing anything.",
+      "Design the thumbnail first, then reverse-engineer the video.",
+      "Buy a viral tag pack from an SEO reseller."
+    ],
+    "correct": 1,
+    "explanation": "Slide 2 of §13.3: keyword research is step one. YouTube Search suggest is free and shows real queries. TubeBuddy/vidIQ free tiers add volume + competition. Google Trends compares phrasings. Thirty minutes of research before any script."
+  },
+  {
+    "scenario": "Sarah drafts the title \"The Karibu Kitchen Story — Sarah's Journey and the Meaning Behind Our Name\".",
+    "question": "What is the professional rewrite, and why?",
+    "options": [
+      "Keep it — long titles perform better.",
+      "Rewrite to front-load the primary keyword with an emotional hook, under 70 characters. Example: \"How to order lunch delivery in Eldoret — under 30 minutes\" (61 chars). The primary keyword is now at the front where YouTube reads it hardest, and \"30 minutes\" is the hook.",
+      "Cut the title to one word: \"Kitchen\".",
+      "The title does not matter at all."
+    ],
+    "correct": 1,
+    "explanation": "Slide 3 of §13.3: title formula = primary keyword FRONT + emotional hook + under 70 characters. Burying the keyword and skipping the hook loses the search-ranking edge and the CTR that comes from an emotional promise."
+  },
+  {
+    "scenario": "Sarah writes a 300-word description but starts with \"Hey guys, welcome back to my channel, please smash that like button, subscribe, and hit the bell icon!\" before mentioning what the video is about.",
+    "question": "Why is this a problem?",
+    "options": [
+      "It is not a problem — every YouTuber does this.",
+      "The first 150 characters of the description are SERP-facing — they appear in YouTube Search results and in Suggested previews. Wasting them on a generic greeting means the video's search snippet says nothing about the content. Front-load: primary keyword + promise + CTA.",
+      "300 words is too long — reduce to 20.",
+      "The description does not appear anywhere."
+    ],
+    "correct": 1,
+    "explanation": "Slide 4 of §13.3: description is two halves. First 150 chars are SERP-facing and must be written like a Google meta description. Below that comes the full ~250-word body with timestamps, links, hashtags."
+  },
+  {
+    "scenario": "A trainee reads \"YouTube tags are deprecated\" and refuses to fill the tag field at all.",
+    "question": "What is the professional practice?",
+    "options": [
+      "Correct — never fill tags.",
+      "Fill 10-15 honest tags. Tags carry very little direct ranking weight but still help YouTube's classifier place the video against related videos in Suggested, and they catch spelling variations viewers type. First tag = exact primary keyword. No stuffing, no irrelevant tags.",
+      "Stuff 100+ tags with trending topics.",
+      "Only large channels are allowed to use tags."
+    ],
+    "correct": 1,
+    "explanation": "Slide 5 of §13.3: tags are deprecated as a strong ranking signal but still done because they help the classifier and catch spelling variations. 10-15 honest tags. First tag = exact primary keyword."
+  },
+  {
+    "scenario": "Sarah's designer uploads a thumbnail at 800×450 pixels, arguing \"smaller = faster loading\".",
+    "question": "What is the correct thumbnail spec?",
+    "options": [
+      "800×450 is correct.",
+      "1280×720 pixels, 16:9 ratio, under 2 MB, JPG or PNG. Anything smaller pixelates on TV and desktop. The thumbnail is the biggest lever after the title — it deserves the full spec.",
+      "500×500 square.",
+      "There is no thumbnail spec on YouTube."
+    ],
+    "correct": 1,
+    "explanation": "Slide 6 of §13.3: thumbnails are 1280×720, 16:9, under 2 MB. Under-sizing produces pixelated thumbnails on large screens and destroys CTR."
+  },
+  {
+    "scenario": "Sarah's thumbnail is a text-only design with the words \"HOW TO ORDER LUNCH DELIVERY IN ELDORET UNDER THIRTY MINUTES A COMPLETE STEP BY STEP GUIDE FOR EVERYONE\" filling the entire frame in small type.",
+    "question": "What are the two problems?",
+    "options": [
+      "No problems — dense text is always good.",
+      "Problem one: text-only thumbnails on average lose to thumbnails with a clear human face (YouTube's own data). Problem two: legibility rule is 3-to-1 aspect — no more than 4-5 words on the image. Rewrite the thumbnail to Sarah's face + \"LUNCH IN 30 MIN\" in bold + a food shot.",
+      "The problem is she used the maroon brand colour.",
+      "Thumbnails cannot have text at all."
+    ],
+    "correct": 1,
+    "explanation": "Slide 6 of §13.3: face + short legible text + brand consistency. Face outperforms text-only on average. 4-5 words maximum for readability at phone size."
+  },
+  {
+    "scenario": "Sarah's 4-minute tutorial gets 60% average view but bounces to 40% when viewers cannot find the section on \"how to place the WhatsApp order\".",
+    "question": "What YouTube feature would fix this?",
+    "options": [
+      "Delete the video and re-record shorter.",
+      "Add chapters. Three or more timestamps in the description, first at 0:00, are auto-parsed into chapter markers on the progress bar. Viewers can then skip WITHIN the video to the relevant section, rather than leaving. Chapters increase average watch time — YouTube's #1 ranking signal.",
+      "Turn off all comments.",
+      "There is no such feature."
+    ],
+    "correct": 1,
+    "explanation": "Slide 7 of §13.3: chapters. 3+ timestamps in the description, first at 0:00. YouTube auto-parses them. Chapters keep viewers inside the video instead of leaving, which lifts the biggest ranking signal — watch time."
+  },
+  {
+    "scenario": "Sarah's tutorials end abruptly with the words \"okay bye\" and a black frame. There is no end screen, no cards, and no pinned comment.",
+    "question": "What is she leaving on the table?",
+    "options": [
+      "Nothing — clean endings are best.",
+      "Three high-impact levers. End screens (last 10-20 sec) drive session watch time by pointing to another video or a subscribe panel — Sarah's should always have both. Cards inside the video link to related content. Pinned comments sit above every other comment and are the best place for her WhatsApp CTA.",
+      "Only the pinned comment matters.",
+      "Only the end screen matters."
+    ],
+    "correct": 1,
+    "explanation": "Slide 7 of §13.3: four polish layers — chapters, end screens, cards, pinned comment. End screens are the single best place to drive session watch time. The pinned comment is prime real estate for the WhatsApp CTA."
+  },
+  {
+    "scenario": "Sarah's description has 3 hashtags at the top: #KaribuKitchen #EldoretLunch #KenyanFood. Her cousin says: \"Add 40 more.\"",
+    "question": "What is the professional rule?",
+    "options": [
+      "Add 100 hashtags for maximum reach.",
+      "YouTube allows up to 15 hashtags per video, but only the first 3 appear above the title. Sarah's current 3 are correct and relevant — she should stop there rather than dilute with unrelated tags. More is not better; relevant and honest is better.",
+      "Zero hashtags — YouTube bans them.",
+      "Hashtags must be at least 60 characters long."
+    ],
+    "correct": 1,
+    "explanation": "Slide 4 of §13.3: up to 15 hashtags allowed, only the first 3 appear above the title. Relevant and honest beats quantity."
+  },
+  {
+    "scenario": "A trainee summarises Lesson 13.3 in one line: \"Titles can be any length, the first 500 characters of the description are SERP-facing, and tags are the #1 ranking signal on YouTube.\"",
+    "question": "How many of those three claims are correct?",
+    "options": [
+      "All three.",
+      "Two — the description and tag parts.",
+      "Zero — every claim is wrong.",
+      "One — only the title part."
+    ],
+    "correct": 2,
+    "explanation": "Every claim is wrong. Titles must sit under 70 characters (Slide 3). It is the first 150 characters of the description that are SERP-facing, not 500 (Slide 4). Tags are deprecated as a strong ranking signal — watch time is the #1 signal (Slide 5 + Lesson 13.1 Slide 4)."
+  }
+];
+
+        let currentQuestion = 0, score = 0, streak = 0, answered = false;
+
+        function updateScoreboard() {
+            document.getElementById('score').textContent = score;
+            document.getElementById('current').textContent = Math.min(currentQuestion + 1, exercises.length);
+            document.getElementById('total').textContent = exercises.length;
+            document.getElementById('streak').textContent = streak;
+            document.getElementById('progress').style.width = ((currentQuestion) / exercises.length) * 100 + '%';
+        }
+
+        function escapeHtml(s) {
+            return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+        }
+
+        function renderQuestion() {
+            answered = false;
+            const q = exercises[currentQuestion];
+            let html = '';
+            if (q.scenario) {
+                html += `<div class="scenario"><strong>Scenario.</strong> ${escapeHtml(q.scenario)}</div>`;
+            }
+            html += `<div class="question">${escapeHtml(q.question)}</div>`;
+            html += '<div class="options">';
+            q.options.forEach((o, i) => {
+                html += `<button class="option" onclick="selectAnswer(${i})">${escapeHtml(o)}</button>`;
+            });
+            html += '</div>';
+            document.getElementById('exerciseCard').innerHTML = html;
+            updateScoreboard();
+        }
+
+        function selectAnswer(i) {
+            if (answered) return;
+            answered = true;
+            const q = exercises[currentQuestion];
+            const btns = document.querySelectorAll('.option');
+            btns.forEach(b => b.classList.add('disabled'));
+            btns[q.correct].classList.add('correct');
+            const right = i === q.correct;
+            if (!right) btns[i].classList.add('wrong');
+            if (right) { score += 10; streak += 1; } else { streak = 0; }
+            const fb = document.createElement('div');
+            fb.className = 'feedback ' + (right ? 'correct' : 'wrong');
+            fb.innerHTML = `<strong>${right ? '✅ Correct.' : '❌ Not quite.'}</strong><br>${escapeHtml(q.explanation)}`;
+            document.getElementById('exerciseCard').appendChild(fb);
+            const nb = document.createElement('button');
+            nb.className = 'next-btn';
+            nb.textContent = currentQuestion === exercises.length - 1 ? 'See results →' : 'Next scenario →';
+            nb.onclick = nextQuestion;
+            document.getElementById('exerciseCard').appendChild(nb);
+            updateScoreboard();
+        }
+
+        function nextQuestion() {
+            currentQuestion++;
+            if (currentQuestion >= exercises.length) return showResults();
+            renderQuestion();
+        }
+
+        function showResults() {
+            document.getElementById('progress').style.width = '100%';
+            const total = exercises.length * 10;
+            const pct = Math.round(score / total * 100);
+            if (window.parent) { window.parent.postMessage({type:"mtti_quiz_score", score: score, total: total, percent: pct}, "*"); }
+            let badge = '🌟', msg = 'Excellent work. You have a professional grasp of this lesson.';
+            if (pct < 50) { badge = '🌱'; msg = 'Good first attempt. Re-watch the lesson video and try again.'; }
+            else if (pct < 80) { badge = '📚'; msg = 'Solid progress. Review the scenarios you missed and retry.'; }
+            document.getElementById('exerciseCard').innerHTML = `
+                <div class="results">
+                    <span class="badge">${badge}</span>
+                    <h2>Quiz Complete</h2>
+                    <div class="final-score">${score} / ${total}</div>
+                    <p><strong>${pct}%</strong> · Longest streak: ${streak}</p>
+                    <p>${msg}</p>
+                    <button class="restart-btn" onclick="restart()">Try again 🔁</button>
+                </div>`;
+        }
+
+        function restart() {
+            currentQuestion = 0; score = 0; streak = 0;
+            renderQuestion();
+        }
+
+        renderQuestion();
+    </script>
+</body>
+</html>

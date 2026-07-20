@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Exposure, Contrast, and White Balance Basics | MTTI Video Editing</title>
+    <link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Fredoka:wght@500;600&display=swap" rel="stylesheet">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Space Mono', monospace; background: linear-gradient(135deg,#6A11CB 0%,#2575FC 100%); min-height: 100vh; padding: 20px; color: #fff; }
+        .container { max-width: 900px; margin: 0 auto; }
+        .header { text-align: center; margin-bottom: 30px; }
+        .header .lesson-tag { display: inline-block; background: rgba(255,255,255,0.2); padding: 6px 16px; border-radius: 999px; font-size: 0.85em; margin-bottom: 12px; }
+        .header h1 { font-family: 'Fredoka', sans-serif; font-size: 2.2em; margin-bottom: 8px; text-shadow: 3px 3px 0 rgba(0,0,0,0.2); }
+        .score-board { background: rgba(255,255,255,0.15); backdrop-filter: blur(10px); border-radius: 20px; padding: 20px; margin-bottom: 20px; display: flex; justify-content: space-around; }
+        .score-item { text-align: center; }
+        .score-item .label { font-size: 0.85em; opacity: 0.9; margin-bottom: 4px; }
+        .score-item .value { font-size: 1.8em; font-weight: bold; font-family: 'Fredoka', sans-serif; }
+        .progress-bar { width: 100%; height: 8px; background: rgba(255,255,255,0.3); border-radius: 10px; margin-bottom: 25px; overflow: hidden; }
+        .progress-fill { height: 100%; background: linear-gradient(90deg, #f7971e 0%, #ffd200 100%); border-radius: 10px; transition: width 0.5s ease; width: 0%; }
+        .exercise-card { background: white; color: #333; border-radius: 25px; padding: 35px; margin-bottom: 20px; box-shadow: 0 20px 60px rgba(0,0,0,0.3); }
+        .scenario { background: linear-gradient(135deg, #fff8e1 0%, #ffecb3 100%); border-left: 5px solid #ffc107; padding: 20px 24px; border-radius: 12px; margin-bottom: 24px; font-size: 0.98em; line-height: 1.55; }
+        .scenario strong { color: #7a5a00; font-family: 'Fredoka', sans-serif; }
+        .question { font-size: 1.15em; margin-bottom: 20px; font-weight: 700; line-height: 1.4; }
+        .options { display: flex; flex-direction: column; gap: 12px; }
+        .option { background: #f5f7fb; border: 2px solid transparent; padding: 16px 20px; border-radius: 12px; cursor: pointer; transition: all 0.2s ease; font-family: 'Space Mono', monospace; font-size: 0.98em; text-align: left; }
+        .option:hover:not(.disabled) { background: #eef2ff; border-color: #2575FC; transform: translateX(4px); }
+        .option.correct { background: #d4edda; border-color: #28a745; color: #155724; }
+        .option.wrong { background: #f8d7da; border-color: #dc3545; color: #721c24; }
+        .option.disabled { cursor: not-allowed; opacity: 0.85; }
+        .feedback { margin-top: 22px; padding: 18px 22px; border-radius: 12px; font-size: 0.98em; line-height: 1.5; }
+        .feedback.correct { background: #d4edda; color: #155724; border-left: 4px solid #28a745; }
+        .feedback.wrong { background: #f8d7da; color: #721c24; border-left: 4px solid #dc3545; }
+        .next-btn, .restart-btn { margin-top: 20px; background: linear-gradient(135deg,#6A11CB 0%,#2575FC 100%); color: white; border: none; padding: 14px 32px; border-radius: 12px; font-size: 1em; cursor: pointer; font-family: 'Fredoka', sans-serif; box-shadow: 0 6px 18px rgba(0,0,0,0.2); }
+        .results { text-align: center; padding: 25px 15px; }
+        .results h2 { font-family: 'Fredoka', sans-serif; font-size: 2em; margin-bottom: 12px; color: #333; }
+        .results .final-score { font-size: 3em; font-family: 'Fredoka', sans-serif; color: #2575FC; margin: 20px 0; }
+        .results p { color: #555; margin-bottom: 12px; }
+        .badge { display: inline-block; font-size: 3.5em; margin: 8px 0; }
+        /* How-To intro screen — shown before question 1, not scored */
+        .howto-card { background: white; color: #333; border-radius: 25px; padding: 35px; margin-bottom: 20px; box-shadow: 0 20px 60px rgba(0,0,0,0.3); }
+        .howto-card h3 { font-family: 'Fredoka', sans-serif; font-size: 1.3em; margin-bottom: 12px; color: #2575FC; }
+        .howto-card p { line-height: 1.6; margin-bottom: 16px; color: #444; }
+        .howto-fields { display: flex; flex-direction: column; gap: 14px; margin-bottom: 18px; }
+        .howto-field { background: #f5f7fb; border-radius: 12px; padding: 14px 18px; display: flex; align-items: center; gap: 14px; }
+        .howto-field label { font-weight: 700; font-size: 0.95em; flex: 1; }
+        .howto-field input { width: 90px; padding: 8px 10px; border-radius: 8px; border: 2px solid #ccd6f0; font-family: 'Space Mono', monospace; font-size: 1em; text-align: center; }
+        .howto-field input.hf-correct { border-color: #28a745; background: #d4edda; }
+        .howto-field input.hf-wrong { border-color: #dc3545; background: #f8d7da; }
+        .howto-field .hf-status { font-size: 0.85em; font-weight: 700; min-width: 60px; text-align: right; }
+        .howto-banner { margin-top: 4px; margin-bottom: 18px; padding: 12px 16px; border-radius: 10px; font-size: 0.9em; font-weight: 700; display: none; }
+        .howto-banner.show { display: block; }
+        .howto-banner.ok { background: #d4edda; color: #155724; }
+        .howto-banner.fail { background: #f8d7da; color: #721c24; }
+        .start-quiz-btn { margin-top: 4px; background: linear-gradient(135deg,#6A11CB 0%,#2575FC 100%); color: white; border: none; padding: 14px 32px; border-radius: 12px; font-size: 1em; cursor: pointer; font-family: 'Fredoka', sans-serif; box-shadow: 0 6px 18px rgba(0,0,0,0.2); }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <div class="lesson-tag">Module 4 · Lesson 4.1 · Quiz</div>
+            <h1>Exposure, Contrast, and White Balance Basics</h1>
+        </div>
+        <div class="score-board">
+            <div class="score-item"><div class="label">Score</div><div class="value" id="score">0</div></div>
+            <div class="score-item"><div class="label">Question</div><div class="value"><span id="current">1</span>/<span id="total">10</span></div></div>
+            <div class="score-item"><div class="label">Streak</div><div class="value" id="streak">0</div></div>
+        </div>
+        <div class="progress-bar"><div class="progress-fill" id="progress"></div></div>
+        <div class="exercise-card" id="exerciseCard"></div>
+    </div>
+    <script>
+        const exercises = [{"scenario":"Otieno reviews a clip filmed in a dim shop back-room and finds it noticeably dark, with shadow detail hard to see.","question":"Which slider should Otieno reach for first, and in which direction?","options":["Contrast, pushed down","Exposure, pushed up (positive)","Temp, pushed toward blue","Tint, pushed toward green"],"correct":1,"explanation":"A dark, underexposed clip is fixed primarily by raising Exposure, brightening the overall image."},{"scenario":"A client testimonial was filmed under a warm tungsten bulb, giving the footage a strong yellow-orange cast.","question":"Which direction should Otieno move CapCut's Temp slider to correct this?","options":["Toward warm\/orange (positive), to match the light source","Toward cool\/blue (negative), to cancel out the orange cast","Temp has no effect on color cast","He should raise Contrast instead of touching Temp"],"correct":1,"explanation":"Since the tungsten light already pushes the footage warm\/orange, correcting it means moving Temp toward cool\/blue (negative) to bring the image back toward neutral."},{"scenario":"Otieno raises Contrast heavily on a flat-looking clip to add punch before checking the result.","question":"What is the risk of pushing Contrast too far?","options":["Contrast has no visible effect on the image","Shadow detail can be crushed to pure black and highlights blown to pure white, losing detail permanently","Contrast only affects audio, not video","The clip becomes underexposed"],"correct":1,"explanation":"Excessive contrast pushes tones toward the extremes, crushing shadows and blowing out highlights, which destroys detail in both."},{"scenario":"Otieno is explaining color temperature to a new assistant editor, using the tungsten bulbs common in Eldoret homes as an example.","question":"Roughly where do warm tungsten bulbs sit on the kelvin scale, and how does that read on camera compared to daylight?","options":["Around 2700-3200K, reading as a warm yellow-orange cast, versus daylight's roughly 5600K neutral-to-blue look","Around 8000K, reading as a cool blue cast, versus daylight's warm orange look","Kelvin only applies to audio recording, not lighting","Tungsten and daylight always produce identical color casts"],"correct":0,"explanation":"Tungsten bulbs sit low on the kelvin scale (roughly 2700-3200K) and read warm\/orange, while daylight sits higher (roughly 5600K) and reads closer to neutral."},{"scenario":"Otieno corrects an orange tungsten-lit clip by dragging Temp all the way to its most negative setting, well beyond what was needed.","question":"What is the likely result of this overcorrection?","options":["The clip will look perfectly neutral no matter how far the slider is pushed","The clip will likely swing to a visible blue cast, replacing one problem with another","Overcorrecting Temp has no visible effect once the cast is removed","The clip's exposure will automatically fix itself"],"correct":1,"explanation":"Pushing Temp far past what's needed to cancel the orange cast introduces a new, opposite blue cast rather than landing on neutral."},{"scenario":"Before adjusting any sliders, Otieno first asks himself: is this clip too dark, too flat, too warm, or too cool?","question":"Why is this diagnosis step important before reaching for the Adjust panel?","options":["It isn't important; any slider can fix any problem","Naming the actual problem first means the right slider gets moved in the right direction, instead of guessing and over- or under-correcting","It only matters for audio editing, not color","Diagnosis is only needed for clips shot outdoors"],"correct":1,"explanation":"Identifying the specific problem before adjusting avoids guesswork, which otherwise tends to either undercorrect (cast still visible) or overcorrect (a new problem appears)."},{"scenario":"A client asks Otieno why he corrects Exposure and Temp as two separate, independent adjustments instead of one combined slider.","question":"What is the best explanation?","options":["Exposure and Temp control the same thing and are interchangeable","Exposure controls overall brightness while Temp controls the warm\/cool color cast &mdash; they are separate problems that need separate, independently-judged corrections","There is no reason; CapCut just happens to split them into two sliders","Only Temp matters; Exposure is a cosmetic setting with no real effect"],"correct":1,"explanation":"Brightness (Exposure) and color cast (Temp) are distinct properties of a shot, so each needs its own correction judged on its own merits, even on the same clip."}];
+        let currentQuestion = 0, score = 0, streak = 0, answered = false;
+        function updateScoreboard() {
+            document.getElementById('score').textContent = score;
+            document.getElementById('current').textContent = Math.min(currentQuestion + 1, exercises.length);
+            document.getElementById('total').textContent = exercises.length;
+            document.getElementById('streak').textContent = streak;
+            document.getElementById('progress').style.width = ((currentQuestion) / exercises.length) * 100 + '%';
+        }
+        function escapeHtml(s) { return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+        function renderQuestion() {
+            answered = false;
+            const q = exercises[currentQuestion];
+            let html = '';
+            if (q.scenario) html += `<div class="scenario"><strong>Scenario.</strong> ${escapeHtml(q.scenario)}</div>`;
+            html += `<div class="question">${escapeHtml(q.question)}</div>`;
+            html += '<div class="options">';
+            q.options.forEach((o, i) => { html += `<button class="option" onclick="selectAnswer(${i})">${escapeHtml(o)}</button>`; });
+            html += '</div>';
+            document.getElementById('exerciseCard').innerHTML = html;
+            updateScoreboard();
+        }
+        function selectAnswer(i) {
+            if (answered) return;
+            answered = true;
+            const q = exercises[currentQuestion];
+            const btns = document.querySelectorAll('.option');
+            btns.forEach(b => b.classList.add('disabled'));
+            btns[q.correct].classList.add('correct');
+            const right = i === q.correct;
+            if (!right) btns[i].classList.add('wrong');
+            if (right) { score += 10; streak += 1; } else { streak = 0; }
+            const fb = document.createElement('div');
+            fb.className = 'feedback ' + (right ? 'correct' : 'wrong');
+            fb.innerHTML = `<strong>${right ? '&#9989; Correct.' : '&#10060; Not quite.'}</strong><br>${escapeHtml(q.explanation)}`;
+            document.getElementById('exerciseCard').appendChild(fb);
+            const nb = document.createElement('button');
+            nb.className = 'next-btn';
+            nb.textContent = currentQuestion === exercises.length - 1 ? 'See results →' : 'Next scenario →';
+            nb.onclick = nextQuestion;
+            document.getElementById('exerciseCard').appendChild(nb);
+            updateScoreboard();
+        }
+        function nextQuestion() { currentQuestion++; if (currentQuestion >= exercises.length) return showResults(); renderQuestion(); }
+        function showResults() {
+            document.getElementById('progress').style.width = '100%';
+            const total = exercises.length * 10;
+            const pct = Math.round(score / total * 100);
+            if (window.parent) { window.parent.postMessage({type:"mtti_quiz_score", score: score, total: total, percent: pct}, "*"); }
+            let badge = '\u{1F31F}', msg = 'Excellent work. Otieno-level color grading know-how.';
+            if (pct < 50) { badge = '\u{1F331}'; msg = 'Good first attempt. Review the lesson and try again.'; }
+            else if (pct < 80) { badge = '\u{1F4DA}'; msg = 'Solid progress. Review the scenarios you missed and retry.'; }
+            document.getElementById('exerciseCard').innerHTML = `
+                <div class="results">
+                    <span class="badge">${badge}</span>
+                    <h2>Quiz Complete</h2>
+                    <div class="final-score">${score} / ${total}</div>
+                    <p><strong>${pct}%</strong> &middot; Longest streak: ${streak}</p>
+                    <p>${msg}</p>
+                    <button class="restart-btn" onclick="restart()">Try again &#128257;</button>
+                </div>`;
+        }
+        function restart() { currentQuestion = 0; score = 0; streak = 0; renderQuestion(); }
+        /* How-To intro — a small, ungraded field-check demo shown before the
+           quiz starts, directly rehearsing the "diagnose a dark clip, then
+           push Exposure positive" mechanic that one of the quiz scenarios
+           asks about, so it's not being asked cold. */
+        const HOWTO_FIELDS = [
+            { id: 'howtoExposure', label: 'Exposure', placeholder: 'e.g. 30', min: 10, max: 80 },
+        ];
+
+        function checkHowtoField(rule) {
+            const el = document.getElementById(rule.id);
+            const raw = el.value.trim();
+            if (raw === '' || isNaN(Number(raw))) return null;
+            const v = Number(raw);
+            return v >= rule.min && v <= rule.max;
+        }
+
+        function checkHowto() {
+            let allOk = true, allAnswered = true;
+            HOWTO_FIELDS.forEach(rule => {
+                const ok = checkHowtoField(rule);
+                const el = document.getElementById(rule.id);
+                const status = document.getElementById(rule.id + '_status');
+                el.classList.remove('hf-correct', 'hf-wrong');
+                if (ok === null) { allAnswered = false; status.textContent = ''; return; }
+                el.classList.add(ok ? 'hf-correct' : 'hf-wrong');
+                status.textContent = ok ? '✅ good' : '❌ off';
+                if (!ok) allOk = false;
+            });
+            const banner = document.getElementById('howtoBanner');
+            banner.classList.add('show');
+            if (!allAnswered) {
+                banner.className = 'howto-banner show fail';
+                banner.textContent = '❌ Enter a number first, then check.';
+                return;
+            }
+            banner.className = 'howto-banner show ' + (allOk ? 'ok' : 'fail');
+            banner.textContent = allOk
+                ? '✅ Brightened the right amount — that\'s the fix for a dark, underexposed clip.'
+                : '❌ Not quite — push Exposure positive, enough to lift the shadows without blowing out highlights.';
+        }
+
+        function renderHowto() {
+            document.getElementById('exerciseCard').innerHTML = `
+                <div class="howto-card">
+                    <h3>🔍 Quick How-To: Fixing an Underexposed Clip</h3>
+                    <p>One of the scenarios coming up asks about this exact situation: a clip filmed in a dim back-room comes in dark, with shadow detail hard to see. Fixing it starts with one slider — Exposure, pushed up (positive) until the shot looks natural again. Type an Exposure value that would brighten this clip below, then check your setting.</p>
+                    <div class="howto-fields" id="howtoFields"></div>
+                    <div class="howto-banner" id="howtoBanner"></div>
+                    <button class="start-quiz-btn" id="checkHowtoBtn">Check My Settings</button>
+                    <button class="start-quiz-btn" id="startQuizBtn" style="margin-left:10px;background:linear-gradient(135deg,#28a745,#1e7e34);">Start Quiz →</button>
+                </div>`;
+            document.getElementById('howtoFields').innerHTML = HOWTO_FIELDS.map(f => `
+                <div class="howto-field">
+                    <label for="${f.id}">${f.label}</label>
+                    <input type="number" id="${f.id}" placeholder="${f.placeholder}">
+                    <span class="hf-status" id="${f.id}_status"></span>
+                </div>`).join('');
+            document.getElementById('checkHowtoBtn').addEventListener('click', checkHowto);
+            document.getElementById('startQuizBtn').addEventListener('click', renderQuestion);
+        }
+
+        renderHowto();
+    </script>
+</body>
+</html>

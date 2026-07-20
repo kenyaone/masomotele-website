@@ -1,0 +1,346 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Spark Ads + Creator Marketplace | MTTI Digital Marketing</title>
+    <link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Fredoka:wght@500;600&display=swap" rel="stylesheet">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Space Mono', monospace;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh; padding: 20px; color: #fff;
+        }
+        .container { max-width: 900px; margin: 0 auto; }
+        .header { text-align: center; margin-bottom: 30px; animation: slideDown 0.6s ease-out; }
+        .header .lesson-tag {
+            display: inline-block; background: rgba(255,255,255,0.2);
+            padding: 6px 16px; border-radius: 999px;
+            font-size: 0.85em; margin-bottom: 12px;
+        }
+        .header h1 {
+            font-family: 'Fredoka', sans-serif; font-size: 2.2em;
+            margin-bottom: 8px; text-shadow: 3px 3px 0 rgba(0,0,0,0.2);
+        }
+        .header p { opacity: 0.95; font-size: 0.95em; }
+        .score-board {
+            background: rgba(255,255,255,0.15); backdrop-filter: blur(10px);
+            border-radius: 20px; padding: 20px; margin-bottom: 20px;
+            display: flex; justify-content: space-around;
+            animation: fadeIn 0.8s ease-out 0.2s both;
+        }
+        .score-item { text-align: center; }
+        .score-item .label { font-size: 0.85em; opacity: 0.9; margin-bottom: 4px; }
+        .score-item .value {
+            font-size: 1.8em; font-weight: bold; font-family: 'Fredoka', sans-serif;
+        }
+        .progress-bar {
+            width: 100%; height: 8px; background: rgba(255,255,255,0.3);
+            border-radius: 10px; margin-bottom: 25px; overflow: hidden;
+        }
+        .progress-fill {
+            height: 100%; background: linear-gradient(90deg, #f093fb 0%, #f5576c 100%);
+            border-radius: 10px; transition: width 0.5s ease; width: 0%;
+        }
+        .exercise-card {
+            background: white; color: #333; border-radius: 25px;
+            padding: 35px; margin-bottom: 20px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            animation: fadeIn 0.6s ease-out both;
+        }
+        .scenario {
+            background: linear-gradient(135deg, #fff8e1 0%, #ffecb3 100%);
+            border-left: 5px solid #ffc107;
+            padding: 20px 24px; border-radius: 12px;
+            margin-bottom: 24px;
+            font-size: 0.98em; line-height: 1.55;
+        }
+        .scenario strong { color: #7a5a00; font-family: 'Fredoka', sans-serif; }
+        .question {
+            font-size: 1.15em; margin-bottom: 20px;
+            font-weight: 700; line-height: 1.4;
+        }
+        .options { display: flex; flex-direction: column; gap: 12px; }
+        .option {
+            background: #f5f7fb; border: 2px solid transparent;
+            padding: 16px 20px; border-radius: 12px;
+            cursor: pointer; transition: all 0.2s ease;
+            font-family: 'Space Mono', monospace; font-size: 0.98em; text-align: left;
+        }
+        .option:hover:not(.disabled) {
+            background: #eef1fb; border-color: #667eea; transform: translateX(4px);
+        }
+        .option.correct { background: #d4edda; border-color: #28a745; color: #155724; }
+        .option.wrong { background: #f8d7da; border-color: #dc3545; color: #721c24; animation: shake 0.4s; }
+        .option.disabled { cursor: not-allowed; opacity: 0.85; }
+        .feedback {
+            margin-top: 22px; padding: 18px 22px; border-radius: 12px;
+            animation: slideUp 0.4s ease-out;
+            font-size: 0.98em; line-height: 1.5;
+        }
+        .feedback.correct { background: #d4edda; color: #155724; border-left: 4px solid #28a745; }
+        .feedback.wrong { background: #f8d7da; color: #721c24; border-left: 4px solid #dc3545; }
+        .feedback strong { font-family: 'Fredoka', sans-serif; }
+        .next-btn, .restart-btn {
+            margin-top: 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white; border: none;
+            padding: 14px 32px; border-radius: 12px;
+            font-size: 1em; cursor: pointer;
+            font-family: 'Fredoka', sans-serif;
+            box-shadow: 0 6px 18px rgba(0,0,0,0.2);
+            transition: transform 0.2s ease;
+        }
+        .next-btn:hover, .restart-btn:hover { transform: scale(1.04); }
+        .results {
+            text-align: center; padding: 25px 15px;
+            animation: bounceIn 0.6s ease-out;
+        }
+        .results h2 {
+            font-family: 'Fredoka', sans-serif; font-size: 2em;
+            margin-bottom: 12px; color: #333;
+        }
+        .results .final-score {
+            font-size: 3em; font-family: 'Fredoka', sans-serif;
+            color: #667eea; margin: 20px 0;
+        }
+        .results p { color: #555; margin-bottom: 12px; }
+        .badge { display: inline-block; font-size: 3.5em; margin: 8px 0; }
+        @keyframes slideDown { from { opacity: 0; transform: translateY(-30px); } to { opacity: 1; transform: translateY(0); } }
+        @keyframes fadeIn { from { opacity: 0; transform: scale(0.96); } to { opacity: 1; transform: scale(1); } }
+        @keyframes slideUp { from { opacity: 0; transform: translateY(15px); } to { opacity: 1; transform: translateY(0); } }
+        @keyframes shake { 0%,100% { transform: translateX(0); } 25% { transform: translateX(-8px); } 75% { transform: translateX(8px); } }
+        @keyframes bounceIn { 0% { opacity: 0; transform: scale(0.4); } 60% { transform: scale(1.05); } 100% { opacity: 1; transform: scale(1); } }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <div class="lesson-tag">Module 12 · Lesson 12.3</div>
+            <h1>Spark Ads + Creator Marketplace</h1>
+            <p>10 Brian Otieno scenarios — Spark Ads, Video Codes, Creator Marketplace, briefs, whitelisting</p>
+        </div>
+
+        <div class="score-board">
+            <div class="score-item"><div class="label">Score</div><div class="value" id="score">0</div></div>
+            <div class="score-item"><div class="label">Question</div><div class="value"><span id="current">1</span>/<span id="total">10</span></div></div>
+            <div class="score-item"><div class="label">Streak</div><div class="value" id="streak">0</div></div>
+        </div>
+
+        <div class="progress-bar"><div class="progress-fill" id="progress"></div></div>
+
+        <div class="exercise-card" id="exerciseCard"></div>
+    </div>
+
+    <script>
+        const exercises = [
+  {
+    "scenario": "Brian has three Chapa Fitness organic TikTok videos with more than 20,000 views each. He wants to promote them as paid ads without losing the likes and comments that make them look native.",
+    "question": "Which TikTok ad format should he use?",
+    "options": [
+      "In-Feed Ad from a new studio video — start fresh for reach.",
+      "Spark Ad — promotes his existing organic videos as paid ads, keeping the original URL, likes, comments, shares, and profile-visit routing. TikTok data shows +130% CTR and +134% completion vs traditional ads.",
+      "TopView ad — replace all organic engagement.",
+      "Brand Takeover — auto-hides likes."
+    ],
+    "correct": 1,
+    "explanation": "Slide 2 of §12.3 defines Spark Ads. They promote an existing organic video while preserving every unit of engagement. Traditional ads reset counters and look produced — Spark Ads look native because they ARE native."
+  },
+  {
+    "scenario": "Brian wants to promote his own Chapa Fitness organic video as a Spark Ad. His TikTok account is already linked as an asset inside his Business Centre.",
+    "question": "What extra step does he need to promote HIS OWN video?",
+    "options": [
+      "He needs to request a Video Code from himself.",
+      "None. Because his account is linked as a Business Centre asset (Lesson 12.1), he selects the post directly inside Ads Manager under \"Use TikTok posts\", picks the identity, adds a CTA, and launches. No authorisation code required for his own posts.",
+      "He must first delete the original post.",
+      "He must pay TikTok a KES 5,000 promotion fee before selecting his own video."
+    ],
+    "correct": 1,
+    "explanation": "Slide 3 of §12.3 covers Spark Ad source #1. When the TikTok account is a Business Centre asset, own posts are picked directly with no authorisation code. That is the whole point of linking the account in 12.1."
+  },
+  {
+    "scenario": "Brian wants to promote a REVIEW VIDEO posted by Wanjiku, a Nairobi fitness creator with 52,000 followers. He does not own her account.",
+    "question": "What is the correct process?",
+    "options": [
+      "Screenshot her video and re-upload it from Brian's account.",
+      "Wanjiku opens her video → Ad settings → \"Allow others to use your post in their ads\" → generates a Video Code (alphanumeric, valid 7 or 60 days) → sends it to Brian. Brian pastes it into Ads Manager, picks the post, adds a CTA, and launches. Her name, handle, and engagement stay on the post.",
+      "Brian must buy her account.",
+      "Brian must upload a signed contract to TikTok headquarters."
+    ],
+    "correct": 1,
+    "explanation": "Slide 4 of §12.3 covers Spark Ad source #2. The Video Code is TikTok's authorisation mechanism — 7 or 60 days valid — that lets an advertiser Spark-boost a creator's post without owning the account. Screenshotting and re-uploading is a policy violation."
+  },
+  {
+    "scenario": "Brian is filtering the TikTok Creator Marketplace at creators.tiktok.com/marketplace to find three fitness creators for Chapa Fitness. He wants Kenyan mid-tier creators with strong engagement.",
+    "question": "Which filter set matches the lesson's professional defaults?",
+    "options": [
+      "Any country, any category, any engagement — cast the widest net.",
+      "Country = Kenya · followers 10k-100k · category fitness or wellness · avg engagement above 5% · avg views above 10k. Then shortlist and message directly through the Marketplace.",
+      "Country = Nigeria · followers 500k+ · sports only.",
+      "Sort by follower count only — bigger is always better."
+    ],
+    "correct": 1,
+    "explanation": "Slide 5 of §12.3 gives Brian's filter defaults: Kenya, 10k-100k followers, fitness/wellness, engagement above 5%, views above 10k. Big followers with low engagement is reach without fit — a common expensive mistake."
+  },
+  {
+    "scenario": "Brian is drafting his brief to Wanjiku. He writes: \"Please make a fun Chapa Fitness video sometime this month. Budget flexible.\"",
+    "question": "What is wrong, and what should he write instead?",
+    "options": [
+      "Nothing wrong — creators prefer freedom.",
+      "The brief is missing every required field. A professional creator brief has six fields: the ask (video type + duration), deliverable count (draft + revision rounds), hook requirement, usage rights (Spark Ads authorisation + duration), budget in KES, and legal (Kenyan tax invoice with KRA PIN).",
+      "He should just send emojis.",
+      "He should let Wanjiku decide the budget after posting."
+    ],
+    "correct": 1,
+    "explanation": "Slide 7 of §12.3 lists the six mandatory brief fields. Ambiguous briefs kill deals — quality drops, Spark rights get forgotten, and creators overpromise. A tight brief is the professional's protection."
+  },
+  {
+    "scenario": "Brian's three creator deals: Wanjiku KES 35,000 + 60-day Spark, Otieno KES 15,000 + 60-day Spark, Amina KES 40,000 + 60-day Spark.",
+    "question": "What is Brian's total spend, and what does he get for it?",
+    "options": [
+      "KES 60,000 for three months of guaranteed sales.",
+      "KES 90,000 for three tested Spark-eligible creatives that Brian can paid-boost across two full months — plus organic reach from the creators' own audiences.",
+      "KES 120,000 for one month of ads.",
+      "KES 45,000 for a single video."
+    ],
+    "correct": 1,
+    "explanation": "Slide 6 of §12.3: 35 + 15 + 40 = KES 90,000. Three creatives, three tiers, three audiences, 60-day Spark rights each. Two months of paid reach plus organic exposure from the creators' followers."
+  },
+  {
+    "scenario": "A trainee argues: \"Whitelisting and Spark Ads are the same thing — both let Brian run a creator's content as ads.\"",
+    "question": "How should you correct this?",
+    "options": [
+      "The trainee is right — one word for the same feature.",
+      "Wrong. A Spark Ad promotes a SPECIFIC existing organic video via a Video Code. Whitelisting (TikTok Ad Identity) lets Brian create NEW ads FROM a creator's handle without a specific pre-existing video — the creator lends their identity. Whitelisting is heavier legally and rate-wise. Start with Spark Ads; save whitelisting for creators after 6+ months of partnership.",
+      "They are the same and both use a Video Code.",
+      "Whitelisting is banned in Kenya."
+    ],
+    "correct": 1,
+    "explanation": "Slide 8 of §12.3 draws the line. Spark Ad = specific existing video + Video Code. Whitelisting/Ad Identity = creator lends handle for new ads via Ads Manager Identity settings. Different mechanics, different rates, different legal exposure."
+  },
+  {
+    "scenario": "Wanjiku sends Brian a Video Code and warns him it \"expires in seven days\".",
+    "question": "What are the two Video Code duration options, and how does he handle this?",
+    "options": [
+      "Video Codes are permanent — she is confused.",
+      "Video Codes are valid for either 7 OR 60 days. If Brian's plan runs longer, he requests a 60-day code from Wanjiku (or renews the code before expiry). Ads keep running only while the underlying code is valid.",
+      "Video Codes are valid for 12 hours only.",
+      "Video Codes are valid for one calendar year."
+    ],
+    "correct": 1,
+    "explanation": "Slide 4 of §12.3 states Video Code validity is either 7 or 60 days. For a 60-day Spark rights deal, request the 60-day code. If it expires mid-campaign, the Spark Ad stops serving."
+  },
+  {
+    "scenario": "Brian has KES 90,000 to spend on creators. Should he spread it across three mid-tier creators or put it all into ONE macro creator with 800,000 followers who charges KES 90,000 flat?",
+    "question": "What is the professional answer?",
+    "options": [
+      "One macro creator every time — reach wins.",
+      "Three mid-tier creators. Reasons: three tested creatives instead of one bet, three separate audiences, higher average engagement (>5%) than macro creators typically deliver, more Spark-Ad rotation options, and less risk if any single creator underperforms.",
+      "One macro creator, but with a 3-day Video Code.",
+      "Split the budget with an influencer agency."
+    ],
+    "correct": 1,
+    "explanation": "Slide 6 of §12.3 gives Brian's three-creator plan. Three tested creatives, three audience segments, and higher engagement rates outperform a single macro bet for a KES 90,000 budget. Diversification, not concentration."
+  },
+  {
+    "scenario": "A trainee summarises Lesson 12.3 in one line: \"Spark Ads require a new studio video, Video Codes are always 30 days, and the Creator Marketplace forbids Kenyan creators.\"",
+    "question": "How many of those three claims are correct?",
+    "options": [
+      "All three.",
+      "Two — the Video Code and Marketplace parts.",
+      "Zero — every claim is wrong.",
+      "One — only the Spark Ads part."
+    ],
+    "correct": 2,
+    "explanation": "Every claim is wrong. Spark Ads promote EXISTING organic videos, not new studio content (Slide 2). Video Codes are valid 7 OR 60 days, not 30 (Slide 4). And the Creator Marketplace explicitly filters BY country — Kenyan creators are eligible and the whole point of Brian filtering by Kenya (Slide 5)."
+  }
+];
+
+        let currentQuestion = 0, score = 0, streak = 0, answered = false;
+
+        function updateScoreboard() {
+            document.getElementById('score').textContent = score;
+            document.getElementById('current').textContent = Math.min(currentQuestion + 1, exercises.length);
+            document.getElementById('total').textContent = exercises.length;
+            document.getElementById('streak').textContent = streak;
+            document.getElementById('progress').style.width = ((currentQuestion) / exercises.length) * 100 + '%';
+        }
+
+        function escapeHtml(s) {
+            return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+        }
+
+        function renderQuestion() {
+            answered = false;
+            const q = exercises[currentQuestion];
+            let html = '';
+            if (q.scenario) {
+                html += `<div class="scenario"><strong>Scenario.</strong> ${escapeHtml(q.scenario)}</div>`;
+            }
+            html += `<div class="question">${escapeHtml(q.question)}</div>`;
+            html += '<div class="options">';
+            q.options.forEach((o, i) => {
+                html += `<button class="option" onclick="selectAnswer(${i})">${escapeHtml(o)}</button>`;
+            });
+            html += '</div>';
+            document.getElementById('exerciseCard').innerHTML = html;
+            updateScoreboard();
+        }
+
+        function selectAnswer(i) {
+            if (answered) return;
+            answered = true;
+            const q = exercises[currentQuestion];
+            const btns = document.querySelectorAll('.option');
+            btns.forEach(b => b.classList.add('disabled'));
+            btns[q.correct].classList.add('correct');
+            const right = i === q.correct;
+            if (!right) btns[i].classList.add('wrong');
+            if (right) { score += 10; streak += 1; } else { streak = 0; }
+            const fb = document.createElement('div');
+            fb.className = 'feedback ' + (right ? 'correct' : 'wrong');
+            fb.innerHTML = `<strong>${right ? '✅ Correct.' : '❌ Not quite.'}</strong><br>${escapeHtml(q.explanation)}`;
+            document.getElementById('exerciseCard').appendChild(fb);
+            const nb = document.createElement('button');
+            nb.className = 'next-btn';
+            nb.textContent = currentQuestion === exercises.length - 1 ? 'See results →' : 'Next scenario →';
+            nb.onclick = nextQuestion;
+            document.getElementById('exerciseCard').appendChild(nb);
+            updateScoreboard();
+        }
+
+        function nextQuestion() {
+            currentQuestion++;
+            if (currentQuestion >= exercises.length) return showResults();
+            renderQuestion();
+        }
+
+        function showResults() {
+            document.getElementById('progress').style.width = '100%';
+            const total = exercises.length * 10;
+            const pct = Math.round(score / total * 100);
+            if (window.parent) { window.parent.postMessage({type:"mtti_quiz_score", score: score, total: total, percent: pct}, "*"); }
+            let badge = '🌟', msg = 'Excellent work. You have a professional grasp of this lesson.';
+            if (pct < 50) { badge = '🌱'; msg = 'Good first attempt. Re-watch the lesson video and try again.'; }
+            else if (pct < 80) { badge = '📚'; msg = 'Solid progress. Review the scenarios you missed and retry.'; }
+            document.getElementById('exerciseCard').innerHTML = `
+                <div class="results">
+                    <span class="badge">${badge}</span>
+                    <h2>Quiz Complete</h2>
+                    <div class="final-score">${score} / ${total}</div>
+                    <p><strong>${pct}%</strong> · Longest streak: ${streak}</p>
+                    <p>${msg}</p>
+                    <button class="restart-btn" onclick="restart()">Try again 🔁</button>
+                </div>`;
+        }
+
+        function restart() {
+            currentQuestion = 0; score = 0; streak = 0;
+            renderQuestion();
+        }
+
+        renderQuestion();
+    </script>
+</body>
+</html>

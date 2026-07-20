@@ -1,0 +1,346 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Long-form vs Shorts Strategy | MTTI Digital Marketing</title>
+    <link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Fredoka:wght@500;600&display=swap" rel="stylesheet">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Space Mono', monospace;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh; padding: 20px; color: #fff;
+        }
+        .container { max-width: 900px; margin: 0 auto; }
+        .header { text-align: center; margin-bottom: 30px; animation: slideDown 0.6s ease-out; }
+        .header .lesson-tag {
+            display: inline-block; background: rgba(255,255,255,0.2);
+            padding: 6px 16px; border-radius: 999px;
+            font-size: 0.85em; margin-bottom: 12px;
+        }
+        .header h1 {
+            font-family: 'Fredoka', sans-serif; font-size: 2.2em;
+            margin-bottom: 8px; text-shadow: 3px 3px 0 rgba(0,0,0,0.2);
+        }
+        .header p { opacity: 0.95; font-size: 0.95em; }
+        .score-board {
+            background: rgba(255,255,255,0.15); backdrop-filter: blur(10px);
+            border-radius: 20px; padding: 20px; margin-bottom: 20px;
+            display: flex; justify-content: space-around;
+            animation: fadeIn 0.8s ease-out 0.2s both;
+        }
+        .score-item { text-align: center; }
+        .score-item .label { font-size: 0.85em; opacity: 0.9; margin-bottom: 4px; }
+        .score-item .value {
+            font-size: 1.8em; font-weight: bold; font-family: 'Fredoka', sans-serif;
+        }
+        .progress-bar {
+            width: 100%; height: 8px; background: rgba(255,255,255,0.3);
+            border-radius: 10px; margin-bottom: 25px; overflow: hidden;
+        }
+        .progress-fill {
+            height: 100%; background: linear-gradient(90deg, #f093fb 0%, #f5576c 100%);
+            border-radius: 10px; transition: width 0.5s ease; width: 0%;
+        }
+        .exercise-card {
+            background: white; color: #333; border-radius: 25px;
+            padding: 35px; margin-bottom: 20px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            animation: fadeIn 0.6s ease-out both;
+        }
+        .scenario {
+            background: linear-gradient(135deg, #fff8e1 0%, #ffecb3 100%);
+            border-left: 5px solid #ffc107;
+            padding: 20px 24px; border-radius: 12px;
+            margin-bottom: 24px;
+            font-size: 0.98em; line-height: 1.55;
+        }
+        .scenario strong { color: #7a5a00; font-family: 'Fredoka', sans-serif; }
+        .question {
+            font-size: 1.15em; margin-bottom: 20px;
+            font-weight: 700; line-height: 1.4;
+        }
+        .options { display: flex; flex-direction: column; gap: 12px; }
+        .option {
+            background: #f5f7fb; border: 2px solid transparent;
+            padding: 16px 20px; border-radius: 12px;
+            cursor: pointer; transition: all 0.2s ease;
+            font-family: 'Space Mono', monospace; font-size: 0.98em; text-align: left;
+        }
+        .option:hover:not(.disabled) {
+            background: #eef1fb; border-color: #667eea; transform: translateX(4px);
+        }
+        .option.correct { background: #d4edda; border-color: #28a745; color: #155724; }
+        .option.wrong { background: #f8d7da; border-color: #dc3545; color: #721c24; animation: shake 0.4s; }
+        .option.disabled { cursor: not-allowed; opacity: 0.85; }
+        .feedback {
+            margin-top: 22px; padding: 18px 22px; border-radius: 12px;
+            animation: slideUp 0.4s ease-out;
+            font-size: 0.98em; line-height: 1.5;
+        }
+        .feedback.correct { background: #d4edda; color: #155724; border-left: 4px solid #28a745; }
+        .feedback.wrong { background: #f8d7da; color: #721c24; border-left: 4px solid #dc3545; }
+        .feedback strong { font-family: 'Fredoka', sans-serif; }
+        .next-btn, .restart-btn {
+            margin-top: 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white; border: none;
+            padding: 14px 32px; border-radius: 12px;
+            font-size: 1em; cursor: pointer;
+            font-family: 'Fredoka', sans-serif;
+            box-shadow: 0 6px 18px rgba(0,0,0,0.2);
+            transition: transform 0.2s ease;
+        }
+        .next-btn:hover, .restart-btn:hover { transform: scale(1.04); }
+        .results {
+            text-align: center; padding: 25px 15px;
+            animation: bounceIn 0.6s ease-out;
+        }
+        .results h2 {
+            font-family: 'Fredoka', sans-serif; font-size: 2em;
+            margin-bottom: 12px; color: #333;
+        }
+        .results .final-score {
+            font-size: 3em; font-family: 'Fredoka', sans-serif;
+            color: #667eea; margin: 20px 0;
+        }
+        .results p { color: #555; margin-bottom: 12px; }
+        .badge { display: inline-block; font-size: 3.5em; margin: 8px 0; }
+        @keyframes slideDown { from { opacity: 0; transform: translateY(-30px); } to { opacity: 1; transform: translateY(0); } }
+        @keyframes fadeIn { from { opacity: 0; transform: scale(0.96); } to { opacity: 1; transform: scale(1); } }
+        @keyframes slideUp { from { opacity: 0; transform: translateY(15px); } to { opacity: 1; transform: translateY(0); } }
+        @keyframes shake { 0%,100% { transform: translateX(0); } 25% { transform: translateX(-8px); } 75% { transform: translateX(8px); } }
+        @keyframes bounceIn { 0% { opacity: 0; transform: scale(0.4); } 60% { transform: scale(1.05); } 100% { opacity: 1; transform: scale(1); } }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <div class="lesson-tag">Module 13 · Lesson 13.4</div>
+            <h1>Long-form vs Shorts Strategy</h1>
+            <p>10 scenarios — Brian's Shorts, Sarah's long-form, and when to pick which</p>
+        </div>
+
+        <div class="score-board">
+            <div class="score-item"><div class="label">Score</div><div class="value" id="score">0</div></div>
+            <div class="score-item"><div class="label">Question</div><div class="value"><span id="current">1</span>/<span id="total">10</span></div></div>
+            <div class="score-item"><div class="label">Streak</div><div class="value" id="streak">0</div></div>
+        </div>
+
+        <div class="progress-bar"><div class="progress-fill" id="progress"></div></div>
+
+        <div class="exercise-card" id="exerciseCard"></div>
+    </div>
+
+    <script>
+        const exercises = [
+  {
+    "scenario": "Brian is starting the Chapa Fitness channel from zero subscribers. Goal: reach as many 18-24 year-old Kenyans as possible in the first 90 days.",
+    "question": "What format should he lead with?",
+    "options": [
+      "Long-form only — depth first.",
+      "Shorts. The Shorts feed is aggressively algorithmic and can show a strong 15-second clip from a brand-new channel to tens of thousands of viewers. Zero prior audience needed. Brian's real number: 0 → 8,000 subscribers in 3 months on Shorts alone.",
+      "A 45-minute livestream.",
+      "Nothing on YouTube — go straight to Meta ads."
+    ],
+    "correct": 1,
+    "explanation": "Slide 3 of §13.4: Shorts wins for awareness and discovery. Zero prior audience needed. 60% of Kenyan viewers under 25 open the Shorts shelf every session — it is the correct discovery format for Gen-Z."
+  },
+  {
+    "scenario": "Sarah's 3-minute ugali tutorial gets watched by people who are actively deciding whether to trust Karibu Kitchen with a lunch order.",
+    "question": "Is this a Shorts play or a long-form play, and why?",
+    "options": [
+      "Shorts — cut it to 30 seconds.",
+      "Long-form. The viewer is in consideration/decision mode, not discovery mode. Long-form is where depth, trust, and search-engine ranking happen. Long-form also earns 10-50× the per-view RPM of Shorts once mid-roll AdSense turns on above 10 minutes.",
+      "Neither — post a photo.",
+      "Livestream only."
+    ],
+    "correct": 1,
+    "explanation": "Slide 4 of §13.4: long-form wins for consideration and decision. The 3-minute tutorial is a trust builder, not a discovery play. It also ranks on Google, which Shorts almost never do."
+  },
+  {
+    "scenario": "Brian is filming a 15-second Short and opens with \"Hey guys, hope you're having an amazing day, welcome back to Chapa Fitness...\" The Short gets almost zero views.",
+    "question": "What is the professional read?",
+    "options": [
+      "The Shorts algorithm is broken.",
+      "The first second is the whole game on Shorts. A generic \"hey guys\" opener triggers swipe-past in frame one, which the algorithm reads as rejection and stops promoting. Open on the VISUAL pay-off (the finished workout move), with on-screen text stating the promise, and pick a trending sound before filming.",
+      "The video was too short.",
+      "The video was too long."
+    ],
+    "correct": 1,
+    "explanation": "Slide 5 of §13.4: Shorts hook rules — open on the visual pay-off, on-screen text in the first second, trending audio. \"Hey guys\" burns the frame that decides everything."
+  },
+  {
+    "scenario": "Sarah is publishing a 5-minute long-form tutorial and asks: \"Should I put my Subscribe CTA, WhatsApp CTA, and website CTA all at the end?\"",
+    "question": "What is the correct rule?",
+    "options": [
+      "Yes — more CTAs is always better.",
+      "One CTA per video. Never three. Stacking CTAs splits the viewer's attention and reduces action rate on all of them. Sarah picks the ONE that matters most for this video — for a decision-stage tutorial, WhatsApp order is usually the winner. Move the others to the pinned comment.",
+      "Zero CTAs — never ask for anything.",
+      "Six CTAs is the sweet spot."
+    ],
+    "correct": 1,
+    "explanation": "Slide 6 of §13.4: the six-part long-form structure ends with ONE clear CTA. Multiple CTAs dilute action. Extra links go in the description and pinned comment."
+  },
+  {
+    "scenario": "Sarah asks about the mid-video re-hook. Her tutorial is 4 minutes long.",
+    "question": "Where does the re-hook sit, and what does it do?",
+    "options": [
+      "At the very end.",
+      "Around the 60% mark — roughly the 2:24 point on a 4-minute video. It restates why the viewer should stay ('and here's the part where the ugali stops sticking to the pot'). Re-hooks can add ~15% to average watch time, which is YouTube's #1 ranking signal.",
+      "In the first 5 seconds.",
+      "Only in Shorts."
+    ],
+    "correct": 1,
+    "explanation": "Slide 6 of §13.4: the re-hook sits at ~60% of the video length and can lift average watch time by ~15%. On a 4-minute video that's around the 2:24 mark."
+  },
+  {
+    "scenario": "Brian is choosing a cadence for Chapa Fitness. He can realistically produce 3 Shorts a week and 1 long-form a month.",
+    "question": "Is this a professional cadence?",
+    "options": [
+      "No — needs at least 3 long-form a week too.",
+      "Yes. 3 Shorts/week (Mon/Wed/Fri) drives discovery. 1 long-form/month (5-8 min walkthrough) drives depth and mid-roll monetisation. Every Short cross-posts to Instagram Reels for a free second audience. This is a standard solo-creator cadence.",
+      "No — Shorts kill algorithm reach on the same channel.",
+      "No — YouTube limits accounts to one upload per week."
+    ],
+    "correct": 1,
+    "explanation": "Slide 7 of §13.4: Brian's exact cadence — 3 Shorts/week + 1 long-form/month, cross-posted to Reels. Sustainable for a solo owner and covers both discovery and depth."
+  },
+  {
+    "scenario": "Sarah, who is a solo owner running the kitchen AND filming, asks whether she should try to match Brian's 3 Shorts a week.",
+    "question": "What is the sensible cadence for Karibu Kitchen?",
+    "options": [
+      "Yes — copy Brian exactly.",
+      "1 Short per week + 1 long-form per month. Sarah's total is 5 uploads/month, manageable while running the kitchen. Every long-form gets the full §13.3 SEO stack; every Short gets a first-second hook and one CTA. Different format, same discipline.",
+      "10 videos a day.",
+      "One video every 6 months."
+    ],
+    "correct": 1,
+    "explanation": "Slide 8 of §13.4: Sarah's cadence is 1 Short + 1 long-form per month baseline, or roughly 5 uploads/month total. Solo-owner realistic and covers discovery + depth."
+  },
+  {
+    "scenario": "Brian earns KES 45 in a month from his 12 Shorts (which hit 2.4 million views combined) and KES 2,100 from his one 8-minute long-form (which hit 45,000 views).",
+    "question": "What does this tell him about YouTube's revenue model?",
+    "options": [
+      "The numbers must be a bug.",
+      "Correct behaviour. Shorts are monetised through the Shorts Ad Revenue Sharing pool at a much lower RPM. Long-form videos above 10 minutes earn mid-roll AdSense, which is typically 10-50× the RPM of Shorts. Shorts drive discovery and audience. Long-form drives revenue.",
+      "Shorts pay more per view than long-form.",
+      "Brian should stop posting long-form."
+    ],
+    "correct": 1,
+    "explanation": "Slide 2 + Slide 4 of §13.4: two different monetisation models. Shorts = revenue-sharing pool (low RPM). Long-form = per-video AdSense with mid-roll (10-50× the RPM). Shorts for discovery. Long-form for money."
+  },
+  {
+    "scenario": "Sarah's cousin argues: \"Shorts kill the algorithm — the channel will only get pushed as a Shorts channel and long-form will stop appearing.\"",
+    "question": "Is this true in 2026?",
+    "options": [
+      "Yes — Shorts destroy long-form reach.",
+      "No. As of 2026, YouTube treats Shorts and long-form on the same channel as separate discovery pools. Mixing them does not penalise long-form reach. The Chapa Fitness and Karibu Kitchen cadences both use both formats without penalty.",
+      "Yes — YouTube deletes long-form once a channel posts Shorts.",
+      "Only in Kenya does mixing hurt reach."
+    ],
+    "correct": 1,
+    "explanation": "Slide 7 + Slide 8 of §13.4: mixed cadences are the professional norm. Both Brian and Sarah run Shorts + long-form on the same channel with no cross-penalty."
+  },
+  {
+    "scenario": "A trainee summarises Lesson 13.4 in one line: \"Shorts must be under 30 seconds, long-form always beats Shorts for awareness, and both formats share the same monetisation model.\"",
+    "question": "How many of those three claims are correct?",
+    "options": [
+      "All three.",
+      "Two — the length and awareness parts.",
+      "Zero — every claim is wrong.",
+      "One — only the monetisation part."
+    ],
+    "correct": 2,
+    "explanation": "Every claim is wrong. Shorts are up to 60 seconds, not 30 (Slide 2). Shorts beat long-form for awareness/discovery — long-form wins consideration/decision (Slides 3-4). And the two formats have different monetisation models — Shorts Ad Revenue Sharing pool vs mid-roll AdSense (Slide 2)."
+  }
+];
+
+        let currentQuestion = 0, score = 0, streak = 0, answered = false;
+
+        function updateScoreboard() {
+            document.getElementById('score').textContent = score;
+            document.getElementById('current').textContent = Math.min(currentQuestion + 1, exercises.length);
+            document.getElementById('total').textContent = exercises.length;
+            document.getElementById('streak').textContent = streak;
+            document.getElementById('progress').style.width = ((currentQuestion) / exercises.length) * 100 + '%';
+        }
+
+        function escapeHtml(s) {
+            return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+        }
+
+        function renderQuestion() {
+            answered = false;
+            const q = exercises[currentQuestion];
+            let html = '';
+            if (q.scenario) {
+                html += `<div class="scenario"><strong>Scenario.</strong> ${escapeHtml(q.scenario)}</div>`;
+            }
+            html += `<div class="question">${escapeHtml(q.question)}</div>`;
+            html += '<div class="options">';
+            q.options.forEach((o, i) => {
+                html += `<button class="option" onclick="selectAnswer(${i})">${escapeHtml(o)}</button>`;
+            });
+            html += '</div>';
+            document.getElementById('exerciseCard').innerHTML = html;
+            updateScoreboard();
+        }
+
+        function selectAnswer(i) {
+            if (answered) return;
+            answered = true;
+            const q = exercises[currentQuestion];
+            const btns = document.querySelectorAll('.option');
+            btns.forEach(b => b.classList.add('disabled'));
+            btns[q.correct].classList.add('correct');
+            const right = i === q.correct;
+            if (!right) btns[i].classList.add('wrong');
+            if (right) { score += 10; streak += 1; } else { streak = 0; }
+            const fb = document.createElement('div');
+            fb.className = 'feedback ' + (right ? 'correct' : 'wrong');
+            fb.innerHTML = `<strong>${right ? '✅ Correct.' : '❌ Not quite.'}</strong><br>${escapeHtml(q.explanation)}`;
+            document.getElementById('exerciseCard').appendChild(fb);
+            const nb = document.createElement('button');
+            nb.className = 'next-btn';
+            nb.textContent = currentQuestion === exercises.length - 1 ? 'See results →' : 'Next scenario →';
+            nb.onclick = nextQuestion;
+            document.getElementById('exerciseCard').appendChild(nb);
+            updateScoreboard();
+        }
+
+        function nextQuestion() {
+            currentQuestion++;
+            if (currentQuestion >= exercises.length) return showResults();
+            renderQuestion();
+        }
+
+        function showResults() {
+            document.getElementById('progress').style.width = '100%';
+            const total = exercises.length * 10;
+            const pct = Math.round(score / total * 100);
+            if (window.parent) { window.parent.postMessage({type:"mtti_quiz_score", score: score, total: total, percent: pct}, "*"); }
+            let badge = '🌟', msg = 'Excellent work. You have a professional grasp of this lesson.';
+            if (pct < 50) { badge = '🌱'; msg = 'Good first attempt. Re-watch the lesson video and try again.'; }
+            else if (pct < 80) { badge = '📚'; msg = 'Solid progress. Review the scenarios you missed and retry.'; }
+            document.getElementById('exerciseCard').innerHTML = `
+                <div class="results">
+                    <span class="badge">${badge}</span>
+                    <h2>Quiz Complete</h2>
+                    <div class="final-score">${score} / ${total}</div>
+                    <p><strong>${pct}%</strong> · Longest streak: ${streak}</p>
+                    <p>${msg}</p>
+                    <button class="restart-btn" onclick="restart()">Try again 🔁</button>
+                </div>`;
+        }
+
+        function restart() {
+            currentQuestion = 0; score = 0; streak = 0;
+            renderQuestion();
+        }
+
+        renderQuestion();
+    </script>
+</body>
+</html>

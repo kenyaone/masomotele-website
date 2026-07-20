@@ -1,0 +1,435 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lesson 6.2 — Web Analytics GA4 (Interactive)</title>
+<style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: 'Segoe UI', -apple-system, sans-serif; line-height: 1.55; color: #1e293b; background: #f8fafc; min-height: 100vh; }
+    .container { max-width: 1200px; margin: 0 auto; padding: 20px; }
+    header { background: linear-gradient(135deg, #2E7D32, #1B5E20); color: #fff; padding: 40px 30px; border-radius: 12px; margin-bottom: 24px; box-shadow: 0 10px 30px rgba(227,116,0,0.25); }
+    header .badge { display: inline-block; background: rgba(255,255,255,0.2); padding: 4px 14px; border-radius: 16px; font-size: 12px; font-weight: bold; letter-spacing: 1px; margin-bottom: 14px; }
+    header h1 { font-size: 34px; margin-bottom: 8px; }
+    header .subtitle { font-size: 17px; opacity: 0.95; margin-bottom: 20px; }
+    .meta-strip { display: flex; flex-wrap: wrap; gap: 12px; }
+    .meta-strip span { background: rgba(255,255,255,0.18); padding: 6px 14px; border-radius: 20px; font-size: 13px; }
+    .toc { background: #fff; border: 1px solid #e2e8f0; border-radius: 10px; padding: 22px 26px; margin-bottom: 22px; }
+    .toc h3 { color: #e37400; margin-bottom: 10px; }
+    .toc ol { padding-left: 20px; }
+    .toc a { color: #e37400; text-decoration: none; font-weight: 600; }
+    section { background: #fff; border: 1px solid #e2e8f0; border-radius: 10px; padding: 26px 30px; margin-bottom: 22px; }
+    section h2 { color: #e37400; font-size: 22px; margin-bottom: 12px; padding-bottom: 8px; border-bottom: 3px solid #e37400; }
+    section p { margin-bottom: 12px; }
+    .callout { border-left: 5px solid #e37400; background: #fff7ed; padding: 14px 18px; margin: 14px 0; border-radius: 4px; }
+    .callout.warn { border-left-color: #dc2626; background: #fef2f2; }
+    .callout.tip { border-left-color: #059669; background: #ecfdf5; }
+    .callout strong { color: #e37400; }
+
+    /* Mock GA4 dashboard — flagship */
+    .ga4 { background: #fff; border: 1px solid #dadce0; border-radius: 8px; overflow: hidden; margin: 14px 0; }
+    .ga4-top { background: #fff; padding: 10px 16px; border-bottom: 1px solid #e5e7eb; font-size: 13px; display: flex; align-items: center; gap: 12px; }
+    .ga4-top .g { display: inline-flex; align-items: center; font-weight: 500; color: #202124; }
+    .ga4-top .g::before { content: 'GA'; background: #e37400; color: #fff; width: 26px; height: 26px; border-radius: 4px; display: inline-flex; align-items: center; justify-content: center; font-size: 11px; font-weight: bold; margin-right: 8px; }
+    .ga4-top .prop { color: #5f6368; font-size: 12px; }
+    .ga4-top .prop::before { content: '· '; }
+    .ga4-body { display: grid; grid-template-columns: 180px 1fr; min-height: 400px; }
+    @media (max-width: 800px) { .ga4-body { grid-template-columns: 1fr; } .ga4-sidebar { display: none; } }
+    .ga4-sidebar { background: #fafafa; border-right: 1px solid #e5e7eb; padding: 8px 0; font-size: 13px; }
+    .ga4-menu { padding: 8px 20px; color: #202124; cursor: pointer; border-left: 3px solid transparent; }
+    .ga4-menu:hover { background: #f1f3f4; }
+    .ga4-menu.active { border-left-color: #e37400; color: #b45309; background: #fff7ed; font-weight: 600; }
+    .ga4-content { padding: 18px; background: #fafafa; }
+    .ga4-title { font-size: 16px; margin-bottom: 4px; color: #202124; }
+    .ga4-date { font-size: 12px; color: #5f6368; margin-bottom: 14px; }
+    .widget-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; margin-bottom: 12px; }
+    @media (max-width: 700px) { .widget-grid { grid-template-columns: 1fr 1fr; } }
+    .widget { background: #fff; border: 1px solid #dadce0; border-radius: 8px; padding: 14px; cursor: pointer; transition: all 0.2s; }
+    .widget:hover { border-color: #e37400; box-shadow: 0 2px 8px rgba(227,116,0,0.15); }
+    .widget.active { border-color: #e37400; border-width: 2px; background: #fff7ed; }
+    .widget .label { font-size: 12px; color: #5f6368; }
+    .widget .value { font-size: 22px; color: #202124; font-weight: 500; margin-top: 4px; }
+    .widget .change { font-size: 11px; margin-top: 2px; }
+    .widget .change.up { color: #188038; }
+    .widget .change.down { color: #ea4335; }
+
+    .explain { margin-top: 12px; padding: 14px; background: #fff7ed; border-left: 4px solid #e37400; border-radius: 4px; font-size: 14px; color: #7c2d12; display: none; }
+    .explain.show { display: block; }
+    .explain h5 { color: #b45309; margin-bottom: 6px; }
+
+    .events-table { background: #fff; border: 1px solid #dadce0; border-radius: 8px; margin-top: 14px; overflow-x: auto; }
+    .events-table table { width: 100%; border-collapse: collapse; font-size: 13px; }
+    .events-table th { background: #f8f9fa; padding: 10px 12px; text-align: left; font-weight: 500; border-bottom: 1px solid #dadce0; font-size: 12px; }
+    .events-table td { padding: 10px 12px; border-bottom: 1px solid #f1f3f4; }
+    .events-table tr:hover { background: #fafafa; }
+
+    /* Terms table */
+    .terms { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 10px; margin: 14px 0; }
+    .term { background: #f8fafc; border-left: 4px solid #e37400; border-radius: 4px; padding: 12px 14px; }
+    .term h5 { color: #b45309; font-size: 14px; margin-bottom: 4px; }
+    .term p { font-size: 13px; color: #475569; margin: 0; }
+
+    /* Quality vs quantity */
+    .qvq { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin: 14px 0; }
+    @media (max-width: 700px) { .qvq { grid-template-columns: 1fr; } }
+    .qvq-card { background: #f8fafc; border: 2px solid #cbd5e1; border-radius: 10px; padding: 14px; }
+    .qvq-card.win { border-color: #059669; background: #ecfdf5; }
+    .qvq-card h4 { margin-bottom: 8px; }
+    .qvq-card .row { display: flex; justify-content: space-between; padding: 4px 0; font-size: 14px; }
+    .qvq-card .row b { font-family: 'Courier New', monospace; }
+
+    /* Sarah's full picture reveal */
+    .surface { background: #fef2f2; border: 2px solid #dc2626; border-radius: 10px; padding: 16px; margin: 14px 0; }
+    .surface h4 { color: #991b1b; margin-bottom: 8px; }
+    .truth { background: #ecfdf5; border: 2px solid #059669; border-radius: 10px; padding: 16px; margin: 14px 0; display: none; }
+    .truth.show { display: block; }
+    .truth h4 { color: #065f46; margin-bottom: 8px; }
+    .reveal-btn { background: #059669; color: #fff; border: 0; padding: 10px 20px; border-radius: 6px; cursor: pointer; font-weight: 600; margin: 10px 0; }
+
+    .quiz-question { background: #fff; border: 2px solid #cbd5e1; border-radius: 10px; padding: 18px; margin: 14px 0; }
+    .quiz-question.correct { border-color: #059669; background: #ecfdf5; }
+    .quiz-question.wrong { border-color: #dc2626; background: #fef2f2; }
+    .quiz-question h4 { margin-bottom: 12px; font-size: 15px; color: #1e293b; }
+    .quiz-question .options label { display: block; padding: 10px 14px; margin-bottom: 6px; background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 6px; cursor: pointer; font-size: 14px; }
+    .quiz-question .options label:hover { background: #fff7ed; }
+    .quiz-question .options input[type="radio"] { margin-right: 10px; }
+    .quiz-question .explanation { display: none; margin-top: 12px; padding: 10px 14px; border-radius: 6px; font-size: 14px; }
+    .quiz-question.correct .explanation { display: block; background: #d1fae5; color: #065f46; border-left: 4px solid #059669; }
+    .quiz-question.wrong .explanation { display: block; background: #fee2e2; color: #991b1b; border-left: 4px solid #dc2626; }
+    .quiz-summary { text-align: center; padding: 30px; background: linear-gradient(135deg, #fff7ed, #fed7aa); border-radius: 10px; margin: 20px 0; display: none; }
+    .quiz-summary.show { display: block; }
+    .quiz-summary .score { font-size: 48px; font-weight: bold; color: #e37400; margin-bottom: 8px; }
+    button.btn { background: #e37400; color: #fff; border: none; padding: 10px 20px; border-radius: 6px; font-size: 15px; font-weight: 600; cursor: pointer; }
+    button.btn:hover { background: #b45309; }
+    button.btn.reset { background: #64748b; margin-left: 8px; }
+    footer { text-align: center; color: #64748b; padding: 24px; font-size: 13px; }
+
+    /* MTTI logo stamp */
+    .mtti-logo-stamp {
+        position: fixed; top: 14px; right: 18px; z-index: 999;
+        opacity: 0.88; transition: opacity 0.2s;
+    }
+    .mtti-logo-stamp:hover { opacity: 1; }
+    .mtti-logo-stamp img { width: 56px; height: 56px; border-radius: 50%; box-shadow: 0 2px 8px rgba(0,0,0,0.18); }
+</style>
+</head>
+<body>
+<div class="mtti-logo-stamp">
+    <img src="../../Resources/Logo.jpeg" alt="MTTI" title="Masomotele Technical Training Institute — Start learning, Start earning">
+</div>
+
+<div class="container">
+<header>
+    <div class="badge">LESSON 6.2  ·  ANALYTICS  ·  INTERACTIVE</div>
+    <h1>Web Analytics (GA4)</h1>
+    <div class="subtitle">The industry-standard tool. 8 essential terms. Why quality beats quantity. And why Sarah is WRONG about her ads.</div>
+    <div class="meta-strip">
+        <span><strong>Duration:</strong> ~35 min</span>
+        <span><strong>Handbook:</strong> Part 6, §6.2</span>
+    </div>
+</header>
+
+<div class="toc">
+    <h3>What you'll do</h3>
+    <ol>
+        <li><a href="#s1">What GA4 measures</a></li>
+        <li><a href="#s2">The 8 essential terms</a></li>
+        <li><a href="#s3">Quality beats quantity</a></li>
+        <li><a href="#s4"><strong>Mock GA4 dashboard — click each widget</strong></a></li>
+        <li><a href="#s5">Sarah's month-3 review — the trap</a></li>
+        <li><a href="#s6">The 3 numbers Sarah is missing (reveal)</a></li>
+        <li><a href="#s7">Self-check quiz</a></li>
+    </ol>
+</div>
+
+<section id="s1">
+    <h2>1. What GA4 measures</h2>
+    <ul>
+        <li><strong>WHO</strong> visits — unique users, location, device, language</li>
+        <li><strong>WHAT</strong> they do — pages, time on site, clicks, scrolls</li>
+        <li><strong>WHETHER</strong> they convert — buy, submit form, subscribe</li>
+    </ul>
+    <div class="callout tip"><strong>Free forever</strong> for standard use. Every Kenyan business site should install it.</div>
+</section>
+
+<section id="s2">
+    <h2>2. The 8 essential terms</h2>
+    <div class="terms">
+        <div class="term"><h5>Unique visitors</h5><p>Individual people (not repeat visits)</p></div>
+        <div class="term"><h5>Impressions</h5><p>Times content was displayed</p></div>
+        <div class="term"><h5>Clicks</h5><p>Times users clicked a link/ad</p></div>
+        <div class="term"><h5>Bounce rate</h5><p>% leaving after 1 page only</p></div>
+        <div class="term"><h5>Conversion rate</h5><p>% who completed desired action</p></div>
+        <div class="term"><h5>CTR</h5><p>Clicks ÷ Impressions</p></div>
+        <div class="term"><h5>Tracking code</h5><p>The JS snippet that collects data</p></div>
+        <div class="term"><h5>Referrals</h5><p>Traffic from other sites linking to you</p></div>
+    </div>
+</section>
+
+<section id="s3">
+    <h2>3. Quality beats quantity</h2>
+    <div class="qvq">
+        <div class="qvq-card win">
+            <h4>✓ Sarah — Karibu Kitchen</h4>
+            <div class="row"><span>Monthly visitors</span><b>2,300</b></div>
+            <div class="row"><span>Orders placed</span><b>170</b></div>
+            <div class="row"><span><strong>Conversion rate</strong></span><b>7.4%</b></div>
+            <div class="row"><span>Industry avg</span><b>2%</b></div>
+        </div>
+        <div class="qvq-card">
+            <h4>✗ Nyakinyua Kitchen</h4>
+            <div class="row"><span>Monthly visitors</span><b>15,000</b></div>
+            <div class="row"><span>Orders placed</span><b>~ 140</b></div>
+            <div class="row"><span><strong>Conversion rate</strong></span><b>0.9%</b></div>
+            <div class="row"><span>vs Sarah</span><b>6× traffic, fewer orders</b></div>
+        </div>
+    </div>
+    <div class="callout"><strong>Quality of traffic matters more than quantity of traffic.</strong> Always. Sarah is winning despite 6× less traffic.</div>
+</section>
+
+<section id="s4">
+    <h2>4. Mock GA4 dashboard — click each widget</h2>
+    <div class="ga4">
+        <div class="ga4-top">
+            <span class="g">GA4</span>
+            <span class="prop">karibukitchen.co.ke</span>
+            <span style="margin-left:auto; color:#5f6368;">Last 28 days</span>
+        </div>
+        <div class="ga4-body">
+            <div class="ga4-sidebar">
+                <div class="ga4-menu active">Reports</div>
+                <div class="ga4-menu">Real-time</div>
+                <div class="ga4-menu">Acquisition</div>
+                <div class="ga4-menu">Engagement</div>
+                <div class="ga4-menu">Monetisation</div>
+                <div class="ga4-menu">Retention</div>
+                <div class="ga4-menu">Explore</div>
+                <div class="ga4-menu">Configure</div>
+            </div>
+            <div class="ga4-content">
+                <div class="ga4-title">Reports snapshot</div>
+                <div class="ga4-date">28-day summary · karibukitchen.co.ke</div>
+
+                <div class="widget-grid">
+                    <div class="widget" onclick="explain('users', this)">
+                        <div class="label">Active users</div>
+                        <div class="value">1,247</div>
+                        <div class="change up">↑ 18%</div>
+                    </div>
+                    <div class="widget" onclick="explain('sessions', this)">
+                        <div class="label">Sessions</div>
+                        <div class="value">1,983</div>
+                        <div class="change up">↑ 22%</div>
+                    </div>
+                    <div class="widget" onclick="explain('engage', this)">
+                        <div class="label">Engagement rate</div>
+                        <div class="value">62%</div>
+                        <div class="change up">↑ 4 pp</div>
+                    </div>
+                    <div class="widget" onclick="explain('convrate', this)">
+                        <div class="label">Conversion rate</div>
+                        <div class="value">7.4%</div>
+                        <div class="change up">↑ 1.3 pp</div>
+                    </div>
+                    <div class="widget" onclick="explain('avgtime', this)">
+                        <div class="label">Avg session time</div>
+                        <div class="value">1m 42s</div>
+                        <div class="change up">↑ 12s</div>
+                    </div>
+                    <div class="widget" onclick="explain('bounce', this)">
+                        <div class="label">Bounce rate</div>
+                        <div class="value">38%</div>
+                        <div class="change down">↓ 4 pp (good)</div>
+                    </div>
+                    <div class="widget" onclick="explain('rev', this)">
+                        <div class="label">Revenue</div>
+                        <div class="value">KES 145k</div>
+                        <div class="change up">↑ 31%</div>
+                    </div>
+                    <div class="widget" onclick="explain('events', this)">
+                        <div class="label">Key events</div>
+                        <div class="value">184</div>
+                        <div class="change up">↑ 24%</div>
+                    </div>
+                </div>
+
+                <div class="explain" id="explainBox">
+                    <h5>Click any widget above</h5>
+                    <p>Each number tells you something specific about how Sarah's website is performing.</p>
+                </div>
+
+                <div class="events-table">
+                    <table>
+                        <tr><th>Top event names</th><th style="text-align:right;">Count</th></tr>
+                        <tr><td>page_view</td><td style="text-align:right;">7,432</td></tr>
+                        <tr><td>session_start</td><td style="text-align:right;">1,983</td></tr>
+                        <tr><td>whatsapp_click</td><td style="text-align:right;">142</td></tr>
+                        <tr><td>form_submit</td><td style="text-align:right;">42</td></tr>
+                        <tr><td>purchase</td><td style="text-align:right;">170</td></tr>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<section id="s5">
+    <h2>5. Sarah's month-3 review — the trap</h2>
+    <div class="surface">
+        <h4>What Sarah sees on the surface</h4>
+        <ul>
+            <li>Ad spend: <strong>KES 45,000</strong></li>
+            <li>Purchases: <strong>58</strong></li>
+            <li>Revenue: <strong>KES 49,300</strong></li>
+        </ul>
+        <p style="margin-top:8px; color:#991b1b;"><em>"Spent 45k, made 49k — that's basically a loss. Kill the ads."</em></p>
+    </div>
+    <button class="reveal-btn" onclick="document.getElementById('truth').classList.add('show')">Reveal the 3 numbers Sarah missed</button>
+    <div class="truth" id="truth">
+        <h4>The truth — 3 numbers she missed</h4>
+        <ul>
+            <li><strong>Profit ≠ Revenue.</strong> Profit per order (after cost) = KES 350. 58 × 350 = <strong>KES 20,300 profit</strong>.</li>
+            <li><strong>View-through conversions.</strong> Meta reports <strong>12 additional purchases</strong> attributed to view-only ad exposure — not in her 58.</li>
+            <li><strong>Lifetime value.</strong> <strong>19 of those 58 customers</strong> have re-ordered organically since. Their real value is 3–5× first purchase.</li>
+        </ul>
+        <p style="margin-top:8px; color:#065f46;"><strong>Sarah's ads ARE profitable.</strong> She just didn't see the full picture. This is why analytics matters — surface numbers lie.</p>
+    </div>
+</section>
+
+<section id="s6">
+    <h2>6. The 4 main analytics tools</h2>
+    <table style="width:100%; border-collapse:collapse; font-size:14px;">
+        <tr><th style="background:#e37400;color:#fff;padding:10px;text-align:left;">Tool</th><th style="background:#e37400;color:#fff;padding:10px;text-align:left;">Best for</th><th style="background:#e37400;color:#fff;padding:10px;text-align:left;">Cost</th></tr>
+        <tr><td style="padding:10px;border:1px solid #e2e8f0;"><strong>Google Analytics 4</strong></td><td style="padding:10px;border:1px solid #e2e8f0;">90% of Kenyan sites. Industry standard.</td><td style="padding:10px;border:1px solid #e2e8f0;">Free</td></tr>
+        <tr><td style="padding:10px;border:1px solid #e2e8f0;">Adobe Analytics</td><td style="padding:10px;border:1px solid #e2e8f0;">Enterprise-grade</td><td style="padding:10px;border:1px solid #e2e8f0;">Paid</td></tr>
+        <tr><td style="padding:10px;border:1px solid #e2e8f0;">Matomo</td><td style="padding:10px;border:1px solid #e2e8f0;">Open-source, privacy-first (popular EU)</td><td style="padding:10px;border:1px solid #e2e8f0;">Free/Self-host</td></tr>
+        <tr><td style="padding:10px;border:1px solid #e2e8f0;">Clicky</td><td style="padding:10px;border:1px solid #e2e8f0;">Simple, small blogs</td><td style="padding:10px;border:1px solid #e2e8f0;">Freemium</td></tr>
+    </table>
+</section>
+
+<section id="s7">
+    <h2>7. Self-check quiz</h2>
+
+    <div class="quiz-question" data-correct="B"><h4>1. GA4 measures three things about visitors. WHO, WHAT, and…?</h4><div class="options"><label><input type="radio" name="q1" value="A"> A) WHERE they came from</label><label><input type="radio" name="q1" value="B"> B) WHETHER they convert</label><label><input type="radio" name="q1" value="C"> C) HOW they feel</label><label><input type="radio" name="q1" value="D"> D) WHY they left</label></div><div class="explanation">Correct — the conversion outcome is the third pillar.</div></div>
+
+    <div class="quiz-question" data-correct="D"><h4>2. Bounce rate =</h4><div class="options"><label><input type="radio" name="q2" value="A"> A) Clicks/impressions</label><label><input type="radio" name="q2" value="B"> B) Revenue/spend</label><label><input type="radio" name="q2" value="C"> C) Users/sessions</label><label><input type="radio" name="q2" value="D"> D) % of visitors who leave after 1 page</label></div><div class="explanation">Correct — one-page visits = bounces.</div></div>
+
+    <div class="quiz-question" data-correct="A"><h4>3. Sarah's conversion rate (170 orders from 2,300 visitors) is…</h4><div class="options"><label><input type="radio" name="q3" value="A"> A) 7.4% — well above industry average</label><label><input type="radio" name="q3" value="B"> B) Below industry average</label><label><input type="radio" name="q3" value="C"> C) 100%</label><label><input type="radio" name="q3" value="D"> D) 0.5%</label></div><div class="explanation">Correct — 170/2300 ≈ 7.4%. Industry avg is 2%.</div></div>
+
+    <div class="quiz-question" data-correct="C"><h4>4. Which is the industry-standard free tool?</h4><div class="options"><label><input type="radio" name="q4" value="A"> A) Adobe Analytics</label><label><input type="radio" name="q4" value="B"> B) Matomo</label><label><input type="radio" name="q4" value="C"> C) Google Analytics 4</label><label><input type="radio" name="q4" value="D"> D) Clicky</label></div><div class="explanation">Correct — 90% of Kenyan sites use GA4.</div></div>
+
+    <div class="quiz-question" data-correct="B"><h4>5. Sarah spent 45k, revenue was 49k. Was she profitable?</h4><div class="options"><label><input type="radio" name="q5" value="A"> A) No — she lost money</label><label><input type="radio" name="q5" value="B"> B) Yes — 20k profit + view-through + lifetime value not counted in the 49k</label><label><input type="radio" name="q5" value="C"> C) Break-even</label><label><input type="radio" name="q5" value="D"> D) Can't tell</label></div><div class="explanation">Correct — surface revenue hides margin, view-through conversions, and LTV.</div></div>
+
+    <div class="quiz-question" data-correct="A"><h4>6. Setting up GA4 on WordPress takes…</h4><div class="options"><label><input type="radio" name="q6" value="A"> A) ~10 minutes with MonsterInsights</label><label><input type="radio" name="q6" value="B"> B) A month</label><label><input type="radio" name="q6" value="C"> C) A developer</label><label><input type="radio" name="q6" value="D"> D) KES 50,000</label></div><div class="explanation">Correct — 3 steps, no code.</div></div>
+
+    <div class="quiz-question" data-correct="D"><h4>7. Quality &gt; quantity means…</h4><div class="options"><label><input type="radio" name="q7" value="A"> A) More visitors is always better</label><label><input type="radio" name="q7" value="B"> B) Followers matter most</label><label><input type="radio" name="q7" value="C"> C) Impressions win</label><label><input type="radio" name="q7" value="D"> D) 2,300 visitors converting at 7% beats 15,000 visitors converting at 1%</label></div><div class="explanation">Correct — Sarah's smaller, higher-intent traffic outperforms.</div></div>
+
+    <div class="quiz-question" data-correct="B"><h4>8. Referrals =</h4><div class="options"><label><input type="radio" name="q8" value="A"> A) Sarah's cousin's recommendations</label><label><input type="radio" name="q8" value="B"> B) Traffic from other websites linking to you</label><label><input type="radio" name="q8" value="C"> C) Employee bonuses</label><label><input type="radio" name="q8" value="D"> D) Google Ads</label></div><div class="explanation">Correct — a specific traffic source in GA4.</div></div>
+
+    <div class="quiz-question" data-correct="C"><h4>9. CTR =</h4><div class="options"><label><input type="radio" name="q9" value="A"> A) Cost To Rank</label><label><input type="radio" name="q9" value="B"> B) Customer Traffic Ratio</label><label><input type="radio" name="q9" value="C"> C) Click-through rate — clicks ÷ impressions</label><label><input type="radio" name="q9" value="D"> D) Content Traffic Rate</label></div><div class="explanation">Correct — classic metric.</div></div>
+
+    <div class="quiz-question" data-correct="A"><h4>10. Nyakinyua has 15k visitors but Sarah is beating them. Why?</h4><div class="options"><label><input type="radio" name="q10" value="A"> A) Quality of traffic beats quantity — Sarah's visitors are ready to buy</label><label><input type="radio" name="q10" value="B"> B) Luck</label><label><input type="radio" name="q10" value="C"> C) Better logo</label><label><input type="radio" name="q10" value="D"> D) Cheaper prices</label></div><div class="explanation">Correct — the eternal analytics lesson.</div></div>
+
+    <div style="margin-top:20px;">
+        <button class="btn" onclick="markQuiz()">Mark my quiz</button>
+        <button class="btn reset" onclick="resetQuiz()">Reset</button>
+    </div>
+    <div class="quiz-summary" id="quizSummary"><div class="score" id="scoreDisplay">0 / 10</div><p id="scoreMessage"></p></div>
+</section>
+
+<footer><p>Lesson 6.2 — Web Analytics (GA4) · MTTI · Handbook Part 6, §6.2</p><p>Next: <strong>Lesson 6.3 — Social Media Insights</strong></p></footer>
+</div>
+
+<script>
+const EXPLAINS = {
+    users: { title: 'Active users', body: '1,247 unique people visited Sarah\'s site in 28 days. Not sessions — real people. Up 18% shows organic + paid working together.' },
+    sessions: { title: 'Sessions', body: '1,983 sessions = average 1.6 visits per user. Higher = better engagement / returning customers.' },
+    engage: { title: 'Engagement rate', body: '62% of sessions were "engaged" — meaning 10+ seconds, a conversion, or multiple page views. GA4\'s modern replacement for old bounce rate.' },
+    convrate: { title: 'Conversion rate', body: '7.4% is EXCELLENT for Kenya — industry benchmark is ~2%. Sarah\'s traffic quality is the reason her small site outperforms Nyakinyua\'s 15,000 visitors.' },
+    avgtime: { title: 'Average session time', body: '1m 42s means visitors are actually reading the menu, not bouncing. Anything above 1 min for a small site is healthy.' },
+    bounce: { title: 'Bounce rate', body: '38% is healthy for a delivery menu site. Down 4pp means Sarah\'s Home page is doing a better job of getting people to the Menu page.' },
+    rev: { title: 'Revenue', body: 'KES 145,000 in 28 days. Up 31% quarter-on-quarter. But — remember from Lesson 6.1 — profit ≠ revenue.' },
+    events: { title: 'Key events', body: '184 conversions in 28 days (WhatsApp clicks, form submits, purchases). This is the number Sarah\'s bank account cares about.' }
+};
+function explain(k, el) {
+    document.querySelectorAll('.widget').forEach(w => w.classList.remove('active'));
+    el.classList.add('active');
+    const box = document.getElementById('explainBox');
+    box.classList.add('show');
+    box.innerHTML = '<h5>' + EXPLAINS[k].title + '</h5><p>' + EXPLAINS[k].body + '</p>';
+}
+
+function markQuiz() {
+    const qs = document.querySelectorAll('.quiz-question'); let s = 0;
+    qs.forEach((q, i) => { const c = q.dataset.correct; const p = q.querySelector(`input[name="q${i+1}"]:checked`); q.classList.remove('correct','wrong'); if (p && p.value === c) { q.classList.add('correct'); s++; } else if (p) q.classList.add('wrong'); });
+    const su = document.getElementById('quizSummary'); su.classList.add('show');
+    document.getElementById('scoreDisplay').textContent = `${s} / 10`;
+    document.getElementById('scoreMessage').textContent = s === 10 ? 'Perfect. Move to 6.3.' : s >= 7 ? 'Strong.' : 'Redo the dashboard walkthrough.';
+    su.scrollIntoView({behavior:'smooth',block:'center'});
+}
+function resetQuiz() { document.querySelectorAll('.quiz-question').forEach(q => { q.classList.remove('correct','wrong'); q.querySelectorAll('input[type=radio]').forEach(r => r.checked = false); }); document.getElementById('quizSummary').classList.remove('show'); }
+</script>
+<style id="mtti-paginator-style">
+  section[data-mtti-page] { display: none !important; }
+  section[data-mtti-page].mtti-active { display: block !important; }
+  #mtti-paginator-bar {
+    position: sticky; bottom: 0; left: 0; right: 0;
+    background: #fff; border-top: 2px solid #e2e8f0;
+    padding: 12px 20px; margin-top: 20px;
+    display: flex; align-items: center; justify-content: space-between; gap: 12px;
+    font-family: 'Segoe UI', -apple-system, sans-serif;
+    box-shadow: 0 -4px 16px rgba(0,0,0,0.08);
+    z-index: 100;
+  }
+  #mtti-paginator-bar button {
+    background: #2E7D32; color: #fff; border: none; padding: 10px 18px;
+    border-radius: 8px; font-size: 13px; font-weight: 600; cursor: pointer;
+  }
+  #mtti-paginator-bar button:disabled { background: #cbd5e1; cursor: not-allowed; }
+  #mtti-paginator-bar button.mtti-prev { background: #64748b; }
+  #mtti-paginator-progress { font-size: 12px; color: #64748b; font-weight: 600; }
+</style>
+<script id="mtti-paginator-script">
+(function(){
+  function init(){
+    var sections = Array.prototype.slice.call(document.querySelectorAll('section[id]'));
+    // Only sections that are real content blocks (has an <h2>), skip stray/decorative ones.
+    sections = sections.filter(function(s){ return s.querySelector('h2'); });
+    if (sections.length < 2) return; // nothing to paginate
+
+    sections.forEach(function(s, i){ s.setAttribute('data-mtti-page', i); });
+    var current = 0;
+
+    var bar = document.createElement('div');
+    bar.id = 'mtti-paginator-bar';
+    bar.innerHTML =
+      '<button class="mtti-prev" id="mtti-pg-prev">← Previous</button>' +
+      '<span id="mtti-paginator-progress"></span>' +
+      '<button id="mtti-pg-next">Next →</button>';
+    sections[sections.length - 1].insertAdjacentElement('afterend', bar);
+
+    var prevBtn = bar.querySelector('#mtti-pg-prev');
+    var nextBtn = bar.querySelector('#mtti-pg-next');
+    var progress = bar.querySelector('#mtti-paginator-progress');
+
+    function render(){
+      sections.forEach(function(s, i){ s.classList.toggle('mtti-active', i === current); });
+      prevBtn.disabled = (current === 0);
+      nextBtn.textContent = (current === sections.length - 1) ? 'Done ✓' : 'Next →';
+      progress.textContent = 'Section ' + (current + 1) + ' of ' + sections.length;
+      window.scrollTo(0, 0);
+    }
+    prevBtn.addEventListener('click', function(){ if (current > 0) { current--; render(); } });
+    nextBtn.addEventListener('click', function(){
+      if (current < sections.length - 1) { current++; render(); }
+    });
+    render();
+  }
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', init);
+  } else {
+    init();
+  }
+})();
+</script>
+</body></html>

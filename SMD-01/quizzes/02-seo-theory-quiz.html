@@ -1,0 +1,346 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Search Engine Optimisation (SEO) Theory | MTTI Digital Marketing</title>
+    <link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Fredoka:wght@500;600&display=swap" rel="stylesheet">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Space Mono', monospace;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh; padding: 20px; color: #fff;
+        }
+        .container { max-width: 900px; margin: 0 auto; }
+        .header { text-align: center; margin-bottom: 30px; animation: slideDown 0.6s ease-out; }
+        .header .lesson-tag {
+            display: inline-block; background: rgba(255,255,255,0.2);
+            padding: 6px 16px; border-radius: 999px;
+            font-size: 0.85em; margin-bottom: 12px;
+        }
+        .header h1 {
+            font-family: 'Fredoka', sans-serif; font-size: 2.2em;
+            margin-bottom: 8px; text-shadow: 3px 3px 0 rgba(0,0,0,0.2);
+        }
+        .header p { opacity: 0.95; font-size: 0.95em; }
+        .score-board {
+            background: rgba(255,255,255,0.15); backdrop-filter: blur(10px);
+            border-radius: 20px; padding: 20px; margin-bottom: 20px;
+            display: flex; justify-content: space-around;
+            animation: fadeIn 0.8s ease-out 0.2s both;
+        }
+        .score-item { text-align: center; }
+        .score-item .label { font-size: 0.85em; opacity: 0.9; margin-bottom: 4px; }
+        .score-item .value {
+            font-size: 1.8em; font-weight: bold; font-family: 'Fredoka', sans-serif;
+        }
+        .progress-bar {
+            width: 100%; height: 8px; background: rgba(255,255,255,0.3);
+            border-radius: 10px; margin-bottom: 25px; overflow: hidden;
+        }
+        .progress-fill {
+            height: 100%; background: linear-gradient(90deg, #f093fb 0%, #f5576c 100%);
+            border-radius: 10px; transition: width 0.5s ease; width: 0%;
+        }
+        .exercise-card {
+            background: white; color: #333; border-radius: 25px;
+            padding: 35px; margin-bottom: 20px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            animation: fadeIn 0.6s ease-out both;
+        }
+        .scenario {
+            background: linear-gradient(135deg, #fff8e1 0%, #ffecb3 100%);
+            border-left: 5px solid #ffc107;
+            padding: 20px 24px; border-radius: 12px;
+            margin-bottom: 24px;
+            font-size: 0.98em; line-height: 1.55;
+        }
+        .scenario strong { color: #7a5a00; font-family: 'Fredoka', sans-serif; }
+        .question {
+            font-size: 1.15em; margin-bottom: 20px;
+            font-weight: 700; line-height: 1.4;
+        }
+        .options { display: flex; flex-direction: column; gap: 12px; }
+        .option {
+            background: #f5f7fb; border: 2px solid transparent;
+            padding: 16px 20px; border-radius: 12px;
+            cursor: pointer; transition: all 0.2s ease;
+            font-family: 'Space Mono', monospace; font-size: 0.98em; text-align: left;
+        }
+        .option:hover:not(.disabled) {
+            background: #eef1fb; border-color: #667eea; transform: translateX(4px);
+        }
+        .option.correct { background: #d4edda; border-color: #28a745; color: #155724; }
+        .option.wrong { background: #f8d7da; border-color: #dc3545; color: #721c24; animation: shake 0.4s; }
+        .option.disabled { cursor: not-allowed; opacity: 0.85; }
+        .feedback {
+            margin-top: 22px; padding: 18px 22px; border-radius: 12px;
+            animation: slideUp 0.4s ease-out;
+            font-size: 0.98em; line-height: 1.5;
+        }
+        .feedback.correct { background: #d4edda; color: #155724; border-left: 4px solid #28a745; }
+        .feedback.wrong { background: #f8d7da; color: #721c24; border-left: 4px solid #dc3545; }
+        .feedback strong { font-family: 'Fredoka', sans-serif; }
+        .next-btn, .restart-btn {
+            margin-top: 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white; border: none;
+            padding: 14px 32px; border-radius: 12px;
+            font-size: 1em; cursor: pointer;
+            font-family: 'Fredoka', sans-serif;
+            box-shadow: 0 6px 18px rgba(0,0,0,0.2);
+            transition: transform 0.2s ease;
+        }
+        .next-btn:hover, .restart-btn:hover { transform: scale(1.04); }
+        .results {
+            text-align: center; padding: 25px 15px;
+            animation: bounceIn 0.6s ease-out;
+        }
+        .results h2 {
+            font-family: 'Fredoka', sans-serif; font-size: 2em;
+            margin-bottom: 12px; color: #333;
+        }
+        .results .final-score {
+            font-size: 3em; font-family: 'Fredoka', sans-serif;
+            color: #667eea; margin: 20px 0;
+        }
+        .results p { color: #555; margin-bottom: 12px; }
+        .badge { display: inline-block; font-size: 3.5em; margin: 8px 0; }
+        @keyframes slideDown { from { opacity: 0; transform: translateY(-30px); } to { opacity: 1; transform: translateY(0); } }
+        @keyframes fadeIn { from { opacity: 0; transform: scale(0.96); } to { opacity: 1; transform: scale(1); } }
+        @keyframes slideUp { from { opacity: 0; transform: translateY(15px); } to { opacity: 1; transform: translateY(0); } }
+        @keyframes shake { 0%,100% { transform: translateX(0); } 25% { transform: translateX(-8px); } 75% { transform: translateX(8px); } }
+        @keyframes bounceIn { 0% { opacity: 0; transform: scale(0.4); } 60% { transform: scale(1.05); } 100% { opacity: 1; transform: scale(1); } }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <div class="lesson-tag">Module 2 · Lesson 2.3</div>
+            <h1>Search Engine Optimisation (SEO) Theory</h1>
+            <p>10 Karibu Kitchen scenarios — apply the three pillars, four intents, and six on-page elements</p>
+        </div>
+
+        <div class="score-board">
+            <div class="score-item"><div class="label">Score</div><div class="value" id="score">0</div></div>
+            <div class="score-item"><div class="label">Question</div><div class="value"><span id="current">1</span>/<span id="total">10</span></div></div>
+            <div class="score-item"><div class="label">Streak</div><div class="value" id="streak">0</div></div>
+        </div>
+
+        <div class="progress-bar"><div class="progress-fill" id="progress"></div></div>
+
+        <div class="exercise-card" id="exerciseCard"></div>
+    </div>
+
+    <script>
+        const exercises = [
+  {
+    "scenario": "Sarah's cousin promises she can be on Google's first page \"by next Tuesday\" if she pays KES 30,000 to a friend who runs a \"secret SEO trick\".",
+    "question": "What is the accurate expectation you should set, per Lesson 2.3?",
+    "options": [
+      "One week — SEO is instant if the developer is skilled.",
+      "Three to six months of consistent work before real results appear — SEO has no legitimate shortcut.",
+      "One year minimum — SEO cannot work faster than that.",
+      "Never — small businesses in Eldoret cannot rank on Google."
+    ],
+    "correct": 1,
+    "explanation": "Section 2.3 sets the honest expectation: three to six months of consistent work. The \"start today, not next month\" principle exists because there is no shortcut. Option 1 is a scam sales pitch, option 3 is too pessimistic, option 4 contradicts the whole lesson."
+  },
+  {
+    "scenario": "Sarah wants to understand what SEO actually is before spending time on it.",
+    "question": "Which definition matches Lesson 2.3?",
+    "options": [
+      "SEO is paying Google directly for a first-page slot.",
+      "SEO is the practice of improving your website's visibility in the ORGANIC, unpaid results of search engines.",
+      "SEO is buying Facebook adverts to boost a Facebook page.",
+      "SEO is the process of blocking competitors from appearing on Google."
+    ],
+    "correct": 1,
+    "explanation": "Section 2.3 defines SEO as improving visibility in organic (unpaid) results. Paid slots are Search Engine Marketing (SEM), a different topic. Option 3 is social advertising; option 4 is not possible."
+  },
+  {
+    "scenario": "Sarah asks: \"What are the moving parts of SEO? What do I actually work on?\"",
+    "question": "Which set matches the three pillars from Lesson 2.3?",
+    "options": [
+      "Backups, hosting, and domain renewals.",
+      "Keywords, content, and links.",
+      "Social media, email, and SMS.",
+      "Logo, colours, and fonts."
+    ],
+    "correct": 1,
+    "explanation": "Section 2.3 names the three pillars explicitly: keywords (what people type), content (pages that use those keywords well), and links (other sites linking to yours, read by Google as votes of confidence). The other options describe unrelated concerns."
+  },
+  {
+    "scenario": "Sarah calls her food \"artisan lunch\" on every page of her site. Google Keyword Planner shows that in Eldoret, nobody searches for \"artisan lunch\" — but hundreds search \"lunch delivery near me\" and \"office lunch delivery Eldoret\".",
+    "question": "What does Lesson 2.3 say Sarah should do?",
+    "options": [
+      "Keep her own preferred words — customers should adapt to her language.",
+      "Rewrite her pages using the words her customers actually type — keyword research finds what people search for, not what you wish they did.",
+      "Ignore keywords entirely — Google is smart enough to guess.",
+      "Only use the shortest possible keywords."
+    ],
+    "correct": 1,
+    "explanation": "Section 2.3 warns against exactly this mistake — using YOUR words instead of your customers' words. Keyword research (Google Keyword Planner, Ubersuggest, SEMrush, Ahrefs) exists to find the real search terms. Then use them naturally."
+  },
+  {
+    "scenario": "A user in Eldoret types \"order lunch delivery Kapsoya now\" into Google.",
+    "question": "Which of the four search intents from Lesson 2.3 is this?",
+    "options": [
+      "Informational — the searcher wants to learn.",
+      "Navigational — the searcher wants to go to a specific site.",
+      "Commercial — the searcher wants to compare before buying.",
+      "Transactional — the searcher wants to buy, right now."
+    ],
+    "correct": 3,
+    "explanation": "Section 2.3 defines the four intents. \"Order... now\" is textbook transactional intent — the searcher is ready to buy. This is one of the two money intents Sarah should chase (commercial and transactional). Options 1 and 2 describe different intent types entirely."
+  },
+  {
+    "scenario": "Sarah wants to rank for \"food delivery\" as her main keyword. That short-tail phrase is dominated by Jumia Food, Glovo, and Uber Eats — huge budgets, thousands of backlinks.",
+    "question": "What long-tail alternative does Lesson 2.3 recommend for a small business like hers?",
+    "options": [
+      "Give up on SEO entirely.",
+      "Fight harder for \"food delivery\" no matter the odds.",
+      "Target long-tail keywords of four or more words — for example, \"vegetarian lunch delivery Elgon View\" or \"office lunch delivery Eldoret CBD\". Fewer searches, higher intent, actually rankable on page one.",
+      "Only target one-word keywords."
+    ],
+    "correct": 2,
+    "explanation": "Section 2.3 makes the long-tail case: one long-tail keyword at number one is worth more than five short-tail keywords at number 40. Fewer people search each phrase but they are ready to buy. Options 1 and 4 abandon the strategy; option 2 wastes months."
+  },
+  {
+    "scenario": "Sarah has written her homepage. You are reviewing the on-page SEO. The page title is \"Home | Karibu Kitchen\", the URL is /page-id=17, the H1 is missing, there are three H1s in the body, and the food photo has no alt text.",
+    "question": "Which fix set matches Lesson 2.3's six on-page elements?",
+    "options": [
+      "Rewrite the title to lead with the keyword (\"Lunch Delivery Eldoret — Karibu Kitchen\", 50–60 characters), clean the URL (karibukitchen.co.ke, lowercase and hyphenated), use one H1 only (\"Fresh lunch, delivered to your desk\"), keep H2/H3 for subsections, add alt text to every image (\"Ugali and beef stew in a takeaway container\"), and write at least 300 words of relevant content.",
+      "Delete the page and start again on Wix.",
+      "Stuff \"lunch\" into the text 100 times.",
+      "Change the domain name every month."
+    ],
+    "correct": 0,
+    "explanation": "Section 2.3's six on-page elements are: title (50–60 chars, keyword at start), clean URL, meta description (120–160 chars), one H1 with H2/H3 for subsections, alt text on every image, and at least 300 words of relevant content. Option 1 captures all six."
+  },
+  {
+    "scenario": "Sarah writes a homepage meta description that reads: \"Karibu Kitchen. Food. Nice food. Yummy.\" — 32 characters.",
+    "question": "What does Lesson 2.3 say a good meta description should be?",
+    "options": [
+      "Exactly 20 characters, no exceptions.",
+      "Between 500 and 800 characters, packed with every keyword possible.",
+      "Between 120 and 160 characters — a short, natural summary that appears under the title in Google results and encourages the click.",
+      "It does not matter — Google ignores meta descriptions."
+    ],
+    "correct": 2,
+    "explanation": "Section 2.3 sets the meta description length at 120–160 characters and uses Sarah's rewritten description as the example: \"Fresh lunch delivered to Eldoret CBD in 30 minutes...\" — 148 characters, natural, and packed with intent. The other options are wrong on length or importance."
+  },
+  {
+    "scenario": "Sarah wonders whether backlinks (other sites linking to hers) still matter, since \"everything is Google now\".",
+    "question": "According to the three pillars of Lesson 2.3, what role do links play?",
+    "options": [
+      "Links do not matter — only keywords count.",
+      "Links from other websites are votes of confidence that Google reads as a signal of authority. They are the third pillar alongside keywords and content — miss one pillar, ranking suffers.",
+      "Only paid links count.",
+      "Only links from Facebook count."
+    ],
+    "correct": 1,
+    "explanation": "Section 2.3 lists links as the third pillar and describes them as votes of confidence. All three pillars — keywords, content, links — must be present. Options 1, 3 and 4 misrepresent how links work."
+  },
+  {
+    "scenario": "Sarah asks: \"For Karibu Kitchen, which of the four search intents should I focus my SEO on?\"",
+    "question": "Which answer matches Lesson 2.3?",
+    "options": [
+      "Only informational — write blog posts about the history of ugali.",
+      "Only navigational — target searches for competitor brand names.",
+      "The money intents — commercial (\"best lunch delivery Eldoret\") and transactional (\"order lunch delivery Kapsoya\"). Those searchers are ready to spend.",
+      "Only ONE intent, ever — pick the smallest audience."
+    ],
+    "correct": 2,
+    "explanation": "Section 2.3 says for most small businesses like Karibu Kitchen, the money keywords are commercial and transactional — searchers ready to buy. Informational content still has a role (top-of-funnel) but should not be the SEO focus at this stage. Options 1, 2 and 4 misdirect the strategy."
+  }
+];
+
+        let currentQuestion = 0, score = 0, streak = 0, answered = false;
+
+        function updateScoreboard() {
+            document.getElementById('score').textContent = score;
+            document.getElementById('current').textContent = Math.min(currentQuestion + 1, exercises.length);
+            document.getElementById('total').textContent = exercises.length;
+            document.getElementById('streak').textContent = streak;
+            document.getElementById('progress').style.width = ((currentQuestion) / exercises.length) * 100 + '%';
+        }
+
+        function escapeHtml(s) {
+            return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+        }
+
+        function renderQuestion() {
+            answered = false;
+            const q = exercises[currentQuestion];
+            let html = '';
+            if (q.scenario) {
+                html += `<div class="scenario"><strong>Scenario.</strong> ${escapeHtml(q.scenario)}</div>`;
+            }
+            html += `<div class="question">${escapeHtml(q.question)}</div>`;
+            html += '<div class="options">';
+            q.options.forEach((o, i) => {
+                html += `<button class="option" onclick="selectAnswer(${i})">${escapeHtml(o)}</button>`;
+            });
+            html += '</div>';
+            document.getElementById('exerciseCard').innerHTML = html;
+            updateScoreboard();
+        }
+
+        function selectAnswer(i) {
+            if (answered) return;
+            answered = true;
+            const q = exercises[currentQuestion];
+            const btns = document.querySelectorAll('.option');
+            btns.forEach(b => b.classList.add('disabled'));
+            btns[q.correct].classList.add('correct');
+            const right = i === q.correct;
+            if (!right) btns[i].classList.add('wrong');
+            if (right) { score += 10; streak += 1; } else { streak = 0; }
+            const fb = document.createElement('div');
+            fb.className = 'feedback ' + (right ? 'correct' : 'wrong');
+            fb.innerHTML = `<strong>${right ? '✅ Correct.' : '❌ Not quite.'}</strong><br>${escapeHtml(q.explanation)}`;
+            document.getElementById('exerciseCard').appendChild(fb);
+            const nb = document.createElement('button');
+            nb.className = 'next-btn';
+            nb.textContent = currentQuestion === exercises.length - 1 ? 'See results →' : 'Next scenario →';
+            nb.onclick = nextQuestion;
+            document.getElementById('exerciseCard').appendChild(nb);
+            updateScoreboard();
+        }
+
+        function nextQuestion() {
+            currentQuestion++;
+            if (currentQuestion >= exercises.length) return showResults();
+            renderQuestion();
+        }
+
+        function showResults() {
+            document.getElementById('progress').style.width = '100%';
+            const total = exercises.length * 10;
+            const pct = Math.round(score / total * 100);
+            if (window.parent) { window.parent.postMessage({type:"mtti_quiz_score", score: score, total: total, percent: pct}, "*"); }
+            let badge = '🌟', msg = 'Excellent work. You have a professional grasp of this lesson.';
+            if (pct < 50) { badge = '🌱'; msg = 'Good first attempt. Re-watch the lesson video and try again.'; }
+            else if (pct < 80) { badge = '📚'; msg = 'Solid progress. Review the scenarios you missed and retry.'; }
+            document.getElementById('exerciseCard').innerHTML = `
+                <div class="results">
+                    <span class="badge">${badge}</span>
+                    <h2>Quiz Complete</h2>
+                    <div class="final-score">${score} / ${total}</div>
+                    <p><strong>${pct}%</strong> · Longest streak: ${streak}</p>
+                    <p>${msg}</p>
+                    <button class="restart-btn" onclick="restart()">Try again 🔁</button>
+                </div>`;
+        }
+
+        function restart() {
+            currentQuestion = 0; score = 0; streak = 0;
+            renderQuestion();
+        }
+
+        renderQuestion();
+    </script>
+</body>
+</html>

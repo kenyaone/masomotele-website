@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Your First Python Program | MTTI Programming Principles</title>
+<link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Fredoka:wght@500;600&display=swap" rel="stylesheet">
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body {
+    font-family: 'Space Mono', monospace;
+    background: linear-gradient(135deg, #2E7D32 0%, #1565C0 100%);
+    min-height: 100vh; padding: 20px; color: #fff;
+}
+.container { max-width: 900px; margin: 0 auto; }
+.header { text-align: center; margin-bottom: 26px; }
+.lesson-tag { display: inline-block; background: rgba(255,255,255,0.2); padding: 6px 16px; border-radius: 999px; font-size: 0.85em; margin-bottom: 12px; }
+.header h1 { font-family: 'Fredoka', sans-serif; font-size: 2.1em; margin-bottom: 8px; text-shadow: 3px 3px 0 rgba(0,0,0,0.2); }
+.task {
+    background: white; color: #333; border-radius: 22px;
+    padding: 26px; margin-bottom: 20px;
+    box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+}
+.task h2 { font-family: 'Fredoka', sans-serif; font-size: 1.3em; margin-bottom: 14px; display: flex; align-items: center; }
+.task-num {
+    display: inline-block; width: 30px; height: 30px;
+    background: linear-gradient(135deg, #2E7D32 0%, #1565C0 100%);
+    color: white; border-radius: 50%; text-align: center; line-height: 30px;
+    font-family: 'Fredoka', sans-serif; font-weight: 600; margin-right: 10px; flex-shrink: 0; font-size: 0.75em;
+}
+.section-body { color: #444; font-size: 0.98em; line-height: 1.7; }
+.section-body p { margin-bottom: 12px; }
+.section-body strong { color: #1B5E20; }
+.section-body ul, .section-body ol { margin: 10px 0 14px 22px; }
+.section-body li { margin-bottom: 6px; }
+.code-block {
+    background: #1e1e2e; color: #cdd6f4; border-radius: 10px;
+    padding: 16px 18px; margin-top: 10px; overflow-x: auto;
+    font-family: 'Courier New', monospace; font-size: 0.88em; line-height: 1.6;
+}
+</style>
+</head>
+<body>
+<div class="container">
+    <div class="header">
+        <div class="lesson-tag">Python Fundamentals · Your First Python Program</div>
+        <h1>Your First Python Program</h1>
+    </div>
+    <div class="task"><h2><span class="task-num">1</span>The print() Function</h2><div class="section-body"><p>print() is how a Python program shows something on the screen. Whatever you put inside the parentheses gets displayed. Text must be wrapped in quotes — either single (<code>'</code>) or double (<code>"</code>), it doesn't matter which, as long as you're consistent.</p><pre class="code-block"><code>print(&quot;Hello, World!&quot;)
+print(&#039;Eldoret, Kenya&#039;)</code></pre></div></div><div class="task"><h2><span class="task-num">2</span>Running Your Code</h2><div class="section-body"><p>Python reads your code from top to bottom, one line at a time, and runs each instruction in order. Each print() statement produces its own line of output.</p><pre class="code-block"><code>print(&quot;Line one&quot;)
+print(&quot;Line two&quot;)
+# Output:
+# Line one
+# Line two</code></pre></div></div><div class="task"><h2><span class="task-num">3</span>Comments</h2><div class="section-body"><p>A comment starts with <code>#</code> and is ignored by Python entirely — it's just a note for humans reading the code, explaining what a piece of code does or why.</p><pre class="code-block"><code># This program greets the user
+print(&quot;Welcome!&quot;)  # this line displays a greeting</code></pre></div></div>
+</div>
+</body>
+</html>

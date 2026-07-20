@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Grid Systems and Visual Balance | MTTI Graphic Design</title>
+    <link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Fredoka:wght@500;600&display=swap" rel="stylesheet">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Space Mono', monospace; background: linear-gradient(135deg, #4338ca 0%, #7c3aed 100%); min-height: 100vh; padding: 20px; color: #fff; }
+        .container { max-width: 900px; margin: 0 auto; }
+        .header { text-align: center; margin-bottom: 30px; }
+        .header .lesson-tag { display: inline-block; background: rgba(255,255,255,0.2); padding: 6px 16px; border-radius: 999px; font-size: 0.85em; margin-bottom: 12px; }
+        .header h1 { font-family: 'Fredoka', sans-serif; font-size: 2.2em; margin-bottom: 8px; text-shadow: 3px 3px 0 rgba(0,0,0,0.2); }
+        .score-board { background: rgba(255,255,255,0.15); backdrop-filter: blur(10px); border-radius: 20px; padding: 20px; margin-bottom: 20px; display: flex; justify-content: space-around; }
+        .score-item { text-align: center; }
+        .score-item .label { font-size: 0.85em; opacity: 0.9; margin-bottom: 4px; }
+        .score-item .value { font-size: 1.8em; font-weight: bold; font-family: 'Fredoka', sans-serif; }
+        .progress-bar { width: 100%; height: 8px; background: rgba(255,255,255,0.3); border-radius: 10px; margin-bottom: 25px; overflow: hidden; }
+        .progress-fill { height: 100%; background: linear-gradient(90deg, #f093fb 0%, #f5576c 100%); border-radius: 10px; transition: width 0.5s ease; width: 0%; }
+        .exercise-card { background: white; color: #333; border-radius: 25px; padding: 35px; margin-bottom: 20px; box-shadow: 0 20px 60px rgba(0,0,0,0.3); }
+        .scenario { background: linear-gradient(135deg, #fff8e1 0%, #ffecb3 100%); border-left: 5px solid #ffc107; padding: 20px 24px; border-radius: 12px; margin-bottom: 24px; font-size: 0.98em; line-height: 1.55; }
+        .scenario strong { color: #7a5a00; font-family: 'Fredoka', sans-serif; }
+        .question { font-size: 1.15em; margin-bottom: 20px; font-weight: 700; line-height: 1.4; }
+        .options { display: flex; flex-direction: column; gap: 12px; }
+        .option { background: #f5f7fb; border: 2px solid transparent; padding: 16px 20px; border-radius: 12px; cursor: pointer; transition: all 0.2s ease; font-family: 'Space Mono', monospace; font-size: 0.98em; text-align: left; }
+        .option:hover:not(.disabled) { background: #eef1fb; border-color: #4338ca; transform: translateX(4px); }
+        .option.correct { background: #d4edda; border-color: #28a745; color: #155724; }
+        .option.wrong { background: #f8d7da; border-color: #dc3545; color: #721c24; }
+        .option.disabled { cursor: not-allowed; opacity: 0.85; }
+        .feedback { margin-top: 22px; padding: 18px 22px; border-radius: 12px; font-size: 0.98em; line-height: 1.5; }
+        .feedback.correct { background: #d4edda; color: #155724; border-left: 4px solid #28a745; }
+        .feedback.wrong { background: #f8d7da; color: #721c24; border-left: 4px solid #dc3545; }
+        .next-btn, .restart-btn { margin-top: 20px; background: linear-gradient(135deg, #4338ca 0%, #7c3aed 100%); color: white; border: none; padding: 14px 32px; border-radius: 12px; font-size: 1em; cursor: pointer; font-family: 'Fredoka', sans-serif; box-shadow: 0 6px 18px rgba(0,0,0,0.2); }
+        .results { text-align: center; padding: 25px 15px; }
+        .results h2 { font-family: 'Fredoka', sans-serif; font-size: 2em; margin-bottom: 12px; color: #333; }
+        .results .final-score { font-size: 3em; font-family: 'Fredoka', sans-serif; color: #4338ca; margin: 20px 0; }
+        .results p { color: #555; margin-bottom: 12px; }
+        .badge { display: inline-block; font-size: 3.5em; margin: 8px 0; }
+        /* How-To intro screen — shown before question 1, not scored */
+        .howto-card { background: white; color: #333; border-radius: 25px; padding: 35px; margin-bottom: 20px; box-shadow: 0 20px 60px rgba(0,0,0,0.3); }
+        .howto-card h3 { font-family: 'Fredoka', sans-serif; font-size: 1.3em; margin-bottom: 12px; color: #4338ca; }
+        .howto-card p { line-height: 1.6; margin-bottom: 16px; color: #444; }
+        .howto-fields { display: flex; flex-direction: column; gap: 14px; margin-bottom: 18px; }
+        .howto-field { background: #f5f7fb; border-radius: 12px; padding: 14px 18px; display: flex; align-items: center; gap: 14px; }
+        .howto-field label { font-weight: 700; font-size: 0.95em; flex: 1; }
+        .howto-field input { width: 90px; padding: 8px 10px; border-radius: 8px; border: 2px solid #ccd6f0; font-family: 'Space Mono', monospace; font-size: 1em; text-align: center; }
+        .howto-field input.hf-correct { border-color: #28a745; background: #d4edda; }
+        .howto-field input.hf-wrong { border-color: #dc3545; background: #f8d7da; }
+        .howto-field .hf-status { font-size: 0.85em; font-weight: 700; min-width: 60px; text-align: right; }
+        .howto-banner { margin-top: 4px; margin-bottom: 18px; padding: 12px 16px; border-radius: 10px; font-size: 0.9em; font-weight: 700; display: none; }
+        .howto-banner.show { display: block; }
+        .howto-banner.ok { background: #d4edda; color: #155724; }
+        .howto-banner.fail { background: #f8d7da; color: #721c24; }
+        .start-quiz-btn { margin-top: 4px; background: linear-gradient(135deg, #4338ca 0%, #7c3aed 100%); color: white; border: none; padding: 14px 32px; border-radius: 12px; font-size: 1em; cursor: pointer; font-family: 'Fredoka', sans-serif; box-shadow: 0 6px 18px rgba(0,0,0,0.2); }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <div class="lesson-tag">Module 3 · Lesson 3.1 · Quiz</div>
+            <h1>Grid Systems and Visual Balance</h1>
+        </div>
+        <div class="score-board">
+            <div class="score-item"><div class="label">Score</div><div class="value" id="score">0</div></div>
+            <div class="score-item"><div class="label">Question</div><div class="value"><span id="current">1</span>/<span id="total">10</span></div></div>
+            <div class="score-item"><div class="label">Streak</div><div class="value" id="streak">0</div></div>
+        </div>
+        <div class="progress-bar"><div class="progress-fill" id="progress"></div></div>
+        <div class="exercise-card" id="exerciseCard"></div>
+    </div>
+    <script>
+        const exercises = [{"scenario":"Ivy is about to start a new flyer layout for Chapa Design Studio and wants consistent alignment across every element from the start.","question":"What should she set up before placing any content?","options":["Nothing — just start placing elements","A grid with columns, margins and gutters","Only a background color","A random assortment of font sizes"],"correct":1,"explanation":"Setting up the grid first gives a consistent structure for every element to align against as the design is built."},{"scenario":"Two elements on Ivy's poster look mismatched even though she placed them by eye and they seem roughly aligned.","question":"What is the most likely fix?","options":["Increase the font size of both elements","Snap both elements precisely to the same grid line or guide","Add more colors to distract from the mismatch","Delete one of the two elements"],"correct":1,"explanation":"Precise alignment to a shared grid line or guide removes the \"almost but not quite\" mismatch that eyeballing often produces."},{"scenario":"Ivy's mentor at Chapa Design Studio tells her a symmetrical layout is not the only way to look balanced.","question":"What does visual balance without symmetry usually rely on instead?","options":["Making every side of the layout identical","Distributing visual weight — size, color, contrast — evenly even when positions differ","Using only black and white, never color","Removing all images from the layout"],"correct":1,"explanation":"Balance can come from evenly distributed visual weight across a layout, even when the composition is not mirror-symmetrical."},{"scenario":"Ivy's flyer has a heavy, dark photo on the left and a mostly empty right side.","question":"How could she balance this without making the layout symmetrical?","options":["Move the photo to the exact center of the page","Add a smaller but visually strong element, like bold text or a color block, on the right","Make the photo even larger","Leave the right side completely empty"],"correct":1,"explanation":"A smaller, visually weighty element on the lighter side can offset a dominant one and restore balance without requiring symmetry."},{"scenario":"Chapa Design Studio's brand flyers are all built on the same 3-column grid.","question":"What is the main benefit of committing to this grid across every flyer?","options":["It guarantees every flyer looks completely identical","It only affects text, never images","It gives every element a consistent, predictable structure, making layouts feel intentional","It removes the need to think about spacing ever again"],"correct":2,"explanation":"A shared grid structure is what makes varied content across different flyers still feel consistently organised and deliberate."},{"scenario":"Ivy notices the gutters — the gaps between her grid's columns — are inconsistent across her flyer.","question":"Why does this matter?","options":["It has no visible effect on the layout","Inconsistent gutters break the grid's rhythm and make spacing feel accidental","Only margins matter, not gutters","Gutters are purely decorative"],"correct":1,"explanation":"Consistent gutters are part of what makes a grid read as deliberate. Inconsistency undermines that sense of structure."},{"scenario":"A cluttered layout and a balanced layout can, in principle, contain the exact same elements.","question":"What typically separates the two?","options":["The balanced one always has fewer elements","There is no real difference between them","The balanced one usually shows intentional alignment and a thoughtful distribution of weight and whitespace","The cluttered one always uses brighter colors"],"correct":2,"explanation":"The same elements can look cluttered or calm depending on how deliberately they are aligned and how visual weight and whitespace are distributed."}];
+        let currentQuestion = 0, score = 0, streak = 0, answered = false;
+        function updateScoreboard() {
+            document.getElementById('score').textContent = score;
+            document.getElementById('current').textContent = Math.min(currentQuestion + 1, exercises.length);
+            document.getElementById('total').textContent = exercises.length;
+            document.getElementById('streak').textContent = streak;
+            document.getElementById('progress').style.width = ((currentQuestion) / exercises.length) * 100 + '%';
+        }
+        function escapeHtml(s) { return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+        function renderQuestion() {
+            answered = false;
+            const q = exercises[currentQuestion];
+            let html = '';
+            if (q.scenario) html += `<div class="scenario"><strong>Scenario.</strong> ${escapeHtml(q.scenario)}</div>`;
+            html += `<div class="question">${escapeHtml(q.question)}</div>`;
+            html += '<div class="options">';
+            q.options.forEach((o, i) => { html += `<button class="option" onclick="selectAnswer(${i})">${escapeHtml(o)}</button>`; });
+            html += '</div>';
+            document.getElementById('exerciseCard').innerHTML = html;
+            updateScoreboard();
+        }
+        function selectAnswer(i) {
+            if (answered) return;
+            answered = true;
+            const q = exercises[currentQuestion];
+            const btns = document.querySelectorAll('.option');
+            btns.forEach(b => b.classList.add('disabled'));
+            btns[q.correct].classList.add('correct');
+            const right = i === q.correct;
+            if (!right) btns[i].classList.add('wrong');
+            if (right) { score += 10; streak += 1; } else { streak = 0; }
+            const fb = document.createElement('div');
+            fb.className = 'feedback ' + (right ? 'correct' : 'wrong');
+            fb.innerHTML = `<strong>${right ? '✅ Correct.' : '❌ Not quite.'}</strong><br>${escapeHtml(q.explanation)}`;
+            document.getElementById('exerciseCard').appendChild(fb);
+            const nb = document.createElement('button');
+            nb.className = 'next-btn';
+            nb.textContent = currentQuestion === exercises.length - 1 ? 'See results →' : 'Next scenario →';
+            nb.onclick = nextQuestion;
+            document.getElementById('exerciseCard').appendChild(nb);
+            updateScoreboard();
+        }
+        function nextQuestion() { currentQuestion++; if (currentQuestion >= exercises.length) return showResults(); renderQuestion(); }
+        function showResults() {
+            document.getElementById('progress').style.width = '100%';
+            const total = exercises.length * 10;
+            const pct = Math.round(score / total * 100);
+            if (window.parent) { window.parent.postMessage({type:"mtti_quiz_score", score: score, total: total, percent: pct}, "*"); }
+            let badge = '🌟', msg = 'Excellent work. You have a professional grasp of this lesson.';
+            if (pct < 50) { badge = '🌱'; msg = 'Good first attempt. Review the lesson and try again.'; }
+            else if (pct < 80) { badge = '📚'; msg = 'Solid progress. Review the scenarios you missed and retry.'; }
+            document.getElementById('exerciseCard').innerHTML = `
+                <div class="results">
+                    <span class="badge">${badge}</span>
+                    <h2>Quiz Complete</h2>
+                    <div class="final-score">${score} / ${total}</div>
+                    <p><strong>${pct}%</strong> · Longest streak: ${streak}</p>
+                    <p>${msg}</p>
+                    <button class="restart-btn" onclick="restart()">Try again 🔁</button>
+                </div>`;
+        }
+        function restart() { currentQuestion = 0; score = 0; streak = 0; renderQuestion(); }
+        /* How-To intro — a small, ungraded field-check demo shown before the
+           quiz starts, directly rehearsing the "snap two elements to the
+           same grid line" mechanic that one of the quiz scenarios asks
+           about, so it is not being asked cold. */
+        const HOWTO_FIELDS = [
+            { id: 'howtoPhotoX', label: 'Photo Frame — X position (px)', placeholder: 'e.g. 240', min: 236, max: 244 },
+            { id: 'howtoCaptionX', label: 'Caption Text — X position (px)', placeholder: 'e.g. 240', min: 236, max: 244 },
+        ];
+
+        function checkHowtoField(rule) {
+            const el = document.getElementById(rule.id);
+            const raw = el.value.trim();
+            if (raw === '' || isNaN(Number(raw))) return null;
+            const v = Number(raw);
+            return v >= rule.min && v <= rule.max;
+        }
+
+        function checkHowto() {
+            let allOk = true, allAnswered = true;
+            HOWTO_FIELDS.forEach(rule => {
+                const ok = checkHowtoField(rule);
+                const el = document.getElementById(rule.id);
+                const status = document.getElementById(rule.id + '_status');
+                el.classList.remove('hf-correct', 'hf-wrong');
+                if (ok === null) { allAnswered = false; status.textContent = ''; return; }
+                el.classList.add(ok ? 'hf-correct' : 'hf-wrong');
+                status.textContent = ok ? '✅ on grid' : '❌ off grid';
+                if (!ok) allOk = false;
+            });
+            const banner = document.getElementById('howtoBanner');
+            banner.classList.add('show');
+            if (!allAnswered) {
+                banner.className = 'howto-banner show fail';
+                banner.textContent = '❌ Enter a position for both elements first, then check.';
+                return;
+            }
+            banner.className = 'howto-banner show ' + (allOk ? 'ok' : 'fail');
+            banner.textContent = allOk
+                ? '✅ Both elements now snap to the same grid line — the mismatch is gone.'
+                : '❌ Not quite — the grid line both elements should snap to sits at 240px.';
+        }
+
+        function renderHowto() {
+            document.getElementById('exerciseCard').innerHTML = `
+                <div class="howto-card">
+                    <h3>🔍 Quick How-To: Snapping to the Same Grid Line</h3>
+                    <p>One of the scenarios coming up asks about this exact situation: two elements on Ivy's poster look almost aligned but are not quite matching. The fix is snapping both to the same grid line rather than eyeballing it. The column guide here sits at <strong>240px</strong>. Type that X position for both elements below, then check your work.</p>
+                    <div class="howto-fields" id="howtoFields"></div>
+                    <div class="howto-banner" id="howtoBanner"></div>
+                    <button class="start-quiz-btn" id="checkHowtoBtn">Check My Alignment</button>
+                    <button class="start-quiz-btn" id="startQuizBtn" style="margin-left:10px;background:linear-gradient(135deg,#28a745,#1e7e34);">Start Quiz →</button>
+                </div>`;
+            document.getElementById('howtoFields').innerHTML = HOWTO_FIELDS.map(f => `
+                <div class="howto-field">
+                    <label for="${f.id}">${f.label}</label>
+                    <input type="number" id="${f.id}" placeholder="${f.placeholder}">
+                    <span class="hf-status" id="${f.id}_status"></span>
+                </div>`).join('');
+            document.getElementById('checkHowtoBtn').addEventListener('click', checkHowto);
+            document.getElementById('startQuizBtn').addEventListener('click', renderQuestion);
+        }
+        renderHowto();
+    </script>
+</body>
+</html>

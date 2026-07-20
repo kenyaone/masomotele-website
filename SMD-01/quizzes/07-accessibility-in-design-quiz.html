@@ -1,0 +1,346 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Accessibility in Design | MTTI Digital Marketing</title>
+    <link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Fredoka:wght@500;600&display=swap" rel="stylesheet">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Space Mono', monospace;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh; padding: 20px; color: #fff;
+        }
+        .container { max-width: 900px; margin: 0 auto; }
+        .header { text-align: center; margin-bottom: 30px; animation: slideDown 0.6s ease-out; }
+        .header .lesson-tag {
+            display: inline-block; background: rgba(255,255,255,0.2);
+            padding: 6px 16px; border-radius: 999px;
+            font-size: 0.85em; margin-bottom: 12px;
+        }
+        .header h1 {
+            font-family: 'Fredoka', sans-serif; font-size: 2.2em;
+            margin-bottom: 8px; text-shadow: 3px 3px 0 rgba(0,0,0,0.2);
+        }
+        .header p { opacity: 0.95; font-size: 0.95em; }
+        .score-board {
+            background: rgba(255,255,255,0.15); backdrop-filter: blur(10px);
+            border-radius: 20px; padding: 20px; margin-bottom: 20px;
+            display: flex; justify-content: space-around;
+            animation: fadeIn 0.8s ease-out 0.2s both;
+        }
+        .score-item { text-align: center; }
+        .score-item .label { font-size: 0.85em; opacity: 0.9; margin-bottom: 4px; }
+        .score-item .value {
+            font-size: 1.8em; font-weight: bold; font-family: 'Fredoka', sans-serif;
+        }
+        .progress-bar {
+            width: 100%; height: 8px; background: rgba(255,255,255,0.3);
+            border-radius: 10px; margin-bottom: 25px; overflow: hidden;
+        }
+        .progress-fill {
+            height: 100%; background: linear-gradient(90deg, #f093fb 0%, #f5576c 100%);
+            border-radius: 10px; transition: width 0.5s ease; width: 0%;
+        }
+        .exercise-card {
+            background: white; color: #333; border-radius: 25px;
+            padding: 35px; margin-bottom: 20px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            animation: fadeIn 0.6s ease-out both;
+        }
+        .scenario {
+            background: linear-gradient(135deg, #fff8e1 0%, #ffecb3 100%);
+            border-left: 5px solid #ffc107;
+            padding: 20px 24px; border-radius: 12px;
+            margin-bottom: 24px;
+            font-size: 0.98em; line-height: 1.55;
+        }
+        .scenario strong { color: #7a5a00; font-family: 'Fredoka', sans-serif; }
+        .question {
+            font-size: 1.15em; margin-bottom: 20px;
+            font-weight: 700; line-height: 1.4;
+        }
+        .options { display: flex; flex-direction: column; gap: 12px; }
+        .option {
+            background: #f5f7fb; border: 2px solid transparent;
+            padding: 16px 20px; border-radius: 12px;
+            cursor: pointer; transition: all 0.2s ease;
+            font-family: 'Space Mono', monospace; font-size: 0.98em; text-align: left;
+        }
+        .option:hover:not(.disabled) {
+            background: #eef1fb; border-color: #667eea; transform: translateX(4px);
+        }
+        .option.correct { background: #d4edda; border-color: #28a745; color: #155724; }
+        .option.wrong { background: #f8d7da; border-color: #dc3545; color: #721c24; animation: shake 0.4s; }
+        .option.disabled { cursor: not-allowed; opacity: 0.85; }
+        .feedback {
+            margin-top: 22px; padding: 18px 22px; border-radius: 12px;
+            animation: slideUp 0.4s ease-out;
+            font-size: 0.98em; line-height: 1.5;
+        }
+        .feedback.correct { background: #d4edda; color: #155724; border-left: 4px solid #28a745; }
+        .feedback.wrong { background: #f8d7da; color: #721c24; border-left: 4px solid #dc3545; }
+        .feedback strong { font-family: 'Fredoka', sans-serif; }
+        .next-btn, .restart-btn {
+            margin-top: 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white; border: none;
+            padding: 14px 32px; border-radius: 12px;
+            font-size: 1em; cursor: pointer;
+            font-family: 'Fredoka', sans-serif;
+            box-shadow: 0 6px 18px rgba(0,0,0,0.2);
+            transition: transform 0.2s ease;
+        }
+        .next-btn:hover, .restart-btn:hover { transform: scale(1.04); }
+        .results {
+            text-align: center; padding: 25px 15px;
+            animation: bounceIn 0.6s ease-out;
+        }
+        .results h2 {
+            font-family: 'Fredoka', sans-serif; font-size: 2em;
+            margin-bottom: 12px; color: #333;
+        }
+        .results .final-score {
+            font-size: 3em; font-family: 'Fredoka', sans-serif;
+            color: #667eea; margin: 20px 0;
+        }
+        .results p { color: #555; margin-bottom: 12px; }
+        .badge { display: inline-block; font-size: 3.5em; margin: 8px 0; }
+        @keyframes slideDown { from { opacity: 0; transform: translateY(-30px); } to { opacity: 1; transform: translateY(0); } }
+        @keyframes fadeIn { from { opacity: 0; transform: scale(0.96); } to { opacity: 1; transform: scale(1); } }
+        @keyframes slideUp { from { opacity: 0; transform: translateY(15px); } to { opacity: 1; transform: translateY(0); } }
+        @keyframes shake { 0%,100% { transform: translateX(0); } 25% { transform: translateX(-8px); } 75% { transform: translateX(8px); } }
+        @keyframes bounceIn { 0% { opacity: 0; transform: scale(0.4); } 60% { transform: scale(1.05); } 100% { opacity: 1; transform: scale(1); } }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <div class="lesson-tag">Module 7 · Lesson 7.6</div>
+            <h1>Accessibility in Design</h1>
+            <p>10 scenarios — WCAG contrast, alt text, captions, Kenya DPA 2019 context</p>
+        </div>
+
+        <div class="score-board">
+            <div class="score-item"><div class="label">Score</div><div class="value" id="score">0</div></div>
+            <div class="score-item"><div class="label">Question</div><div class="value"><span id="current">1</span>/<span id="total">10</span></div></div>
+            <div class="score-item"><div class="label">Streak</div><div class="value" id="streak">0</div></div>
+        </div>
+
+        <div class="progress-bar"><div class="progress-fill" id="progress"></div></div>
+
+        <div class="exercise-card" id="exerciseCard"></div>
+    </div>
+
+    <script>
+        const exercises = [
+  {
+    "scenario": "Sarah's cousin argues accessibility is \"for a tiny minority\" and not worth Sarah's time.",
+    "question": "What proportion of Sarah's potential customers is Lesson 7.6 saying she is leaving behind?",
+    "options": [
+      "About 0.1% — negligible.",
+      "About 10-15% — 7% of Kenyans live with some visual impairment, 4% with hearing impairment, plus everyone reading on cheap phones in bright Kenyan sunlight or watching video with sound off.",
+      "About 90%.",
+      "Nobody — accessibility affects no customers."
+    ],
+    "correct": 1,
+    "explanation": "Section 7.6 quantifies the audience: 7% visual, 4% hearing, plus age/sun/diabetes-related reduced vision, plus every sound-off viewer. That is 10-15% of Sarah's potential customers her competitors are ignoring."
+  },
+  {
+    "scenario": "Sarah picks light-grey body text on a slightly-lighter-grey background. She likes the \"minimalist\" feel.",
+    "question": "Which WCAG contrast standard from Lesson 7.6 has she failed?",
+    "options": [
+      "3:1 — the standard for large decorative titles.",
+      "4.5:1 minimum contrast ratio between body text and background. Dark text on light, or light on dark. Never grey-on-slightly-lighter-grey. Sarah should check every design with the WebAIM contrast checker.",
+      "1:1 — any two colours are fine.",
+      "10:1 — an impossible ratio."
+    ],
+    "correct": 1,
+    "explanation": "Section 7.6 sets 4.5:1 as the professional body-text contrast standard. Grey-on-grey typically fails. Sarah should use the free WebAIM contrast checker for every design — five seconds per check."
+  },
+  {
+    "scenario": "Sarah's Instagram Story says \"the red option is sold out, the green option is available\" using red and green squares and nothing else.",
+    "question": "Which accessibility rule from Lesson 7.6 has she broken?",
+    "options": [
+      "None — colour is enough.",
+      "Rule two — do not rely on colour alone. Colour-blind customers cannot distinguish. Label each option in text — \"SOLD OUT\" and \"AVAILABLE\" — AND back it up with colour. Two signals always beats one.",
+      "Rule one — contrast.",
+      "Rule five — captions on video."
+    ],
+    "correct": 1,
+    "explanation": "Section 7.6's rule two: do not use ONLY colour to convey information. Sarah needs text labels on top of the colour. Belt AND braces. This applies to every graph, product option, and warning."
+  },
+  {
+    "scenario": "Sarah uploads a lunch photo to her Karibu Kitchen WordPress site with alt text: \"IMG_0342.jpg\".",
+    "question": "Which alt-text guidance from Lesson 7.6 should she follow instead?",
+    "options": [
+      "Alt text is optional.",
+      "Alt text is a plain-text description used by screen readers AND search engines. Good example: \"Ugali and beef stew in a takeaway container with a spoon\". Describe what is in the image; include a keyword naturally; keep it concise (about 125 characters is the usual guidance); do NOT start with \"image of\" or \"picture of\" — screen readers already announce that.",
+      "Start every alt text with \"image of\" or \"picture of\".",
+      "Use the file name always."
+    ],
+    "correct": 1,
+    "explanation": "Section 7.6's alt-text rule + WCAG guidance: describe the image concisely (typically ≤125 chars), include a natural keyword, and skip \"image of\" / \"picture of\" (redundant for screen readers). Alt text also helps SEO — see Lesson 2.3."
+  },
+  {
+    "scenario": "Sarah's WooCommerce site uses 11 px body text so she can \"fit more on screen\".",
+    "question": "Which readability rule from Lesson 7.6 does she break?",
+    "options": [
+      "Rule four-A — minimum 16 px for body text on the web. Below 16 px, older phones display fuzzy text and older or partially-sighted users cannot read it.",
+      "Rule two — colour alone.",
+      "Rule three — alt text.",
+      "Rule five — captions."
+    ],
+    "correct": 0,
+    "explanation": "Section 7.6's rule four-A: 16 px minimum for body text on the web. Cramming with 11 px sacrifices readability. If content matters, it must be readable at arm's length on the smallest phone Sarah expects."
+  },
+  {
+    "scenario": "Sarah uses a script/cursive font for her Karibu Kitchen menu prices because she thinks it looks \"elegant\".",
+    "question": "Which rule from Lesson 7.6 does that violate?",
+    "options": [
+      "None — decorative fonts are fine everywhere.",
+      "Rule four-B — no decorative script fonts for anything longer than a headline. Cursive scripts look unreadable to a customer with reduced vision or a fifty-year-old bank director. Use clean high-legibility fonts for body, buttons, and CTAs.",
+      "Rule one — contrast.",
+      "Rule six — flashing."
+    ],
+    "correct": 1,
+    "explanation": "Section 7.6's rule four-B: save decorative fonts for a logo. Menu prices are body copy — use a clean high-legibility font. Elegance without readability is a design failure."
+  },
+  {
+    "scenario": "Sarah publishes a 30-second Reel of her cooking with no captions.",
+    "question": "Which rule from Lesson 7.6 applies?",
+    "options": [
+      "None — Reels are always watched with sound on.",
+      "Rule five — captions on every video. Two reasons: accessibility for hearing-impaired viewers, and the majority of social video plays with the sound off. Canva has an auto-caption feature; TikTok and Instagram have native tools. Use them every video, no exceptions.",
+      "Rule one — contrast.",
+      "Rule six — flashing content."
+    ],
+    "correct": 1,
+    "explanation": "Section 7.6's rule five: captions on every video. The 30 seconds it takes to add them roughly doubles the number of people who receive the message. Note the tension with Lesson 7.7's \"88% watch TikTok with sound ON\" — both are true; captions serve reach, sound serves engagement."
+  },
+  {
+    "scenario": "Brian is experimenting with a Chapa Fitness Reel that flashes text at 6 flashes per second for the whole 15-second clip.",
+    "question": "Which accessibility rule from Lesson 7.6 does that break?",
+    "options": [
+      "Rule one — contrast.",
+      "Rule six — no flashing content. Content that flashes more than three times per second can trigger seizures in viewers with photosensitive epilepsy. Real global campaigns have faced legal action for exactly this. Keep any pulses/blinks under 3 per second, or use smooth movement instead.",
+      "Rule three — alt text.",
+      "Rule five — captions."
+    ],
+    "correct": 1,
+    "explanation": "Section 7.6's rule six is a safety rule: no more than 3 flashes per second. Real global campaigns have been withdrawn and sued over this. Brian's 6 flashes/second design is genuinely dangerous."
+  },
+  {
+    "scenario": "Sarah asks whether accessibility is legally required in Kenya.",
+    "question": "How does Lesson 7.6 frame the Kenyan legal context?",
+    "options": [
+      "Only global brands are subject to any accessibility rules.",
+      "Kenya has broader anti-discrimination and Persons with Disabilities Act obligations, and Kenya's Data Protection Act 2019 covers how Sarah must handle her customer data — including how she uses it in accessible communications. Combined with WCAG as the professional standard, accessibility is both an ethical and increasingly legal expectation.",
+      "There is no legal or ethical basis for accessibility in Kenya.",
+      "Accessibility is illegal in Kenya."
+    ],
+    "correct": 1,
+    "explanation": "Section 7.6 frames accessibility as an ethical requirement backed by Kenya's DPA 2019 (data handling) and broader Persons with Disabilities and anti-discrimination law. WCAG is the professional design standard. It is not optional for a serious marketer."
+  },
+  {
+    "scenario": "Sarah is finalising the Karibu Kitchen brand and wants a quick checklist she can run against every design.",
+    "question": "Which six-rule checklist does Lesson 7.6 give?",
+    "options": [
+      "Colour contrast (4.5:1 minimum) — do not rely on colour alone — alt text on every image — readable fonts (16 px min body, no decorative scripts for body) — captions on every video — no flashing content over 3 per second.",
+      "Just check the contrast and move on.",
+      "Alt text only.",
+      "Video captions only."
+    ],
+    "correct": 0,
+    "explanation": "Section 7.6's six rules are the professional accessibility checklist: contrast, colour+text, alt text, readable fonts, video captions, no dangerous flashing. Follow all six and Sarah reaches an extra 10-15% of customers her competitors ignore."
+  }
+];
+
+        let currentQuestion = 0, score = 0, streak = 0, answered = false;
+
+        function updateScoreboard() {
+            document.getElementById('score').textContent = score;
+            document.getElementById('current').textContent = Math.min(currentQuestion + 1, exercises.length);
+            document.getElementById('total').textContent = exercises.length;
+            document.getElementById('streak').textContent = streak;
+            document.getElementById('progress').style.width = ((currentQuestion) / exercises.length) * 100 + '%';
+        }
+
+        function escapeHtml(s) {
+            return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+        }
+
+        function renderQuestion() {
+            answered = false;
+            const q = exercises[currentQuestion];
+            let html = '';
+            if (q.scenario) {
+                html += `<div class="scenario"><strong>Scenario.</strong> ${escapeHtml(q.scenario)}</div>`;
+            }
+            html += `<div class="question">${escapeHtml(q.question)}</div>`;
+            html += '<div class="options">';
+            q.options.forEach((o, i) => {
+                html += `<button class="option" onclick="selectAnswer(${i})">${escapeHtml(o)}</button>`;
+            });
+            html += '</div>';
+            document.getElementById('exerciseCard').innerHTML = html;
+            updateScoreboard();
+        }
+
+        function selectAnswer(i) {
+            if (answered) return;
+            answered = true;
+            const q = exercises[currentQuestion];
+            const btns = document.querySelectorAll('.option');
+            btns.forEach(b => b.classList.add('disabled'));
+            btns[q.correct].classList.add('correct');
+            const right = i === q.correct;
+            if (!right) btns[i].classList.add('wrong');
+            if (right) { score += 10; streak += 1; } else { streak = 0; }
+            const fb = document.createElement('div');
+            fb.className = 'feedback ' + (right ? 'correct' : 'wrong');
+            fb.innerHTML = `<strong>${right ? '✅ Correct.' : '❌ Not quite.'}</strong><br>${escapeHtml(q.explanation)}`;
+            document.getElementById('exerciseCard').appendChild(fb);
+            const nb = document.createElement('button');
+            nb.className = 'next-btn';
+            nb.textContent = currentQuestion === exercises.length - 1 ? 'See results →' : 'Next scenario →';
+            nb.onclick = nextQuestion;
+            document.getElementById('exerciseCard').appendChild(nb);
+            updateScoreboard();
+        }
+
+        function nextQuestion() {
+            currentQuestion++;
+            if (currentQuestion >= exercises.length) return showResults();
+            renderQuestion();
+        }
+
+        function showResults() {
+            document.getElementById('progress').style.width = '100%';
+            const total = exercises.length * 10;
+            const pct = Math.round(score / total * 100);
+            if (window.parent) { window.parent.postMessage({type:"mtti_quiz_score", score: score, total: total, percent: pct}, "*"); }
+            let badge = '🌟', msg = 'Excellent work. You have a professional grasp of this lesson.';
+            if (pct < 50) { badge = '🌱'; msg = 'Good first attempt. Re-watch the lesson video and try again.'; }
+            else if (pct < 80) { badge = '📚'; msg = 'Solid progress. Review the scenarios you missed and retry.'; }
+            document.getElementById('exerciseCard').innerHTML = `
+                <div class="results">
+                    <span class="badge">${badge}</span>
+                    <h2>Quiz Complete</h2>
+                    <div class="final-score">${score} / ${total}</div>
+                    <p><strong>${pct}%</strong> · Longest streak: ${streak}</p>
+                    <p>${msg}</p>
+                    <button class="restart-btn" onclick="restart()">Try again 🔁</button>
+                </div>`;
+        }
+
+        function restart() {
+            currentQuestion = 0; score = 0; streak = 0;
+            renderQuestion();
+        }
+
+        renderQuestion();
+    </script>
+</body>
+</html>

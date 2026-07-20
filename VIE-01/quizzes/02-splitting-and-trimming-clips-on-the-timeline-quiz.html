@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Splitting and Trimming Clips on the Timeline | MTTI Video Editing</title>
+    <link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Fredoka:wght@500;600&display=swap" rel="stylesheet">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Space Mono', monospace; background: linear-gradient(135deg, #6A11CB 0%, #2575FC 100%); min-height: 100vh; padding: 20px; color: #fff; }
+        .container { max-width: 900px; margin: 0 auto; }
+        .header { text-align: center; margin-bottom: 30px; }
+        .header .lesson-tag { display: inline-block; background: rgba(255,255,255,0.2); padding: 6px 16px; border-radius: 999px; font-size: 0.85em; margin-bottom: 12px; }
+        .header h1 { font-family: 'Fredoka', sans-serif; font-size: 2.2em; margin-bottom: 8px; text-shadow: 3px 3px 0 rgba(0,0,0,0.2); }
+        .score-board { background: rgba(255,255,255,0.15); backdrop-filter: blur(10px); border-radius: 20px; padding: 20px; margin-bottom: 20px; display: flex; justify-content: space-around; }
+        .score-item { text-align: center; }
+        .score-item .label { font-size: 0.85em; opacity: 0.9; margin-bottom: 4px; }
+        .score-item .value { font-size: 1.8em; font-weight: bold; font-family: 'Fredoka', sans-serif; }
+        .progress-bar { width: 100%; height: 8px; background: rgba(255,255,255,0.3); border-radius: 10px; margin-bottom: 25px; overflow: hidden; }
+        .progress-fill { height: 100%; background: linear-gradient(90deg, #f7971e 0%, #ffd200 100%); border-radius: 10px; transition: width 0.5s ease; width: 0%; }
+        .exercise-card { background: white; color: #333; border-radius: 25px; padding: 35px; margin-bottom: 20px; box-shadow: 0 20px 60px rgba(0,0,0,0.3); }
+        .scenario { background: linear-gradient(135deg, #fff8e1 0%, #ffecb3 100%); border-left: 5px solid #ffc107; padding: 20px 24px; border-radius: 12px; margin-bottom: 24px; font-size: 0.98em; line-height: 1.55; }
+        .scenario strong { color: #7a5a00; font-family: 'Fredoka', sans-serif; }
+        .question { font-size: 1.15em; margin-bottom: 20px; font-weight: 700; line-height: 1.4; }
+        .options { display: flex; flex-direction: column; gap: 12px; }
+        .option { background: #f5f7fb; border: 2px solid transparent; padding: 16px 20px; border-radius: 12px; cursor: pointer; transition: all 0.2s ease; font-family: 'Space Mono', monospace; font-size: 0.98em; text-align: left; }
+        .option:hover:not(.disabled) { background: #eef1fb; border-color: #6A11CB; transform: translateX(4px); }
+        .option.correct { background: #d4edda; border-color: #28a745; color: #155724; }
+        .option.wrong { background: #f8d7da; border-color: #dc3545; color: #721c24; }
+        .option.disabled { cursor: not-allowed; opacity: 0.85; }
+        .feedback { margin-top: 22px; padding: 18px 22px; border-radius: 12px; font-size: 0.98em; line-height: 1.5; }
+        .feedback.correct { background: #d4edda; color: #155724; border-left: 4px solid #28a745; }
+        .feedback.wrong { background: #f8d7da; color: #721c24; border-left: 4px solid #dc3545; }
+        .next-btn, .restart-btn { margin-top: 20px; background: linear-gradient(135deg, #6A11CB 0%, #2575FC 100%); color: white; border: none; padding: 14px 32px; border-radius: 12px; font-size: 1em; cursor: pointer; font-family: 'Fredoka', sans-serif; box-shadow: 0 6px 18px rgba(0,0,0,0.2); }
+        .results { text-align: center; padding: 25px 15px; }
+        .results h2 { font-family: 'Fredoka', sans-serif; font-size: 2em; margin-bottom: 12px; color: #333; }
+        .results .final-score { font-size: 3em; font-family: 'Fredoka', sans-serif; color: #6A11CB; margin: 20px 0; }
+        .results p { color: #555; margin-bottom: 12px; }
+
+        /* How-To intro screen — shown before question 1, not scored */
+        .howto-card { background: white; color: #333; border-radius: 25px; padding: 35px; margin-bottom: 20px; box-shadow: 0 20px 60px rgba(0,0,0,0.3); }
+        .howto-card h3 { font-family: 'Fredoka', sans-serif; font-size: 1.3em; margin-bottom: 12px; color: #6A11CB; }
+        .howto-card p { line-height: 1.6; margin-bottom: 16px; color: #444; }
+        .howto-fields { display: flex; flex-direction: column; gap: 14px; margin-bottom: 18px; }
+        .howto-field { background: #f5f7fb; border: 2px solid #e0e4ee; border-radius: 12px; padding: 14px 18px; transition: all 0.2s ease; }
+        .howto-field label { display: block; font-weight: 700; margin-bottom: 8px; font-size: 0.92em; }
+        .howto-field input, .howto-field select { width: 100%; padding: 10px 12px; border-radius: 8px; border: 2px solid #ccd3e0; font-family: 'Space Mono', monospace; font-size: 0.98em; }
+        .howto-field .hc-status { margin-top: 8px; font-size: 0.85em; font-weight: 700; }
+        .howto-field.hc-correct { border-color: #28a745; background: #eafaf0; }
+        .howto-field.hc-wrong { border-color: #dc3545; background: #fdeeee; }
+        .howto-banner { margin-top: 4px; margin-bottom: 18px; padding: 12px 16px; border-radius: 10px; font-size: 0.9em; font-weight: 700; display: none; }
+        .howto-banner.show { display: block; }
+        .howto-banner.ok { background: #d4edda; color: #155724; }
+        .howto-banner.fail { background: #f8d7da; color: #721c24; }
+        .start-quiz-btn { margin-top: 4px; background: linear-gradient(135deg, #6A11CB 0%, #2575FC 100%); color: white; border: none; padding: 14px 32px; border-radius: 12px; font-size: 1em; cursor: pointer; font-family: 'Fredoka', sans-serif; box-shadow: 0 6px 18px rgba(0,0,0,0.2); }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <div class="lesson-tag">Unit 22 · Lesson 22.1 · Quiz</div>
+            <h1>Splitting and Trimming Clips on the Timeline</h1>
+        </div>
+        <div class="score-board">
+            <div class="score-item"><div class="label">Score</div><div class="value" id="score">0</div></div>
+            <div class="score-item"><div class="label">Question</div><div class="value"><span id="current">1</span>/<span id="total">10</span></div></div>
+            <div class="score-item"><div class="label">Streak</div><div class="value" id="streak">0</div></div>
+        </div>
+        <div class="progress-bar"><div class="progress-fill" id="progress"></div></div>
+        <div class="exercise-card" id="exerciseCard"></div>
+    </div>
+    <script>
+        const exercises = [{"scenario":"Otieno is scrubbing through a raw clip in CapCut and wants to remove a shaky section in the middle without touching the footage before or after it.","question":"What is the correct first step?","options":["Delete the whole clip and re-film it","Move the playhead to the start and end of the shaky section and use the Split tool at each point, then delete the middle piece","Drag the clip's right trim handle inward","Export the clip as-is; shaky footage cannot be removed"],"correct":1,"explanation":"Splitting at both edges of the shaky section isolates it as its own clip, which Otieno can then delete without affecting the footage on either side."},{"scenario":"A 42-second raw clip needs to be trimmed so only a 15-second segment survives.","question":"How is the resulting duration calculated once trim-in and trim-out points are set?","options":["Trim-out plus trim-in","Trim-out minus trim-in","The original clip length minus 15","Duration is fixed at 42 seconds regardless of trim points"],"correct":1,"explanation":"A clip's kept duration is always trim-out minus trim-in \u2014 for example 0:33 out minus 0:18 in leaves a 15-second segment."},{"scenario":"Otieno sets a trim-out point at 0:45 on a clip that is only 42 seconds long.","question":"What is wrong with this trim-out point?","options":["Nothing \u2014 CapCut will pad the extra 3 seconds with black frames","It runs past the end of the original clip, which isn't possible since there's no footage there to keep","0:45 is always invalid regardless of clip length","Trim-out points can only be set in whole minutes"],"correct":1,"explanation":"A trim-out point can never exceed the original clip's actual length \u2014 there is simply no recorded footage beyond 0:42 to include."},{"scenario":"Otieno needs a WhatsApp Status clip capped at 30 seconds, but his trimmed segment currently runs 34 seconds.","question":"What should he do before exporting?","options":["Export anyway; WhatsApp will trim it automatically","Move the trim-in or trim-out point so the resulting duration is 30 seconds or under","Switch to the YouTube export preset instead","Add a title card to make the video feel shorter"],"correct":1,"explanation":"The resulting segment duration has to actually match the platform's limit \u2014 adjusting the trim points is what changes the real runtime, not the export preset or added graphics."},{"scenario":"Otieno wants to zoom into the CapCut timeline before setting his trim points.","question":"Why would he do this?","options":["Zooming has no effect on trimming accuracy","Zooming in lets him see and set trim-in\/trim-out points down to individual frames instead of rough seconds","Zooming automatically calculates the resulting duration for him","Zooming changes the clip's export resolution"],"correct":1,"explanation":"Zooming into the timeline gives finer visual precision, letting Otieno land trim points on an exact frame rather than guessing at a rough second."},{"scenario":"A client asks why Otieno didn't just delete the whole raw clip and re-film a shorter version instead of trimming it.","question":"What is the best explanation Otieno can give?","options":["Re-filming is always faster than trimming","Splitting and trimming are non-destructive to the original footage, letting him keep exactly the best moment without needing to reshoot anything","CapCut cannot delete raw clips once imported","Trimming changes the original video file stored on his phone"],"correct":1,"explanation":"Splitting and trimming only change how the clip is divided and played back on the timeline \u2014 the original recorded footage is untouched, so Otieno can extract exactly the segment he needs without reshooting."},{"scenario":"Otieno picks the Instagram Reels (9:16) export preset for a clip he plans to also post to YouTube as a 16:9 landscape video.","question":"What is the issue with using one preset for both destinations?","options":["There is no issue; export presets never affect aspect ratio or framing","The two platforms expect different aspect ratios\/framing, so a single preset chosen for Reels may crop or letterbox awkwardly on YouTube","YouTube automatically converts any 9:16 clip to 16:9 with no visible change","Export presets only affect audio quality, not video framing"],"correct":1,"explanation":"Reels (9:16 vertical) and YouTube (16:9 landscape) have different aspect ratios, so a preset built for one destination often needs separate framing or a separate export for the other."}];
+        let currentQuestion = 0, score = 0, streak = 0, answered = false;
+        function updateScoreboard() {
+            document.getElementById('score').textContent = score;
+            document.getElementById('current').textContent = Math.min(currentQuestion + 1, exercises.length);
+            document.getElementById('total').textContent = exercises.length;
+            document.getElementById('streak').textContent = streak;
+            document.getElementById('progress').style.width = ((currentQuestion) / exercises.length) * 100 + '%';
+        }
+        function escapeHtml(s) { return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+        function renderQuestion() {
+            answered = false;
+            const q = exercises[currentQuestion];
+            let html = '';
+            if (q.scenario) html += `<div class="scenario"><strong>Scenario.</strong> ${escapeHtml(q.scenario)}</div>`;
+            html += `<div class="question">${escapeHtml(q.question)}</div>`;
+            html += '<div class="options">';
+            q.options.forEach((o, i) => { html += `<button class="option" onclick="selectAnswer(${i})">${escapeHtml(o)}</button>`; });
+            html += '</div>';
+            document.getElementById('exerciseCard').innerHTML = html;
+            updateScoreboard();
+        }
+        function selectAnswer(i) {
+            if (answered) return;
+            answered = true;
+            const q = exercises[currentQuestion];
+            const btns = document.querySelectorAll('.option');
+            btns.forEach(b => b.classList.add('disabled'));
+            btns[q.correct].classList.add('correct');
+            const right = i === q.correct;
+            if (!right) btns[i].classList.add('wrong');
+            if (right) { score += 10; streak += 1; } else { streak = 0; }
+            const fb = document.createElement('div');
+            fb.className = 'feedback ' + (right ? 'correct' : 'wrong');
+            fb.innerHTML = `<strong>${right ? '&#9989; Correct.' : '&#10060; Not quite.'}</strong><br>${escapeHtml(q.explanation)}`;
+            document.getElementById('exerciseCard').appendChild(fb);
+            const nb = document.createElement('button');
+            nb.className = 'next-btn';
+            nb.textContent = currentQuestion === exercises.length - 1 ? 'See results →' : 'Next scenario →';
+            nb.onclick = nextQuestion;
+            document.getElementById('exerciseCard').appendChild(nb);
+            updateScoreboard();
+        }
+        function nextQuestion() { currentQuestion++; if (currentQuestion >= exercises.length) return showResults(); renderQuestion(); }
+        function showResults() {
+            document.getElementById('progress').style.width = '100%';
+            const total = exercises.length * 10;
+            const pct = Math.round(score / total * 100);
+            if (window.parent) { window.parent.postMessage({type:"mtti_quiz_score", score: score, total: total, percent: pct}, "*"); }
+            let badge = '🌟', msg = 'Excellent work. Otieno-level editing instincts.';
+            if (pct < 50) { badge = '🌱'; msg = 'Good first attempt. Review the lesson and try again.'; }
+            else if (pct < 80) { badge = '📚'; msg = 'Solid progress. Review the scenarios you missed and retry.'; }
+            document.getElementById('exerciseCard').innerHTML = `
+                <div class="results">
+                    <span class="badge">${badge}</span>
+                    <h2>Quiz Complete</h2>
+                    <div class="final-score">${score} / ${total}</div>
+                    <p><strong>${pct}%</strong> &middot; Longest streak: ${streak}</p>
+                    <p>${msg}</p>
+                    <button class="restart-btn" onclick="restart()">Try again &#128257;</button>
+                </div>`;
+        }
+        function restart() { currentQuestion = 0; score = 0; streak = 0; renderQuestion(); }
+        /* How-To intro — a small, ungraded field-check demo shown before the
+           quiz starts, directly rehearsing the "set trim-in/trim-out so the
+           kept duration fits under a platform limit, without running past
+           the clip's real length" mechanic one of the quiz scenarios asks
+           about, so it's not being asked cold. */
+        const HOWTO_FIELDS = [
+            { id: 'trimIn', label: 'Trim-in point (seconds into the 50-second clip)', type: 'number' },
+            { id: 'trimOut', label: 'Trim-out point (seconds into the 50-second clip)', type: 'number' },
+        ];
+        const HOWTO_RULES = {
+            trimIn: [ { op: 'gte', value: 10 }, { op: 'lte', value: 20 } ],
+            trimOut: [ { op: 'lte', value: 50 } ]
+        };
+
+        function applyOpH(op, actual, target) {
+            if (op === 'gte') return actual >= target;
+            if (op === 'lte') return actual <= target;
+            if (op === 'eq') return actual === target;
+            return false;
+        }
+
+        function checkHowtoField(id, trimIn, trimOut) {
+            if (id === 'trimIn') {
+                return Number.isFinite(trimIn) && HOWTO_RULES.trimIn.every(r => applyOpH(r.op, trimIn, r.value));
+            }
+            if (id === 'trimOut') {
+                if (!Number.isFinite(trimOut) || !Number.isFinite(trimIn)) return false;
+                const passesStatic = HOWTO_RULES.trimOut.every(r => applyOpH(r.op, trimOut, r.value));
+                const segment = trimOut - trimIn;
+                return passesStatic && applyOpH('gte', segment, 18) && applyOpH('lte', segment, 22);
+            }
+            return false;
+        }
+
+        function checkHowto() {
+            const trimIn = parseFloat(document.getElementById('field_trimIn').value);
+            const trimOut = parseFloat(document.getElementById('field_trimOut').value);
+            let allOk = true;
+            HOWTO_FIELDS.forEach(f => {
+                const ok = checkHowtoField(f.id, trimIn, trimOut);
+                allOk = allOk && ok;
+                const wrap = document.getElementById('fieldwrap_' + f.id);
+                wrap.classList.remove('hc-correct', 'hc-wrong');
+                wrap.classList.add(ok ? 'hc-correct' : 'hc-wrong');
+                document.getElementById('status_' + f.id).textContent = ok ? '✅ Looks right' : '❌ Check again';
+            });
+            const banner = document.getElementById('howtoBanner');
+            banner.classList.add('show');
+            banner.className = 'howto-banner show ' + (allOk ? 'ok' : 'fail');
+            banner.textContent = allOk
+                ? '✅ Nailed it — that keeps roughly a 20-second highlight, comfortably under a 30-second WhatsApp Status cap, and never runs past the clip\'s real 50-second length.'
+                : '❌ Not quite — remember: kept duration = trim-out minus trim-in, and trim-out can never exceed the clip\'s real length.';
+        }
+
+        function renderHowto() {
+            document.getElementById('exerciseCard').innerHTML = `
+                <div class="howto-card">
+                    <h3>🔍 Quick How-To: Setting Trim Points</h3>
+                    <p>One of the scenarios coming up asks about exactly this: Otieno has a 50-second raw clip and needs roughly a 20-second highlight for a WhatsApp Status post, starting around the 15-second mark. Set a trim-in and trim-out point below that keep about 20 seconds, without running past the clip's real 50-second length, then check your work.</p>
+                    <div class="howto-fields">
+                        <div class="howto-field" id="fieldwrap_trimIn">
+                            <label for="field_trimIn">Trim-in point (seconds into the 50-second clip)</label>
+                            <input type="number" id="field_trimIn" step="1" min="0" placeholder="e.g. 15">
+                            <div class="hc-status" id="status_trimIn"></div>
+                        </div>
+                        <div class="howto-field" id="fieldwrap_trimOut">
+                            <label for="field_trimOut">Trim-out point (seconds into the 50-second clip)</label>
+                            <input type="number" id="field_trimOut" step="1" min="0" placeholder="e.g. 35">
+                            <div class="hc-status" id="status_trimOut"></div>
+                        </div>
+                    </div>
+                    <div class="howto-banner" id="howtoBanner"></div>
+                    <button class="start-quiz-btn" id="checkHowtoBtn">Check My Settings</button>
+                    <button class="start-quiz-btn" id="startQuizBtn" style="margin-left:10px;background:linear-gradient(135deg,#28a745,#1e7e34);">Start Quiz →</button>
+                </div>`;
+            document.getElementById('checkHowtoBtn').addEventListener('click', checkHowto);
+            document.getElementById('startQuizBtn').addEventListener('click', renderQuestion);
+        }
+
+        renderHowto();
+    </script>
+</body>
+</html>

@@ -1,0 +1,346 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Online Advertising Overview | MTTI Digital Marketing</title>
+    <link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Fredoka:wght@500;600&display=swap" rel="stylesheet">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Space Mono', monospace;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh; padding: 20px; color: #fff;
+        }
+        .container { max-width: 900px; margin: 0 auto; }
+        .header { text-align: center; margin-bottom: 30px; animation: slideDown 0.6s ease-out; }
+        .header .lesson-tag {
+            display: inline-block; background: rgba(255,255,255,0.2);
+            padding: 6px 16px; border-radius: 999px;
+            font-size: 0.85em; margin-bottom: 12px;
+        }
+        .header h1 {
+            font-family: 'Fredoka', sans-serif; font-size: 2.2em;
+            margin-bottom: 8px; text-shadow: 3px 3px 0 rgba(0,0,0,0.2);
+        }
+        .header p { opacity: 0.95; font-size: 0.95em; }
+        .score-board {
+            background: rgba(255,255,255,0.15); backdrop-filter: blur(10px);
+            border-radius: 20px; padding: 20px; margin-bottom: 20px;
+            display: flex; justify-content: space-around;
+            animation: fadeIn 0.8s ease-out 0.2s both;
+        }
+        .score-item { text-align: center; }
+        .score-item .label { font-size: 0.85em; opacity: 0.9; margin-bottom: 4px; }
+        .score-item .value {
+            font-size: 1.8em; font-weight: bold; font-family: 'Fredoka', sans-serif;
+        }
+        .progress-bar {
+            width: 100%; height: 8px; background: rgba(255,255,255,0.3);
+            border-radius: 10px; margin-bottom: 25px; overflow: hidden;
+        }
+        .progress-fill {
+            height: 100%; background: linear-gradient(90deg, #f093fb 0%, #f5576c 100%);
+            border-radius: 10px; transition: width 0.5s ease; width: 0%;
+        }
+        .exercise-card {
+            background: white; color: #333; border-radius: 25px;
+            padding: 35px; margin-bottom: 20px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            animation: fadeIn 0.6s ease-out both;
+        }
+        .scenario {
+            background: linear-gradient(135deg, #fff8e1 0%, #ffecb3 100%);
+            border-left: 5px solid #ffc107;
+            padding: 20px 24px; border-radius: 12px;
+            margin-bottom: 24px;
+            font-size: 0.98em; line-height: 1.55;
+        }
+        .scenario strong { color: #7a5a00; font-family: 'Fredoka', sans-serif; }
+        .question {
+            font-size: 1.15em; margin-bottom: 20px;
+            font-weight: 700; line-height: 1.4;
+        }
+        .options { display: flex; flex-direction: column; gap: 12px; }
+        .option {
+            background: #f5f7fb; border: 2px solid transparent;
+            padding: 16px 20px; border-radius: 12px;
+            cursor: pointer; transition: all 0.2s ease;
+            font-family: 'Space Mono', monospace; font-size: 0.98em; text-align: left;
+        }
+        .option:hover:not(.disabled) {
+            background: #eef1fb; border-color: #667eea; transform: translateX(4px);
+        }
+        .option.correct { background: #d4edda; border-color: #28a745; color: #155724; }
+        .option.wrong { background: #f8d7da; border-color: #dc3545; color: #721c24; animation: shake 0.4s; }
+        .option.disabled { cursor: not-allowed; opacity: 0.85; }
+        .feedback {
+            margin-top: 22px; padding: 18px 22px; border-radius: 12px;
+            animation: slideUp 0.4s ease-out;
+            font-size: 0.98em; line-height: 1.5;
+        }
+        .feedback.correct { background: #d4edda; color: #155724; border-left: 4px solid #28a745; }
+        .feedback.wrong { background: #f8d7da; color: #721c24; border-left: 4px solid #dc3545; }
+        .feedback strong { font-family: 'Fredoka', sans-serif; }
+        .next-btn, .restart-btn {
+            margin-top: 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white; border: none;
+            padding: 14px 32px; border-radius: 12px;
+            font-size: 1em; cursor: pointer;
+            font-family: 'Fredoka', sans-serif;
+            box-shadow: 0 6px 18px rgba(0,0,0,0.2);
+            transition: transform 0.2s ease;
+        }
+        .next-btn:hover, .restart-btn:hover { transform: scale(1.04); }
+        .results {
+            text-align: center; padding: 25px 15px;
+            animation: bounceIn 0.6s ease-out;
+        }
+        .results h2 {
+            font-family: 'Fredoka', sans-serif; font-size: 2em;
+            margin-bottom: 12px; color: #333;
+        }
+        .results .final-score {
+            font-size: 3em; font-family: 'Fredoka', sans-serif;
+            color: #667eea; margin: 20px 0;
+        }
+        .results p { color: #555; margin-bottom: 12px; }
+        .badge { display: inline-block; font-size: 3.5em; margin: 8px 0; }
+        @keyframes slideDown { from { opacity: 0; transform: translateY(-30px); } to { opacity: 1; transform: translateY(0); } }
+        @keyframes fadeIn { from { opacity: 0; transform: scale(0.96); } to { opacity: 1; transform: scale(1); } }
+        @keyframes slideUp { from { opacity: 0; transform: translateY(15px); } to { opacity: 1; transform: translateY(0); } }
+        @keyframes shake { 0%,100% { transform: translateX(0); } 25% { transform: translateX(-8px); } 75% { transform: translateX(8px); } }
+        @keyframes bounceIn { 0% { opacity: 0; transform: scale(0.4); } 60% { transform: scale(1.05); } 100% { opacity: 1; transform: scale(1); } }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <div class="lesson-tag">Module 5 · Lesson 5.1</div>
+            <h1>Online Advertising Overview</h1>
+            <p>10 Sarah Chebet scenarios — pick the right ad family, platform, and budget split</p>
+        </div>
+
+        <div class="score-board">
+            <div class="score-item"><div class="label">Score</div><div class="value" id="score">0</div></div>
+            <div class="score-item"><div class="label">Question</div><div class="value"><span id="current">1</span>/<span id="total">10</span></div></div>
+            <div class="score-item"><div class="label">Streak</div><div class="value" id="streak">0</div></div>
+        </div>
+
+        <div class="progress-bar"><div class="progress-fill" id="progress"></div></div>
+
+        <div class="exercise-card" id="exerciseCard"></div>
+    </div>
+
+    <script>
+        const exercises = [
+  {
+    "scenario": "Sarah's cousin is back with fresh advice: he tells her that \"online advertising means Google Ads\" and that everything else — Meta, TikTok, LinkedIn — is really just a variation of Google. Sarah has KES 15,000 a month for Karibu Kitchen and wants to know if that is true before she picks a platform.",
+    "question": "How should you correct him?",
+    "options": [
+      "He is correct — Google Ads owns every online advertising platform.",
+      "Every online ad platform falls into one of two families: Search Engine Marketing, where ads appear in response to a search query, and Social and Display, where ads appear in feeds, stories, or on other websites. Google Ads is only the giant of the SEM family.",
+      "Online advertising is really six unrelated families and none of them talk to each other.",
+      "Online advertising is only social — search ads no longer count in Kenya."
+    ],
+    "correct": 1,
+    "explanation": "Section 5.1 splits every online ad platform into exactly two families — SEM (Google Ads, Microsoft Advertising, Yahoo) and Social/Display (Meta, LinkedIn, X, TikTok, YouTube, display networks). Google dominates the SEM family with over 90% of world search-ad spend, but it does not own Meta, TikTok, or LinkedIn."
+  },
+  {
+    "scenario": "Sarah asks whether she should bother with Microsoft Advertising (formerly Bing Ads) or Yahoo Ads to reach more Eldoret customers on the cheap.",
+    "question": "What is the right advice for Karibu Kitchen specifically?",
+    "options": [
+      "Yes — Bing is bigger than Google in East Africa.",
+      "Yes — Yahoo is where Kenyan office workers search for lunch.",
+      "For Sarah in Kenya, Google Ads is the only SEM platform that matters. Bing and Yahoo have some share globally but very little audience in East Africa, so the effort of learning them is not worth it for a lunch-delivery shop.",
+      "No — SEM is banned in Kenya."
+    ],
+    "correct": 2,
+    "explanation": "Section 5.1 lists three SEM platforms trainees should recognise (Google, Microsoft Advertising, Yahoo) but is explicit that for a Kenyan small business only Google Ads is worth learning first. Sarah has KES 15,000 — she cannot afford to split it between platforms that have almost no East African audience."
+  },
+  {
+    "scenario": "Sarah is scrolling through her feed and sees: (a) a text ad at the top of a Google search for \"lunch Eldoret\", (b) a rectangular banner on a news website, (c) a food commercial that plays before a YouTube video, and (d) a full-screen ad that opened in a separate window over the site she was reading.",
+    "question": "How should you label each format using the seven-format taxonomy from the lesson?",
+    "options": [
+      "All four are \"sponsored posts\".",
+      "(a) search ad, (b) display or banner ad, (c) video ad, (d) pop-up ad.",
+      "(a) floating ad, (b) sponsored post, (c) image ad, (d) search ad.",
+      "(a) video ad, (b) pop-up ad, (c) sponsored post, (d) banner ad."
+    ],
+    "correct": 1,
+    "explanation": "Slide 6 of §5.1 lists the seven formats: search, display/banner, video, image, pop-up, floating, and sponsored post. The four examples map cleanly onto search, display, video, and pop-up in that order. Getting the names right matters because platforms and agencies use them as shorthand."
+  },
+  {
+    "scenario": "Before picking a platform, Sarah wants a professional method — not a guess. You teach her the four questions from Slide 7 of Lesson 5.1.",
+    "question": "In the correct order, what are the four questions she must answer?",
+    "options": [
+      "How much money do I have? What is trendy? Who is my competitor? What day is it?",
+      "Which platform is cheapest? Which platform is newest? Which platform is my friend on? Which platform does my cousin like?",
+      "Who is my customer? Where do they spend their time online? What am I selling? How urgent is the decision?",
+      "What creative do I have? Which agency shall I hire? What awards can I win? Which influencer is available?"
+    ],
+    "correct": 2,
+    "explanation": "The four choice questions from §5.1 are: (1) WHO is my customer, (2) WHERE do they spend their time online, (3) WHAT am I selling, (4) HOW URGENT is the decision. Answering them in order is what lets Sarah decide 60% Meta / 30% Google / 10% test — instead of guessing."
+  },
+  {
+    "scenario": "Sarah answers the four questions honestly. Her customer is an Eldoret office worker or family. They spend time mostly on Facebook and Instagram, some time on Google search, and almost none on LinkedIn. She is selling a direct delivery order — a transactional purchase. The decision is very urgent — hungry office workers decide within an hour.",
+    "question": "What budget split does Lesson 5.1 recommend for her KES 15,000?",
+    "options": [
+      "KES 15,000 to LinkedIn Ads — professional targeting.",
+      "KES 9,000 to Meta Ads (60%), KES 4,500 to Google Search Ads (30%), and KES 1,500 held as a testing reserve (10%).",
+      "KES 7,500 to TikTok and KES 7,500 to Yahoo Ads.",
+      "KES 5,000 each to Meta, Google, and LinkedIn — split it evenly."
+    ],
+    "correct": 1,
+    "explanation": "Slide 8 of §5.1 gives Sarah's answer: 60% Meta (broad social reach where her customers already are), 30% Google Search (for the ready-to-buy \"lunch delivery Eldoret\" query), and 10% testing reserve. The 10% testing reserve is a professional discipline — every serious marketer keeps one."
+  },
+  {
+    "scenario": "Sarah asks: \"Why do I need a testing reserve? Cannot I just put all KES 15,000 into whichever platform is best that month?\"",
+    "question": "What is the strongest justification for the 10% testing reserve?",
+    "options": [
+      "Because the platforms make you spend it — it is a legal requirement.",
+      "Because it is a superstition among marketers.",
+      "Because platforms, audiences, and ad formats change constantly. A testing reserve lets Sarah try one new thing every month — a TikTok video, a local Facebook group post — without risking the money that is already paying for her known winners.",
+      "Because Meta charges a 10% platform fee that Sarah must set aside."
+    ],
+    "correct": 2,
+    "explanation": "The testing reserve exists so that Sarah can learn what works next without gambling the budget that is already producing orders. Slide 8 of §5.1 calls this a \"testing budget\" and says every professional marketer keeps one. It is how discoveries — a new creator, a new format, a new placement — get funded."
+  },
+  {
+    "scenario": "Sarah's friend runs Wangari's Wellness — a Nairobi-based B2B corporate wellness consultancy that sells workshops to HR Directors at insurance and banking firms. Deal size is KES 200,000 to KES 500,000. Wangari asks whether she should copy Sarah's 60/30/10 split.",
+    "question": "What is the right guidance for Wangari, using the four choice questions?",
+    "options": [
+      "Copy Sarah exactly — the same split works for every Kenyan business.",
+      "No — Wangari's customer is an HR Director, who spends professional time on LinkedIn, not Facebook. Her sale is a slow, high-value B2B decision, not an urgent lunch. The four questions point her to LinkedIn Ads even though clicks are much more expensive.",
+      "Wangari should use TikTok because it is the fastest-growing platform.",
+      "Wangari should not advertise at all — B2B does not use online ads."
+    ],
+    "correct": 1,
+    "explanation": "The four questions from §5.1 give different answers for different businesses. Sarah's B2C urgent lunch decision points to Meta plus Google. Wangari's B2B slow high-value decision, aimed at HR Directors, points to LinkedIn — where professional targeting is unmatched, even though CPCs are USD 5-15. That is why the lesson introduces her as a contrast case."
+  },
+  {
+    "scenario": "Sarah wonders whether she should skip Google Search entirely because \"most people just scroll Facebook — nobody searches for food any more\".",
+    "question": "Why is that reasoning weak?",
+    "options": [
+      "Because Google is more expensive per click than Meta.",
+      "Because search intent is different from feed intent. A Kenyan office worker who types \"lunch delivery Eldoret\" is ready to order NOW — high urgency, high commercial intent — and that is exactly what Sarah is selling. Losing that surface means losing the most ready-to-buy queries.",
+      "Because Google Ads sends her physical foot traffic, not delivery orders.",
+      "Because Facebook has banned food adverts."
+    ],
+    "correct": 1,
+    "explanation": "Slide 7 of §5.1 walks through Sarah's four answers, and \"how urgent is the search?\" comes back as \"very\". The whole point of allocating 30% of her budget to Google Search Ads is that people who type \"lunch delivery Eldoret\" have already decided to buy — they just have not chosen the seller yet. Missing that surface means missing the highest-intent traffic."
+  },
+  {
+    "scenario": "A trainee summarises Lesson 5.1 like this: \"Meta and TikTok are the same family, LinkedIn is a search engine, and YouTube ads are bought inside LinkedIn.\"",
+    "question": "How many of those three claims are correct?",
+    "options": [
+      "All three.",
+      "Two — the LinkedIn and YouTube parts.",
+      "Zero — every claim is wrong.",
+      "One — only the Meta and TikTok part."
+    ],
+    "correct": 3,
+    "explanation": "From §5.1: Meta and TikTok ARE both in the Social and Display family — that claim is correct. LinkedIn is a social platform (B2B), NOT a search engine — wrong. YouTube ads are managed inside GOOGLE Ads, not LinkedIn — wrong. So only one of the three claims survives, which is why the correct count is one."
+  },
+  {
+    "scenario": "By the end of Lesson 5.1, Sarah asks: \"So how many platforms and formats am I actually being asked to learn across this whole module?\"",
+    "question": "Which single-line summary is accurate to the lesson?",
+    "options": [
+      "Nine platforms across two families, seven ad formats, and four choice questions used to decide between them.",
+      "One platform (Google), one format (search ads), and no choice questions needed.",
+      "Twenty-five platforms and thirty formats — memorise them all.",
+      "Two platforms (Meta and Google), no formats, and one question — \"what is trendy?\"."
+    ],
+    "correct": 0,
+    "explanation": "Slide 9 of §5.1 gives the summary: two families (SEM and Social/Display), nine platforms in total across both families (Google, Microsoft, Yahoo, Meta, LinkedIn, X, YouTube, TikTok, display networks), seven ad formats, and the four choice questions. Memorising that summary is what makes the rest of Module 5 easy."
+  }
+];
+
+        let currentQuestion = 0, score = 0, streak = 0, answered = false;
+
+        function updateScoreboard() {
+            document.getElementById('score').textContent = score;
+            document.getElementById('current').textContent = Math.min(currentQuestion + 1, exercises.length);
+            document.getElementById('total').textContent = exercises.length;
+            document.getElementById('streak').textContent = streak;
+            document.getElementById('progress').style.width = ((currentQuestion) / exercises.length) * 100 + '%';
+        }
+
+        function escapeHtml(s) {
+            return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+        }
+
+        function renderQuestion() {
+            answered = false;
+            const q = exercises[currentQuestion];
+            let html = '';
+            if (q.scenario) {
+                html += `<div class="scenario"><strong>Scenario.</strong> ${escapeHtml(q.scenario)}</div>`;
+            }
+            html += `<div class="question">${escapeHtml(q.question)}</div>`;
+            html += '<div class="options">';
+            q.options.forEach((o, i) => {
+                html += `<button class="option" onclick="selectAnswer(${i})">${escapeHtml(o)}</button>`;
+            });
+            html += '</div>';
+            document.getElementById('exerciseCard').innerHTML = html;
+            updateScoreboard();
+        }
+
+        function selectAnswer(i) {
+            if (answered) return;
+            answered = true;
+            const q = exercises[currentQuestion];
+            const btns = document.querySelectorAll('.option');
+            btns.forEach(b => b.classList.add('disabled'));
+            btns[q.correct].classList.add('correct');
+            const right = i === q.correct;
+            if (!right) btns[i].classList.add('wrong');
+            if (right) { score += 10; streak += 1; } else { streak = 0; }
+            const fb = document.createElement('div');
+            fb.className = 'feedback ' + (right ? 'correct' : 'wrong');
+            fb.innerHTML = `<strong>${right ? '✅ Correct.' : '❌ Not quite.'}</strong><br>${escapeHtml(q.explanation)}`;
+            document.getElementById('exerciseCard').appendChild(fb);
+            const nb = document.createElement('button');
+            nb.className = 'next-btn';
+            nb.textContent = currentQuestion === exercises.length - 1 ? 'See results →' : 'Next scenario →';
+            nb.onclick = nextQuestion;
+            document.getElementById('exerciseCard').appendChild(nb);
+            updateScoreboard();
+        }
+
+        function nextQuestion() {
+            currentQuestion++;
+            if (currentQuestion >= exercises.length) return showResults();
+            renderQuestion();
+        }
+
+        function showResults() {
+            document.getElementById('progress').style.width = '100%';
+            const total = exercises.length * 10;
+            const pct = Math.round(score / total * 100);
+            if (window.parent) { window.parent.postMessage({type:"mtti_quiz_score", score: score, total: total, percent: pct}, "*"); }
+            let badge = '🌟', msg = 'Excellent work. You have a professional grasp of this lesson.';
+            if (pct < 50) { badge = '🌱'; msg = 'Good first attempt. Re-watch the lesson video and try again.'; }
+            else if (pct < 80) { badge = '📚'; msg = 'Solid progress. Review the scenarios you missed and retry.'; }
+            document.getElementById('exerciseCard').innerHTML = `
+                <div class="results">
+                    <span class="badge">${badge}</span>
+                    <h2>Quiz Complete</h2>
+                    <div class="final-score">${score} / ${total}</div>
+                    <p><strong>${pct}%</strong> · Longest streak: ${streak}</p>
+                    <p>${msg}</p>
+                    <button class="restart-btn" onclick="restart()">Try again 🔁</button>
+                </div>`;
+        }
+
+        function restart() {
+            currentQuestion = 0; score = 0; streak = 0;
+            renderQuestion();
+        }
+
+        renderQuestion();
+    </script>
+</body>
+</html>

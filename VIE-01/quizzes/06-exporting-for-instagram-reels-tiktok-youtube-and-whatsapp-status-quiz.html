@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Exporting for Instagram Reels, TikTok, YouTube, and WhatsApp Status | MTTI Video Editing</title>
+    <link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Fredoka:wght@500;600&display=swap" rel="stylesheet">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Space Mono', monospace; background: linear-gradient(135deg, #2b0a4a 0%, #1b3a8c 100%); min-height: 100vh; padding: 20px; color: #fff; }
+        .container { max-width: 900px; margin: 0 auto; }
+        .header { text-align: center; margin-bottom: 30px; }
+        .header .lesson-tag { display: inline-block; background: rgba(255,255,255,0.2); padding: 6px 16px; border-radius: 999px; font-size: 0.85em; margin-bottom: 12px; }
+        .header h1 { font-family: 'Fredoka', sans-serif; font-size: 2.2em; margin-bottom: 8px; text-shadow: 3px 3px 0 rgba(0,0,0,0.2); }
+        .score-board { background: rgba(255,255,255,0.15); backdrop-filter: blur(10px); border-radius: 20px; padding: 20px; margin-bottom: 20px; display: flex; justify-content: space-around; }
+        .score-item { text-align: center; }
+        .score-item .label { font-size: 0.85em; opacity: 0.9; margin-bottom: 4px; }
+        .score-item .value { font-size: 1.8em; font-weight: bold; font-family: 'Fredoka', sans-serif; }
+        .progress-bar { width: 100%; height: 8px; background: rgba(255,255,255,0.3); border-radius: 10px; margin-bottom: 25px; overflow: hidden; }
+        .progress-fill { height: 100%; background: linear-gradient(90deg, #f7971e 0%, #ffd200 100%); border-radius: 10px; transition: width 0.5s ease; width: 0%; }
+        .exercise-card { background: white; color: #333; border-radius: 25px; padding: 35px; margin-bottom: 20px; box-shadow: 0 20px 60px rgba(0,0,0,0.3); }
+        .scenario { background: linear-gradient(135deg, #fff8e1 0%, #ffecb3 100%); border-left: 5px solid #ffc107; padding: 20px 24px; border-radius: 12px; margin-bottom: 24px; font-size: 0.98em; line-height: 1.55; }
+        .scenario strong { color: #7a5a00; font-family: 'Fredoka', sans-serif; }
+        .question { font-size: 1.15em; margin-bottom: 20px; font-weight: 700; line-height: 1.4; }
+        .options { display: flex; flex-direction: column; gap: 12px; }
+        .option { background: #f5f7fb; border: 2px solid transparent; padding: 16px 20px; border-radius: 12px; cursor: pointer; transition: all 0.2s ease; font-family: 'Space Mono', monospace; font-size: 0.98em; text-align: left; }
+        .option:hover:not(.disabled) { background: #eef1fb; border-color: #2b0a4a; transform: translateX(4px); }
+        .option.correct { background: #d4edda; border-color: #28a745; color: #155724; }
+        .option.wrong { background: #f8d7da; border-color: #dc3545; color: #721c24; }
+        .option.disabled { cursor: not-allowed; opacity: 0.85; }
+        .feedback { margin-top: 22px; padding: 18px 22px; border-radius: 12px; font-size: 0.98em; line-height: 1.5; }
+        .feedback.correct { background: #d4edda; color: #155724; border-left: 4px solid #28a745; }
+        .feedback.wrong { background: #f8d7da; color: #721c24; border-left: 4px solid #dc3545; }
+        .next-btn, .restart-btn { margin-top: 20px; background: linear-gradient(135deg, #2b0a4a 0%, #1b3a8c 100%); color: white; border: none; padding: 14px 32px; border-radius: 12px; font-size: 1em; cursor: pointer; font-family: 'Fredoka', sans-serif; box-shadow: 0 6px 18px rgba(0,0,0,0.2); }
+        .results { text-align: center; padding: 25px 15px; }
+        .results h2 { font-family: 'Fredoka', sans-serif; font-size: 2em; margin-bottom: 12px; color: #333; }
+        .results .final-score { font-size: 3em; font-family: 'Fredoka', sans-serif; color: #2b0a4a; margin: 20px 0; }
+        .results p { color: #555; margin-bottom: 12px; }
+        .badge { display: inline-block; font-size: 3.5em; margin: 8px 0; }
+
+        /* How-To intro screen — shown before question 1, not scored */
+        .howto-card { background: white; color: #333; border-radius: 25px; padding: 35px; margin-bottom: 20px; box-shadow: 0 20px 60px rgba(0,0,0,0.3); }
+        .howto-card h3 { font-family: 'Fredoka', sans-serif; font-size: 1.3em; margin-bottom: 12px; color: #2b0a4a; }
+        .howto-card p { line-height: 1.6; margin-bottom: 16px; color: #444; }
+        .howto-fields { display: flex; flex-direction: column; gap: 14px; background: #f5f7fb; border-radius: 12px; padding: 18px; margin-bottom: 18px; }
+        .howto-field-row { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
+        .howto-field-label { flex: 0 0 210px; font-weight: 700; font-size: 0.92em; }
+        .howto-field-input { flex: 1; min-width: 140px; padding: 9px 12px; border-radius: 8px; border: 2px solid #ccc; font-family: 'Space Mono', monospace; font-size: 0.95em; background: #fff; color: #333; }
+        .howto-field-input:focus { outline: none; border-color: #2b0a4a; }
+        .howto-field-result { width: 26px; text-align: center; font-size: 1.15em; }
+        .howto-banner { margin-top: 4px; margin-bottom: 18px; padding: 12px 16px; border-radius: 10px; font-size: 0.9em; font-weight: 700; display: none; }
+        .howto-banner.show { display: block; }
+        .howto-banner.ok { background: #d4edda; color: #155724; }
+        .howto-banner.fail { background: #f8d7da; color: #721c24; }
+        .start-quiz-btn { margin-top: 4px; background: linear-gradient(135deg, #2b0a4a 0%, #1b3a8c 100%); color: white; border: none; padding: 14px 32px; border-radius: 12px; font-size: 1em; cursor: pointer; font-family: 'Fredoka', sans-serif; box-shadow: 0 6px 18px rgba(0,0,0,0.2); }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <div class="lesson-tag">Exporting & Rendering · Lesson 3 · Quiz</div>
+            <h1>Exporting for Instagram Reels, TikTok, YouTube, and WhatsApp Status</h1>
+        </div>
+        <div class="score-board">
+            <div class="score-item"><div class="label">Score</div><div class="value" id="score">0</div></div>
+            <div class="score-item"><div class="label">Question</div><div class="value"><span id="current">1</span>/<span id="total">10</span></div></div>
+            <div class="score-item"><div class="label">Streak</div><div class="value" id="streak">0</div></div>
+        </div>
+        <div class="progress-bar"><div class="progress-fill" id="progress"></div></div>
+        <div class="exercise-card" id="exerciseCard"></div>
+    </div>
+    <script>
+        const exercises = [{"scenario":"Otieno is exporting a finished edit specifically as an Instagram Reel.","question":"Which aspect ratio does that export need?","options":["16:9 horizontal","9:16 vertical","1:1 square only","Aspect ratio doesn't matter for Reels"],"correct":1,"explanation":"Instagram Reels are full-screen vertical video, expecting a 9:16 aspect ratio."},{"scenario":"A client asks Otieno why he ran their 16:9 wedding clip through CapCut's Auto Reframe tool before exporting it for TikTok, instead of just squashing the frame to fit.","question":"What is the best explanation for using Auto Reframe?","options":["Auto Reframe makes the file smaller, nothing else","Auto Reframe intelligently recrops the footage to the new aspect ratio, keeping the subject properly proportioned, instead of distorting the picture like a simple stretch would","Auto Reframe only works on audio, not video","Stretching the frame always looks identical to reframing"],"correct":1,"explanation":"Auto Reframe (or Canva's Resize) recrops the shot to fit a new aspect ratio without warping proportions, unlike simply stretching or squashing the original frame."},{"scenario":"Otieno has a 90-second church event highlight and wants to post part of it as a single WhatsApp Status update.","question":"What does he need to do to fit WhatsApp Status's constraints?","options":["Post the full 90 seconds as one Status update","Trim the clip down to roughly 30 seconds or less (or split it across multiple Status posts)","WhatsApp Status has no duration limit at all","Convert it to an audio-only file instead"],"correct":1,"explanation":"WhatsApp Status limits each individual post to about 30 seconds, so a longer clip needs trimming or splitting to fit."},{"scenario":"Otieno is preparing the same finished edit for a standard YouTube upload.","question":"Which duration and aspect ratio expectations apply there?","options":["9:16 vertical, under 30 seconds, same as WhatsApp Status","16:9 horizontal, with no strict duration cap for a standard upload","1:1 square, exactly 60 seconds","YouTube has no aspect ratio or duration expectations at all"],"correct":1,"explanation":"A standard YouTube upload uses the traditional 16:9 horizontal framing and has no strict duration cap, unlike the short-form vertical formats used by Reels, TikTok, and WhatsApp Status."},{"scenario":"Otieno wants to post a shop promo as both a TikTok video and an Instagram Reel from the same finished edit.","question":"What do these two destinations have in common in terms of export settings?","options":["Both expect 16:9 horizontal video","Both favour vertical 9:16 video and short-form duration for the best engagement","Both require exactly 90-second clips","Neither platform supports vertical video"],"correct":1,"explanation":"TikTok and Instagram Reels both favour vertical, 9:16 short-form video, which is why exports for these two destinations look similar even though they're different apps."},{"scenario":"A client asks Otieno why the WhatsApp Status version of their promo needs to be a smaller file than the YouTube version of the same edit.","question":"What is the best explanation?","options":["WhatsApp Status is viewed directly in a chat app over the viewer's data connection, so a smaller, quickly-loading file matters more there than on YouTube, which has no strict size cap","File size never matters for either platform","YouTube requires smaller files than WhatsApp","There is no real difference between the two exports"],"correct":0,"explanation":"WhatsApp Status is loaded inside a chat app on whatever connection the viewer has, so a smaller file loads faster there \u2014 a constraint that doesn't apply the same way to a YouTube upload."},{"scenario":"Otieno keeps one master edit in Canva's Video editor and exports separate versions for Reels, YouTube, and WhatsApp Status rather than trying to make one file serve all three.","question":"Why is this the right approach?","options":["Because each destination has different real aspect ratio, duration, and file-size expectations that one single export cannot satisfy for all three at once","Because CapCut and Canva cannot export more than once from the same project","Because file size never differs between platforms","Because aspect ratio is identical across Reels, YouTube, and WhatsApp Status"],"correct":0,"explanation":"Since Reels, YouTube, and WhatsApp Status each expect meaningfully different aspect ratios, durations, and file sizes, exporting a tailored version for each destination from the same master edit is the reliable approach."}];
+        let currentQuestion = 0, score = 0, streak = 0, answered = false;
+        function updateScoreboard() {
+            document.getElementById('score').textContent = score;
+            document.getElementById('current').textContent = Math.min(currentQuestion + 1, exercises.length);
+            document.getElementById('total').textContent = exercises.length;
+            document.getElementById('streak').textContent = streak;
+            document.getElementById('progress').style.width = ((currentQuestion) / exercises.length) * 100 + '%';
+        }
+        function escapeHtml(s) { return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+        function renderQuestion() {
+            answered = false;
+            const q = exercises[currentQuestion];
+            let html = '';
+            if (q.scenario) html += `<div class="scenario"><strong>Scenario.</strong> ${escapeHtml(q.scenario)}</div>`;
+            html += `<div class="question">${escapeHtml(q.question)}</div>`;
+            html += '<div class="options">';
+            q.options.forEach((o, i) => { html += `<button class="option" onclick="selectAnswer(${i})">${escapeHtml(o)}</button>`; });
+            html += '</div>';
+            document.getElementById('exerciseCard').innerHTML = html;
+            updateScoreboard();
+        }
+        function selectAnswer(i) {
+            if (answered) return;
+            answered = true;
+            const q = exercises[currentQuestion];
+            const btns = document.querySelectorAll('.option');
+            btns.forEach(b => b.classList.add('disabled'));
+            btns[q.correct].classList.add('correct');
+            const right = i === q.correct;
+            if (!right) btns[i].classList.add('wrong');
+            if (right) { score += 10; streak += 1; } else { streak = 0; }
+            const fb = document.createElement('div');
+            fb.className = 'feedback ' + (right ? 'correct' : 'wrong');
+            fb.innerHTML = `<strong>${right ? '&#9989; Correct.' : '&#10060; Not quite.'}</strong><br>${escapeHtml(q.explanation)}`;
+            document.getElementById('exerciseCard').appendChild(fb);
+            const nb = document.createElement('button');
+            nb.className = 'next-btn';
+            nb.textContent = currentQuestion === exercises.length - 1 ? 'See results →' : 'Next scenario →';
+            nb.onclick = nextQuestion;
+            document.getElementById('exerciseCard').appendChild(nb);
+            updateScoreboard();
+        }
+        function nextQuestion() { currentQuestion++; if (currentQuestion >= exercises.length) return showResults(); renderQuestion(); }
+        function showResults() {
+            document.getElementById('progress').style.width = '100%';
+            const total = exercises.length * 10;
+            const pct = Math.round(score / total * 100);
+            if (window.parent) { window.parent.postMessage({type:"mtti_quiz_score", score: score, total: total, percent: pct}, "*"); }
+            let badge = '🌟', msg = 'Excellent work. Otieno-level export know-how.';
+            if (pct < 50) { badge = '🌱'; msg = 'Good first attempt. Review the lesson and try again.'; }
+            else if (pct < 80) { badge = '📚'; msg = 'Solid progress. Review the scenarios you missed and retry.'; }
+            document.getElementById('exerciseCard').innerHTML = `
+                <div class="results">
+                    <span class="badge">${badge}</span>
+                    <h2>Quiz Complete</h2>
+                    <div class="final-score">${score} / ${total}</div>
+                    <p><strong>${pct}%</strong> &middot; Longest streak: ${streak}</p>
+                    <p>${msg}</p>
+                    <button class="restart-btn" onclick="restart()">Try again &#128257;</button>
+                </div>`;
+        }
+        function restart() { currentQuestion = 0; score = 0; streak = 0; renderQuestion(); }
+
+        /* How-To intro — a small, ungraded field-check demo shown before
+           the quiz starts, directly rehearsing the export-setting mechanic
+           that one of the quiz scenarios asks about, so it's not being
+           asked cold. */
+        const HOWTO_FIELDS = [
+            { id: 'howtoLen', label: 'Trimmed Clip Length (seconds)', type: 'number', start: 90 }
+        ];
+        const HOWTO_RULES = [
+            { id: 'howtoLen', op: 'lte', target: 30 }
+        ];
+
+        function renderHowtoFields() {
+            document.getElementById('howtoFields').innerHTML = HOWTO_FIELDS.map(f => {
+                if (f.type === 'select') {
+                    const opts = f.options.map(o => `<option value="${o}" ${o === f.start ? 'selected' : ''}>${o}</option>`).join('');
+                    return `<div class="howto-field-row"><label class="howto-field-label" for="${f.id}">${f.label}</label><select class="howto-field-input" id="${f.id}">${opts}</select><span class="howto-field-result" id="${f.id}_result"></span></div>`;
+                }
+                return `<div class="howto-field-row"><label class="howto-field-label" for="${f.id}">${f.label}</label><input class="howto-field-input" type="number" id="${f.id}" value="${f.start}"><span class="howto-field-result" id="${f.id}_result"></span></div>`;
+            }).join('');
+        }
+
+        function applyHowtoOp(op, val, target) {
+            if (op === 'eq') return String(val) === String(target);
+            if (op === 'lte') return parseFloat(val) <= parseFloat(target);
+            if (op === 'gte') return parseFloat(val) >= parseFloat(target);
+            return false;
+        }
+
+        function checkHowto() {
+            let allOk = true;
+            HOWTO_RULES.forEach(r => {
+                const el = document.getElementById(r.id);
+                const ok = applyHowtoOp(r.op, el.value, r.target);
+                if (!ok) allOk = false;
+                const resultEl = document.getElementById(r.id + '_result');
+                resultEl.textContent = ok ? '✅' : '❌';
+            });
+            const banner = document.getElementById('howtoBanner');
+            banner.classList.add('show');
+            banner.className = 'howto-banner show ' + (allOk ? 'ok' : 'fail');
+            banner.textContent = allOk
+                ? '✅ Nailed it — that\'s exactly the setting to use here.'
+                : '❌ Not quite yet — adjust the highlighted field(s) and check again.';
+        }
+
+        function renderHowto() {
+            document.getElementById('exerciseCard').innerHTML = `
+                <div class="howto-card">
+                    <h3>🔍 Quick How-To: Trimming to Fit WhatsApp Status</h3>
+                    <p>One of the scenarios coming up asks about exactly this. Otieno has a <strong>90-second church event highlight</strong> and wants to post part of it as a single WhatsApp Status update, which limits each post to roughly 30 seconds. Set a trimmed clip length below that actually fits, then check your work.</p>
+                    <div class="howto-fields" id="howtoFields"></div>
+                    <div class="howto-banner" id="howtoBanner"></div>
+                    <button class="start-quiz-btn" id="checkHowtoBtn">Check My Settings</button>
+                    <button class="start-quiz-btn" id="startQuizBtn" style="margin-left:10px;background:linear-gradient(135deg,#28a745,#1e7e34);">Start Quiz →</button>
+                </div>`;
+            renderHowtoFields();
+            document.getElementById('checkHowtoBtn').addEventListener('click', checkHowto);
+            document.getElementById('startQuizBtn').addEventListener('click', renderQuestion);
+        }
+
+        renderHowto();
+    </script>
+</body>
+</html>

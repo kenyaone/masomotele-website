@@ -1,0 +1,346 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Budgets, Advantage+, and the Learning Phase | MTTI Digital Marketing</title>
+    <link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Fredoka:wght@500;600&display=swap" rel="stylesheet">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Space Mono', monospace;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh; padding: 20px; color: #fff;
+        }
+        .container { max-width: 900px; margin: 0 auto; }
+        .header { text-align: center; margin-bottom: 30px; animation: slideDown 0.6s ease-out; }
+        .header .lesson-tag {
+            display: inline-block; background: rgba(255,255,255,0.2);
+            padding: 6px 16px; border-radius: 999px;
+            font-size: 0.85em; margin-bottom: 12px;
+        }
+        .header h1 {
+            font-family: 'Fredoka', sans-serif; font-size: 2.2em;
+            margin-bottom: 8px; text-shadow: 3px 3px 0 rgba(0,0,0,0.2);
+        }
+        .header p { opacity: 0.95; font-size: 0.95em; }
+        .score-board {
+            background: rgba(255,255,255,0.15); backdrop-filter: blur(10px);
+            border-radius: 20px; padding: 20px; margin-bottom: 20px;
+            display: flex; justify-content: space-around;
+            animation: fadeIn 0.8s ease-out 0.2s both;
+        }
+        .score-item { text-align: center; }
+        .score-item .label { font-size: 0.85em; opacity: 0.9; margin-bottom: 4px; }
+        .score-item .value {
+            font-size: 1.8em; font-weight: bold; font-family: 'Fredoka', sans-serif;
+        }
+        .progress-bar {
+            width: 100%; height: 8px; background: rgba(255,255,255,0.3);
+            border-radius: 10px; margin-bottom: 25px; overflow: hidden;
+        }
+        .progress-fill {
+            height: 100%; background: linear-gradient(90deg, #f093fb 0%, #f5576c 100%);
+            border-radius: 10px; transition: width 0.5s ease; width: 0%;
+        }
+        .exercise-card {
+            background: white; color: #333; border-radius: 25px;
+            padding: 35px; margin-bottom: 20px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            animation: fadeIn 0.6s ease-out both;
+        }
+        .scenario {
+            background: linear-gradient(135deg, #fff8e1 0%, #ffecb3 100%);
+            border-left: 5px solid #ffc107;
+            padding: 20px 24px; border-radius: 12px;
+            margin-bottom: 24px;
+            font-size: 0.98em; line-height: 1.55;
+        }
+        .scenario strong { color: #7a5a00; font-family: 'Fredoka', sans-serif; }
+        .question {
+            font-size: 1.15em; margin-bottom: 20px;
+            font-weight: 700; line-height: 1.4;
+        }
+        .options { display: flex; flex-direction: column; gap: 12px; }
+        .option {
+            background: #f5f7fb; border: 2px solid transparent;
+            padding: 16px 20px; border-radius: 12px;
+            cursor: pointer; transition: all 0.2s ease;
+            font-family: 'Space Mono', monospace; font-size: 0.98em; text-align: left;
+        }
+        .option:hover:not(.disabled) {
+            background: #eef1fb; border-color: #667eea; transform: translateX(4px);
+        }
+        .option.correct { background: #d4edda; border-color: #28a745; color: #155724; }
+        .option.wrong { background: #f8d7da; border-color: #dc3545; color: #721c24; animation: shake 0.4s; }
+        .option.disabled { cursor: not-allowed; opacity: 0.85; }
+        .feedback {
+            margin-top: 22px; padding: 18px 22px; border-radius: 12px;
+            animation: slideUp 0.4s ease-out;
+            font-size: 0.98em; line-height: 1.5;
+        }
+        .feedback.correct { background: #d4edda; color: #155724; border-left: 4px solid #28a745; }
+        .feedback.wrong { background: #f8d7da; color: #721c24; border-left: 4px solid #dc3545; }
+        .feedback strong { font-family: 'Fredoka', sans-serif; }
+        .next-btn, .restart-btn {
+            margin-top: 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white; border: none;
+            padding: 14px 32px; border-radius: 12px;
+            font-size: 1em; cursor: pointer;
+            font-family: 'Fredoka', sans-serif;
+            box-shadow: 0 6px 18px rgba(0,0,0,0.2);
+            transition: transform 0.2s ease;
+        }
+        .next-btn:hover, .restart-btn:hover { transform: scale(1.04); }
+        .results {
+            text-align: center; padding: 25px 15px;
+            animation: bounceIn 0.6s ease-out;
+        }
+        .results h2 {
+            font-family: 'Fredoka', sans-serif; font-size: 2em;
+            margin-bottom: 12px; color: #333;
+        }
+        .results .final-score {
+            font-size: 3em; font-family: 'Fredoka', sans-serif;
+            color: #667eea; margin: 20px 0;
+        }
+        .results p { color: #555; margin-bottom: 12px; }
+        .badge { display: inline-block; font-size: 3.5em; margin: 8px 0; }
+        @keyframes slideDown { from { opacity: 0; transform: translateY(-30px); } to { opacity: 1; transform: translateY(0); } }
+        @keyframes fadeIn { from { opacity: 0; transform: scale(0.96); } to { opacity: 1; transform: scale(1); } }
+        @keyframes slideUp { from { opacity: 0; transform: translateY(15px); } to { opacity: 1; transform: translateY(0); } }
+        @keyframes shake { 0%,100% { transform: translateX(0); } 25% { transform: translateX(-8px); } 75% { transform: translateX(8px); } }
+        @keyframes bounceIn { 0% { opacity: 0; transform: scale(0.4); } 60% { transform: scale(1.05); } 100% { opacity: 1; transform: scale(1); } }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <div class="lesson-tag">Module 11 · Lesson 11.5</div>
+            <h1>Budgets, Advantage+, and the Learning Phase</h1>
+            <p>10 Sarah Chebet scenarios — budget modes, Learning Phase, scaling, kill triggers, Advantage+</p>
+        </div>
+
+        <div class="score-board">
+            <div class="score-item"><div class="label">Score</div><div class="value" id="score">0</div></div>
+            <div class="score-item"><div class="label">Question</div><div class="value"><span id="current">1</span>/<span id="total">10</span></div></div>
+            <div class="score-item"><div class="label">Streak</div><div class="value" id="streak">0</div></div>
+        </div>
+
+        <div class="progress-bar"><div class="progress-fill" id="progress"></div></div>
+
+        <div class="exercise-card" id="exerciseCard"></div>
+    </div>
+
+    <script>
+        const exercises = [
+  {
+    "scenario": "Sarah is choosing between a daily budget and a lifetime budget for her ongoing Karibu Kitchen lunch campaign, which she plans to run indefinitely.",
+    "question": "Which budget mode fits, and why?",
+    "options": [
+      "Lifetime — because it costs less.",
+      "Daily budget. Meta spends up to that amount every day, results are predictable, and Sarah always knows her cap. Lifetime is better only for time-bound promotions like a two-week Ramadan iftar push where the ad set has a hard end date.",
+      "There is no difference between the two.",
+      "Advantage+ overrides both."
+    ],
+    "correct": 1,
+    "explanation": "Slide 2 of §11.5: daily budgets are simpler and predictable, best-fit for beginners and evergreen campaigns. Lifetime budgets are for time-bound promotions where Meta can redistribute across days to catch the best conversion opportunities."
+  },
+  {
+    "scenario": "Sarah has three ad sets in one campaign — cold prospecting, retargeting, and Reels awareness. She wants Meta to shift budget to whichever is converting best in real time.",
+    "question": "What should she use?",
+    "options": [
+      "Set a fixed daily budget on each ad set and never change them.",
+      "Advantage+ Campaign Budget (formerly CBO). One budget lives at the campaign level, Meta redistributes across ad sets in real time to the top performer. Almost always wins with 3+ ad sets.",
+      "Spread the ads across three separate Business Managers.",
+      "Turn all ad sets off except one."
+    ],
+    "correct": 1,
+    "explanation": "Slide 3 of §11.5: Advantage+ Campaign Budget (previously called Campaign Budget Optimisation / CBO) lets Meta redistribute one campaign-level budget across ad sets in real time. It almost always outperforms ad-set-level budgets when a campaign has 3+ ad sets."
+  },
+  {
+    "scenario": "Sarah launches a new ad set and after 3 days sees cost per purchase swinging from KES 200 to KES 900. She wants to kill it.",
+    "question": "What is happening, and what should she do?",
+    "options": [
+      "The ad is broken — turn it off immediately.",
+      "The ad set is in the Learning Phase. Meta needs ~50 optimisation events in a rolling 7-day window to stabilise. Below 50 events, cost per result swings wildly. Sarah should NOT judge or kill a new campaign until it exits Learning — measured in events, not days.",
+      "Meta is broken — file a support ticket.",
+      "She should double the budget immediately."
+    ],
+    "correct": 1,
+    "explanation": "Slide 4 of §11.5 deepens the Learning Phase from §5.4. New ad sets need ~50 events in 7 days to stabilise. Below 50, results wobble. Judging or killing a Learning ad set is one of the top-3 mistakes in professional Meta Ads work."
+  },
+  {
+    "scenario": "Sarah's ad set exited Learning last week and is performing well. She wants to \"tune it\" by adjusting the audience, tweaking the budget, and rewriting the creative headline all in one afternoon.",
+    "question": "What is the risk, and what should she do?",
+    "options": [
+      "No risk — Meta absorbs edits smoothly.",
+      "Meaningful edits (budget, audience, creative, schedule) re-enter Learning and reset the 50-event count. The winner regresses. Sarah should NEVER edit a live winner — instead, duplicate the ad set and test the changes there.",
+      "She should also change the campaign objective.",
+      "Kill the ad set and start over."
+    ],
+    "correct": 1,
+    "explanation": "Slide 4 of §11.5: any meaningful edit resets Learning. The professional rule is \"never edit a converting ad set into a re-learn\" — always test changes in a duplicate. Small edits (typo fixes) are usually safe; the big four (budget, audience, creative, schedule) are not."
+  },
+  {
+    "scenario": "Sarah's Meta budget is KES 15,000/month. She plans three ad sets in one campaign using Advantage+ Campaign Budget.",
+    "question": "What is the recommended split from the lesson?",
+    "options": [
+      "KES 10,000 on cold prospecting, KES 3,000 on retargeting, KES 2,000 on Reels awareness.",
+      "40% Advantage+ Sales cold prospecting (KES 6,000), 30% retargeting (KES 4,500), 30% Reels awareness (KES 4,500) — roughly KES 200/day + KES 150/day + KES 150/day.",
+      "Everything on Reels — the highest engagement format.",
+      "KES 15,000 in one single Boost Post."
+    ],
+    "correct": 1,
+    "explanation": "Slide 5 of §11.5 gives Sarah's textbook split: 40/30/30 across cold prospecting (Advantage+ Sales), retargeting, and Reels awareness. Rough daily equivalents: KES 200, KES 150, KES 150. All three run in one campaign under Advantage+ Campaign Budget."
+  },
+  {
+    "scenario": "Sarah's retargeting ad set has been winning at KES 150/day for a week. She wants to scale.",
+    "question": "What is the safe scaling rule?",
+    "options": [
+      "Double it overnight — momentum wins.",
+      "Raise the daily budget by no more than ~20% every 3-4 days. From KES 150 to KES 180 on day 4, then KES 215 on day 7, then KES 260 on day 10. Bigger jumps re-enter Learning and blow up CPA.",
+      "Raise it 500% and see what happens.",
+      "Never scale a winning ad set."
+    ],
+    "correct": 1,
+    "explanation": "Slide 6 of §11.5: the ≤20% every 3-4 days rule keeps the algorithm calm. Bigger jumps trigger a re-learn, which typically wipes out the winning CPA for a week or more. Small patient increases compound — Sarah's example almost doubles spend in 3 weeks without a re-learn."
+  },
+  {
+    "scenario": "Sarah's Reels ad frequency is now 4.2 per person per week. CTR has dropped from 2.1% to 0.8%. Cost per purchase has risen 60%.",
+    "question": "What is happening, and what should she do?",
+    "options": [
+      "The ad is winning — raise the budget.",
+      "Ad fatigue. Frequency > 3 is the first kill/refresh trigger. Same person has seen the ad too many times in a week. Sarah should refresh the creative or turn the ad off — no amount of budget adjustment fixes creative fatigue.",
+      "Increase the frequency to 8.",
+      "Move to lifetime budget."
+    ],
+    "correct": 1,
+    "explanation": "Slide 7 of §11.5: frequency > 3 is Sarah's first kill trigger. Ad fatigue collapses CTR and drives up CPA. The fix is new creative or turning off — budget changes cannot revive a fatigued ad. Refresh, do not persist."
+  },
+  {
+    "scenario": "Sarah's CPA target is KES 300. One of her cold ad sets has spent KES 1,500 with zero purchases (5x her CPA target).",
+    "question": "What is the professional call?",
+    "options": [
+      "Give it another week — patience.",
+      "Kill the ad set. Kill trigger #2: CPA above target by a wide margin (Sarah's rule: spend > 5x CPA with no conversion). Waiting only spends more on a losing ad set. Duplicate with new creative or new audience.",
+      "Double the budget to escape the slump.",
+      "Change the campaign objective mid-flight."
+    ],
+    "correct": 1,
+    "explanation": "Slide 7 of §11.5: kill trigger #2 is CPA above target. Sarah's specific rule: if an ad set spends 5x her CPA target (5 × 300 = KES 1,500) with no purchase, she kills. The alternative — hoping — burns budget with no signal that things will improve."
+  },
+  {
+    "scenario": "Sarah is currently averaging ~20 purchases/week. Her Meta rep suggests moving straight to Advantage+ Shopping.",
+    "question": "What is the correct call?",
+    "options": [
+      "Move immediately — the algorithm will figure it out.",
+      "Wait. Advantage+ Shopping needs ≥50 purchase events per week already flowing to work well. At 20/week Sarah does not have enough conversion data — Advantage+ Shopping would underperform her current Advantage+ Sales ad set. Cross 50/week first, then migrate.",
+      "Switch to Awareness objective instead.",
+      "Move to LinkedIn."
+    ],
+    "correct": 1,
+    "explanation": "Slide 8 of §11.5: Advantage+ Shopping is powerful once you have data (≥50 purchases/week) but underperforms with less. Sarah at 20/week stays on Advantage+ Sales inside a standard campaign structure. Migrate the day she crosses 50/week."
+  },
+  {
+    "scenario": "A trainee summarises Lesson 11.5 in one line: \"The Learning Phase needs 5 events, budgets should double every day, and Advantage+ Shopping is for beginners.\"",
+    "question": "How many of those three claims are correct?",
+    "options": [
+      "All three.",
+      "Two — the Learning Phase and doubling parts.",
+      "Zero — every claim is wrong.",
+      "One — only the Advantage+ Shopping part."
+    ],
+    "correct": 2,
+    "explanation": "Every claim is wrong. Learning Phase needs ~50 events in a rolling 7-day window, not 5 (Slide 4). Scaling rule is ≤20% every 3-4 days, not double every day — doubling re-enters Learning and blows up CPA (Slide 6). Advantage+ Shopping is NOT for beginners — it needs ≥50 purchases/week already flowing (Slide 8)."
+  }
+];
+
+        let currentQuestion = 0, score = 0, streak = 0, answered = false;
+
+        function updateScoreboard() {
+            document.getElementById('score').textContent = score;
+            document.getElementById('current').textContent = Math.min(currentQuestion + 1, exercises.length);
+            document.getElementById('total').textContent = exercises.length;
+            document.getElementById('streak').textContent = streak;
+            document.getElementById('progress').style.width = ((currentQuestion) / exercises.length) * 100 + '%';
+        }
+
+        function escapeHtml(s) {
+            return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+        }
+
+        function renderQuestion() {
+            answered = false;
+            const q = exercises[currentQuestion];
+            let html = '';
+            if (q.scenario) {
+                html += `<div class="scenario"><strong>Scenario.</strong> ${escapeHtml(q.scenario)}</div>`;
+            }
+            html += `<div class="question">${escapeHtml(q.question)}</div>`;
+            html += '<div class="options">';
+            q.options.forEach((o, i) => {
+                html += `<button class="option" onclick="selectAnswer(${i})">${escapeHtml(o)}</button>`;
+            });
+            html += '</div>';
+            document.getElementById('exerciseCard').innerHTML = html;
+            updateScoreboard();
+        }
+
+        function selectAnswer(i) {
+            if (answered) return;
+            answered = true;
+            const q = exercises[currentQuestion];
+            const btns = document.querySelectorAll('.option');
+            btns.forEach(b => b.classList.add('disabled'));
+            btns[q.correct].classList.add('correct');
+            const right = i === q.correct;
+            if (!right) btns[i].classList.add('wrong');
+            if (right) { score += 10; streak += 1; } else { streak = 0; }
+            const fb = document.createElement('div');
+            fb.className = 'feedback ' + (right ? 'correct' : 'wrong');
+            fb.innerHTML = `<strong>${right ? '✅ Correct.' : '❌ Not quite.'}</strong><br>${escapeHtml(q.explanation)}`;
+            document.getElementById('exerciseCard').appendChild(fb);
+            const nb = document.createElement('button');
+            nb.className = 'next-btn';
+            nb.textContent = currentQuestion === exercises.length - 1 ? 'See results →' : 'Next scenario →';
+            nb.onclick = nextQuestion;
+            document.getElementById('exerciseCard').appendChild(nb);
+            updateScoreboard();
+        }
+
+        function nextQuestion() {
+            currentQuestion++;
+            if (currentQuestion >= exercises.length) return showResults();
+            renderQuestion();
+        }
+
+        function showResults() {
+            document.getElementById('progress').style.width = '100%';
+            const total = exercises.length * 10;
+            const pct = Math.round(score / total * 100);
+            if (window.parent) { window.parent.postMessage({type:"mtti_quiz_score", score: score, total: total, percent: pct}, "*"); }
+            let badge = '🌟', msg = 'Excellent work. You have a professional grasp of this lesson.';
+            if (pct < 50) { badge = '🌱'; msg = 'Good first attempt. Re-watch the lesson video and try again.'; }
+            else if (pct < 80) { badge = '📚'; msg = 'Solid progress. Review the scenarios you missed and retry.'; }
+            document.getElementById('exerciseCard').innerHTML = `
+                <div class="results">
+                    <span class="badge">${badge}</span>
+                    <h2>Quiz Complete</h2>
+                    <div class="final-score">${score} / ${total}</div>
+                    <p><strong>${pct}%</strong> · Longest streak: ${streak}</p>
+                    <p>${msg}</p>
+                    <button class="restart-btn" onclick="restart()">Try again 🔁</button>
+                </div>`;
+        }
+
+        function restart() {
+            currentQuestion = 0; score = 0; streak = 0;
+            renderQuestion();
+        }
+
+        renderQuestion();
+    </script>
+</body>
+</html>

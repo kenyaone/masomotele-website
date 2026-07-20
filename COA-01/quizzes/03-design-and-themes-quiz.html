@@ -37,6 +37,22 @@
         .results .final-score { font-size: 3em; font-family: 'Fredoka', sans-serif; color: #667eea; margin: 20px 0; }
         .results p { color: #555; margin-bottom: 12px; }
         .badge { display: inline-block; font-size: 3.5em; margin: 8px 0; }
+
+        /* How-To intro screen — shown before question 1, not scored */
+        .howto-card { background: white; color: #333; border-radius: 25px; padding: 35px; margin-bottom: 20px; box-shadow: 0 20px 60px rgba(0,0,0,0.3); }
+        .howto-card h3 { font-family: 'Fredoka', sans-serif; font-size: 1.3em; margin-bottom: 12px; color: #667eea; }
+        .howto-card p { line-height: 1.6; margin-bottom: 16px; color: #444; }
+        .howto-field { margin-bottom: 18px; }
+        .howto-field label { display: block; font-weight: 700; margin-bottom: 6px; color: #333; font-size: 0.95em; }
+        .howto-field input[type="number"], .howto-field select { font-family: 'Space Mono', monospace; font-size: 0.98em; padding: 10px 12px; border-radius: 8px; border: 2px solid #ddd; width: 100%; max-width: 260px; }
+        .howto-fmark { display: block; margin-top: 6px; font-size: 0.9em; font-weight: 700; }
+        .howto-fmark.ok { color: #155724; }
+        .howto-fmark.fail { color: #721c24; }
+        .howto-banner { margin-top: 4px; margin-bottom: 18px; padding: 12px 16px; border-radius: 10px; font-size: 0.9em; font-weight: 700; display: none; }
+        .howto-banner.show { display: block; }
+        .howto-banner.ok { background: #d4edda; color: #155724; }
+        .howto-banner.fail { background: #f8d7da; color: #721c24; }
+        .start-quiz-btn { margin-top: 4px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; border: none; padding: 14px 32px; border-radius: 12px; font-size: 1em; cursor: pointer; font-family: 'Fredoka', sans-serif; box-shadow: 0 6px 18px rgba(0,0,0,0.2); }
     </style>
 </head>
 <body>
@@ -117,7 +133,64 @@
                 </div>`;
         }
         function restart() { currentQuestion = 0; score = 0; streak = 0; renderQuestion(); }
-        renderQuestion();
+
+        /* How-To intro — a small, ungraded field-check demo shown before
+           the quiz starts, directly rehearsing the "run a quick font-size
+           and contrast check before presenting" habit that one of the
+           quiz scenarios asks about, so it's not being asked cold. */
+        function checkHowto() {
+            const fontSize = parseFloat(document.getElementById('howtoFontSize').value);
+            const contrast = document.getElementById('howtoContrast').value;
+            const fontOk = fontSize >= 24;
+            const contrastOk = contrast === 'white';
+
+            const sizeMark = document.getElementById('howtoFontSizeMark');
+            sizeMark.textContent = fontOk ? '✅ 24pt or larger — readable from the back of the room' : '❌ Too small — bump it up to 24pt or larger';
+            sizeMark.className = 'howto-fmark ' + (fontOk ? 'ok' : 'fail');
+
+            const contrastMark = document.getElementById('howtoContrastMark');
+            contrastMark.textContent = contrastOk ? '✅ Strong contrast against the black background' : '❌ Low contrast — switch to white text on this background';
+            contrastMark.className = 'howto-fmark ' + (contrastOk ? 'ok' : 'fail');
+
+            const allOk = fontOk && contrastOk;
+            const banner = document.getElementById('howtoBanner');
+            banner.classList.add('show');
+            banner.className = 'howto-banner show ' + (allOk ? 'ok' : 'fail');
+            banner.textContent = allOk
+                ? '✅ Both checks pass — this slide is ready for the meeting room.'
+                : '❌ Not yet — fix the flagged setting above, then check again.';
+        }
+
+        function renderHowto() {
+            document.getElementById('exerciseCard').innerHTML = `
+                <div class="howto-card">
+                    <h3>🔍 Quick How-To: Slide Readability Check</h3>
+                    <p>One of the scenarios coming up is about keeping slide text readable from across a meeting room — dark grey text on a black background was a real problem on one of Brenda's own slides. Try it here: pick a body font size and a text colour for a slide with a black background, then check your settings.</p>
+                    <div class="howto-field">
+                        <label for="howtoFontSize">Body text font size (pt)</label>
+                        <input type="number" id="howtoFontSize" value="16" min="8" max="60">
+                        <span class="howto-fmark" id="howtoFontSizeMark"></span>
+                    </div>
+                    <div class="howto-field">
+                        <label for="howtoContrast">Text colour on this black slide background</label>
+                        <select id="howtoContrast">
+                            <option value="darkgrey">Dark grey text</option>
+                            <option value="black">Black text</option>
+                            <option value="white">White text</option>
+                        </select>
+                        <span class="howto-fmark" id="howtoContrastMark"></span>
+                    </div>
+                    <div class="howto-banner" id="howtoBanner"></div>
+                    <button class="start-quiz-btn" id="checkHowtoBtn">Check My Settings</button>
+                    <button class="start-quiz-btn" id="startQuizBtn" style="margin-left:10px;background:linear-gradient(135deg,#28a745,#1e7e34);">Start Quiz →</button>
+                </div>`;
+            document.getElementById('checkHowtoBtn').addEventListener('click', checkHowto);
+            document.getElementById('startQuizBtn').addEventListener('click', renderQuestion);
+        }
+
+        renderHowto();
+
+        renderHowto();
     </script>
 </body>
 </html>

@@ -112,6 +112,22 @@
         @keyframes slideUp { from { opacity: 0; transform: translateY(15px); } to { opacity: 1; transform: translateY(0); } }
         @keyframes shake { 0%,100% { transform: translateX(0); } 25% { transform: translateX(-8px); } 75% { transform: translateX(8px); } }
         @keyframes bounceIn { 0% { opacity: 0; transform: scale(0.4); } 60% { transform: scale(1.05); } 100% { opacity: 1; transform: scale(1); } }
+
+        /* How-To intro screen — shown before question 1, not scored */
+        .howto-card { background: white; color: #333; border-radius: 25px; padding: 35px; margin-bottom: 20px; box-shadow: 0 20px 60px rgba(0,0,0,0.3); }
+        .howto-card h3 { font-family: 'Fredoka', sans-serif; font-size: 1.3em; margin-bottom: 12px; color: #667eea; }
+        .howto-card p { line-height: 1.6; margin-bottom: 16px; color: #444; }
+        .howto-fields { display: flex; flex-direction: column; gap: 16px; margin-bottom: 18px; }
+        .howto-field { display: flex; flex-direction: column; gap: 6px; background: #f5f7fb; border-radius: 10px; padding: 14px 16px; }
+        .howto-field label { font-weight: 700; font-family: 'Fredoka', sans-serif; font-size: 0.9em; color: #444; }
+        .howto-field input, .howto-field select { padding: 10px 12px; border-radius: 8px; border: 2px solid #ccd3e0; font-family: 'Space Mono', monospace; font-size: 0.95em; background: #fff; }
+        .howto-field input.hc-correct, .howto-field select.hc-correct { border-color: #28a745; background: #eafaf0; }
+        .howto-field input.hc-wrong, .howto-field select.hc-wrong { border-color: #dc3545; background: #fdecea; }
+        .howto-banner { margin-top: 4px; margin-bottom: 18px; padding: 12px 16px; border-radius: 10px; font-size: 0.9em; font-weight: 700; display: none; }
+        .howto-banner.show { display: block; }
+        .howto-banner.ok { background: #d4edda; color: #155724; }
+        .howto-banner.fail { background: #f8d7da; color: #721c24; }
+        .start-quiz-btn { margin-top: 4px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; border: none; padding: 14px 32px; border-radius: 12px; font-size: 1em; cursor: pointer; font-family: 'Fredoka', sans-serif; box-shadow: 0 6px 18px rgba(0,0,0,0.2); }
     </style>
 </head>
 <body>
@@ -340,7 +356,65 @@
             renderQuestion();
         }
 
-        renderQuestion();
+        /* How-To intro — a small, ungraded field-check demo shown before the
+           quiz starts, directly rehearsing the <time datetime="..."> fix one
+           of the quiz questions asks about, so it's not being asked cold. */
+        const HOWTO_RULES = [
+            { id: 'howtoElementSelect', op: 'eq', value: 'time' },
+            { id: 'howtoDatetimeInput', op: 'eq', value: '2025-01-15' }
+        ];
+
+        function applyHowtoOp(op, actual, target) {
+            if (op === 'eq') return String(actual).trim() === String(target).trim();
+            return false;
+        }
+
+        function checkHowto() {
+            let allOk = true;
+            HOWTO_RULES.forEach(r => {
+                const el = document.getElementById(r.id);
+                const ok = applyHowtoOp(r.op, el.value, r.value);
+                el.classList.remove('hc-correct', 'hc-wrong');
+                el.classList.add(ok ? 'hc-correct' : 'hc-wrong');
+                if (!ok) allOk = false;
+            });
+            const banner = document.getElementById('howtoBanner');
+            banner.classList.add('show');
+            banner.className = 'howto-banner show ' + (allOk ? 'ok' : 'fail');
+            banner.textContent = allOk
+                ? "✅ Semantic — <time> with an ISO datetime gives browsers and search engines a machine-readable date."
+                : "❌ Not yet — pick <time> as the element, and enter the date as YYYY-MM-DD.";
+        }
+
+        function renderHowto() {
+            document.getElementById('exerciseCard').innerHTML = `
+                <div class="howto-card">
+                    <h3>🔍 Quick How-To: Marking Up a Date Semantically</h3>
+                    <p>One of the questions coming up asks how to mark up a date more semantically than plain text. James wrote <code>&lt;p&gt;Available: 15 January 2025&lt;/p&gt;</code> for his hardware shop's product release date. Choose the right element and enter the matching ISO date value below, then check your work.</p>
+                    <div class="howto-fields">
+                        <div class="howto-field">
+                            <label for="howtoElementSelect">Which element should wrap the date?</label>
+                            <select id="howtoElementSelect">
+                                <option value="p">&lt;p&gt;</option>
+                                <option value="span">&lt;span&gt;</option>
+                                <option value="time">&lt;time&gt;</option>
+                                <option value="date">&lt;date&gt;</option>
+                            </select>
+                        </div>
+                        <div class="howto-field">
+                            <label for="howtoDatetimeInput">datetime attribute value (ISO format, e.g. YYYY-MM-DD) for “15 January 2025”</label>
+                            <input type="text" id="howtoDatetimeInput" value="15-01-2025">
+                        </div>
+                    </div>
+                    <div class="howto-banner" id="howtoBanner"></div>
+                    <button class="start-quiz-btn" id="checkHowtoBtn">Check My Markup</button>
+                    <button class="start-quiz-btn" id="startQuizBtn" style="margin-left:10px;background:linear-gradient(135deg,#28a745,#1e7e34);">Start Quiz →</button>
+                </div>`;
+            document.getElementById('checkHowtoBtn').addEventListener('click', checkHowto);
+            document.getElementById('startQuizBtn').addEventListener('click', renderQuestion);
+        }
+
+        renderHowto();
     </script>
 </body>
 </html>

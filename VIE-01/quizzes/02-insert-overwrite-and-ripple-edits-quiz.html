@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Insert, Overwrite, and Ripple Edits | MTTI Video Editing</title>
+    <link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Fredoka:wght@500;600&display=swap" rel="stylesheet">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Space Mono', monospace; background: linear-gradient(135deg, #6A11CB 0%, #2575FC 100%); min-height: 100vh; padding: 20px; color: #fff; }
+        .container { max-width: 900px; margin: 0 auto; }
+        .header { text-align: center; margin-bottom: 30px; }
+        .header .lesson-tag { display: inline-block; background: rgba(255,255,255,0.2); padding: 6px 16px; border-radius: 999px; font-size: 0.85em; margin-bottom: 12px; }
+        .header h1 { font-family: 'Fredoka', sans-serif; font-size: 2.2em; margin-bottom: 8px; text-shadow: 3px 3px 0 rgba(0,0,0,0.2); }
+        .score-board { background: rgba(255,255,255,0.15); backdrop-filter: blur(10px); border-radius: 20px; padding: 20px; margin-bottom: 20px; display: flex; justify-content: space-around; }
+        .score-item { text-align: center; }
+        .score-item .label { font-size: 0.85em; opacity: 0.9; margin-bottom: 4px; }
+        .score-item .value { font-size: 1.8em; font-weight: bold; font-family: 'Fredoka', sans-serif; }
+        .progress-bar { width: 100%; height: 8px; background: rgba(255,255,255,0.3); border-radius: 10px; margin-bottom: 25px; overflow: hidden; }
+        .progress-fill { height: 100%; background: linear-gradient(90deg, #f7971e 0%, #ffd200 100%); border-radius: 10px; transition: width 0.5s ease; width: 0%; }
+        .exercise-card { background: white; color: #333; border-radius: 25px; padding: 35px; margin-bottom: 20px; box-shadow: 0 20px 60px rgba(0,0,0,0.3); }
+        .scenario { background: linear-gradient(135deg, #fff8e1 0%, #ffecb3 100%); border-left: 5px solid #ffc107; padding: 20px 24px; border-radius: 12px; margin-bottom: 24px; font-size: 0.98em; line-height: 1.55; }
+        .scenario strong { color: #7a5a00; font-family: 'Fredoka', sans-serif; }
+        .question { font-size: 1.15em; margin-bottom: 20px; font-weight: 700; line-height: 1.4; }
+        .options { display: flex; flex-direction: column; gap: 12px; }
+        .option { background: #f5f7fb; border: 2px solid transparent; padding: 16px 20px; border-radius: 12px; cursor: pointer; transition: all 0.2s ease; font-family: 'Space Mono', monospace; font-size: 0.98em; text-align: left; }
+        .option:hover:not(.disabled) { background: #eef1fb; border-color: #6A11CB; transform: translateX(4px); }
+        .option.correct { background: #d4edda; border-color: #28a745; color: #155724; }
+        .option.wrong { background: #f8d7da; border-color: #dc3545; color: #721c24; }
+        .option.disabled { cursor: not-allowed; opacity: 0.85; }
+        .feedback { margin-top: 22px; padding: 18px 22px; border-radius: 12px; font-size: 0.98em; line-height: 1.5; }
+        .feedback.correct { background: #d4edda; color: #155724; border-left: 4px solid #28a745; }
+        .feedback.wrong { background: #f8d7da; color: #721c24; border-left: 4px solid #dc3545; }
+        .next-btn, .restart-btn { margin-top: 20px; background: linear-gradient(135deg, #6A11CB 0%, #2575FC 100%); color: white; border: none; padding: 14px 32px; border-radius: 12px; font-size: 1em; cursor: pointer; font-family: 'Fredoka', sans-serif; box-shadow: 0 6px 18px rgba(0,0,0,0.2); }
+        .results { text-align: center; padding: 25px 15px; }
+        .results h2 { font-family: 'Fredoka', sans-serif; font-size: 2em; margin-bottom: 12px; color: #333; }
+        .results .final-score { font-size: 3em; font-family: 'Fredoka', sans-serif; color: #6A11CB; margin: 20px 0; }
+        .results p { color: #555; margin-bottom: 12px; }
+
+        /* How-To intro screen — shown before question 1, not scored */
+        .howto-card { background: white; color: #333; border-radius: 25px; padding: 35px; margin-bottom: 20px; box-shadow: 0 20px 60px rgba(0,0,0,0.3); }
+        .howto-card h3 { font-family: 'Fredoka', sans-serif; font-size: 1.3em; margin-bottom: 12px; color: #6A11CB; }
+        .howto-card p { line-height: 1.6; margin-bottom: 16px; color: #444; }
+        .howto-fields { display: flex; flex-direction: column; gap: 14px; margin-bottom: 18px; }
+        .howto-field { background: #f5f7fb; border: 2px solid #e0e4ee; border-radius: 12px; padding: 14px 18px; transition: all 0.2s ease; }
+        .howto-field label { display: block; font-weight: 700; margin-bottom: 8px; font-size: 0.92em; }
+        .howto-field input, .howto-field select { width: 100%; padding: 10px 12px; border-radius: 8px; border: 2px solid #ccd3e0; font-family: 'Space Mono', monospace; font-size: 0.98em; }
+        .howto-field .hc-status { margin-top: 8px; font-size: 0.85em; font-weight: 700; }
+        .howto-field.hc-correct { border-color: #28a745; background: #eafaf0; }
+        .howto-field.hc-wrong { border-color: #dc3545; background: #fdeeee; }
+        .howto-banner { margin-top: 4px; margin-bottom: 18px; padding: 12px 16px; border-radius: 10px; font-size: 0.9em; font-weight: 700; display: none; }
+        .howto-banner.show { display: block; }
+        .howto-banner.ok { background: #d4edda; color: #155724; }
+        .howto-banner.fail { background: #f8d7da; color: #721c24; }
+        .start-quiz-btn { margin-top: 4px; background: linear-gradient(135deg, #6A11CB 0%, #2575FC 100%); color: white; border: none; padding: 14px 32px; border-radius: 12px; font-size: 1em; cursor: pointer; font-family: 'Fredoka', sans-serif; box-shadow: 0 6px 18px rgba(0,0,0,0.2); }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <div class="lesson-tag">Unit 22 · Lesson 22.2 · Quiz</div>
+            <h1>Insert, Overwrite, and Ripple Edits</h1>
+        </div>
+        <div class="score-board">
+            <div class="score-item"><div class="label">Score</div><div class="value" id="score">0</div></div>
+            <div class="score-item"><div class="label">Question</div><div class="value"><span id="current">1</span>/<span id="total">10</span></div></div>
+            <div class="score-item"><div class="label">Streak</div><div class="value" id="streak">0</div></div>
+        </div>
+        <div class="progress-bar"><div class="progress-fill" id="progress"></div></div>
+        <div class="exercise-card" id="exerciseCard"></div>
+    </div>
+    <script>
+        const exercises = [{"scenario":"Otieno wants to add a new 6-second cutaway clip between two existing clips on his 60-second timeline, without losing any footage already placed.","question":"Which edit mode should he use, and what happens to the total duration?","options":["Overwrite edit; total stays 60 seconds","Insert edit; total becomes 66 seconds","Ripple delete; total becomes 54 seconds","None of these \u2014 new clips can only go at the very end"],"correct":1,"explanation":"An Insert edit adds the new clip and pushes everything after it later, lengthening the timeline by the new clip's duration (60 + 6 = 66 seconds)."},{"scenario":"A 4-second black placeholder clip sits in the middle of Otieno's timeline, and he wants to swap in the real 4-second toast-speech footage in that exact spot.","question":"Which edit mode fits, and what happens to the clips around it?","options":["Ripple delete; the placeholder disappears and the gap closes","Overwrite edit (CapCut's Replace tool); the new clip drops into the same slot and nothing else shifts","Insert edit; everything after the placeholder shifts later by 4 seconds","This requires re-editing the entire timeline from scratch"],"correct":1,"explanation":"Since the replacement clip is the same length as the placeholder, an Overwrite edit (CapCut's Replace tool) swaps it in place with no shift to anything else on the timeline."},{"scenario":"Otieno selects an unwanted 3-second blooper clip on his timeline and deletes it using CapCut's default delete behaviour.","question":"What happens to the timeline as a result?","options":["A silent 3-second gap remains where the clip was","Every clip after the deleted one shifts 3 seconds earlier, automatically closing the gap (a ripple delete)","The whole timeline is deleted","The deleted clip's audio keeps playing even though the video is gone"],"correct":1,"explanation":"CapCut's default clip-delete behaviour is a ripple delete: it removes the clip and slides everything after it earlier to close the gap automatically."},{"scenario":"Otieno accidentally uses an Overwrite edit instead of an Insert edit when trying to add a brand-new 5-second clip into a gap that already has footage in it.","question":"What is the likely result?","options":["The new clip is added and everything shifts later, exactly like an Insert edit","The new clip replaces (overwrites) whatever existing footage was already occupying that spot, instead of adding alongside it","Nothing happens; Overwrite only works at the very start of the timeline","The timeline automatically becomes 5 seconds longer with no footage lost"],"correct":1,"explanation":"Overwrite replaces whatever is already in that timeline position \u2014 using it instead of Insert would destroy the existing footage in that spot rather than shifting it later."},{"scenario":"A client asks Otieno why removing a bad clip with Ripple Delete is usually better than just replacing it with black or silence (an overwrite-to-blank).","question":"What's the best explanation?","options":["There is no real difference between the two approaches","Ripple Delete shortens the total timeline by closing the gap, while an overwrite-to-blank leaves a blank section and keeps the same total duration","Overwrite-to-blank is always faster to execute","Ripple Delete cannot be used on video clips, only audio clips"],"correct":1,"explanation":"The key difference is what happens to the gap: Ripple Delete closes it and shortens the timeline, while overwriting with blank footage just replaces the content and leaves the timeline the same length."},{"scenario":"Otieno's timeline is 72 seconds long. He inserts a 10-second interview clip using an Insert edit, then ripple-deletes an unrelated 6-second clip elsewhere on the timeline.","question":"What is the resulting total timeline duration?","options":["72 seconds (no net change)","76 seconds (72 + 10 \u2212 6)","88 seconds (72 + 10 + 6)","62 seconds (72 \u2212 10)"],"correct":1,"explanation":"The Insert edit adds 10 seconds (72 + 10 = 82), and the Ripple Delete then removes 6 seconds and closes the gap (82 \u2212 6 = 76 seconds)."},{"scenario":"A new editing apprentice at Eldoret Reels Studio asks Otieno for a simple rule to remember Insert vs Overwrite vs Ripple Delete.","question":"Which summary is most accurate?","options":["Insert adds and lengthens the timeline; Overwrite replaces in place without shifting anything; Ripple Delete removes and shortens the timeline by closing the gap","All three edit modes always keep the timeline the exact same length","Insert, Overwrite, and Ripple Delete are three names for the same operation","Only Ripple Delete can change the timeline's total duration; Insert and Overwrite never can"],"correct":0,"explanation":"That three-part rule captures the real difference: Insert lengthens by adding, Overwrite swaps in place with no length change, and Ripple Delete shortens by closing the gap left behind."}];
+        let currentQuestion = 0, score = 0, streak = 0, answered = false;
+        function updateScoreboard() {
+            document.getElementById('score').textContent = score;
+            document.getElementById('current').textContent = Math.min(currentQuestion + 1, exercises.length);
+            document.getElementById('total').textContent = exercises.length;
+            document.getElementById('streak').textContent = streak;
+            document.getElementById('progress').style.width = ((currentQuestion) / exercises.length) * 100 + '%';
+        }
+        function escapeHtml(s) { return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+        function renderQuestion() {
+            answered = false;
+            const q = exercises[currentQuestion];
+            let html = '';
+            if (q.scenario) html += `<div class="scenario"><strong>Scenario.</strong> ${escapeHtml(q.scenario)}</div>`;
+            html += `<div class="question">${escapeHtml(q.question)}</div>`;
+            html += '<div class="options">';
+            q.options.forEach((o, i) => { html += `<button class="option" onclick="selectAnswer(${i})">${escapeHtml(o)}</button>`; });
+            html += '</div>';
+            document.getElementById('exerciseCard').innerHTML = html;
+            updateScoreboard();
+        }
+        function selectAnswer(i) {
+            if (answered) return;
+            answered = true;
+            const q = exercises[currentQuestion];
+            const btns = document.querySelectorAll('.option');
+            btns.forEach(b => b.classList.add('disabled'));
+            btns[q.correct].classList.add('correct');
+            const right = i === q.correct;
+            if (!right) btns[i].classList.add('wrong');
+            if (right) { score += 10; streak += 1; } else { streak = 0; }
+            const fb = document.createElement('div');
+            fb.className = 'feedback ' + (right ? 'correct' : 'wrong');
+            fb.innerHTML = `<strong>${right ? '&#9989; Correct.' : '&#10060; Not quite.'}</strong><br>${escapeHtml(q.explanation)}`;
+            document.getElementById('exerciseCard').appendChild(fb);
+            const nb = document.createElement('button');
+            nb.className = 'next-btn';
+            nb.textContent = currentQuestion === exercises.length - 1 ? 'See results →' : 'Next scenario →';
+            nb.onclick = nextQuestion;
+            document.getElementById('exerciseCard').appendChild(nb);
+            updateScoreboard();
+        }
+        function nextQuestion() { currentQuestion++; if (currentQuestion >= exercises.length) return showResults(); renderQuestion(); }
+        function showResults() {
+            document.getElementById('progress').style.width = '100%';
+            const total = exercises.length * 10;
+            const pct = Math.round(score / total * 100);
+            if (window.parent) { window.parent.postMessage({type:"mtti_quiz_score", score: score, total: total, percent: pct}, "*"); }
+            let badge = '🌟', msg = 'Excellent work. Otieno-level editing instincts.';
+            if (pct < 50) { badge = '🌱'; msg = 'Good first attempt. Review the lesson and try again.'; }
+            else if (pct < 80) { badge = '📚'; msg = 'Solid progress. Review the scenarios you missed and retry.'; }
+            document.getElementById('exerciseCard').innerHTML = `
+                <div class="results">
+                    <span class="badge">${badge}</span>
+                    <h2>Quiz Complete</h2>
+                    <div class="final-score">${score} / ${total}</div>
+                    <p><strong>${pct}%</strong> &middot; Longest streak: ${streak}</p>
+                    <p>${msg}</p>
+                    <button class="restart-btn" onclick="restart()">Try again &#128257;</button>
+                </div>`;
+        }
+        function restart() { currentQuestion = 0; score = 0; streak = 0; renderQuestion(); }
+        /* How-To intro — a small, ungraded field-check demo shown before the
+           quiz starts, directly rehearsing the "pick the right edit mode and
+           work out the resulting timeline length" mechanic one of the quiz
+           scenarios asks about, so it's not being asked cold. */
+        const HOWTO_FIELDS = [
+            { id: 'editMode', label: 'Which edit mode should Otieno use?', type: 'select' },
+            { id: 'newTotal', label: 'Resulting total timeline length (seconds)', type: 'number' },
+        ];
+        const HOWTO_RULES = {
+            editMode: [ { op: 'eq', value: 'insert' } ],
+            newTotal: [ { op: 'eq', value: 55 } ]
+        };
+
+        function applyOpH(op, actual, target) {
+            if (op === 'eq') return actual === target;
+            if (op === 'gte') return actual >= target;
+            if (op === 'lte') return actual <= target;
+            return false;
+        }
+
+        function checkHowto() {
+            const editMode = document.getElementById('field_editMode').value;
+            const newTotal = parseFloat(document.getElementById('field_newTotal').value);
+            const modeOk = HOWTO_RULES.editMode.every(r => applyOpH(r.op, editMode, r.value));
+            const totalOk = Number.isFinite(newTotal) && HOWTO_RULES.newTotal.every(r => applyOpH(r.op, newTotal, r.value));
+            [['editMode', modeOk], ['newTotal', totalOk]].forEach(pair => {
+                const id = pair[0], ok = pair[1];
+                const wrap = document.getElementById('fieldwrap_' + id);
+                wrap.classList.remove('hc-correct', 'hc-wrong');
+                wrap.classList.add(ok ? 'hc-correct' : 'hc-wrong');
+                document.getElementById('status_' + id).textContent = ok ? '✅ Looks right' : '❌ Check again';
+            });
+            const allOk = modeOk && totalOk;
+            const banner = document.getElementById('howtoBanner');
+            banner.classList.add('show');
+            banner.className = 'howto-banner show ' + (allOk ? 'ok' : 'fail');
+            banner.textContent = allOk
+                ? '✅ Exactly right — an Insert edit adds the new clip without destroying anything, and lengthens the timeline by the new clip\'s duration.'
+                : '❌ Not quite — an Insert edit is what adds a clip without losing existing footage, and it lengthens the timeline by the new clip\'s duration.';
+        }
+
+        function renderHowto() {
+            document.getElementById('exerciseCard').innerHTML = `
+                <div class="howto-card">
+                    <h3>🔍 Quick How-To: Choosing the Right Edit Mode</h3>
+                    <p>One of the scenarios coming up asks about exactly this: Otieno's timeline is currently 50 seconds long, and he wants to add a new 5-second worship-team intro clip between two existing clips, without losing any footage already placed. Pick the edit mode he should use below, and work out the resulting timeline length, then check your work.</p>
+                    <div class="howto-fields">
+                        <div class="howto-field" id="fieldwrap_editMode">
+                            <label for="field_editMode">Which edit mode should Otieno use?</label>
+                            <select id="field_editMode">
+                                <option value="">— choose —</option>
+                                <option value="insert">Insert edit</option>
+                                <option value="overwrite">Overwrite edit</option>
+                                <option value="ripple">Ripple Delete</option>
+                            </select>
+                            <div class="hc-status" id="status_editMode"></div>
+                        </div>
+                        <div class="howto-field" id="fieldwrap_newTotal">
+                            <label for="field_newTotal">Resulting total timeline length (seconds)</label>
+                            <input type="number" id="field_newTotal" step="1" min="0" placeholder="e.g. 55">
+                            <div class="hc-status" id="status_newTotal"></div>
+                        </div>
+                    </div>
+                    <div class="howto-banner" id="howtoBanner"></div>
+                    <button class="start-quiz-btn" id="checkHowtoBtn">Check My Settings</button>
+                    <button class="start-quiz-btn" id="startQuizBtn" style="margin-left:10px;background:linear-gradient(135deg,#28a745,#1e7e34);">Start Quiz →</button>
+                </div>`;
+            document.getElementById('checkHowtoBtn').addEventListener('click', checkHowto);
+            document.getElementById('startQuizBtn').addEventListener('click', renderQuestion);
+        }
+
+        renderHowto();
+    </script>
+</body>
+</html>

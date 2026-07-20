@@ -112,6 +112,24 @@
         @keyframes slideUp { from { opacity: 0; transform: translateY(15px); } to { opacity: 1; transform: translateY(0); } }
         @keyframes shake { 0%,100% { transform: translateX(0); } 25% { transform: translateX(-8px); } 75% { transform: translateX(8px); } }
         @keyframes bounceIn { 0% { opacity: 0; transform: scale(0.4); } 60% { transform: scale(1.05); } 100% { opacity: 1; transform: scale(1); } }
+
+        /* How-To intro screen — shown before question 1, not scored */
+        .howto-card { background: white; color: #333; border-radius: 25px; padding: 35px; margin-bottom: 20px; box-shadow: 0 20px 60px rgba(0,0,0,0.3); }
+        .howto-card h3 { font-family: 'Fredoka', sans-serif; font-size: 1.3em; margin-bottom: 12px; color: #667eea; }
+        .howto-card p { line-height: 1.6; margin-bottom: 16px; color: #444; }
+        .howto-banner { margin-top: 4px; margin-bottom: 18px; padding: 12px 16px; border-radius: 10px; font-size: 0.9em; font-weight: 700; display: none; }
+        .howto-banner.show { display: block; }
+        .howto-banner.ok { background: #d4edda; color: #155724; }
+        .howto-banner.fail { background: #f8d7da; color: #721c24; }
+        .start-quiz-btn { margin-top: 4px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; border: none; padding: 14px 32px; border-radius: 12px; font-size: 1em; cursor: pointer; font-family: 'Fredoka', sans-serif; box-shadow: 0 6px 18px rgba(0,0,0,0.2); }
+        .howto-timeline { display: flex; gap: 6px; background: #2b2b3d; border-radius: 12px; padding: 12px; margin-bottom: 18px; overflow-x: auto; }
+        .howto-clip { flex-shrink: 0; min-width: 96px; border-radius: 8px; padding: 10px 10px 8px; display: flex; flex-direction: column; justify-content: space-between; font-size: 0.78em; color: #fff; }
+        .howto-clip .hc-label { font-weight: 700; }
+        .howto-clip .hc-move { display: flex; gap: 4px; margin-top: 6px; }
+        .howto-clip .hc-move button { flex: 1; background: rgba(0,0,0,0.25); border: none; color: #fff; border-radius: 5px; padding: 3px 0; cursor: pointer; font-size: 0.95em; }
+        .howto-clip .hc-move button:disabled { opacity: 0.3; cursor: not-allowed; }
+        .howto-clip.hc-correct { outline: 3px solid #28a745; }
+        .howto-clip.hc-wrong { outline: 3px solid #dc3545; }
     </style>
 </head>
 <body>
@@ -340,7 +358,77 @@
             renderQuestion();
         }
 
-        renderQuestion();
+
+        /* How-To intro — a small, ungraded reorder demo shown before the
+           quiz starts, directly rehearsing the "create an element, then
+           append it to the DOM" step order that one of the quiz questions
+           asks about, so it's not being asked cold. */
+        const HOWTO_CLIPS = [
+            { id: 'h1', label: 'Select the list', color: '#6A11CB' },
+            { id: 'h2', label: 'Create the item', color: '#2575FC' },
+            { id: 'h3', label: 'Set its text', color: '#E65100' },
+            { id: 'h4', label: 'Append it', color: '#00897B' },
+        ];
+        const HOWTO_CORRECT = ['h1', 'h2', 'h3', 'h4'];
+        let howtoOrder = ['h1', 'h3', 'h2', 'h4']; // two steps start swapped, same as the quiz scenario describes
+
+        function escHtmlH(s) { return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+        function howtoClipById(id) { return HOWTO_CLIPS.find(c => c.id === id); }
+
+        function renderHowtoTimeline(marks) {
+            document.getElementById('howtoTimeline').innerHTML = howtoOrder.map((id, i) => {
+                const c = howtoClipById(id);
+                const cls = marks ? (marks[i] ? 'hc-correct' : 'hc-wrong') : '';
+                return `<div class="howto-clip ${cls}" style="background:${c.color};">
+                    <div class="hc-label">${escHtmlH(c.label)}</div>
+                    <div class="hc-move">
+                        <button data-dir="left" data-id="${id}" ${i===0?'disabled':''}>◀</button>
+                        <button data-dir="right" data-id="${id}" ${i===howtoOrder.length-1?'disabled':''}>▶</button>
+                    </div>
+                </div>`;
+            }).join('');
+            document.querySelectorAll('.hc-move button').forEach(btn => {
+                btn.addEventListener('click', () => moveHowtoClip(btn.dataset.id, btn.dataset.dir));
+            });
+        }
+
+        function moveHowtoClip(id, dir) {
+            const i = howtoOrder.indexOf(id);
+            const j = dir === 'left' ? i - 1 : i + 1;
+            if (j < 0 || j >= howtoOrder.length) return;
+            [howtoOrder[i], howtoOrder[j]] = [howtoOrder[j], howtoOrder[i]];
+            renderHowtoTimeline();
+            document.getElementById('howtoBanner').classList.remove('show');
+        }
+
+        function checkHowto() {
+            const marks = howtoOrder.map((id, i) => id === HOWTO_CORRECT[i]);
+            renderHowtoTimeline(marks);
+            const allOk = marks.every(m => m);
+            const banner = document.getElementById('howtoBanner');
+            banner.classList.add('show');
+            banner.className = 'howto-banner show ' + (allOk ? 'ok' : 'fail');
+            banner.textContent = allOk
+                ? 'Correct — that is exactly the order: find the parent, build the new element, fill it in, then attach it.'
+                : 'Not quite yet — keep using ◀▶ to swap the two out-of-order steps.';
+        }
+
+        function renderHowto() {
+            document.getElementById('exerciseCard').innerHTML = `
+                <div class="howto-card">
+                    <h3>Quick How-To: Adding a New Product Card</h3>
+                    <p>One of the questions coming up asks how James adds a brand-new item to a product list on the page. Here is the order it happens in: <strong>select the parent list, create the new element, set its text, then append it</strong>. Try putting these four steps back in the right order, then check your work.</p>
+                    <div class="howto-timeline" id="howtoTimeline"></div>
+                    <div class="howto-banner" id="howtoBanner"></div>
+                    <button class="start-quiz-btn" id="checkHowtoBtn">Check My Order</button>
+                    <button class="start-quiz-btn" id="startQuizBtn" style="margin-left:10px;background:linear-gradient(135deg,#28a745,#1e7e34);">Start Quiz →</button>
+                </div>`;
+            renderHowtoTimeline();
+            document.getElementById('checkHowtoBtn').addEventListener('click', checkHowto);
+            document.getElementById('startQuizBtn').addEventListener('click', renderQuestion);
+        }
+
+        renderHowto();
     </script>
 </body>
 </html>

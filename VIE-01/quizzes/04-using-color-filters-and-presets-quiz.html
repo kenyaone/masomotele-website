@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Using Color Filters and Presets | MTTI Video Editing</title>
+    <link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Fredoka:wght@500;600&display=swap" rel="stylesheet">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Space Mono', monospace; background: linear-gradient(135deg,#6A11CB 0%,#2575FC 100%); min-height: 100vh; padding: 20px; color: #fff; }
+        .container { max-width: 900px; margin: 0 auto; }
+        .header { text-align: center; margin-bottom: 30px; }
+        .header .lesson-tag { display: inline-block; background: rgba(255,255,255,0.2); padding: 6px 16px; border-radius: 999px; font-size: 0.85em; margin-bottom: 12px; }
+        .header h1 { font-family: 'Fredoka', sans-serif; font-size: 2.2em; margin-bottom: 8px; text-shadow: 3px 3px 0 rgba(0,0,0,0.2); }
+        .score-board { background: rgba(255,255,255,0.15); backdrop-filter: blur(10px); border-radius: 20px; padding: 20px; margin-bottom: 20px; display: flex; justify-content: space-around; }
+        .score-item { text-align: center; }
+        .score-item .label { font-size: 0.85em; opacity: 0.9; margin-bottom: 4px; }
+        .score-item .value { font-size: 1.8em; font-weight: bold; font-family: 'Fredoka', sans-serif; }
+        .progress-bar { width: 100%; height: 8px; background: rgba(255,255,255,0.3); border-radius: 10px; margin-bottom: 25px; overflow: hidden; }
+        .progress-fill { height: 100%; background: linear-gradient(90deg, #f7971e 0%, #ffd200 100%); border-radius: 10px; transition: width 0.5s ease; width: 0%; }
+        .exercise-card { background: white; color: #333; border-radius: 25px; padding: 35px; margin-bottom: 20px; box-shadow: 0 20px 60px rgba(0,0,0,0.3); }
+        .scenario { background: linear-gradient(135deg, #fff8e1 0%, #ffecb3 100%); border-left: 5px solid #ffc107; padding: 20px 24px; border-radius: 12px; margin-bottom: 24px; font-size: 0.98em; line-height: 1.55; }
+        .scenario strong { color: #7a5a00; font-family: 'Fredoka', sans-serif; }
+        .question { font-size: 1.15em; margin-bottom: 20px; font-weight: 700; line-height: 1.4; }
+        .options { display: flex; flex-direction: column; gap: 12px; }
+        .option { background: #f5f7fb; border: 2px solid transparent; padding: 16px 20px; border-radius: 12px; cursor: pointer; transition: all 0.2s ease; font-family: 'Space Mono', monospace; font-size: 0.98em; text-align: left; }
+        .option:hover:not(.disabled) { background: #eef2ff; border-color: #2575FC; transform: translateX(4px); }
+        .option.correct { background: #d4edda; border-color: #28a745; color: #155724; }
+        .option.wrong { background: #f8d7da; border-color: #dc3545; color: #721c24; }
+        .option.disabled { cursor: not-allowed; opacity: 0.85; }
+        .feedback { margin-top: 22px; padding: 18px 22px; border-radius: 12px; font-size: 0.98em; line-height: 1.5; }
+        .feedback.correct { background: #d4edda; color: #155724; border-left: 4px solid #28a745; }
+        .feedback.wrong { background: #f8d7da; color: #721c24; border-left: 4px solid #dc3545; }
+        .next-btn, .restart-btn { margin-top: 20px; background: linear-gradient(135deg,#6A11CB 0%,#2575FC 100%); color: white; border: none; padding: 14px 32px; border-radius: 12px; font-size: 1em; cursor: pointer; font-family: 'Fredoka', sans-serif; box-shadow: 0 6px 18px rgba(0,0,0,0.2); }
+        .results { text-align: center; padding: 25px 15px; }
+        .results h2 { font-family: 'Fredoka', sans-serif; font-size: 2em; margin-bottom: 12px; color: #333; }
+        .results .final-score { font-size: 3em; font-family: 'Fredoka', sans-serif; color: #2575FC; margin: 20px 0; }
+        .results p { color: #555; margin-bottom: 12px; }
+        .badge { display: inline-block; font-size: 3.5em; margin: 8px 0; }
+        /* How-To intro screen — shown before question 1, not scored */
+        .howto-card { background: white; color: #333; border-radius: 25px; padding: 35px; margin-bottom: 20px; box-shadow: 0 20px 60px rgba(0,0,0,0.3); }
+        .howto-card h3 { font-family: 'Fredoka', sans-serif; font-size: 1.3em; margin-bottom: 12px; color: #2575FC; }
+        .howto-card p { line-height: 1.6; margin-bottom: 16px; color: #444; }
+        .howto-timeline { display: flex; gap: 6px; background: #0f0f18; border-radius: 12px; padding: 12px; margin-bottom: 18px; overflow-x: auto; }
+        .howto-clip { flex-shrink: 0; min-width: 78px; border-radius: 8px; padding: 10px 10px 8px; display: flex; flex-direction: column; justify-content: space-between; font-size: 0.78em; color: #fff; }
+        .howto-clip .hc-label { font-weight: 700; }
+        .howto-clip .hc-move { display: flex; gap: 4px; margin-top: 6px; }
+        .howto-clip .hc-move button { flex: 1; background: rgba(0,0,0,0.25); border: none; color: #fff; border-radius: 5px; padding: 3px 0; cursor: pointer; font-size: 0.95em; }
+        .howto-clip .hc-move button:disabled { opacity: 0.3; cursor: not-allowed; }
+        .howto-clip.hc-correct { outline: 3px solid #28a745; }
+        .howto-clip.hc-wrong { outline: 3px solid #dc3545; }
+        .howto-banner { margin-top: 4px; margin-bottom: 18px; padding: 12px 16px; border-radius: 10px; font-size: 0.9em; font-weight: 700; display: none; }
+        .howto-banner.show { display: block; }
+        .howto-banner.ok { background: #d4edda; color: #155724; }
+        .howto-banner.fail { background: #f8d7da; color: #721c24; }
+        .start-quiz-btn { margin-top: 4px; background: linear-gradient(135deg,#6A11CB 0%,#2575FC 100%); color: white; border: none; padding: 14px 32px; border-radius: 12px; font-size: 1em; cursor: pointer; font-family: 'Fredoka', sans-serif; box-shadow: 0 6px 18px rgba(0,0,0,0.2); }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <div class="lesson-tag">Module 4 · Lesson 4.2 · Quiz</div>
+            <h1>Using Color Filters and Presets</h1>
+        </div>
+        <div class="score-board">
+            <div class="score-item"><div class="label">Score</div><div class="value" id="score">0</div></div>
+            <div class="score-item"><div class="label">Question</div><div class="value"><span id="current">1</span>/<span id="total">10</span></div></div>
+            <div class="score-item"><div class="label">Streak</div><div class="value" id="streak">0</div></div>
+        </div>
+        <div class="progress-bar"><div class="progress-fill" id="progress"></div></div>
+        <div class="exercise-card" id="exerciseCard"></div>
+    </div>
+    <script>
+        const exercises = [{"scenario":"Otieno applies a Golden filter directly to a clip that still has an uncorrected orange tungsten cast, without fixing white balance first.","question":"What is the likely result?","options":["The filter automatically fixes the white balance problem","The existing orange cast gets stacked with the filter's warm tone, likely making the color problem worse rather than better","Filters have no interaction with existing color casts","The clip becomes underexposed"],"correct":1,"explanation":"A stylistic filter applied on top of an uncorrected color problem tends to compound it, since both push color in a similar or unpredictable combined direction."},{"scenario":"For a wedding reel, Otieno wants every clip to share one consistent 'warm golden-hour' feeling.","question":"What is the recommended approach across the whole reel?","options":["Use a different filter on each clip to keep things visually interesting","Apply the same filter and the same intensity level consistently across every clip in the project","Apply filters randomly and adjust to taste per clip with no fixed rule","Filters should only be applied to the first and last clips"],"correct":1,"explanation":"Consistency across a multi-clip project comes from applying the same filter and intensity to every clip that needs the look, not varying it clip by clip."},{"scenario":"Otieno considers setting a Golden filter to 100% intensity to make sure the golden-hour look is unmistakable.","question":"What is the main risk of using 100% intensity?","options":["There is no risk; maximum intensity always looks best","At full strength, skin tones and shadows can look unnatural or overprocessed, more like a heavy social-media filter than a graded video","100% intensity uses more storage space than lower settings","100% intensity disables the export function"],"correct":1,"explanation":"Full-strength filters often push color too far, producing an artificial look rather than a subtle graded feel."},{"scenario":"A client wants a 'cool, moody' feeling for a church event video rather than a warm golden-hour look.","question":"Which CapCut filter category would generally be the better starting point?","options":["Golden","Moody","Vibrant","None of these; filters cannot create a cool mood"],"correct":1,"explanation":"A 'Moody' style preset is designed for a cooler, more subdued mood, unlike Golden which leans warm."},{"scenario":"Otieno is deciding whether to correct a clip's exposure and white balance before or after applying a stylistic filter.","question":"What is the correct order, and why?","options":["Filter first, correction second, since the order never matters","Correction first, filter second, since styling an already-broken clip tends to make problems worse instead of creating the intended look","Correction and filtering must always happen in the same single step","Only correction matters; filters are purely cosmetic and unrelated to correction"],"correct":1,"explanation":"Fixing exposure and white balance first gives the filter a clean, accurate starting point, so the stylistic look lands the way it's meant to instead of amplifying existing problems."},{"scenario":"Midway through editing the wedding reel, Otieno considers bumping intensity higher on just the darker indoor reception clips so they 'pop' more.","question":"Why might this specific change risk breaking the reel's overall look?","options":["It wouldn't risk anything; intensity differences are never noticeable","Applying a different intensity to only some clips reintroduces inconsistency across the reel, working against the client's request for one uniform look","Only the very first clip in a reel needs a filter applied at all","Reception clips cannot have filters applied to them"],"correct":1,"explanation":"Since the goal was one consistent look throughout, changing intensity on only some clips undermines that consistency, even if each individual clip might look fine on its own."},{"scenario":"Otieno explains his filter workflow to a new assistant: settle on one filter and intensity using a representative test clip, then apply that same combination to the rest of the project.","question":"Why is testing on a representative clip first a good habit?","options":["It wastes time and should be skipped","It lets Otieno confirm the chosen filter and intensity actually achieve the desired mood before locking that same setting in across every clip in the reel","Representative clips render faster than other clips","Testing is only necessary for audio, not color filters"],"correct":1,"explanation":"Testing on one representative clip first confirms the look works before it's applied uniformly everywhere, avoiding a reel-wide redo if the choice turns out wrong."}];
+        let currentQuestion = 0, score = 0, streak = 0, answered = false;
+        function updateScoreboard() {
+            document.getElementById('score').textContent = score;
+            document.getElementById('current').textContent = Math.min(currentQuestion + 1, exercises.length);
+            document.getElementById('total').textContent = exercises.length;
+            document.getElementById('streak').textContent = streak;
+            document.getElementById('progress').style.width = ((currentQuestion) / exercises.length) * 100 + '%';
+        }
+        function escapeHtml(s) { return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+        function renderQuestion() {
+            answered = false;
+            const q = exercises[currentQuestion];
+            let html = '';
+            if (q.scenario) html += `<div class="scenario"><strong>Scenario.</strong> ${escapeHtml(q.scenario)}</div>`;
+            html += `<div class="question">${escapeHtml(q.question)}</div>`;
+            html += '<div class="options">';
+            q.options.forEach((o, i) => { html += `<button class="option" onclick="selectAnswer(${i})">${escapeHtml(o)}</button>`; });
+            html += '</div>';
+            document.getElementById('exerciseCard').innerHTML = html;
+            updateScoreboard();
+        }
+        function selectAnswer(i) {
+            if (answered) return;
+            answered = true;
+            const q = exercises[currentQuestion];
+            const btns = document.querySelectorAll('.option');
+            btns.forEach(b => b.classList.add('disabled'));
+            btns[q.correct].classList.add('correct');
+            const right = i === q.correct;
+            if (!right) btns[i].classList.add('wrong');
+            if (right) { score += 10; streak += 1; } else { streak = 0; }
+            const fb = document.createElement('div');
+            fb.className = 'feedback ' + (right ? 'correct' : 'wrong');
+            fb.innerHTML = `<strong>${right ? '&#9989; Correct.' : '&#10060; Not quite.'}</strong><br>${escapeHtml(q.explanation)}`;
+            document.getElementById('exerciseCard').appendChild(fb);
+            const nb = document.createElement('button');
+            nb.className = 'next-btn';
+            nb.textContent = currentQuestion === exercises.length - 1 ? 'See results →' : 'Next scenario →';
+            nb.onclick = nextQuestion;
+            document.getElementById('exerciseCard').appendChild(nb);
+            updateScoreboard();
+        }
+        function nextQuestion() { currentQuestion++; if (currentQuestion >= exercises.length) return showResults(); renderQuestion(); }
+        function showResults() {
+            document.getElementById('progress').style.width = '100%';
+            const total = exercises.length * 10;
+            const pct = Math.round(score / total * 100);
+            if (window.parent) { window.parent.postMessage({type:"mtti_quiz_score", score: score, total: total, percent: pct}, "*"); }
+            let badge = '\u{1F31F}', msg = 'Excellent work. Otieno-level color grading know-how.';
+            if (pct < 50) { badge = '\u{1F331}'; msg = 'Good first attempt. Review the lesson and try again.'; }
+            else if (pct < 80) { badge = '\u{1F4DA}'; msg = 'Solid progress. Review the scenarios you missed and retry.'; }
+            document.getElementById('exerciseCard').innerHTML = `
+                <div class="results">
+                    <span class="badge">${badge}</span>
+                    <h2>Quiz Complete</h2>
+                    <div class="final-score">${score} / ${total}</div>
+                    <p><strong>${pct}%</strong> &middot; Longest streak: ${streak}</p>
+                    <p>${msg}</p>
+                    <button class="restart-btn" onclick="restart()">Try again &#128257;</button>
+                </div>`;
+        }
+        function restart() { currentQuestion = 0; score = 0; streak = 0; renderQuestion(); }
+        /* How-To intro — a small, ungraded reorder demo shown before the
+           quiz starts, directly rehearsing the "fix exposure/white balance
+           before applying a stylistic filter, then apply that same setting
+           to the whole reel" workflow order that one of the quiz scenarios
+           asks about, so it's not being asked cold. */
+        const HOWTO_CLIPS = [
+            { id: 's1', label: 'Fix Exposure & WB', color: '#6A11CB' },
+            { id: 's2', label: 'Test Filter on 1 Clip', color: '#2575FC' },
+            { id: 's3', label: 'Set the Intensity', color: '#E65100' },
+            { id: 's4', label: 'Apply to Whole Reel', color: '#00897B' },
+        ];
+        const HOWTO_CORRECT = ['s1', 's2', 's3', 's4'];
+        let howtoOrder = ['s1', 's3', 's2', 's4']; // two steps start swapped, same as the quiz scenario describes
+
+        function escHtmlH(s) { return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+        function howtoClipById(id) { return HOWTO_CLIPS.find(c => c.id === id); }
+
+        function renderHowtoTimeline(marks) {
+            document.getElementById('howtoTimeline').innerHTML = howtoOrder.map((id, i) => {
+                const c = howtoClipById(id);
+                const cls = marks ? (marks[i] ? 'hc-correct' : 'hc-wrong') : '';
+                return `<div class="howto-clip ${cls}" style="background:${c.color};">
+                    <div class="hc-label">${escHtmlH(c.label)}</div>
+                    <div class="hc-move">
+                        <button data-dir="left" data-id="${id}" ${i===0?'disabled':''}>◀</button>
+                        <button data-dir="right" data-id="${id}" ${i===howtoOrder.length-1?'disabled':''}>▶</button>
+                    </div>
+                </div>`;
+            }).join('');
+            document.querySelectorAll('.hc-move button').forEach(btn => {
+                btn.addEventListener('click', () => moveHowtoClip(btn.dataset.id, btn.dataset.dir));
+            });
+        }
+
+        function moveHowtoClip(id, dir) {
+            const i = howtoOrder.indexOf(id);
+            const j = dir === 'left' ? i - 1 : i + 1;
+            if (j < 0 || j >= howtoOrder.length) return;
+            [howtoOrder[i], howtoOrder[j]] = [howtoOrder[j], howtoOrder[i]];
+            renderHowtoTimeline();
+            document.getElementById('howtoBanner').classList.remove('show');
+        }
+
+        function checkHowto() {
+            const marks = howtoOrder.map((id, i) => id === HOWTO_CORRECT[i]);
+            renderHowtoTimeline(marks);
+            const allOk = marks.every(m => m);
+            const banner = document.getElementById('howtoBanner');
+            banner.classList.add('show');
+            banner.className = 'howto-banner show ' + (allOk ? 'ok' : 'fail');
+            banner.textContent = allOk
+                ? '✅ That\'s the order — clean correction first, then a tested, locked-in style applied consistently to every clip.'
+                : '❌ Not yet — correction always comes before styling, and testing comes before a reel-wide apply. Keep using ◀▶.';
+        }
+
+        function renderHowto() {
+            document.getElementById('exerciseCard').innerHTML = `
+                <div class="howto-card">
+                    <h3>🔍 Quick How-To: Getting the Workflow Order Right</h3>
+                    <p>One of the scenarios coming up asks whether correction or filtering should come first, and why the order matters. Here's the full workflow: fix the raw exposure and white balance, test your chosen filter on one representative clip, lock in the intensity that looks right, then apply that exact combination to the rest of the reel. The four steps below start out of order — use ◀▶ to fix the sequence, then check your work.</p>
+                    <div class="howto-timeline" id="howtoTimeline"></div>
+                    <div class="howto-banner" id="howtoBanner"></div>
+                    <button class="start-quiz-btn" id="checkHowtoBtn">Check My Order</button>
+                    <button class="start-quiz-btn" id="startQuizBtn" style="margin-left:10px;background:linear-gradient(135deg,#28a745,#1e7e34);">Start Quiz →</button>
+                </div>`;
+            renderHowtoTimeline();
+            document.getElementById('checkHowtoBtn').addEventListener('click', checkHowto);
+            document.getElementById('startQuizBtn').addEventListener('click', renderQuestion);
+        }
+
+        renderHowto();
+    </script>
+</body>
+</html>

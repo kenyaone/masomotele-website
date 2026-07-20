@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Analog vs IP Transmission — Practical | MTTI CCTV Installation</title>
+<link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Fredoka:wght@500;600&display=swap" rel="stylesheet">
+<style>
+* { margin:0; padding:0; box-sizing:border-box; }
+body { font-family:'Space Mono', monospace; background:linear-gradient(135deg,#1e293b,#0f172a); min-height:100vh; padding:20px; color:#e2e8f0; }
+.container { max-width:900px; margin:0 auto; }
+.header { text-align:center; margin-bottom:18px; }
+.header .tag { display:inline-block; background:rgba(255,255,255,0.12); padding:6px 16px; border-radius:999px; font-size:0.85em; margin-bottom:10px; color:#86efac; }
+.header h1 { font-family:'Fredoka', sans-serif; font-size:1.8em; color:#fff; }
+.intro-card { background:#fff; color:#1e293b; border-radius:14px; padding:16px 22px; margin-bottom:16px; box-shadow:0 15px 40px rgba(0,0,0,0.4); border-left:6px solid #059669; font-size:0.92em; line-height:1.5; }
+.intro-card h3 { color:#059669; margin-bottom:6px; font-family:'Fredoka', sans-serif; }
+.panel { background:#0b1220; border:2px solid #334155; border-radius:10px; box-shadow:0 20px 60px rgba(0,0,0,0.5); overflow:hidden; margin-bottom:18px; }
+.panel-titlebar { background:#1e293b; padding:8px 16px; font-size:0.8em; color:#94a3b8; border-bottom:1px solid #334155; }
+.panel-body { padding:20px 24px; }
+.field { margin-bottom:14px; }
+.field label { display:block; font-size:0.85em; color:#93c5fd; margin-bottom:6px; font-weight:600; }
+.field input[type=text], .field input[type=number], .field select { width:100%; background:#1e293b; border:2px solid #334155; color:#e2e8f0; padding:10px 12px; border-radius:8px; font-size:0.95em; font-family:'Space Mono', monospace; }
+.field input:focus, .field select:focus { outline:none; border-color:#059669; }
+.field .checkbox-row { display:flex; align-items:center; gap:8px; }
+.field .checkbox-row input { width:auto; }
+.check-btn { background:linear-gradient(135deg,#059669,#047857); color:#fff; border:none; padding:12px 28px; border-radius:10px; font-size:0.95em; font-weight:700; cursor:pointer; font-family:'Fredoka', sans-serif; }
+.results { margin-top:16px; display:none; }
+.results.show { display:block; }
+.result-summary { padding:14px 18px; border-radius:10px; margin-bottom:12px; font-weight:700; font-size:0.9em; }
+.result-summary.ok { background:#14532d; color:#86efac; }
+.result-summary.fail { background:#450a0a; color:#fca5a5; }
+.result-row { display:flex; justify-content:space-between; gap:10px; padding:8px 12px; border-radius:6px; font-size:0.82em; margin-bottom:4px; background:#1e293b; }
+.result-row.ok { border-left:3px solid #22c55e; }
+.result-row.fail { border-left:3px solid #ef4444; }
+.final-q { background:#fff; color:#1e293b; border-radius:16px; padding:20px 24px; box-shadow:0 20px 60px rgba(0,0,0,0.4); display:none; }
+.final-q.show { display:block; }
+.final-q h4 { font-size:1.02em; margin-bottom:12px; color:#1e293b; font-family:'Fredoka', sans-serif; }
+.options { display:flex; flex-direction:column; gap:10px; }
+.option { background:#f5f7fb; border:2px solid transparent; padding:13px 16px; border-radius:10px; cursor:pointer; font-size:0.9em; text-align:left; color:#334155; font-family:'Space Mono', monospace; }
+.option:hover:not(.disabled) { background:#ecfdf5; border-color:#059669; }
+.option.correct { background:#d4edda; border-color:#28a745; color:#155724; }
+.option.wrong { background:#f8d7da; border-color:#dc3545; color:#721c24; }
+.option.disabled { cursor:not-allowed; }
+.feedback { margin-top:14px; padding:14px 18px; border-radius:10px; font-size:0.9em; }
+.feedback.correct { background:#d4edda; color:#155724; border-left:4px solid #28a745; }
+.feedback.wrong { background:#f8d7da; color:#721c24; border-left:4px solid #dc3545; }
+</style>
+</head>
+<body>
+<div class="container">
+<div class="header"><div class="tag">Module 4 · Lesson 4.1 · Practical</div><h1>Analog vs IP Transmission — Practical</h1></div>
+<div class="intro-card"><h3>📋 Task</h3><p>Dennis (SafeView Security Systems) is scoping a job for a boutique in Eldoret town. The building already has UTP (Cat5e) network cabling run from a previous IT install, and the owner says she wants to check her 6 cameras live from her phone while she's away buying stock. Enter Dennis's site assessment and proposed system below.</p></div>
+<div class="panel">
+<div class="panel-titlebar">Diagnostic readings — simulated, no real device is changed</div>
+<div class="panel-body">
+<div id="fieldsWrap"></div>
+<button class="check-btn" onclick="checkConfig()">Check My Readings</button>
+<div class="results" id="results"></div>
+</div>
+</div>
+<div class="final-q" id="finalQ"></div>
+</div>
+<script>
+/* MTTI_DiagnosticSim v1 — generic, config-driven diagnostic-readings widget.
+   Student enters realistic readings/decisions into a form; the engine checks
+   each against a declared rule (operator + threshold), shows a pass/fail
+   breakdown, then reveals a scenario-tied follow-up question. No native
+   dialogs — the iframe sandbox blocks prompt/alert/confirm. */
+const FIELDS = [{"id":"existing_cabling","label":"Existing cabling type found on site","type":"select","options":["Coax","UTP","None"]},{"id":"wants_mobile","label":"Client wants smartphone remote viewing","type":"checkbox"},{"id":"camera_count","label":"Number of cameras needed","type":"number","placeholder":"e.g. 6"},{"id":"system_type","label":"Dennis's recommended system type","type":"select","options":["Analog (CVBS\/HD-TVI)","IP (Network\/PoE)"]}];
+const RULES = [{"field":"existing_cabling","operator":"eq","value":"UTP","label":"Existing cabling matches what Dennis found on site (UTP)"},{"field":"wants_mobile","operator":"checked","value":true,"label":"Confirms client wants smartphone remote viewing"},{"field":"camera_count","operator":"gte","value":6,"label":"Camera count meets the site requirement (at least 6)"},{"field":"system_type","operator":"eq","value":"IP (Network\/PoE)","label":"Recommended system suits the existing UTP cabling and the client's mobile-viewing requirement (IP over PoE)"}];
+const FINAL = {"text":"The client already has UTP cabling in place and wants to view her 6 cameras from her smartphone. Which system type should Dennis recommend, and why?","options":["IP (network\/PoE) cameras \u2014 they run over the existing UTP\/PoE cabling and natively support remote app viewing over the network","Analog (CVBS) cameras \u2014 always cheaper, regardless of what cabling is already installed","Tell the client to rip out the UTP cabling and install coax instead","Tell the client smartphone remote viewing isn't possible with any camera system"],"answer":0,"explanation":"IP cameras use the existing UTP\/PoE cabling directly (no re-cabling needed) and connect to an NVR that natively pushes video to a mobile app \u2014 a much better fit here than tearing out working cabling to force an analog system that doesn't support app viewing as cleanly."};
+
+const wrap = document.getElementById('fieldsWrap');
+FIELDS.forEach(f => {
+    const div = document.createElement('div');
+    div.className = 'field';
+    if (f.type === 'checkbox') {
+        div.innerHTML = `<div class="checkbox-row"><input type="checkbox" id="f_${f.id}"><label for="f_${f.id}" style="margin:0;">${f.label}</label></div>`;
+    } else if (f.type === 'select') {
+        const opts = (f.options || []).map(o => `<option value="${o}">${o}</option>`).join('');
+        div.innerHTML = `<label for="f_${f.id}">${f.label}</label><select id="f_${f.id}"><option value="">-- choose --</option>${opts}</select>`;
+    } else {
+        div.innerHTML = `<label for="f_${f.id}">${f.label}</label><input type="${f.type}" id="f_${f.id}" placeholder="${f.placeholder || ''}">`;
+    }
+    wrap.appendChild(div);
+});
+
+function collectValues() {
+    const values = {};
+    FIELDS.forEach(f => {
+        const el = document.getElementById('f_' + f.id);
+        values[f.id] = f.type === 'checkbox' ? el.checked : el.value;
+    });
+    return values;
+}
+
+function applyOp(val, op, target) {
+    const n = parseFloat(val);
+    switch (op) {
+        case 'gte': return !isNaN(n) && n >= target;
+        case 'lte': return !isNaN(n) && n <= target;
+        case 'gt':  return !isNaN(n) && n > target;
+        case 'lt':  return !isNaN(n) && n < target;
+        case 'eq':  return String(val).trim().toLowerCase() === String(target).trim().toLowerCase();
+        case 'neq': return String(val).trim().toLowerCase() !== String(target).trim().toLowerCase();
+        case 'checked':   return val === true;
+        case 'unchecked': return val === false;
+        default: return false;
+    }
+}
+
+function checkConfig() {
+    const values = collectValues();
+    const rows = RULES.map(r => {
+        const ok = applyOp(values[r.field], r.operator, r.value);
+        const fieldDef = FIELDS.find(f => f.id === r.field);
+        const shown = fieldDef && fieldDef.type === 'checkbox' ? (values[r.field] ? 'Checked' : 'Unchecked') : (values[r.field] === '' ? '(blank)' : values[r.field]);
+        return { ok, label: r.label, you: shown };
+    });
+    const allOk = rows.every(r => r.ok);
+    const box = document.getElementById('results');
+    box.classList.add('show');
+    let html = `<div class="result-summary ${allOk ? 'ok' : 'fail'}">${allOk ? '✅ All readings check out.' : '⚠️ Some readings are outside the expected range — review below.'}</div>`;
+    rows.forEach(r => {
+        html += `<div class="result-row ${r.ok ? 'ok' : 'fail'}"><span>${r.label}</span><span>${r.ok ? '✓' : ('you: ' + r.you)}</span></div>`;
+    });
+    box.innerHTML = html;
+    document.getElementById('finalQ').classList.add('show');
+}
+
+function renderFinal() {
+    const fq = document.getElementById('finalQ');
+    let html = `<h4>🛠️ ${FINAL.text}</h4><div class="options">`;
+    FINAL.options.forEach((o, i) => { html += `<button class="option" onclick="selectFinal(${i})">${o}</button>`; });
+    html += '</div>';
+    fq.innerHTML = html;
+}
+function selectFinal(i) {
+    const btns = document.querySelectorAll('#finalQ .option');
+    btns.forEach(b => b.classList.add('disabled'));
+    btns[FINAL.answer].classList.add('correct');
+    const right = i === FINAL.answer;
+    if (!right) btns[i].classList.add('wrong');
+    const fb = document.createElement('div');
+    fb.className = 'feedback ' + (right ? 'correct' : 'wrong');
+    fb.innerHTML = `<strong>${right ? '✅ Correct.' : '❌ Not quite.'}</strong><br>${FINAL.explanation}`;
+    document.getElementById('finalQ').appendChild(fb);
+}
+renderFinal();
+</script>
+</body>
+</html>

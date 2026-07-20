@@ -1,0 +1,346 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Technical SEO (Core Web Vitals) | MTTI Digital Marketing</title>
+    <link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Fredoka:wght@500;600&display=swap" rel="stylesheet">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Space Mono', monospace;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh; padding: 20px; color: #fff;
+        }
+        .container { max-width: 900px; margin: 0 auto; }
+        .header { text-align: center; margin-bottom: 30px; animation: slideDown 0.6s ease-out; }
+        .header .lesson-tag {
+            display: inline-block; background: rgba(255,255,255,0.2);
+            padding: 6px 16px; border-radius: 999px;
+            font-size: 0.85em; margin-bottom: 12px;
+        }
+        .header h1 {
+            font-family: 'Fredoka', sans-serif; font-size: 2.2em;
+            margin-bottom: 8px; text-shadow: 3px 3px 0 rgba(0,0,0,0.2);
+        }
+        .header p { opacity: 0.95; font-size: 0.95em; }
+        .score-board {
+            background: rgba(255,255,255,0.15); backdrop-filter: blur(10px);
+            border-radius: 20px; padding: 20px; margin-bottom: 20px;
+            display: flex; justify-content: space-around;
+            animation: fadeIn 0.8s ease-out 0.2s both;
+        }
+        .score-item { text-align: center; }
+        .score-item .label { font-size: 0.85em; opacity: 0.9; margin-bottom: 4px; }
+        .score-item .value {
+            font-size: 1.8em; font-weight: bold; font-family: 'Fredoka', sans-serif;
+        }
+        .progress-bar {
+            width: 100%; height: 8px; background: rgba(255,255,255,0.3);
+            border-radius: 10px; margin-bottom: 25px; overflow: hidden;
+        }
+        .progress-fill {
+            height: 100%; background: linear-gradient(90deg, #f093fb 0%, #f5576c 100%);
+            border-radius: 10px; transition: width 0.5s ease; width: 0%;
+        }
+        .exercise-card {
+            background: white; color: #333; border-radius: 25px;
+            padding: 35px; margin-bottom: 20px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            animation: fadeIn 0.6s ease-out both;
+        }
+        .scenario {
+            background: linear-gradient(135deg, #fff8e1 0%, #ffecb3 100%);
+            border-left: 5px solid #ffc107;
+            padding: 20px 24px; border-radius: 12px;
+            margin-bottom: 24px;
+            font-size: 0.98em; line-height: 1.55;
+        }
+        .scenario strong { color: #7a5a00; font-family: 'Fredoka', sans-serif; }
+        .question {
+            font-size: 1.15em; margin-bottom: 20px;
+            font-weight: 700; line-height: 1.4;
+        }
+        .options { display: flex; flex-direction: column; gap: 12px; }
+        .option {
+            background: #f5f7fb; border: 2px solid transparent;
+            padding: 16px 20px; border-radius: 12px;
+            cursor: pointer; transition: all 0.2s ease;
+            font-family: 'Space Mono', monospace; font-size: 0.98em; text-align: left;
+        }
+        .option:hover:not(.disabled) {
+            background: #eef1fb; border-color: #667eea; transform: translateX(4px);
+        }
+        .option.correct { background: #d4edda; border-color: #28a745; color: #155724; }
+        .option.wrong { background: #f8d7da; border-color: #dc3545; color: #721c24; animation: shake 0.4s; }
+        .option.disabled { cursor: not-allowed; opacity: 0.85; }
+        .feedback {
+            margin-top: 22px; padding: 18px 22px; border-radius: 12px;
+            animation: slideUp 0.4s ease-out;
+            font-size: 0.98em; line-height: 1.5;
+        }
+        .feedback.correct { background: #d4edda; color: #155724; border-left: 4px solid #28a745; }
+        .feedback.wrong { background: #f8d7da; color: #721c24; border-left: 4px solid #dc3545; }
+        .feedback strong { font-family: 'Fredoka', sans-serif; }
+        .next-btn, .restart-btn {
+            margin-top: 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white; border: none;
+            padding: 14px 32px; border-radius: 12px;
+            font-size: 1em; cursor: pointer;
+            font-family: 'Fredoka', sans-serif;
+            box-shadow: 0 6px 18px rgba(0,0,0,0.2);
+            transition: transform 0.2s ease;
+        }
+        .next-btn:hover, .restart-btn:hover { transform: scale(1.04); }
+        .results {
+            text-align: center; padding: 25px 15px;
+            animation: bounceIn 0.6s ease-out;
+        }
+        .results h2 {
+            font-family: 'Fredoka', sans-serif; font-size: 2em;
+            margin-bottom: 12px; color: #333;
+        }
+        .results .final-score {
+            font-size: 3em; font-family: 'Fredoka', sans-serif;
+            color: #667eea; margin: 20px 0;
+        }
+        .results p { color: #555; margin-bottom: 12px; }
+        .badge { display: inline-block; font-size: 3.5em; margin: 8px 0; }
+        @keyframes slideDown { from { opacity: 0; transform: translateY(-30px); } to { opacity: 1; transform: translateY(0); } }
+        @keyframes fadeIn { from { opacity: 0; transform: scale(0.96); } to { opacity: 1; transform: scale(1); } }
+        @keyframes slideUp { from { opacity: 0; transform: translateY(15px); } to { opacity: 1; transform: translateY(0); } }
+        @keyframes shake { 0%,100% { transform: translateX(0); } 25% { transform: translateX(-8px); } 75% { transform: translateX(8px); } }
+        @keyframes bounceIn { 0% { opacity: 0; transform: scale(0.4); } 60% { transform: scale(1.05); } 100% { opacity: 1; transform: scale(1); } }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <div class="lesson-tag">Module 9 · Lesson 9.4</div>
+            <h1>Technical SEO (Core Web Vitals)</h1>
+            <p>10 Sarah scenarios — LCP, INP, CLS, PageSpeed Insights, image fixes</p>
+        </div>
+
+        <div class="score-board">
+            <div class="score-item"><div class="label">Score</div><div class="value" id="score">0</div></div>
+            <div class="score-item"><div class="label">Question</div><div class="value"><span id="current">1</span>/<span id="total">10</span></div></div>
+            <div class="score-item"><div class="label">Streak</div><div class="value" id="streak">0</div></div>
+        </div>
+
+        <div class="progress-bar"><div class="progress-fill" id="progress"></div></div>
+
+        <div class="exercise-card" id="exerciseCard"></div>
+    </div>
+
+    <script>
+        const exercises = [
+  {
+    "scenario": "Sarah thinks SEO ends with Yoast and content. Her trainer disagrees.",
+    "question": "What is Lesson 9.4's definition of technical SEO?",
+    "options": [
+      "Everything Google reads about your site OTHER than words and images — site speed, mobile responsiveness, whether search engines can crawl, HTTPS, whether pages are indexed, sitemap, robots.txt.",
+      "Only the choice of theme.",
+      "Only the CMS version number.",
+      "Only what the developer types by hand."
+    ],
+    "correct": 0,
+    "explanation": "Slide 2 defines technical SEO as everything Google reads other than words/images — speed, mobile, crawlability, HTTPS, indexing, sitemap, robots.txt. Yoast handles the writing. Technical SEO handles the plumbing."
+  },
+  {
+    "scenario": "Sarah wants to memorise Google's three Core Web Vitals metrics and their targets.",
+    "question": "Which trio is correct?",
+    "options": [
+      "LCP < 2.5 seconds, INP < 200 milliseconds, CLS < 0.1.",
+      "LCP < 10 seconds, INP < 5 seconds, CLS < 3.0.",
+      "TTFB < 1 second, DNS < 500ms, SSL < 200ms.",
+      "PageRank > 5, DomainAuthority > 50, TrustFlow > 30."
+    ],
+    "correct": 0,
+    "explanation": "Slide 3 lists the three CWV with their thresholds — LCP (Largest Contentful Paint) under 2.5s, INP (Interaction to Next Paint) under 200ms, CLS (Cumulative Layout Shift) under 0.1. Miss any and Google demotes."
+  },
+  {
+    "scenario": "Sarah wants to grade karibukitchen.co.ke technically for free with the same tool Google uses internally.",
+    "question": "Which tool?",
+    "options": [
+      "Google Analytics 4.",
+      "PageSpeed Insights — free at pagespeed.web.dev. Enter the URL, click Analyze, and Google returns a 0-100 performance score with all three Core Web Vitals broken out and specific recommendations.",
+      "MonsterInsights.",
+      "Yoast SEO Premium."
+    ],
+    "correct": 1,
+    "explanation": "Slide 4 names PageSpeed Insights at pagespeed.web.dev — free, official, the professional starting point for every SEO audit."
+  },
+  {
+    "scenario": "Sarah's PageSpeed report shows Performance 78 (amber), LCP 92 (green), INP 88 (green), CLS 74 (amber).",
+    "question": "How should Sarah interpret this?",
+    "options": [
+      "Everything is broken — abandon the site.",
+      "Performance is good but not great. LCP and INP are strong. CLS is the weakness — the layout shifts a little after loading. Fix the CLS issue first.",
+      "Only the colour of the report matters.",
+      "The green scores mean nothing."
+    ],
+    "correct": 1,
+    "explanation": "Slide 5 walks through Sarah's exact report — 78 amber overall, LCP green, INP green, CLS amber. The weakness is layout shift, and PageSpeed lists specific fixes ranked by impact."
+  },
+  {
+    "scenario": "Sarah's PageSpeed report says her biggest opportunity is 'serve images in next-gen formats', with an estimated 1.2s saving. Her hero image is 3,200 pixels wide and 2 MB.",
+    "question": "What is the fix from Slide 6?",
+    "options": [
+      "Upload the image at 8,000 pixels wide.",
+      "Export the image at 900 pixels wide in WebP format. File size drops from 2 MB to under 100 KB. Load time drops 1.2 seconds. Repeat for every image on every page.",
+      "Convert the image to a PDF.",
+      "Delete the image entirely."
+    ],
+    "correct": 1,
+    "explanation": "Slide 6 gives Sarah's exact fix — 900px WebP, 100KB, 1.2s saved. She was loading 3.5x more image than any phone would ever display."
+  },
+  {
+    "scenario": "Sarah has 20 similar oversized images across her site.",
+    "question": "How much aggregate speed can she reclaim?",
+    "options": [
+      "None — the savings do not add up.",
+      "Roughly 24 seconds in aggregate (20 x 1.2s). Google notices.",
+      "Only on the Home page.",
+      "Only on mobile."
+    ],
+    "correct": 1,
+    "explanation": "Slide 6 does the maths — 20 images x 1.2s = 24 seconds saved in aggregate. Google's ranking systems reward this."
+  },
+  {
+    "scenario": "Sarah asks what a sitemap is, whether she needs to generate one by hand, and what URL to submit to Google Search Console.",
+    "question": "Which answer is correct?",
+    "options": [
+      "A sitemap is an image of the site — Sarah must draw it.",
+      "A sitemap is an XML file listing every page on your site so Google knows what to crawl. Yoast SEO auto-generates one at /sitemap_index.xml. Sarah submits that URL to Google Search Console in Lesson 9.6.",
+      "Sitemaps are illegal in Kenya.",
+      "Only agencies can create sitemaps."
+    ],
+    "correct": 1,
+    "explanation": "Slide 7 explains the sitemap — XML file listing every page, auto-generated by Yoast at /sitemap_index.xml, submitted to Search Console in the next lesson."
+  },
+  {
+    "scenario": "Sarah is tempted to edit robots.txt to 'improve SEO' after reading a random blog post.",
+    "question": "What is the honest guidance from Lesson 9.4?",
+    "options": [
+      "Edit robots.txt as often as possible.",
+      "Do not touch robots.txt unless you know exactly what you are doing. The WordPress defaults are fine.",
+      "Delete robots.txt entirely.",
+      "Add 'Disallow: /' to speed up the site."
+    ],
+    "correct": 1,
+    "explanation": "Slide 7 warns — WordPress defaults for robots.txt are fine. Do not touch it unless you know exactly what you are doing. A wrong entry can hide the entire site from Google."
+  },
+  {
+    "scenario": "Sarah opens Google Search Console and finds the Core Web Vitals report shows a Poor bar for 8 of her pages.",
+    "question": "What is the correct workflow from Slide 8?",
+    "options": [
+      "Ignore red pages.",
+      "Fix red pages first, then fix amber pages, until all 30 days are solid green. When the trend is solid green, the Core Web Vitals ranking factor is maxed.",
+      "Delete red pages.",
+      "Change theme to hide the errors."
+    ],
+    "correct": 1,
+    "explanation": "Slide 8 describes the workflow — red first, then amber, until 30 days trend solid green. That is when the CWV ranking factor is maxed."
+  },
+  {
+    "scenario": "Sarah's classmate scoffs: 'Speed does not matter, only content does.' Sarah wonders if he is right.",
+    "question": "What does Lesson 9.4 actually say?",
+    "options": [
+      "Speed is irrelevant.",
+      "A fast site outranks a slow site every time. Technical SEO is the layer most Kenyan marketers ignore, and it is where competitors quietly beat you. Yoast and technical SEO both matter equally.",
+      "Speed only matters on mobile.",
+      "Speed matters only outside Kenya."
+    ],
+    "correct": 1,
+    "explanation": "Slide 1 says fast beats slow every time. Slide 2 says Yoast handles writing, technical SEO handles the plumbing — both matter equally. The classmate is wrong."
+  }
+];
+
+        let currentQuestion = 0, score = 0, streak = 0, answered = false;
+
+        function updateScoreboard() {
+            document.getElementById('score').textContent = score;
+            document.getElementById('current').textContent = Math.min(currentQuestion + 1, exercises.length);
+            document.getElementById('total').textContent = exercises.length;
+            document.getElementById('streak').textContent = streak;
+            document.getElementById('progress').style.width = ((currentQuestion) / exercises.length) * 100 + '%';
+        }
+
+        function escapeHtml(s) {
+            return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+        }
+
+        function renderQuestion() {
+            answered = false;
+            const q = exercises[currentQuestion];
+            let html = '';
+            if (q.scenario) {
+                html += `<div class="scenario"><strong>Scenario.</strong> ${escapeHtml(q.scenario)}</div>`;
+            }
+            html += `<div class="question">${escapeHtml(q.question)}</div>`;
+            html += '<div class="options">';
+            q.options.forEach((o, i) => {
+                html += `<button class="option" onclick="selectAnswer(${i})">${escapeHtml(o)}</button>`;
+            });
+            html += '</div>';
+            document.getElementById('exerciseCard').innerHTML = html;
+            updateScoreboard();
+        }
+
+        function selectAnswer(i) {
+            if (answered) return;
+            answered = true;
+            const q = exercises[currentQuestion];
+            const btns = document.querySelectorAll('.option');
+            btns.forEach(b => b.classList.add('disabled'));
+            btns[q.correct].classList.add('correct');
+            const right = i === q.correct;
+            if (!right) btns[i].classList.add('wrong');
+            if (right) { score += 10; streak += 1; } else { streak = 0; }
+            const fb = document.createElement('div');
+            fb.className = 'feedback ' + (right ? 'correct' : 'wrong');
+            fb.innerHTML = `<strong>${right ? '✅ Correct.' : '❌ Not quite.'}</strong><br>${escapeHtml(q.explanation)}`;
+            document.getElementById('exerciseCard').appendChild(fb);
+            const nb = document.createElement('button');
+            nb.className = 'next-btn';
+            nb.textContent = currentQuestion === exercises.length - 1 ? 'See results →' : 'Next scenario →';
+            nb.onclick = nextQuestion;
+            document.getElementById('exerciseCard').appendChild(nb);
+            updateScoreboard();
+        }
+
+        function nextQuestion() {
+            currentQuestion++;
+            if (currentQuestion >= exercises.length) return showResults();
+            renderQuestion();
+        }
+
+        function showResults() {
+            document.getElementById('progress').style.width = '100%';
+            const total = exercises.length * 10;
+            const pct = Math.round(score / total * 100);
+            if (window.parent) { window.parent.postMessage({type:"mtti_quiz_score", score: score, total: total, percent: pct}, "*"); }
+            let badge = '🌟', msg = 'Excellent work. You have a professional grasp of this lesson.';
+            if (pct < 50) { badge = '🌱'; msg = 'Good first attempt. Re-watch the lesson video and try again.'; }
+            else if (pct < 80) { badge = '📚'; msg = 'Solid progress. Review the scenarios you missed and retry.'; }
+            document.getElementById('exerciseCard').innerHTML = `
+                <div class="results">
+                    <span class="badge">${badge}</span>
+                    <h2>Quiz Complete</h2>
+                    <div class="final-score">${score} / ${total}</div>
+                    <p><strong>${pct}%</strong> · Longest streak: ${streak}</p>
+                    <p>${msg}</p>
+                    <button class="restart-btn" onclick="restart()">Try again 🔁</button>
+                </div>`;
+        }
+
+        function restart() {
+            currentQuestion = 0; score = 0; streak = 0;
+            renderQuestion();
+        }
+
+        renderQuestion();
+    </script>
+</body>
+</html>

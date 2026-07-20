@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Where Bias in AI Systems Comes From (Lesson) | MTTI Artificial Intelligence</title>
+<link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Fredoka:wght@500;600&display=swap" rel="stylesheet">
+<style>
+* { margin:0; padding:0; box-sizing:border-box; }
+body { font-family:'Space Mono', monospace; background:linear-gradient(135deg,#1B2A4A 0%,#3E5C76 100%); min-height:100vh; padding:20px; color:#fff; }
+.container { max-width:820px; margin:0 auto; }
+.header { text-align:center; margin-bottom:24px; }
+.lesson-tag { display:inline-block; background:rgba(255,255,255,0.2); padding:6px 16px; border-radius:999px; font-size:0.85em; margin-bottom:12px; }
+.header h1 { font-family:'Fredoka', sans-serif; font-size:2em; margin-bottom:6px; text-shadow:3px 3px 0 rgba(0,0,0,0.2); }
+.card { background:#fff; color:#333; border-radius:22px; padding:32px; margin-bottom:20px; box-shadow:0 20px 60px rgba(0,0,0,0.3); }
+.section { margin-bottom:26px; }
+.section:last-child { margin-bottom:0; }
+.section h2 { font-family:'Fredoka', sans-serif; font-size:1.2em; margin-bottom:10px; color:#2E5C8A; }
+.section .body { line-height:1.65; font-size:0.98em; }
+.section .body p { margin-bottom:10px; }
+.section .body code { background:#f5f7fb; padding:2px 6px; border-radius:4px; font-size:0.92em; }
+.keypoint { background:#fff8e1; border-left:4px solid #ffc107; padding:12px 16px; border-radius:8px; margin-top:12px; font-size:0.92em; }
+</style>
+</head>
+<body>
+<div class="container">
+<div class="header"><div class="lesson-tag">Module 6 · Lesson 6.1</div><h1>Where Bias in AI Systems Comes From</h1></div>
+<div class="card">
+<div class="section"><h2>Bias Is a Data Problem, Not a "Robot Opinion"</h2><div class="body"><p>An AI system does not sit and form opinions about people. What it does is look for patterns in the examples it was trained on, and then repeat those patterns on new cases. If Brian trains a simple model to predict which customers are likely to pay late using five years of a client's sales records, the model is not being clever or unfair on its own — it is copying whatever pattern already existed in that history, good or bad.</p><p>This is why people say "the data is the bias." If the training data mostly shows one kind of outcome for one kind of group, the system learns that pattern as normal and applies it to everyone, including new cases where it should not.</p></div></div>
+<div class="section"><h2>The Hiring-Screening Example</h2><div class="body"><p>Imagine a company builds an AI tool to screen job applications, training it on ten years of resumes from people the company previously hired. If most of those past hires happened to share one university background, one gender, or one type of work experience — not because that background makes someone more capable, but simply because of who applied or was hired before — the tool learns to score resumes like those more highly. A strong candidate with a different background can be scored lower, not due to weaker qualifications, but because their profile looks different from the historical pattern.</p></div><div class="keypoint"><strong>Key Point.</strong> Bias comes from what the training data does and does not represent — not from the algorithm having an opinion. Always ask: whose examples were used to teach this system, and who is missing from them?</div></div>
+<div class="section"><h2>What This Means for Rafiki Insights</h2><div class="body"><p>When Brian helps a client at Rafiki Insights build a scoring, screening, or ranking tool from their historical records, the historical records are the real source of any unfairness the tool ends up producing. Before trusting or recommending such a tool, Brian's job includes asking who is represented in that data, who is underrepresented, and whether the pattern being learned is actually one the client should want repeated.</p></div></div>
+</div>
+</div>
+</body>
+</html>

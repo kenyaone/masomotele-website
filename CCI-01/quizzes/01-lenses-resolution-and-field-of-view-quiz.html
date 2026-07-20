@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lenses, Resolution and Field of View | MTTI CCTV Installation</title>
+    <link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Fredoka:wght@500;600&display=swap" rel="stylesheet">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Space Mono', monospace; background: linear-gradient(135deg, #0f2027 0%, #2c5364 100%); min-height: 100vh; padding: 20px; color: #fff; }
+        .container { max-width: 900px; margin: 0 auto; }
+        .header { text-align: center; margin-bottom: 30px; }
+        .header .lesson-tag { display: inline-block; background: rgba(255,255,255,0.2); padding: 6px 16px; border-radius: 999px; font-size: 0.85em; margin-bottom: 12px; }
+        .header h1 { font-family: 'Fredoka', sans-serif; font-size: 2.2em; margin-bottom: 8px; text-shadow: 3px 3px 0 rgba(0,0,0,0.2); }
+        .score-board { background: rgba(255,255,255,0.15); backdrop-filter: blur(10px); border-radius: 20px; padding: 20px; margin-bottom: 20px; display: flex; justify-content: space-around; }
+        .score-item { text-align: center; }
+        .score-item .label { font-size: 0.85em; opacity: 0.9; margin-bottom: 4px; }
+        .score-item .value { font-size: 1.8em; font-weight: bold; font-family: 'Fredoka', sans-serif; }
+        .progress-bar { width: 100%; height: 8px; background: rgba(255,255,255,0.3); border-radius: 10px; margin-bottom: 25px; overflow: hidden; }
+        .progress-fill { height: 100%; background: linear-gradient(90deg, #f7971e 0%, #ffd200 100%); border-radius: 10px; transition: width 0.5s ease; width: 0%; }
+        .exercise-card { background: white; color: #333; border-radius: 25px; padding: 35px; margin-bottom: 20px; box-shadow: 0 20px 60px rgba(0,0,0,0.3); }
+        .scenario { background: linear-gradient(135deg, #fff8e1 0%, #ffecb3 100%); border-left: 5px solid #ffc107; padding: 20px 24px; border-radius: 12px; margin-bottom: 24px; font-size: 0.98em; line-height: 1.55; }
+        .scenario strong { color: #7a5a00; font-family: 'Fredoka', sans-serif; }
+        .question { font-size: 1.15em; margin-bottom: 20px; font-weight: 700; line-height: 1.4; }
+        .options { display: flex; flex-direction: column; gap: 12px; }
+        .option { background: #f5f7fb; border: 2px solid transparent; padding: 16px 20px; border-radius: 12px; cursor: pointer; transition: all 0.2s ease; font-family: 'Space Mono', monospace; font-size: 0.98em; text-align: left; }
+        .option:hover:not(.disabled) { background: #eef6fb; border-color: #2c5364; transform: translateX(4px); }
+        .option.correct { background: #d4edda; border-color: #28a745; color: #155724; }
+        .option.wrong { background: #f8d7da; border-color: #dc3545; color: #721c24; }
+        .option.disabled { cursor: not-allowed; opacity: 0.85; }
+        .feedback { margin-top: 22px; padding: 18px 22px; border-radius: 12px; font-size: 0.98em; line-height: 1.5; }
+        .feedback.correct { background: #d4edda; color: #155724; border-left: 4px solid #28a745; }
+        .feedback.wrong { background: #f8d7da; color: #721c24; border-left: 4px solid #dc3545; }
+        .next-btn, .restart-btn { margin-top: 20px; background: linear-gradient(135deg, #0f2027 0%, #2c5364 100%); color: white; border: none; padding: 14px 32px; border-radius: 12px; font-size: 1em; cursor: pointer; font-family: 'Fredoka', sans-serif; box-shadow: 0 6px 18px rgba(0,0,0,0.2); }
+        .results { text-align: center; padding: 25px 15px; }
+        .results h2 { font-family: 'Fredoka', sans-serif; font-size: 2em; margin-bottom: 12px; color: #333; }
+        .results .final-score { font-size: 3em; font-family: 'Fredoka', sans-serif; color: #2c5364; margin: 20px 0; }
+        .results p { color: #555; margin-bottom: 12px; }
+        .badge { display: inline-block; font-size: 3.5em; margin: 8px 0; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <div class="lesson-tag">Module 1 · Lesson 1.2 · Quiz</div>
+            <h1>Lenses, Resolution and Field of View</h1>
+        </div>
+        <div class="score-board">
+            <div class="score-item"><div class="label">Score</div><div class="value" id="score">0</div></div>
+            <div class="score-item"><div class="label">Question</div><div class="value"><span id="current">1</span>/<span id="total">10</span></div></div>
+            <div class="score-item"><div class="label">Streak</div><div class="value" id="streak">0</div></div>
+        </div>
+        <div class="progress-bar"><div class="progress-fill" id="progress"></div></div>
+        <div class="exercise-card" id="exerciseCard"></div>
+    </div>
+    <script>
+        const exercises = [{"scenario":"Dennis is choosing a lens for a camera pointed permanently at one fixed doorway, where the distance never changes.","question":"Which lens type is the simplest, most cost-effective fit here?","options":["Varifocal lens","Fixed lens","No lens is required","PTZ lens"],"correct":1,"explanation":"A fixed lens suits a known, unchanging distance and angle, and costs less than an equivalent varifocal lens."},{"scenario":"During a site survey, Dennis is not yet sure of the exact field of view he'll need until he is standing at the mounting point.","question":"Which lens type gives him the flexibility to fine-tune the zoom level on site?","options":["Fixed lens","Varifocal lens","Neither type can be adjusted","Only a PTZ camera can be adjusted"],"correct":1,"explanation":"A varifocal lens can be adjusted by hand at install time, letting Dennis fine-tune the field of view once he sees the actual site conditions."},{"scenario":"A client asks Dennis what \"4MP\" actually means for one of their cameras.","question":"What is the best explanation?","options":["It means the camera can zoom four times","It refers to the camera's resolution \u2014 roughly 4 million pixels per image, giving a sharper picture than a lower-megapixel camera","It means the camera records for four hours before needing power","It refers to the number of cameras that can connect to one recorder"],"correct":1,"explanation":"Megapixel figures describe resolution \u2014 how many pixels make up each image \u2014 not zoom, run time, or camera count."},{"scenario":"A client wants every camera on site set to the highest resolution available, without considering the recorder's storage capacity.","question":"What should Dennis point out about this plan?","options":["Higher resolution has no effect on storage use at all","Higher resolution produces larger video files, which increases storage and bandwidth needs, so resolution should be matched to what is actually needed and to the storage budget","Only fixed lenses are affected by resolution, not varifocal lenses","Resolution can be changed after recording to save space, so it does not matter now"],"correct":1,"explanation":"Because sharper images mean larger files, blindly maximising resolution everywhere can quickly outstrip available storage and network bandwidth."},{"scenario":"Dennis is deciding between a wide field of view and a narrow, zoomed-in field of view for a camera overlooking a large open yard where the goal is a general overview rather than reading faces.","question":"Which choice fits the stated goal better?","options":["A narrow, zoomed-in field of view, since more zoom is always better","A wider field of view, since broad coverage of the yard matters more here than fine detail on any one spot","Field of view has no impact on how much area is covered","Neither option can cover an outdoor yard"],"correct":1,"explanation":"For a general overview goal, a wider field of view that covers more ground is the better fit, accepting less per-object detail in exchange."},{"scenario":"A client wants to zoom into recorded footage after an incident and read a vehicle's number plate clearly at the gate.","question":"Which combination should Dennis prioritise for that specific camera?","options":["Low resolution with the widest possible field of view","Higher resolution with a narrower field of view aimed directly at the area where plates will appear","Resolution and field of view make no difference to reading a plate","A fixed lens is required, and resolution is irrelevant"],"correct":1,"explanation":"Reading fine detail like a number plate needs both enough pixels on the subject (higher resolution) and a narrower field of view that keeps the plate large enough in frame."},{"scenario":"Dennis explains to a new apprentice why field of view and resolution can't both be maximised at once for the same camera and budget.","question":"What is the core trade-off he should describe?","options":["Wider coverage means less detail per object, and higher detail on a smaller area means less overall coverage \u2014 the two must be balanced against the actual need","Field of view and resolution are unrelated settings that never interact","Maximum field of view and maximum resolution can always be achieved together at no extra cost","Only the recorder's settings affect field of view, not the lens"],"correct":0,"explanation":"The fundamental trade-off is that broader coverage spreads detail thinner across a scene, while zooming in for detail narrows the area covered \u2014 the right balance depends on what the camera is actually meant to achieve."}];
+        let currentQuestion = 0, score = 0, streak = 0, answered = false;
+        function updateScoreboard() {
+            document.getElementById('score').textContent = score;
+            document.getElementById('current').textContent = Math.min(currentQuestion + 1, exercises.length);
+            document.getElementById('total').textContent = exercises.length;
+            document.getElementById('streak').textContent = streak;
+            document.getElementById('progress').style.width = ((currentQuestion) / exercises.length) * 100 + '%';
+        }
+        function escapeHtml(s) { return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+        function renderQuestion() {
+            answered = false;
+            const q = exercises[currentQuestion];
+            let html = '';
+            if (q.scenario) html += `<div class="scenario"><strong>Scenario.</strong> ${escapeHtml(q.scenario)}</div>`;
+            html += `<div class="question">${escapeHtml(q.question)}</div>`;
+            html += '<div class="options">';
+            q.options.forEach((o, i) => { html += `<button class="option" onclick="selectAnswer(${i})">${escapeHtml(o)}</button>`; });
+            html += '</div>';
+            document.getElementById('exerciseCard').innerHTML = html;
+            updateScoreboard();
+        }
+        function selectAnswer(i) {
+            if (answered) return;
+            answered = true;
+            const q = exercises[currentQuestion];
+            const btns = document.querySelectorAll('.option');
+            btns.forEach(b => b.classList.add('disabled'));
+            btns[q.correct].classList.add('correct');
+            const right = i === q.correct;
+            if (!right) btns[i].classList.add('wrong');
+            if (right) { score += 10; streak += 1; } else { streak = 0; }
+            const fb = document.createElement('div');
+            fb.className = 'feedback ' + (right ? 'correct' : 'wrong');
+            fb.innerHTML = `<strong>${right ? '&#9989; Correct.' : '&#10060; Not quite.'}</strong><br>${escapeHtml(q.explanation)}`;
+            document.getElementById('exerciseCard').appendChild(fb);
+            const nb = document.createElement('button');
+            nb.className = 'next-btn';
+            nb.textContent = currentQuestion === exercises.length - 1 ? 'See results →' : 'Next scenario →';
+            nb.onclick = nextQuestion;
+            document.getElementById('exerciseCard').appendChild(nb);
+            updateScoreboard();
+        }
+        function nextQuestion() { currentQuestion++; if (currentQuestion >= exercises.length) return showResults(); renderQuestion(); }
+        function showResults() {
+            document.getElementById('progress').style.width = '100%';
+            const total = exercises.length * 10;
+            const pct = Math.round(score / total * 100);
+            if (window.parent) { window.parent.postMessage({type:"mtti_quiz_score", score: score, total: total, percent: pct}, "*"); }
+            let badge = '🌟', msg = 'Excellent work. Dennis-level CCTV know-how.';
+            if (pct < 50) { badge = '🌱'; msg = 'Good first attempt. Review the lesson and try again.'; }
+            else if (pct < 80) { badge = '📚'; msg = 'Solid progress. Review the scenarios you missed and retry.'; }
+            document.getElementById('exerciseCard').innerHTML = `
+                <div class="results">
+                    <span class="badge">${badge}</span>
+                    <h2>Quiz Complete</h2>
+                    <div class="final-score">${score} / ${total}</div>
+                    <p><strong>${pct}%</strong> &middot; Longest streak: ${streak}</p>
+                    <p>${msg}</p>
+                    <button class="restart-btn" onclick="restart()">Try again &#128257;</button>
+                </div>`;
+        }
+        function restart() { currentQuestion = 0; score = 0; streak = 0; renderQuestion(); }
+        renderQuestion();
+    </script>
+</body>
+</html>

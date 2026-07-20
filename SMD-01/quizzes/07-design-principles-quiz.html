@@ -1,0 +1,346 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Design Principles | MTTI Digital Marketing</title>
+    <link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Fredoka:wght@500;600&display=swap" rel="stylesheet">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Space Mono', monospace;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh; padding: 20px; color: #fff;
+        }
+        .container { max-width: 900px; margin: 0 auto; }
+        .header { text-align: center; margin-bottom: 30px; animation: slideDown 0.6s ease-out; }
+        .header .lesson-tag {
+            display: inline-block; background: rgba(255,255,255,0.2);
+            padding: 6px 16px; border-radius: 999px;
+            font-size: 0.85em; margin-bottom: 12px;
+        }
+        .header h1 {
+            font-family: 'Fredoka', sans-serif; font-size: 2.2em;
+            margin-bottom: 8px; text-shadow: 3px 3px 0 rgba(0,0,0,0.2);
+        }
+        .header p { opacity: 0.95; font-size: 0.95em; }
+        .score-board {
+            background: rgba(255,255,255,0.15); backdrop-filter: blur(10px);
+            border-radius: 20px; padding: 20px; margin-bottom: 20px;
+            display: flex; justify-content: space-around;
+            animation: fadeIn 0.8s ease-out 0.2s both;
+        }
+        .score-item { text-align: center; }
+        .score-item .label { font-size: 0.85em; opacity: 0.9; margin-bottom: 4px; }
+        .score-item .value {
+            font-size: 1.8em; font-weight: bold; font-family: 'Fredoka', sans-serif;
+        }
+        .progress-bar {
+            width: 100%; height: 8px; background: rgba(255,255,255,0.3);
+            border-radius: 10px; margin-bottom: 25px; overflow: hidden;
+        }
+        .progress-fill {
+            height: 100%; background: linear-gradient(90deg, #f093fb 0%, #f5576c 100%);
+            border-radius: 10px; transition: width 0.5s ease; width: 0%;
+        }
+        .exercise-card {
+            background: white; color: #333; border-radius: 25px;
+            padding: 35px; margin-bottom: 20px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            animation: fadeIn 0.6s ease-out both;
+        }
+        .scenario {
+            background: linear-gradient(135deg, #fff8e1 0%, #ffecb3 100%);
+            border-left: 5px solid #ffc107;
+            padding: 20px 24px; border-radius: 12px;
+            margin-bottom: 24px;
+            font-size: 0.98em; line-height: 1.55;
+        }
+        .scenario strong { color: #7a5a00; font-family: 'Fredoka', sans-serif; }
+        .question {
+            font-size: 1.15em; margin-bottom: 20px;
+            font-weight: 700; line-height: 1.4;
+        }
+        .options { display: flex; flex-direction: column; gap: 12px; }
+        .option {
+            background: #f5f7fb; border: 2px solid transparent;
+            padding: 16px 20px; border-radius: 12px;
+            cursor: pointer; transition: all 0.2s ease;
+            font-family: 'Space Mono', monospace; font-size: 0.98em; text-align: left;
+        }
+        .option:hover:not(.disabled) {
+            background: #eef1fb; border-color: #667eea; transform: translateX(4px);
+        }
+        .option.correct { background: #d4edda; border-color: #28a745; color: #155724; }
+        .option.wrong { background: #f8d7da; border-color: #dc3545; color: #721c24; animation: shake 0.4s; }
+        .option.disabled { cursor: not-allowed; opacity: 0.85; }
+        .feedback {
+            margin-top: 22px; padding: 18px 22px; border-radius: 12px;
+            animation: slideUp 0.4s ease-out;
+            font-size: 0.98em; line-height: 1.5;
+        }
+        .feedback.correct { background: #d4edda; color: #155724; border-left: 4px solid #28a745; }
+        .feedback.wrong { background: #f8d7da; color: #721c24; border-left: 4px solid #dc3545; }
+        .feedback strong { font-family: 'Fredoka', sans-serif; }
+        .next-btn, .restart-btn {
+            margin-top: 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white; border: none;
+            padding: 14px 32px; border-radius: 12px;
+            font-size: 1em; cursor: pointer;
+            font-family: 'Fredoka', sans-serif;
+            box-shadow: 0 6px 18px rgba(0,0,0,0.2);
+            transition: transform 0.2s ease;
+        }
+        .next-btn:hover, .restart-btn:hover { transform: scale(1.04); }
+        .results {
+            text-align: center; padding: 25px 15px;
+            animation: bounceIn 0.6s ease-out;
+        }
+        .results h2 {
+            font-family: 'Fredoka', sans-serif; font-size: 2em;
+            margin-bottom: 12px; color: #333;
+        }
+        .results .final-score {
+            font-size: 3em; font-family: 'Fredoka', sans-serif;
+            color: #667eea; margin: 20px 0;
+        }
+        .results p { color: #555; margin-bottom: 12px; }
+        .badge { display: inline-block; font-size: 3.5em; margin: 8px 0; }
+        @keyframes slideDown { from { opacity: 0; transform: translateY(-30px); } to { opacity: 1; transform: translateY(0); } }
+        @keyframes fadeIn { from { opacity: 0; transform: scale(0.96); } to { opacity: 1; transform: scale(1); } }
+        @keyframes slideUp { from { opacity: 0; transform: translateY(15px); } to { opacity: 1; transform: translateY(0); } }
+        @keyframes shake { 0%,100% { transform: translateX(0); } 25% { transform: translateX(-8px); } 75% { transform: translateX(8px); } }
+        @keyframes bounceIn { 0% { opacity: 0; transform: scale(0.4); } 60% { transform: scale(1.05); } 100% { opacity: 1; transform: scale(1); } }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <div class="lesson-tag">Module 7 · Lesson 7.3</div>
+            <h1>Design Principles</h1>
+            <p>10 scenarios — colour psychology, typography, hierarchy, white space, rule of thirds, brand consistency</p>
+        </div>
+
+        <div class="score-board">
+            <div class="score-item"><div class="label">Score</div><div class="value" id="score">0</div></div>
+            <div class="score-item"><div class="label">Question</div><div class="value"><span id="current">1</span>/<span id="total">10</span></div></div>
+            <div class="score-item"><div class="label">Streak</div><div class="value" id="streak">0</div></div>
+        </div>
+
+        <div class="progress-bar"><div class="progress-fill" id="progress"></div></div>
+
+        <div class="exercise-card" id="exerciseCard"></div>
+    </div>
+
+    <script>
+        const exercises = [
+  {
+    "scenario": "Wangari is choosing colours for her Wangari Wellness B2B corporate wellness pitch deck for a Nairobi bank. She wants HR directors to associate the brand with trust and professionalism.",
+    "question": "Which colour from Lesson 7.3's Kenyan colour psychology fits best?",
+    "options": [
+      "Red — energy and urgency (KFC, Java House).",
+      "Blue — trust, security, professionalism (Equity Bank, KCB).",
+      "Yellow — attention and warmth (MTN).",
+      "Purple — creativity and luxury (Cadbury)."
+    ],
+    "correct": 1,
+    "explanation": "Section 7.3 pairs six colours with associations: blue = trust and professionalism, used by banks and hospitals (Equity, KCB). For a B2B pitch to HR directors at a bank, blue is the strongest cultural match."
+  },
+  {
+    "scenario": "Brian wants to launch a Chapa Fitness flash sale on TikTok — \"48 hours only, 30% off the new streetwear drop.\"",
+    "question": "Which colour from Lesson 7.3 signals \"flash sale, urgency\" best?",
+    "options": [
+      "Green — growth and environment (Safaricom, Naivas).",
+      "Blue — trust and professionalism.",
+      "Red — energy, urgency, passion (used in flash sales, Coca-Cola, KFC).",
+      "Purple — luxury."
+    ],
+    "correct": 2,
+    "explanation": "Section 7.3 names red for urgency and flash sales. Brian's 48-hour drop reads urgent by design — red anchors the countdown."
+  },
+  {
+    "scenario": "Sarah's latest Karibu Kitchen menu poster uses five fonts: a script font for the dish names, a bold sans-serif for prices, a serif for the address, a decorative font for \"Order Now\", and a monospace for the WhatsApp number.",
+    "question": "Which of the three typography rules from Lesson 7.3 is she breaking?",
+    "options": [
+      "None — five fonts is standard.",
+      "Rule one — maximum 2-3 fonts per design. One for headlines, one for body. More than three and the design looks amateur.",
+      "Rule two — readability comes before decoration.",
+      "Rule three — establish visual hierarchy."
+    ],
+    "correct": 1,
+    "explanation": "Section 7.3's rule one caps fonts at 2-3 per design. Five is amateur. Sarah should keep one bold headline font and one clean body font — everything else uses those two."
+  },
+  {
+    "scenario": "Sarah puts small light-grey delivery-time text over a beige plate background on a Story. Customers cannot read it in bright Eldoret sunlight.",
+    "question": "Which typography rule from Lesson 7.3 has she broken?",
+    "options": [
+      "Rule one — too many fonts.",
+      "Rule two — readability comes before decoration. Test on the smallest screen you expect (a phone in the CBD in direct sunlight). Contrast between text and background is not optional.",
+      "Rule three — visual hierarchy.",
+      "None."
+    ],
+    "correct": 1,
+    "explanation": "Section 7.3 puts readability above every decorative choice. Grey-on-beige fails on a bright-sunlight phone screen. This links directly to Lesson 7.6's 4.5:1 contrast ratio."
+  },
+  {
+    "scenario": "Sarah is composing a Karibu Kitchen menu post. She has: the food photo, the price, the dish name, her WhatsApp number, her logo, and small print with delivery-radius rules.",
+    "question": "Which visual hierarchy from Lesson 7.3 is correct?",
+    "options": [
+      "Everything the same size.",
+      "Food photo largest (about 70% of the space); price and dish name next to the food; WhatsApp number below; logo in the corner; delivery instructions smallest.",
+      "Delivery small-print largest.",
+      "Logo takes 90% of the space."
+    ],
+    "correct": 1,
+    "explanation": "Section 7.3's three hierarchy steps: pick the single most important element (the food), make it largest, arrange everything else in supporting order — price and dish near the food, WhatsApp below, logo corner, small print smallest. Eye moves food → price → WhatsApp."
+  },
+  {
+    "scenario": "Sarah's cousin fills every pixel of every graphic with text, icons, and extra call-to-action badges. \"Every inch must sell,\" he insists.",
+    "question": "Which Lesson 7.3 rule is he breaking?",
+    "options": [
+      "None — cramming is professional.",
+      "The white space rule. At least about 20% of any social graphic should be empty (not literally white — can be background colour, just no elements). Empty space makes headlines feel important and looks professionally finished.",
+      "The rule of thirds — he should use MORE elements.",
+      "The brand-consistency rule — he needs more fonts."
+    ],
+    "correct": 1,
+    "explanation": "Section 7.3 sets the white-space rule at roughly 20% of the graphic empty. Look at Coca-Cola or Safaricom design — empty space is disciplined, not decorative. Sarah's cousin is filling to hide a lack of hierarchy."
+  },
+  {
+    "scenario": "Sarah always centres her food photos dead in the middle of the frame. The compositions feel flat.",
+    "question": "Which composition principle from Lesson 7.3 should she apply?",
+    "options": [
+      "The rule of thirds — imagine a 3x3 grid over the image and place the subject on one of the four intersection points where the human eye naturally focuses. Most phone camera apps have a grid setting she should turn on.",
+      "The rule of centring — always centre everything.",
+      "The rule of fifths — use a 5x5 grid.",
+      "None — flat is fine."
+    ],
+    "correct": 0,
+    "explanation": "Section 7.3 introduces the rule of thirds: place the subject at one of the four grid intersections rather than dead centre. Every modern phone camera app has a grid option — Sarah should turn it on and use it."
+  },
+  {
+    "scenario": "Nyakinyua Kitchen changes their brand colours nearly every week. In February they were teal, in March they were pink, in April they were black. Customers cannot describe Nyakinyua's \"look\".",
+    "question": "Which Lesson 7.3 principle are they breaking, and what result should Sarah aim for?",
+    "options": [
+      "None — variety is the professional standard.",
+      "Brand consistency — same colours, same logo (same size, same corner), same fonts, same photo treatment, same tone of voice. Boring in the short term, but over a year it builds a business customers recognise from 30 metres away.",
+      "Rule of thirds — Nyakinyua needs a grid.",
+      "Typography rule two — more decorative fonts."
+    ],
+    "correct": 1,
+    "explanation": "Section 7.3 calls brand consistency the compound rule: over time it separates recognisable brands from forgettable ones. Nyakinyua sabotages themselves weekly; Sarah's maroon + gold every time is what customers will learn to spot."
+  },
+  {
+    "scenario": "Sarah has finished a new poster and wants to check whether it works before publishing.",
+    "question": "Which test from Lesson 7.3 does she run?",
+    "options": [
+      "Show it to her cousin for 30 minutes.",
+      "The five-second brand test — show the design to a friend for 5 seconds, take it away, then ask: (1) what business does this belong to? (2) what does the business do or sell? (3) what should they do next? If they cannot answer any one, fix that element.",
+      "Post it to Instagram and see how many likes it gets.",
+      "Print it on paper and mail it."
+    ],
+    "correct": 1,
+    "explanation": "Section 7.3's five-second brand test is a fast, cheap sanity check every serious Kenyan marketer runs. Failure on question 1 = brand not visible. Failure on 2 = unclear message. Failure on 3 = missing call to action."
+  },
+  {
+    "scenario": "Sarah asks whether design principles matter when she can just tap templates in Canva. Her cousin says \"the template does all the work.\"",
+    "question": "How does Lesson 7.3 respond?",
+    "options": [
+      "Correct — templates replace principles.",
+      "Templates give you a starting layout, but colour psychology, typography rules, visual hierarchy, white space, rule of thirds, and brand consistency are what turn a template that \"looks nice\" into a design that actually converts customers.",
+      "Principles only apply to print, not digital.",
+      "Only Photoshop users need principles."
+    ],
+    "correct": 1,
+    "explanation": "Section 7.3 opens with this exact framing: principles turn Canva templates into professional marketing. Templates are the raw material; principles are what make them work commercially."
+  }
+];
+
+        let currentQuestion = 0, score = 0, streak = 0, answered = false;
+
+        function updateScoreboard() {
+            document.getElementById('score').textContent = score;
+            document.getElementById('current').textContent = Math.min(currentQuestion + 1, exercises.length);
+            document.getElementById('total').textContent = exercises.length;
+            document.getElementById('streak').textContent = streak;
+            document.getElementById('progress').style.width = ((currentQuestion) / exercises.length) * 100 + '%';
+        }
+
+        function escapeHtml(s) {
+            return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+        }
+
+        function renderQuestion() {
+            answered = false;
+            const q = exercises[currentQuestion];
+            let html = '';
+            if (q.scenario) {
+                html += `<div class="scenario"><strong>Scenario.</strong> ${escapeHtml(q.scenario)}</div>`;
+            }
+            html += `<div class="question">${escapeHtml(q.question)}</div>`;
+            html += '<div class="options">';
+            q.options.forEach((o, i) => {
+                html += `<button class="option" onclick="selectAnswer(${i})">${escapeHtml(o)}</button>`;
+            });
+            html += '</div>';
+            document.getElementById('exerciseCard').innerHTML = html;
+            updateScoreboard();
+        }
+
+        function selectAnswer(i) {
+            if (answered) return;
+            answered = true;
+            const q = exercises[currentQuestion];
+            const btns = document.querySelectorAll('.option');
+            btns.forEach(b => b.classList.add('disabled'));
+            btns[q.correct].classList.add('correct');
+            const right = i === q.correct;
+            if (!right) btns[i].classList.add('wrong');
+            if (right) { score += 10; streak += 1; } else { streak = 0; }
+            const fb = document.createElement('div');
+            fb.className = 'feedback ' + (right ? 'correct' : 'wrong');
+            fb.innerHTML = `<strong>${right ? '✅ Correct.' : '❌ Not quite.'}</strong><br>${escapeHtml(q.explanation)}`;
+            document.getElementById('exerciseCard').appendChild(fb);
+            const nb = document.createElement('button');
+            nb.className = 'next-btn';
+            nb.textContent = currentQuestion === exercises.length - 1 ? 'See results →' : 'Next scenario →';
+            nb.onclick = nextQuestion;
+            document.getElementById('exerciseCard').appendChild(nb);
+            updateScoreboard();
+        }
+
+        function nextQuestion() {
+            currentQuestion++;
+            if (currentQuestion >= exercises.length) return showResults();
+            renderQuestion();
+        }
+
+        function showResults() {
+            document.getElementById('progress').style.width = '100%';
+            const total = exercises.length * 10;
+            const pct = Math.round(score / total * 100);
+            if (window.parent) { window.parent.postMessage({type:"mtti_quiz_score", score: score, total: total, percent: pct}, "*"); }
+            let badge = '🌟', msg = 'Excellent work. You have a professional grasp of this lesson.';
+            if (pct < 50) { badge = '🌱'; msg = 'Good first attempt. Re-watch the lesson video and try again.'; }
+            else if (pct < 80) { badge = '📚'; msg = 'Solid progress. Review the scenarios you missed and retry.'; }
+            document.getElementById('exerciseCard').innerHTML = `
+                <div class="results">
+                    <span class="badge">${badge}</span>
+                    <h2>Quiz Complete</h2>
+                    <div class="final-score">${score} / ${total}</div>
+                    <p><strong>${pct}%</strong> · Longest streak: ${streak}</p>
+                    <p>${msg}</p>
+                    <button class="restart-btn" onclick="restart()">Try again 🔁</button>
+                </div>`;
+        }
+
+        function restart() {
+            currentQuestion = 0; score = 0; streak = 0;
+            renderQuestion();
+        }
+
+        renderQuestion();
+    </script>
+</body>
+</html>

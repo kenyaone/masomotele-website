@@ -1,0 +1,346 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mobile Marketing | MTTI Digital Marketing</title>
+    <link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Fredoka:wght@500;600&display=swap" rel="stylesheet">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Space Mono', monospace;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh; padding: 20px; color: #fff;
+        }
+        .container { max-width: 900px; margin: 0 auto; }
+        .header { text-align: center; margin-bottom: 30px; animation: slideDown 0.6s ease-out; }
+        .header .lesson-tag {
+            display: inline-block; background: rgba(255,255,255,0.2);
+            padding: 6px 16px; border-radius: 999px;
+            font-size: 0.85em; margin-bottom: 12px;
+        }
+        .header h1 {
+            font-family: 'Fredoka', sans-serif; font-size: 2.2em;
+            margin-bottom: 8px; text-shadow: 3px 3px 0 rgba(0,0,0,0.2);
+        }
+        .header p { opacity: 0.95; font-size: 0.95em; }
+        .score-board {
+            background: rgba(255,255,255,0.15); backdrop-filter: blur(10px);
+            border-radius: 20px; padding: 20px; margin-bottom: 20px;
+            display: flex; justify-content: space-around;
+            animation: fadeIn 0.8s ease-out 0.2s both;
+        }
+        .score-item { text-align: center; }
+        .score-item .label { font-size: 0.85em; opacity: 0.9; margin-bottom: 4px; }
+        .score-item .value {
+            font-size: 1.8em; font-weight: bold; font-family: 'Fredoka', sans-serif;
+        }
+        .progress-bar {
+            width: 100%; height: 8px; background: rgba(255,255,255,0.3);
+            border-radius: 10px; margin-bottom: 25px; overflow: hidden;
+        }
+        .progress-fill {
+            height: 100%; background: linear-gradient(90deg, #f093fb 0%, #f5576c 100%);
+            border-radius: 10px; transition: width 0.5s ease; width: 0%;
+        }
+        .exercise-card {
+            background: white; color: #333; border-radius: 25px;
+            padding: 35px; margin-bottom: 20px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            animation: fadeIn 0.6s ease-out both;
+        }
+        .scenario {
+            background: linear-gradient(135deg, #fff8e1 0%, #ffecb3 100%);
+            border-left: 5px solid #ffc107;
+            padding: 20px 24px; border-radius: 12px;
+            margin-bottom: 24px;
+            font-size: 0.98em; line-height: 1.55;
+        }
+        .scenario strong { color: #7a5a00; font-family: 'Fredoka', sans-serif; }
+        .question {
+            font-size: 1.15em; margin-bottom: 20px;
+            font-weight: 700; line-height: 1.4;
+        }
+        .options { display: flex; flex-direction: column; gap: 12px; }
+        .option {
+            background: #f5f7fb; border: 2px solid transparent;
+            padding: 16px 20px; border-radius: 12px;
+            cursor: pointer; transition: all 0.2s ease;
+            font-family: 'Space Mono', monospace; font-size: 0.98em; text-align: left;
+        }
+        .option:hover:not(.disabled) {
+            background: #eef1fb; border-color: #667eea; transform: translateX(4px);
+        }
+        .option.correct { background: #d4edda; border-color: #28a745; color: #155724; }
+        .option.wrong { background: #f8d7da; border-color: #dc3545; color: #721c24; animation: shake 0.4s; }
+        .option.disabled { cursor: not-allowed; opacity: 0.85; }
+        .feedback {
+            margin-top: 22px; padding: 18px 22px; border-radius: 12px;
+            animation: slideUp 0.4s ease-out;
+            font-size: 0.98em; line-height: 1.5;
+        }
+        .feedback.correct { background: #d4edda; color: #155724; border-left: 4px solid #28a745; }
+        .feedback.wrong { background: #f8d7da; color: #721c24; border-left: 4px solid #dc3545; }
+        .feedback strong { font-family: 'Fredoka', sans-serif; }
+        .next-btn, .restart-btn {
+            margin-top: 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white; border: none;
+            padding: 14px 32px; border-radius: 12px;
+            font-size: 1em; cursor: pointer;
+            font-family: 'Fredoka', sans-serif;
+            box-shadow: 0 6px 18px rgba(0,0,0,0.2);
+            transition: transform 0.2s ease;
+        }
+        .next-btn:hover, .restart-btn:hover { transform: scale(1.04); }
+        .results {
+            text-align: center; padding: 25px 15px;
+            animation: bounceIn 0.6s ease-out;
+        }
+        .results h2 {
+            font-family: 'Fredoka', sans-serif; font-size: 2em;
+            margin-bottom: 12px; color: #333;
+        }
+        .results .final-score {
+            font-size: 3em; font-family: 'Fredoka', sans-serif;
+            color: #667eea; margin: 20px 0;
+        }
+        .results p { color: #555; margin-bottom: 12px; }
+        .badge { display: inline-block; font-size: 3.5em; margin: 8px 0; }
+        @keyframes slideDown { from { opacity: 0; transform: translateY(-30px); } to { opacity: 1; transform: translateY(0); } }
+        @keyframes fadeIn { from { opacity: 0; transform: scale(0.96); } to { opacity: 1; transform: scale(1); } }
+        @keyframes slideUp { from { opacity: 0; transform: translateY(15px); } to { opacity: 1; transform: translateY(0); } }
+        @keyframes shake { 0%,100% { transform: translateX(0); } 25% { transform: translateX(-8px); } 75% { transform: translateX(8px); } }
+        @keyframes bounceIn { 0% { opacity: 0; transform: scale(0.4); } 60% { transform: scale(1.05); } 100% { opacity: 1; transform: scale(1); } }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <div class="lesson-tag">Module 5 · Lesson 5.3</div>
+            <h1>Mobile Marketing</h1>
+            <p>10 Sarah Chebet scenarios — the 80% rule, geo-fencing, and WhatsApp Business</p>
+        </div>
+
+        <div class="score-board">
+            <div class="score-item"><div class="label">Score</div><div class="value" id="score">0</div></div>
+            <div class="score-item"><div class="label">Question</div><div class="value"><span id="current">1</span>/<span id="total">10</span></div></div>
+            <div class="score-item"><div class="label">Streak</div><div class="value" id="streak">0</div></div>
+        </div>
+
+        <div class="progress-bar"><div class="progress-fill" id="progress"></div></div>
+
+        <div class="exercise-card" id="exerciseCard"></div>
+    </div>
+
+    <script>
+        const exercises = [
+  {
+    "scenario": "Sarah opens her Google Analytics for the first time. It shows that 87% of visitors to Karibu Kitchen's website come from mobile phones and only 13% from laptops. Her current site is designed to look great on a large laptop screen and \"squishes down\" for phones.",
+    "question": "What does the 80%-plus mobile share of Kenyan internet traffic mean for how Sarah should now design the site?",
+    "options": [
+      "Nothing — desktop design still comes first, phone is optional.",
+      "It is a strategic instruction, not a statistic. Everything Sarah creates — the site, the ads, the emails, the posts — must be designed for the phone first. The desktop version comes second. \"Adapted for phone\" is not enough; it must be designed for phone from the start.",
+      "It means Sarah should build a native mobile app immediately.",
+      "It means she should stop marketing on Facebook."
+    ],
+    "correct": 1,
+    "explanation": "Slide 2 of §5.3 puts it exactly this way: the 80% number is not a statistic, it is a strategic instruction. Because eight-plus of every ten Kenyan users see everything on a phone, design must be mobile-first — not \"desktop that adapts\". Sarah's 87% figure just confirms the rule for her own site."
+  },
+  {
+    "scenario": "A developer quotes Sarah KES 250,000 to build a Karibu Kitchen mobile app for iOS and Android. He argues \"a real business needs an app\".",
+    "question": "Using Lesson 5.3's guidance on mobile apps, what is the honest advice?",
+    "options": [
+      "Build the app immediately — every serious business needs one.",
+      "For most Kenyan small businesses, a well-designed mobile-friendly website does the four legitimate app jobs (promotion, service delivery, sales, loyalty) at a fraction of the cost. Sarah should only build an app if the maths says it pays for itself — not to look impressive.",
+      "Build two apps — one for iOS, one for Android — as separate businesses.",
+      "Apps are illegal in Kenya without a licence."
+    ],
+    "correct": 1,
+    "explanation": "Slide 4 of §5.3 lists four legitimate app uses (promotion, services, sales, loyalty) but is explicit that most Kenyan small businesses should NOT build an app — a mobile-friendly site does all four at a fraction of the cost. Build an app only if the numbers work out, never for prestige."
+  },
+  {
+    "scenario": "Sarah wants Karibu Kitchen ads to show ONLY to phones physically located in Eldoret CBD between 11 a.m. and 1 p.m. — the exact window when office workers get hungry — plus separate ads for Kapsoya, Elgon View, and Racecourse in the evenings.",
+    "question": "What is this feature called, and why does the lesson describe it as under-used?",
+    "options": [
+      "Retargeting — but Kenyan phones do not support it.",
+      "Geo-fencing — location-based targeting available in every serious ad platform. It is one of the most powerful and under-used features for small businesses in Kenya because most business owners do not know it exists.",
+      "Interest-only targeting — Sarah cannot restrict by location.",
+      "Broadcast advertising — the ad shows to everyone in the country."
+    ],
+    "correct": 1,
+    "explanation": "Slide 7 of §5.3 names this feature: geo-fencing. It is available in every serious ad platform and is described as one of the most powerful and under-used features for Kenyan small businesses. Sarah's lunch-versus-dinner-neighbourhood split is the exact use case the lesson shows."
+  },
+  {
+    "scenario": "Sarah's cousin says: \"Just shoot your food videos in landscape — that is what proper videographers do.\" Sarah checks her Instagram: her landscape videos look tiny with big black bars top and bottom on every phone.",
+    "question": "How should she shoot food videos going forward, according to Slide 8 of §5.3?",
+    "options": [
+      "Landscape 16:9, 60 seconds, laptop-sized text — proper cinema style.",
+      "Vertical 9:16 ratio, 30 seconds or less, headlines under 60 characters so they fit on one line of a phone display, and buttons at least 44 pixels tall so a thumb can tap them.",
+      "Square 1:1 only, no vertical option.",
+      "It does not matter — phones auto-rotate."
+    ],
+    "correct": 1,
+    "explanation": "Slide 8 of §5.3 lays out Sarah's mobile-first content plan: portrait photos, vertical 9:16 video, under 30 seconds, headlines under 60 characters, buttons minimum 44 pixels tall, forms under three fields, hamburger menu. Landscape video is wasted screen space on the phone."
+  },
+  {
+    "scenario": "Sarah is asked to name the five ad formats built specifically for mobile so she can talk to a Meta rep intelligently.",
+    "question": "Which list matches Slide 6 of §5.3?",
+    "options": [
+      "Newspaper ads, radio jingles, billboards, flyers, roadside banners.",
+      "Video ads, search ads, display ads, social media ads, in-app ads.",
+      "Only Facebook ads and Instagram ads — everything else is desktop.",
+      "Print ads, TV ads, WhatsApp broadcast, SMS, USSD."
+    ],
+    "correct": 1,
+    "explanation": "Slide 6 of §5.3 lists the five mobile ad formats: video ads (skippable and non-skippable), search ads (mobile Google results), display ads (banners inside mobile sites/games), social media ads (Facebook, Instagram, TikTok, X feed ads), and in-app ads (shown inside other people's apps). The lesson also flags the confusion between in-app ads (promote something else) and app-install ads (promote the app itself)."
+  },
+  {
+    "scenario": "Sarah confuses two ad types: \"in-app ads\" and \"app-install ads\". She asks you to explain the difference in one line.",
+    "question": "What is the correct distinction?",
+    "options": [
+      "They are the same thing.",
+      "In-app ads appear INSIDE other people's mobile apps and promote something else (like Karibu Kitchen lunch). App-install ads specifically promote the download of the app itself.",
+      "In-app ads promote apps; app-install ads promote food.",
+      "In-app ads are free; app-install ads are paid."
+    ],
+    "correct": 1,
+    "explanation": "Slide 6 of §5.3 calls this out explicitly: the difference matters. In-app ads run INSIDE somebody else's app and can promote anything (Sarah's lunch, a bank product). App-install ads specifically drive downloads of an app — they are only useful once you have an app to install. Sarah does not need app-install ads because she does not have an app."
+  },
+  {
+    "scenario": "Sarah asks whether the way people SEARCH from a phone is any different from the way they search from a laptop. She wants to write her Google Ads keywords accordingly.",
+    "question": "What does Lesson 5.3 say about tailored keywords for mobile?",
+    "options": [
+      "Mobile searches are identical to desktop — same keywords work fine.",
+      "Mobile search queries are shorter, more voice-like, and more location-specific. \"Lunch near me\" is a mobile query; \"Best value lunch delivery restaurants Eldoret CBD\" is a desktop query. Sarah should tailor keyword lists for each surface.",
+      "Mobile searches are always longer than desktop searches.",
+      "Mobile queries only use hashtags, not words."
+    ],
+    "correct": 1,
+    "explanation": "Slide 5 of §5.3, consideration two, is \"tailored keywords\". Mobile queries are shorter, voice-like (\"lunch near me\"), and location-heavy. Desktop queries are longer, more comparison-style. Using desktop keywords in a mobile campaign misses the actual queries users type on the phone."
+  },
+  {
+    "scenario": "Sarah's WhatsApp Business is central to how she takes orders. She wants to know which of the five mobile advantages from Lesson 5.3 helps her convert a Facebook ad into a WhatsApp order the fastest.",
+    "question": "Which advantage most directly explains why a Meta ad with a WhatsApp CTA reaches an Eldoret office worker within minutes?",
+    "options": [
+      "Reach — access to more customers overall.",
+      "Immediate reach — users check phones many times a day, so an ad reaches them within minutes of Sarah paying to publish it.",
+      "Personalisation — each phone belongs to one person.",
+      "High engagement rates — mobile users interact more than desktop users."
+    ],
+    "correct": 1,
+    "explanation": "Slide 3 of §5.3 lists five mobile advantages: reach, location-based targeting, immediate reach, engagement, personalisation. \"Immediate reach\" is the one that specifically explains why a phone ad turns into a WhatsApp order within the same lunch hour — users check phones many times a day. All five matter, but this is the one about SPEED."
+  },
+  {
+    "scenario": "Sarah collects customer phone numbers, delivery addresses, and — for some — the GPS location that WhatsApp shared when they sent \"my location\". She wants to enrich her Meta ads with that data.",
+    "question": "What does Kenya's Data Protection Act 2019 require before she reuses that location data for marketing?",
+    "options": [
+      "Nothing — location is public.",
+      "She is a data controller under the DPA 2019. She must obtain explicit consent for the specific purpose of marketing (location shared for delivery does NOT cover marketing), log the consent, restrict access on a need-to-know basis, and be able to demonstrate how the data is stored and used.",
+      "Only banks are covered by the DPA 2019.",
+      "She can sell the data to Meta directly for cash."
+    ],
+    "correct": 1,
+    "explanation": "Kenya's DPA 2019 is the through-line across Module 5 (see 5.2 warnings too). Location shared to make a delivery is a specific-purpose consent — it does NOT automatically cover marketing use. To reuse that data in Meta ads, Sarah must obtain fresh, explicit consent for the marketing purpose, log it, and follow the storage/access rules. She is a data controller."
+  },
+  {
+    "scenario": "A trainee summarises Lesson 5.3 like this: \"Mobile marketing means building an app, ignoring location, and shooting landscape video.\"",
+    "question": "How many of those three claims are correct?",
+    "options": [
+      "All three.",
+      "Two — the app and landscape parts.",
+      "Zero — every claim is wrong.",
+      "One — only the app part."
+    ],
+    "correct": 2,
+    "explanation": "Every claim contradicts the lesson. Most Kenyan small businesses should NOT build an app (§5.3 Slide 4). Location-based targeting is the killer Kenyan feature — geo-fencing — that Sarah should USE, not ignore (Slide 7). Video should be vertical 9:16, not landscape (Slide 8). This question checks all three anti-patterns at once."
+  }
+];
+
+        let currentQuestion = 0, score = 0, streak = 0, answered = false;
+
+        function updateScoreboard() {
+            document.getElementById('score').textContent = score;
+            document.getElementById('current').textContent = Math.min(currentQuestion + 1, exercises.length);
+            document.getElementById('total').textContent = exercises.length;
+            document.getElementById('streak').textContent = streak;
+            document.getElementById('progress').style.width = ((currentQuestion) / exercises.length) * 100 + '%';
+        }
+
+        function escapeHtml(s) {
+            return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+        }
+
+        function renderQuestion() {
+            answered = false;
+            const q = exercises[currentQuestion];
+            let html = '';
+            if (q.scenario) {
+                html += `<div class="scenario"><strong>Scenario.</strong> ${escapeHtml(q.scenario)}</div>`;
+            }
+            html += `<div class="question">${escapeHtml(q.question)}</div>`;
+            html += '<div class="options">';
+            q.options.forEach((o, i) => {
+                html += `<button class="option" onclick="selectAnswer(${i})">${escapeHtml(o)}</button>`;
+            });
+            html += '</div>';
+            document.getElementById('exerciseCard').innerHTML = html;
+            updateScoreboard();
+        }
+
+        function selectAnswer(i) {
+            if (answered) return;
+            answered = true;
+            const q = exercises[currentQuestion];
+            const btns = document.querySelectorAll('.option');
+            btns.forEach(b => b.classList.add('disabled'));
+            btns[q.correct].classList.add('correct');
+            const right = i === q.correct;
+            if (!right) btns[i].classList.add('wrong');
+            if (right) { score += 10; streak += 1; } else { streak = 0; }
+            const fb = document.createElement('div');
+            fb.className = 'feedback ' + (right ? 'correct' : 'wrong');
+            fb.innerHTML = `<strong>${right ? '✅ Correct.' : '❌ Not quite.'}</strong><br>${escapeHtml(q.explanation)}`;
+            document.getElementById('exerciseCard').appendChild(fb);
+            const nb = document.createElement('button');
+            nb.className = 'next-btn';
+            nb.textContent = currentQuestion === exercises.length - 1 ? 'See results →' : 'Next scenario →';
+            nb.onclick = nextQuestion;
+            document.getElementById('exerciseCard').appendChild(nb);
+            updateScoreboard();
+        }
+
+        function nextQuestion() {
+            currentQuestion++;
+            if (currentQuestion >= exercises.length) return showResults();
+            renderQuestion();
+        }
+
+        function showResults() {
+            document.getElementById('progress').style.width = '100%';
+            const total = exercises.length * 10;
+            const pct = Math.round(score / total * 100);
+            if (window.parent) { window.parent.postMessage({type:"mtti_quiz_score", score: score, total: total, percent: pct}, "*"); }
+            let badge = '🌟', msg = 'Excellent work. You have a professional grasp of this lesson.';
+            if (pct < 50) { badge = '🌱'; msg = 'Good first attempt. Re-watch the lesson video and try again.'; }
+            else if (pct < 80) { badge = '📚'; msg = 'Solid progress. Review the scenarios you missed and retry.'; }
+            document.getElementById('exerciseCard').innerHTML = `
+                <div class="results">
+                    <span class="badge">${badge}</span>
+                    <h2>Quiz Complete</h2>
+                    <div class="final-score">${score} / ${total}</div>
+                    <p><strong>${pct}%</strong> · Longest streak: ${streak}</p>
+                    <p>${msg}</p>
+                    <button class="restart-btn" onclick="restart()">Try again 🔁</button>
+                </div>`;
+        }
+
+        function restart() {
+            currentQuestion = 0; score = 0; streak = 0;
+            renderQuestion();
+        }
+
+        renderQuestion();
+    </script>
+</body>
+</html>

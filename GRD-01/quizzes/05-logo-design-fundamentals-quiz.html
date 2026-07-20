@@ -1,0 +1,232 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Logo Design Fundamentals | MTTI Graphic Design</title>
+    <link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Fredoka:wght@500;600&display=swap" rel="stylesheet">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Space Mono', monospace; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); min-height: 100vh; padding: 20px; color: #fff; }
+        .container { max-width: 900px; margin: 0 auto; }
+        .header { text-align: center; margin-bottom: 30px; }
+        .header .lesson-tag { display: inline-block; background: rgba(255,255,255,0.2); padding: 6px 16px; border-radius: 999px; font-size: 0.85em; margin-bottom: 12px; }
+        .header h1 { font-family: 'Fredoka', sans-serif; font-size: 2.2em; margin-bottom: 8px; text-shadow: 3px 3px 0 rgba(0,0,0,0.2); }
+        .score-board { background: rgba(255,255,255,0.15); backdrop-filter: blur(10px); border-radius: 20px; padding: 20px; margin-bottom: 20px; display: flex; justify-content: space-around; }
+        .score-item { text-align: center; }
+        .score-item .label { font-size: 0.85em; opacity: 0.9; margin-bottom: 4px; }
+        .score-item .value { font-size: 1.8em; font-weight: bold; font-family: 'Fredoka', sans-serif; }
+        .progress-bar { width: 100%; height: 8px; background: rgba(255,255,255,0.3); border-radius: 10px; margin-bottom: 25px; overflow: hidden; }
+        .progress-fill { height: 100%; background: linear-gradient(90deg, #f093fb 0%, #f5576c 100%); border-radius: 10px; transition: width 0.5s ease; width: 0%; }
+        .exercise-card { background: white; color: #333; border-radius: 25px; padding: 35px; margin-bottom: 20px; box-shadow: 0 20px 60px rgba(0,0,0,0.3); }
+        .scenario { background: linear-gradient(135deg, #fff8e1 0%, #ffecb3 100%); border-left: 5px solid #ffc107; padding: 20px 24px; border-radius: 12px; margin-bottom: 24px; font-size: 0.98em; line-height: 1.55; }
+        .scenario strong { color: #7a5a00; font-family: 'Fredoka', sans-serif; }
+        .question { font-size: 1.15em; margin-bottom: 20px; font-weight: 700; line-height: 1.4; }
+        .options { display: flex; flex-direction: column; gap: 12px; }
+        .option { background: #f5f7fb; border: 2px solid transparent; padding: 16px 20px; border-radius: 12px; cursor: pointer; transition: all 0.2s ease; font-family: 'Space Mono', monospace; font-size: 0.98em; text-align: left; }
+        .option:hover:not(.disabled) { background: #eef1fb; border-color: #667eea; transform: translateX(4px); }
+        .option.correct { background: #d4edda; border-color: #28a745; color: #155724; }
+        .option.wrong { background: #f8d7da; border-color: #dc3545; color: #721c24; }
+        .option.disabled { cursor: not-allowed; opacity: 0.85; }
+        .feedback { margin-top: 22px; padding: 18px 22px; border-radius: 12px; font-size: 0.98em; line-height: 1.5; }
+        .feedback.correct { background: #d4edda; color: #155724; border-left: 4px solid #28a745; }
+        .feedback.wrong { background: #f8d7da; color: #721c24; border-left: 4px solid #dc3545; }
+        .next-btn, .restart-btn { margin-top: 20px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; border: none; padding: 14px 32px; border-radius: 12px; font-size: 1em; cursor: pointer; font-family: 'Fredoka', sans-serif; box-shadow: 0 6px 18px rgba(0,0,0,0.2); }
+        .results { text-align: center; padding: 25px 15px; }
+        .results h2 { font-family: 'Fredoka', sans-serif; font-size: 2em; margin-bottom: 12px; color: #333; }
+        .results .final-score { font-size: 3em; font-family: 'Fredoka', sans-serif; color: #667eea; margin: 20px 0; }
+        .results p { color: #555; margin-bottom: 12px; }
+        .badge { display: inline-block; font-size: 3.5em; margin: 8px 0; }
+
+        /* How-To intro screen — shown before question 1, not scored */
+        .howto-card { background: white; color: #333; border-radius: 25px; padding: 35px; margin-bottom: 20px; box-shadow: 0 20px 60px rgba(0,0,0,0.3); }
+        .howto-card h3 { font-family: 'Fredoka', sans-serif; font-size: 1.3em; margin-bottom: 12px; color: #667eea; }
+        .howto-card p { line-height: 1.6; margin-bottom: 16px; color: #444; }
+        .howto-field-group { margin-bottom: 18px; }
+        .howto-field { margin-bottom: 16px; }
+        .howto-field label { display: block; font-weight: 700; margin-bottom: 6px; color: #333; font-size: 0.92em; }
+        .howto-field select, .howto-field input[type="text"] { width: 100%; padding: 10px 12px; border-radius: 8px; border: 2px solid #ddd; font-family: 'Space Mono', monospace; font-size: 0.95em; background: #f5f7fb; }
+        .howto-field.hf-correct select, .howto-field.hf-correct input[type="text"] { border-color: #28a745; background: #f0fff4; }
+        .howto-field.hf-wrong select, .howto-field.hf-wrong input[type="text"] { border-color: #dc3545; background: #fff5f5; }
+        .howto-checkbox-row { display: flex; align-items: flex-start; gap: 10px; }
+        .howto-checkbox-row input[type="checkbox"] { margin-top: 3px; width: 18px; height: 18px; flex-shrink: 0; }
+        .howto-checkbox-row label { font-weight: 700; color: #333; font-size: 0.92em; line-height: 1.4; }
+        .howto-field.hf-correct .howto-checkbox-row label { color: #155724; }
+        .howto-field.hf-wrong .howto-checkbox-row label { color: #721c24; }
+        .howto-banner { margin-top: 4px; margin-bottom: 18px; padding: 12px 16px; border-radius: 10px; font-size: 0.9em; font-weight: 700; display: none; }
+        .howto-banner.show { display: block; }
+        .howto-banner.ok { background: #d4edda; color: #155724; }
+        .howto-banner.fail { background: #f8d7da; color: #721c24; }
+        .start-quiz-btn { margin-top: 4px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; border: none; padding: 14px 32px; border-radius: 12px; font-size: 1em; cursor: pointer; font-family: 'Fredoka', sans-serif; box-shadow: 0 6px 18px rgba(0,0,0,0.2); }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <div class="lesson-tag">Branding & Illustration · Logo Design · Quiz</div>
+            <h1>Logo Design Fundamentals</h1>
+        </div>
+        <div class="score-board">
+            <div class="score-item"><div class="label">Score</div><div class="value" id="score">0</div></div>
+            <div class="score-item"><div class="label">Question</div><div class="value"><span id="current">1</span>/<span id="total">10</span></div></div>
+            <div class="score-item"><div class="label">Streak</div><div class="value" id="streak">0</div></div>
+        </div>
+        <div class="progress-bar"><div class="progress-fill" id="progress"></div></div>
+        <div class="exercise-card" id="exerciseCard"></div>
+    </div>
+    <script>
+        const exercises = [{"scenario":"Ivy is designing a logo for a new client who runs a small hardware shop in Eldoret. The client says it will appear on business cards, a fabric banner, and a large metal signboard outside the shop.","question":"What should Ivy prioritise across all of these?","options":["Making sure it only looks good on the large signboard","Designing it so it still reads clearly at the smallest of these sizes, the business card","Using as many colours as possible","Adding as much fine detail as possible"],"correct":1,"explanation":"A logo has to work at its smallest real use-case, since anything that fails at business-card size will fail everywhere it is used small."},{"scenario":"Ivy's first logo draft for a client uses thin, delicate line-art, and it will be cut from vinyl using a small sign-cutting machine.","question":"Why might this be risky?","options":["Thin lines cut cleanly every time regardless of process","Thin lines and fine detail can be lost or become unreliable when reproduced through processes like cutting or printing","Thin lines are always cheaper to print","It has no effect on reproduction quality"],"correct":1,"explanation":"Fine detail and hairline strokes are exactly the elements most likely to be lost or distorted when a logo is reproduced through cutting, embroidery, or small-scale printing."},{"scenario":"Chapa Design Studio is asked to redesign a competitor's logo, which is full of small text and fine shading detail.","question":"What is the main design problem with this kind of logo?","options":["It's too colourful for print","It has too much fine detail and small text to remain legible when the logo is scaled down","It uses too few fonts","It has no problem, complexity always reads well"],"correct":1,"explanation":"Excess fine detail and small text are the classic reasons a logo fails to stay legible once it is shrunk down to everyday sizes."},{"scenario":"Ivy is choosing between two logo directions for a coffee shop: a single bold icon plus wordmark, or a detailed watercolour-style illustration.","question":"Which direction is generally safer for scalability across signage, packaging, and stationery?","options":["The detailed watercolour illustration","The bold single icon plus a clean wordmark","Neither works for a coffee shop","Both are equally safe choices"],"correct":1,"explanation":"Bold, simple icon-and-wordmark combinations reproduce reliably across many surfaces and sizes, unlike fine, detailed illustration styles."},{"scenario":"A client tells Ivy, \"I love the logo, but can we add three more colours and a drop shadow to make it richer?\"","question":"What is a reasonable professional response, thinking about scalability?","options":["Add unlimited colours and effects immediately with no concerns","Explain that extra colours and effects can complicate reproduction, such as one-colour printing or small sizes, and this trade-off should be discussed","Refuse to make any changes at all","Tell the client colours never matter for logo design"],"correct":1,"explanation":"A professional designer explains the practical trade-offs of added complexity rather than either blindly agreeing or flatly refusing."},{"scenario":"Ivy zooms her draft logo out to preview it at roughly the size it will appear printed on a branded pen.","question":"If the logo becomes an unreadable blur at that size, what does this tell Ivy?","options":["The logo needs simplifying, for example fewer details or bolder shapes","Pens are the wrong product to worry about","The logo is finished and ready to present","The client will not notice the difference"],"correct":0,"explanation":"If a logo fails to read clearly at a realistic small size, that is a direct signal it needs simplifying before it is finished."},{"scenario":"Ivy is reviewing a shortlist of logo drafts before a client meeting and wants a quick way to judge scalability.","question":"Which of these is the best quick test?","options":["Asking whether it took a long time to design","Shrinking it down or squinting at it to see if it still reads clearly at a glance","Checking only how it looks on a huge screen","Counting how many software effects were used"],"correct":1,"explanation":"Shrinking a design down, or squinting at it, is a fast and reliable way to simulate small real-world use and check that the key shapes still read clearly."},{"scenario":"A client insists the logo must include a slogan in very small text underneath the main mark.","question":"What should Ivy point out about this from a scalability perspective?","options":["Small text can become unreadable when the logo is shrunk for items like business cards or embroidery, so it may be better kept as a separate, optional lock-up","Small text always reproduces perfectly at any size","Slogans should always be the biggest element in a logo","This has no impact on the logo at all"],"correct":0,"explanation":"Tiny text baked into the core logo mark is one of the most common reasons a logo fails at small sizes; keeping it as an optional add-on protects the core mark's scalability."}];
+        let currentQuestion = 0, score = 0, streak = 0, answered = false;
+        function updateScoreboard() {
+            document.getElementById('score').textContent = score;
+            document.getElementById('current').textContent = Math.min(currentQuestion + 1, exercises.length);
+            document.getElementById('total').textContent = exercises.length;
+            document.getElementById('streak').textContent = streak;
+            document.getElementById('progress').style.width = ((currentQuestion) / exercises.length) * 100 + '%';
+        }
+        function escapeHtml(s) { return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+        function renderQuestion() {
+            answered = false;
+            const q = exercises[currentQuestion];
+            let html = '';
+            if (q.scenario) html += `<div class="scenario"><strong>Scenario.</strong> ${escapeHtml(q.scenario)}</div>`;
+            html += `<div class="question">${escapeHtml(q.question)}</div>`;
+            html += '<div class="options">';
+            q.options.forEach((o, i) => { html += `<button class="option" onclick="selectAnswer(${i})">${escapeHtml(o)}</button>`; });
+            html += '</div>';
+            document.getElementById('exerciseCard').innerHTML = html;
+            updateScoreboard();
+        }
+        function selectAnswer(i) {
+            if (answered) return;
+            answered = true;
+            const q = exercises[currentQuestion];
+            const btns = document.querySelectorAll('.option');
+            btns.forEach(b => b.classList.add('disabled'));
+            btns[q.correct].classList.add('correct');
+            const right = i === q.correct;
+            if (!right) btns[i].classList.add('wrong');
+            if (right) { score += 10; streak += 1; } else { streak = 0; }
+            const fb = document.createElement('div');
+            fb.className = 'feedback ' + (right ? 'correct' : 'wrong');
+            fb.innerHTML = `<strong>${right ? '✅ Correct.' : '❌ Not quite.'}</strong><br>${escapeHtml(q.explanation)}`;
+            document.getElementById('exerciseCard').appendChild(fb);
+            const nb = document.createElement('button');
+            nb.className = 'next-btn';
+            nb.textContent = currentQuestion === exercises.length - 1 ? 'See results →' : 'Next scenario →';
+            nb.onclick = nextQuestion;
+            document.getElementById('exerciseCard').appendChild(nb);
+            updateScoreboard();
+        }
+        function nextQuestion() { currentQuestion++; if (currentQuestion >= exercises.length) return showResults(); renderQuestion(); }
+        function showResults() {
+            document.getElementById('progress').style.width = '100%';
+            const total = exercises.length * 10;
+            const pct = Math.round(score / total * 100);
+            if (window.parent) { window.parent.postMessage({type:"mtti_quiz_score", score: score, total: total, percent: pct}, "*"); }
+            let badge = '🌟', msg = 'Excellent work. You have a professional grasp of this lesson.';
+            if (pct < 50) { badge = '🌱'; msg = 'Good first attempt. Review the lesson and try again.'; }
+            else if (pct < 80) { badge = '📚'; msg = 'Solid progress. Review the scenarios you missed and retry.'; }
+            document.getElementById('exerciseCard').innerHTML = `
+                <div class="results">
+                    <span class="badge">${badge}</span>
+                    <h2>Quiz Complete</h2>
+                    <div class="final-score">${score} / ${total}</div>
+                    <p><strong>${pct}%</strong> · Longest streak: ${streak}</p>
+                    <p>${msg}</p>
+                    <button class="restart-btn" onclick="restart()">Try again 🔁</button>
+                </div>`;
+        }
+        function restart() { currentQuestion = 0; score = 0; streak = 0; renderQuestion(); }
+
+        /* How-To intro — a small, ungraded field-check demo shown before the
+           quiz starts, directly rehearsing the "shrink the logo down to its smallest real size and eyeball it" scalability-check
+           that one of the quiz scenarios asks about, so it is not being asked cold. */
+        const HOWTO_TITLE = "🔍 Quick How-To: The Shrink Test for Scalability";
+        const HOWTO_INTRO = "Ivy just finished a first logo draft for a new client at Chapa Design Studio and wants to check it before presenting it to the client. One of the scenarios coming up asks about the fastest way to test this. Here is the habit: preview the logo at its smallest realistic size, and check by eye whether it still reads clearly. Try the check below, then start the quiz.";
+        const HOWTO_CHECK_LABEL = "Check My Review";
+        const HOWTO_OK_MSG = "✅ Correct habit - testing at the smallest real size and checking legibility by eye is exactly the quick scalability test the quiz asks about.";
+        const HOWTO_FAIL_MSG = "❌ Not yet - preview at the smallest size (business card), and confirm you checked whether it still reads clearly.";
+        const HOWTO_FIELDS = [
+            { id: 'previewSize', type: 'select', label: 'Preview the logo at:', options: [
+                { value: 'signboard', label: 'Large signboard (2m wide)' },
+                { value: 'card', label: 'Business card (5cm wide)' }
+            ], defaultValue: 'signboard', rule: { op: 'eq', value: 'card' } },
+            { id: 'squintCheck', type: 'checkbox', label: 'I shrank the preview (or squinted at it) to confirm the shapes and any text still read clearly at a glance', rule: { op: 'checked' } }
+        ];
+        function escHtmlH(s) { return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+
+        function howtoFieldHtml(f) {
+            if (f.type === 'checkbox') {
+                return `<div class="howto-field" id="howtoField-${f.id}">
+                    <div class="howto-checkbox-row">
+                        <input type="checkbox" id="hf-${f.id}">
+                        <label for="hf-${f.id}">${escHtmlH(f.label)}</label>
+                    </div>
+                </div>`;
+            }
+            if (f.type === 'select') {
+                const opts = f.options.map(o => `<option value="${escHtmlH(o.value)}"${o.value === f.defaultValue ? ' selected' : ''}>${escHtmlH(o.label)}</option>`).join('');
+                return `<div class="howto-field" id="howtoField-${f.id}">
+                    <label for="hf-${f.id}">${escHtmlH(f.label)}</label>
+                    <select id="hf-${f.id}">${opts}</select>
+                </div>`;
+            }
+            return `<div class="howto-field" id="howtoField-${f.id}">
+                <label for="hf-${f.id}">${escHtmlH(f.label)}</label>
+                <input type="text" id="hf-${f.id}" value="${escHtmlH(f.defaultValue || '')}">
+            </div>`;
+        }
+
+        function renderHowtoFields() {
+            document.getElementById('howtoFields').innerHTML = HOWTO_FIELDS.map(howtoFieldHtml).join('');
+        }
+
+        function howtoFieldValue(f) {
+            const el = document.getElementById('hf-' + f.id);
+            if (f.type === 'checkbox') return el.checked;
+            return el.value;
+        }
+
+        function howtoFieldPasses(f) {
+            const v = howtoFieldValue(f);
+            if (f.rule.op === 'checked') return v === true;
+            if (f.rule.op === 'eq') return v === f.rule.value;
+            if (f.rule.op === 'regex') return f.rule.value.test(v);
+            return false;
+        }
+
+        function checkHowtoFields() {
+            let allOk = true;
+            HOWTO_FIELDS.forEach(f => {
+                const ok = howtoFieldPasses(f);
+                if (!ok) allOk = false;
+                const wrap = document.getElementById('howtoField-' + f.id);
+                wrap.classList.remove('hf-correct', 'hf-wrong');
+                wrap.classList.add(ok ? 'hf-correct' : 'hf-wrong');
+            });
+            const banner = document.getElementById('howtoBanner');
+            banner.classList.add('show');
+            banner.className = 'howto-banner show ' + (allOk ? 'ok' : 'fail');
+            banner.textContent = allOk ? HOWTO_OK_MSG : HOWTO_FAIL_MSG;
+        }
+
+        function renderHowto() {
+            document.getElementById('exerciseCard').innerHTML = `
+                <div class="howto-card">
+                    <h3>${HOWTO_TITLE}</h3>
+                    <p>${HOWTO_INTRO}</p>
+                    <div class="howto-field-group" id="howtoFields"></div>
+                    <div class="howto-banner" id="howtoBanner"></div>
+                    <button class="start-quiz-btn" id="checkHowtoBtn">${HOWTO_CHECK_LABEL}</button>
+                    <button class="start-quiz-btn" id="startQuizBtn" style="margin-left:10px;background:linear-gradient(135deg,#28a745,#1e7e34);">Start Quiz →</button>
+                </div>`;
+            renderHowtoFields();
+            document.getElementById('checkHowtoBtn').addEventListener('click', checkHowtoFields);
+            document.getElementById('startQuizBtn').addEventListener('click', renderQuestion);
+        }
+
+        renderHowto();
+    </script>
+</body>
+</html>

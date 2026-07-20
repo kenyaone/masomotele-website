@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Where Bias in AI Systems Comes From | MTTI Artificial Intelligence</title>
+    <link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Fredoka:wght@500;600&display=swap" rel="stylesheet">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Space Mono', monospace; background: linear-gradient(135deg, #6a11cb 0%, #2575fc 100%); min-height: 100vh; padding: 20px; color: #fff; }
+        .container { max-width: 900px; margin: 0 auto; }
+        .header { text-align: center; margin-bottom: 30px; }
+        .header .lesson-tag { display: inline-block; background: rgba(255,255,255,0.2); padding: 6px 16px; border-radius: 999px; font-size: 0.85em; margin-bottom: 12px; }
+        .header h1 { font-family: 'Fredoka', sans-serif; font-size: 2.2em; margin-bottom: 8px; text-shadow: 3px 3px 0 rgba(0,0,0,0.2); }
+        .score-board { background: rgba(255,255,255,0.15); backdrop-filter: blur(10px); border-radius: 20px; padding: 20px; margin-bottom: 20px; display: flex; justify-content: space-around; }
+        .score-item { text-align: center; }
+        .score-item .label { font-size: 0.85em; opacity: 0.9; margin-bottom: 4px; }
+        .score-item .value { font-size: 1.8em; font-weight: bold; font-family: 'Fredoka', sans-serif; }
+        .progress-bar { width: 100%; height: 8px; background: rgba(255,255,255,0.3); border-radius: 10px; margin-bottom: 25px; overflow: hidden; }
+        .progress-fill { height: 100%; background: linear-gradient(90deg, #2575fc 0%, #6a11cb 100%); border-radius: 10px; transition: width 0.5s ease; width: 0%; }
+        .exercise-card { background: white; color: #333; border-radius: 25px; padding: 35px; margin-bottom: 20px; box-shadow: 0 20px 60px rgba(0,0,0,0.3); }
+        .scenario { background: linear-gradient(135deg, #fff8e1 0%, #ffecb3 100%); border-left: 5px solid #ffc107; padding: 20px 24px; border-radius: 12px; margin-bottom: 24px; font-size: 0.98em; line-height: 1.55; }
+        .scenario strong { color: #7a5a00; font-family: 'Fredoka', sans-serif; }
+        .question { font-size: 1.15em; margin-bottom: 20px; font-weight: 700; line-height: 1.4; }
+        .options { display: flex; flex-direction: column; gap: 12px; }
+        .option { background: #f5f7fb; border: 2px solid transparent; padding: 16px 20px; border-radius: 12px; cursor: pointer; transition: all 0.2s ease; font-family: 'Space Mono', monospace; font-size: 0.98em; text-align: left; }
+        .option:hover:not(.disabled) { background: #eef1fb; border-color: #6a11cb; transform: translateX(4px); }
+        .option.correct { background: #d4edda; border-color: #28a745; color: #155724; }
+        .option.wrong { background: #f8d7da; border-color: #dc3545; color: #721c24; }
+        .option.disabled { cursor: not-allowed; opacity: 0.85; }
+        .feedback { margin-top: 22px; padding: 18px 22px; border-radius: 12px; font-size: 0.98em; line-height: 1.5; }
+        .feedback.correct { background: #d4edda; color: #155724; border-left: 4px solid #28a745; }
+        .feedback.wrong { background: #f8d7da; color: #721c24; border-left: 4px solid #dc3545; }
+        .next-btn, .restart-btn { margin-top: 20px; background: linear-gradient(135deg, #6a11cb 0%, #2575fc 100%); color: white; border: none; padding: 14px 32px; border-radius: 12px; font-size: 1em; cursor: pointer; font-family: 'Fredoka', sans-serif; box-shadow: 0 6px 18px rgba(0,0,0,0.2); }
+        .results { text-align: center; padding: 25px 15px; }
+        .results h2 { font-family: 'Fredoka', sans-serif; font-size: 2em; margin-bottom: 12px; color: #333; }
+        .results .final-score { font-size: 3em; font-family: 'Fredoka', sans-serif; color: #6a11cb; margin: 20px 0; }
+        .results p { color: #555; margin-bottom: 12px; }
+        .badge { display: inline-block; font-size: 3.5em; margin: 8px 0; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <div class="lesson-tag">Module 6 · Lesson 6.1 · Quiz</div>
+            <h1>Where Bias in AI Systems Comes From</h1>
+        </div>
+        <div class="score-board">
+            <div class="score-item"><div class="label">Score</div><div class="value" id="score">0</div></div>
+            <div class="score-item"><div class="label">Question</div><div class="value"><span id="current">1</span>/<span id="total">10</span></div></div>
+            <div class="score-item"><div class="label">Streak</div><div class="value" id="streak">0</div></div>
+        </div>
+        <div class="progress-bar"><div class="progress-fill" id="progress"></div></div>
+        <div class="exercise-card" id="exerciseCard"></div>
+    </div>
+    <script>
+        const exercises = [{"scenario":"Brian is explaining to a client why their new AI screening tool sometimes seems unfair.","question":"What is the most accurate explanation for why an AI system produces biased results?","options":["The algorithm has personal opinions about people","The system learned patterns from its training data, and repeats whatever pattern was in that data, fair or not","AI systems are randomly unfair with no real cause","Bias only happens if the programmer is prejudiced"],"correct":1,"explanation":"AI systems learn statistical patterns from training data and reproduce them \\u2014 they do not form opinions. If the data reflects a narrow or skewed pattern, the system repeats it."},{"scenario":"A client's hiring-screening tool was trained on ten years of resumes from staff who were mostly hired from one university.","question":"What is the most likely effect of this on new applicants from other universities?","options":["No effect at all, university is never a factor","They may be unfairly scored lower, even with equal or better qualifications, simply for not matching the historical pattern","They will automatically be hired first","The tool will refuse to process their resumes"],"correct":1,"explanation":"When training data skews heavily toward one group, the tool learns to favour that group's profile, which can unfairly disadvantage equally qualified applicants who look different on paper."},{"scenario":"A client insists, \\"The AI made the decision, so it must be objective and fair.\\"","question":"How should Brian respond?","options":["Agree completely, since computers cannot be biased","Explain that the tool only reflects patterns in its training data, so it can be just as unfair as that data was","Say nothing and let the client believe it","Suggest turning off the tool's explanations so no one asks questions"],"correct":1,"explanation":"\\"The computer decided\\" is not evidence of fairness. An AI tool's output is only as fair as the data patterns it learned from."},{"scenario":"Brian is asked to check a new client scoring model before it goes live.","question":"What is the single most useful question to ask about the training data first?","options":["How many rows does the spreadsheet have?","Who is represented in this data, and who might be missing or underrepresented?","What font was used to type the data?","How old is the laptop that stored the data?"],"correct":1,"explanation":"Identifying who the data does and does not represent is the key first step in spotting where an AI tool might learn an unfair pattern."},{"scenario":"A delivery company's past records show almost all top-rated riders came from just two neighbourhoods, because that is where recruiting historically focused, not because riders elsewhere perform worse.","question":"What does this scenario best illustrate?","options":["That neighbourhood is a genuinely important predictor of rider quality","That a narrow, unrepresentative pattern in historical data can look like a meaningful signal to an AI tool, when it is really just history repeating itself","That the data must be fabricated","That delivery riders should always be tested in person instead"],"correct":1,"explanation":"An AI tool cannot tell the difference between a meaningful pattern and a narrow historical accident \\u2014 it will treat both the same way unless someone checks the data's real story."},{"scenario":"Brian wants to reduce the risk of a client's screening tool being biased before it is used on real applicants.","question":"Which action addresses the actual root of the problem?","options":["Reviewing what groups are represented and underrepresented in the training data, and testing outcomes across different groups before launch","Changing the tool's colour scheme","Making the tool run faster","Renaming the tool to sound more official"],"correct":1,"explanation":"Since bias originates in the training data, checking representation and testing outcomes across groups is what actually addresses the risk \\u2014 cosmetic changes do not."},{"scenario":"A colleague argues that adding more historical data will automatically fix any bias in a client's model.","question":"Is this reasoning sound?","options":["Yes, more data always removes bias automatically","Not necessarily \\u2014 if the additional data reflects the same narrow pattern, the bias simply gets reinforced rather than fixed","Yes, because bigger files are always more accurate","No, because more data always makes bias worse"],"correct":1,"explanation":"Volume alone does not fix bias. If new data still comes from the same unrepresentative source, it can reinforce the existing skewed pattern instead of correcting it."}];
+        let currentQuestion = 0, score = 0, streak = 0, answered = false;
+        function updateScoreboard() {
+            document.getElementById('score').textContent = score;
+            document.getElementById('current').textContent = Math.min(currentQuestion + 1, exercises.length);
+            document.getElementById('total').textContent = exercises.length;
+            document.getElementById('streak').textContent = streak;
+            document.getElementById('progress').style.width = ((currentQuestion) / exercises.length) * 100 + '%';
+        }
+        function escapeHtml(s) { return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+        function renderQuestion() {
+            answered = false;
+            const q = exercises[currentQuestion];
+            let html = '';
+            if (q.scenario) html += `<div class="scenario"><strong>Scenario.</strong> ${escapeHtml(q.scenario)}</div>`;
+            html += `<div class="question">${escapeHtml(q.question)}</div>`;
+            html += '<div class="options">';
+            q.options.forEach((o, i) => { html += `<button class="option" onclick="selectAnswer(${i})">${escapeHtml(o)}</button>`; });
+            html += '</div>';
+            document.getElementById('exerciseCard').innerHTML = html;
+            updateScoreboard();
+        }
+        function selectAnswer(i) {
+            if (answered) return;
+            answered = true;
+            const q = exercises[currentQuestion];
+            const btns = document.querySelectorAll('.option');
+            btns.forEach(b => b.classList.add('disabled'));
+            btns[q.correct].classList.add('correct');
+            const right = i === q.correct;
+            if (!right) btns[i].classList.add('wrong');
+            if (right) { score += 10; streak += 1; } else { streak = 0; }
+            const fb = document.createElement('div');
+            fb.className = 'feedback ' + (right ? 'correct' : 'wrong');
+            fb.innerHTML = `<strong>${right ? '✅ Correct.' : '❌ Not quite.'}</strong><br>${escapeHtml(q.explanation)}`;
+            document.getElementById('exerciseCard').appendChild(fb);
+            const nb = document.createElement('button');
+            nb.className = 'next-btn';
+            nb.textContent = currentQuestion === exercises.length - 1 ? 'See results →' : 'Next scenario →';
+            nb.onclick = nextQuestion;
+            document.getElementById('exerciseCard').appendChild(nb);
+            updateScoreboard();
+        }
+        function nextQuestion() { currentQuestion++; if (currentQuestion >= exercises.length) return showResults(); renderQuestion(); }
+        function showResults() {
+            document.getElementById('progress').style.width = '100%';
+            const total = exercises.length * 10;
+            const pct = Math.round(score / total * 100);
+            if (window.parent) { window.parent.postMessage({type:"mtti_quiz_score", score: score, total: total, percent: pct}, "*"); }
+            let badge = '🌟', msg = 'Excellent work. You have a professional grasp of this lesson.';
+            if (pct < 50) { badge = '🌱'; msg = 'Good first attempt. Review the lesson and try again.'; }
+            else if (pct < 80) { badge = '📚'; msg = 'Solid progress. Review the scenarios you missed and retry.'; }
+            document.getElementById('exerciseCard').innerHTML = `
+                <div class="results">
+                    <span class="badge">${badge}</span>
+                    <h2>Quiz Complete</h2>
+                    <div class="final-score">${score} / ${total}</div>
+                    <p><strong>${pct}%</strong> · Longest streak: ${streak}</p>
+                    <p>${msg}</p>
+                    <button class="restart-btn" onclick="restart()">Try again 🔁</button>
+                </div>`;
+        }
+        function restart() { currentQuestion = 0; score = 0; streak = 0; renderQuestion(); }
+        renderQuestion();
+    </script>
+</body>
+</html>

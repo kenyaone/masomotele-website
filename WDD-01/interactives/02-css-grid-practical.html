@@ -727,7 +727,7 @@ class LiveCode {
         // Preview side
         const previewWrap = el('div', {class: 'wg-code-preview-wrap'});
         previewWrap.appendChild(el('div', {class: 'wg-code-preview-label', html: 'Live preview'}));
-        this.preview = el('iframe', {class: 'wg-code-preview', sandbox: 'allow-scripts'});
+        this.preview = el('iframe', {class: 'wg-code-preview', sandbox: 'allow-scripts allow-same-origin'});
         previewWrap.appendChild(this.preview);
         split.appendChild(previewWrap);
         container.appendChild(split);
@@ -769,7 +769,7 @@ class LiveCode {
                     if (type === 'tag') return !!doc.querySelector(args[0]);
                     if (type === 'text') return doc.body.textContent.toLowerCase().includes(args.join(':').toLowerCase());
                     if (type === 'count') return doc.querySelectorAll(args[0]).length >= parseInt(args[1] || '1', 10);
-                    if (type === 'attr') { const node = doc.querySelector(args[0]); return node && (!args[2] || node.getAttribute(args[1]) === args[2]); }
+                    if (type === 'attr') { const node = doc.querySelector(args[0]); if (!node) return false; return args[2] !== undefined ? node.getAttribute(args[1]) === args[2] : node.hasAttribute(args[1]); }
                     if (type === 'contains') return this.code.toLowerCase().includes(args.join(':').toLowerCase());
                     if (type === 'regex') return new RegExp(args.join(':'), 'i').test(this.code);
                 } catch { return false; }

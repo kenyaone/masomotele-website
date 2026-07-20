@@ -1,0 +1,346 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Web Presence Options | MTTI Digital Marketing</title>
+    <link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Fredoka:wght@500;600&display=swap" rel="stylesheet">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Space Mono', monospace;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh; padding: 20px; color: #fff;
+        }
+        .container { max-width: 900px; margin: 0 auto; }
+        .header { text-align: center; margin-bottom: 30px; animation: slideDown 0.6s ease-out; }
+        .header .lesson-tag {
+            display: inline-block; background: rgba(255,255,255,0.2);
+            padding: 6px 16px; border-radius: 999px;
+            font-size: 0.85em; margin-bottom: 12px;
+        }
+        .header h1 {
+            font-family: 'Fredoka', sans-serif; font-size: 2.2em;
+            margin-bottom: 8px; text-shadow: 3px 3px 0 rgba(0,0,0,0.2);
+        }
+        .header p { opacity: 0.95; font-size: 0.95em; }
+        .score-board {
+            background: rgba(255,255,255,0.15); backdrop-filter: blur(10px);
+            border-radius: 20px; padding: 20px; margin-bottom: 20px;
+            display: flex; justify-content: space-around;
+            animation: fadeIn 0.8s ease-out 0.2s both;
+        }
+        .score-item { text-align: center; }
+        .score-item .label { font-size: 0.85em; opacity: 0.9; margin-bottom: 4px; }
+        .score-item .value {
+            font-size: 1.8em; font-weight: bold; font-family: 'Fredoka', sans-serif;
+        }
+        .progress-bar {
+            width: 100%; height: 8px; background: rgba(255,255,255,0.3);
+            border-radius: 10px; margin-bottom: 25px; overflow: hidden;
+        }
+        .progress-fill {
+            height: 100%; background: linear-gradient(90deg, #f093fb 0%, #f5576c 100%);
+            border-radius: 10px; transition: width 0.5s ease; width: 0%;
+        }
+        .exercise-card {
+            background: white; color: #333; border-radius: 25px;
+            padding: 35px; margin-bottom: 20px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            animation: fadeIn 0.6s ease-out both;
+        }
+        .scenario {
+            background: linear-gradient(135deg, #fff8e1 0%, #ffecb3 100%);
+            border-left: 5px solid #ffc107;
+            padding: 20px 24px; border-radius: 12px;
+            margin-bottom: 24px;
+            font-size: 0.98em; line-height: 1.55;
+        }
+        .scenario strong { color: #7a5a00; font-family: 'Fredoka', sans-serif; }
+        .question {
+            font-size: 1.15em; margin-bottom: 20px;
+            font-weight: 700; line-height: 1.4;
+        }
+        .options { display: flex; flex-direction: column; gap: 12px; }
+        .option {
+            background: #f5f7fb; border: 2px solid transparent;
+            padding: 16px 20px; border-radius: 12px;
+            cursor: pointer; transition: all 0.2s ease;
+            font-family: 'Space Mono', monospace; font-size: 0.98em; text-align: left;
+        }
+        .option:hover:not(.disabled) {
+            background: #eef1fb; border-color: #667eea; transform: translateX(4px);
+        }
+        .option.correct { background: #d4edda; border-color: #28a745; color: #155724; }
+        .option.wrong { background: #f8d7da; border-color: #dc3545; color: #721c24; animation: shake 0.4s; }
+        .option.disabled { cursor: not-allowed; opacity: 0.85; }
+        .feedback {
+            margin-top: 22px; padding: 18px 22px; border-radius: 12px;
+            animation: slideUp 0.4s ease-out;
+            font-size: 0.98em; line-height: 1.5;
+        }
+        .feedback.correct { background: #d4edda; color: #155724; border-left: 4px solid #28a745; }
+        .feedback.wrong { background: #f8d7da; color: #721c24; border-left: 4px solid #dc3545; }
+        .feedback strong { font-family: 'Fredoka', sans-serif; }
+        .next-btn, .restart-btn {
+            margin-top: 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white; border: none;
+            padding: 14px 32px; border-radius: 12px;
+            font-size: 1em; cursor: pointer;
+            font-family: 'Fredoka', sans-serif;
+            box-shadow: 0 6px 18px rgba(0,0,0,0.2);
+            transition: transform 0.2s ease;
+        }
+        .next-btn:hover, .restart-btn:hover { transform: scale(1.04); }
+        .results {
+            text-align: center; padding: 25px 15px;
+            animation: bounceIn 0.6s ease-out;
+        }
+        .results h2 {
+            font-family: 'Fredoka', sans-serif; font-size: 2em;
+            margin-bottom: 12px; color: #333;
+        }
+        .results .final-score {
+            font-size: 3em; font-family: 'Fredoka', sans-serif;
+            color: #667eea; margin: 20px 0;
+        }
+        .results p { color: #555; margin-bottom: 12px; }
+        .badge { display: inline-block; font-size: 3.5em; margin: 8px 0; }
+        @keyframes slideDown { from { opacity: 0; transform: translateY(-30px); } to { opacity: 1; transform: translateY(0); } }
+        @keyframes fadeIn { from { opacity: 0; transform: scale(0.96); } to { opacity: 1; transform: scale(1); } }
+        @keyframes slideUp { from { opacity: 0; transform: translateY(15px); } to { opacity: 1; transform: translateY(0); } }
+        @keyframes shake { 0%,100% { transform: translateX(0); } 25% { transform: translateX(-8px); } 75% { transform: translateX(8px); } }
+        @keyframes bounceIn { 0% { opacity: 0; transform: scale(0.4); } 60% { transform: scale(1.05); } 100% { opacity: 1; transform: scale(1); } }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <div class="lesson-tag">Module 2 · Lesson 2.1</div>
+            <h1>Web Presence Options</h1>
+            <p>10 Karibu Kitchen scenarios — pick the right web presence, understand CMS, and plan the four build steps</p>
+        </div>
+
+        <div class="score-board">
+            <div class="score-item"><div class="label">Score</div><div class="value" id="score">0</div></div>
+            <div class="score-item"><div class="label">Question</div><div class="value"><span id="current">1</span>/<span id="total">10</span></div></div>
+            <div class="score-item"><div class="label">Streak</div><div class="value" id="streak">0</div></div>
+        </div>
+
+        <div class="progress-bar"><div class="progress-fill" id="progress"></div></div>
+
+        <div class="exercise-card" id="exerciseCard"></div>
+    </div>
+
+    <script>
+        const exercises = [
+  {
+    "scenario": "Sarah's cousin insists: \"You do not need a website — everyone is on Facebook and WhatsApp anyway.\" But when Sarah searches Google for \"lunch delivery Eldoret\", Nyakinyua Kitchen's WordPress site sits at position one and Karibu Kitchen does not appear at all.",
+    "question": "Which reply best captures the Lesson 2.1 message?",
+    "options": [
+      "\"Your cousin is right — a Facebook page is enough for any small business.\"",
+      "\"A social profile alone is not a substitute for a proper website, and a website alone is not a substitute for being findable on Google. You need more than one doorway.\"",
+      "\"Shut down the Facebook page and only build a website.\"",
+      "\"Buy a mobile app — that will fix the Google problem.\""
+    ],
+    "correct": 1,
+    "explanation": "Section 2.1 frames web presence as a set of doorways — most businesses need more than one. Sarah cannot compete on Google with a Facebook page alone. Option 1 keeps her invisible on Google. Option 3 throws away her existing audience. Option 4 is expensive and does not help with search."
+  },
+  {
+    "scenario": "You are teaching Sarah the eight main types of web presence from §2.1 so she can decide which to build first.",
+    "question": "Which option correctly lists the eight types?",
+    "options": [
+      "Business directory listing, social media, information website, blog, e-commerce website, mobile site, web application, mobile application.",
+      "Facebook page, Instagram page, WhatsApp Business, TikTok, YouTube, LinkedIn, X, Pinterest.",
+      "Domain, hosting, SSL, DNS, CDN, CMS, FTP, SSH.",
+      "Print flyer, radio advert, billboard, TV ad, email, SMS, cold call, poster."
+    ],
+    "correct": 0,
+    "explanation": "Section 2.1's eight types are: directory listing, social media, information website, blog, e-commerce site, mobile site, web application, mobile application. Option 2 lists only social platforms. Option 3 lists hosting terms. Option 4 is offline media."
+  },
+  {
+    "scenario": "Sarah has KES 8,000 to spend on her first web presence. Karibu Kitchen is a small lunch-and-dinner delivery service in Eldoret; orders come in through WhatsApp; she has 340 friends on a personal Facebook page.",
+    "question": "Which three web presence types should she prioritise FIRST, according to Lesson 2.1?",
+    "options": [
+      "A native mobile application, a web application, and a blog.",
+      "An e-commerce site with a checkout, a whitepaper library, and a LinkedIn showcase page.",
+      "A Google Business Profile, an information website, and a refreshed Facebook Page.",
+      "TikTok, Pinterest, and a mobile app."
+    ],
+    "correct": 2,
+    "explanation": "Section 2.1's decision for Sarah is exactly this triad: Google Business Profile so people searching find her, an information website to receive the click, and Facebook as an amplifier. An e-commerce site is unnecessary because WhatsApp handles orders; a native app is not justified by her volume."
+  },
+  {
+    "scenario": "Sarah is ready to build her WordPress site. You are teaching her the four steps introduced in Lesson 2.1.",
+    "question": "Which sequence matches the lesson?",
+    "options": [
+      "Buy an SSL certificate, install Google Analytics, write a blog post, wait for traffic.",
+      "Register a domain name, register hosting, design and build the site, promote the site through multiple channels.",
+      "Print flyers, hand them out, wait for orders, then build the site.",
+      "Design the site, then decide on the business, then choose a domain, then find hosting."
+    ],
+    "correct": 1,
+    "explanation": "Section 2.1 names the four steps in order: domain, hosting, design/build, promotion. The lesson stresses that skipping step four (promotion) means nobody visits. Option 4 reverses the sequence."
+  },
+  {
+    "scenario": "Sarah asks: \"Do I need to learn to code before I can build a Karibu Kitchen website?\"",
+    "question": "Which reply reflects the lesson correctly?",
+    "options": [
+      "\"Yes, learn HTML, CSS, JavaScript, and PHP before you build anything.\"",
+      "\"No — a Content Management System (CMS) like WordPress lets you create and update content by typing, similar to Microsoft Word.\"",
+      "\"No — just pay a Nairobi agency KES 200,000 to build it for you.\"",
+      "\"You do not need a website at all — coding is irrelevant.\""
+    ],
+    "correct": 1,
+    "explanation": "Section 2.1 explains a CMS is the reason non-coders can run a website. WordPress in particular is the CMS the course chooses. Option 3 wastes her budget; option 4 contradicts the whole lesson."
+  },
+  {
+    "scenario": "Sarah is comparing WordPress, Drupal, and Joomla. Her cousin says all three are equally common and it does not matter which she picks.",
+    "question": "Why does Lesson 2.1 specifically recommend WordPress?",
+    "options": [
+      "It is the only CMS that is legal in Kenya.",
+      "It powers approximately 43 per cent of every website on the internet, and Kenyan digital-marketing job listings routinely expect WordPress skills.",
+      "It is the fastest CMS ever built and always outperforms Drupal.",
+      "It is the only CMS that supports Swahili content."
+    ],
+    "correct": 1,
+    "explanation": "Section 2.1 uses the 43 per cent figure and the employability argument explicitly. Options 1, 3 and 4 are invented. Skills that customers and employers pay for are what makes WordPress the right course choice."
+  },
+  {
+    "scenario": "Sarah has claimed a Google Business Profile and built her WordPress site, but has not told anyone about it. Three weeks later her site has 12 visits total, most of them her own.",
+    "question": "Which step of the four has she skipped, and what should she do?",
+    "options": [
+      "Step 1 — she forgot to register a domain. Buy another domain.",
+      "Step 4 — promotion. Share every new page on social media, add the URL to her email signature, print it on business cards and flyers, and cross-link from her Facebook and Google Business Profile.",
+      "Step 2 — hosting. Move to a different host.",
+      "Step 3 — design. Rebuild the site from scratch."
+    ],
+    "correct": 1,
+    "explanation": "Section 2.1 warns that most small businesses stop at step three and never do step four, then wonder why nobody visits. The four steps are meaningless without promotion. Options 1, 3 and 4 solve non-problems."
+  },
+  {
+    "scenario": "Sarah has KES 8,000 total for her first-year web presence. You are working through the actual costs from §2.1.",
+    "question": "Which budget best matches the numbers in the lesson?",
+    "options": [
+      "Domain KES 30,000, hosting KES 100,000, agency KES 500,000.",
+      "Domain KES 1,500 a year, hosting KES 3,000 a year, WordPress build free using Local WP for practice then paid hosting to go live, leaving a buffer for promotion.",
+      "Domain KES 50, hosting free forever, no promotion needed.",
+      "Skip domain and hosting — build the site directly on a competitor's server."
+    ],
+    "correct": 1,
+    "explanation": "Section 2.1 quotes domains at KES 1,000–3,000 a year and small-site hosting at KES 2,000–8,000. Sarah's plan of KES 1,500 + KES 3,000 fits inside her KES 8,000 with room to promote. Option 1 is way over budget; option 3 misleads about hosting costs; option 4 is not legal."
+  },
+  {
+    "scenario": "Brian Otieno, founder of Chapa Fitness (Gen-Z fitness apparel), tells Sarah his whole business runs on TikTok, no website. He argues Sarah could do the same.",
+    "question": "How should you frame the difference, using Lesson 2.1?",
+    "options": [
+      "Brian is wrong — every business needs a full e-commerce website and mobile app.",
+      "Match the web presence to the business. Brian's Gen-Z apparel audience lives on TikTok and Instagram, so a social-first presence can work for him. Sarah's audience is Eldoret office workers who Google \"lunch delivery Eldoret\" — she needs a Google Business Profile and information site.",
+      "Sarah should copy Brian exactly and delete her website plan.",
+      "Both should ignore digital and go back to flyers."
+    ],
+    "correct": 1,
+    "explanation": "Section 2.1's core rule is match presence to business and audience. Two different audiences justify two different mixes. Option 1 overbuilds for Brian; option 3 abandons Sarah's search intent audience; option 4 abandons the module entirely."
+  },
+  {
+    "scenario": "Sarah asks whether she should build a native mobile app for Karibu Kitchen so customers can \"tap once and order\".",
+    "question": "What does Lesson 2.1 say about mobile apps for a business at Sarah's stage?",
+    "options": [
+      "Every Kenyan business needs a native mobile app — build it before anything else.",
+      "The cost of a native app is not justified for a small lunch-delivery business, especially when WhatsApp already handles ordering.",
+      "Only Android apps are allowed in Kenya.",
+      "A mobile app replaces the need for a Google Business Profile."
+    ],
+    "correct": 1,
+    "explanation": "Section 2.1 explicitly says Sarah does not need a mobile app — the cost is not justified. Match presence to business volume and audience. Options 1, 3 and 4 are wrong on the lesson and on the economics."
+  }
+];
+
+        let currentQuestion = 0, score = 0, streak = 0, answered = false;
+
+        function updateScoreboard() {
+            document.getElementById('score').textContent = score;
+            document.getElementById('current').textContent = Math.min(currentQuestion + 1, exercises.length);
+            document.getElementById('total').textContent = exercises.length;
+            document.getElementById('streak').textContent = streak;
+            document.getElementById('progress').style.width = ((currentQuestion) / exercises.length) * 100 + '%';
+        }
+
+        function escapeHtml(s) {
+            return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+        }
+
+        function renderQuestion() {
+            answered = false;
+            const q = exercises[currentQuestion];
+            let html = '';
+            if (q.scenario) {
+                html += `<div class="scenario"><strong>Scenario.</strong> ${escapeHtml(q.scenario)}</div>`;
+            }
+            html += `<div class="question">${escapeHtml(q.question)}</div>`;
+            html += '<div class="options">';
+            q.options.forEach((o, i) => {
+                html += `<button class="option" onclick="selectAnswer(${i})">${escapeHtml(o)}</button>`;
+            });
+            html += '</div>';
+            document.getElementById('exerciseCard').innerHTML = html;
+            updateScoreboard();
+        }
+
+        function selectAnswer(i) {
+            if (answered) return;
+            answered = true;
+            const q = exercises[currentQuestion];
+            const btns = document.querySelectorAll('.option');
+            btns.forEach(b => b.classList.add('disabled'));
+            btns[q.correct].classList.add('correct');
+            const right = i === q.correct;
+            if (!right) btns[i].classList.add('wrong');
+            if (right) { score += 10; streak += 1; } else { streak = 0; }
+            const fb = document.createElement('div');
+            fb.className = 'feedback ' + (right ? 'correct' : 'wrong');
+            fb.innerHTML = `<strong>${right ? '✅ Correct.' : '❌ Not quite.'}</strong><br>${escapeHtml(q.explanation)}`;
+            document.getElementById('exerciseCard').appendChild(fb);
+            const nb = document.createElement('button');
+            nb.className = 'next-btn';
+            nb.textContent = currentQuestion === exercises.length - 1 ? 'See results →' : 'Next scenario →';
+            nb.onclick = nextQuestion;
+            document.getElementById('exerciseCard').appendChild(nb);
+            updateScoreboard();
+        }
+
+        function nextQuestion() {
+            currentQuestion++;
+            if (currentQuestion >= exercises.length) return showResults();
+            renderQuestion();
+        }
+
+        function showResults() {
+            document.getElementById('progress').style.width = '100%';
+            const total = exercises.length * 10;
+            const pct = Math.round(score / total * 100);
+            if (window.parent) { window.parent.postMessage({type:"mtti_quiz_score", score: score, total: total, percent: pct}, "*"); }
+            let badge = '🌟', msg = 'Excellent work. You have a professional grasp of this lesson.';
+            if (pct < 50) { badge = '🌱'; msg = 'Good first attempt. Re-watch the lesson video and try again.'; }
+            else if (pct < 80) { badge = '📚'; msg = 'Solid progress. Review the scenarios you missed and retry.'; }
+            document.getElementById('exerciseCard').innerHTML = `
+                <div class="results">
+                    <span class="badge">${badge}</span>
+                    <h2>Quiz Complete</h2>
+                    <div class="final-score">${score} / ${total}</div>
+                    <p><strong>${pct}%</strong> · Longest streak: ${streak}</p>
+                    <p>${msg}</p>
+                    <button class="restart-btn" onclick="restart()">Try again 🔁</button>
+                </div>`;
+        }
+
+        function restart() {
+            currentQuestion = 0; score = 0; streak = 0;
+            renderQuestion();
+        }
+
+        renderQuestion();
+    </script>
+</body>
+</html>

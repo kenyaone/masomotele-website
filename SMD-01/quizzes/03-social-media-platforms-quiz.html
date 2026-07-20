@@ -1,0 +1,346 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Social Media Platforms | MTTI Digital Marketing</title>
+    <link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Fredoka:wght@500;600&display=swap" rel="stylesheet">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Space Mono', monospace;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh; padding: 20px; color: #fff;
+        }
+        .container { max-width: 900px; margin: 0 auto; }
+        .header { text-align: center; margin-bottom: 30px; animation: slideDown 0.6s ease-out; }
+        .header .lesson-tag {
+            display: inline-block; background: rgba(255,255,255,0.2);
+            padding: 6px 16px; border-radius: 999px;
+            font-size: 0.85em; margin-bottom: 12px;
+        }
+        .header h1 {
+            font-family: 'Fredoka', sans-serif; font-size: 2.2em;
+            margin-bottom: 8px; text-shadow: 3px 3px 0 rgba(0,0,0,0.2);
+        }
+        .header p { opacity: 0.95; font-size: 0.95em; }
+        .score-board {
+            background: rgba(255,255,255,0.15); backdrop-filter: blur(10px);
+            border-radius: 20px; padding: 20px; margin-bottom: 20px;
+            display: flex; justify-content: space-around;
+            animation: fadeIn 0.8s ease-out 0.2s both;
+        }
+        .score-item { text-align: center; }
+        .score-item .label { font-size: 0.85em; opacity: 0.9; margin-bottom: 4px; }
+        .score-item .value {
+            font-size: 1.8em; font-weight: bold; font-family: 'Fredoka', sans-serif;
+        }
+        .progress-bar {
+            width: 100%; height: 8px; background: rgba(255,255,255,0.3);
+            border-radius: 10px; margin-bottom: 25px; overflow: hidden;
+        }
+        .progress-fill {
+            height: 100%; background: linear-gradient(90deg, #f093fb 0%, #f5576c 100%);
+            border-radius: 10px; transition: width 0.5s ease; width: 0%;
+        }
+        .exercise-card {
+            background: white; color: #333; border-radius: 25px;
+            padding: 35px; margin-bottom: 20px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            animation: fadeIn 0.6s ease-out both;
+        }
+        .scenario {
+            background: linear-gradient(135deg, #fff8e1 0%, #ffecb3 100%);
+            border-left: 5px solid #ffc107;
+            padding: 20px 24px; border-radius: 12px;
+            margin-bottom: 24px;
+            font-size: 0.98em; line-height: 1.55;
+        }
+        .scenario strong { color: #7a5a00; font-family: 'Fredoka', sans-serif; }
+        .question {
+            font-size: 1.15em; margin-bottom: 20px;
+            font-weight: 700; line-height: 1.4;
+        }
+        .options { display: flex; flex-direction: column; gap: 12px; }
+        .option {
+            background: #f5f7fb; border: 2px solid transparent;
+            padding: 16px 20px; border-radius: 12px;
+            cursor: pointer; transition: all 0.2s ease;
+            font-family: 'Space Mono', monospace; font-size: 0.98em; text-align: left;
+        }
+        .option:hover:not(.disabled) {
+            background: #eef1fb; border-color: #667eea; transform: translateX(4px);
+        }
+        .option.correct { background: #d4edda; border-color: #28a745; color: #155724; }
+        .option.wrong { background: #f8d7da; border-color: #dc3545; color: #721c24; animation: shake 0.4s; }
+        .option.disabled { cursor: not-allowed; opacity: 0.85; }
+        .feedback {
+            margin-top: 22px; padding: 18px 22px; border-radius: 12px;
+            animation: slideUp 0.4s ease-out;
+            font-size: 0.98em; line-height: 1.5;
+        }
+        .feedback.correct { background: #d4edda; color: #155724; border-left: 4px solid #28a745; }
+        .feedback.wrong { background: #f8d7da; color: #721c24; border-left: 4px solid #dc3545; }
+        .feedback strong { font-family: 'Fredoka', sans-serif; }
+        .next-btn, .restart-btn {
+            margin-top: 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white; border: none;
+            padding: 14px 32px; border-radius: 12px;
+            font-size: 1em; cursor: pointer;
+            font-family: 'Fredoka', sans-serif;
+            box-shadow: 0 6px 18px rgba(0,0,0,0.2);
+            transition: transform 0.2s ease;
+        }
+        .next-btn:hover, .restart-btn:hover { transform: scale(1.04); }
+        .results {
+            text-align: center; padding: 25px 15px;
+            animation: bounceIn 0.6s ease-out;
+        }
+        .results h2 {
+            font-family: 'Fredoka', sans-serif; font-size: 2em;
+            margin-bottom: 12px; color: #333;
+        }
+        .results .final-score {
+            font-size: 3em; font-family: 'Fredoka', sans-serif;
+            color: #667eea; margin: 20px 0;
+        }
+        .results p { color: #555; margin-bottom: 12px; }
+        .badge { display: inline-block; font-size: 3.5em; margin: 8px 0; }
+        @keyframes slideDown { from { opacity: 0; transform: translateY(-30px); } to { opacity: 1; transform: translateY(0); } }
+        @keyframes fadeIn { from { opacity: 0; transform: scale(0.96); } to { opacity: 1; transform: scale(1); } }
+        @keyframes slideUp { from { opacity: 0; transform: translateY(15px); } to { opacity: 1; transform: translateY(0); } }
+        @keyframes shake { 0%,100% { transform: translateX(0); } 25% { transform: translateX(-8px); } 75% { transform: translateX(8px); } }
+        @keyframes bounceIn { 0% { opacity: 0; transform: scale(0.4); } 60% { transform: scale(1.05); } 100% { opacity: 1; transform: scale(1); } }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <div class="lesson-tag">Module 3 · Lesson 3.1</div>
+            <h1>Social Media Platforms</h1>
+            <p>10 Karibu Kitchen scenarios — match platforms to audiences and run a four-element campaign</p>
+        </div>
+
+        <div class="score-board">
+            <div class="score-item"><div class="label">Score</div><div class="value" id="score">0</div></div>
+            <div class="score-item"><div class="label">Question</div><div class="value"><span id="current">1</span>/<span id="total">10</span></div></div>
+            <div class="score-item"><div class="label">Streak</div><div class="value" id="streak">0</div></div>
+        </div>
+
+        <div class="progress-bar"><div class="progress-fill" id="progress"></div></div>
+
+        <div class="exercise-card" id="exerciseCard"></div>
+    </div>
+
+    <script>
+        const exercises = [
+  {
+    "scenario": "Sarah's cousin insists Karibu Kitchen must join every platform: Facebook, Instagram, TikTok, LinkedIn, X, YouTube, Pinterest, Snapchat, Threads, and Reddit. Sarah has time to genuinely maintain three at most.",
+    "question": "What does Lesson 3.1 say is the single most important skill in social media marketing?",
+    "options": [
+      "Being on every platform, at all times.",
+      "Choosing the right platform for the right audience.",
+      "Posting daily on all ten platforms.",
+      "Buying followers on every platform to look big."
+    ],
+    "correct": 1,
+    "explanation": "Section 3.1 explicitly names \"choosing the right platform for the right audience\" as the single most important skill in social media marketing. Being everywhere but reaching nobody is the classic small-business mistake. Buying followers violates every professional habit later in the module."
+  },
+  {
+    "scenario": "You are teaching Sarah the seven main platforms every Kenyan digital marketer should know.",
+    "question": "Which list matches Lesson 3.1's seven?",
+    "options": [
+      "Facebook, Instagram, X (Twitter), LinkedIn, YouTube, TikTok, Pinterest.",
+      "WhatsApp, SMS, email, Facebook, Instagram, TikTok, YouTube.",
+      "Google, Bing, Yahoo, DuckDuckGo, Ecosia, Baidu, Yandex.",
+      "Only Facebook and Instagram — the rest do not matter in Kenya."
+    ],
+    "correct": 0,
+    "explanation": "Section 3.1 names these seven exactly: Facebook, Instagram, X, LinkedIn, YouTube, TikTok, Pinterest. Option 2 mixes messaging apps with platforms. Option 3 lists search engines. Option 4 undersells the landscape."
+  },
+  {
+    "scenario": "Wangari Kamau's B2B corporate wellness business targets HR directors and CFOs at Nairobi banks and insurance firms. Brian Otieno's Chapa Fitness targets Gen-Z apparel buyers aged 16 to 24.",
+    "question": "Which platform matching from Lesson 3.1 fits each?",
+    "options": [
+      "Wangari → LinkedIn; Brian → TikTok.",
+      "Wangari → TikTok; Brian → LinkedIn.",
+      "Both should focus only on Pinterest.",
+      "Both should focus only on X."
+    ],
+    "correct": 0,
+    "explanation": "Section 3.1's platform-audience rule: LinkedIn beats TikTok for a 35–50 corporate professional; TikTok beats LinkedIn for a 16–24 Gen-Z. Wangari's B2B decision-makers live on LinkedIn; Brian's Gen-Z apparel audience lives on TikTok. Option 2 swaps them; options 3 and 4 ignore both audiences."
+  },
+  {
+    "scenario": "Karibu Kitchen's customers are Eldoret office workers aged 25–50 who order lunch, plus Kapsoya families who order dinner. Sarah is choosing her three focus platforms.",
+    "question": "Which three does Lesson 3.1 recommend for her?",
+    "options": [
+      "LinkedIn, Pinterest, X.",
+      "TikTok, Snapchat, Threads.",
+      "Facebook, Instagram, and Google Business Profile.",
+      "Only WhatsApp Business."
+    ],
+    "correct": 2,
+    "explanation": "Section 3.1 picks Facebook (existing friends, lunch/menu posts), Instagram (food photography engagement) and Google Business Profile (transactional search intent) as Sarah's three. TikTok is a maybe if she has creative energy. LinkedIn and Pinterest are wrong-audience matches for her."
+  },
+  {
+    "scenario": "Sarah posted the same generic caption — \"Order today!\" — simultaneously to Facebook, Instagram, and LinkedIn. Facebook engagement was low. Instagram engagement was very low. LinkedIn had zero engagement.",
+    "question": "Which element of the four-element campaign from Lesson 3.1 is she failing at?",
+    "options": [
+      "Choosing platforms.",
+      "Planning and creating content that suits EACH platform — Facebook posts, Instagram Reels, and LinkedIn articles are different formats and should not be identical.",
+      "Tracking the campaign.",
+      "Evaluating performance."
+    ],
+    "correct": 1,
+    "explanation": "Section 3.1's second campaign element is \"plan and create content that suits each platform\". The lesson is explicit: do NOT post the same thing everywhere. Format, tone, and length must match the platform's culture. The other elements matter too but are not what is failing here."
+  },
+  {
+    "scenario": "After three weeks of posting Sarah has never once looked at Instagram Insights or Facebook Page Insights. Her cousin says analytics is \"only for big businesses\".",
+    "question": "Which two campaign elements from Lesson 3.1 is she skipping?",
+    "options": [
+      "Choosing platforms and planning content.",
+      "Tracking the campaign (reach, engagement, clicks, conversions) and evaluating performance (deciding what to keep, drop, or shift).",
+      "Nothing — analytics is optional.",
+      "Only tracking — evaluation is done automatically by the platform."
+    ],
+    "correct": 1,
+    "explanation": "Section 3.1's four elements are: choose platforms, create per-platform content, track, evaluate. Sarah is skipping the last two. Without tracking there is no data; without evaluation there is no adjustment. Every platform has built-in analytics — free."
+  },
+  {
+    "scenario": "Sarah posted brilliantly for one week — daily photos, replies to every comment — then went silent for three weeks because the kitchen was busy. Her reach dropped by 70 per cent.",
+    "question": "Which of the three professional habits from Lesson 3.1 is she breaking?",
+    "options": [
+      "Quality over quantity.",
+      "Consistency — posting on a schedule, weekly at minimum, daily is better. Sporadic brilliance is worse than steady presence.",
+      "Engagement.",
+      "None — the algorithm always recovers."
+    ],
+    "correct": 1,
+    "explanation": "Section 3.1's three habits are consistency, quality over quantity, and engagement. Consistency is the one Sarah is breaking. The lesson is explicit: post on a schedule, weekly minimum, daily better. The other habits are being kept during the active weeks."
+  },
+  {
+    "scenario": "Sarah posts ten shaky 8-second videos a day of nothing in particular — the kitchen ceiling, her chopping board, a random spoon. Engagement is near zero. Her cousin says the algorithm just \"needs more posts\".",
+    "question": "Which habit from Lesson 3.1 does she need instead?",
+    "options": [
+      "Post more — go from 10 videos a day to 50.",
+      "Quality over quantity — one well-photographed lunch plate with a proper caption beats ten shaky videos of nothing.",
+      "Delete the account and start over.",
+      "Post only text — never images or video."
+    ],
+    "correct": 1,
+    "explanation": "Section 3.1 names quality over quantity as habit two: one well-photographed lunch photo with a proper caption beats ten shaky videos. Volume without value hurts, not helps. Option 4 contradicts the whole module."
+  },
+  {
+    "scenario": "A customer commented \"Delivery to Kapsoya today?\" on Sarah's Facebook post at 11am. Sarah is genuinely busy in the kitchen and did not reply until Friday — four days later.",
+    "question": "Which habit from Lesson 3.1 has she broken, and what is the professional standard?",
+    "options": [
+      "Consistency — reply once a month.",
+      "Engagement — reply to every single comment, especially negative ones, within 24 hours. Social media is a conversation, not a broadcast.",
+      "Nothing — customers can wait a week.",
+      "Only reply to positive comments; ignore questions."
+    ],
+    "correct": 1,
+    "explanation": "Section 3.1's third habit is engagement — reply to every comment within 24 hours, especially negative ones. Four days is silence, and silence loses the order. The other options undermine the customer relationship."
+  },
+  {
+    "scenario": "Sarah is about to sign up for TikTok because her cousin says \"a friend's samosa business went viral with 40,000 followers\". She posted one 8-second shaky clip herself and got 12 views.",
+    "question": "What does Lesson 3.1 advise about TikTok for Karibu Kitchen specifically?",
+    "options": [
+      "Join immediately — every business needs TikTok.",
+      "TikTok is a maybe — only worth the effort if Sarah has the time and creative energy to make one strong video a week. It is not part of her three-platform focus.",
+      "TikTok is banned in Kenya.",
+      "TikTok is the only platform that matters for Kenyan restaurants."
+    ],
+    "correct": 1,
+    "explanation": "Section 3.1 places TikTok as a \"maybe later\" for Sarah — only if she has creative energy for one strong video a week. Her three-platform focus (Facebook, Instagram, Google Business Profile) comes first. Chasing viral fantasies without capacity wastes time — a theme continued in Lesson 4.2."
+  }
+];
+
+        let currentQuestion = 0, score = 0, streak = 0, answered = false;
+
+        function updateScoreboard() {
+            document.getElementById('score').textContent = score;
+            document.getElementById('current').textContent = Math.min(currentQuestion + 1, exercises.length);
+            document.getElementById('total').textContent = exercises.length;
+            document.getElementById('streak').textContent = streak;
+            document.getElementById('progress').style.width = ((currentQuestion) / exercises.length) * 100 + '%';
+        }
+
+        function escapeHtml(s) {
+            return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+        }
+
+        function renderQuestion() {
+            answered = false;
+            const q = exercises[currentQuestion];
+            let html = '';
+            if (q.scenario) {
+                html += `<div class="scenario"><strong>Scenario.</strong> ${escapeHtml(q.scenario)}</div>`;
+            }
+            html += `<div class="question">${escapeHtml(q.question)}</div>`;
+            html += '<div class="options">';
+            q.options.forEach((o, i) => {
+                html += `<button class="option" onclick="selectAnswer(${i})">${escapeHtml(o)}</button>`;
+            });
+            html += '</div>';
+            document.getElementById('exerciseCard').innerHTML = html;
+            updateScoreboard();
+        }
+
+        function selectAnswer(i) {
+            if (answered) return;
+            answered = true;
+            const q = exercises[currentQuestion];
+            const btns = document.querySelectorAll('.option');
+            btns.forEach(b => b.classList.add('disabled'));
+            btns[q.correct].classList.add('correct');
+            const right = i === q.correct;
+            if (!right) btns[i].classList.add('wrong');
+            if (right) { score += 10; streak += 1; } else { streak = 0; }
+            const fb = document.createElement('div');
+            fb.className = 'feedback ' + (right ? 'correct' : 'wrong');
+            fb.innerHTML = `<strong>${right ? '✅ Correct.' : '❌ Not quite.'}</strong><br>${escapeHtml(q.explanation)}`;
+            document.getElementById('exerciseCard').appendChild(fb);
+            const nb = document.createElement('button');
+            nb.className = 'next-btn';
+            nb.textContent = currentQuestion === exercises.length - 1 ? 'See results →' : 'Next scenario →';
+            nb.onclick = nextQuestion;
+            document.getElementById('exerciseCard').appendChild(nb);
+            updateScoreboard();
+        }
+
+        function nextQuestion() {
+            currentQuestion++;
+            if (currentQuestion >= exercises.length) return showResults();
+            renderQuestion();
+        }
+
+        function showResults() {
+            document.getElementById('progress').style.width = '100%';
+            const total = exercises.length * 10;
+            const pct = Math.round(score / total * 100);
+            if (window.parent) { window.parent.postMessage({type:"mtti_quiz_score", score: score, total: total, percent: pct}, "*"); }
+            let badge = '🌟', msg = 'Excellent work. You have a professional grasp of this lesson.';
+            if (pct < 50) { badge = '🌱'; msg = 'Good first attempt. Re-watch the lesson video and try again.'; }
+            else if (pct < 80) { badge = '📚'; msg = 'Solid progress. Review the scenarios you missed and retry.'; }
+            document.getElementById('exerciseCard').innerHTML = `
+                <div class="results">
+                    <span class="badge">${badge}</span>
+                    <h2>Quiz Complete</h2>
+                    <div class="final-score">${score} / ${total}</div>
+                    <p><strong>${pct}%</strong> · Longest streak: ${streak}</p>
+                    <p>${msg}</p>
+                    <button class="restart-btn" onclick="restart()">Try again 🔁</button>
+                </div>`;
+        }
+
+        function restart() {
+            currentQuestion = 0; score = 0; streak = 0;
+            renderQuestion();
+        }
+
+        renderQuestion();
+    </script>
+</body>
+</html>

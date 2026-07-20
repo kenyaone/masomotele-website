@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Compatibility Across Devices and Platforms (Lesson) | MTTI Video Editing</title>
+<link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Fredoka:wght@500;600&display=swap" rel="stylesheet">
+<style>
+* { margin:0; padding:0; box-sizing:border-box; }
+body { font-family:'Space Mono', monospace; background:linear-gradient(135deg,#6A11CB 0%,#2575FC 100%); min-height:100vh; padding:20px; color:#fff; }
+.container { max-width:820px; margin:0 auto; }
+.header { text-align:center; margin-bottom:24px; }
+.lesson-tag { display:inline-block; background:rgba(255,255,255,0.2); padding:6px 16px; border-radius:999px; font-size:0.85em; margin-bottom:12px; }
+.header h1 { font-family:'Fredoka', sans-serif; font-size:2em; margin-bottom:6px; text-shadow:3px 3px 0 rgba(0,0,0,0.2); }
+.card { background:#fff; color:#333; border-radius:22px; padding:32px; margin-bottom:20px; box-shadow:0 20px 60px rgba(0,0,0,0.3); }
+.section { margin-bottom:26px; }
+.section:last-child { margin-bottom:0; }
+.section h2 { font-family:'Fredoka', sans-serif; font-size:1.2em; margin-bottom:10px; color:#6A11CB; }
+.section .body { line-height:1.65; font-size:0.98em; }
+.section .body p { margin-bottom:10px; }
+.section .body code { background:#f5f7fb; padding:2px 6px; border-radius:4px; font-size:0.92em; }
+.keypoint { background:#fff8e1; border-left:4px solid #ffc107; padding:12px 16px; border-radius:8px; margin-top:12px; font-size:0.92em; }
+</style>
+</head>
+<body>
+<div class="container">
+<div class="header"><div class="lesson-tag">Module 4 · Lesson 4.3</div><h1>Compatibility Across Devices and Platforms</h1></div>
+<div class="card"><div class="section"><h2>Why "It Plays On My Phone" Isn't Enough</h2><div class="body"><p>Otieno often exports and previews a finished video on his own newer phone, where it plays flawlessly &mdash; but a client's older or budget Android device may lack hardware decoding support for a newer codec like H.265 (HEVC), causing the video to fail to open, stutter badly, or show only a black screen. H.264 (AVC) inside an MP4 container is the safest, most universally supported combination across old and new devices, most browsers, and every major social platform, which is why it remains CapCut and Canva Video's default export option.</p></div></div><div class="section"><h2>Platform-Specific Requirements</h2><div class="body"><p>Each platform has its own accepted formats, resolutions, and aspect ratios. Reels and TikTok expect vertical 9:16 video (commonly 1080&times;1920), and reject or badly crop video shot and exported in landscape 16:9. YouTube accepts both orientations but has its own recommended resolution/bitrate combinations for smooth playback. WhatsApp Status has both a duration limit and compresses whatever is uploaded, so sending an already very high-bitrate file often gets re-compressed harshly by WhatsApp itself, undoing careful quality work.</p></div></div><div class="section"><h2>Diagnosing a Real Complaint</h2><div class="body"><p>When a client reports "it won't play" or "the platform rejected my upload," Otieno treats it like a checklist, not a guess: What codec was it exported in (H.265 is the most common culprit on older Android)? What container (MP4 is safest)? What resolution and aspect ratio (wrong orientation is a common TikTok/Reels rejection cause)? Fixing the actual reported problem means matching the export settings to the specific device or platform in the complaint, not simply re-exporting with random tweaks.</p><p>CapCut and Canva Video both offer named export presets (for example, "Reels/TikTok" or "YouTube") that pre-set the safe resolution, aspect ratio, and codec/container combination for that destination &mdash; using the matching preset avoids most of these compatibility problems before they happen.</p></div><div class="keypoint"><strong>Key Point.</strong> When compatibility breaks, work through it in order: codec (H.264 over H.265 for older Android), container (MP4 over MOV/AVI for uploads), then resolution/aspect ratio (vertical 9:16 for Reels/TikTok). Match the export to what the complaint actually describes, and prefer the platform's named preset when one exists.</div></div></div>
+</div>
+</body>
+</html>

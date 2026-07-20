@@ -112,6 +112,25 @@
         @keyframes slideUp { from { opacity: 0; transform: translateY(15px); } to { opacity: 1; transform: translateY(0); } }
         @keyframes shake { 0%,100% { transform: translateX(0); } 25% { transform: translateX(-8px); } 75% { transform: translateX(8px); } }
         @keyframes bounceIn { 0% { opacity: 0; transform: scale(0.4); } 60% { transform: scale(1.05); } 100% { opacity: 1; transform: scale(1); } }
+
+        /* How-To intro screen — shown before question 1, not scored */
+        .howto-card { background: white; color: #333; border-radius: 25px; padding: 35px; margin-bottom: 20px; box-shadow: 0 20px 60px rgba(0,0,0,0.3); }
+        .howto-card h3 { font-family: 'Fredoka', sans-serif; font-size: 1.3em; margin-bottom: 12px; color: #667eea; }
+        .howto-card p { line-height: 1.6; margin-bottom: 16px; color: #444; }
+        .howto-banner { margin-top: 4px; margin-bottom: 18px; padding: 12px 16px; border-radius: 10px; font-size: 0.9em; font-weight: 700; display: none; }
+        .howto-banner.show { display: block; }
+        .howto-banner.ok { background: #d4edda; color: #155724; }
+        .howto-banner.fail { background: #f8d7da; color: #721c24; }
+        .start-quiz-btn { margin-top: 4px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; border: none; padding: 14px 32px; border-radius: 12px; font-size: 1em; cursor: pointer; font-family: 'Fredoka', sans-serif; box-shadow: 0 6px 18px rgba(0,0,0,0.2); }
+        .howto-fields { display: flex; flex-direction: column; gap: 14px; background: #f5f7fb; border-radius: 12px; padding: 18px; margin-bottom: 18px; }
+        .howto-field { display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap; border-radius: 8px; padding: 8px 10px; }
+        .howto-field .hf-label { font-size: 0.92em; flex: 1; min-width: 220px; }
+        .howto-field .hf-label code { background: #e8ebf7; padding: 2px 6px; border-radius: 4px; }
+        .howto-field select { padding: 8px 10px; border-radius: 8px; border: 2px solid #ccd3ea; font-family: 'Space Mono', monospace; font-size: 0.92em; }
+        .howto-field.hf-correct { background: #d4edda; }
+        .howto-field.hf-wrong { background: #f8d7da; }
+        .howto-field.hf-correct select { border-color: #28a745; }
+        .howto-field.hf-wrong select { border-color: #dc3545; }
     </style>
 </head>
 <body>
@@ -340,7 +359,65 @@
             renderQuestion();
         }
 
-        renderQuestion();
+
+        /* How-To intro — a small, ungraded "identify the data type" demo shown
+           before the quiz starts, directly rehearsing the "what type is this
+           value?" mechanic that one of the quiz questions asks about, so it's
+           not being asked cold. */
+        const HOWTO_OPTIONS = ['String', 'Number', 'Boolean', 'Object'];
+        const HOWTO_FIELDS = [
+            { id: 'hf1', label: "const productName = 'Cement';", target: 'String' },
+            { id: 'hf2', label: 'const price = 850;', target: 'Number' },
+            { id: 'hf3', label: 'let inStock = true;', target: 'Boolean' },
+        ];
+
+        function escHtmlH(s) { return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+
+        function renderHowtoFields() {
+            document.getElementById('howtoFields').innerHTML = HOWTO_FIELDS.map(f => `
+                <div class="howto-field" id="row-${f.id}">
+                    <div class="hf-label">James writes: <code>${escHtmlH(f.label)}</code> What data type is this?</div>
+                    <select id="${f.id}">
+                        <option value="">-- choose --</option>
+                        ${HOWTO_OPTIONS.map(o => `<option value="${escHtmlH(o)}">${escHtmlH(o)}</option>`).join('')}
+                    </select>
+                </div>`).join('');
+        }
+
+        function checkHowto() {
+            let allOk = true;
+            HOWTO_FIELDS.forEach(f => {
+                const sel = document.getElementById(f.id);
+                const row = document.getElementById('row-' + f.id);
+                const ok = sel.value === f.target;
+                row.classList.remove('hf-correct', 'hf-wrong');
+                row.classList.add(ok ? 'hf-correct' : 'hf-wrong');
+                if (!ok) allOk = false;
+            });
+            const banner = document.getElementById('howtoBanner');
+            banner.classList.add('show');
+            banner.className = 'howto-banner show ' + (allOk ? 'ok' : 'fail');
+            banner.textContent = allOk
+                ? 'Correct — quotes mean String, a plain number means Number, and true/false mean Boolean.'
+                : 'Not quite yet — check each field above and try again.';
+        }
+
+        function renderHowto() {
+            document.getElementById('exerciseCard').innerHTML = `
+                <div class="howto-card">
+                    <h3>Quick How-To: Reading Data Types</h3>
+                    <p>Some of the questions coming up ask you to identify a variable's data type just by how it is written. Quotes around a value mean <strong>String</strong>, a plain number means <strong>Number</strong>, and true/false mean <strong>Boolean</strong>. Try it on these three variables from James's product record, then check your answers.</p>
+                    <div class="howto-fields" id="howtoFields"></div>
+                    <div class="howto-banner" id="howtoBanner"></div>
+                    <button class="start-quiz-btn" id="checkHowtoBtn">Check My Types</button>
+                    <button class="start-quiz-btn" id="startQuizBtn" style="margin-left:10px;background:linear-gradient(135deg,#28a745,#1e7e34);">Start Quiz →</button>
+                </div>`;
+            renderHowtoFields();
+            document.getElementById('checkHowtoBtn').addEventListener('click', checkHowto);
+            document.getElementById('startQuizBtn').addEventListener('click', renderQuestion);
+        }
+
+        renderHowto();
     </script>
 </body>
 </html>

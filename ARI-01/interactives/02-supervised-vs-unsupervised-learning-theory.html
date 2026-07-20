@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Supervised vs Unsupervised Learning (Lesson) | MTTI Artificial Intelligence</title>
+<link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Fredoka:wght@500;600&display=swap" rel="stylesheet">
+<style>
+* { margin:0; padding:0; box-sizing:border-box; }
+body { font-family:'Space Mono', monospace; background:linear-gradient(135deg,#311B92 0%,#0288D1 100%); min-height:100vh; padding:20px; color:#fff; }
+.container { max-width:820px; margin:0 auto; }
+.header { text-align:center; margin-bottom:24px; }
+.lesson-tag { display:inline-block; background:rgba(255,255,255,0.2); padding:6px 16px; border-radius:999px; font-size:0.85em; margin-bottom:12px; }
+.header h1 { font-family:'Fredoka', sans-serif; font-size:2em; margin-bottom:6px; text-shadow:3px 3px 0 rgba(0,0,0,0.2); }
+.card { background:#fff; color:#333; border-radius:22px; padding:32px; margin-bottom:20px; box-shadow:0 20px 60px rgba(0,0,0,0.3); }
+.section { margin-bottom:26px; }
+.section:last-child { margin-bottom:0; }
+.section h2 { font-family:'Fredoka', sans-serif; font-size:1.2em; margin-bottom:10px; color:#0288D1; }
+.section .body { line-height:1.65; font-size:0.98em; }
+.section .body p { margin-bottom:10px; }
+.section .body code { background:#f5f7fb; padding:2px 6px; border-radius:4px; font-size:0.92em; }
+.keypoint { background:#fff8e1; border-left:4px solid #ffc107; padding:12px 16px; border-radius:8px; margin-top:12px; font-size:0.92em; }
+</style>
+</head>
+<body>
+<div class="container">
+<div class="header"><div class="lesson-tag">Module 2 · Topic 2.1</div><h1>Supervised vs Unsupervised Learning</h1></div>
+<div class="card"><div class="section"><h2>Supervised Learning: Learning From Labeled Examples</h2><div class="body"><p>Supervised learning is the type of machine learning where the model is trained on past examples that already come with the correct answer attached. That correct answer is called a <strong>label</strong>. At Rafiki Insights, Brian sometimes helps a client predict which customers are likely to pay an invoice late, using three years of past invoices. Each of those old invoices already has a known outcome: "paid on time" or "paid late". The model studies the details of each past invoice — the amount, the client's payment history, the credit terms offered — alongside its known outcome, and learns the relationship between the two.</p><p>Because the correct answers are supplied up front, this is called "supervised" learning: it is a bit like a trainee analyst learning from a stack of already-graded case studies, where every example is marked right or wrong before they start.</p></div></div><div class="section"><h2>Unsupervised Learning: Finding Patterns With No Labels</h2><div class="body"><p>Unsupervised learning works differently: the data has no correct answers attached at all. Instead of predicting a known outcome, the model's job is to find structure — patterns, groupings, or clusters — hidden inside the data on its own. Suppose a Rafiki Insights client, a small hardware retailer, wants to understand its customer base better but has never categorized customers into any type. Brian can feed the retailer's sales data into a clustering algorithm, and it might surface natural groupings such as "frequent small-basket shoppers" and "occasional bulk buyers" — categories nobody defined beforehand.</p></div><div class="keypoint"><strong>Key Point.</strong> The real difference between the two is not the algorithm — it is the data itself. Supervised learning starts from known answers and learns to reproduce them on new cases. Unsupervised learning starts with no answers and looks for structure that was not there to begin with.</div></div><div class="section"><h2>Choosing the Right Approach for a Business Question</h2><div class="body"><p>A simple rule of thumb: if a business already has historical outcomes clearly labeled — such as which past customers defaulted, or which past leads converted — and wants to predict that same outcome for new cases, that is a supervised learning problem. If instead the goal is to explore data that has no predefined outcome, looking for natural groupings or patterns the business did not already know about, that is an unsupervised learning problem. Brian's first question with any new client dataset is always: "Do we already have a labeled answer we're trying to predict, or are we exploring with no labels at all?"</p></div></div></div>
+</div>
+</body>
+</html>

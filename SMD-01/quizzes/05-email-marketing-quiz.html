@@ -1,0 +1,346 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Email Marketing | MTTI Digital Marketing</title>
+    <link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Fredoka:wght@500;600&display=swap" rel="stylesheet">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Space Mono', monospace;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh; padding: 20px; color: #fff;
+        }
+        .container { max-width: 900px; margin: 0 auto; }
+        .header { text-align: center; margin-bottom: 30px; animation: slideDown 0.6s ease-out; }
+        .header .lesson-tag {
+            display: inline-block; background: rgba(255,255,255,0.2);
+            padding: 6px 16px; border-radius: 999px;
+            font-size: 0.85em; margin-bottom: 12px;
+        }
+        .header h1 {
+            font-family: 'Fredoka', sans-serif; font-size: 2.2em;
+            margin-bottom: 8px; text-shadow: 3px 3px 0 rgba(0,0,0,0.2);
+        }
+        .header p { opacity: 0.95; font-size: 0.95em; }
+        .score-board {
+            background: rgba(255,255,255,0.15); backdrop-filter: blur(10px);
+            border-radius: 20px; padding: 20px; margin-bottom: 20px;
+            display: flex; justify-content: space-around;
+            animation: fadeIn 0.8s ease-out 0.2s both;
+        }
+        .score-item { text-align: center; }
+        .score-item .label { font-size: 0.85em; opacity: 0.9; margin-bottom: 4px; }
+        .score-item .value {
+            font-size: 1.8em; font-weight: bold; font-family: 'Fredoka', sans-serif;
+        }
+        .progress-bar {
+            width: 100%; height: 8px; background: rgba(255,255,255,0.3);
+            border-radius: 10px; margin-bottom: 25px; overflow: hidden;
+        }
+        .progress-fill {
+            height: 100%; background: linear-gradient(90deg, #f093fb 0%, #f5576c 100%);
+            border-radius: 10px; transition: width 0.5s ease; width: 0%;
+        }
+        .exercise-card {
+            background: white; color: #333; border-radius: 25px;
+            padding: 35px; margin-bottom: 20px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            animation: fadeIn 0.6s ease-out both;
+        }
+        .scenario {
+            background: linear-gradient(135deg, #fff8e1 0%, #ffecb3 100%);
+            border-left: 5px solid #ffc107;
+            padding: 20px 24px; border-radius: 12px;
+            margin-bottom: 24px;
+            font-size: 0.98em; line-height: 1.55;
+        }
+        .scenario strong { color: #7a5a00; font-family: 'Fredoka', sans-serif; }
+        .question {
+            font-size: 1.15em; margin-bottom: 20px;
+            font-weight: 700; line-height: 1.4;
+        }
+        .options { display: flex; flex-direction: column; gap: 12px; }
+        .option {
+            background: #f5f7fb; border: 2px solid transparent;
+            padding: 16px 20px; border-radius: 12px;
+            cursor: pointer; transition: all 0.2s ease;
+            font-family: 'Space Mono', monospace; font-size: 0.98em; text-align: left;
+        }
+        .option:hover:not(.disabled) {
+            background: #eef1fb; border-color: #667eea; transform: translateX(4px);
+        }
+        .option.correct { background: #d4edda; border-color: #28a745; color: #155724; }
+        .option.wrong { background: #f8d7da; border-color: #dc3545; color: #721c24; animation: shake 0.4s; }
+        .option.disabled { cursor: not-allowed; opacity: 0.85; }
+        .feedback {
+            margin-top: 22px; padding: 18px 22px; border-radius: 12px;
+            animation: slideUp 0.4s ease-out;
+            font-size: 0.98em; line-height: 1.5;
+        }
+        .feedback.correct { background: #d4edda; color: #155724; border-left: 4px solid #28a745; }
+        .feedback.wrong { background: #f8d7da; color: #721c24; border-left: 4px solid #dc3545; }
+        .feedback strong { font-family: 'Fredoka', sans-serif; }
+        .next-btn, .restart-btn {
+            margin-top: 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white; border: none;
+            padding: 14px 32px; border-radius: 12px;
+            font-size: 1em; cursor: pointer;
+            font-family: 'Fredoka', sans-serif;
+            box-shadow: 0 6px 18px rgba(0,0,0,0.2);
+            transition: transform 0.2s ease;
+        }
+        .next-btn:hover, .restart-btn:hover { transform: scale(1.04); }
+        .results {
+            text-align: center; padding: 25px 15px;
+            animation: bounceIn 0.6s ease-out;
+        }
+        .results h2 {
+            font-family: 'Fredoka', sans-serif; font-size: 2em;
+            margin-bottom: 12px; color: #333;
+        }
+        .results .final-score {
+            font-size: 3em; font-family: 'Fredoka', sans-serif;
+            color: #667eea; margin: 20px 0;
+        }
+        .results p { color: #555; margin-bottom: 12px; }
+        .badge { display: inline-block; font-size: 3.5em; margin: 8px 0; }
+        @keyframes slideDown { from { opacity: 0; transform: translateY(-30px); } to { opacity: 1; transform: translateY(0); } }
+        @keyframes fadeIn { from { opacity: 0; transform: scale(0.96); } to { opacity: 1; transform: scale(1); } }
+        @keyframes slideUp { from { opacity: 0; transform: translateY(15px); } to { opacity: 1; transform: translateY(0); } }
+        @keyframes shake { 0%,100% { transform: translateX(0); } 25% { transform: translateX(-8px); } 75% { transform: translateX(8px); } }
+        @keyframes bounceIn { 0% { opacity: 0; transform: scale(0.4); } 60% { transform: scale(1.05); } 100% { opacity: 1; transform: scale(1); } }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <div class="lesson-tag">Module 5 · Lesson 5.2</div>
+            <h1>Email Marketing</h1>
+            <p>10 Sarah Chebet scenarios — Mailchimp, the six terms, and the DPA 2019 warnings</p>
+        </div>
+
+        <div class="score-board">
+            <div class="score-item"><div class="label">Score</div><div class="value" id="score">0</div></div>
+            <div class="score-item"><div class="label">Question</div><div class="value"><span id="current">1</span>/<span id="total">10</span></div></div>
+            <div class="score-item"><div class="label">Streak</div><div class="value" id="streak">0</div></div>
+        </div>
+
+        <div class="progress-bar"><div class="progress-fill" id="progress"></div></div>
+
+        <div class="exercise-card" id="exerciseCard"></div>
+    </div>
+
+    <script>
+        const exercises = [
+  {
+    "scenario": "Sarah tells you: \"Nobody reads email any more — my customers are on WhatsApp. There is no point running email marketing for Karibu Kitchen.\" She has 340 Facebook friends, a WhatsApp Business number, and no email list.",
+    "question": "What is the strongest correction, using the reasons from Lesson 5.2?",
+    "options": [
+      "She is right — email is dead in Kenya.",
+      "Email still wins on three specific measures: direct ownership (the list belongs to her, not to a platform's algorithm), measurable performance (opens, clicks, unsubscribes on every send), and return on investment (KES 30-40 returned per KES 1 spent in credible surveys). Kenyan office workers — her exact customer — check work email dozens of times a day.",
+      "Email is only useful for banks and insurance firms.",
+      "She should replace WhatsApp with email entirely."
+    ],
+    "correct": 1,
+    "explanation": "Slide 3 of §5.2 gives three reasons email still wins: ownership, measurability, and ROI (KES 30-40 per KES 1). Facebook and TikTok can change their algorithms overnight; Sarah's email list belongs to her. And her exact customers — Eldoret office workers — check email dozens of times a day."
+  },
+  {
+    "scenario": "Sarah is choosing her first email platform. She has zero subscribers, no coding skills, and KES 0 to spend on tooling this month.",
+    "question": "Which platform does Lesson 5.2 recommend for a Kenyan starter like her, and why?",
+    "options": [
+      "SendGrid — because Sarah needs developer-focused transactional email.",
+      "AWeber — because it is the veteran platform favoured by consultants.",
+      "Mailchimp — free tier up to 500 contacts, easy setup, and the industry standard for beginners.",
+      "Campaign Monitor — because Australian design-heavy templates suit Karibu Kitchen best."
+    ],
+    "correct": 2,
+    "explanation": "Slide 4 of §5.2 lists five platforms (Mailchimp, Constant Contact, SendGrid, AWeber, Campaign Monitor) and is explicit that for Sarah the answer is Mailchimp — free up to 500 contacts, easy, and the industry standard. SendGrid is for developers, Constant Contact and AWeber are paid, Campaign Monitor is design-heavy."
+  },
+  {
+    "scenario": "Sarah is reading her first Mailchimp report and does not know what any of the numbers mean. It shows: Open rate 35%, Click rate 6%, Bounce rate 3%, Unsubscribes 2.",
+    "question": "Using the six terms taught in Slide 5, which single interpretation is most accurate?",
+    "options": [
+      "Everything is great — nothing needs attention.",
+      "Everything is broken — she should stop sending.",
+      "Open rate 35% is healthy (20-40% band for small business), click rate 6% is good (above the 2-5% normal band), but bounce rate 3% is above the safe ceiling of 2% and needs list cleaning. The two unsubscribes are opt-outs — legally required and normal.",
+      "Bounce rate is the percentage who bought — 3% bought."
+    ],
+    "correct": 2,
+    "explanation": "Slide 5 of §5.2 defines the six terms and gives benchmarks: open rate 20-40% healthy, click rate 2-5% normal (10% excellent), bounce rate under 2%. Sarah's bounce rate at 3% suggests some bad addresses that need cleaning. Bounce is NOT purchase rate; unsubscribes are opt-outs, which every email MUST allow."
+  },
+  {
+    "scenario": "A Facebook seller offers Sarah a list of 20,000 Kenyan email addresses for KES 1,000. He says it is \"the fastest way to launch\" and \"everyone does it\".",
+    "question": "What should you tell Sarah?",
+    "options": [
+      "Buy it — 20,000 subscribers overnight is a bargain.",
+      "Never buy a list. It is illegal under Kenya's Data Protection Act 2019, it is spam under CAN-SPAM and GDPR, and Mailchimp will detect the poor engagement, mark her as a spammer, and land every future email in the junk folder. This one purchase destroys her sender reputation forever.",
+      "Buy it but only send once to see if it works.",
+      "Buy it and re-label the sender name so nobody knows."
+    ],
+    "correct": 1,
+    "explanation": "Slide 6 of §5.2 is titled \"Warning One — never buy a list\" and is unambiguous. It is illegal under Kenya's DPA 2019, it is spam under CAN-SPAM (US) and GDPR (EU), and it destroys sender reputation because engagement is terrible — Mailchimp detects that, flags Sarah as a spammer, and future deliverability collapses. Options 3 and 4 keep the illegality AND destroy her reputation."
+  },
+  {
+    "scenario": "Sarah already has 180 customer phone numbers in her WhatsApp Business — some of them gave her an email address too, purely to receive a receipt. She wonders if she can now email them marketing offers because \"they are already my customers\".",
+    "question": "What does Kenya's Data Protection Act 2019 require here?",
+    "options": [
+      "Nothing — existing customers are exempt.",
+      "She can email whatever she wants because they gave the address willingly for a receipt.",
+      "Marketing emails require explicit opt-in consent — the customer must actively agree to receive marketing content. A receipt-only email address does NOT cover marketing. She must ask, get a yes (checkbox or ticked delivery ticket), and log the consent — otherwise she is in violation of the DPA 2019.",
+      "She only needs consent for customers outside Kenya."
+    ],
+    "correct": 2,
+    "explanation": "Slide 7 of §5.2 is titled \"Warning Two — always get consent\" and is very specific: having an email for a receipt does NOT give permission to send marketing. Under Kenya's DPA 2019 Sarah must obtain explicit opt-in and log it. A checkbox on a form, a website subscriber, or a ticked delivery ticket all qualify. Absence of consent = violation."
+  },
+  {
+    "scenario": "Sarah writes her first Mailchimp campaign but forgets to include an unsubscribe link. She reasons: \"They can just reply STOP if they want out.\"",
+    "question": "Why is that not acceptable?",
+    "options": [
+      "It is acceptable — reply STOP is enough for email.",
+      "Every marketing email MUST include a working unsubscribe link — that is what \"opt-out\" means in Slide 5. It is required by Kenya's DPA 2019 and by international spam laws. Mailchimp inserts the link automatically for a reason; removing it is both illegal and platform-punishable.",
+      "It is fine as long as she signs the email.",
+      "It only applies once she has 1,000 subscribers."
+    ],
+    "correct": 1,
+    "explanation": "Slide 5 of §5.2 defines opt-out/unsubscribe and states plainly: every email you send MUST have a working unsubscribe link. This is legally required in Kenya (DPA 2019) and matches international standards. Mailchimp includes the merge tag for exactly this reason. Removing it violates the law and gets Sarah's account suspended."
+  },
+  {
+    "scenario": "Sarah decides to launch her first Mailchimp campaign following the five steps from Slide 8. She has just signed up for Mailchimp free.",
+    "question": "What is the correct next step BEFORE she sends her first email?",
+    "options": [
+      "Immediately upload every WhatsApp customer's phone number as an email address and hit send.",
+      "Create a simple signup form for her website — for example, \"Get the weekly menu, delivered\" — with an opt-in tickbox, log the consent, and over the first month ask every WhatsApp customer for their email as they order, with consent, until she reaches around 30 real subscribers.",
+      "Buy 5,000 addresses on Facebook to speed things up.",
+      "Skip the signup form and just import her contacts app."
+    ],
+    "correct": 1,
+    "explanation": "Slide 8 of §5.2 walks through Sarah's five-step first campaign. After signing up (step 1), step 2 is the signup form with opt-in and consent logging, and step 3 is asking WhatsApp customers one at a time for their email — building slowly to about 30 subscribers over the first month. Slow, consent-first growth is the only legal and sustainable start."
+  },
+  {
+    "scenario": "Sarah sends her first email — a friendly Monday note with the week's specials and a \"Reply YES to reserve\" call to action — to her 30 subscribers. Mailchimp reports 40% open rate, 4 replies, 2 confirmed orders averaging KES 600 each.",
+    "question": "What is her return on this campaign, and what does it demonstrate about email marketing?",
+    "options": [
+      "Return is KES 0 — because Mailchimp is free, ROI is impossible to calculate.",
+      "Return is KES 1,200 from an email that cost KES 0 to send, illustrating exactly the point that email delivers high ROI compared to other channels — even at a tiny scale of 30 subscribers.",
+      "Return is negative because 40% open rate is a failure.",
+      "Return is KES 600 — Mailchimp only counts the first order."
+    ],
+    "correct": 1,
+    "explanation": "Slide 8 of §5.2 gives this exact worked example: 12 people opened (40% of 30), 4 replied, 2 ordered — KES 1,200 return on KES 0 spend. The open rate of 40% is at the top of the healthy 20-40% band from Slide 5. This is the Slide 3 ROI point (KES 30-40 per KES 1) in miniature."
+  },
+  {
+    "scenario": "A trainee summarises Lesson 5.2 in one sentence: \"Email is dead, Mailchimp is expensive, and Kenya has no data protection law so you can email anyone.\"",
+    "question": "How many of those three claims are correct?",
+    "options": [
+      "All three.",
+      "Two — the Mailchimp and Kenya law parts.",
+      "Zero — every claim is wrong.",
+      "One — only the \"email is dead\" part."
+    ],
+    "correct": 2,
+    "explanation": "Every claim is wrong. Email is NOT dead — it still delivers the highest ROI of any channel (§5.2 Slide 3). Mailchimp is FREE up to 500 contacts (Slide 4). And Kenya has the Data Protection Act 2019, which requires opt-in consent and forbids buying lists (Slides 6-7). This question exists to catch each of the three warnings in one prompt."
+  },
+  {
+    "scenario": "Sarah asks for the one-line summary of Lesson 5.2 she should tape to her laptop.",
+    "question": "Which summary matches the wrap-up in Slide 9?",
+    "options": [
+      "\"Five platforms, six terms, two legal warnings — build the list slowly and legally.\"",
+      "\"Buy the biggest list you can find and blast it once.\"",
+      "\"Skip email — WhatsApp only.\"",
+      "\"Ignore consent — the law only applies to banks.\""
+    ],
+    "correct": 0,
+    "explanation": "Slide 9 of §5.2 closes with exactly the five-platform / six-term / two-warning structure taught in the lesson. Everything else in the options contradicts a core rule of the lesson — either the DPA 2019 warnings, the ownership argument, or the platform list."
+  }
+];
+
+        let currentQuestion = 0, score = 0, streak = 0, answered = false;
+
+        function updateScoreboard() {
+            document.getElementById('score').textContent = score;
+            document.getElementById('current').textContent = Math.min(currentQuestion + 1, exercises.length);
+            document.getElementById('total').textContent = exercises.length;
+            document.getElementById('streak').textContent = streak;
+            document.getElementById('progress').style.width = ((currentQuestion) / exercises.length) * 100 + '%';
+        }
+
+        function escapeHtml(s) {
+            return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+        }
+
+        function renderQuestion() {
+            answered = false;
+            const q = exercises[currentQuestion];
+            let html = '';
+            if (q.scenario) {
+                html += `<div class="scenario"><strong>Scenario.</strong> ${escapeHtml(q.scenario)}</div>`;
+            }
+            html += `<div class="question">${escapeHtml(q.question)}</div>`;
+            html += '<div class="options">';
+            q.options.forEach((o, i) => {
+                html += `<button class="option" onclick="selectAnswer(${i})">${escapeHtml(o)}</button>`;
+            });
+            html += '</div>';
+            document.getElementById('exerciseCard').innerHTML = html;
+            updateScoreboard();
+        }
+
+        function selectAnswer(i) {
+            if (answered) return;
+            answered = true;
+            const q = exercises[currentQuestion];
+            const btns = document.querySelectorAll('.option');
+            btns.forEach(b => b.classList.add('disabled'));
+            btns[q.correct].classList.add('correct');
+            const right = i === q.correct;
+            if (!right) btns[i].classList.add('wrong');
+            if (right) { score += 10; streak += 1; } else { streak = 0; }
+            const fb = document.createElement('div');
+            fb.className = 'feedback ' + (right ? 'correct' : 'wrong');
+            fb.innerHTML = `<strong>${right ? '✅ Correct.' : '❌ Not quite.'}</strong><br>${escapeHtml(q.explanation)}`;
+            document.getElementById('exerciseCard').appendChild(fb);
+            const nb = document.createElement('button');
+            nb.className = 'next-btn';
+            nb.textContent = currentQuestion === exercises.length - 1 ? 'See results →' : 'Next scenario →';
+            nb.onclick = nextQuestion;
+            document.getElementById('exerciseCard').appendChild(nb);
+            updateScoreboard();
+        }
+
+        function nextQuestion() {
+            currentQuestion++;
+            if (currentQuestion >= exercises.length) return showResults();
+            renderQuestion();
+        }
+
+        function showResults() {
+            document.getElementById('progress').style.width = '100%';
+            const total = exercises.length * 10;
+            const pct = Math.round(score / total * 100);
+            if (window.parent) { window.parent.postMessage({type:"mtti_quiz_score", score: score, total: total, percent: pct}, "*"); }
+            let badge = '🌟', msg = 'Excellent work. You have a professional grasp of this lesson.';
+            if (pct < 50) { badge = '🌱'; msg = 'Good first attempt. Re-watch the lesson video and try again.'; }
+            else if (pct < 80) { badge = '📚'; msg = 'Solid progress. Review the scenarios you missed and retry.'; }
+            document.getElementById('exerciseCard').innerHTML = `
+                <div class="results">
+                    <span class="badge">${badge}</span>
+                    <h2>Quiz Complete</h2>
+                    <div class="final-score">${score} / ${total}</div>
+                    <p><strong>${pct}%</strong> · Longest streak: ${streak}</p>
+                    <p>${msg}</p>
+                    <button class="restart-btn" onclick="restart()">Try again 🔁</button>
+                </div>`;
+        }
+
+        function restart() {
+            currentQuestion = 0; score = 0; streak = 0;
+            renderQuestion();
+        }
+
+        renderQuestion();
+    </script>
+</body>
+</html>

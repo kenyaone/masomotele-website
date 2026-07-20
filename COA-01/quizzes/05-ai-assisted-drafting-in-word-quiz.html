@@ -37,6 +37,23 @@
         .results .final-score { font-size: 3em; font-family: 'Fredoka', sans-serif; color: #667eea; margin: 20px 0; }
         .results p { color: #555; margin-bottom: 12px; }
         .badge { display: inline-block; font-size: 3.5em; margin: 8px 0; }
+
+        /* How-To intro screen — shown before question 1, not scored */
+        .howto-card { background: white; color: #333; border-radius: 25px; padding: 35px; margin-bottom: 20px; box-shadow: 0 20px 60px rgba(0,0,0,0.3); }
+        .howto-card h3 { font-family: 'Fredoka', sans-serif; font-size: 1.3em; margin-bottom: 12px; color: #667eea; }
+        .howto-card p { line-height: 1.6; margin-bottom: 16px; color: #444; }
+        .howto-fields { background: #f5f7fb; border-radius: 12px; padding: 18px 20px; margin-bottom: 18px; display: flex; flex-direction: column; gap: 14px; }
+        .howto-field label { display: block; font-weight: 700; margin-bottom: 6px; font-size: 0.92em; color: #333; }
+        .howto-field input[type="text"], .howto-field select { width: 100%; padding: 10px 12px; border-radius: 8px; border: 2px solid #ddd; font-family: 'Space Mono', monospace; font-size: 0.95em; }
+        .howto-field input[type="checkbox"] { width: 18px; height: 18px; margin-right: 8px; vertical-align: middle; }
+        .howto-field.hc-correct input[type="text"], .howto-field.hc-correct select { border-color: #28a745; }
+        .howto-field.hc-wrong input[type="text"], .howto-field.hc-wrong select { border-color: #dc3545; }
+        .howto-field .hc-mark { margin-left: 8px; font-weight: 700; }
+        .howto-banner { margin-top: 4px; margin-bottom: 18px; padding: 12px 16px; border-radius: 10px; font-size: 0.9em; font-weight: 700; display: none; }
+        .howto-banner.show { display: block; }
+        .howto-banner.ok { background: #d4edda; color: #155724; }
+        .howto-banner.fail { background: #f8d7da; color: #721c24; }
+        .start-quiz-btn { margin-top: 4px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; border: none; padding: 14px 32px; border-radius: 12px; font-size: 1em; cursor: pointer; font-family: 'Fredoka', sans-serif; box-shadow: 0 6px 18px rgba(0,0,0,0.2); }
     </style>
 </head>
 <body>
@@ -117,7 +134,82 @@
                 </div>`;
         }
         function restart() { currentQuestion = 0; score = 0; streak = 0; renderQuestion(); }
-        renderQuestion();
+
+        /* How-To intro — an ungraded field-check demo shown before the
+           quiz starts, directly rehearsing the "give the AI the specifics it needs, not a vague prompt" habit
+           that one of the quiz scenarios asks about, so it's not being
+           asked cold. */
+        const HOWTO_FIELDS = [
+            { id: 'fldDueDate', type: 'text', label: 'Due date to include in the letter', value: '', op: 'eq', target: 'March 30' },
+            { id: 'fldTone', type: 'select', label: "Tone that matches Amani Stationers' voice", value: 'Vague / not specified', options: ['Vague / not specified', 'Overly formal', 'Friendly and direct'], op: 'eq', target: 'Friendly and direct' },
+        ];
+        function readHowtoFields() {
+            HOWTO_FIELDS.forEach(f => {
+                const el = document.getElementById(f.id);
+                if (!el) return;
+                if (f.type === 'checkbox') f.checked = el.checked;
+                else f.value = el.value;
+            });
+        }
+        function applyOpHowto(op, val, target) {
+            if (op === 'checked') return val === target;
+            if (op === 'eq') return String(val).trim().toLowerCase() === String(target).trim().toLowerCase();
+            return false;
+        }
+        function renderHowtoFields(marks) {
+            document.getElementById('howtoFields').innerHTML = HOWTO_FIELDS.map((f, i) => {
+                const cls = marks ? (marks[i] ? 'hc-correct' : 'hc-wrong') : '';
+                const mark = marks ? (marks[i] ? ' <span class="hc-mark" style="color:#28a745;">&#10003;</span>' : ' <span class="hc-mark" style="color:#dc3545;">&#10007;</span>') : '';
+                if (f.type === 'checkbox') {
+                    return `<div class="howto-field ${cls}">
+                        <label><input type="checkbox" id="${f.id}" ${f.checked ? 'checked' : ''}> ${escapeHtml(f.label)}${mark}</label>
+                    </div>`;
+                }
+                if (f.type === 'select') {
+                    const opts = f.options.map(o => `<option value="${escapeHtml(o)}" ${o === f.value ? 'selected' : ''}>${escapeHtml(o)}</option>`).join('');
+                    return `<div class="howto-field ${cls}">
+                        <label>${escapeHtml(f.label)}${mark}</label>
+                        <select id="${f.id}">${opts}</select>
+                    </div>`;
+                }
+                return `<div class="howto-field ${cls}">
+                    <label>${escapeHtml(f.label)}${mark}</label>
+                    <input type="text" id="${f.id}" value="${escapeHtml(f.value)}">
+                </div>`;
+            }).join('');
+            HOWTO_FIELDS.forEach(f => {
+                if (f.type === 'select') {
+                    const el = document.getElementById(f.id);
+                    if (el) el.addEventListener('change', () => { f.value = el.value; });
+                }
+            });
+        }
+        function checkHowto() {
+            readHowtoFields();
+            const marks = HOWTO_FIELDS.map(f => applyOpHowto(f.op, f.type === 'checkbox' ? f.checked : f.value, f.target));
+            renderHowtoFields(marks);
+            const allOk = marks.every(m => m);
+            const banner = document.getElementById('howtoBanner');
+            banner.classList.add('show');
+            banner.className = 'howto-banner show ' + (allOk ? 'ok' : 'fail');
+            banner.textContent = allOk ? `Good — specific facts and the right tone give the AI something real to work with.` : `Not yet — the AI can only tailor its draft around what you actually give it.`;
+        }
+        function renderHowto() {
+            document.getElementById('exerciseCard').innerHTML = `
+                <div class="howto-card">
+                    <h3>&#128269; Quick How-To: Give the AI What It Needs</h3>
+                    <p>One of the scenarios coming up is about exactly this: a vague prompt leaves the AI guessing, and specific facts like a due date only end up in the letter if Kevin actually supplies them. Kevin is prompting an AI assistant to draft a reminder letter about an overdue invoice for Amani Stationers. Fill in the due date and pick the tone that matches the shop's real voice, then check your prompt.</p>
+                    <div class="howto-fields" id="howtoFields"></div>
+                    <div class="howto-banner" id="howtoBanner"></div>
+                    <button class="start-quiz-btn" id="checkHowtoBtn">Check My Prompt</button>
+                    <button class="start-quiz-btn" id="startQuizBtn" style="margin-left:10px;background:linear-gradient(135deg,#28a745,#1e7e34);">Start Quiz &rarr;</button>
+                </div>`;
+            renderHowtoFields();
+            document.getElementById('checkHowtoBtn').addEventListener('click', checkHowto);
+            document.getElementById('startQuizBtn').addEventListener('click', renderQuestion);
+        }
+
+        renderHowto();
     </script>
 </body>
 </html>

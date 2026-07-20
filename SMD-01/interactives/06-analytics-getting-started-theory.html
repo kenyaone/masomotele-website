@@ -1,0 +1,375 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lesson 6.1 — Analytics: Getting Started (Interactive)</title>
+<style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: 'Segoe UI', -apple-system, sans-serif; line-height: 1.55; color: #1e293b; background: #f8fafc; min-height: 100vh; }
+    .container { max-width: 1100px; margin: 0 auto; padding: 20px; }
+    header { background: linear-gradient(135deg, #2E7D32, #1B5E20); color: #fff; padding: 40px 30px; border-radius: 12px; margin-bottom: 24px; box-shadow: 0 10px 30px rgba(30,41,59,0.25); }
+    header .badge { display: inline-block; background: rgba(255,255,255,0.2); padding: 4px 14px; border-radius: 16px; font-size: 12px; font-weight: bold; letter-spacing: 1px; margin-bottom: 14px; }
+    header h1 { font-size: 34px; margin-bottom: 8px; }
+    header .subtitle { font-size: 17px; opacity: 0.95; margin-bottom: 20px; }
+    .meta-strip { display: flex; flex-wrap: wrap; gap: 12px; }
+    .meta-strip span { background: rgba(255,255,255,0.18); padding: 6px 14px; border-radius: 20px; font-size: 13px; }
+    .toc { background: #fff; border: 1px solid #e2e8f0; border-radius: 10px; padding: 22px 26px; margin-bottom: 22px; }
+    .toc h3 { color: #475569; margin-bottom: 10px; }
+    .toc ol { padding-left: 20px; }
+    .toc a { color: #475569; text-decoration: none; font-weight: 600; }
+    section { background: #fff; border: 1px solid #e2e8f0; border-radius: 10px; padding: 26px 30px; margin-bottom: 22px; }
+    section h2 { color: #475569; font-size: 22px; margin-bottom: 12px; padding-bottom: 8px; border-bottom: 3px solid #475569; }
+    section p { margin-bottom: 12px; }
+    section ul, section ol { padding-left: 22px; margin-bottom: 12px; }
+    .callout { border-left: 5px solid #475569; background: #f1f5f9; padding: 14px 18px; margin: 14px 0; border-radius: 4px; }
+    .callout.warn { border-left-color: #dc2626; background: #fef2f2; }
+    .callout.tip { border-left-color: #059669; background: #ecfdf5; }
+    .callout strong { color: #475569; }
+
+    /* Vanity vs Business sorter — flagship */
+    .sorter { background: #f1f5f9; border: 1.5px solid #cbd5e1; border-radius: 10px; padding: 18px; margin: 14px 0; }
+    .sorter h4 { color: #1e293b; margin-bottom: 10px; }
+    .metric-pool { display: flex; flex-wrap: wrap; gap: 8px; padding: 14px; background: #fff; border-radius: 8px; min-height: 60px; border: 2px dashed #cbd5e1; margin-bottom: 14px; }
+    .metric-chip {
+        background: #64748b; color: #fff;
+        padding: 6px 12px; border-radius: 16px;
+        font-size: 13px; cursor: pointer;
+        transition: transform 0.15s;
+    }
+    .metric-chip:hover { transform: scale(1.05); }
+    .metric-chip.correct-vanity { background: #dc2626; }
+    .metric-chip.correct-business { background: #059669; }
+    .metric-chip.wrong { background: #f59e0b; }
+
+    .buckets { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+    @media (max-width: 700px) { .buckets { grid-template-columns: 1fr; } }
+    .bucket { background: #fff; border-radius: 8px; padding: 14px; min-height: 100px; border: 2px solid #cbd5e1; }
+    .bucket.vanity { border-color: #dc2626; }
+    .bucket.business { border-color: #059669; }
+    .bucket h5 { margin-bottom: 8px; font-size: 15px; }
+    .bucket.vanity h5 { color: #991b1b; }
+    .bucket.business h5 { color: #065f46; }
+    .bucket .drop-zone { display: flex; flex-wrap: wrap; gap: 6px; min-height: 60px; }
+    .sorter-verdict { margin-top: 12px; padding: 12px; border-radius: 6px; text-align: center; font-weight: 600; display: none; }
+    .sorter-verdict.show { display: block; }
+    .sorter-verdict.good { background: #d1fae5; color: #065f46; }
+
+    /* A/B test simulator */
+    .abtest { background: #fef3c7; border: 2px solid #f59e0b; border-radius: 10px; padding: 18px; margin: 14px 0; }
+    .abtest h4 { color: #78350f; margin-bottom: 10px; }
+    .ab-variants { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin: 12px 0; }
+    @media (max-width: 600px) { .ab-variants { grid-template-columns: 1fr; } }
+    .ab-var { background: #fff; border: 2px solid #cbd5e1; border-radius: 8px; padding: 14px; text-align: center; }
+    .ab-var.winner { border-color: #059669; background: #ecfdf5; }
+    .ab-var .letter { font-size: 24px; font-weight: bold; color: #475569; }
+    .ab-var .desc { font-size: 13px; color: #475569; margin: 6px 0; }
+    .ab-var .metric { font-size: 22px; font-weight: bold; color: #78350f; }
+    .ab-var .m-lbl { font-size: 11px; color: #92400e; text-transform: uppercase; }
+    .ab-var.winner::before { content: '★ WINNER'; display: block; background: #059669; color: #fff; padding: 3px 8px; border-radius: 4px; font-size: 11px; font-weight: bold; margin-bottom: 6px; }
+
+    /* Cadence timeline */
+    .cadence { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 12px; margin: 14px 0; }
+    .cad-card { background: #f8fafc; border: 1.5px solid #cbd5e1; border-radius: 8px; padding: 14px; }
+    .cad-card h5 { color: #475569; font-size: 14px; margin-bottom: 4px; }
+    .cad-card .when { font-size: 12px; color: #64748b; margin-bottom: 6px; }
+    .cad-card p { font-size: 13px; margin: 0; color: #1e293b; }
+
+    .quiz-question { background: #fff; border: 2px solid #cbd5e1; border-radius: 10px; padding: 18px; margin: 14px 0; }
+    .quiz-question.correct { border-color: #059669; background: #ecfdf5; }
+    .quiz-question.wrong { border-color: #dc2626; background: #fef2f2; }
+    .quiz-question h4 { margin-bottom: 12px; font-size: 15px; color: #1e293b; }
+    .quiz-question .options label { display: block; padding: 10px 14px; margin-bottom: 6px; background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 6px; cursor: pointer; font-size: 14px; }
+    .quiz-question .options label:hover { background: #f1f5f9; }
+    .quiz-question .options input[type="radio"] { margin-right: 10px; }
+    .quiz-question .explanation { display: none; margin-top: 12px; padding: 10px 14px; border-radius: 6px; font-size: 14px; }
+    .quiz-question.correct .explanation { display: block; background: #d1fae5; color: #065f46; border-left: 4px solid #059669; }
+    .quiz-question.wrong .explanation { display: block; background: #fee2e2; color: #991b1b; border-left: 4px solid #dc2626; }
+    .quiz-summary { text-align: center; padding: 30px; background: linear-gradient(135deg, #f1f5f9, #cbd5e1); border-radius: 10px; margin: 20px 0; display: none; }
+    .quiz-summary.show { display: block; }
+    .quiz-summary .score { font-size: 48px; font-weight: bold; color: #475569; margin-bottom: 8px; }
+    button.btn { background: #475569; color: #fff; border: none; padding: 10px 20px; border-radius: 6px; font-size: 15px; font-weight: 600; cursor: pointer; }
+    button.btn:hover { background: #1e293b; }
+    button.btn.reset { background: #94a3b8; margin-left: 8px; }
+    footer { text-align: center; color: #64748b; padding: 24px; font-size: 13px; }
+
+    /* MTTI logo stamp */
+    .mtti-logo-stamp {
+        position: fixed; top: 14px; right: 18px; z-index: 999;
+        opacity: 0.88; transition: opacity 0.2s;
+    }
+    .mtti-logo-stamp:hover { opacity: 1; }
+    .mtti-logo-stamp img { width: 56px; height: 56px; border-radius: 50%; box-shadow: 0 2px 8px rgba(0,0,0,0.18); }
+</style>
+</head>
+<body>
+<div class="mtti-logo-stamp">
+    <img src="../../Resources/Logo.jpeg" alt="MTTI" title="Masomotele Technical Training Institute — Start learning, Start earning">
+</div>
+
+<div class="container">
+<header>
+    <div class="badge">LESSON 6.1  ·  ANALYTICS  ·  INTERACTIVE</div>
+    <h1>Analytics: Getting Started</h1>
+    <div class="subtitle">Where digital marketing stops being art and becomes science. The one rule. Vanity vs business. A/B testing.</div>
+    <div class="meta-strip">
+        <span><strong>Duration:</strong> ~30 min</span>
+        <span><strong>Handbook:</strong> Part 6, §6.1</span>
+    </div>
+</header>
+
+<div class="toc">
+    <h3>What you'll do</h3>
+    <ol>
+        <li><a href="#s1">The one rule</a></li>
+        <li><a href="#s2"><strong>Vanity vs Business metric sorter (click to place)</strong></a></li>
+        <li><a href="#s3">A/B testing — the 3 rules</a></li>
+        <li><a href="#s4">Sarah's first A/B test</a></li>
+        <li><a href="#s5">The reporting cadence</a></li>
+        <li><a href="#s6">Self-check quiz</a></li>
+    </ol>
+</div>
+
+<section id="s1">
+    <h2>1. The one rule</h2>
+    <p>Sarah has spent KES 45,000 on Meta Ads over 3 months. She <em>thinks</em> the ads are losing money. Her cousin says switch them off. Sarah is about to make an expensive decision based on a feeling.</p>
+    <div class="callout warn">
+        <strong>The one rule of all digital marketing:</strong> you <em>cannot</em> improve what you do not measure. Not "should not". <em>Cannot</em>. Without data, every decision is a guess.
+    </div>
+</section>
+
+<section id="s2">
+    <h2>2. Vanity vs Business metric sorter</h2>
+    <p>Click each chip to place it in the correct bucket. Vanity metrics look good but don't move the business. Business metrics do.</p>
+    <div class="sorter">
+        <h4>Metric pool — click each to sort</h4>
+        <div class="metric-pool" id="metricPool"></div>
+
+        <div class="buckets">
+            <div class="bucket vanity">
+                <h5>❤️ Vanity metrics</h5>
+                <div class="drop-zone" id="vanityBucket"></div>
+            </div>
+            <div class="bucket business">
+                <h5>💰 Business metrics</h5>
+                <div class="drop-zone" id="businessBucket"></div>
+            </div>
+        </div>
+
+        <div class="sorter-verdict good" id="sorterVerdict"></div>
+    </div>
+    <div class="callout tip">
+        <strong>Once you learn to see the difference, you can't un-see it.</strong> Every report from now on, ask: vanity or business?
+    </div>
+</section>
+
+<section id="s3">
+    <h2>3. A/B testing — the 3 rules</h2>
+    <ul>
+        <li><strong>Rule 1: Change only ONE thing at a time.</strong> Two headlines + two images = you can't tell what caused the difference.</li>
+        <li><strong>Rule 2: Get statistical significance.</strong> Professional threshold: ≥ 100 conversions per variant. Below that = noise.</li>
+        <li><strong>Rule 3: Define your winning metric BEFORE the test starts.</strong> Deciding after = cherry-picking = dishonest.</li>
+    </ul>
+</section>
+
+<section id="s4">
+    <h2>4. Sarah's first A/B test</h2>
+    <div class="abtest">
+        <h4>Karibu Kitchen · Meta Ads · A/B test · 2 weeks · winning metric = orders in 24h</h4>
+        <div class="ab-variants">
+            <div class="ab-var">
+                <div class="letter">A</div>
+                <div class="desc">Original: sun-lit ugali &amp; beef stew</div>
+                <div class="metric" id="mA">18</div>
+                <div class="m-lbl">Orders in 24h</div>
+            </div>
+            <div class="ab-var winner">
+                <div class="letter">B</div>
+                <div class="desc">New: same food, white plate, better lighting</div>
+                <div class="metric" id="mB">30</div>
+                <div class="m-lbl">Orders in 24h</div>
+            </div>
+        </div>
+        <div style="text-align:center; margin-top:10px; font-size:14px; color:#78350f;">
+            <strong>Version B produced 67% more orders</strong> — Sarah retires A. ROAS improves without adding a shilling to budget.
+        </div>
+    </div>
+</section>
+
+<section id="s5">
+    <h2>5. The reporting cadence</h2>
+    <p>Reporting is not something you do when a client asks. It is a rhythm.</p>
+    <div class="cadence">
+        <div class="cad-card">
+            <h5>🗓 Weekly</h5>
+            <div class="when">Every Friday · 30 min</div>
+            <p>Review last 7 days of every active campaign. Winning ad? What to replace next week?</p>
+        </div>
+        <div class="cad-card">
+            <h5>📊 Monthly</h5>
+            <div class="when">Last Friday of month · 90 min</div>
+            <p>Full month vs goals. Reallocate budget across platforms based on Cost per Result.</p>
+        </div>
+        <div class="cad-card">
+            <h5>🎯 Quarterly</h5>
+            <div class="when">Every 90 days</div>
+            <p>Strategic review of the quarter. Adjust strategy, drop losers, double down on winners.</p>
+        </div>
+    </div>
+</section>
+
+<section id="s6">
+    <h2>6. Self-check quiz</h2>
+
+    <div class="quiz-question" data-correct="A"><h4>1. The one rule of digital marketing?</h4><div class="options"><label><input type="radio" name="q1" value="A"> A) You cannot improve what you do not measure</label><label><input type="radio" name="q1" value="B"> B) Post daily</label><label><input type="radio" name="q1" value="C"> C) Buy TikTok followers</label><label><input type="radio" name="q1" value="D"> D) Use ALL CAPS</label></div><div class="explanation">Correct — without data, every decision is a guess.</div></div>
+
+    <div class="quiz-question" data-correct="B"><h4>2. Which is a VANITY metric?</h4><div class="options"><label><input type="radio" name="q2" value="A"> A) Revenue</label><label><input type="radio" name="q2" value="B"> B) Follower count</label><label><input type="radio" name="q2" value="C"> C) ROAS</label><label><input type="radio" name="q2" value="D"> D) Cost per acquisition</label></div><div class="explanation">Correct — followers don't buy dinner. Orders do.</div></div>
+
+    <div class="quiz-question" data-correct="C"><h4>3. Which is a BUSINESS metric?</h4><div class="options"><label><input type="radio" name="q3" value="A"> A) Likes</label><label><input type="radio" name="q3" value="B"> B) Reach</label><label><input type="radio" name="q3" value="C"> C) Sales generated</label><label><input type="radio" name="q3" value="D"> D) Impressions</label></div><div class="explanation">Correct — sales pay the rent.</div></div>
+
+    <div class="quiz-question" data-correct="A"><h4>4. In an A/B test, you should change…</h4><div class="options"><label><input type="radio" name="q4" value="A"> A) Only one thing at a time</label><label><input type="radio" name="q4" value="B"> B) Everything at once</label><label><input type="radio" name="q4" value="C"> C) Nothing</label><label><input type="radio" name="q4" value="D"> D) The metric mid-test</label></div><div class="explanation">Correct — otherwise you don't know what caused the change.</div></div>
+
+    <div class="quiz-question" data-correct="C"><h4>5. Minimum conversions per variant for A/B significance?</h4><div class="options"><label><input type="radio" name="q5" value="A"> A) 5</label><label><input type="radio" name="q5" value="B"> B) 20</label><label><input type="radio" name="q5" value="C"> C) ~100</label><label><input type="radio" name="q5" value="D"> D) 1 million</label></div><div class="explanation">Correct — professional threshold. Below that is noise.</div></div>
+
+    <div class="quiz-question" data-correct="D"><h4>6. When should you define the winning metric?</h4><div class="options"><label><input type="radio" name="q6" value="A"> A) After the test</label><label><input type="radio" name="q6" value="B"> B) Whenever</label><label><input type="radio" name="q6" value="C"> C) During the test</label><label><input type="radio" name="q6" value="D"> D) BEFORE the test starts</label></div><div class="explanation">Correct — deciding after = cherry-picking.</div></div>
+
+    <div class="quiz-question" data-correct="B"><h4>7. Weekly reporting cadence?</h4><div class="options"><label><input type="radio" name="q7" value="A"> A) 5 hours daily</label><label><input type="radio" name="q7" value="B"> B) 30 min every Friday</label><label><input type="radio" name="q7" value="C"> C) Never</label><label><input type="radio" name="q7" value="D"> D) Only when the client emails</label></div><div class="explanation">Correct — 30 min/week is the professional rhythm.</div></div>
+
+    <div class="quiz-question" data-correct="A"><h4>8. Sarah's A/B test winner produced…</h4><div class="options"><label><input type="radio" name="q8" value="A"> A) 67% more orders</label><label><input type="radio" name="q8" value="B"> B) 5% more orders</label><label><input type="radio" name="q8" value="C"> C) 0%</label><label><input type="radio" name="q8" value="D"> D) 300%</label></div><div class="explanation">Correct — a real, meaningful lift.</div></div>
+
+    <div class="quiz-question" data-correct="C"><h4>9. What's cherry-picking?</h4><div class="options"><label><input type="radio" name="q9" value="A"> A) Choosing fruit</label><label><input type="radio" name="q9" value="B"> B) A skill</label><label><input type="radio" name="q9" value="C"> C) Changing the winning metric after seeing results to make a version "win"</label><label><input type="radio" name="q9" value="D"> D) Following the data</label></div><div class="explanation">Correct — dishonest analytics. Avoid.</div></div>
+
+    <div class="quiz-question" data-correct="D"><h4>10. Why did Sarah's cousin's advice (switch off ads) fail?</h4><div class="options"><label><input type="radio" name="q10" value="A"> A) He's her cousin</label><label><input type="radio" name="q10" value="B"> B) It's Friday</label><label><input type="radio" name="q10" value="C"> C) Meta charges too much</label><label><input type="radio" name="q10" value="D"> D) It was a feeling, not a data-driven decision</label></div><div class="explanation">Correct — analytics replaces feelings with numbers.</div></div>
+
+    <div style="margin-top:20px;">
+        <button class="btn" onclick="markQuiz()">Mark my quiz</button>
+        <button class="btn reset" onclick="resetQuiz()">Reset</button>
+    </div>
+    <div class="quiz-summary" id="quizSummary"><div class="score" id="scoreDisplay">0 / 10</div><p id="scoreMessage"></p></div>
+</section>
+
+<footer><p>Lesson 6.1 — Analytics: Getting Started · MTTI · Handbook Part 6, §6.1</p><p>Next: <strong>Lesson 6.2 — Web Analytics (GA4)</strong></p></footer>
+</div>
+
+<script>
+const METRICS = [
+    { name: 'Follower count', type: 'vanity' },
+    { name: 'Likes', type: 'vanity' },
+    { name: 'Impressions', type: 'vanity' },
+    { name: 'Reach', type: 'vanity' },
+    { name: 'Post shares', type: 'vanity' },
+    { name: 'Video views', type: 'vanity' },
+    { name: 'Sales revenue', type: 'business' },
+    { name: 'Leads captured', type: 'business' },
+    { name: 'Conversion rate', type: 'business' },
+    { name: 'ROAS', type: 'business' },
+    { name: 'Cost per acquisition', type: 'business' },
+    { name: 'Order value', type: 'business' }
+];
+function initPool() {
+    const pool = document.getElementById('metricPool');
+    // shuffle
+    const shuffled = METRICS.slice().sort(() => Math.random() - 0.5);
+    pool.innerHTML = shuffled.map(m => `<span class="metric-chip" data-type="${m.type}" onclick="sort(this, 'auto')">${m.name}</span>`).join('');
+}
+function sort(chip, which) {
+    const type = chip.dataset.type;
+    // Move to correct bucket
+    const target = document.getElementById(type === 'vanity' ? 'vanityBucket' : 'businessBucket');
+    chip.classList.add('correct-' + type);
+    chip.setAttribute('onclick', 'moveBack(this)');
+    target.appendChild(chip);
+    checkComplete();
+}
+function moveBack(chip) {
+    chip.classList.remove('correct-vanity', 'correct-business');
+    chip.setAttribute('onclick', "sort(this, 'auto')");
+    document.getElementById('metricPool').appendChild(chip);
+    checkComplete();
+}
+function checkComplete() {
+    const remaining = document.getElementById('metricPool').children.length;
+    const v = document.getElementById('sorterVerdict');
+    if (remaining === 0) {
+        v.classList.add('show');
+        v.textContent = '✓ All sorted. You can now spot vanity vs business at a glance.';
+    } else {
+        v.classList.remove('show');
+    }
+}
+initPool();
+
+function markQuiz() {
+    const qs = document.querySelectorAll('.quiz-question'); let s = 0;
+    qs.forEach((q, i) => { const c = q.dataset.correct; const p = q.querySelector(`input[name="q${i+1}"]:checked`); q.classList.remove('correct','wrong'); if (p && p.value === c) { q.classList.add('correct'); s++; } else if (p) q.classList.add('wrong'); });
+    const su = document.getElementById('quizSummary'); su.classList.add('show');
+    document.getElementById('scoreDisplay').textContent = `${s} / 10`;
+    document.getElementById('scoreMessage').textContent = s === 10 ? 'Perfect. Move to 6.2 — GA4.' : s >= 7 ? 'Strong.' : 'Redo the sorter and try again.';
+    su.scrollIntoView({behavior:'smooth',block:'center'});
+}
+function resetQuiz() { document.querySelectorAll('.quiz-question').forEach(q => { q.classList.remove('correct','wrong'); q.querySelectorAll('input[type=radio]').forEach(r => r.checked = false); }); document.getElementById('quizSummary').classList.remove('show'); }
+</script>
+<style id="mtti-paginator-style">
+  section[data-mtti-page] { display: none !important; }
+  section[data-mtti-page].mtti-active { display: block !important; }
+  #mtti-paginator-bar {
+    position: sticky; bottom: 0; left: 0; right: 0;
+    background: #fff; border-top: 2px solid #e2e8f0;
+    padding: 12px 20px; margin-top: 20px;
+    display: flex; align-items: center; justify-content: space-between; gap: 12px;
+    font-family: 'Segoe UI', -apple-system, sans-serif;
+    box-shadow: 0 -4px 16px rgba(0,0,0,0.08);
+    z-index: 100;
+  }
+  #mtti-paginator-bar button {
+    background: #2E7D32; color: #fff; border: none; padding: 10px 18px;
+    border-radius: 8px; font-size: 13px; font-weight: 600; cursor: pointer;
+  }
+  #mtti-paginator-bar button:disabled { background: #cbd5e1; cursor: not-allowed; }
+  #mtti-paginator-bar button.mtti-prev { background: #64748b; }
+  #mtti-paginator-progress { font-size: 12px; color: #64748b; font-weight: 600; }
+</style>
+<script id="mtti-paginator-script">
+(function(){
+  function init(){
+    var sections = Array.prototype.slice.call(document.querySelectorAll('section[id]'));
+    // Only sections that are real content blocks (has an <h2>), skip stray/decorative ones.
+    sections = sections.filter(function(s){ return s.querySelector('h2'); });
+    if (sections.length < 2) return; // nothing to paginate
+
+    sections.forEach(function(s, i){ s.setAttribute('data-mtti-page', i); });
+    var current = 0;
+
+    var bar = document.createElement('div');
+    bar.id = 'mtti-paginator-bar';
+    bar.innerHTML =
+      '<button class="mtti-prev" id="mtti-pg-prev">← Previous</button>' +
+      '<span id="mtti-paginator-progress"></span>' +
+      '<button id="mtti-pg-next">Next →</button>';
+    sections[sections.length - 1].insertAdjacentElement('afterend', bar);
+
+    var prevBtn = bar.querySelector('#mtti-pg-prev');
+    var nextBtn = bar.querySelector('#mtti-pg-next');
+    var progress = bar.querySelector('#mtti-paginator-progress');
+
+    function render(){
+      sections.forEach(function(s, i){ s.classList.toggle('mtti-active', i === current); });
+      prevBtn.disabled = (current === 0);
+      nextBtn.textContent = (current === sections.length - 1) ? 'Done ✓' : 'Next →';
+      progress.textContent = 'Section ' + (current + 1) + ' of ' + sections.length;
+      window.scrollTo(0, 0);
+    }
+    prevBtn.addEventListener('click', function(){ if (current > 0) { current--; render(); } });
+    nextBtn.addEventListener('click', function(){
+      if (current < sections.length - 1) { current++; render(); }
+    });
+    render();
+  }
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', init);
+  } else {
+    init();
+  }
+})();
+</script>
+</body></html>

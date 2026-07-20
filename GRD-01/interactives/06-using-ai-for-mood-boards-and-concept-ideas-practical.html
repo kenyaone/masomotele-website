@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Using AI for Mood Boards and Concept Ideas | MTTI Graphic Design</title>
+<link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Fredoka:wght@500;600&display=swap" rel="stylesheet">
+<style>
+* { margin:0; padding:0; box-sizing:border-box; }
+body { font-family:'Space Mono', monospace; background:linear-gradient(135deg,#16A085 0%,#2980B9 100%); min-height:100vh; padding:20px; color:#fff; }
+.container { max-width:900px; margin:0 auto; }
+.header { text-align:center; margin-bottom:24px; }
+.lesson-tag { display:inline-block; background:rgba(255,255,255,0.2); padding:6px 16px; border-radius:999px; font-size:0.85em; margin-bottom:12px; }
+.header h1 { font-family:'Fredoka', sans-serif; font-size:2em; margin-bottom:6px; text-shadow:3px 3px 0 rgba(0,0,0,0.2); }
+.scenario { background:rgba(255,255,255,0.14); backdrop-filter:blur(10px); border-radius:16px; padding:16px 22px; margin-bottom:20px; border-left:5px solid #ffd54f; font-size:0.95em; line-height:1.55; }
+.task { background:#fff; color:#333; border-radius:20px; padding:24px; margin-bottom:16px; box-shadow:0 14px 40px rgba(0,0,0,0.25); }
+.task-num { display:inline-block; width:28px; height:28px; background:linear-gradient(135deg,#16A085 0%,#2980B9 100%); color:#fff; border-radius:50%; text-align:center; line-height:28px; font-family:'Fredoka', sans-serif; font-weight:600; margin-right:8px; }
+.task h3 { font-family:'Fredoka', sans-serif; font-size:1.05em; display:inline; }
+.options { margin-top:14px; display:flex; flex-direction:column; gap:10px; }
+.option { background:#f5f7fb; border:2px solid transparent; padding:12px 16px; border-radius:10px; cursor:pointer; transition:all 0.2s; font-family:'Space Mono', monospace; font-size:0.92em; text-align:left; }
+.option:hover:not(.disabled) { background:#e8f5e9; border-color:#16A085; }
+.option.correct { background:#d4edda; border-color:#28a745; color:#155724; }
+.option.wrong { background:#f8d7da; border-color:#dc3545; color:#721c24; }
+.option.disabled { cursor:not-allowed; }
+.feedback { margin-top:14px; padding:12px 16px; border-radius:10px; font-size:0.9em; line-height:1.5; }
+.feedback.correct { background:#d4edda; color:#155724; border-left:4px solid #28a745; }
+.feedback.wrong { background:#f8d7da; color:#721c24; border-left:4px solid #dc3545; }
+.done-banner { text-align:center; padding:20px; color:#fff; font-family:'Fredoka', sans-serif; font-size:1.1em; }
+</style>
+</head>
+<body>
+<div class="container">
+<div class="header"><div class="lesson-tag">AI Tools for Graphic Designers · Topic 1 · Practical</div><h1>Using AI for Mood Boards and Concept Ideas</h1></div>
+<div class="scenario">Ivy at Chapa Design Studio has been asked to design a logo for a new eco-friendly cafe. Before opening CorelDraw, she wants to use an AI image tool to build a quick mood board of concept directions.</div>
+<div id="tasks"></div>
+<div class="done-banner" id="doneBanner" style="display:none;">&#9989; Practical complete — you can move to the quiz.</div>
+</div>
+<script>
+const tasks = [{"prompt":"Which prompt will most likely give Ivy useful, focused concept ideas for the cafe logo mood board?","options":["\"cafe logo\"","\"minimal modern logo concept for an eco-friendly cafe, warm green and cream tones, hand-drawn leaf motif, flat vector style\"","\"make me a logo\"","\"pretty picture\""],"correct":1,"explanation":"A specific prompt with subject, mood, colour palette, and style reference gives the AI tool real direction, producing far more focused mood board ideas than a vague one."},{"prompt":"After generating several AI mood board images, what should Ivy do next?","options":["Save one of the AI images directly as the client's final logo file","Pick the colour palette and motif she likes, then recreate the design as original vector artwork in CorelDraw","Print the AI image as-is for the shop sign","Delete all the images since they are not useful for anything"],"correct":1,"explanation":"The AI images are a starting point for direction and inspiration — the actual client-ready design still needs to be built as original vector artwork in CorelDraw."},{"prompt":"The client asks to see the \"final logo\" file. What should Ivy send?","options":["The best-looking raw AI-generated image","A vector logo she built in CorelDraw, using the AI mood board only as inspiration","A screenshot of the AI tool's homepage","Any of the AI images, whichever loads fastest"],"correct":1,"explanation":"A paying client needs original, scalable vector artwork — not a raw AI-generated image used only for early concept exploration."}];
+function escapeHtml(s){return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
+function render(){
+  const c = document.getElementById('tasks');
+  c.innerHTML = tasks.map((t,i)=>`
+    <div class="task" id="task-${i}">
+      <div><span class="task-num">${i+1}</span><h3>${escapeHtml(t.prompt)}</h3></div>
+      <div class="options">
+        ${t.options.map((o,j)=>`<button class="option" onclick="answer(${i},${j})">${escapeHtml(o)}</button>`).join('')}
+      </div>
+    </div>`).join('');
+}
+function answer(i,j){
+  const task = tasks[i];
+  const el = document.getElementById('task-'+i);
+  const btns = el.querySelectorAll('.option');
+  if (btns[0].classList.contains('disabled')) return;
+  btns.forEach(b=>b.classList.add('disabled'));
+  btns[task.correct].classList.add('correct');
+  const right = j === task.correct;
+  if (!right) btns[j].classList.add('wrong');
+  const fb = document.createElement('div');
+  fb.className = 'feedback ' + (right?'correct':'wrong');
+  fb.innerHTML = '<strong>' + (right?'&#9989; Correct.':'&#10060; Not quite.') + '</strong><br>' + escapeHtml(task.explanation);
+  el.appendChild(fb);
+  if (i === tasks.length-1) document.getElementById('doneBanner').style.display='block';
+}
+render();
+</script>
+</body>
+</html>

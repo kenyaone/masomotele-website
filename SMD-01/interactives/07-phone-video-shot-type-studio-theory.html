@@ -1,0 +1,612 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lesson 7.7 — Video Creation Basics (Interactive)</title>
+<style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: 'Segoe UI', -apple-system, sans-serif; line-height: 1.55; color: #1e293b; background: #fff8f2; min-height: 100vh; }
+    .container { max-width: 1150px; margin: 0 auto; padding: 20px; }
+    header {
+        background: linear-gradient(135deg, #2E7D32, #1B5E20);
+        color: #4a1d1d; padding: 40px 30px; border-radius: 12px; margin-bottom: 24px;
+        box-shadow: 0 10px 30px rgba(250,112,154,0.28);
+    }
+    header .badge { display: inline-block; background: rgba(255,255,255,0.35); padding: 4px 14px; border-radius: 16px; font-size: 12px; font-weight: bold; letter-spacing: 1px; margin-bottom: 14px; color: #7a1d3b; }
+    header h1 { font-size: 34px; margin-bottom: 8px; color: #4a1d1d; }
+    header .subtitle { font-size: 17px; opacity: 0.95; margin-bottom: 20px; }
+    .meta-strip { display: flex; flex-wrap: wrap; gap: 12px; }
+    .meta-strip span { background: rgba(255,255,255,0.35); padding: 6px 14px; border-radius: 20px; font-size: 13px; color: #7a1d3b; }
+    .toc { background: #fff; border: 1px solid #fecdd3; border-radius: 10px; padding: 22px 26px; margin-bottom: 22px; }
+    .toc h3 { color: #e11d74; margin-bottom: 10px; }
+    .toc ol { padding-left: 20px; }
+    .toc a { color: #e11d74; text-decoration: none; font-weight: 600; }
+    section { background: #fff; border: 1px solid #fecdd3; border-radius: 10px; padding: 26px 30px; margin-bottom: 22px; }
+    section h2 { color: #e11d74; font-size: 22px; margin-bottom: 12px; padding-bottom: 8px; border-bottom: 3px solid #fa709a; }
+    section h3 { color: #4a1d1d; font-size: 17px; margin: 18px 0 8px; }
+    section p { margin-bottom: 12px; }
+    section ul, section ol { padding-left: 22px; margin-bottom: 12px; }
+    section li { margin-bottom: 4px; }
+    .callout { border-left: 5px solid #fa709a; background: #fff1f2; padding: 14px 18px; margin: 14px 0; border-radius: 4px; }
+    .callout.warn { border-left-color: #dc2626; background: #fef2f2; }
+    .callout.tip { border-left-color: #059669; background: #ecfdf5; }
+    .callout strong { color: #e11d74; }
+
+    /* Shot type gallery */
+    .shot-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 14px; margin: 16px 0; }
+    .shot-card { background: linear-gradient(180deg, #fff 0%, #fff5f7 100%); border: 2px solid #fecdd3; border-radius: 12px; padding: 14px; text-align: center; transition: transform 0.15s; }
+    .shot-card:hover { transform: translateY(-2px); box-shadow: 0 6px 18px rgba(250,112,154,0.2); }
+    .shot-card h4 { color: #e11d74; margin-bottom: 6px; font-size: 16px; }
+    .shot-card .diagram { background: #fff; border: 1px dashed #fbcfe8; border-radius: 8px; padding: 10px; margin: 8px 0; }
+    .shot-card .use { font-size: 13px; color: #7a1d3b; font-style: italic; }
+
+    /* Purpose picker */
+    .purpose-block { background: #fff5f7; border: 2px solid #fecdd3; border-radius: 10px; padding: 14px 16px; margin: 12px 0; }
+    .purpose-block h4 { color: #e11d74; margin-bottom: 8px; font-size: 15px; }
+    .shot-chips { display: flex; flex-wrap: wrap; gap: 6px; margin: 8px 0; }
+    .shot-chip { padding: 6px 12px; background: #fff; border: 1.5px solid #fbcfe8; border-radius: 16px; font-size: 12.5px; cursor: pointer; user-select: none; color: #7a1d3b; font-weight: 600; }
+    .shot-chip.picked { background: #fa709a; color: #fff; border-color: #e11d74; }
+    .p-verdict { margin-top: 8px; padding: 8px 12px; border-radius: 6px; font-size: 13px; display: none; }
+    .p-verdict.show { display: block; }
+    .p-verdict.good { background: #d1fae5; color: #065f46; border-left: 4px solid #059669; }
+    .p-verdict.bad { background: #fee2e2; color: #991b1b; border-left: 4px solid #dc2626; }
+
+    /* Hook timer */
+    .hook-tool { background: linear-gradient(135deg, #fff5f7 0%, #fff8e1 100%); border: 2px solid #fecdd3; border-radius: 12px; padding: 18px; margin: 14px 0; }
+    .hook-tool label { display: block; font-weight: 600; color: #7a1d3b; margin-bottom: 6px; }
+    .hook-tool textarea { width: 100%; padding: 10px; border: 1.5px solid #fbcfe8; border-radius: 6px; font-family: inherit; font-size: 14px; resize: vertical; min-height: 60px; }
+    .hook-stats { display: flex; gap: 16px; margin-top: 10px; flex-wrap: wrap; }
+    .hook-stat { background: #fff; border: 1px solid #fbcfe8; padding: 8px 12px; border-radius: 8px; font-size: 13px; }
+    .hook-stat b { font-size: 20px; color: #e11d74; display: block; }
+    .hook-verdict { margin-top: 10px; padding: 10px 14px; border-radius: 6px; font-size: 14px; display: none; }
+    .hook-verdict.show { display: block; }
+    .hook-verdict.pass { background: #d1fae5; color: #065f46; border-left: 4px solid #059669; }
+    .hook-verdict.fail { background: #fee2e2; color: #991b1b; border-left: 4px solid #dc2626; }
+
+    /* Checklist */
+    .checklist { background: #fff5f7; border: 1.5px solid #fbcfe8; border-radius: 10px; padding: 16px; }
+    .check-row { display: flex; align-items: flex-start; gap: 12px; padding: 8px 0; border-bottom: 1px solid #fecdd3; }
+    .check-row:last-child { border-bottom: 0; }
+    .check-row input[type=checkbox] { margin-top: 4px; width: 18px; height: 18px; accent-color: #e11d74; cursor: pointer; }
+    .check-row label { flex: 1; font-size: 14px; cursor: pointer; }
+    .check-row label small { display: block; color: #7a1d3b; font-size: 12px; margin-top: 2px; }
+    .check-row.done { opacity: 0.6; }
+    .check-row.done label { text-decoration: line-through; }
+    .cl-score { margin-top: 12px; text-align: right; font-weight: 700; color: #e11d74; font-size: 16px; }
+
+    /* Quiz */
+    .quiz-question { background: #fff; border: 2px solid #fecdd3; border-radius: 10px; padding: 18px; margin: 14px 0; }
+    .quiz-question.correct { border-color: #059669; background: #ecfdf5; }
+    .quiz-question.wrong { border-color: #dc2626; background: #fef2f2; }
+    .quiz-question h4 { margin-bottom: 12px; font-size: 15px; color: #1e293b; }
+    .quiz-question .options label { display: block; padding: 10px 14px; margin-bottom: 6px; background: #fff5f7; border: 1px solid #fecdd3; border-radius: 6px; cursor: pointer; font-size: 14px; }
+    .quiz-question .options label:hover { background: #fff1f2; }
+    .quiz-question .options input[type="radio"] { margin-right: 10px; }
+    .quiz-question .explanation { display: none; margin-top: 12px; padding: 10px 14px; border-radius: 6px; font-size: 14px; }
+    .quiz-question.correct .explanation { display: block; background: #d1fae5; color: #065f46; border-left: 4px solid #059669; }
+    .quiz-question.wrong .explanation { display: block; background: #fee2e2; color: #991b1b; border-left: 4px solid #dc2626; }
+    .quiz-summary { text-align: center; padding: 30px; background: linear-gradient(135deg, #fff5f7 0%, #fee140 100%); border-radius: 10px; margin: 20px 0; display: none; }
+    .quiz-summary.show { display: block; }
+    .quiz-summary .score { font-size: 48px; font-weight: bold; color: #e11d74; margin-bottom: 8px; }
+    button.btn { background: #e11d74; color: #fff; border: none; padding: 10px 20px; border-radius: 6px; font-size: 15px; font-weight: 600; cursor: pointer; }
+    button.btn:hover { background: #be185d; }
+    button.btn.reset { background: #7a1d3b; margin-left: 8px; }
+    footer { text-align: center; color: #7a1d3b; padding: 24px; font-size: 13px; }
+
+    @media (max-width: 800px) {
+        header h1 { font-size: 26px; }
+        .container { padding: 12px; }
+        section { padding: 18px; }
+        .shot-grid { grid-template-columns: 1fr 1fr; }
+    }
+    @media (max-width: 520px) {
+        .shot-grid { grid-template-columns: 1fr; }
+    }
+
+    /* MTTI logo stamp */
+    .mtti-logo-stamp {
+        position: fixed; top: 14px; right: 18px; z-index: 999;
+        opacity: 0.88; transition: opacity 0.2s;
+    }
+    .mtti-logo-stamp:hover { opacity: 1; }
+    .mtti-logo-stamp img { width: 56px; height: 56px; border-radius: 50%; box-shadow: 0 2px 8px rgba(0,0,0,0.18); }
+</style>
+</head>
+<body>
+<div class="mtti-logo-stamp">
+    <img src="../../Resources/Logo.jpeg" alt="MTTI" title="Masomotele Technical Training Institute — Start learning, Start earning">
+</div>
+
+<div class="container">
+
+<header>
+    <div class="badge">LESSON 7.7  ·  VIDEO CREATION  ·  INTERACTIVE</div>
+    <h1>Phone-Video Shot-Type Studio</h1>
+    <div class="subtitle">Pick the right shots for the right story. Brian frames the shots, Sarah delivers the hook.</div>
+    <div class="meta-strip">
+        <span><strong>Duration:</strong> ~35 min interactive</span>
+        <span><strong>Level:</strong> Beginner</span>
+        <span><strong>Tool:</strong> Phone camera + CapCut</span>
+        <span><strong>Handbook:</strong> Part 7, §7.7</span>
+    </div>
+</header>
+
+<div class="toc">
+    <h3>What you'll do in this lesson</h3>
+    <ol>
+        <li><a href="#s1">The 6 shot types every phone-filmmaker uses</a></li>
+        <li><a href="#s2">Pick shots for 4 video purposes (auto-scored)</a></li>
+        <li><a href="#s3">The 3-second hook timer challenge</a></li>
+        <li><a href="#s4">Mobile-video quality checklist</a></li>
+        <li><a href="#s5">Self-check quiz (8 questions)</a></li>
+    </ol>
+</div>
+
+<section id="s1">
+    <h2>1. The 6 shot types every phone-filmmaker uses</h2>
+    <p>Brian's rule: <em>a Reel is a stack of 3-4 shots, never one long take.</em> Learn what each shot does before you pick a phone up.</p>
+    <div class="shot-grid">
+        <div class="shot-card">
+            <h4>WIDE</h4>
+            <div class="diagram">
+                <svg viewBox="0 0 120 80" width="100%" height="70">
+                    <rect x="2" y="2" width="116" height="76" fill="#fff5f7" stroke="#fa709a" stroke-width="1.5"/>
+                    <rect x="52" y="42" width="16" height="32" fill="#fa709a"/>
+                    <circle cx="60" cy="36" r="6" fill="#fa709a"/>
+                    <rect x="10" y="60" width="100" height="14" fill="#fee140" opacity="0.6"/>
+                    <text x="60" y="14" font-size="8" text-anchor="middle" fill="#7a1d3b">FULL SCENE</text>
+                </svg>
+            </div>
+            <div class="use">Establish the setting — Sarah's kitchen or the delivery scooter.</div>
+        </div>
+        <div class="shot-card">
+            <h4>MEDIUM</h4>
+            <div class="diagram">
+                <svg viewBox="0 0 120 80" width="100%" height="70">
+                    <rect x="2" y="2" width="116" height="76" fill="#fff5f7" stroke="#fa709a" stroke-width="1.5"/>
+                    <rect x="42" y="30" width="36" height="60" fill="#fa709a"/>
+                    <circle cx="60" cy="22" r="10" fill="#fa709a"/>
+                </svg>
+            </div>
+            <div class="use">Waist up — great for talking-head + gesture.</div>
+        </div>
+        <div class="shot-card">
+            <h4>CLOSE-UP</h4>
+            <div class="diagram">
+                <svg viewBox="0 0 120 80" width="100%" height="70">
+                    <rect x="2" y="2" width="116" height="76" fill="#fff5f7" stroke="#fa709a" stroke-width="1.5"/>
+                    <circle cx="60" cy="40" r="30" fill="#fa709a"/>
+                    <circle cx="50" cy="34" r="3" fill="#fff"/>
+                    <circle cx="70" cy="34" r="3" fill="#fff"/>
+                    <path d="M50 50 Q60 58 70 50" stroke="#fff" stroke-width="2" fill="none"/>
+                </svg>
+            </div>
+            <div class="use">Emotion + reaction — the smile after the first bite.</div>
+        </div>
+        <div class="shot-card">
+            <h4>B-ROLL</h4>
+            <div class="diagram">
+                <svg viewBox="0 0 120 80" width="100%" height="70">
+                    <rect x="2" y="2" width="116" height="76" fill="#fff5f7" stroke="#fa709a" stroke-width="1.5"/>
+                    <rect x="20" y="20" width="20" height="40" fill="#fbbf24"/>
+                    <rect x="50" y="30" width="20" height="30" fill="#fa709a"/>
+                    <rect x="80" y="15" width="20" height="45" fill="#84cc16"/>
+                    <text x="60" y="72" font-size="7" text-anchor="middle" fill="#7a1d3b">CUTAWAYS</text>
+                </svg>
+            </div>
+            <div class="use">Cutaways of ingredients, hands, packaging. Hides jump cuts.</div>
+        </div>
+        <div class="shot-card">
+            <h4>POV</h4>
+            <div class="diagram">
+                <svg viewBox="0 0 120 80" width="100%" height="70">
+                    <rect x="2" y="2" width="116" height="76" fill="#fff5f7" stroke="#fa709a" stroke-width="1.5"/>
+                    <rect x="10" y="50" width="100" height="26" fill="#fee140"/>
+                    <circle cx="45" cy="40" r="8" fill="#fa709a"/>
+                    <circle cx="75" cy="42" r="10" fill="#fbbf24"/>
+                    <text x="60" y="16" font-size="7" text-anchor="middle" fill="#7a1d3b">FIRST PERSON</text>
+                </svg>
+            </div>
+            <div class="use">Customer POV — as if you are the one lifting the fork.</div>
+        </div>
+        <div class="shot-card">
+            <h4>OVERHEAD</h4>
+            <div class="diagram">
+                <svg viewBox="0 0 120 80" width="100%" height="70">
+                    <rect x="2" y="2" width="116" height="76" fill="#fff5f7" stroke="#fa709a" stroke-width="1.5"/>
+                    <circle cx="60" cy="40" r="24" fill="#fbbf24" stroke="#fa709a" stroke-width="2"/>
+                    <circle cx="60" cy="40" r="14" fill="#fff5f7"/>
+                    <text x="60" y="72" font-size="7" text-anchor="middle" fill="#7a1d3b">TOP-DOWN</text>
+                </svg>
+            </div>
+            <div class="use">Flat-lay of the plated dish. Instagram gold.</div>
+        </div>
+    </div>
+    <div class="callout tip">
+        <strong>Brian's rule of 4:</strong> a 12-second Reel usually mixes 3-4 different shot types. Never repeat the same angle twice in a row.
+    </div>
+</section>
+
+<section id="s2">
+    <h2>2. Pick shots for 4 video purposes</h2>
+    <p>Tap 2 or 3 chips per purpose. The tool auto-marks against Brian's cheat sheet.</p>
+
+    <div class="purpose-block" data-p="reveal" data-good="Overhead,Close-up,B-roll">
+        <h4>A. Product reveal — the new "Chapati Wraps" launch</h4>
+        <div class="shot-chips">
+            <span class="shot-chip" data-shot="Wide">Wide</span>
+            <span class="shot-chip" data-shot="Medium">Medium</span>
+            <span class="shot-chip" data-shot="Close-up">Close-up</span>
+            <span class="shot-chip" data-shot="B-roll">B-roll</span>
+            <span class="shot-chip" data-shot="POV">POV</span>
+            <span class="shot-chip" data-shot="Overhead">Overhead</span>
+        </div>
+        <div class="p-verdict"></div>
+    </div>
+
+    <div class="purpose-block" data-p="testimonial" data-good="Medium,Close-up,B-roll">
+        <h4>B. Customer testimonial — Elgon View office worker</h4>
+        <div class="shot-chips">
+            <span class="shot-chip" data-shot="Wide">Wide</span>
+            <span class="shot-chip" data-shot="Medium">Medium</span>
+            <span class="shot-chip" data-shot="Close-up">Close-up</span>
+            <span class="shot-chip" data-shot="B-roll">B-roll</span>
+            <span class="shot-chip" data-shot="POV">POV</span>
+            <span class="shot-chip" data-shot="Overhead">Overhead</span>
+        </div>
+        <div class="p-verdict"></div>
+    </div>
+
+    <div class="purpose-block" data-p="howto" data-good="Overhead,Close-up,POV">
+        <h4>C. How-to — "How Sarah plates a lunchbox in 30 seconds"</h4>
+        <div class="shot-chips">
+            <span class="shot-chip" data-shot="Wide">Wide</span>
+            <span class="shot-chip" data-shot="Medium">Medium</span>
+            <span class="shot-chip" data-shot="Close-up">Close-up</span>
+            <span class="shot-chip" data-shot="B-roll">B-roll</span>
+            <span class="shot-chip" data-shot="POV">POV</span>
+            <span class="shot-chip" data-shot="Overhead">Overhead</span>
+        </div>
+        <div class="p-verdict"></div>
+    </div>
+
+    <div class="purpose-block" data-p="atmosphere" data-good="Wide,B-roll,Close-up">
+        <h4>D. Atmosphere — "A Friday lunchtime at Karibu Kitchen"</h4>
+        <div class="shot-chips">
+            <span class="shot-chip" data-shot="Wide">Wide</span>
+            <span class="shot-chip" data-shot="Medium">Medium</span>
+            <span class="shot-chip" data-shot="Close-up">Close-up</span>
+            <span class="shot-chip" data-shot="B-roll">B-roll</span>
+            <span class="shot-chip" data-shot="POV">POV</span>
+            <span class="shot-chip" data-shot="Overhead">Overhead</span>
+        </div>
+        <div class="p-verdict"></div>
+    </div>
+
+    <div style="margin-top:14px;">
+        <button class="btn" onclick="markPurposes()">Mark my picks</button>
+        <button class="btn reset" onclick="resetPurposes()">Reset</button>
+    </div>
+</section>
+
+<section id="s3">
+    <h2>3. The 3-second hook timer challenge</h2>
+    <p>Kenyan viewers say <em>"nishike ndani ya sekunde tatu ama nascroll"</em> — hook me in 3 seconds or I scroll. Average confident speaking rate is roughly <strong>5 words per second</strong>, so a 3-second hook is about <strong>13-15 words maximum</strong>.</p>
+    <div class="hook-tool">
+        <label for="hookInput">Write your hook for Sarah's "Fresh Lunch, Delivered" Reel</label>
+        <textarea id="hookInput" placeholder="e.g. Sisi hukupelekea lunch fresh, moto, na kwenye desk yako ndani ya dakika thelathini."></textarea>
+        <div class="hook-stats">
+            <div class="hook-stat"><b id="wordCount">0</b> words</div>
+            <div class="hook-stat"><b id="secEstimate">0.0</b> seconds spoken</div>
+            <div class="hook-stat"><b id="charCount">0</b> characters</div>
+        </div>
+        <div class="hook-verdict" id="hookVerdict"></div>
+        <div style="margin-top:10px;">
+            <button class="btn" onclick="checkHook()">Check my hook</button>
+            <button class="btn reset" onclick="resetHook()">Clear</button>
+        </div>
+    </div>
+    <div class="callout warn">
+        <strong>Too long?</strong> Cut adjectives first. "Delicious fresh authentic homemade lunch" &rarr; "Fresh lunch". The verb and the promise stay; the flourishes go.
+    </div>
+</section>
+
+<section id="s4">
+    <h2>4. Mobile-video quality checklist</h2>
+    <p>Before you post, tick every box. Anything less looks amateur next to the professional Reels on the feed.</p>
+    <div class="checklist" id="qualityChecklist">
+        <div class="check-row"><input type="checkbox" id="q1"><label for="q1">Phone was <strong>steady</strong> — tripod, gimbal, or braced elbows<small>Handheld wobble kills professionalism instantly</small></label></div>
+        <div class="check-row"><input type="checkbox" id="q2"><label for="q2">Scene is <strong>well-lit</strong> — natural window light or a ring light<small>Shoot mornings or late afternoon. Never under fluorescent tubes.</small></label></div>
+        <div class="check-row"><input type="checkbox" id="q3"><label for="q3"><strong>Clean audio</strong> — no fan noise, no matatu hooting in background<small>Record indoors or use a lavalier mic</small></label></div>
+        <div class="check-row"><input type="checkbox" id="q4"><label for="q4"><strong>Tight edits</strong> — no clip over 4 seconds without a cut<small>Rapid cuts hold attention</small></label></div>
+        <div class="check-row"><input type="checkbox" id="q5"><label for="q5">Shot <strong>vertical 9:16</strong> for Reels / TikTok / Stories<small>Horizontal only for YouTube long-form</small></label></div>
+        <div class="check-row"><input type="checkbox" id="q6"><label for="q6">Used the <strong>back camera</strong>, not the selfie camera<small>Back cameras are 3-4x higher resolution</small></label></div>
+        <div class="check-row"><input type="checkbox" id="q7"><label for="q7"><strong>Burned-in captions</strong> — sound-off viewers can still follow<small>CapCut auto-captions in 30 seconds</small></label></div>
+        <div class="check-row"><input type="checkbox" id="q8"><label for="q8">Strong <strong>ending</strong> — smile, satisfied nod, or clear CTA<small>Never fade to nothing. Never end mid-sentence.</small></label></div>
+    </div>
+    <div class="cl-score" id="qualityScore">0 / 8 ticked</div>
+</section>
+
+<section id="s5">
+    <h2>5. Self-check quiz</h2>
+
+    <div class="quiz-question" data-correct="C">
+        <h4>1. First 3 seconds of a Reel are called the...</h4>
+        <div class="options">
+            <label><input type="radio" name="q1" value="A"> A) Outro</label>
+            <label><input type="radio" name="q1" value="B"> B) B-roll</label>
+            <label><input type="radio" name="q1" value="C"> C) Hook</label>
+            <label><input type="radio" name="q1" value="D"> D) Transition</label>
+        </div>
+        <div class="explanation">Correct — if the hook fails, everything after it is wasted.</div>
+    </div>
+
+    <div class="quiz-question" data-correct="B">
+        <h4>2. Best shot type for a plated-food flat-lay on Instagram is...</h4>
+        <div class="options">
+            <label><input type="radio" name="q2" value="A"> A) Wide</label>
+            <label><input type="radio" name="q2" value="B"> B) Overhead</label>
+            <label><input type="radio" name="q2" value="C"> C) POV</label>
+            <label><input type="radio" name="q2" value="D"> D) Medium</label>
+        </div>
+        <div class="explanation">Correct — overhead flat-lay is the food photographer's default.</div>
+    </div>
+
+    <div class="quiz-question" data-correct="A">
+        <h4>3. Roughly how many words fit in a 3-second spoken hook?</h4>
+        <div class="options">
+            <label><input type="radio" name="q3" value="A"> A) 13-15</label>
+            <label><input type="radio" name="q3" value="B"> B) 25-30</label>
+            <label><input type="radio" name="q3" value="C"> C) 40-50</label>
+            <label><input type="radio" name="q3" value="D"> D) 5-6</label>
+        </div>
+        <div class="explanation">Correct — ~5 words per second, so 13-15 is the cap.</div>
+    </div>
+
+    <div class="quiz-question" data-correct="D">
+        <h4>4. Which is NOT a phone-video rule Brian teaches?</h4>
+        <div class="options">
+            <label><input type="radio" name="q4" value="A"> A) Shoot with the back camera</label>
+            <label><input type="radio" name="q4" value="B"> B) Use natural light</label>
+            <label><input type="radio" name="q4" value="C"> C) Shoot longer than you need</label>
+            <label><input type="radio" name="q4" value="D"> D) Always shoot horizontal</label>
+        </div>
+        <div class="explanation">Correct — horizontal is only for YouTube long-form. Reels need vertical.</div>
+    </div>
+
+    <div class="quiz-question" data-correct="C">
+        <h4>5. Best shot to establish a scene at the start of a Reel?</h4>
+        <div class="options">
+            <label><input type="radio" name="q5" value="A"> A) Close-up</label>
+            <label><input type="radio" name="q5" value="B"> B) Overhead</label>
+            <label><input type="radio" name="q5" value="C"> C) Wide</label>
+            <label><input type="radio" name="q5" value="D"> D) B-roll</label>
+        </div>
+        <div class="explanation">Correct — Wide establishes context in one glance.</div>
+    </div>
+
+    <div class="quiz-question" data-correct="B">
+        <h4>6. Best shot to capture emotion after Sarah's customer tastes lunch?</h4>
+        <div class="options">
+            <label><input type="radio" name="q6" value="A"> A) Wide</label>
+            <label><input type="radio" name="q6" value="B"> B) Close-up</label>
+            <label><input type="radio" name="q6" value="C"> C) POV</label>
+            <label><input type="radio" name="q6" value="D"> D) Overhead</label>
+        </div>
+        <div class="explanation">Correct — Close-up on the face = emotion. Every time.</div>
+    </div>
+
+    <div class="quiz-question" data-correct="A">
+        <h4>7. TikTok says what % of users watch with sound ON?</h4>
+        <div class="options">
+            <label><input type="radio" name="q7" value="A"> A) About 88%</label>
+            <label><input type="radio" name="q7" value="B"> B) About 12%</label>
+            <label><input type="radio" name="q7" value="C"> C) About 50%</label>
+            <label><input type="radio" name="q7" value="D"> D) About 30%</label>
+        </div>
+        <div class="explanation">Correct — sound ON is the norm; captions cover the exceptions.</div>
+    </div>
+
+    <div class="quiz-question" data-correct="D">
+        <h4>8. Amateur mistake Brian warns Sarah about?</h4>
+        <div class="options">
+            <label><input type="radio" name="q8" value="A"> A) Using CapCut</label>
+            <label><input type="radio" name="q8" value="B"> B) Filming vertically</label>
+            <label><input type="radio" name="q8" value="C"> C) Adding captions</label>
+            <label><input type="radio" name="q8" value="D"> D) Holding one shot for 8 seconds without a cut</label>
+        </div>
+        <div class="explanation">Correct — anything over 4 seconds without a cut feels slow on Reels.</div>
+    </div>
+
+    <div style="margin-top: 20px;">
+        <button class="btn" onclick="markQuiz()">Mark my quiz</button>
+        <button class="btn reset" onclick="resetQuiz()">Reset</button>
+    </div>
+    <div class="quiz-summary" id="quizSummary">
+        <div class="score" id="scoreDisplay">0 / 8</div>
+        <p id="scoreMessage"></p>
+    </div>
+</section>
+
+<footer>
+    <p>Lesson 7.7 — Video Creation Basics · Masomotele Technical Training Institute · Handbook Part 7, §7.7</p>
+    <p>Next: <strong>Lesson 7.8 — User-Generated Content</strong></p>
+</footer>
+</div>
+
+<script>
+// Shot picker
+document.querySelectorAll('.shot-chip').forEach(chip => {
+    chip.addEventListener('click', () => chip.classList.toggle('picked'));
+});
+function markPurposes() {
+    document.querySelectorAll('.purpose-block').forEach(pb => {
+        const good = pb.dataset.good.split(',');
+        const picked = Array.from(pb.querySelectorAll('.shot-chip.picked')).map(c => c.dataset.shot);
+        const verdict = pb.querySelector('.p-verdict');
+        if (picked.length < 2 || picked.length > 3) {
+            verdict.className = 'p-verdict show bad';
+            verdict.innerHTML = '<strong>Pick 2 or 3 shots</strong> — you picked ' + picked.length + '.';
+            return;
+        }
+        const matches = picked.filter(s => good.includes(s)).length;
+        if (matches === picked.length) {
+            verdict.className = 'p-verdict show good';
+            verdict.innerHTML = '<strong>Nailed it.</strong> All picks match Brian\'s cheat sheet: ' + good.join(' + ') + '.';
+        } else if (matches >= picked.length - 1) {
+            verdict.className = 'p-verdict show good';
+            verdict.innerHTML = '<strong>Close.</strong> Cheat sheet: ' + good.join(' + ') + '. Swap the odd one out.';
+        } else {
+            verdict.className = 'p-verdict show bad';
+            verdict.innerHTML = '<strong>Reconsider.</strong> The strongest combo here is: ' + good.join(' + ') + '.';
+        }
+    });
+}
+function resetPurposes() {
+    document.querySelectorAll('.shot-chip').forEach(c => c.classList.remove('picked'));
+    document.querySelectorAll('.p-verdict').forEach(v => { v.className = 'p-verdict'; v.innerHTML = ''; });
+}
+
+// Hook checker
+const hookInput = document.getElementById('hookInput');
+hookInput.addEventListener('input', () => {
+    const text = hookInput.value.trim();
+    const words = text ? text.split(/\s+/).filter(Boolean).length : 0;
+    document.getElementById('wordCount').textContent = words;
+    document.getElementById('charCount').textContent = text.length;
+    document.getElementById('secEstimate').textContent = (words / 5).toFixed(1);
+});
+function checkHook() {
+    const text = hookInput.value.trim();
+    const words = text ? text.split(/\s+/).filter(Boolean).length : 0;
+    const secs = words / 5;
+    const v = document.getElementById('hookVerdict');
+    if (words === 0) {
+        v.className = 'hook-verdict show fail';
+        v.innerHTML = '<strong>Write something first.</strong> Even one line.';
+    } else if (secs <= 3.0 && words >= 5) {
+        v.className = 'hook-verdict show pass';
+        v.innerHTML = '<strong>Passes the 3-second rule.</strong> ' + words + ' words &asymp; ' + secs.toFixed(1) + 's spoken. Now film it.';
+    } else if (secs > 3.0) {
+        v.className = 'hook-verdict show fail';
+        v.innerHTML = '<strong>Too long.</strong> ' + words + ' words &asymp; ' + secs.toFixed(1) + 's — cut to 13-15 words max.';
+    } else {
+        v.className = 'hook-verdict show fail';
+        v.innerHTML = '<strong>Too thin.</strong> Only ' + words + ' words — needs a specific hook, at least 5 words.';
+    }
+}
+function resetHook() {
+    hookInput.value = '';
+    document.getElementById('wordCount').textContent = '0';
+    document.getElementById('charCount').textContent = '0';
+    document.getElementById('secEstimate').textContent = '0.0';
+    const v = document.getElementById('hookVerdict');
+    v.className = 'hook-verdict'; v.innerHTML = '';
+}
+
+// Quality checklist
+function updateQuality() {
+    const boxes = document.querySelectorAll('#qualityChecklist input[type=checkbox]');
+    let done = 0;
+    boxes.forEach(b => {
+        const row = b.closest('.check-row');
+        if (b.checked) { done++; row.classList.add('done'); } else row.classList.remove('done');
+    });
+    document.getElementById('qualityScore').textContent = done + ' / ' + boxes.length + ' ticked';
+}
+document.querySelectorAll('#qualityChecklist input[type=checkbox]').forEach(cb => cb.addEventListener('change', updateQuality));
+
+// Quiz
+function markQuiz() {
+    const questions = document.querySelectorAll('.quiz-question');
+    let score = 0;
+    questions.forEach((q, i) => {
+        const correct = q.dataset.correct;
+        const picked = q.querySelector(`input[name="q${i+1}"]:checked`);
+        q.classList.remove('correct', 'wrong');
+        if (picked && picked.value === correct) { q.classList.add('correct'); score++; }
+        else if (picked) q.classList.add('wrong');
+    });
+    const summary = document.getElementById('quizSummary');
+    summary.classList.add('show');
+    document.getElementById('scoreDisplay').textContent = `${score} / 8`;
+    const msg = document.getElementById('scoreMessage');
+    if (score === 8) msg.textContent = 'Perfect. Move to 7.8 — User-Generated Content.';
+    else if (score >= 6) msg.textContent = 'Strong. Review the missed answers.';
+    else msg.textContent = 'Rewatch the shot-type gallery, then try again.';
+    summary.scrollIntoView({ behavior: 'smooth', block: 'center' });
+}
+function resetQuiz() {
+    document.querySelectorAll('.quiz-question').forEach(q => {
+        q.classList.remove('correct', 'wrong');
+        q.querySelectorAll('input[type=radio]').forEach(r => r.checked = false);
+    });
+    document.getElementById('quizSummary').classList.remove('show');
+}
+</script>
+<style id="mtti-paginator-style">
+  section[data-mtti-page] { display: none !important; }
+  section[data-mtti-page].mtti-active { display: block !important; }
+  #mtti-paginator-bar {
+    position: sticky; bottom: 0; left: 0; right: 0;
+    background: #fff; border-top: 2px solid #e2e8f0;
+    padding: 12px 20px; margin-top: 20px;
+    display: flex; align-items: center; justify-content: space-between; gap: 12px;
+    font-family: 'Segoe UI', -apple-system, sans-serif;
+    box-shadow: 0 -4px 16px rgba(0,0,0,0.08);
+    z-index: 100;
+  }
+  #mtti-paginator-bar button {
+    background: #2E7D32; color: #fff; border: none; padding: 10px 18px;
+    border-radius: 8px; font-size: 13px; font-weight: 600; cursor: pointer;
+  }
+  #mtti-paginator-bar button:disabled { background: #cbd5e1; cursor: not-allowed; }
+  #mtti-paginator-bar button.mtti-prev { background: #64748b; }
+  #mtti-paginator-progress { font-size: 12px; color: #64748b; font-weight: 600; }
+</style>
+<script id="mtti-paginator-script">
+(function(){
+  function init(){
+    var sections = Array.prototype.slice.call(document.querySelectorAll('section[id]'));
+    // Only sections that are real content blocks (has an <h2>), skip stray/decorative ones.
+    sections = sections.filter(function(s){ return s.querySelector('h2'); });
+    if (sections.length < 2) return; // nothing to paginate
+
+    sections.forEach(function(s, i){ s.setAttribute('data-mtti-page', i); });
+    var current = 0;
+
+    var bar = document.createElement('div');
+    bar.id = 'mtti-paginator-bar';
+    bar.innerHTML =
+      '<button class="mtti-prev" id="mtti-pg-prev">← Previous</button>' +
+      '<span id="mtti-paginator-progress"></span>' +
+      '<button id="mtti-pg-next">Next →</button>';
+    sections[sections.length - 1].insertAdjacentElement('afterend', bar);
+
+    var prevBtn = bar.querySelector('#mtti-pg-prev');
+    var nextBtn = bar.querySelector('#mtti-pg-next');
+    var progress = bar.querySelector('#mtti-paginator-progress');
+
+    function render(){
+      sections.forEach(function(s, i){ s.classList.toggle('mtti-active', i === current); });
+      prevBtn.disabled = (current === 0);
+      nextBtn.textContent = (current === sections.length - 1) ? 'Done ✓' : 'Next →';
+      progress.textContent = 'Section ' + (current + 1) + ' of ' + sections.length;
+      window.scrollTo(0, 0);
+    }
+    prevBtn.addEventListener('click', function(){ if (current > 0) { current--; render(); } });
+    nextBtn.addEventListener('click', function(){
+      if (current < sections.length - 1) { current++; render(); }
+    });
+    render();
+  }
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', init);
+  } else {
+    init();
+  }
+})();
+</script>
+</body>
+</html>

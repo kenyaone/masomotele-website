@@ -1,0 +1,346 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Content Creation Tools (Canva) | MTTI Digital Marketing</title>
+    <link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Fredoka:wght@500;600&display=swap" rel="stylesheet">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Space Mono', monospace;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh; padding: 20px; color: #fff;
+        }
+        .container { max-width: 900px; margin: 0 auto; }
+        .header { text-align: center; margin-bottom: 30px; animation: slideDown 0.6s ease-out; }
+        .header .lesson-tag {
+            display: inline-block; background: rgba(255,255,255,0.2);
+            padding: 6px 16px; border-radius: 999px;
+            font-size: 0.85em; margin-bottom: 12px;
+        }
+        .header h1 {
+            font-family: 'Fredoka', sans-serif; font-size: 2.2em;
+            margin-bottom: 8px; text-shadow: 3px 3px 0 rgba(0,0,0,0.2);
+        }
+        .header p { opacity: 0.95; font-size: 0.95em; }
+        .score-board {
+            background: rgba(255,255,255,0.15); backdrop-filter: blur(10px);
+            border-radius: 20px; padding: 20px; margin-bottom: 20px;
+            display: flex; justify-content: space-around;
+            animation: fadeIn 0.8s ease-out 0.2s both;
+        }
+        .score-item { text-align: center; }
+        .score-item .label { font-size: 0.85em; opacity: 0.9; margin-bottom: 4px; }
+        .score-item .value {
+            font-size: 1.8em; font-weight: bold; font-family: 'Fredoka', sans-serif;
+        }
+        .progress-bar {
+            width: 100%; height: 8px; background: rgba(255,255,255,0.3);
+            border-radius: 10px; margin-bottom: 25px; overflow: hidden;
+        }
+        .progress-fill {
+            height: 100%; background: linear-gradient(90deg, #f093fb 0%, #f5576c 100%);
+            border-radius: 10px; transition: width 0.5s ease; width: 0%;
+        }
+        .exercise-card {
+            background: white; color: #333; border-radius: 25px;
+            padding: 35px; margin-bottom: 20px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            animation: fadeIn 0.6s ease-out both;
+        }
+        .scenario {
+            background: linear-gradient(135deg, #fff8e1 0%, #ffecb3 100%);
+            border-left: 5px solid #ffc107;
+            padding: 20px 24px; border-radius: 12px;
+            margin-bottom: 24px;
+            font-size: 0.98em; line-height: 1.55;
+        }
+        .scenario strong { color: #7a5a00; font-family: 'Fredoka', sans-serif; }
+        .question {
+            font-size: 1.15em; margin-bottom: 20px;
+            font-weight: 700; line-height: 1.4;
+        }
+        .options { display: flex; flex-direction: column; gap: 12px; }
+        .option {
+            background: #f5f7fb; border: 2px solid transparent;
+            padding: 16px 20px; border-radius: 12px;
+            cursor: pointer; transition: all 0.2s ease;
+            font-family: 'Space Mono', monospace; font-size: 0.98em; text-align: left;
+        }
+        .option:hover:not(.disabled) {
+            background: #eef1fb; border-color: #667eea; transform: translateX(4px);
+        }
+        .option.correct { background: #d4edda; border-color: #28a745; color: #155724; }
+        .option.wrong { background: #f8d7da; border-color: #dc3545; color: #721c24; animation: shake 0.4s; }
+        .option.disabled { cursor: not-allowed; opacity: 0.85; }
+        .feedback {
+            margin-top: 22px; padding: 18px 22px; border-radius: 12px;
+            animation: slideUp 0.4s ease-out;
+            font-size: 0.98em; line-height: 1.5;
+        }
+        .feedback.correct { background: #d4edda; color: #155724; border-left: 4px solid #28a745; }
+        .feedback.wrong { background: #f8d7da; color: #721c24; border-left: 4px solid #dc3545; }
+        .feedback strong { font-family: 'Fredoka', sans-serif; }
+        .next-btn, .restart-btn {
+            margin-top: 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white; border: none;
+            padding: 14px 32px; border-radius: 12px;
+            font-size: 1em; cursor: pointer;
+            font-family: 'Fredoka', sans-serif;
+            box-shadow: 0 6px 18px rgba(0,0,0,0.2);
+            transition: transform 0.2s ease;
+        }
+        .next-btn:hover, .restart-btn:hover { transform: scale(1.04); }
+        .results {
+            text-align: center; padding: 25px 15px;
+            animation: bounceIn 0.6s ease-out;
+        }
+        .results h2 {
+            font-family: 'Fredoka', sans-serif; font-size: 2em;
+            margin-bottom: 12px; color: #333;
+        }
+        .results .final-score {
+            font-size: 3em; font-family: 'Fredoka', sans-serif;
+            color: #667eea; margin: 20px 0;
+        }
+        .results p { color: #555; margin-bottom: 12px; }
+        .badge { display: inline-block; font-size: 3.5em; margin: 8px 0; }
+        @keyframes slideDown { from { opacity: 0; transform: translateY(-30px); } to { opacity: 1; transform: translateY(0); } }
+        @keyframes fadeIn { from { opacity: 0; transform: scale(0.96); } to { opacity: 1; transform: scale(1); } }
+        @keyframes slideUp { from { opacity: 0; transform: translateY(15px); } to { opacity: 1; transform: translateY(0); } }
+        @keyframes shake { 0%,100% { transform: translateX(0); } 25% { transform: translateX(-8px); } 75% { transform: translateX(8px); } }
+        @keyframes bounceIn { 0% { opacity: 0; transform: scale(0.4); } 60% { transform: scale(1.05); } 100% { opacity: 1; transform: scale(1); } }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <div class="lesson-tag">Module 7 · Lesson 7.2</div>
+            <h1>Content Creation Tools (Canva)</h1>
+            <p>10 Karibu Kitchen scenarios — Canva free vs Pro, workflow, Brand Kit, and common mistakes</p>
+        </div>
+
+        <div class="score-board">
+            <div class="score-item"><div class="label">Score</div><div class="value" id="score">0</div></div>
+            <div class="score-item"><div class="label">Question</div><div class="value"><span id="current">1</span>/<span id="total">10</span></div></div>
+            <div class="score-item"><div class="label">Streak</div><div class="value" id="streak">0</div></div>
+        </div>
+
+        <div class="progress-bar"><div class="progress-fill" id="progress"></div></div>
+
+        <div class="exercise-card" id="exerciseCard"></div>
+    </div>
+
+    <script>
+        const exercises = [
+  {
+    "scenario": "Sarah's cousin insists she needs Adobe Photoshop and a KES 25,000 short course before she can post \"proper\" graphics. Sarah wants to start this week.",
+    "question": "Which tool does Lesson 7.2 recommend Sarah start with, and at what cost?",
+    "options": [
+      "Photoshop — the only professional option.",
+      "Canva at the free tier — browser-based, template-driven, over 250,000 templates, 1 million free photos, unlimited exports. Enough to run a Kenyan small business for years.",
+      "Figma — because it is designed for restaurants.",
+      "Piktochart — the default tool for lunch delivery businesses."
+    ],
+    "correct": 1,
+    "explanation": "Section 7.2 names Canva's free tier as sufficient for a serious Kenyan small business for years. Photoshop is overkill for Sarah's workflow; Figma is UI-oriented; Piktochart is infographic-specialist."
+  },
+  {
+    "scenario": "Sarah is deciding whether to upgrade to Canva Pro (about KES 1,500/month) or stay on the free tier. She currently makes about two graphics a week.",
+    "question": "What does Lesson 7.2 recommend?",
+    "options": [
+      "Always upgrade immediately.",
+      "Free tier is enough. Canva Pro pays for itself in time saved once you are making MORE than about three graphics a week. Under that, free is fine.",
+      "Never upgrade under any circumstances.",
+      "Only upgrade if you have a KES 500,000/month marketing budget."
+    ],
+    "correct": 1,
+    "explanation": "Section 7.2 sets the tipping point at roughly three graphics a week. Sarah's two-a-week volume does not yet justify Pro's KES 1,500/month. When she batches 12 posts/month, upgrading becomes worth it."
+  },
+  {
+    "scenario": "Sarah upgrades to Canva Pro eventually. She wants to know what four things Pro adds.",
+    "question": "Which set matches Lesson 7.2?",
+    "options": [
+      "Brand Kit (colours, fonts, logo), Magic Resize (one design becomes multiple sizes with one click), background remover, and 100M+ premium images and elements.",
+      "Adobe Photoshop, a free DSLR, an intern, and unlimited stock video.",
+      "Free hosting, free domain, free email, and free SEO audits.",
+      "A free Google Analytics licence, free WhatsApp Business API, free Meta ads, and free TikTok Shop."
+    ],
+    "correct": 0,
+    "explanation": "Section 7.2 lists Pro's four value-adds precisely: Brand Kit, Magic Resize, background remover, and the premium image/element library. Options 2-4 are unrelated."
+  },
+  {
+    "scenario": "Sarah is asked in class to name three professional Canva alternatives she should at least recognise.",
+    "question": "Which set matches Lesson 7.2's six alternatives?",
+    "options": [
+      "Adobe Express, Vista Create (formerly Crello), PicMonkey — plus Piktochart, Snappa, and Figma.",
+      "Word, Excel, PowerPoint.",
+      "Notepad, MS Paint, Windows Movie Maker.",
+      "Only WordPress themes."
+    ],
+    "correct": 0,
+    "explanation": "Section 7.2's six named alternatives are Adobe Express, Vista Create, PicMonkey, Piktochart, Snappa, and Figma. For 95% of Kenyan small-business work, Canva is the answer — but a trainee should recognise all six."
+  },
+  {
+    "scenario": "Sarah is planning her weekly Canva session for Karibu Kitchen.",
+    "question": "Which workflow from Lesson 7.2 does she follow on a Monday morning?",
+    "options": [
+      "Shoot photos, open Canva, pick templates (Instagram Square + Story), drop photos in, add price/delivery number/logo, download as JPEG, upload to Meta Business Suite and schedule across the week. Total time: about 45 minutes.",
+      "Design each post one at a time throughout the week whenever inspiration strikes.",
+      "Hire an agency for KES 40,000/month.",
+      "Only post text — Canva is unnecessary."
+    ],
+    "correct": 0,
+    "explanation": "Section 7.2 walks through Sarah's six-step Monday workflow exactly. Batching Sunday photos + Monday Canva + Monday scheduling = a whole week of graphics in 45 minutes. This is professional practice."
+  },
+  {
+    "scenario": "Sarah is building her Karibu Kitchen Brand Kit for the first time.",
+    "question": "Which set of ingredients does Lesson 7.2 tell her to save?",
+    "options": [
+      "Two brand colours (maroon and gold), two fonts (bold headline + clean body), three logo versions (full colour / black / white), her tagline (\"Fresh Kenyan lunch, delivered\"), and her contact strip (WhatsApp, website, address).",
+      "Twenty different colours changing every week.",
+      "Six different logos and eight different fonts.",
+      "No brand elements — pick fresh each time to \"stay creative\"."
+    ],
+    "correct": 0,
+    "explanation": "Section 7.2 lists Sarah's Brand Kit ingredients: two colours, two fonts, three logo versions, a tagline, and a contact strip. Even on the free tier Sarah can save and reuse these. Consistency is what turns a Page into a recognisable brand."
+  },
+  {
+    "scenario": "Sarah wants to save time each week without paying for Pro. She has 45 minutes on Monday morning.",
+    "question": "Which three Canva shortcuts from Lesson 7.2 apply?",
+    "options": [
+      "Duplicate last week's design and change only the text; use Canva's built-in schedule feature to post directly to Facebook and Instagram; create a Weekly Post Template once and Magic-Resize it into three sizes.",
+      "Start every graphic from a blank template.",
+      "Manually copy-paste every design into every platform.",
+      "Screenshot old posts and re-upload as new."
+    ],
+    "correct": 0,
+    "explanation": "Section 7.2 lists three specific time-savers: duplicate + change text; Canva's built-in scheduler; and Magic Resize (or manual duplication on free) for three sizes from one design. Each saves 15-20 minutes."
+  },
+  {
+    "scenario": "Sarah's latest Instagram post uses five different fonts, seven colours from the Canva palette, and crams 62 words of text over her food photo.",
+    "question": "Which Canva mistakes from Lesson 7.2 is she making?",
+    "options": [
+      "None — this is professional.",
+      "Too many fonts (max 2-3), too many colours (Brand Kit only), and cramming text (under 15 words per image is the rule).",
+      "Not enough fonts and not enough colours.",
+      "The photo is too high-resolution."
+    ],
+    "correct": 1,
+    "explanation": "Section 7.2 lists four common mistakes: too many fonts (>3), off-brand colours, cramming text (>15 words), and ignoring the safe zone. Sarah is triggering the first three. Fewer fonts, Brand Kit colours only, tighter copy."
+  },
+  {
+    "scenario": "Sarah places her Karibu Kitchen logo 10 pixels from the top edge of an Instagram Story. On some phones, the logo disappears under the Instagram header.",
+    "question": "Which Canva mistake from Lesson 7.2 is this?",
+    "options": [
+      "None — every phone displays exactly the same way.",
+      "Ignoring the safe zone — anything near the edge of the design gets cut off on some displays. Keep critical content at least about 50 pixels from every edge.",
+      "The logo is too large.",
+      "The logo file type is wrong."
+    ],
+    "correct": 1,
+    "explanation": "Section 7.2 names ignoring the safe zone as one of the four Canva mistakes. The safe zone rule is roughly 50 pixels from every edge (and top/bottom 200 pixels on Stories/Reels — see Lesson 7.4)."
+  },
+  {
+    "scenario": "Sarah's cousin scoffs: \"Canva is a toy — real designers use Photoshop.\"",
+    "question": "How does Lesson 7.2 frame Canva vs the alternatives?",
+    "options": [
+      "Cousin is right — Canva is worthless.",
+      "For 95% of Kenyan small-business marketing work, Canva IS the answer. Learn Canva first. The others (Figma, Adobe Express, etc.) later, only if the work demands them.",
+      "Photoshop is required by Kenyan law.",
+      "Every business must use all six tools every week."
+    ],
+    "correct": 1,
+    "explanation": "Section 7.2 is direct: Canva covers 95% of Kenyan small-business work. Photoshop and Figma are heavier tools designed for different jobs. Start with Canva; graduate later only if the work requires it."
+  }
+];
+
+        let currentQuestion = 0, score = 0, streak = 0, answered = false;
+
+        function updateScoreboard() {
+            document.getElementById('score').textContent = score;
+            document.getElementById('current').textContent = Math.min(currentQuestion + 1, exercises.length);
+            document.getElementById('total').textContent = exercises.length;
+            document.getElementById('streak').textContent = streak;
+            document.getElementById('progress').style.width = ((currentQuestion) / exercises.length) * 100 + '%';
+        }
+
+        function escapeHtml(s) {
+            return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+        }
+
+        function renderQuestion() {
+            answered = false;
+            const q = exercises[currentQuestion];
+            let html = '';
+            if (q.scenario) {
+                html += `<div class="scenario"><strong>Scenario.</strong> ${escapeHtml(q.scenario)}</div>`;
+            }
+            html += `<div class="question">${escapeHtml(q.question)}</div>`;
+            html += '<div class="options">';
+            q.options.forEach((o, i) => {
+                html += `<button class="option" onclick="selectAnswer(${i})">${escapeHtml(o)}</button>`;
+            });
+            html += '</div>';
+            document.getElementById('exerciseCard').innerHTML = html;
+            updateScoreboard();
+        }
+
+        function selectAnswer(i) {
+            if (answered) return;
+            answered = true;
+            const q = exercises[currentQuestion];
+            const btns = document.querySelectorAll('.option');
+            btns.forEach(b => b.classList.add('disabled'));
+            btns[q.correct].classList.add('correct');
+            const right = i === q.correct;
+            if (!right) btns[i].classList.add('wrong');
+            if (right) { score += 10; streak += 1; } else { streak = 0; }
+            const fb = document.createElement('div');
+            fb.className = 'feedback ' + (right ? 'correct' : 'wrong');
+            fb.innerHTML = `<strong>${right ? '✅ Correct.' : '❌ Not quite.'}</strong><br>${escapeHtml(q.explanation)}`;
+            document.getElementById('exerciseCard').appendChild(fb);
+            const nb = document.createElement('button');
+            nb.className = 'next-btn';
+            nb.textContent = currentQuestion === exercises.length - 1 ? 'See results →' : 'Next scenario →';
+            nb.onclick = nextQuestion;
+            document.getElementById('exerciseCard').appendChild(nb);
+            updateScoreboard();
+        }
+
+        function nextQuestion() {
+            currentQuestion++;
+            if (currentQuestion >= exercises.length) return showResults();
+            renderQuestion();
+        }
+
+        function showResults() {
+            document.getElementById('progress').style.width = '100%';
+            const total = exercises.length * 10;
+            const pct = Math.round(score / total * 100);
+            if (window.parent) { window.parent.postMessage({type:"mtti_quiz_score", score: score, total: total, percent: pct}, "*"); }
+            let badge = '🌟', msg = 'Excellent work. You have a professional grasp of this lesson.';
+            if (pct < 50) { badge = '🌱'; msg = 'Good first attempt. Re-watch the lesson video and try again.'; }
+            else if (pct < 80) { badge = '📚'; msg = 'Solid progress. Review the scenarios you missed and retry.'; }
+            document.getElementById('exerciseCard').innerHTML = `
+                <div class="results">
+                    <span class="badge">${badge}</span>
+                    <h2>Quiz Complete</h2>
+                    <div class="final-score">${score} / ${total}</div>
+                    <p><strong>${pct}%</strong> · Longest streak: ${streak}</p>
+                    <p>${msg}</p>
+                    <button class="restart-btn" onclick="restart()">Try again 🔁</button>
+                </div>`;
+        }
+
+        function restart() {
+            currentQuestion = 0; score = 0; streak = 0;
+            renderQuestion();
+        }
+
+        renderQuestion();
+    </script>
+</body>
+</html>

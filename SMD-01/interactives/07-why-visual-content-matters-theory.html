@@ -1,0 +1,665 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lesson 7.1 — Why Visual Content Matters (Interactive)</title>
+<style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+        font-family: 'Segoe UI', -apple-system, sans-serif;
+        line-height: 1.6;
+        color: #1e293b;
+        background: #fff7fa;
+        min-height: 100vh;
+    }
+    .container { max-width: 1150px; margin: 0 auto; padding: 20px; }
+    header {
+        background: linear-gradient(135deg, #2E7D32, #1B5E20);
+        color: #fff;
+        padding: 40px 30px;
+        border-radius: 12px;
+        margin-bottom: 24px;
+        box-shadow: 0 10px 30px rgba(245,87,108,0.30);
+    }
+    header .badge {
+        display: inline-block;
+        background: rgba(255,255,255,0.22);
+        padding: 4px 14px;
+        border-radius: 16px;
+        font-size: 12px;
+        font-weight: bold;
+        letter-spacing: 1px;
+        margin-bottom: 14px;
+    }
+    header h1 { font-size: 34px; margin-bottom: 8px; }
+    header .subtitle { font-size: 17px; opacity: 0.95; margin-bottom: 20px; }
+    .meta-strip { display: flex; flex-wrap: wrap; gap: 12px; }
+    .meta-strip span {
+        background: rgba(255,255,255,0.20);
+        padding: 6px 14px;
+        border-radius: 20px;
+        font-size: 13px;
+    }
+    .toc {
+        background: #fff;
+        border: 1px solid #fbcfe8;
+        border-radius: 10px;
+        padding: 22px 26px;
+        margin-bottom: 22px;
+    }
+    .toc h3 { color: #f5576c; margin-bottom: 10px; }
+    .toc ol { padding-left: 20px; }
+    .toc a { color: #f5576c; text-decoration: none; font-weight: 600; }
+    .toc a:hover { text-decoration: underline; }
+    section {
+        background: #fff;
+        border: 1px solid #fbcfe8;
+        border-radius: 10px;
+        padding: 26px 30px;
+        margin-bottom: 22px;
+    }
+    section h2 {
+        color: #f5576c;
+        font-size: 22px;
+        margin-bottom: 12px;
+        padding-bottom: 8px;
+        border-bottom: 3px solid #f093fb;
+    }
+    section h3 { color: #0f172a; font-size: 17px; margin: 18px 0 8px; }
+    section p { margin-bottom: 12px; }
+    section ul, section ol { padding-left: 22px; margin-bottom: 12px; }
+    section li { margin-bottom: 4px; }
+    .callout {
+        border-left: 5px solid #f093fb;
+        background: #fdf2f8;
+        padding: 14px 18px;
+        margin: 14px 0;
+        border-radius: 4px;
+    }
+    .callout.warn { border-left-color: #dc2626; background: #fef2f2; }
+    .callout.tip { border-left-color: #059669; background: #ecfdf5; }
+    .callout strong { color: #f5576c; }
+    .callout.warn strong { color: #dc2626; }
+    .callout.tip strong { color: #059669; }
+
+    /* Format comparator */
+    .comparator {
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        gap: 12px;
+        margin: 18px 0;
+    }
+    .format-card {
+        background: #fff;
+        border: 2px solid #fbcfe8;
+        border-radius: 10px;
+        padding: 14px;
+        cursor: pointer;
+        transition: all 0.2s;
+    }
+    .format-card:hover { transform: translateY(-3px); box-shadow: 0 6px 20px rgba(245,87,108,0.15); }
+    .format-card.active { border-color: #f5576c; background: linear-gradient(135deg,#fdf2f8,#fff7fa); }
+    .format-card h4 { color: #831843; font-size: 15px; margin-bottom: 6px; }
+    .format-card .peak { font-size: 22px; font-weight: bold; color: #f5576c; margin: 4px 0; }
+    .format-card .label { font-size: 11px; color: #64748b; text-transform: uppercase; letter-spacing: 1px; }
+    .chart-box {
+        margin-top: 8px;
+        background: #fdf2f8;
+        border-radius: 6px;
+        padding: 6px;
+    }
+    .chart-box svg { display: block; width: 100%; height: 80px; }
+
+    /* Scenario picker */
+    .scenario {
+        background: #fff;
+        border: 2px solid #fbcfe8;
+        border-radius: 10px;
+        padding: 16px;
+        margin: 14px 0;
+        transition: border-color 0.3s;
+    }
+    .scenario.correct { border-color: #059669; background: #ecfdf5; }
+    .scenario.wrong { border-color: #dc2626; background: #fef2f2; }
+    .scenario .prompt {
+        font-weight: 600;
+        margin-bottom: 10px;
+        color: #1e293b;
+    }
+    .scenario .prompt .brief {
+        display: block;
+        font-weight: normal;
+        color: #64748b;
+        font-size: 13px;
+        margin-top: 4px;
+    }
+    .scenario-opts {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+        gap: 8px;
+    }
+    .scenario-opts label {
+        background: #fdf2f8;
+        border: 1.5px solid #fbcfe8;
+        border-radius: 6px;
+        padding: 10px 12px;
+        cursor: pointer;
+        font-size: 13px;
+    }
+    .scenario-opts label:hover { border-color: #f5576c; background: #fff; }
+    .scenario-opts input { margin-right: 6px; }
+    .scenario .feedback {
+        margin-top: 10px;
+        padding: 10px 14px;
+        border-radius: 6px;
+        font-size: 13px;
+        display: none;
+    }
+    .scenario.correct .feedback {
+        display: block;
+        background: #d1fae5;
+        color: #065f46;
+        border-left: 4px solid #059669;
+    }
+    .scenario.wrong .feedback {
+        display: block;
+        background: #fee2e2;
+        color: #991b1b;
+        border-left: 4px solid #dc2626;
+    }
+
+    /* Studio checklist */
+    .checklist {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
+        gap: 10px;
+        margin: 14px 0;
+    }
+    .check-item {
+        background: #fff;
+        border: 2px solid #fbcfe8;
+        border-radius: 8px;
+        padding: 12px 14px;
+        cursor: pointer;
+        display: flex;
+        gap: 10px;
+        align-items: flex-start;
+        font-size: 14px;
+        transition: all 0.15s;
+    }
+    .check-item:hover { border-color: #f5576c; }
+    .check-item.on { background: linear-gradient(135deg,#ecfdf5,#f0fdfa); border-color: #059669; }
+    .check-item input { margin-top: 3px; }
+    .check-item .lbl { font-weight: 600; color: #831843; }
+    .check-item .desc { display: block; font-weight: normal; color: #64748b; font-size: 12px; margin-top: 2px; }
+
+    button.btn {
+        background: linear-gradient(135deg,#f093fb,#f5576c);
+        color: #fff;
+        border: none;
+        padding: 10px 22px;
+        border-radius: 6px;
+        font-size: 15px;
+        font-weight: 600;
+        cursor: pointer;
+    }
+    button.btn:hover { opacity: 0.92; }
+    button.btn.reset { background: #64748b; margin-left: 8px; }
+
+    .quiz-summary {
+        text-align: center;
+        padding: 30px;
+        background: linear-gradient(135deg, #fdf2f8 0%, #ffe4ec 100%);
+        border-radius: 10px;
+        margin: 20px 0;
+        display: none;
+    }
+    .quiz-summary.show { display: block; }
+    .quiz-summary .score {
+        font-size: 48px;
+        font-weight: bold;
+        background: linear-gradient(135deg,#f093fb,#f5576c);
+        -webkit-background-clip: text;
+        background-clip: text;
+        color: transparent;
+        margin-bottom: 8px;
+    }
+
+    .compare-note {
+        background: #fff;
+        border: 1.5px solid #fbcfe8;
+        border-radius: 10px;
+        padding: 14px 18px;
+        margin-top: 14px;
+        display: none;
+        font-size: 14px;
+    }
+    .compare-note.show { display: block; }
+    .compare-note strong { color: #f5576c; }
+
+    footer { text-align: center; color: #64748b; padding: 24px; font-size: 13px; }
+    @media (max-width: 800px) {
+        .comparator { grid-template-columns: repeat(2, 1fr); }
+        header h1 { font-size: 26px; }
+    }
+
+    /* MTTI logo stamp */
+    .mtti-logo-stamp {
+        position: fixed; top: 14px; right: 18px; z-index: 999;
+        opacity: 0.88; transition: opacity 0.2s;
+    }
+    .mtti-logo-stamp:hover { opacity: 1; }
+    .mtti-logo-stamp img { width: 56px; height: 56px; border-radius: 50%; box-shadow: 0 2px 8px rgba(0,0,0,0.18); }
+</style>
+</head>
+<body>
+<div class="mtti-logo-stamp">
+    <img src="../../Resources/Logo.jpeg" alt="MTTI" title="Masomotele Technical Training Institute — Start learning, Start earning">
+</div>
+
+<div class="container">
+
+<header>
+    <div class="badge">LESSON 7.1  ·  CONTENT &amp; DESIGN  ·  INTERACTIVE</div>
+    <h1>Why Visual Content Matters</h1>
+    <div class="subtitle">Compare 4 content formats side-by-side — and figure out which one wins for each of Sarah's messages</div>
+    <div class="meta-strip">
+        <span><strong>Duration:</strong> ~30 min interactive</span>
+        <span><strong>Level:</strong> Foundation</span>
+        <span><strong>Prerequisite:</strong> Module 6 (Content Strategy)</span>
+        <span><strong>Handbook:</strong> Part 7, §7.1</span>
+    </div>
+</header>
+
+<div class="toc">
+    <h3>What you'll do in this lesson</h3>
+    <ol>
+        <li><a href="#s1">Content Format Comparator (4 formats)</a></li>
+        <li><a href="#s2">Pick-the-format scenario challenge (auto-marked)</a></li>
+        <li><a href="#s3">Phone-as-Studio checklist</a></li>
+        <li><a href="#s4">The 90-second content check</a></li>
+    </ol>
+</div>
+
+<section id="s1">
+    <h2>1. Content Format Comparator</h2>
+    <p>Four formats. Same message, same day, same audience. The lines below show typical engagement (comments + saves + shares as % of reach) over the 30 days after posting. Click a card to compare.</p>
+
+    <div class="comparator" id="cmp">
+        <div class="format-card active" data-fmt="text">
+            <h4>Plain text</h4>
+            <div class="peak">1.2%</div>
+            <div class="label">peak engagement</div>
+            <div class="chart-box">
+                <svg viewBox="0 0 100 60" preserveAspectRatio="none">
+                    <path d="M0,55 L10,52 L20,50 L30,52 L40,55 L50,57 L60,58 L70,58 L80,59 L90,59 L100,59"
+                          fill="none" stroke="#94a3b8" stroke-width="2.5"/>
+                    <path d="M0,55 L10,52 L20,50 L30,52 L40,55 L50,57 L60,58 L70,58 L80,59 L90,59 L100,59 L100,60 L0,60 Z"
+                          fill="#e2e8f0" opacity="0.6"/>
+                </svg>
+            </div>
+        </div>
+
+        <div class="format-card" data-fmt="image">
+            <h4>Image</h4>
+            <div class="peak">2.8%</div>
+            <div class="label">peak engagement</div>
+            <div class="chart-box">
+                <svg viewBox="0 0 100 60" preserveAspectRatio="none">
+                    <path d="M0,40 L10,28 L20,25 L30,30 L40,38 L50,45 L60,50 L70,54 L80,56 L90,58 L100,59"
+                          fill="none" stroke="#f5576c" stroke-width="2.5"/>
+                    <path d="M0,40 L10,28 L20,25 L30,30 L40,38 L50,45 L60,50 L70,54 L80,56 L90,58 L100,59 L100,60 L0,60 Z"
+                          fill="#fbcfe8" opacity="0.6"/>
+                </svg>
+            </div>
+        </div>
+
+        <div class="format-card" data-fmt="carousel">
+            <h4>Carousel</h4>
+            <div class="peak">4.2%</div>
+            <div class="label">peak engagement</div>
+            <div class="chart-box">
+                <svg viewBox="0 0 100 60" preserveAspectRatio="none">
+                    <path d="M0,30 L10,15 L20,10 L30,12 L40,20 L50,30 L60,40 L70,48 L80,53 L90,56 L100,58"
+                          fill="none" stroke="#a855f7" stroke-width="2.5"/>
+                    <path d="M0,30 L10,15 L20,10 L30,12 L40,20 L50,30 L60,40 L70,48 L80,53 L90,56 L100,58 L100,60 L0,60 Z"
+                          fill="#e9d5ff" opacity="0.6"/>
+                </svg>
+            </div>
+        </div>
+
+        <div class="format-card" data-fmt="video">
+            <h4>Short video</h4>
+            <div class="peak">7.1%</div>
+            <div class="label">peak engagement</div>
+            <div class="chart-box">
+                <svg viewBox="0 0 100 60" preserveAspectRatio="none">
+                    <path d="M0,20 L10,5 L20,3 L30,6 L40,12 L50,20 L60,30 L70,40 L80,48 L90,53 L100,56"
+                          fill="none" stroke="#f093fb" stroke-width="2.5"/>
+                    <path d="M0,20 L10,5 L20,3 L30,6 L40,12 L50,20 L60,30 L70,40 L80,48 L90,53 L100,56 L100,60 L0,60 Z"
+                          fill="#f5d0fe" opacity="0.6"/>
+                </svg>
+            </div>
+        </div>
+    </div>
+
+    <div class="compare-note show" id="cmpNote"></div>
+
+    <div class="callout tip">
+        <strong>Rule of thumb:</strong> The best-performing Kenyan food business Reels get 5–10× the reach of the same recipe posted as plain text. But an authentic image beats a lazy Reel. Format follows message — see the next challenge.
+    </div>
+</section>
+
+<section id="s2">
+    <h2>2. Scenario challenge — pick the best format</h2>
+    <p>Three messages Sarah needs to publish today. For each, pick the format most likely to land the message.</p>
+
+    <div class="scenario" data-correct="image">
+        <div class="prompt">
+            Scenario 1 — Announce a same-day promo
+            <span class="brief">"Today only: KES 350 chapati-mayai combo with free delivery in Kapsoya between 12–2 PM." Sarah needs high urgency and instant clarity.</span>
+        </div>
+        <div class="scenario-opts">
+            <label><input type="radio" name="sc1" value="text"> Plain text</label>
+            <label><input type="radio" name="sc1" value="image"> Image with price overlay</label>
+            <label><input type="radio" name="sc1" value="carousel"> Carousel (5 slides)</label>
+            <label><input type="radio" name="sc1" value="video"> Short video (30s)</label>
+        </div>
+        <div class="feedback">
+            <strong>Correct: Image with price overlay.</strong> Promo needs one glance. Add "TODAY ONLY · KES 350 · WhatsApp 0712-XXX-XXX" burned into the image so it survives being screenshotted and shared to WhatsApp Status.
+        </div>
+    </div>
+
+    <div class="scenario" data-correct="video">
+        <div class="prompt">
+            Scenario 2 — Tell a customer story
+            <span class="brief">Joyce Wanjiru's office ordered lunch for 12 people during a rough project week. She sent Sarah a tearful voice note thanking the team.</span>
+        </div>
+        <div class="scenario-opts">
+            <label><input type="radio" name="sc2" value="text"> Plain text</label>
+            <label><input type="radio" name="sc2" value="image"> Single image</label>
+            <label><input type="radio" name="sc2" value="carousel"> Carousel (5 slides)</label>
+            <label><input type="radio" name="sc2" value="video"> Short vertical video</label>
+        </div>
+        <div class="feedback">
+            <strong>Correct: Short vertical video.</strong> Stories carry emotion. A 30-second video of Joyce's team eating + captions with her quote earns saves and shares — carousels tell facts, video tells feeling.
+        </div>
+    </div>
+
+    <div class="scenario" data-correct="carousel">
+        <div class="prompt">
+            Scenario 3 — Teach a recipe
+            <span class="brief">Sarah wants to publish her signature 6-step ugali-and-sukuma recipe as free content, showing expertise and getting saves.</span>
+        </div>
+        <div class="scenario-opts">
+            <label><input type="radio" name="sc3" value="text"> Plain text</label>
+            <label><input type="radio" name="sc3" value="image"> Single image</label>
+            <label><input type="radio" name="sc3" value="carousel"> 6-slide carousel</label>
+            <label><input type="radio" name="sc3" value="video"> 12-second Reel</label>
+        </div>
+        <div class="feedback">
+            <strong>Correct: 6-slide carousel.</strong> Instructional content wins on carousels — one step per slide gives readers control, drives Save actions (weighted heavily by Instagram's algorithm), and lets them return without re-watching a video.
+        </div>
+    </div>
+
+    <div style="margin-top: 20px;">
+        <button class="btn" onclick="markScenarios()">Mark my choices</button>
+        <button class="btn reset" onclick="resetScenarios()">Reset</button>
+    </div>
+
+    <div class="quiz-summary" id="scSummary">
+        <div class="score" id="scScore">0 / 3</div>
+        <p id="scMsg">Nice.</p>
+    </div>
+</section>
+
+<section id="s3">
+    <h2>3. Phone-as-Studio checklist</h2>
+    <p>Sarah's Tecno Camon is her whole content studio. Check every item that applies to today's shoot — <em>Score my setup</em> tells you if the shot will publish or waste her lunch break.</p>
+
+    <div class="checklist" id="checklist">
+        <label class="check-item">
+            <input type="checkbox" value="light">
+            <span>
+                <span class="lbl">Natural light on the food</span>
+                <span class="desc">Shoot near a window between 11 AM and 2 PM — never under kitchen fluorescents.</span>
+            </span>
+        </label>
+        <label class="check-item">
+            <input type="checkbox" value="frame">
+            <span>
+                <span class="lbl">Shoot in 9:16 vertical</span>
+                <span class="desc">For Reels &amp; Stories. Lock the phone in portrait — no landscape by accident.</span>
+            </span>
+        </label>
+        <label class="check-item">
+            <input type="checkbox" value="focus">
+            <span>
+                <span class="lbl">Tap the plate to lock focus</span>
+                <span class="desc">Prevents the phone auto-focusing on background steam or hands.</span>
+            </span>
+        </label>
+        <label class="check-item">
+            <input type="checkbox" value="clean">
+            <span>
+                <span class="lbl">Wipe the lens</span>
+                <span class="desc">30 seconds with a T-shirt fixes 80% of "why is my footage blurry" complaints.</span>
+            </span>
+        </label>
+        <label class="check-item">
+            <input type="checkbox" value="mic">
+            <span>
+                <span class="lbl">Quiet room OR captions</span>
+                <span class="desc">85% of Reels are watched with sound off. Captions matter more than audio quality.</span>
+            </span>
+        </label>
+        <label class="check-item">
+            <input type="checkbox" value="stable">
+            <span>
+                <span class="lbl">Stabilise the phone</span>
+                <span class="desc">Prop it against a book stack or use a KES 500 mini-tripod. No shaky handheld.</span>
+            </span>
+        </label>
+        <label class="check-item">
+            <input type="checkbox" value="filter">
+            <span>
+                <span class="lbl">Heavy Instagram filter on top of everything</span>
+                <span class="desc">Modern content is bright and real — filters look dated in 2026.</span>
+            </span>
+        </label>
+        <label class="check-item">
+            <input type="checkbox" value="stock">
+            <span>
+                <span class="lbl">Use a stock photo if the real plate looks average</span>
+                <span class="desc">Kenyan customers spot stock in one second. Never use it for food.</span>
+            </span>
+        </label>
+    </div>
+
+    <div style="margin-top: 16px;">
+        <button class="btn" onclick="scoreStudio()">Score my setup</button>
+        <button class="btn reset" onclick="resetStudio()">Reset</button>
+    </div>
+
+    <div class="quiz-summary" id="studioSummary">
+        <div class="score" id="studioScore">0 / 6</div>
+        <p id="studioMsg"></p>
+    </div>
+</section>
+
+<section id="s4">
+    <h2>4. The 90-second content check</h2>
+    <p>Before you press <em>Post</em>, run every visual through these 5 questions. Blurry photos are worse than no post.</p>
+    <ol>
+        <li><strong>Is it sharp?</strong> Zoom to 100%. If the food edges are fuzzy, re-shoot.</li>
+        <li><strong>Is it well-lit?</strong> Natural light beats artificial light every time.</li>
+        <li><strong>Real person / place / product?</strong> Not a stock model, not a generic photo.</li>
+        <li><strong>Does it match your brand?</strong> Same colours and style as last week's post.</li>
+        <li><strong>Message in 3 seconds?</strong> A viewer scrolling should get it without reading the caption.</li>
+    </ol>
+    <div class="callout warn">
+        <strong>Ninety seconds. Five questions. Every visual. Every time.</strong> Sarah runs this check on her Sunday-afternoon shoots — the plates that fail get eaten, not posted.
+    </div>
+
+    <h3>The five research numbers that make the case</h3>
+    <ul>
+        <li><strong>2.3&times;</strong> — posts with images get roughly 2.3&times; the engagement of text-only posts (2024 HubSpot cross-platform study).</li>
+        <li><strong>1.8&times;</strong> — video content increases conversion rates by around 80% versus static media on landing pages.</li>
+        <li><strong>3&times;</strong> — infographics are shared roughly 3&times; more often than any other content type on Facebook and LinkedIn.</li>
+        <li><strong>65%</strong> — customers who see branded visuals recall the brand a week later, vs 10% for text-only.</li>
+        <li><strong>~85%</strong> — mobile users scroll past text-only posts within 1.5 seconds, whether they intended to or not.</li>
+    </ul>
+    <div class="callout tip">
+        <strong>What to stop doing:</strong> three habits that quietly kill Kenyan small-business content. <em>Stop stock imagery</em> — customers spot "smiling Kenyan office worker" in a second. <em>Stop heavy filters</em> — 2018 Instagram aesthetics look dated in 2026. <em>Stop text-only posts</em> — if you don't have time for a visual, don't post.
+    </div>
+</section>
+
+<footer>
+    <p>Lesson 7.1 — Why Visual Content Matters · Masomotele Technical Training Institute · Handbook Part 7, §7.1</p>
+    <p>Next: <strong>Lesson 7.2 — Content Creation Tools (Canva)</strong></p>
+</footer>
+
+</div>
+
+<script>
+const CMP_NOTES = {
+    text: '<strong>Plain text:</strong> Peaks at ~1.2% engagement then drops to almost nothing after day 3. Meta&apos;s algorithm de-prioritises text-only in the feed. Only use for very short, punchy announcements — and even then, add an emoji block for visual weight.',
+    image: '<strong>Image:</strong> Peak ~2.8%. Sarah&apos;s workhorse. A real Karibu Kitchen plate shot on her phone will out-perform a stock photo by 3× — customers can tell the difference in under a second.',
+    carousel: '<strong>Carousel:</strong> Peak ~4.2%. Wins on <em>saves</em> because readers control the pace. Use for recipes, before/after transformations, and menus. Ends with a CTA slide: "WhatsApp us to order."',
+    video: '<strong>Short video:</strong> Peak ~7.1%, and Reels keep earning reach for 2–3 weeks vs 3 days for images. Highest ceiling — but a boring Reel still beats an average plain-text post. Format follows the message.'
+};
+
+const cmpNote = document.getElementById('cmpNote');
+function setCmp(fmt) { cmpNote.innerHTML = CMP_NOTES[fmt]; }
+document.querySelectorAll('#cmp .format-card').forEach(c => {
+    c.addEventListener('click', () => {
+        document.querySelectorAll('#cmp .format-card').forEach(x => x.classList.remove('active'));
+        c.classList.add('active');
+        setCmp(c.dataset.fmt);
+    });
+});
+setCmp('text');
+
+function markScenarios() {
+    const cards = document.querySelectorAll('.scenario');
+    let score = 0;
+    cards.forEach((c, i) => {
+        const correct = c.dataset.correct;
+        const picked = c.querySelector('input[name="sc' + (i+1) + '"]:checked');
+        c.classList.remove('correct', 'wrong');
+        if (picked && picked.value === correct) { c.classList.add('correct'); score++; }
+        else c.classList.add('wrong');
+    });
+    const summary = document.getElementById('scSummary');
+    summary.classList.add('show');
+    document.getElementById('scScore').textContent = score + ' / 3';
+    const msg = document.getElementById('scMsg');
+    if (score === 3) msg.textContent = 'Perfect — you match format to message like a pro.';
+    else if (score === 2) msg.textContent = 'Close. Re-read the format comparator commentary.';
+    else msg.textContent = 'Rewatch slides 5–6 of the video: format follows message, not the other way round.';
+    summary.scrollIntoView({ behavior: 'smooth', block: 'center' });
+}
+function resetScenarios() {
+    document.querySelectorAll('.scenario').forEach(c => {
+        c.classList.remove('correct', 'wrong');
+        c.querySelectorAll('input[type=radio]').forEach(r => r.checked = false);
+    });
+    document.getElementById('scSummary').classList.remove('show');
+}
+
+// Studio checklist scoring
+const STUDIO_GOOD = ['light','frame','focus','clean','mic','stable'];
+const STUDIO_BAD = ['filter','stock'];
+
+document.querySelectorAll('#checklist .check-item').forEach(item => {
+    const cb = item.querySelector('input');
+    cb.addEventListener('change', () => {
+        if (cb.checked) item.classList.add('on'); else item.classList.remove('on');
+    });
+});
+
+function scoreStudio() {
+    const checked = [...document.querySelectorAll('#checklist input:checked')].map(i => i.value);
+    let score = 0;
+    STUDIO_GOOD.forEach(g => { if (checked.includes(g)) score++; });
+    STUDIO_BAD.forEach(b => { if (checked.includes(b)) score--; });
+    if (score < 0) score = 0;
+    document.getElementById('studioScore').textContent = score + ' / 6';
+    const msg = document.getElementById('studioMsg');
+    if (score >= 5) msg.textContent = 'Ready to shoot. This lunch break will produce publishable content.';
+    else if (score >= 3) msg.textContent = 'Halfway there — add the missing basics before you shoot.';
+    else msg.textContent = 'Skip today&apos;s shoot. Fix the fundamentals or the footage will not publish.';
+    document.getElementById('studioSummary').classList.add('show');
+    document.getElementById('studioSummary').scrollIntoView({ behavior: 'smooth', block: 'center' });
+}
+function resetStudio() {
+    document.querySelectorAll('#checklist input').forEach(i => { i.checked = false; i.parentElement.parentElement.classList.remove('on'); });
+    document.getElementById('studioSummary').classList.remove('show');
+}
+</script>
+<style id="mtti-paginator-style">
+  section[data-mtti-page] { display: none !important; }
+  section[data-mtti-page].mtti-active { display: block !important; }
+  #mtti-paginator-bar {
+    position: sticky; bottom: 0; left: 0; right: 0;
+    background: #fff; border-top: 2px solid #e2e8f0;
+    padding: 12px 20px; margin-top: 20px;
+    display: flex; align-items: center; justify-content: space-between; gap: 12px;
+    font-family: 'Segoe UI', -apple-system, sans-serif;
+    box-shadow: 0 -4px 16px rgba(0,0,0,0.08);
+    z-index: 100;
+  }
+  #mtti-paginator-bar button {
+    background: #2E7D32; color: #fff; border: none; padding: 10px 18px;
+    border-radius: 8px; font-size: 13px; font-weight: 600; cursor: pointer;
+  }
+  #mtti-paginator-bar button:disabled { background: #cbd5e1; cursor: not-allowed; }
+  #mtti-paginator-bar button.mtti-prev { background: #64748b; }
+  #mtti-paginator-progress { font-size: 12px; color: #64748b; font-weight: 600; }
+</style>
+<script id="mtti-paginator-script">
+(function(){
+  function init(){
+    var sections = Array.prototype.slice.call(document.querySelectorAll('section[id]'));
+    // Only sections that are real content blocks (has an <h2>), skip stray/decorative ones.
+    sections = sections.filter(function(s){ return s.querySelector('h2'); });
+    if (sections.length < 2) return; // nothing to paginate
+
+    sections.forEach(function(s, i){ s.setAttribute('data-mtti-page', i); });
+    var current = 0;
+
+    var bar = document.createElement('div');
+    bar.id = 'mtti-paginator-bar';
+    bar.innerHTML =
+      '<button class="mtti-prev" id="mtti-pg-prev">← Previous</button>' +
+      '<span id="mtti-paginator-progress"></span>' +
+      '<button id="mtti-pg-next">Next →</button>';
+    sections[sections.length - 1].insertAdjacentElement('afterend', bar);
+
+    var prevBtn = bar.querySelector('#mtti-pg-prev');
+    var nextBtn = bar.querySelector('#mtti-pg-next');
+    var progress = bar.querySelector('#mtti-paginator-progress');
+
+    function render(){
+      sections.forEach(function(s, i){ s.classList.toggle('mtti-active', i === current); });
+      prevBtn.disabled = (current === 0);
+      nextBtn.textContent = (current === sections.length - 1) ? 'Done ✓' : 'Next →';
+      progress.textContent = 'Section ' + (current + 1) + ' of ' + sections.length;
+      window.scrollTo(0, 0);
+    }
+    prevBtn.addEventListener('click', function(){ if (current > 0) { current--; render(); } });
+    nextBtn.addEventListener('click', function(){
+      if (current < sections.length - 1) { current++; render(); }
+    });
+    render();
+  }
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', init);
+  } else {
+    init();
+  }
+})();
+</script>
+</body>
+</html>

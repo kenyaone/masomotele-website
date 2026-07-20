@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Containers vs Codecs — MP4/MOV vs H.264/H.265 (Lesson) | MTTI Video Editing</title>
+<link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Fredoka:wght@500;600&display=swap" rel="stylesheet">
+<style>
+* { margin:0; padding:0; box-sizing:border-box; }
+body { font-family:'Space Mono', monospace; background:linear-gradient(135deg,#6A11CB 0%,#2575FC 100%); min-height:100vh; padding:20px; color:#fff; }
+.container { max-width:820px; margin:0 auto; }
+.header { text-align:center; margin-bottom:24px; }
+.lesson-tag { display:inline-block; background:rgba(255,255,255,0.2); padding:6px 16px; border-radius:999px; font-size:0.85em; margin-bottom:12px; }
+.header h1 { font-family:'Fredoka', sans-serif; font-size:2em; margin-bottom:6px; text-shadow:3px 3px 0 rgba(0,0,0,0.2); }
+.card { background:#fff; color:#333; border-radius:22px; padding:32px; margin-bottom:20px; box-shadow:0 20px 60px rgba(0,0,0,0.3); }
+.section { margin-bottom:26px; }
+.section:last-child { margin-bottom:0; }
+.section h2 { font-family:'Fredoka', sans-serif; font-size:1.2em; margin-bottom:10px; color:#6A11CB; }
+.section .body { line-height:1.65; font-size:0.98em; }
+.section .body p { margin-bottom:10px; }
+.section .body code { background:#f5f7fb; padding:2px 6px; border-radius:4px; font-size:0.92em; }
+.keypoint { background:#fff8e1; border-left:4px solid #ffc107; padding:12px 16px; border-radius:8px; margin-top:12px; font-size:0.92em; }
+</style>
+</head>
+<body>
+<div class="container">
+<div class="header"><div class="lesson-tag">Module 4 · Lesson 4.1</div><h1>Containers vs Codecs — MP4/MOV vs H.264/H.265</h1></div>
+<div class="card"><div class="section"><h2>What a Container Actually Is</h2><div class="body"><p>A container (or "wrapper") is the file format you see in the filename &mdash; <code>.mp4</code>, <code>.mov</code>, <code>.avi</code>. It is essentially a box that holds the video track, the audio track, subtitles if any, and metadata like frame rate, all bundled together so a player or editor knows how to unpack them.</p><p>The container itself does not describe how the picture data is compressed. Two <code>.mp4</code> files can use completely different internal compression, and two files with different extensions (<code>.mov</code> vs <code>.mp4</code>) can use the exact same compression inside.</p></div></div><div class="section"><h2>What a Codec Actually Is</h2><div class="body"><p>A codec (coder-decoder) is the compression method used to shrink the raw video data into a manageable file size, and to decompress it again for playback or editing. <strong>H.264</strong> (also called AVC) is the most common codec on phones and the web &mdash; it is what CapCut exports by default and what most client phone footage arrives as. <strong>H.265</strong> (HEVC) compresses further for the same quality, common on newer iPhones. <strong>ProRes</strong> is a much lighter-compression, high-quality codec used for professional intermediate editing, common in <code>.mov</code> files from higher-end cameras.</p><p>So when Otieno gets a clip, the container tells him what box it arrived in; the codec tells him how tightly the footage inside was actually squeezed.</p></div></div><div class="section"><h2>Real Pairings Otieno Sees</h2><div class="body"><p>A CapCut export saved as <code>.mp4</code> is almost always H.264 (or H.265 on some phones) inside. An iPhone clip saved as <code>.mov</code> is usually H.264 or H.265 too &mdash; MOV is Apple's native container, but it can hold the same codecs as MP4. Footage exported for professional colour grading as ProRes is nearly always wrapped in <code>.mov</code>, since MP4 does not commonly carry ProRes.</p><p>This is why a client can send Otieno a <code>.mov</code> file that opens and edits exactly like an <code>.mp4</code> one &mdash; the container extension alone doesn't tell him the compression, or how heavy the file will be to work with on his phone.</p></div><div class="keypoint"><strong>Key Point.</strong> Container (MP4/MOV/AVI) = the box the file is wrapped in. Codec (H.264/H.265/ProRes) = how the video data inside is actually compressed. Never assume a file's extension tells you its codec, or that its codec tells you its extension &mdash; check both separately before deciding how to handle a client's footage.</div></div></div>
+</div>
+</body>
+</html>

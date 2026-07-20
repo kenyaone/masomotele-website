@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Where Computer Vision Shows Up in Everyday Kenyan Business | MTTI Artificial Intelligence</title>
+    <link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Fredoka:wght@500;600&display=swap" rel="stylesheet">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Space Mono', monospace; background: linear-gradient(135deg, #5E35B1 0%, #311B92 100%); min-height: 100vh; padding: 20px; color: #fff; }
+        .container { max-width: 900px; margin: 0 auto; }
+        .header { text-align: center; margin-bottom: 30px; }
+        .header .lesson-tag { display: inline-block; background: rgba(255,255,255,0.2); padding: 6px 16px; border-radius: 999px; font-size: 0.85em; margin-bottom: 12px; }
+        .header h1 { font-family: 'Fredoka', sans-serif; font-size: 2.2em; margin-bottom: 8px; text-shadow: 3px 3px 0 rgba(0,0,0,0.2); }
+        .score-board { background: rgba(255,255,255,0.15); backdrop-filter: blur(10px); border-radius: 20px; padding: 20px; margin-bottom: 20px; display: flex; justify-content: space-around; }
+        .score-item { text-align: center; }
+        .score-item .label { font-size: 0.85em; opacity: 0.9; margin-bottom: 4px; }
+        .score-item .value { font-size: 1.8em; font-weight: bold; font-family: 'Fredoka', sans-serif; }
+        .progress-bar { width: 100%; height: 8px; background: rgba(255,255,255,0.3); border-radius: 10px; margin-bottom: 25px; overflow: hidden; }
+        .progress-fill { height: 100%; background: linear-gradient(90deg, #f093fb 0%, #f5576c 100%); border-radius: 10px; transition: width 0.5s ease; width: 0%; }
+        .exercise-card { background: white; color: #333; border-radius: 25px; padding: 35px; margin-bottom: 20px; box-shadow: 0 20px 60px rgba(0,0,0,0.3); }
+        .scenario { background: linear-gradient(135deg, #fff8e1 0%, #ffecb3 100%); border-left: 5px solid #ffc107; padding: 20px 24px; border-radius: 12px; margin-bottom: 24px; font-size: 0.98em; line-height: 1.55; }
+        .scenario strong { color: #7a5a00; font-family: 'Fredoka', sans-serif; }
+        .question { font-size: 1.15em; margin-bottom: 20px; font-weight: 700; line-height: 1.4; }
+        .options { display: flex; flex-direction: column; gap: 12px; }
+        .option { background: #f5f7fb; border: 2px solid transparent; padding: 16px 20px; border-radius: 12px; cursor: pointer; transition: all 0.2s ease; font-family: 'Space Mono', monospace; font-size: 0.98em; text-align: left; }
+        .option:hover:not(.disabled) { background: #ece3fb; border-color: #5E35B1; transform: translateX(4px); }
+        .option.correct { background: #d4edda; border-color: #28a745; color: #155724; }
+        .option.wrong { background: #f8d7da; border-color: #dc3545; color: #721c24; }
+        .option.disabled { cursor: not-allowed; opacity: 0.85; }
+        .feedback { margin-top: 22px; padding: 18px 22px; border-radius: 12px; font-size: 0.98em; line-height: 1.5; }
+        .feedback.correct { background: #d4edda; color: #155724; border-left: 4px solid #28a745; }
+        .feedback.wrong { background: #f8d7da; color: #721c24; border-left: 4px solid #dc3545; }
+        .next-btn, .restart-btn { margin-top: 20px; background: linear-gradient(135deg, #5E35B1 0%, #311B92 100%); color: white; border: none; padding: 14px 32px; border-radius: 12px; font-size: 1em; cursor: pointer; font-family: 'Fredoka', sans-serif; box-shadow: 0 6px 18px rgba(0,0,0,0.2); }
+        .results { text-align: center; padding: 25px 15px; }
+        .results h2 { font-family: 'Fredoka', sans-serif; font-size: 2em; margin-bottom: 12px; color: #333; }
+        .results .final-score { font-size: 3em; font-family: 'Fredoka', sans-serif; color: #5E35B1; margin: 20px 0; }
+        .results p { color: #555; margin-bottom: 12px; }
+        .badge { display: inline-block; font-size: 3.5em; margin: 8px 0; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <div class="lesson-tag">Module 5 · Lesson 5.3 · Quiz</div>
+            <h1>Where Computer Vision Shows Up in Everyday Kenyan Business</h1>
+        </div>
+        <div class="score-board">
+            <div class="score-item"><div class="label">Score</div><div class="value" id="score">0</div></div>
+            <div class="score-item"><div class="label">Question</div><div class="value"><span id="current">1</span>/<span id="total">10</span></div></div>
+            <div class="score-item"><div class="label">Streak</div><div class="value" id="streak">0</div></div>
+        </div>
+        <div class="progress-bar"><div class="progress-fill" id="progress"></div></div>
+        <div class="exercise-card" id="exerciseCard"></div>
+    </div>
+    <script>
+        const exercises = [{"scenario":"An office park in Eldoret wants a camera to read each car's number plate as it enters and match it against a pre-approved list.","question":"Which everyday computer vision use is this?","options":["ID verification during onboarding","Number-plate recognition at the gate","Stock-shelf audit","Quality-control photo check"],"correct":1,"explanation":"Reading and matching vehicle plates automatically at an entry point is exactly gate number-plate recognition."},{"scenario":"A supermarket wants staff to photograph a shelf each evening so gaps and misplaced items are flagged automatically.","question":"Which everyday use is this?","options":["Number-plate recognition","Stock-shelf photo audit","ID verification during onboarding","None of these"],"correct":1,"explanation":"Flagging shelf gaps and misplaced items from photos is a stock-shelf photo audit."},{"scenario":"A SACCO wants to check that a new member's uploaded ID photo is clear and matches their selfie before an account is opened.","question":"Which everyday use is this?","options":["Quality-control check on a factory line","ID and photo verification during onboarding","Number-plate recognition","Stock-shelf audit"],"correct":1,"explanation":"Matching an ID photo against a selfie during account opening is ID and photo verification during onboarding."},{"scenario":"A small bottling plant photographs bottles on the line and flags any with a crooked label or a missing cap.","question":"Which everyday use is this?","options":["ID verification","Stock-shelf audit","Quality-control photo check","Number-plate recognition"],"correct":2,"explanation":"Flagging visible defects on a production line from photos is a quality-control photo check."},{"scenario":"Brian's manager reminds the team that computer vision flags should still be checked by a person before rejecting a customer's ID or docking a supplier for damaged stock.","question":"Why does this matter?","options":["Because computer vision is only a fast first-pass check, and human judgement should confirm anything unusual, especially where money or identity is involved","Because computer vision tools are always wrong","Because it slows down every single task on purpose","Because it is a rule required by every camera manufacturer"],"correct":0,"explanation":"Computer vision speeds up repetitive checking, but decisions that matter for money, identity or safety still deserve a human review."},{"scenario":"A mall's gate system logs a vehicle's entry automatically once its plate is read from a photo.","question":"What underlying computer vision idea from earlier in this unit makes this possible?","options":["The system converts the plate photo into pixel values and looks for the edge and shape patterns that form readable characters","The system asks the driver to type the plate number manually","No computer vision is actually involved in reading plates","The gate opens automatically for every vehicle regardless of plate"],"correct":0,"explanation":"Plate recognition still relies on the same foundation from Lesson 5.1: pixel values, and the edge and shape patterns found within them."},{"scenario":"A retailer wants to know both whether a shelf photo shows a gap, and separately, exactly how many product facings are visible and where they sit.","question":"Which two computer vision tasks from earlier lessons are both being used here?","options":["Classification only, for everything","Classification for the gap check, and object detection for counting and locating facings","Object detection only, with no classification involved","Neither task applies to shelf photos"],"correct":1,"explanation":"The overall gap check is classification, while counting and locating individual facings is object detection — both tasks combined."},{"scenario":"Brian is asked to summarise, in one sentence, why Kenyan SMEs like Rafiki Insights' clients are adopting these computer vision tools.","question":"Which summary fits best?","options":["They replace every staff decision completely, with no human review needed","They speed up repetitive photo-checking tasks (gates, shelves, IDs, quality) so staff can focus on the judgement calls that still need a person","They are legally required for every business to install","They only work for very large multinational companies"],"correct":1,"explanation":"The value is in speeding up repetitive checking work, while people remain in charge of judgement calls that matter."}];
+        let currentQuestion = 0, score = 0, streak = 0, answered = false;
+        function updateScoreboard() {
+            document.getElementById('score').textContent = score;
+            document.getElementById('current').textContent = Math.min(currentQuestion + 1, exercises.length);
+            document.getElementById('total').textContent = exercises.length;
+            document.getElementById('streak').textContent = streak;
+            document.getElementById('progress').style.width = ((currentQuestion) / exercises.length) * 100 + '%';
+        }
+        function escapeHtml(s) { return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+        function renderQuestion() {
+            answered = false;
+            const q = exercises[currentQuestion];
+            let html = '';
+            if (q.scenario) html += `<div class="scenario"><strong>Scenario.</strong> ${escapeHtml(q.scenario)}</div>`;
+            html += `<div class="question">${escapeHtml(q.question)}</div>`;
+            html += '<div class="options">';
+            q.options.forEach((o, i) => { html += `<button class="option" onclick="selectAnswer(${i})">${escapeHtml(o)}</button>`; });
+            html += '</div>';
+            document.getElementById('exerciseCard').innerHTML = html;
+            updateScoreboard();
+        }
+        function selectAnswer(i) {
+            if (answered) return;
+            answered = true;
+            const q = exercises[currentQuestion];
+            const btns = document.querySelectorAll('.option');
+            btns.forEach(b => b.classList.add('disabled'));
+            btns[q.correct].classList.add('correct');
+            const right = i === q.correct;
+            if (!right) btns[i].classList.add('wrong');
+            if (right) { score += 10; streak += 1; } else { streak = 0; }
+            const fb = document.createElement('div');
+            fb.className = 'feedback ' + (right ? 'correct' : 'wrong');
+            fb.innerHTML = `<strong>${right ? '✅ Correct.' : '❌ Not quite.'}</strong><br>${escapeHtml(q.explanation)}`;
+            document.getElementById('exerciseCard').appendChild(fb);
+            const nb = document.createElement('button');
+            nb.className = 'next-btn';
+            nb.textContent = currentQuestion === exercises.length - 1 ? 'See results →' : 'Next scenario →';
+            nb.onclick = nextQuestion;
+            document.getElementById('exerciseCard').appendChild(nb);
+            updateScoreboard();
+        }
+        function nextQuestion() { currentQuestion++; if (currentQuestion >= exercises.length) return showResults(); renderQuestion(); }
+        function showResults() {
+            document.getElementById('progress').style.width = '100%';
+            const total = exercises.length * 10;
+            const pct = Math.round(score / total * 100);
+            if (window.parent) { window.parent.postMessage({type:"mtti_quiz_score", score: score, total: total, percent: pct}, "*"); }
+            let badge = '🌟', msg = 'Excellent work. You can confidently spot computer vision in everyday business.';
+            if (pct < 50) { badge = '🌱'; msg = 'Good first attempt. Review the lesson and try again.'; }
+            else if (pct < 80) { badge = '📚'; msg = 'Solid progress. Review the scenarios you missed and retry.'; }
+            document.getElementById('exerciseCard').innerHTML = `
+                <div class="results">
+                    <span class="badge">${badge}</span>
+                    <h2>Quiz Complete</h2>
+                    <div class="final-score">${score} / ${total}</div>
+                    <p><strong>${pct}%</strong> · Longest streak: ${streak}</p>
+                    <p>${msg}</p>
+                    <button class="restart-btn" onclick="restart()">Try again 🔁</button>
+                </div>`;
+        }
+        function restart() { currentQuestion = 0; score = 0; streak = 0; renderQuestion(); }
+        renderQuestion();
+    </script>
+</body>
+</html>

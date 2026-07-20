@@ -1,0 +1,487 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lesson 14.4 — Reviews + Q&A + Google Posts (Interactive)</title>
+<style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: 'Segoe UI', -apple-system, Roboto, sans-serif; line-height: 1.55; color: #0f172a; background: #f8fafc; min-height: 100vh; }
+    .container { max-width: 1200px; margin: 0 auto; padding: 20px; }
+    header {
+        background: linear-gradient(135deg, #2E7D32, #1B5E20);
+        color: #fff; padding: 40px 30px; border-radius: 12px; margin-bottom: 24px;
+        box-shadow: 0 10px 30px rgba(26,115,232,0.25);
+    }
+    header .badge { display: inline-block; background: rgba(255,255,255,0.2); padding: 4px 14px; border-radius: 16px; font-size: 12px; font-weight: bold; letter-spacing: 1px; margin-bottom: 14px; }
+    header h1 { font-size: 32px; margin-bottom: 8px; }
+    header .subtitle { font-size: 17px; opacity: 0.95; margin-bottom: 20px; }
+    .meta-strip { display: flex; flex-wrap: wrap; gap: 12px; }
+    .meta-strip span { background: rgba(255,255,255,0.18); padding: 6px 14px; border-radius: 20px; font-size: 13px; }
+    .toc { background: #fff; border: 1px solid #e2e8f0; border-radius: 10px; padding: 22px 26px; margin-bottom: 22px; }
+    .toc h3 { color: #1a73e8; margin-bottom: 10px; }
+    .toc ol { padding-left: 20px; }
+    .toc a { color: #1a73e8; text-decoration: none; font-weight: 600; }
+    section { background: #fff; border: 1px solid #e2e8f0; border-radius: 10px; padding: 26px 30px; margin-bottom: 22px; }
+    section h2 { color: #1a73e8; font-size: 22px; margin-bottom: 12px; padding-bottom: 8px; border-bottom: 3px solid #1a73e8; }
+    section h3 { color: #0f172a; font-size: 17px; margin: 18px 0 8px; }
+    section p { margin-bottom: 12px; }
+    .callout { border-left: 5px solid #1a73e8; background: #e8f0fe; padding: 14px 18px; margin: 14px 0; border-radius: 4px; }
+    .callout.warn { border-left-color: #ea4335; background: #fef2f2; }
+    .callout.tip { border-left-color: #34a853; background: #ecfdf5; }
+    .callout strong { color: #1a73e8; }
+    .callout.warn strong { color: #ea4335; }
+    .callout.tip strong { color: #34a853; }
+
+    /* Review cards */
+    .review { background: #fff; border: 1px solid #dadce0; border-radius: 10px; padding: 16px; margin-bottom: 12px; }
+    .review-top { display: flex; gap: 12px; align-items: flex-start; }
+    .avatar { width: 40px; height: 40px; border-radius: 50%; background: #1a73e8; color: #fff; display: flex; align-items: center; justify-content: center; font-weight: bold; flex-shrink: 0; }
+    .avatar.b { background: #ea4335; }
+    .avatar.c { background: #fbbc04; color: #202124; }
+    .avatar.d { background: #34a853; }
+    .avatar.e { background: #7627cf; }
+    .r-body { flex: 1; }
+    .r-name { font-weight: 600; color: #202124; font-size: 14px; }
+    .r-meta { color: #5f6368; font-size: 12px; margin-bottom: 6px; }
+    .r-stars { color: #fbbc04; font-size: 15px; margin-bottom: 6px; }
+    .r-text { color: #202124; font-size: 14px; line-height: 1.5; }
+    .r-actions { margin-top: 10px; }
+    .r-actions button { background: none; border: 1px solid #dadce0; color: #1a73e8; padding: 6px 14px; border-radius: 16px; font-size: 12px; cursor: pointer; font-weight: 500; }
+    .r-actions button:hover { background: #e8f0fe; }
+    .reply-box { margin-top: 12px; padding: 12px; background: #f8fafc; border-left: 3px solid #1a73e8; border-radius: 6px; display: none; }
+    .reply-box.show { display: block; }
+    .reply-box textarea { width: 100%; min-height: 90px; padding: 10px; border: 1px solid #dadce0; border-radius: 6px; font-size: 14px; font-family: inherit; resize: vertical; }
+    .reply-box .r-btn { background: #1a73e8; color: #fff; border: 0; padding: 8px 16px; border-radius: 6px; font-size: 13px; cursor: pointer; margin-top: 8px; font-weight: 600; }
+
+    .response-feedback { margin-top: 10px; padding: 10px 12px; border-radius: 6px; font-size: 13px; display: none; }
+    .response-feedback.show { display: block; }
+    .response-feedback ul { margin: 0; padding-left: 20px; }
+    .response-feedback.pass { background: #e6f4ea; color: #137333; border-left: 4px solid #34a853; }
+    .response-feedback.warn { background: #fef7e0; color: #78350f; border-left: 4px solid #fbbc04; }
+    .response-feedback.fail { background: #fef2f2; color: #991b1b; border-left: 4px solid #ea4335; }
+
+    /* Q&A */
+    .qa-item { background: #fff; border: 1px solid #dadce0; border-radius: 10px; padding: 14px 16px; margin-bottom: 10px; }
+    .qa-q { font-weight: 500; color: #202124; margin-bottom: 6px; font-size: 14px; }
+    .qa-meta { font-size: 12px; color: #5f6368; margin-bottom: 8px; }
+    .qa-item textarea { width: 100%; min-height: 55px; padding: 8px 10px; border: 1px solid #dadce0; border-radius: 6px; font-size: 13px; font-family: inherit; resize: vertical; }
+    .owner-badge { background: #e8f0fe; color: #1a73e8; padding: 2px 8px; border-radius: 12px; font-size: 11px; font-weight: 600; margin-left: 6px; }
+
+    /* Post composer */
+    .composer { background: #fff; border: 1px solid #dadce0; border-radius: 10px; padding: 18px; margin: 14px 0; }
+    .post-types { display: flex; gap: 8px; margin-bottom: 14px; flex-wrap: wrap; }
+    .post-type { padding: 8px 14px; border: 1px solid #dadce0; border-radius: 20px; background: #fff; cursor: pointer; font-size: 13px; color: #202124; font-weight: 500; }
+    .post-type.active { background: #1a73e8; color: #fff; border-color: #1a73e8; }
+    .composer textarea { width: 100%; min-height: 100px; padding: 10px; border: 1px solid #dadce0; border-radius: 6px; font-size: 14px; font-family: inherit; resize: vertical; }
+    .composer .row { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; margin-top: 10px; }
+    .composer input[type=text] { padding: 8px 10px; border: 1px solid #dadce0; border-radius: 6px; font-size: 13px; flex: 1; min-width: 140px; }
+    .composer .img-slot { width: 90px; height: 90px; background: #f1f3f4; border: 2px dashed #dadce0; border-radius: 8px; display: flex; align-items: center; justify-content: center; color: #5f6368; font-size: 24px; cursor: pointer; }
+    .cadence-tag { background: #fef7e0; color: #78350f; padding: 6px 12px; border-radius: 6px; font-size: 12px; margin-top: 10px; display: inline-block; font-weight: 500; }
+
+    /* Mwema cameo */
+    .cameo { background: linear-gradient(135deg, #fef3c7 0%, #fef7e0 100%); border: 2px solid #fbbc04; border-radius: 10px; padding: 18px; margin: 16px 0; }
+    .cameo h4 { color: #78350f; margin-bottom: 8px; }
+    .cameo-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-top: 10px; }
+    @media (max-width: 600px) { .cameo-grid { grid-template-columns: 1fr; } }
+    .cameo-side { background: #fff; padding: 12px; border-radius: 8px; }
+    .cameo-side.before { border-left: 4px solid #ea4335; }
+    .cameo-side.after { border-left: 4px solid #34a853; }
+    .cameo-side h5 { font-size: 13px; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 4px; }
+    .cameo-side.before h5 { color: #c5221f; }
+    .cameo-side.after h5 { color: #137333; }
+
+    footer { text-align: center; color: #64748b; padding: 24px; font-size: 13px; }
+
+    /* MTTI logo stamp */
+    .mtti-logo-stamp {
+        position: fixed; top: 14px; right: 18px; z-index: 999;
+        opacity: 0.88; transition: opacity 0.2s;
+    }
+    .mtti-logo-stamp:hover { opacity: 1; }
+    .mtti-logo-stamp img { width: 56px; height: 56px; border-radius: 50%; box-shadow: 0 2px 8px rgba(0,0,0,0.18); }
+</style>
+</head>
+<body>
+<div class="mtti-logo-stamp">
+    <img src="../../Resources/Logo.jpeg" alt="MTTI" title="Masomotele Technical Training Institute — Start learning, Start earning">
+</div>
+
+<div class="container">
+
+<header>
+    <div class="badge">LESSON 14.4  ·  GOOGLE BUSINESS PROFILE  ·  INTERACTIVE</div>
+    <h1>Reviews + Q&amp;A + Google Posts</h1>
+    <div class="subtitle">The three ongoing tabs. Reviews drive Prominence. Q&amp;A answers pre-order questions. Posts keep the listing fresh.</div>
+    <div class="meta-strip">
+        <span><strong>Duration:</strong> ~40 min interactive</span>
+        <span><strong>Level:</strong> Intermediate</span>
+        <span><strong>Tool:</strong> business.google.com</span>
+        <span><strong>Handbook:</strong> Module 14, &sect;14.4</span>
+    </div>
+</header>
+
+<div class="toc">
+    <h3>What you'll do in this lesson</h3>
+    <ol>
+        <li><a href="#s1">Why reviews are the biggest Prominence signal</a></li>
+        <li><a href="#s2"><strong>Reply to 5 Karibu Kitchen reviews with tone + DPA checks</strong></a></li>
+        <li><a href="#s3">Kenya DPA 2019 &mdash; never publish a surname</a></li>
+        <li><a href="#s4"><strong>Seed the Q&amp;A tab &mdash; 5 owner answers</strong></a></li>
+        <li><a href="#s5"><strong>Google Posts composer &mdash; 4 post types</strong></a></li>
+        <li><a href="#s6">Mwema Coffee House cameo &mdash; the recovery story</a></li>
+    </ol>
+</div>
+
+<section id="s1">
+    <h2>1. Reviews &mdash; the biggest Prominence signal</h2>
+    <p>Volume, recency, star rating and your responses all matter &mdash; Google reads them and searchers read them. Sarah's target: <strong>1&ndash;2 fresh reviews per week, forever</strong>. The trick is asking every satisfied customer individually via a personal WhatsApp thank-you with the <code>g.page/r/&hellip;</code> short review link.</p>
+    <div class="callout warn">
+        <strong>Never buy reviews.</strong> Fifty shillings a review from a Facebook group looks tempting. Google's algorithm detects them at scale, removes them, flags the profile, and in severe cases suspends the entire listing. Competitors also report each other.
+    </div>
+</section>
+
+<section id="s2">
+    <h2>2. Reply to 5 reviews &mdash; live response builder</h2>
+    <p>Below are 5 real-shape reviews on Karibu Kitchen's profile. Click <em>Reply</em> under each. The tool checks your response for tone, DPA compliance and a private-channel fix offer.</p>
+
+    <div class="review" data-id="r1" data-star="4" data-name="John">
+        <div class="review-top">
+            <div class="avatar">JK</div>
+            <div class="r-body">
+                <div class="r-name">John Kamau</div>
+                <div class="r-meta">Local Guide &middot; 12 reviews &middot; 2 days ago</div>
+                <div class="r-stars">&#9733;&#9733;&#9733;&#9733;&#9734;</div>
+                <div class="r-text">Great pilau, delivered warm and on time to Elgon View. Slightly small portion of sukuma for the price but overall very good. Will order again.</div>
+                <div class="r-actions"><button onclick="openReply('r1')">Reply</button></div>
+                <div class="reply-box" id="reply-r1">
+                    <textarea placeholder="Write your response...">Asante for the kind words. So glad the pilau delivered on time. We hear you on the sukuma portion &mdash; we will look at it. Karibu tena!</textarea>
+                    <button class="r-btn" onclick="checkReply('r1')">Check my response</button>
+                    <div class="response-feedback" id="fb-r1"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="review" data-id="r2" data-star="2" data-name="Faith">
+        <div class="review-top">
+            <div class="avatar b">FA</div>
+            <div class="r-body">
+                <div class="r-name">Faith Achieng</div>
+                <div class="r-meta">3 reviews &middot; 5 days ago</div>
+                <div class="r-stars">&#9733;&#9733;&#9734;&#9734;&#9734;</div>
+                <div class="r-text">Ordered at 12:30, arrived at 14:10. Food was cold by then. Chapati beans was tasty though. Please improve delivery time to Pioneer estate.</div>
+                <div class="r-actions"><button onclick="openReply('r2')">Reply</button></div>
+                <div class="reply-box" id="reply-r2">
+                    <textarea placeholder="Write your response...">Sarah here &mdash; I am so sorry the food arrived cold and 100 minutes late. That is not our standard. Please WhatsApp me on the business number on our profile so I can make this right personally.</textarea>
+                    <button class="r-btn" onclick="checkReply('r2')">Check my response</button>
+                    <div class="response-feedback" id="fb-r2"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="review" data-id="r3" data-star="5" data-name="Peter">
+        <div class="review-top">
+            <div class="avatar c">PW</div>
+            <div class="r-body">
+                <div class="r-name">Peter Wanjiku</div>
+                <div class="r-meta">7 reviews &middot; 1 week ago</div>
+                <div class="r-stars">&#9733;&#9733;&#9733;&#9733;&#9733;</div>
+                <div class="r-text">Best nyama choma platter in Eldoret. Bulk lunch for our office of 15 people, delivered warm, exact time promised. Karibu Kitchen is my new default caterer.</div>
+                <div class="r-actions"><button onclick="openReply('r3')">Reply</button></div>
+                <div class="reply-box" id="reply-r3">
+                    <textarea placeholder="Write your response...">Asante for the review! So glad the nyama choma platter delivered on time for your office. Karibu tena &mdash; we will save the note for the next bulk order.</textarea>
+                    <button class="r-btn" onclick="checkReply('r3')">Check my response</button>
+                    <div class="response-feedback" id="fb-r3"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="review" data-id="r4" data-star="1" data-name="Angry">
+        <div class="review-top">
+            <div class="avatar d">AC</div>
+            <div class="r-body">
+                <div class="r-name">Anonymous Customer</div>
+                <div class="r-meta">1 review &middot; 3 days ago</div>
+                <div class="r-stars">&#9733;&#9734;&#9734;&#9734;&#9734;</div>
+                <div class="r-text">Terrible experience. Ordered ugali sukuma, got half a portion, sukuma was salty. Rider dropped receipt in the corridor. Refused to answer calls after. Will never order again.</div>
+                <div class="r-actions"><button onclick="openReply('r4')">Reply</button></div>
+                <div class="reply-box" id="reply-r4">
+                    <textarea placeholder="Write your response...">We are truly sorry for the bad experience. This is not our standard on portion size or on our rider's conduct. Please WhatsApp us on the business number on our profile &mdash; I want to refund your order and re-deliver personally.</textarea>
+                    <button class="r-btn" onclick="checkReply('r4')">Check my response</button>
+                    <div class="response-feedback" id="fb-r4"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="review" data-id="r5" data-star="5" data-name="Grace">
+        <div class="review-top">
+            <div class="avatar e">GN</div>
+            <div class="r-body">
+                <div class="r-name">Grace Njoki</div>
+                <div class="r-meta">4 reviews &middot; today</div>
+                <div class="r-stars">&#9733;&#9733;&#9733;&#9733;&#9733;</div>
+                <div class="r-text">Halal options confirmed, prices are honest, ugali sukuma at 350 shillings is great value. Delivery to Kapsoya was 20 minutes flat.</div>
+                <div class="r-actions"><button onclick="openReply('r5')">Reply</button></div>
+                <div class="reply-box" id="reply-r5">
+                    <textarea placeholder="Write your response...">Asante for the kind words! Glad the ugali sukuma delivered fast to Kapsoya. Karibu tena &mdash; halal options are always available.</textarea>
+                    <button class="r-btn" onclick="checkReply('r5')">Check my response</button>
+                    <div class="response-feedback" id="fb-r5"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="callout tip">
+        <strong>The 48-hour rule.</strong> Every review gets a response within 48 hours. Positive reviews thank the sentiment + product. Negatives apologise, offer a fix, move it to private channel.
+    </div>
+</section>
+
+<section id="s3">
+    <h2>3. Kenya DPA 2019 &mdash; never publish a customer's full name</h2>
+    <p>The <strong>Data Protection Act 2019</strong> makes it unlawful to publish a customer's personal data &mdash; including their full name &mdash; without their consent. When Sarah responds to a review, she does not include the customer's surname in her public response.</p>
+    <p><strong>Rules:</strong> Use only the first name they used to sign the review, OR a neutral form ("Thank you for the kind words"). Never add surnames, phone numbers or estate names. The fine is up to <strong>KES 5 million</strong> per breach.</p>
+    <div class="callout warn">
+        <strong>DPA-safe example:</strong> "Asante for the kind words. So glad the pilau met the mark." <br>
+        <strong>DPA-breach example:</strong> "Asante John Kamau. Karibu tena to Elgon View." &mdash; surname + estate = personal data.
+    </div>
+</section>
+
+<section id="s4">
+    <h2>4. Q&amp;A &mdash; seed your own answers</h2>
+    <p>The Q&amp;A tab lets ANYONE ask a question about the business, and ANYONE can answer &mdash; including local guides who have never eaten at Karibu Kitchen. Sarah seeds five likely questions with her own owner answers.</p>
+    <p>Write your owner answer under each seeded question. Answer as Sarah, from the profile.</p>
+
+    <div class="qa-item"><div class="qa-q">Do you deliver to Elgon View?</div><div class="qa-meta">Asked by A.M. &middot; 2 weeks ago &middot; 3 people also asked this</div><textarea placeholder="Owner answer...">Yes &mdash; typically 30 minutes from order confirmation.</textarea></div>
+    <div class="qa-item"><div class="qa-q">Do you accept M-Pesa?</div><div class="qa-meta">Asked by B.K. &middot; 3 weeks ago</div><textarea placeholder="Owner answer...">Yes, till number is on every receipt and on our website.</textarea></div>
+    <div class="qa-item"><div class="qa-q">What is the minimum order?</div><div class="qa-meta">Asked by D.O. &middot; 1 month ago</div><textarea placeholder="Owner answer...">KES 250 for delivery within Kapsoya. KES 400 for other estates.</textarea></div>
+    <div class="qa-item"><div class="qa-q">Do you cater for offices?</div><div class="qa-meta">Asked by an office admin &middot; 1 month ago</div><textarea placeholder="Owner answer...">Yes &mdash; bulk office catering from KES 4,000, 24-hour notice preferred.</textarea></div>
+    <div class="qa-item"><div class="qa-q">Are there halal options?</div><div class="qa-meta">Asked by S.H. &middot; 6 days ago</div><textarea placeholder="Owner answer...">Yes, halal options are always available. Ask the rider for the halal-marked container.</textarea></div>
+
+    <div class="callout"><strong>Monitor weekly.</strong> Check for new questions and correct any wrong community answers. A wrong answer sitting at the top of your Q&amp;A costs orders every day.</div>
+</section>
+
+<section id="s5">
+    <h2>5. Google Posts composer &mdash; 4 types</h2>
+    <p>Google Posts are short posts on the listing itself. Four types. Sarah posts <strong>1&ndash;2 per week</strong>.</p>
+
+    <div class="composer">
+        <div class="post-types">
+            <span class="post-type active" onclick="pickPostType(this,'whatsnew')">What's New</span>
+            <span class="post-type" onclick="pickPostType(this,'offer')">Offer</span>
+            <span class="post-type" onclick="pickPostType(this,'event')">Event</span>
+            <span class="post-type" onclick="pickPostType(this,'product')">Product</span>
+        </div>
+
+        <div style="display: flex; gap: 12px; align-items: flex-start;">
+            <div class="img-slot">+</div>
+            <div style="flex:1;">
+                <textarea id="postBody" oninput="postCount()" placeholder="Write your post...">This week Karibu Kitchen is adding a Boxing Day catering menu &mdash; bulk pilau and nyama choma platters for offices reopening on 27 December. Order 48 hours ahead. KES 4,500 minimum.</textarea>
+                <div class="char-count" id="postCharCount" style="text-align:right; font-size:12px; color:#5f6368;">0 / 1500</div>
+            </div>
+        </div>
+
+        <div class="row">
+            <input type="text" placeholder="Button label (e.g. Order now)" value="Order on WhatsApp">
+            <input type="text" placeholder="URL" value="https://wa.me/254722000111">
+        </div>
+
+        <div class="cadence-tag" id="cadence">Post cadence &mdash; aim for 1&ndash;2 per week. Google reads freshness.</div>
+    </div>
+
+    <div class="callout tip"><strong>Every post is a fresh signal.</strong> Google keeps posts live for 7 days. After 7 days, the post archives. Cadence is the freshness engine.</div>
+</section>
+
+<section id="s6">
+    <h2>6. Mwema Coffee House &mdash; the recovery cameo</h2>
+    <div class="cameo">
+        <h4>The Mwema Coffee House recovery, Nairobi &mdash; Kilimani, 8 weeks</h4>
+        <p style="color:#78350f;font-size:14px;">Three months ago Mwema Coffee House had three brutal 1-star reviews after a staff shortage caused slow service across a full weekend. Rank collapsed from position 2 to position 7 for "coffee shop Kilimani". Sarah walked them through the fix.</p>
+        <div class="cameo-grid">
+            <div class="cameo-side before">
+                <h5>Before &mdash; Position 7</h5>
+                <ul style="padding-left: 18px; font-size: 13px; color: #7f1d1d;">
+                    <li>Three 1-star complaints, unanswered</li>
+                    <li>No Google Posts in 2 months</li>
+                    <li>Average rating: 3.9</li>
+                    <li>15 reviews, no fresh velocity</li>
+                </ul>
+            </div>
+            <div class="cameo-side after">
+                <h5>After &mdash; Position 2</h5>
+                <ul style="padding-left: 18px; font-size: 13px; color: #14532d;">
+                    <li>All 3 negatives publicly acknowledged with private-channel fix offer</li>
+                    <li>2 Google Posts per week for 8 weeks</li>
+                    <li>Average rating: 4.4 (14 fresh 5-stars)</li>
+                    <li>29 reviews, weekly velocity</li>
+                </ul>
+            </div>
+        </div>
+        <p style="color:#78350f;font-size:14px;margin-top:12px;"><strong>Lesson:</strong> Response strategy IS recovery strategy. Never argue in public. Move the fix to WhatsApp. Ask happy customers weekly. Post twice a week. Ranking follows.</p>
+    </div>
+</section>
+
+<footer>
+    <p>Lesson 14.4 &middot; Google Business Profile &middot; Masomotele Technical Training Institute &middot; Module 14, &sect;14.4</p>
+    <p>Next: <strong>Lesson 14.5 &mdash; GBP Insights + Local-Pack Ranking</strong></p>
+</footer>
+</div>
+
+<script>
+function openReply(id) {
+    document.getElementById('reply-' + id).classList.add('show');
+}
+
+function checkReply(id) {
+    const review = document.querySelector('[data-id="' + id + '"]');
+    const star = +review.dataset.star;
+    const isNeg = star <= 2;
+    const isPos = star >= 4;
+    const text = document.querySelector('#reply-' + id + ' textarea').value.trim();
+    const fb = document.getElementById('fb-' + id);
+    fb.classList.add('show');
+
+    const checks = [];
+    let pass = true;
+
+    // Length check
+    if (text.length < 20) {
+        checks.push({ ok: false, msg: 'Response is too short (' + text.length + ' chars). Aim for 40+ characters minimum.' });
+        pass = false;
+    }
+
+    // DPA name check &mdash; look for surnames (multi-word capitalised names)
+    const surnames = ['Kamau','Achieng','Wanjiku','Njoki','Kimani','Otieno','Mwangi','Chebet'];
+    const surnameHit = surnames.find(s => text.includes(s));
+    if (surnameHit) {
+        checks.push({ ok: false, msg: 'DPA 2019 breach &mdash; surname "' + surnameHit + '" appears in your public response. Use first name only OR "thank you for the kind words".' });
+        pass = false;
+    } else {
+        checks.push({ ok: true, msg: 'DPA 2019 &mdash; no surname detected in public response.' });
+    }
+
+    // Estate name check
+    const estates = ['Elgon View','Pioneer','Kapsoya','Racecourse','Eldoret CBD'];
+    const estateHit = estates.filter(e => text.includes(e));
+    if (isNeg && estateHit.length > 0) {
+        checks.push({ ok: false, msg: 'DPA 2019 caution &mdash; estate name "' + estateHit[0] + '" combined with a complaint reveals customer location. Remove it.' });
+        pass = false;
+    }
+
+    if (isNeg) {
+        const hasApology = /sorry|apolog|regret/i.test(text);
+        const hasFixOffer = /whatsapp|call|dm|refund|re-?deliver|make this right|contact|private/i.test(text);
+        const hasBlame = /you should|your fault|actually|complain|next time|but/i.test(text);
+
+        checks.push({ ok: hasApology, msg: hasApology ? 'Apology found &mdash; good on negative reviews.' : 'Missing apology. Start with "Sorry" or "We apologise" on 1&ndash;2 star reviews.' });
+        checks.push({ ok: hasFixOffer, msg: hasFixOffer ? 'Private-channel fix offer found (WhatsApp / call / refund).' : 'No private-channel fix offer. Add "Please WhatsApp us on the business number so I can make this right."' });
+        checks.push({ ok: !hasBlame, msg: !hasBlame ? 'No public blame or defensiveness &mdash; good.' : 'Argumentative or defensive language detected. Never argue in public.' });
+
+        if (!hasApology || !hasFixOffer || hasBlame) pass = false;
+    }
+
+    if (isPos) {
+        const hasThanks = /asante|thank|karibu tena|glad|grateful/i.test(text);
+        const mentionsProduct = /pilau|nyama|ugali|sukuma|chapati|halal|delivery/i.test(text);
+        checks.push({ ok: hasThanks, msg: hasThanks ? 'Warm thank-you found.' : 'Add "Asante" or "Karibu tena" &mdash; warmth matters.' });
+        checks.push({ ok: mentionsProduct, msg: mentionsProduct ? 'You mentioned the specific product &mdash; strong personal touch.' : 'Mention the specific product they ordered (pilau, ugali, delivery time).' });
+        if (!hasThanks || !mentionsProduct) pass = false;
+    }
+
+    let html = '<ul>';
+    checks.forEach(c => { html += '<li>' + (c.ok ? '&check; ' : '&times; ') + c.msg + '</li>'; });
+    html += '</ul>';
+    fb.innerHTML = html;
+    fb.className = 'response-feedback show ' + (pass ? 'pass' : (checks.filter(c=>!c.ok).length === 1 ? 'warn' : 'fail'));
+}
+
+// Post composer
+function pickPostType(el, type) {
+    document.querySelectorAll('.post-type').forEach(t => t.classList.remove('active'));
+    el.classList.add('active');
+    const templates = {
+        whatsnew: 'This week Karibu Kitchen is adding a Boxing Day catering menu &mdash; bulk pilau and nyama choma platters for offices reopening on 27 December. Order 48 hours ahead. KES 4,500 minimum.',
+        offer: 'Lunch delivery deal &mdash; order 4 pilau plates, get one free ugali sukuma. Valid Monday to Friday, 12:00 to 14:00. Use code KAPSOYA5 on WhatsApp checkout.',
+        event: 'Nyama Choma Friday &mdash; Friday 20 June, 18:00 to 22:00. KES 750 per platter, live music from DJ Kip. Booking on WhatsApp 0722 000 111.',
+        product: 'Featured: Pilau Beef Platter &mdash; KES 500 &middot; slow-cooked beef, basmati rice, kachumbari, chapati on the side. Delivery in 30 minutes across Kapsoya and Elgon View.'
+    };
+    document.getElementById('postBody').value = templates[type];
+    postCount();
+}
+
+function postCount() {
+    const l = document.getElementById('postBody').value.length;
+    const cc = document.getElementById('postCharCount');
+    cc.textContent = l + ' / 1500';
+    cc.style.color = l > 1400 ? '#ea4335' : (l > 1200 ? '#d97706' : '#5f6368');
+}
+postCount();
+</script>
+<style id="mtti-paginator-style">
+  section[data-mtti-page] { display: none !important; }
+  section[data-mtti-page].mtti-active { display: block !important; }
+  #mtti-paginator-bar {
+    position: sticky; bottom: 0; left: 0; right: 0;
+    background: #fff; border-top: 2px solid #e2e8f0;
+    padding: 12px 20px; margin-top: 20px;
+    display: flex; align-items: center; justify-content: space-between; gap: 12px;
+    font-family: 'Segoe UI', -apple-system, sans-serif;
+    box-shadow: 0 -4px 16px rgba(0,0,0,0.08);
+    z-index: 100;
+  }
+  #mtti-paginator-bar button {
+    background: #2E7D32; color: #fff; border: none; padding: 10px 18px;
+    border-radius: 8px; font-size: 13px; font-weight: 600; cursor: pointer;
+  }
+  #mtti-paginator-bar button:disabled { background: #cbd5e1; cursor: not-allowed; }
+  #mtti-paginator-bar button.mtti-prev { background: #64748b; }
+  #mtti-paginator-progress { font-size: 12px; color: #64748b; font-weight: 600; }
+</style>
+<script id="mtti-paginator-script">
+(function(){
+  function init(){
+    var sections = Array.prototype.slice.call(document.querySelectorAll('section[id]'));
+    // Only sections that are real content blocks (has an <h2>), skip stray/decorative ones.
+    sections = sections.filter(function(s){ return s.querySelector('h2'); });
+    if (sections.length < 2) return; // nothing to paginate
+
+    sections.forEach(function(s, i){ s.setAttribute('data-mtti-page', i); });
+    var current = 0;
+
+    var bar = document.createElement('div');
+    bar.id = 'mtti-paginator-bar';
+    bar.innerHTML =
+      '<button class="mtti-prev" id="mtti-pg-prev">← Previous</button>' +
+      '<span id="mtti-paginator-progress"></span>' +
+      '<button id="mtti-pg-next">Next →</button>';
+    sections[sections.length - 1].insertAdjacentElement('afterend', bar);
+
+    var prevBtn = bar.querySelector('#mtti-pg-prev');
+    var nextBtn = bar.querySelector('#mtti-pg-next');
+    var progress = bar.querySelector('#mtti-paginator-progress');
+
+    function render(){
+      sections.forEach(function(s, i){ s.classList.toggle('mtti-active', i === current); });
+      prevBtn.disabled = (current === 0);
+      nextBtn.textContent = (current === sections.length - 1) ? 'Done ✓' : 'Next →';
+      progress.textContent = 'Section ' + (current + 1) + ' of ' + sections.length;
+      window.scrollTo(0, 0);
+    }
+    prevBtn.addEventListener('click', function(){ if (current > 0) { current--; render(); } });
+    nextBtn.addEventListener('click', function(){
+      if (current < sections.length - 1) { current++; render(); }
+    });
+    render();
+  }
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', init);
+  } else {
+    init();
+  }
+})();
+</script>
+</body>
+</html>

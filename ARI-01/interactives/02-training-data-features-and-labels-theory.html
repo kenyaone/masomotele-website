@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Training Data, Features, and Labels (Lesson) | MTTI Artificial Intelligence</title>
+<link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Fredoka:wght@500;600&display=swap" rel="stylesheet">
+<style>
+* { margin:0; padding:0; box-sizing:border-box; }
+body { font-family:'Space Mono', monospace; background:linear-gradient(135deg,#311B92 0%,#0288D1 100%); min-height:100vh; padding:20px; color:#fff; }
+.container { max-width:820px; margin:0 auto; }
+.header { text-align:center; margin-bottom:24px; }
+.lesson-tag { display:inline-block; background:rgba(255,255,255,0.2); padding:6px 16px; border-radius:999px; font-size:0.85em; margin-bottom:12px; }
+.header h1 { font-family:'Fredoka', sans-serif; font-size:2em; margin-bottom:6px; text-shadow:3px 3px 0 rgba(0,0,0,0.2); }
+.card { background:#fff; color:#333; border-radius:22px; padding:32px; margin-bottom:20px; box-shadow:0 20px 60px rgba(0,0,0,0.3); }
+.section { margin-bottom:26px; }
+.section:last-child { margin-bottom:0; }
+.section h2 { font-family:'Fredoka', sans-serif; font-size:1.2em; margin-bottom:10px; color:#0288D1; }
+.section .body { line-height:1.65; font-size:0.98em; }
+.section .body p { margin-bottom:10px; }
+.section .body code { background:#f5f7fb; padding:2px 6px; border-radius:4px; font-size:0.92em; }
+.keypoint { background:#fff8e1; border-left:4px solid #ffc107; padding:12px 16px; border-radius:8px; margin-top:12px; font-size:0.92em; }
+</style>
+</head>
+<body>
+<div class="container">
+<div class="header"><div class="lesson-tag">Module 2 · Topic 2.2</div><h1>Training Data, Features, and Labels</h1></div>
+<div class="card"><div class="section"><h2>What Is a Feature?</h2><div class="body"><p>A <strong>feature</strong> is an input variable — one piece of information the model is given to help it make a prediction. Suppose Brian is helping a Rafiki Insights client, a small agrovet supply business, build a model to predict which customers will renew their annual supply contract. Useful features might include: how many months the customer has been with the business, their average monthly order size, the number of support queries they have raised, and which industry sector they belong to. Each of these is a separate clue the model can use.</p></div></div><div class="section"><h2>What Is a Label?</h2><div class="body"><p>The <strong>label</strong> is different — it is the answer the model is trying to predict, the known outcome attached to each past example. In the contract-renewal example, the label for each past customer is simply "renewed" or "did not renew". Every row of training data needs both: a set of features describing the situation, and a label recording what actually happened. The model studies many such rows to learn how the features relate to the label, so it can make a prediction when it sees a new customer's features without yet knowing the outcome.</p></div><div class="keypoint"><strong>Key Point.</strong> Features are the clues, the label is the answer those clues are meant to predict. A model is only ever as good as the training data — accurate, relevant features and correctly recorded labels — that it was built from.</div></div><div class="section"><h2>Garbage In, Garbage Out: Why Data Quality Matters</h2><div class="body"><p>No algorithm, however sophisticated, can make up for poor training data. If the features contain irrelevant or noisy information, if values are missing or wrong, or if the labels themselves were recorded incorrectly, the model will confidently learn the wrong patterns. This is often summarized as "garbage in, garbage out": the quality and relevance of the training data is what determines the quality of the resulting model — not the cleverness of the technique used to build it. Brian always checks a client's data for accuracy and relevance before building anything on top of it.</p></div></div></div>
+</div>
+</body>
+</html>

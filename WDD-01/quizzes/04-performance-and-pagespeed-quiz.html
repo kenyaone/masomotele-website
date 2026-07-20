@@ -112,6 +112,24 @@
         @keyframes slideUp { from { opacity: 0; transform: translateY(15px); } to { opacity: 1; transform: translateY(0); } }
         @keyframes shake { 0%,100% { transform: translateX(0); } 25% { transform: translateX(-8px); } 75% { transform: translateX(8px); } }
         @keyframes bounceIn { 0% { opacity: 0; transform: scale(0.4); } 60% { transform: scale(1.05); } 100% { opacity: 1; transform: scale(1); } }
+
+        /* How-To intro screen — shown before question 1, not scored */
+        .howto-card { background: white; color: #333; border-radius: 25px; padding: 35px; margin-bottom: 20px; box-shadow: 0 20px 60px rgba(0,0,0,0.3); }
+        .howto-card h3 { font-family: 'Fredoka', sans-serif; font-size: 1.3em; margin-bottom: 12px; color: #667eea; }
+        .howto-card p { line-height: 1.6; margin-bottom: 16px; color: #444; }
+        .howto-field { margin-bottom: 16px; }
+        .howto-field label { display: block; font-weight: 700; margin-bottom: 6px; color: #333; font-family: 'Fredoka', sans-serif; font-size: 0.95em; }
+        .howto-field select { width: 100%; max-width: 360px; padding: 10px 12px; border-radius: 8px; border: 2px solid #ddd; font-family: 'Space Mono', monospace; font-size: 0.95em; background: #f5f7fb; }
+        .howto-field select.field-ok { border-color: #28a745; background: #eafaf0; }
+        .howto-field select.field-fail { border-color: #dc3545; background: #fdeaea; }
+        .howto-field .hf-note { display: block; margin-top: 6px; font-size: 0.85em; font-weight: 700; }
+        .howto-field .hf-note.ok { color: #155724; }
+        .howto-field .hf-note.fail { color: #721c24; }
+        .howto-banner { margin-top: 4px; margin-bottom: 18px; padding: 12px 16px; border-radius: 10px; font-size: 0.9em; font-weight: 700; display: none; }
+        .howto-banner.show { display: block; }
+        .howto-banner.ok { background: #d4edda; color: #155724; }
+        .howto-banner.fail { background: #f8d7da; color: #721c24; }
+        .start-quiz-btn { margin-top: 4px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; border: none; padding: 14px 32px; border-radius: 12px; font-size: 1em; cursor: pointer; font-family: 'Fredoka', sans-serif; box-shadow: 0 6px 18px rgba(0,0,0,0.2); }
     </style>
 </head>
 <body>
@@ -340,7 +358,69 @@
             renderQuestion();
         }
 
-        renderQuestion();
+        /* How-To intro — a small, ungraded field-check demo shown before
+           the quiz starts, directly rehearsing the image-optimisation
+           settings (WebP format, lazy loading below the fold) that two
+           of the quiz scenarios ask about, so they're not being asked
+           cold. */
+        const HOWTO_RULES = [
+            { id: 'howtoFormat', label: 'image format', ok: v => v === 'webp', tip: 'WebP is typically 25–35% smaller than JPEG at the same visual quality.' },
+            { id: 'howtoLoading', label: 'loading behaviour', ok: v => v === 'lazy', tip: 'loading="lazy" defers this off-screen product photo until it nears the viewport.' },
+        ];
+
+        function checkHowto() {
+            let allOk = true;
+            HOWTO_RULES.forEach(r => {
+                const el = document.getElementById(r.id);
+                const note = document.getElementById(r.id + 'Note');
+                const pass = r.ok(el.value);
+                el.classList.remove('field-ok', 'field-fail');
+                el.classList.add(pass ? 'field-ok' : 'field-fail');
+                note.className = 'hf-note ' + (pass ? 'ok' : 'fail');
+                note.textContent = pass ? ('✅ ' + r.tip) : ('❌ Not the best pick for this field — ' + r.tip);
+                if (!pass) allOk = false;
+            });
+            const banner = document.getElementById('howtoBanner');
+            banner.classList.add('show');
+            banner.className = 'howto-banner show ' + (allOk ? 'ok' : 'fail');
+            banner.textContent = allOk
+                ? 'Both settings are optimised — this product photo will load fast for James’s customers on 4G.'
+                : 'Not quite yet — adjust the field(s) marked in red, then check again.';
+        }
+
+        function renderHowto() {
+            document.getElementById('exerciseCard').innerHTML = `
+                <div class="howto-card">
+                    <h3>How-To: Optimising a Product Photo</h3>
+                    <p>A couple of the scenarios coming up ask about the right settings for a new product photo on Nakuru Hardware Hub — one that sits further down the page, below the fold. Set these two options the way a performance-conscious developer would, then check your settings.</p>
+                    <div class="howto-field">
+                        <label for="howtoFormat">Image format for this product photo</label>
+                        <select id="howtoFormat">
+                            <option value="jpeg">JPEG</option>
+                            <option value="png">PNG</option>
+                            <option value="webp">WebP</option>
+                            <option value="svg">SVG</option>
+                        </select>
+                        <span class="hf-note" id="howtoFormatNote"></span>
+                    </div>
+                    <div class="howto-field">
+                        <label for="howtoLoading">Loading behaviour for this below-the-fold image</label>
+                        <select id="howtoLoading">
+                            <option value="none">No loading attribute</option>
+                            <option value="eager">loading="eager"</option>
+                            <option value="lazy">loading="lazy"</option>
+                        </select>
+                        <span class="hf-note" id="howtoLoadingNote"></span>
+                    </div>
+                    <div class="howto-banner" id="howtoBanner"></div>
+                    <button class="start-quiz-btn" id="checkHowtoBtn">Check My Settings</button>
+                    <button class="start-quiz-btn" id="startQuizBtn" style="margin-left:10px;background:linear-gradient(135deg,#28a745,#1e7e34);">Start Quiz →</button>
+                </div>`;
+            document.getElementById('checkHowtoBtn').addEventListener('click', checkHowto);
+            document.getElementById('startQuizBtn').addEventListener('click', renderQuestion);
+        }
+
+        renderHowto();
     </script>
 </body>
 </html>

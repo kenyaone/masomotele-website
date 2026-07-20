@@ -1,0 +1,346 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Optimising the Listing | MTTI Digital Marketing</title>
+    <link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Fredoka:wght@500;600&display=swap" rel="stylesheet">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Space Mono', monospace;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh; padding: 20px; color: #fff;
+        }
+        .container { max-width: 900px; margin: 0 auto; }
+        .header { text-align: center; margin-bottom: 30px; animation: slideDown 0.6s ease-out; }
+        .header .lesson-tag {
+            display: inline-block; background: rgba(255,255,255,0.2);
+            padding: 6px 16px; border-radius: 999px;
+            font-size: 0.85em; margin-bottom: 12px;
+        }
+        .header h1 {
+            font-family: 'Fredoka', sans-serif; font-size: 2.2em;
+            margin-bottom: 8px; text-shadow: 3px 3px 0 rgba(0,0,0,0.2);
+        }
+        .header p { opacity: 0.95; font-size: 0.95em; }
+        .score-board {
+            background: rgba(255,255,255,0.15); backdrop-filter: blur(10px);
+            border-radius: 20px; padding: 20px; margin-bottom: 20px;
+            display: flex; justify-content: space-around;
+            animation: fadeIn 0.8s ease-out 0.2s both;
+        }
+        .score-item { text-align: center; }
+        .score-item .label { font-size: 0.85em; opacity: 0.9; margin-bottom: 4px; }
+        .score-item .value {
+            font-size: 1.8em; font-weight: bold; font-family: 'Fredoka', sans-serif;
+        }
+        .progress-bar {
+            width: 100%; height: 8px; background: rgba(255,255,255,0.3);
+            border-radius: 10px; margin-bottom: 25px; overflow: hidden;
+        }
+        .progress-fill {
+            height: 100%; background: linear-gradient(90deg, #f093fb 0%, #f5576c 100%);
+            border-radius: 10px; transition: width 0.5s ease; width: 0%;
+        }
+        .exercise-card {
+            background: white; color: #333; border-radius: 25px;
+            padding: 35px; margin-bottom: 20px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            animation: fadeIn 0.6s ease-out both;
+        }
+        .scenario {
+            background: linear-gradient(135deg, #fff8e1 0%, #ffecb3 100%);
+            border-left: 5px solid #ffc107;
+            padding: 20px 24px; border-radius: 12px;
+            margin-bottom: 24px;
+            font-size: 0.98em; line-height: 1.55;
+        }
+        .scenario strong { color: #7a5a00; font-family: 'Fredoka', sans-serif; }
+        .question {
+            font-size: 1.15em; margin-bottom: 20px;
+            font-weight: 700; line-height: 1.4;
+        }
+        .options { display: flex; flex-direction: column; gap: 12px; }
+        .option {
+            background: #f5f7fb; border: 2px solid transparent;
+            padding: 16px 20px; border-radius: 12px;
+            cursor: pointer; transition: all 0.2s ease;
+            font-family: 'Space Mono', monospace; font-size: 0.98em; text-align: left;
+        }
+        .option:hover:not(.disabled) {
+            background: #eef1fb; border-color: #667eea; transform: translateX(4px);
+        }
+        .option.correct { background: #d4edda; border-color: #28a745; color: #155724; }
+        .option.wrong { background: #f8d7da; border-color: #dc3545; color: #721c24; animation: shake 0.4s; }
+        .option.disabled { cursor: not-allowed; opacity: 0.85; }
+        .feedback {
+            margin-top: 22px; padding: 18px 22px; border-radius: 12px;
+            animation: slideUp 0.4s ease-out;
+            font-size: 0.98em; line-height: 1.5;
+        }
+        .feedback.correct { background: #d4edda; color: #155724; border-left: 4px solid #28a745; }
+        .feedback.wrong { background: #f8d7da; color: #721c24; border-left: 4px solid #dc3545; }
+        .feedback strong { font-family: 'Fredoka', sans-serif; }
+        .next-btn, .restart-btn {
+            margin-top: 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white; border: none;
+            padding: 14px 32px; border-radius: 12px;
+            font-size: 1em; cursor: pointer;
+            font-family: 'Fredoka', sans-serif;
+            box-shadow: 0 6px 18px rgba(0,0,0,0.2);
+            transition: transform 0.2s ease;
+        }
+        .next-btn:hover, .restart-btn:hover { transform: scale(1.04); }
+        .results {
+            text-align: center; padding: 25px 15px;
+            animation: bounceIn 0.6s ease-out;
+        }
+        .results h2 {
+            font-family: 'Fredoka', sans-serif; font-size: 2em;
+            margin-bottom: 12px; color: #333;
+        }
+        .results .final-score {
+            font-size: 3em; font-family: 'Fredoka', sans-serif;
+            color: #667eea; margin: 20px 0;
+        }
+        .results p { color: #555; margin-bottom: 12px; }
+        .badge { display: inline-block; font-size: 3.5em; margin: 8px 0; }
+        @keyframes slideDown { from { opacity: 0; transform: translateY(-30px); } to { opacity: 1; transform: translateY(0); } }
+        @keyframes fadeIn { from { opacity: 0; transform: scale(0.96); } to { opacity: 1; transform: scale(1); } }
+        @keyframes slideUp { from { opacity: 0; transform: translateY(15px); } to { opacity: 1; transform: translateY(0); } }
+        @keyframes shake { 0%,100% { transform: translateX(0); } 25% { transform: translateX(-8px); } 75% { transform: translateX(8px); } }
+        @keyframes bounceIn { 0% { opacity: 0; transform: scale(0.4); } 60% { transform: scale(1.05); } 100% { opacity: 1; transform: scale(1); } }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <div class="lesson-tag">Module 14 · Lesson 14.3</div>
+            <h1>Optimising the Listing</h1>
+            <p>10 Sarah Chebet scenarios — photos, hours, attributes, description, completeness</p>
+        </div>
+
+        <div class="score-board">
+            <div class="score-item"><div class="label">Score</div><div class="value" id="score">0</div></div>
+            <div class="score-item"><div class="label">Question</div><div class="value"><span id="current">1</span>/<span id="total">10</span></div></div>
+            <div class="score-item"><div class="label">Streak</div><div class="value" id="streak">0</div></div>
+        </div>
+
+        <div class="progress-bar"><div class="progress-fill" id="progress"></div></div>
+
+        <div class="exercise-card" id="exerciseCard"></div>
+    </div>
+
+    <script>
+        const exercises = [
+  {
+    "scenario": "Sarah asks how many photos she really needs on Karibu Kitchen's profile, and across which categories.",
+    "question": "Which target matches Lesson 14.3?",
+    "options": [
+      "One photo of the logo — anything more is decoration.",
+      "Minimum 10 photos, spread across six types: logo (300x300 square), cover (16:9 landscape), interior (Kapsoya kitchen), exterior (signage from the road), product (ugali sukuma, pilau, chapati beans, nyama choma), and team (Sarah + her cooks). Refresh monthly.",
+      "50 selfies of Sarah only.",
+      "Google chooses photos automatically — no upload needed."
+    ],
+    "correct": 1,
+    "explanation": "Slide 2: 10 photos minimum, across the six types listed. Google's own data: photos give +42% direction requests and +35% website clicks. Refresh monthly."
+  },
+  {
+    "scenario": "Sarah is setting business hours. She wonders whether Kenyan public holidays need any special treatment.",
+    "question": "Which is correct?",
+    "options": [
+      "No — regular hours cover everything.",
+      "Yes — set Special hours for Madaraka Day (1 Jun), Mashujaa Day (20 Oct), Jamhuri Day (12 Dec), Christmas (25 Dec), Boxing Day (26 Dec), Idd and Easter Monday. Setting special hours prevents the #1 bad customer experience — driving to a closed restaurant — and avoids Google penalising the listing for wrong hours.",
+      "Only for Christmas — no other holidays matter.",
+      "Sarah must close for a full week around Jamhuri Day."
+    ],
+    "correct": 1,
+    "explanation": "Slide 3: regular hours + special hours for every Kenyan public holiday (Madaraka, Mashujaa, Jamhuri, Christmas, Boxing Day, Idd, Easter). Wrong hours = customer-experience disaster + Google penalty."
+  },
+  {
+    "scenario": "Sarah's business description field allows 750 characters. She asks whether keywords or natural writing matters more.",
+    "question": "Which advice matches Lesson 14.3?",
+    "options": [
+      "Stuff every keyword — 100 repetitions of \"lunch delivery Eldoret\".",
+      "Only the first 250 characters show without a click. Put priority keywords (\"lunch delivery Eldoret Kapsoya\", signature dishes, trust markers like M-Pesa and 30-minute delivery) in that opening — but written naturally. Description is a direct Relevance signal, and stuffing is easy to detect.",
+      "Keywords do not matter at all.",
+      "Write only in one word: \"Restaurant\"."
+    ],
+    "correct": 1,
+    "explanation": "Slide 6: 750 chars total but only the first 250 show without a click. Keywords in the opening, written naturally. Direct Relevance signal, no stuffing."
+  },
+  {
+    "scenario": "Sarah is ticking attributes. She sees \"Wheelchair accessible entrance\", \"Accepts M-Pesa\", \"Halal options\", \"Free Wi-Fi\", \"Women-owned business\", \"Wedding venue\" and \"Nightclub\".",
+    "question": "How should she approach the attributes list?",
+    "options": [
+      "Tick every attribute — more is better.",
+      "Tick only accurate attributes (Wheelchair accessible: yes; M-Pesa: yes; Halal: yes; Women-owned: yes; Wi-Fi: no; Wedding venue: no; Nightclub: no). Every accurate tick = a filter she SHOWS UP for; every false tick is a policy violation that can lead to suspension.",
+      "Never tick any attributes.",
+      "Only tick \"Nightclub\" for humour."
+    ],
+    "correct": 1,
+    "explanation": "Slide 5: attributes are yes/no ticks that change search filters. Every unticked attribute = an invisible filter. But every FALSE attribute = a policy violation. Accurate only."
+  },
+  {
+    "scenario": "Sarah is filling in services. She wonders whether she should also list every dish under Menu with a price.",
+    "question": "Why does the menu section matter?",
+    "options": [
+      "It does not — Menu is optional and ignored.",
+      "Every menu item feeds Relevance for the dish name and helps Google understand what queries the listing should appear for. Sarah lists ugali sukuma (KES 350), pilau beef (KES 500), chapati beans stew (KES 300), nyama choma platter S (KES 750) — each with a photo and a price.",
+      "Menu items lower ranking.",
+      "Menu is only for booking sites like Jumia."
+    ],
+    "correct": 1,
+    "explanation": "Slide 4: services AND menu items both feed Relevance. Each dish helps Google map the listing to \"pilau near me\" or \"nyama choma Eldoret\" style queries. Price + photo per item."
+  },
+  {
+    "scenario": "Sarah is considering putting her opening date as 2018 instead of the real date (15 March 2024) — she thinks an older-looking business will rank higher.",
+    "question": "What is wrong with this plan?",
+    "options": [
+      "Nothing — nobody checks.",
+      "Two problems. First, Google cross-checks opening date against public records (domain registration, business registration, first citation dates) where possible — a lie can flag the listing. Second, opening date is only ONE of many Prominence signals; the payoff of a fake date is small, but the risk (suspension) is large.",
+      "The lie is a good idea because Google trusts businesses.",
+      "Sarah should say 1892 to look historical."
+    ],
+    "correct": 1,
+    "explanation": "Slide 7: opening date is a Prominence signal but Google verifies against public records where possible. Lie = risk of suspension. Real date only."
+  },
+  {
+    "scenario": "Sarah asks what \"completeness score\" is and whether hitting 100% actually helps ranking.",
+    "question": "Which answer matches Lesson 14.3?",
+    "options": [
+      "Completeness is cosmetic — no ranking effect.",
+      "Business Profile Manager shows a completeness percentage for every field filled. Google's own data: fully-filled profiles rank on average ~1.4 positions higher in the local pack than half-filled ones — enough to move Sarah from position 4 (below the fold) to position 1 for \"lunch delivery Eldoret\".",
+      "Sarah is rewarded with KES 10,000 for hitting 100%.",
+      "Completeness only affects the knowledge panel, not the local pack."
+    ],
+    "correct": 1,
+    "explanation": "Slide 8: completeness score = every field filled. Full profiles rank ~1.4 positions higher on average — worth position 4 → position 1 for Sarah's target query."
+  },
+  {
+    "scenario": "Sarah asks if she can \"set and forget\" the profile — fill it once and never touch it again.",
+    "question": "What is the correct cadence?",
+    "options": [
+      "Yes — a one-time setup is enough.",
+      "No. Optimisation is a monthly habit. Refresh at least one photo per month, update hours before every public holiday, add new menu items when the menu changes, and adjust services if the offering shifts. Stale profiles look abandoned to both customers and Google's freshness signals.",
+      "Update every 5 years only.",
+      "Only touch it if Google emails you."
+    ],
+    "correct": 1,
+    "explanation": "Slide 8: optimisation is a monthly habit, not a one-time task. Photos refreshed monthly. Hours before every holiday. Menu updated when it changes. Freshness signal."
+  },
+  {
+    "scenario": "Sarah's cousin suggests uploading 30 selfies of Sarah smiling — \"more photos = more ranking\".",
+    "question": "What is wrong with this plan?",
+    "options": [
+      "Nothing — quantity is all that matters.",
+      "Wrong — photo MIX matters, not raw count. Slide 2 requires six categories (logo, cover, interior, exterior, product, team). Thirty selfies fill only one slot and leave five categories empty. Better: 10 photos spread across all six categories, refreshed monthly.",
+      "Sarah should upload only her national ID photo.",
+      "Photos are irrelevant."
+    ],
+    "correct": 1,
+    "explanation": "Slide 2: the six photo TYPES matter. Ten photos across the six categories, not 30 photos in one category. Mix + freshness beats raw count."
+  },
+  {
+    "scenario": "A trainee summarises §14.3 as: \"You need 1 photo, no special hours are needed, attributes are optional, and the description is capped at 100 characters.\"",
+    "question": "How many of the four claims are correct?",
+    "options": [
+      "All four.",
+      "Two.",
+      "Zero — every claim is wrong.",
+      "One — only the attributes claim."
+    ],
+    "correct": 2,
+    "explanation": "Every claim is wrong. Minimum 10 photos across six types (Slide 2). Special hours REQUIRED for every Kenyan public holiday (Slide 3). Attributes are strong yes/no ranking + filter signals (Slide 5). Description is 750 chars total, first 250 shown without a click (Slide 6)."
+  }
+];
+
+        let currentQuestion = 0, score = 0, streak = 0, answered = false;
+
+        function updateScoreboard() {
+            document.getElementById('score').textContent = score;
+            document.getElementById('current').textContent = Math.min(currentQuestion + 1, exercises.length);
+            document.getElementById('total').textContent = exercises.length;
+            document.getElementById('streak').textContent = streak;
+            document.getElementById('progress').style.width = ((currentQuestion) / exercises.length) * 100 + '%';
+        }
+
+        function escapeHtml(s) {
+            return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+        }
+
+        function renderQuestion() {
+            answered = false;
+            const q = exercises[currentQuestion];
+            let html = '';
+            if (q.scenario) {
+                html += `<div class="scenario"><strong>Scenario.</strong> ${escapeHtml(q.scenario)}</div>`;
+            }
+            html += `<div class="question">${escapeHtml(q.question)}</div>`;
+            html += '<div class="options">';
+            q.options.forEach((o, i) => {
+                html += `<button class="option" onclick="selectAnswer(${i})">${escapeHtml(o)}</button>`;
+            });
+            html += '</div>';
+            document.getElementById('exerciseCard').innerHTML = html;
+            updateScoreboard();
+        }
+
+        function selectAnswer(i) {
+            if (answered) return;
+            answered = true;
+            const q = exercises[currentQuestion];
+            const btns = document.querySelectorAll('.option');
+            btns.forEach(b => b.classList.add('disabled'));
+            btns[q.correct].classList.add('correct');
+            const right = i === q.correct;
+            if (!right) btns[i].classList.add('wrong');
+            if (right) { score += 10; streak += 1; } else { streak = 0; }
+            const fb = document.createElement('div');
+            fb.className = 'feedback ' + (right ? 'correct' : 'wrong');
+            fb.innerHTML = `<strong>${right ? '✅ Correct.' : '❌ Not quite.'}</strong><br>${escapeHtml(q.explanation)}`;
+            document.getElementById('exerciseCard').appendChild(fb);
+            const nb = document.createElement('button');
+            nb.className = 'next-btn';
+            nb.textContent = currentQuestion === exercises.length - 1 ? 'See results →' : 'Next scenario →';
+            nb.onclick = nextQuestion;
+            document.getElementById('exerciseCard').appendChild(nb);
+            updateScoreboard();
+        }
+
+        function nextQuestion() {
+            currentQuestion++;
+            if (currentQuestion >= exercises.length) return showResults();
+            renderQuestion();
+        }
+
+        function showResults() {
+            document.getElementById('progress').style.width = '100%';
+            const total = exercises.length * 10;
+            const pct = Math.round(score / total * 100);
+            if (window.parent) { window.parent.postMessage({type:"mtti_quiz_score", score: score, total: total, percent: pct}, "*"); }
+            let badge = '🌟', msg = 'Excellent work. You have a professional grasp of this lesson.';
+            if (pct < 50) { badge = '🌱'; msg = 'Good first attempt. Re-watch the lesson video and try again.'; }
+            else if (pct < 80) { badge = '📚'; msg = 'Solid progress. Review the scenarios you missed and retry.'; }
+            document.getElementById('exerciseCard').innerHTML = `
+                <div class="results">
+                    <span class="badge">${badge}</span>
+                    <h2>Quiz Complete</h2>
+                    <div class="final-score">${score} / ${total}</div>
+                    <p><strong>${pct}%</strong> · Longest streak: ${streak}</p>
+                    <p>${msg}</p>
+                    <button class="restart-btn" onclick="restart()">Try again 🔁</button>
+                </div>`;
+        }
+
+        function restart() {
+            currentQuestion = 0; score = 0; streak = 0;
+            renderQuestion();
+        }
+
+        renderQuestion();
+    </script>
+</body>
+</html>

@@ -1,0 +1,458 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lesson 15.1 — AI for Marketers: Copy &amp; Content (Interactive)</title>
+<style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: 'Segoe UI', -apple-system, sans-serif; line-height: 1.55; color: #1e293b; background: #f8fafc; min-height: 100vh; }
+    .container { max-width: 1100px; margin: 0 auto; padding: 20px; }
+    header { background: linear-gradient(135deg, #2E7D32, #1B5E20); color: #fff; padding: 40px 30px; border-radius: 12px; margin-bottom: 24px; box-shadow: 0 10px 30px rgba(124,58,237,0.25); }
+    header .badge { display: inline-block; background: rgba(255,255,255,0.2); padding: 4px 14px; border-radius: 16px; font-size: 12px; font-weight: bold; letter-spacing: 1px; margin-bottom: 14px; }
+    header h1 { font-size: 34px; margin-bottom: 8px; text-shadow: 0 2px 4px rgba(0,0,0,0.15); }
+    header .subtitle { font-size: 17px; opacity: 0.95; margin-bottom: 20px; }
+    .meta-strip { display: flex; flex-wrap: wrap; gap: 12px; }
+    .meta-strip span { background: rgba(255,255,255,0.18); padding: 6px 14px; border-radius: 20px; font-size: 13px; }
+    .toc { background: #fff; border: 1px solid #e2e8f0; border-radius: 10px; padding: 22px 26px; margin-bottom: 22px; }
+    .toc h3 { color: #F57C00; margin-bottom: 10px; }
+    .toc ol { padding-left: 20px; }
+    .toc a { color: #F57C00; text-decoration: none; font-weight: 600; }
+    section { background: #fff; border: 1px solid #e2e8f0; border-radius: 10px; padding: 26px 30px; margin-bottom: 22px; }
+    section h2 { color: #F57C00; font-size: 22px; margin-bottom: 12px; padding-bottom: 8px; border-bottom: 3px solid #F57C00; }
+    section p { margin-bottom: 12px; }
+    section ul, section ol { padding-left: 22px; margin-bottom: 12px; }
+    .callout { border-left: 5px solid #F57C00; background: #f5f3ff; padding: 14px 18px; margin: 14px 0; border-radius: 4px; }
+    .callout.warn { border-left-color: #dc2626; background: #fef2f2; }
+    .callout.tip { border-left-color: #059669; background: #ecfdf5; }
+    .callout strong { color: #F57C00; }
+
+    /* Tool comparison */
+    .tools { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 12px; margin: 14px 0; }
+    .tool { background: #f8fafc; border: 2px solid #cbd5e1; border-radius: 10px; padding: 14px; }
+    .tool.pick { border-color: #F57C00; background: #f5f3ff; }
+    .tool h4 { color: #1e293b; margin-bottom: 4px; }
+    .tool .cost { font-size: 12px; color: #059669; font-weight: bold; margin: 4px 0; }
+    .tool p { font-size: 12.5px; margin: 4px 0; color: #475569; }
+    .tool .best { font-size: 11px; color: #64748b; font-style: italic; margin-top: 6px; }
+
+    /* Prompt builder — flagship */
+    .prompt-lab { background: #f5f3ff; border: 2px solid #F57C00; border-radius: 10px; padding: 18px; margin: 14px 0; }
+    .prompt-lab h4 { color: #4c1d95; margin-bottom: 12px; }
+    .p-row { margin-bottom: 12px; }
+    .p-row label { display: block; font-size: 13px; font-weight: 600; margin-bottom: 4px; color: #4c1d95; }
+    .p-row select, .p-row input, .p-row textarea { width: 100%; padding: 8px 10px; border: 1.5px solid #cbd5e1; border-radius: 6px; font-size: 14px; font-family: inherit; }
+    .p-row textarea { resize: vertical; }
+
+    .p-out { background: #1e293b; color: #e2e8f0; padding: 16px; border-radius: 8px; margin-top: 14px; font-family: 'Courier New', monospace; font-size: 13px; min-height: 100px; white-space: pre-wrap; }
+    .p-generated { background: #ecfdf5; border-left: 4px solid #059669; padding: 14px; border-radius: 6px; margin-top: 12px; font-size: 14px; color: #065f46; display: none; }
+    .p-generated.show { display: block; }
+    .p-generated h5 { color: #065f46; margin-bottom: 8px; }
+    .p-out button { background: #F57C00; color: #fff; border: 0; padding: 6px 14px; border-radius: 4px; cursor: pointer; font-size: 12px; margin-top: 8px; }
+
+    /* Prompt patterns */
+    .patterns { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 10px; margin: 14px 0; }
+    .pattern { background: #fef3c7; border-left: 4px solid #d97706; border-radius: 6px; padding: 12px 14px; }
+    .pattern h5 { color: #78350f; font-size: 13px; margin-bottom: 4px; }
+    .pattern .ex { font-family: 'Courier New', monospace; font-size: 12px; color: #92400e; background: #fff; padding: 6px 8px; border-radius: 4px; margin-top: 4px; }
+
+    /* Can vs can't */
+    .can-cant { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin: 14px 0; }
+    @media (max-width: 700px) { .can-cant { grid-template-columns: 1fr; } }
+    .can { background: #ecfdf5; border-left: 4px solid #059669; padding: 14px; border-radius: 8px; }
+    .cant { background: #fee2e2; border-left: 4px solid #dc2626; padding: 14px; border-radius: 8px; }
+    .can h4 { color: #065f46; margin-bottom: 6px; }
+    .cant h4 { color: #991b1b; margin-bottom: 6px; }
+
+    /* DPA implications */
+    .dpa { background: #fef2f2; border: 2px solid #dc2626; border-radius: 10px; padding: 16px; margin: 14px 0; }
+    .dpa h4 { color: #991b1b; margin-bottom: 8px; }
+
+    table { width: 100%; border-collapse: collapse; margin: 14px 0; font-size: 14px; }
+    th, td { padding: 10px 12px; text-align: left; border: 1px solid #e2e8f0; }
+    th { background: #F57C00; color: #fff; }
+    tr:nth-child(even) { background: #f8fafc; }
+
+    .quiz-question { background: #fff; border: 2px solid #cbd5e1; border-radius: 10px; padding: 18px; margin: 14px 0; }
+    .quiz-question.correct { border-color: #059669; background: #ecfdf5; }
+    .quiz-question.wrong { border-color: #dc2626; background: #fef2f2; }
+    .quiz-question h4 { margin-bottom: 12px; font-size: 15px; color: #1e293b; }
+    .quiz-question .options label { display: block; padding: 10px 14px; margin-bottom: 6px; background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 6px; cursor: pointer; font-size: 14px; }
+    .quiz-question .options label:hover { background: #f5f3ff; }
+    .quiz-question .options input[type="radio"] { margin-right: 10px; }
+    .quiz-question .explanation { display: none; margin-top: 12px; padding: 10px 14px; border-radius: 6px; font-size: 14px; }
+    .quiz-question.correct .explanation { display: block; background: #d1fae5; color: #065f46; border-left: 4px solid #059669; }
+    .quiz-question.wrong .explanation { display: block; background: #fee2e2; color: #991b1b; border-left: 4px solid #dc2626; }
+    .quiz-summary { text-align: center; padding: 30px; background: linear-gradient(135deg, #f5f3ff, #ddd6fe); border-radius: 10px; margin: 20px 0; display: none; }
+    .quiz-summary.show { display: block; }
+    .quiz-summary .score { font-size: 48px; font-weight: bold; color: #F57C00; margin-bottom: 8px; }
+    button.btn { background: #F57C00; color: #fff; border: none; padding: 10px 20px; border-radius: 6px; font-size: 15px; font-weight: 600; cursor: pointer; }
+    button.btn:hover { background: #4c1d95; }
+    button.btn.reset { background: #64748b; margin-left: 8px; }
+    footer { text-align: center; color: #64748b; padding: 24px; font-size: 13px; }
+
+    /* MTTI logo stamp */
+    .mtti-logo-stamp {
+        position: fixed; top: 14px; right: 18px; z-index: 999;
+        opacity: 0.88; transition: opacity 0.2s;
+    }
+    .mtti-logo-stamp:hover { opacity: 1; }
+    .mtti-logo-stamp img { width: 56px; height: 56px; border-radius: 50%; box-shadow: 0 2px 8px rgba(0,0,0,0.18); }
+</style>
+</head>
+<body>
+<div class="mtti-logo-stamp">
+    <img src="../../Resources/Logo.jpeg" alt="MTTI" title="Masomotele Technical Training Institute — Start learning, Start earning">
+</div>
+
+<div class="container">
+<header>
+    <div class="badge">LESSON 15.1  ·  AI IN MARKETING  ·  INTERACTIVE</div>
+    <h1>AI for Marketers: Copy &amp; Content</h1>
+    <div class="subtitle">The single biggest productivity shift in marketing since Google Ads. Use it right, or fall behind.</div>
+    <div class="meta-strip"><span><strong>Duration:</strong> ~35 min</span><span><strong>Tools:</strong> ChatGPT · Claude · Gemini</span></div>
+</header>
+
+<div class="toc">
+    <h3>What you'll do</h3>
+    <ol>
+        <li><a href="#s1">Why AI matters for marketers in 2026</a></li>
+        <li><a href="#s2">What AI CAN and CAN'T do</a></li>
+        <li><a href="#s3">The 3 tools (ChatGPT vs Claude vs Gemini)</a></li>
+        <li><a href="#s4">The 5 prompt patterns</a></li>
+        <li><a href="#s5"><strong>Live prompt builder — generate Karibu Kitchen copy</strong></a></li>
+        <li><a href="#s6">Ethics + Kenya DPA 2019 implications</a></li>
+        <li><a href="#s7">Self-check quiz</a></li>
+    </ol>
+</div>
+
+<section id="s1">
+    <h2>1. Why AI matters for marketers in 2026</h2>
+    <p>The productivity shift in marketing since 2023 is comparable to the shift from print to Google Ads. Marketers who use AI properly ship <strong>3–5× more content</strong> for the same hours. Those who don't fall behind. Fast.</p>
+    <div class="callout"><strong>What changes:</strong> ad copy A/B tests, email subject lines, blog outlines, meta descriptions, translation, customer-support drafts, social captions, image generation, video scripts. All of these move from hours to minutes.</div>
+</section>
+
+<section id="s2">
+    <h2>2. What AI CAN and CAN'T do</h2>
+    <div class="can-cant">
+        <div class="can">
+            <h4>✓ AI CAN</h4>
+            <ul>
+                <li>Draft ad copy variants in seconds</li>
+                <li>Generate 20 headlines to A/B test</li>
+                <li>Translate between English, Swahili, Sheng</li>
+                <li>Summarise long documents</li>
+                <li>Suggest content ideas at scale</li>
+                <li>Draft emails, replies, SEO metas</li>
+                <li>Debug spreadsheet formulas</li>
+            </ul>
+        </div>
+        <div class="cant">
+            <h4>✗ AI CANNOT (yet)</h4>
+            <ul>
+                <li>Know your specific customer without you telling it</li>
+                <li>Make strategic decisions for you</li>
+                <li>Verify facts — will confidently invent things (hallucinations)</li>
+                <li>Replace your brand voice — you must train it</li>
+                <li>Replace human judgment on ethics + tone</li>
+                <li>Understand your business results</li>
+            </ul>
+        </div>
+    </div>
+    <div class="callout warn"><strong>The golden rule:</strong> AI is a junior assistant, not a strategist. You direct. You verify. You are responsible for what ships.</div>
+</section>
+
+<section id="s3">
+    <h2>3. The 3 tools</h2>
+    <div class="tools">
+        <div class="tool pick">
+            <h4>Claude (Anthropic) ★</h4>
+            <div class="cost">Free tier · Paid Pro ~$20/mo</div>
+            <p>Best for long-form writing, nuanced marketing copy, strategic thinking. Strong reasoning.</p>
+            <div class="best">Best for: blog posts, strategy docs, thoughtful email copy</div>
+        </div>
+        <div class="tool pick">
+            <h4>ChatGPT (OpenAI) ★</h4>
+            <div class="cost">Free tier · Paid Plus $20/mo</div>
+            <p>Most-used. Broad capability. Image generation built in (DALL-E). Voice mode.</p>
+            <div class="best">Best for: general marketing, quick drafts, images, brainstorming</div>
+        </div>
+        <div class="tool">
+            <h4>Gemini (Google)</h4>
+            <div class="cost">Free · Advanced $20/mo</div>
+            <p>Integrated with Google Workspace. Access to real-time Google Search.</p>
+            <div class="best">Best for: research with citations, Google Workspace users</div>
+        </div>
+    </div>
+    <div class="callout tip"><strong>Practical picks:</strong> Free tier of any of the three is enough to start. Get Pro on ONE (not all three) once you use it daily.</div>
+</section>
+
+<section id="s4">
+    <h2>4. The 5 prompt patterns</h2>
+    <p>These are the templates professional marketers use every day. Learn them by heart.</p>
+    <div class="patterns">
+        <div class="pattern">
+            <h5>1. Role + Task + Context</h5>
+            <div class="ex">You are a Kenyan copywriter for a lunch delivery business. Write 5 Facebook ad headlines for a KES 350 ugali &amp; beef stew delivery in Eldoret CBD.</div>
+        </div>
+        <div class="pattern">
+            <h5>2. Constraint + Format</h5>
+            <div class="ex">Under 40 characters each. Include the price. Use emoji sparingly. Output as a numbered list.</div>
+        </div>
+        <div class="pattern">
+            <h5>3. Voice + Audience</h5>
+            <div class="ex">Voice: warm, friendly, Kenyan English. Audience: office workers 25–45. Sarah is the founder — feel personal.</div>
+        </div>
+        <div class="pattern">
+            <h5>4. Show, don't tell</h5>
+            <div class="ex">Here are 3 examples of ads I love: [paste 3 examples]. Match this style for Karibu Kitchen.</div>
+        </div>
+        <div class="pattern">
+            <h5>5. Iterate</h5>
+            <div class="ex">"That's good but #3 sounds too corporate. Rewrite it more casual, like Sarah is texting a friend."</div>
+        </div>
+    </div>
+</section>
+
+<section id="s5">
+    <h2>5. Live prompt builder</h2>
+    <p>Fill each pattern below. Tool assembles a professional prompt AND shows sample AI output.</p>
+    <div class="prompt-lab">
+        <div class="p-row">
+            <label>1. Task</label>
+            <select id="pTask">
+                <option value="fb-headlines">Facebook ad headlines (5 variants)</option>
+                <option value="email-subject">Email subject lines (10 variants)</option>
+                <option value="ig-caption">Instagram post caption</option>
+                <option value="whatsapp">WhatsApp order confirmation</option>
+                <option value="blog-outline">Blog post outline (SEO)</option>
+                <option value="google-ad">Google Search ad (headline + description)</option>
+                <option value="meta-desc">Meta description for SEO page</option>
+            </select>
+        </div>
+        <div class="p-row">
+            <label>2. Voice</label>
+            <select id="pVoice">
+                <option value="warm">Warm, friendly, Kenyan English</option>
+                <option value="professional">Professional, corporate</option>
+                <option value="playful">Playful, Gen Z, casual</option>
+                <option value="urgent">Urgent, action-focused</option>
+            </select>
+        </div>
+        <div class="p-row">
+            <label>3. Audience</label>
+            <input id="pAudience" value="Office workers 25–45 in Eldoret CBD, ordering lunch delivery">
+        </div>
+        <div class="p-row">
+            <label>4. Constraints (length, emoji, keywords)</label>
+            <input id="pConstraint" value="Under 40 characters each. Include the price. Emoji sparingly. Include 'lunch delivery Eldoret' for SEO.">
+        </div>
+        <div class="p-row">
+            <label>5. Business context</label>
+            <textarea id="pContext" rows="2">Karibu Kitchen — fresh Kenyan lunch. KES 350 ugali & beef stew, delivered in 30 min. WhatsApp 0782-XXX-XXX. Sarah is the founder.</textarea>
+        </div>
+
+        <button class="btn" onclick="buildPrompt()">Generate prompt + AI output</button>
+
+        <div class="p-out" id="promptOut">Your assembled prompt will appear here…</div>
+        <div class="p-generated" id="promptGenerated"></div>
+    </div>
+</section>
+
+<section id="s6">
+    <h2>6. Ethics + Kenya DPA 2019 implications</h2>
+    <div class="dpa">
+        <h4>⚠ 5 rules for Kenyan marketers using AI</h4>
+        <ol>
+            <li><strong>Never paste customer PII</strong> (names, phone numbers, addresses, order history) into public AI tools. DPA 2019 violation.</li>
+            <li><strong>Always verify facts.</strong> AI invents statistics, quotes, product features. Cross-check before shipping.</li>
+            <li><strong>Disclose AI use</strong> when it materially affects the customer (e.g., AI-generated support replies). Not legally required yet in Kenya — ethically required.</li>
+            <li><strong>Keep human judgment on tone.</strong> AI can produce technically-correct copy that feels tone-deaf about local context.</li>
+            <li><strong>Own the output.</strong> If AI writes something misleading, that's still on you legally. AI is not a defence.</li>
+        </ol>
+    </div>
+    <div class="callout tip"><strong>Safer alternative:</strong> paid Claude Pro / ChatGPT Team plans promise not to train on your data. Use those for sensitive work. Free tiers may use your data for training.</div>
+</section>
+
+<section id="s7">
+    <h2>7. Self-check quiz</h2>
+
+    <div class="quiz-question" data-correct="B"><h4>1. AI is a…</h4><div class="options"><label><input type="radio" name="q1" value="A"> A) Strategist</label><label><input type="radio" name="q1" value="B"> B) Junior assistant — you direct, verify, and are responsible</label><label><input type="radio" name="q1" value="C"> C) Replacement for marketers</label><label><input type="radio" name="q1" value="D"> D) Magic</label></div><div class="explanation">Correct — the golden rule.</div></div>
+
+    <div class="quiz-question" data-correct="D"><h4>2. What CAN'T AI do reliably?</h4><div class="options"><label><input type="radio" name="q2" value="A"> A) Draft headlines</label><label><input type="radio" name="q2" value="B"> B) Translate</label><label><input type="radio" name="q2" value="C"> C) Summarise documents</label><label><input type="radio" name="q2" value="D"> D) Verify facts — it invents things (hallucinations)</label></div><div class="explanation">Correct — always verify.</div></div>
+
+    <div class="quiz-question" data-correct="C"><h4>3. Which prompt pattern helps the AI understand tone?</h4><div class="options"><label><input type="radio" name="q3" value="A"> A) Task only</label><label><input type="radio" name="q3" value="B"> B) Delete the pattern</label><label><input type="radio" name="q3" value="C"> C) Voice + Audience specification</label><label><input type="radio" name="q3" value="D"> D) Longer prompt = better</label></div><div class="explanation">Correct — voice + audience shapes tone.</div></div>
+
+    <div class="quiz-question" data-correct="B"><h4>4. "Show, don't tell" prompt pattern means…</h4><div class="options"><label><input type="radio" name="q4" value="A"> A) Use images</label><label><input type="radio" name="q4" value="B"> B) Paste examples of what you want, ask AI to match the style</label><label><input type="radio" name="q4" value="C"> C) Explain more</label><label><input type="radio" name="q4" value="D"> D) Use ALL CAPS</label></div><div class="explanation">Correct — examples train the style faster than descriptions.</div></div>
+
+    <div class="quiz-question" data-correct="A"><h4>5. Under DPA 2019, you should NOT paste…</h4><div class="options"><label><input type="radio" name="q5" value="A"> A) Customer PII (names, phones, order history) into public AI tools</label><label><input type="radio" name="q5" value="B"> B) Your marketing plan</label><label><input type="radio" name="q5" value="C"> C) Ad copy drafts</label><label><input type="radio" name="q5" value="D"> D) Blog outlines</label></div><div class="explanation">Correct — public AI = potential data leak = DPA violation.</div></div>
+
+    <div class="quiz-question" data-correct="D"><h4>6. Which tool has real-time Google Search built in?</h4><div class="options"><label><input type="radio" name="q6" value="A"> A) Claude</label><label><input type="radio" name="q6" value="B"> B) ChatGPT free</label><label><input type="radio" name="q6" value="C"> C) None</label><label><input type="radio" name="q6" value="D"> D) Gemini</label></div><div class="explanation">Correct — Google integration is Gemini's differentiator.</div></div>
+
+    <div class="quiz-question" data-correct="B"><h4>7. AI writes something misleading. Who's responsible?</h4><div class="options"><label><input type="radio" name="q7" value="A"> A) The AI company</label><label><input type="radio" name="q7" value="B"> B) You, the marketer — AI is not a defence</label><label><input type="radio" name="q7" value="C"> C) The customer</label><label><input type="radio" name="q7" value="D"> D) Nobody</label></div><div class="explanation">Correct — you own the output.</div></div>
+
+    <div class="quiz-question" data-correct="A"><h4>8. Best AI tool for long-form thoughtful writing?</h4><div class="options"><label><input type="radio" name="q8" value="A"> A) Claude</label><label><input type="radio" name="q8" value="B"> B) Random blog tool</label><label><input type="radio" name="q8" value="C"> C) Grammarly only</label><label><input type="radio" name="q8" value="D"> D) Google Translate</label></div><div class="explanation">Correct — Claude's strength.</div></div>
+
+    <div class="quiz-question" data-correct="C"><h4>9. Iterate prompt pattern =</h4><div class="options"><label><input type="radio" name="q9" value="A"> A) Give up</label><label><input type="radio" name="q9" value="B"> B) Ask a different tool</label><label><input type="radio" name="q9" value="C"> C) "That's good but rewrite #3 more casual, like Sarah is texting a friend"</label><label><input type="radio" name="q9" value="D"> D) Delete the conversation</label></div><div class="explanation">Correct — iteration is where the magic happens.</div></div>
+
+    <div class="quiz-question" data-correct="D"><h4>10. Productivity shift AI enables in marketing?</h4><div class="options"><label><input type="radio" name="q10" value="A"> A) 10%</label><label><input type="radio" name="q10" value="B"> B) 20%</label><label><input type="radio" name="q10" value="C"> C) None</label><label><input type="radio" name="q10" value="D"> D) 3–5× more content for same hours</label></div><div class="explanation">Correct — the shift is real.</div></div>
+
+    <div style="margin-top:20px;">
+        <button class="btn" onclick="markQuiz()">Mark my quiz</button>
+        <button class="btn reset" onclick="resetQuiz()">Reset</button>
+    </div>
+    <div class="quiz-summary" id="quizSummary"><div class="score" id="scoreDisplay">0 / 10</div><p id="scoreMessage"></p></div>
+</section>
+
+<footer><p>Lesson 15.1 — AI for Marketers: Copy &amp; Content · MTTI · New AI Module</p><p>Next: <strong>Lesson 15.2 — AI for Visuals &amp; Automation</strong></p></footer>
+</div>
+
+<script>
+const SAMPLE_OUTPUTS = {
+    'fb-headlines-warm': `1. Fresh Kenyan lunch — KES 350 🍲
+2. Ugali & stew, delivered by 1 PM ✓
+3. Karibu Kitchen · lunch in 30 min
+4. Skip the queue — order now
+5. Today's lunch, delivered to your desk`,
+    'fb-headlines-professional': `1. Karibu Kitchen — reliable lunch delivery
+2. Fresh Kenyan meals · Eldoret CBD
+3. Professional lunch service — KES 350
+4. Punctual delivery, quality guaranteed
+5. Corporate lunch orders welcomed`,
+    'email-subject-warm': `1. Sarah here — today's lunch is 🍲
+2. Fresh from our kitchen: today's special
+3. Your Monday menu is ready
+4. Warm lunch, delivered in 30 min
+5. Karibu Kitchen: today's specials
+6. Order by 12 for a hot lunch
+7. Ugali & beef stew — KES 350 today
+8. Lunch delivery Eldoret: this week's menu
+9. Skip the lunch queue — order now
+10. Weekly menu inside 📋`,
+    'ig-caption-warm': `Fresh ugali & beef stew — plated hot and delivered in 30 minutes. KES 350. WhatsApp 0782-XXX-XXX to order 🍲\n\nEldoret CBD lunch delivery · Kapsoya · Elgon View · Racecourse.\n\n#KaribuKitchen #EldoretFood #LunchDeliveryEldoret`,
+    'whatsapp-warm': `Karibu! Your order for ugali & beef stew (KES 350) is confirmed.\n\nDelivery: 30 minutes to your address.\nPayment: M-Pesa Paybill XXXX / Cash on delivery.\n\nAsante for choosing Karibu Kitchen! Sarah.`,
+    'blog-outline-warm': `Title: 7 Best Lunch Delivery Options in Eldoret CBD 2026\n\n1. Introduction — Why lunch delivery matters for Eldoret office workers\n2. What makes a good lunch delivery service (5 criteria)\n3. Karibu Kitchen — home-style Kenyan menus\n4. Comparison table: price · delivery time · menu variety\n5. How to order (WhatsApp, phone, apps)\n6. Payment options (M-Pesa, cash)\n7. FAQ — allergies, group orders, dietary options\n\nSEO focus: lunch delivery Eldoret CBD · target 800+ words`,
+    'google-ad-warm': `Headline 1: Lunch Delivery Eldoret CBD\nHeadline 2: Fresh Kenyan Meals · KES 350\nHeadline 3: 30 Min Delivery Guaranteed\nDescription: Fresh ugali, beef stew, chapati. Delivered to Eldoret CBD offices in 30 min. Order by 12, eat by 1. WhatsApp today.`,
+    'meta-desc-warm': `Fresh lunch delivered to Eldoret CBD in 30 minutes. Order by 12, eat by 1. Ugali · chapati · beef stew · vegetarian options. WhatsApp 0782-XXX-XXX for today's menu.`
+};
+
+function buildPrompt() {
+    const task = document.getElementById('pTask').value;
+    const voice = document.getElementById('pVoice').value;
+    const audience = document.getElementById('pAudience').value;
+    const constraint = document.getElementById('pConstraint').value;
+    const context = document.getElementById('pContext').value;
+    const taskMap = {
+        'fb-headlines': 'Write 5 Facebook ad headlines',
+        'email-subject': 'Write 10 email subject lines',
+        'ig-caption': 'Write 1 Instagram post caption',
+        'whatsapp': 'Write a WhatsApp order confirmation message',
+        'blog-outline': 'Write a blog post outline (SEO-focused)',
+        'google-ad': 'Write a Google Search ad (headlines + description)',
+        'meta-desc': 'Write a meta description for an SEO page'
+    };
+    const voiceMap = {
+        'warm': 'warm, friendly, Kenyan English',
+        'professional': 'professional and corporate',
+        'playful': 'playful, casual, Gen Z',
+        'urgent': 'urgent, action-focused'
+    };
+
+    const prompt = `You are a Kenyan copywriter for a small business.
+
+TASK: ${taskMap[task]}.
+
+VOICE: ${voiceMap[voice]}.
+
+AUDIENCE: ${audience}.
+
+CONSTRAINTS: ${constraint}.
+
+BUSINESS CONTEXT: ${context}
+
+Output as a numbered list. Do not add commentary — just the copy.`;
+
+    document.getElementById('promptOut').textContent = prompt;
+
+    // Show sample output
+    const key = task + '-' + voice;
+    const output = SAMPLE_OUTPUTS[key] || SAMPLE_OUTPUTS['fb-headlines-warm'];
+    const g = document.getElementById('promptGenerated');
+    g.innerHTML = '<h5>✓ Sample AI output (Claude / ChatGPT would return something like this)</h5><pre style="font-family: inherit; white-space: pre-wrap;">' + output + '</pre>';
+    g.classList.add('show');
+}
+
+function markQuiz() {
+    const qs = document.querySelectorAll('.quiz-question'); let s = 0;
+    qs.forEach((q, i) => { const c = q.dataset.correct; const p = q.querySelector(`input[name="q${i+1}"]:checked`); q.classList.remove('correct','wrong'); if (p && p.value === c) { q.classList.add('correct'); s++; } else if (p) q.classList.add('wrong'); });
+    const su = document.getElementById('quizSummary'); su.classList.add('show');
+    document.getElementById('scoreDisplay').textContent = `${s} / 10`;
+    document.getElementById('scoreMessage').textContent = s === 10 ? 'Perfect. Move to 15.2 — AI for Visuals.' : s >= 7 ? 'Strong.' : 'Play with the prompt builder more.';
+    su.scrollIntoView({behavior:'smooth',block:'center'});
+}
+function resetQuiz() { document.querySelectorAll('.quiz-question').forEach(q => { q.classList.remove('correct','wrong'); q.querySelectorAll('input[type=radio]').forEach(r => r.checked = false); }); document.getElementById('quizSummary').classList.remove('show'); }
+</script>
+<style id="mtti-paginator-style">
+  section[data-mtti-page] { display: none !important; }
+  section[data-mtti-page].mtti-active { display: block !important; }
+  #mtti-paginator-bar {
+    position: sticky; bottom: 0; left: 0; right: 0;
+    background: #fff; border-top: 2px solid #e2e8f0;
+    padding: 12px 20px; margin-top: 20px;
+    display: flex; align-items: center; justify-content: space-between; gap: 12px;
+    font-family: 'Segoe UI', -apple-system, sans-serif;
+    box-shadow: 0 -4px 16px rgba(0,0,0,0.08);
+    z-index: 100;
+  }
+  #mtti-paginator-bar button {
+    background: #2E7D32; color: #fff; border: none; padding: 10px 18px;
+    border-radius: 8px; font-size: 13px; font-weight: 600; cursor: pointer;
+  }
+  #mtti-paginator-bar button:disabled { background: #cbd5e1; cursor: not-allowed; }
+  #mtti-paginator-bar button.mtti-prev { background: #64748b; }
+  #mtti-paginator-progress { font-size: 12px; color: #64748b; font-weight: 600; }
+</style>
+<script id="mtti-paginator-script">
+(function(){
+  function init(){
+    var sections = Array.prototype.slice.call(document.querySelectorAll('section[id]'));
+    // Only sections that are real content blocks (has an <h2>), skip stray/decorative ones.
+    sections = sections.filter(function(s){ return s.querySelector('h2'); });
+    if (sections.length < 2) return; // nothing to paginate
+
+    sections.forEach(function(s, i){ s.setAttribute('data-mtti-page', i); });
+    var current = 0;
+
+    var bar = document.createElement('div');
+    bar.id = 'mtti-paginator-bar';
+    bar.innerHTML =
+      '<button class="mtti-prev" id="mtti-pg-prev">← Previous</button>' +
+      '<span id="mtti-paginator-progress"></span>' +
+      '<button id="mtti-pg-next">Next →</button>';
+    sections[sections.length - 1].insertAdjacentElement('afterend', bar);
+
+    var prevBtn = bar.querySelector('#mtti-pg-prev');
+    var nextBtn = bar.querySelector('#mtti-pg-next');
+    var progress = bar.querySelector('#mtti-paginator-progress');
+
+    function render(){
+      sections.forEach(function(s, i){ s.classList.toggle('mtti-active', i === current); });
+      prevBtn.disabled = (current === 0);
+      nextBtn.textContent = (current === sections.length - 1) ? 'Done ✓' : 'Next →';
+      progress.textContent = 'Section ' + (current + 1) + ' of ' + sections.length;
+      window.scrollTo(0, 0);
+    }
+    prevBtn.addEventListener('click', function(){ if (current > 0) { current--; render(); } });
+    nextBtn.addEventListener('click', function(){
+      if (current < sections.length - 1) { current++; render(); }
+    });
+    render();
+  }
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', init);
+  } else {
+    init();
+  }
+})();
+</script>
+</body></html>

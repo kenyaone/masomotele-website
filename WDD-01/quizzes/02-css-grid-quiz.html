@@ -112,6 +112,23 @@
         @keyframes slideUp { from { opacity: 0; transform: translateY(15px); } to { opacity: 1; transform: translateY(0); } }
         @keyframes shake { 0%,100% { transform: translateX(0); } 25% { transform: translateX(-8px); } 75% { transform: translateX(8px); } }
         @keyframes bounceIn { 0% { opacity: 0; transform: scale(0.4); } 60% { transform: scale(1.05); } 100% { opacity: 1; transform: scale(1); } }
+    
+        /* How-To intro screen — shown before question 1, not scored */
+        .howto-card { background: white; color: #333; border-radius: 25px; padding: 35px; margin-bottom: 20px; box-shadow: 0 20px 60px rgba(0,0,0,0.3); }
+        .howto-card h3 { font-family: 'Fredoka', sans-serif; font-size: 1.3em; margin-bottom: 12px; color: #667eea; }
+        .howto-card p { line-height: 1.6; margin-bottom: 16px; color: #444; }
+        .howto-field { background: #f5f7fb; border: 2px solid transparent; border-radius: 12px; padding: 16px 18px; margin-bottom: 14px; }
+        .howto-field label { display: block; font-weight: 700; font-family: 'Fredoka', sans-serif; margin-bottom: 8px; font-size: 0.95em; }
+        .howto-field select { width: 100%; padding: 10px 12px; border-radius: 8px; border: 2px solid #ddd; font-family: 'Space Mono', monospace; font-size: 0.95em; background: #fff; color: #333; }
+        .howto-field.hf-correct { border-color: #28a745; }
+        .howto-field.hf-correct select { border-color: #28a745; background: #f0fff4; }
+        .howto-field.hf-wrong { border-color: #dc3545; }
+        .howto-field.hf-wrong select { border-color: #dc3545; background: #fff5f5; }
+        .howto-banner { margin-top: 4px; margin-bottom: 18px; padding: 12px 16px; border-radius: 10px; font-size: 0.9em; font-weight: 700; display: none; }
+        .howto-banner.show { display: block; }
+        .howto-banner.ok { background: #d4edda; color: #155724; }
+        .howto-banner.fail { background: #f8d7da; color: #721c24; }
+        .start-quiz-btn { margin-top: 4px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; border: none; padding: 14px 32px; border-radius: 12px; font-size: 1em; cursor: pointer; font-family: 'Fredoka', sans-serif; box-shadow: 0 6px 18px rgba(0,0,0,0.2); }
     </style>
 </head>
 <body>
@@ -340,7 +357,60 @@
             renderQuestion();
         }
 
-        renderQuestion();
+
+        /* How-To intro — a small, ungraded field-check demo shown before the
+           quiz starts, directly rehearsing the "pick the grid-column value that spans a hero banner across every column" mechanic
+           that one of the quiz scenarios asks about, so it is not being
+           asked cold. */
+        const HOWTO_FIELDS = [
+            { id: 'hf1', label: 'grid-column value for the hero banner:', options: [
+                { value: '', text: '-- choose a value --' },
+                { value: 'width: 100%;', text: 'width: 100%;' },
+                { value: 'grid-row: span 3;', text: 'grid-row: span 3;' },
+                { value: 'grid-column: 1 / -1;', text: 'grid-column: 1 / -1;' },
+                { value: 'flex: 1 1 100%;', text: 'flex: 1 1 100%;' }
+            ], target: 'grid-column: 1 / -1;' }
+        ];
+
+        function renderHowtoFields(marks) {
+            document.getElementById('howtoFields').innerHTML = HOWTO_FIELDS.map((f, i) => {
+                const cls = marks ? (marks[i] ? 'hf-correct' : 'hf-wrong') : '';
+                const opts = f.options.map(o => `<option value="${o.value}">${o.text}</option>`).join('');
+                return `<div class="howto-field ${cls}">
+                    <label for="${f.id}">${f.label}</label>
+                    <select id="${f.id}">${opts}</select>
+                </div>`;
+            }).join('');
+        }
+
+        function checkHowtoFields() {
+            const marks = HOWTO_FIELDS.map(f => document.getElementById(f.id).value === f.target);
+            renderHowtoFields(marks);
+            const allOk = marks.every(m => m);
+            const banner = document.getElementById('howtoBanner');
+            banner.classList.add('show');
+            banner.className = 'howto-banner show ' + (allOk ? 'ok' : 'fail');
+            banner.textContent = allOk
+                ? 'That is exactly the fix — grid-column: 1 / -1 spans from the first grid line to the last, so the hero banner stretches across all 3 columns no matter how many there are.'
+                : 'Not yet — the hero banner is still confined to one column. Pick the grid-column value that spans from line 1 to the last line.';
+        }
+
+        function renderHowto() {
+            document.getElementById('exerciseCard').innerHTML = `
+                <div class="howto-card">
+                    <h3>🔍 Quick How-To: Spanning a Grid Item Across All Columns</h3>
+                    <p>One of the scenarios coming up asks about this exact situation: James wants a hero banner to stretch across every column of his 3-column product grid. Here is the fix: set the correct grid-column value on the banner. Try picking the right value below, then check your work.</p>
+                    <div id="howtoFields"></div>
+                    <div class="howto-banner" id="howtoBanner"></div>
+                    <button class="start-quiz-btn" id="checkHowtoBtn">Check My Fix</button>
+                    <button class="start-quiz-btn" id="startQuizBtn" style="margin-left:10px;background:linear-gradient(135deg,#28a745,#1e7e34);">Start Quiz →</button>
+                </div>`;
+            renderHowtoFields();
+            document.getElementById('checkHowtoBtn').addEventListener('click', checkHowtoFields);
+            document.getElementById('startQuizBtn').addEventListener('click', renderQuestion);
+        }
+
+        renderHowto();
     </script>
 </body>
 </html>

@@ -1,0 +1,506 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lesson 14.3 — Optimising the Listing (Interactive)</title>
+<style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: 'Segoe UI', -apple-system, Roboto, sans-serif; line-height: 1.55; color: #0f172a; background: #f8fafc; min-height: 100vh; }
+    .container { max-width: 1200px; margin: 0 auto; padding: 20px; }
+    header {
+        background: linear-gradient(135deg, #2E7D32, #1B5E20);
+        color: #fff; padding: 40px 30px; border-radius: 12px; margin-bottom: 24px;
+        box-shadow: 0 10px 30px rgba(26,115,232,0.25);
+    }
+    header .badge { display: inline-block; background: rgba(255,255,255,0.2); padding: 4px 14px; border-radius: 16px; font-size: 12px; font-weight: bold; letter-spacing: 1px; margin-bottom: 14px; }
+    header h1 { font-size: 32px; margin-bottom: 8px; }
+    header .subtitle { font-size: 17px; opacity: 0.95; margin-bottom: 20px; }
+    .meta-strip { display: flex; flex-wrap: wrap; gap: 12px; }
+    .meta-strip span { background: rgba(255,255,255,0.18); padding: 6px 14px; border-radius: 20px; font-size: 13px; }
+    .toc { background: #fff; border: 1px solid #e2e8f0; border-radius: 10px; padding: 22px 26px; margin-bottom: 22px; }
+    .toc h3 { color: #1a73e8; margin-bottom: 10px; }
+    .toc ol { padding-left: 20px; }
+    .toc a { color: #1a73e8; text-decoration: none; font-weight: 600; }
+    section { background: #fff; border: 1px solid #e2e8f0; border-radius: 10px; padding: 26px 30px; margin-bottom: 22px; }
+    section h2 { color: #1a73e8; font-size: 22px; margin-bottom: 12px; padding-bottom: 8px; border-bottom: 3px solid #1a73e8; }
+    section h3 { color: #0f172a; font-size: 17px; margin: 18px 0 8px; }
+    section p { margin-bottom: 12px; }
+    .callout { border-left: 5px solid #1a73e8; background: #e8f0fe; padding: 14px 18px; margin: 14px 0; border-radius: 4px; }
+    .callout.warn { border-left-color: #ea4335; background: #fef2f2; }
+    .callout.tip { border-left-color: #34a853; background: #ecfdf5; }
+    .callout strong { color: #1a73e8; }
+    .callout.warn strong { color: #ea4335; }
+    .callout.tip strong { color: #34a853; }
+
+    /* Business Profile Manager mock */
+    .bpm { background: #fff; border: 1px solid #dadce0; border-radius: 12px; overflow: hidden; margin: 16px 0; }
+    .bpm-top { background: #fff; padding: 10px 20px; display: flex; align-items: center; gap: 12px; border-bottom: 1px solid #ebedf0; font-size: 14px; }
+    .bpm-top .g { display: inline-flex; align-items: center; font-weight: 500; }
+    .bpm-top .g::before { content: 'G'; background: linear-gradient(45deg, #4285f4, #ea4335, #fbbc04, #34a853); background-clip: text; -webkit-background-clip: text; color: #ea4335; width: 22px; height: 22px; border-radius: 50%; display: inline-flex; align-items: center; justify-content: center; font-size: 14px; font-weight: bold; margin-right: 10px; border: 1px solid #dadce0; }
+    .bpm-top .prop { background: #f1f3f4; padding: 4px 12px; border-radius: 4px; font-size: 12px; color: #5f6368; }
+    .bpm-body { display: grid; grid-template-columns: 200px 1fr; min-height: 500px; }
+    @media (max-width: 850px) { .bpm-body { grid-template-columns: 1fr; } .bpm-sidebar { display: flex; overflow-x: auto; } }
+    .bpm-sidebar { background: #fff; border-right: 1px solid #ebedf0; padding: 10px 0; font-size: 13px; }
+    .bpm-menu { padding: 10px 20px; color: #202124; cursor: pointer; border-left: 3px solid transparent; white-space: nowrap; }
+    .bpm-menu:hover { background: #f1f3f4; }
+    .bpm-menu.active { border-left-color: #1a73e8; color: #1a73e8; background: #e8f0fe; font-weight: 500; }
+    .bpm-menu .ic { display: inline-block; width: 20px; margin-right: 8px; }
+    .bpm-content { padding: 22px; background: #fafafa; }
+    .bpm-tab-panel { display: none; }
+    .bpm-tab-panel.active { display: block; }
+
+    .field { background: #fff; border: 1px solid #dadce0; border-radius: 8px; padding: 16px; margin-bottom: 14px; }
+    .field-label { font-size: 12px; color: #5f6368; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 4px; font-weight: 600; }
+    .field-value { font-size: 15px; color: #202124; }
+    .field select, .field input[type=text], .field textarea { width: 100%; padding: 8px 10px; border: 1px solid #dadce0; border-radius: 6px; font-size: 14px; font-family: inherit; }
+    .field textarea { min-height: 140px; resize: vertical; }
+
+    /* Category pills */
+    .pills { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 8px; }
+    .pill { background: #e8f0fe; color: #1a73e8; padding: 5px 12px; border-radius: 16px; font-size: 12px; font-weight: 500; display: inline-flex; align-items: center; gap: 6px; }
+    .pill .x { cursor: pointer; opacity: 0.6; }
+    .pill.add { background: #f1f3f4; color: #5f6368; cursor: pointer; border: 1px dashed #dadce0; }
+
+    .char-count { font-size: 12px; color: #5f6368; text-align: right; margin-top: 4px; }
+    .char-count.warn { color: #d97706; }
+    .char-count.err { color: #ea4335; }
+    .kw-highlight { background: #fff59d; padding: 0 2px; border-radius: 2px; }
+    .kw-panel { background: #f0fdf4; border: 1px solid #34a853; border-radius: 8px; padding: 10px 12px; margin-top: 8px; font-size: 13px; color: #137333; }
+
+    /* Attributes toggles */
+    .attrs { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 10px; margin-top: 10px; }
+    .attr { display: flex; align-items: center; justify-content: space-between; padding: 10px 14px; background: #fff; border: 1px solid #dadce0; border-radius: 6px; font-size: 14px; cursor: pointer; }
+    .attr .switch { width: 34px; height: 18px; background: #dadce0; border-radius: 9px; position: relative; transition: background 0.2s; }
+    .attr .switch::after { content: ''; position: absolute; top: 2px; left: 2px; width: 14px; height: 14px; background: #fff; border-radius: 50%; transition: left 0.2s; }
+    .attr.on { border-color: #1a73e8; background: #e8f0fe; color: #1557b0; font-weight: 500; }
+    .attr.on .switch { background: #1a73e8; }
+    .attr.on .switch::after { left: 18px; }
+
+    /* Hours */
+    .hours-grid { display: grid; grid-template-columns: 90px 120px 20px 120px; gap: 8px; align-items: center; margin-bottom: 6px; font-size: 14px; }
+    @media (max-width: 500px) { .hours-grid { grid-template-columns: 80px 1fr; } }
+    .hours-grid .day { color: #202124; font-weight: 500; }
+    .hours-grid input { padding: 6px 8px; border: 1px solid #dadce0; border-radius: 4px; font-size: 13px; }
+
+    .holiday-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 10px; margin: 10px 0; }
+    .holiday-card { background: #fff; border: 1px solid #dadce0; border-radius: 8px; padding: 12px; }
+    .holiday-card .h-name { font-weight: 600; color: #202124; font-size: 14px; margin-bottom: 3px; }
+    .holiday-card .h-date { color: #5f6368; font-size: 12px; margin-bottom: 6px; }
+    .holiday-card select { width: 100%; padding: 6px 8px; border: 1px solid #dadce0; border-radius: 4px; font-size: 12px; }
+
+    /* Photos checklist */
+    .photo-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 10px; margin: 10px 0; }
+    .photo-slot { background: #fff; border: 2px dashed #dadce0; border-radius: 8px; padding: 20px 10px; text-align: center; cursor: pointer; transition: all 0.2s; position: relative; }
+    .photo-slot:hover { border-color: #1a73e8; background: #f0f5ff; }
+    .photo-slot .p-icon { font-size: 28px; margin-bottom: 6px; color: #5f6368; }
+    .photo-slot .p-label { font-size: 13px; color: #202124; font-weight: 500; }
+    .photo-slot .p-sub { font-size: 11px; color: #5f6368; }
+    .photo-slot.uploaded { border-style: solid; border-color: #34a853; background: #e6f4ea; }
+    .photo-slot.uploaded .p-icon { color: #137333; }
+    .photo-slot.uploaded .p-icon::before { content: '\2713'; }
+
+    /* Completeness score */
+    .score-panel { background: linear-gradient(135deg, #e8f0fe 0%, #f8fafc 100%); border: 2px solid #1a73e8; border-radius: 12px; padding: 20px; margin: 16px 0; text-align: center; }
+    .score-panel .num { font-size: 48px; font-weight: bold; color: #1a73e8; }
+    .score-panel .lbl { color: #5f6368; font-size: 14px; margin-bottom: 12px; }
+    .score-bar { height: 10px; background: #dadce0; border-radius: 5px; overflow: hidden; margin-top: 8px; }
+    .score-bar-fill { height: 100%; background: linear-gradient(90deg, #1a73e8, #34a853); transition: width 0.4s; }
+
+    .check-btn { background: #1a73e8; color: #fff; border: 0; padding: 10px 20px; border-radius: 6px; cursor: pointer; font-weight: 600; font-size: 14px; margin-top: 12px; }
+    .check-btn:hover { background: #1557b0; }
+    .verdict { display: none; padding: 14px 18px; margin-top: 12px; border-radius: 8px; font-size: 14px; }
+    .verdict.show { display: block; }
+    .verdict.pass { background: #e6f4ea; color: #137333; border-left: 4px solid #34a853; }
+    .verdict.fail { background: #fef2f2; color: #991b1b; border-left: 4px solid #ea4335; }
+
+    footer { text-align: center; color: #64748b; padding: 24px; font-size: 13px; }
+
+    /* MTTI logo stamp */
+    .mtti-logo-stamp {
+        position: fixed; top: 14px; right: 18px; z-index: 999;
+        opacity: 0.88; transition: opacity 0.2s;
+    }
+    .mtti-logo-stamp:hover { opacity: 1; }
+    .mtti-logo-stamp img { width: 56px; height: 56px; border-radius: 50%; box-shadow: 0 2px 8px rgba(0,0,0,0.18); }
+</style>
+</head>
+<body>
+<div class="mtti-logo-stamp">
+    <img src="../../Resources/Logo.jpeg" alt="MTTI" title="Masomotele Technical Training Institute — Start learning, Start earning">
+</div>
+
+<div class="container">
+
+<header>
+    <div class="badge">LESSON 14.3  ·  GOOGLE BUSINESS PROFILE  ·  INTERACTIVE</div>
+    <h1>Optimising the Listing</h1>
+    <div class="subtitle">Every field filled ranks 1.4 positions higher on average. Drive the completeness score to 100% for Karibu Kitchen.</div>
+    <div class="meta-strip">
+        <span><strong>Duration:</strong> ~40 min interactive</span>
+        <span><strong>Level:</strong> Intermediate</span>
+        <span><strong>Tool:</strong> Business Profile Manager</span>
+        <span><strong>Handbook:</strong> Module 14, &sect;14.3</span>
+    </div>
+</header>
+
+<div class="toc">
+    <h3>What you'll do in this lesson</h3>
+    <ol>
+        <li><a href="#s1">Business Profile Manager tour</a></li>
+        <li><a href="#s2"><strong>Info tab &mdash; categories, description, attributes</strong></a></li>
+        <li><a href="#s3">Hours &mdash; regular + Kenyan special hours</a></li>
+        <li><a href="#s4">Photos &mdash; minimum-photo checklist</a></li>
+        <li><a href="#s5"><strong>Auto-marked challenge: hit 100% completeness</strong></a></li>
+    </ol>
+</div>
+
+<section id="s1">
+    <h2>1. Business Profile Manager tour</h2>
+    <p>Sarah's listing is verified. Now every empty field is a ranking factor sitting unused. Click each sidebar tab.</p>
+
+    <div class="bpm">
+        <div class="bpm-top">
+            <span class="g">Business Profile Manager</span>
+            <span class="prop">Karibu Kitchen &middot; Kapsoya</span>
+        </div>
+        <div class="bpm-body">
+            <div class="bpm-sidebar">
+                <div class="bpm-menu active" data-tab="info" onclick="showTab(this)"><span class="ic">&#9432;</span>Info</div>
+                <div class="bpm-menu" data-tab="photos" onclick="showTab(this)"><span class="ic">&#128247;</span>Photos</div>
+                <div class="bpm-menu" data-tab="products" onclick="showTab(this)"><span class="ic">&#128230;</span>Products</div>
+                <div class="bpm-menu" data-tab="services" onclick="showTab(this)"><span class="ic">&#128203;</span>Services</div>
+                <div class="bpm-menu" data-tab="hours" onclick="showTab(this)"><span class="ic">&#128340;</span>Hours</div>
+                <div class="bpm-menu" data-tab="reviews" onclick="showTab(this)"><span class="ic">&#9733;</span>Reviews</div>
+                <div class="bpm-menu" data-tab="insights" onclick="showTab(this)"><span class="ic">&#128200;</span>Insights</div>
+            </div>
+            <div class="bpm-content">
+
+                <div class="bpm-tab-panel active" id="tab-info">
+                    <h3 style="margin-top:0;">Business information</h3>
+
+                    <div class="field">
+                        <div class="field-label">Business name</div>
+                        <div class="field-value">Karibu Kitchen</div>
+                    </div>
+
+                    <div class="field">
+                        <div class="field-label">Primary category</div>
+                        <select id="primCat" onchange="onEdit()">
+                            <option value="meal">Meal delivery service</option>
+                            <option value="restaurant">Restaurant</option>
+                            <option value="caterer">Caterer</option>
+                            <option value="african">African restaurant</option>
+                            <option value="fastfood">Fast food restaurant</option>
+                        </select>
+                    </div>
+
+                    <div class="field">
+                        <div class="field-label">Additional categories (up to 9)</div>
+                        <div class="pills" id="addCats">
+                            <span class="pill">Caterer <span class="x" onclick="removeCat(this)">&times;</span></span>
+                            <span class="pill">African restaurant <span class="x" onclick="removeCat(this)">&times;</span></span>
+                            <span class="pill">Delivery service <span class="x" onclick="removeCat(this)">&times;</span></span>
+                            <span class="pill">Restaurant <span class="x" onclick="removeCat(this)">&times;</span></span>
+                            <span class="pill add" onclick="addCat()">+ Add category</span>
+                        </div>
+                    </div>
+
+                    <div class="field">
+                        <div class="field-label">Business description (750 chars max)</div>
+                        <textarea id="desc" oninput="checkDesc()">Karibu Kitchen is Eldoret's fast, affordable lunch delivery service, based in Kapsoya and delivering across Eldoret CBD, Elgon View, Racecourse and Pioneer. We prepare fresh Kenyan meals every day &mdash; ugali sukuma, pilau, chapati beans, nyama choma and more. Same-day office catering. Delivery within 30 minutes. Order on WhatsApp or through karibukitchen.co.ke. Halal options. Woman-owned. M-Pesa accepted.</textarea>
+                        <div class="char-count" id="charCount">0 / 750</div>
+                        <div class="kw-panel" id="kwPanel">Keyword scan: pending.</div>
+                    </div>
+
+                    <div class="field">
+                        <div class="field-label">Attributes</div>
+                        <div class="attrs" id="attrs">
+                            <div class="attr on" onclick="toggleAttr(this)"><span>Delivery</span><span class="switch"></span></div>
+                            <div class="attr on" onclick="toggleAttr(this)"><span>Takeaway</span><span class="switch"></span></div>
+                            <div class="attr on" onclick="toggleAttr(this)"><span>Dine-in</span><span class="switch"></span></div>
+                            <div class="attr" onclick="toggleAttr(this)"><span>Wheelchair accessible</span><span class="switch"></span></div>
+                            <div class="attr" onclick="toggleAttr(this)"><span>Women-owned</span><span class="switch"></span></div>
+                            <div class="attr" onclick="toggleAttr(this)"><span>Accepts M-Pesa</span><span class="switch"></span></div>
+                            <div class="attr" onclick="toggleAttr(this)"><span>Halal options</span><span class="switch"></span></div>
+                            <div class="attr" onclick="toggleAttr(this)"><span>Vegetarian options</span><span class="switch"></span></div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="bpm-tab-panel" id="tab-photos">
+                    <h3 style="margin-top:0;">Photo checklist &mdash; minimum 6 types</h3>
+                    <p style="color:#5f6368;font-size:13px;">Click a slot to mark it uploaded. Businesses with photos get 42% more direction requests.</p>
+                    <div class="photo-grid" id="photoGrid">
+                        <div class="photo-slot" data-type="logo" onclick="togglePhoto(this)"><div class="p-icon">&#128247;</div><div class="p-label">Logo</div><div class="p-sub">300 &times; 300</div></div>
+                        <div class="photo-slot" data-type="cover" onclick="togglePhoto(this)"><div class="p-icon">&#128247;</div><div class="p-label">Cover</div><div class="p-sub">16:9 landscape</div></div>
+                        <div class="photo-slot" data-type="interior" onclick="togglePhoto(this)"><div class="p-icon">&#128247;</div><div class="p-label">Interior</div><div class="p-sub">Kitchen shot</div></div>
+                        <div class="photo-slot" data-type="exterior" onclick="togglePhoto(this)"><div class="p-icon">&#128247;</div><div class="p-label">Exterior</div><div class="p-sub">Signage visible</div></div>
+                        <div class="photo-slot" data-type="product" onclick="togglePhoto(this)"><div class="p-icon">&#128247;</div><div class="p-label">Product</div><div class="p-sub">Pilau, ugali, chapati</div></div>
+                        <div class="photo-slot" data-type="team" onclick="togglePhoto(this)"><div class="p-icon">&#128247;</div><div class="p-label">Team</div><div class="p-sub">Sarah + cooks</div></div>
+                    </div>
+                    <div class="callout tip"><strong>Refresh monthly.</strong> Google reads photo recency as an activity signal.</div>
+                </div>
+
+                <div class="bpm-tab-panel" id="tab-hours">
+                    <h3 style="margin-top:0;">Regular hours</h3>
+                    <div class="field">
+                        <div class="hours-grid"><span class="day">Monday</span><input type="text" value="10:00"><span>&ndash;</span><input type="text" value="21:00"></div>
+                        <div class="hours-grid"><span class="day">Tuesday</span><input type="text" value="10:00"><span>&ndash;</span><input type="text" value="21:00"></div>
+                        <div class="hours-grid"><span class="day">Wednesday</span><input type="text" value="10:00"><span>&ndash;</span><input type="text" value="21:00"></div>
+                        <div class="hours-grid"><span class="day">Thursday</span><input type="text" value="10:00"><span>&ndash;</span><input type="text" value="21:00"></div>
+                        <div class="hours-grid"><span class="day">Friday</span><input type="text" value="10:00"><span>&ndash;</span><input type="text" value="21:00"></div>
+                        <div class="hours-grid"><span class="day">Saturday</span><input type="text" value="10:00"><span>&ndash;</span><input type="text" value="21:00"></div>
+                        <div class="hours-grid"><span class="day">Sunday</span><input type="text" value="12:00"><span>&ndash;</span><input type="text" value="20:00"></div>
+                    </div>
+
+                    <h3>Special hours &mdash; Kenyan public holidays</h3>
+                    <div class="holiday-grid">
+                        <div class="holiday-card"><div class="h-name">Madaraka Day</div><div class="h-date">1 June</div><select><option>Closed</option><option>Half day</option><option>Open</option></select></div>
+                        <div class="holiday-card"><div class="h-name">Mashujaa Day</div><div class="h-date">20 October</div><select><option>Half day (10:00&ndash;14:00)</option><option>Closed</option><option>Open</option></select></div>
+                        <div class="holiday-card"><div class="h-name">Jamhuri Day</div><div class="h-date">12 December</div><select><option>Closed</option><option>Half day</option><option>Open</option></select></div>
+                        <div class="holiday-card"><div class="h-name">Christmas Day</div><div class="h-date">25 December</div><select><option>Closed</option><option>Half day</option><option>Open</option></select></div>
+                        <div class="holiday-card"><div class="h-name">Boxing Day</div><div class="h-date">26 December</div><select><option>Half day (12:00&ndash;18:00)</option><option>Closed</option><option>Open</option></select></div>
+                        <div class="holiday-card"><div class="h-name">Idd ul-Fitr</div><div class="h-date">Varies</div><select><option>Closed</option><option>Half day</option><option>Open</option></select></div>
+                    </div>
+                    <div class="callout warn"><strong>Wrong hours = worst customer experience.</strong> Google penalises listings that mislead searchers about opening times.</div>
+                </div>
+
+                <div class="bpm-tab-panel" id="tab-products">
+                    <h3 style="margin-top:0;">Menu items &mdash; every dish is a keyword</h3>
+                    <div class="field"><div class="field-label">Item</div>Ugali Sukuma &mdash; <strong>KES 350</strong></div>
+                    <div class="field"><div class="field-label">Item</div>Pilau Beef &mdash; <strong>KES 500</strong></div>
+                    <div class="field"><div class="field-label">Item</div>Chapati Beans Stew &mdash; <strong>KES 300</strong></div>
+                    <div class="field"><div class="field-label">Item</div>Nyama Choma Platter (small) &mdash; <strong>KES 750</strong></div>
+                </div>
+                <div class="bpm-tab-panel" id="tab-services"><h3 style="margin-top:0;">Services</h3><div class="field">Lunch delivery &mdash; KES 300&ndash;700</div><div class="field">Dinner delivery &mdash; KES 350&ndash;750</div><div class="field">Bulk office catering &mdash; from KES 4,000</div></div>
+                <div class="bpm-tab-panel" id="tab-reviews"><h3 style="margin-top:0;">Reviews</h3><p style="color:#5f6368;">Managed in detail in Lesson 14.4.</p></div>
+                <div class="bpm-tab-panel" id="tab-insights"><h3 style="margin-top:0;">Insights</h3><p style="color:#5f6368;">Covered in Lesson 14.5.</p></div>
+
+            </div>
+        </div>
+    </div>
+</section>
+
+<section id="s2">
+    <h2>2. The 750-character business description &mdash; keyword logic</h2>
+    <p>Google gives you 750 characters, but only the first <strong>250</strong> show without a "more" click. Every high-value keyword lives in the first 250 chars. Keywords watched:</p>
+    <ul style="padding-left: 22px; margin-bottom: 12px;">
+        <li><strong>lunch delivery</strong> &mdash; the target discovery query</li>
+        <li><strong>Eldoret</strong> &mdash; the town</li>
+        <li><strong>Kapsoya</strong> &mdash; the neighbourhood</li>
+    </ul>
+    <p>Edit the textarea in the mock above. The green panel shows a live keyword scan.</p>
+    <div class="callout tip">
+        <strong>Natural writing beats stuffing.</strong> Google's algorithm penalises listings that repeat "lunch delivery Eldoret" seven times. Write the way a real customer would explain the business to a friend.
+    </div>
+</section>
+
+<section id="s3">
+    <h2>3. Attributes and hours &mdash; the small ticks that move filters</h2>
+    <p>Attributes decide which <em>filters</em> your listing appears under. If a searcher taps "delivery" in the Google Maps filter panel and you haven't ticked Delivery, you are invisible for that whole search &mdash; even if you deliver.</p>
+    <p>Regular hours + <strong>special hours</strong> is the difference between "the food was hot" and "I drove there and they were closed for Madaraka Day". Special hours prevent the #1 worst customer experience.</p>
+</section>
+
+<section id="s4">
+    <h2>4. Photos &mdash; minimum 10 across 6 types</h2>
+    <p>Click the Photos tab in the mock. Each of the 6 required slots turns green when uploaded. Google's own data: businesses with photos get <strong>42% more direction requests</strong> and <strong>35% more website clicks</strong>.</p>
+</section>
+
+<section id="s5">
+    <h2>5. Challenge &mdash; drive completeness to 100%</h2>
+    <p>The score updates live as you edit fields above. Aim for 100%.</p>
+
+    <div class="score-panel">
+        <div class="num" id="scoreNum">0%</div>
+        <div class="lbl">Profile completeness score</div>
+        <div class="score-bar"><div class="score-bar-fill" id="scoreFill" style="width:0%;"></div></div>
+    </div>
+
+    <button class="check-btn" onclick="checkAll()">Mark my profile</button>
+
+    <div class="verdict" id="verdict"></div>
+
+    <div class="callout">
+        <strong>The ranking payoff:</strong> Google's own studies show fully-filled profiles rank <strong>1.4 positions higher</strong> on average than half-filled ones. For "lunch delivery Eldoret" that is the difference between position four (below the fold) and position one (the first tap).
+    </div>
+</section>
+
+<footer>
+    <p>Lesson 14.3 &middot; Google Business Profile &middot; Masomotele Technical Training Institute &middot; Module 14, &sect;14.3</p>
+    <p>Next: <strong>Lesson 14.4 &mdash; Reviews + Q&amp;A + Google Posts</strong></p>
+</footer>
+</div>
+
+<script>
+function showTab(el) {
+    document.querySelectorAll('.bpm-menu').forEach(m => m.classList.remove('active'));
+    document.querySelectorAll('.bpm-tab-panel').forEach(p => p.classList.remove('active'));
+    el.classList.add('active');
+    document.getElementById('tab-' + el.dataset.tab).classList.add('active');
+}
+
+function removeCat(x) {
+    x.parentElement.remove();
+    onEdit();
+}
+function addCat() {
+    const options = ['Restaurant','Fast food restaurant','Bulk catering','Halal restaurant','Vegetarian restaurant'];
+    const existing = Array.from(document.querySelectorAll('#addCats .pill:not(.add)')).map(p => p.textContent.trim().replace('&times;','').trim());
+    const next = options.find(o => !existing.some(e => e.startsWith(o)));
+    if (!next) return;
+    const pill = document.createElement('span');
+    pill.className = 'pill';
+    pill.innerHTML = next + ' <span class="x" onclick="removeCat(this)">&times;</span>';
+    const add = document.querySelector('#addCats .pill.add');
+    add.parentElement.insertBefore(pill, add);
+    onEdit();
+}
+
+function toggleAttr(el) {
+    el.classList.toggle('on');
+    onEdit();
+}
+function togglePhoto(el) {
+    el.classList.toggle('uploaded');
+    onEdit();
+}
+
+function checkDesc() {
+    const t = document.getElementById('desc').value;
+    const len = t.length;
+    const cc = document.getElementById('charCount');
+    cc.textContent = len + ' / 750';
+    cc.className = 'char-count' + (len > 700 ? ' err' : (len > 600 ? ' warn' : ''));
+
+    const first250 = t.slice(0, 250).toLowerCase();
+    const hasLunch = first250.includes('lunch delivery');
+    const hasEld = first250.includes('eldoret');
+    const hasKap = first250.includes('kapsoya');
+
+    const p = document.getElementById('kwPanel');
+    let count = 0;
+    ['lunch delivery','eldoret','kapsoya'].forEach(k => { if (first250.includes(k)) count++; });
+    p.innerHTML = 'Keyword scan (first 250 chars): '
+        + (hasLunch ? '&check; <strong>lunch delivery</strong> &nbsp;' : '&times; lunch delivery &nbsp;')
+        + (hasEld ? '&check; <strong>Eldoret</strong> &nbsp;' : '&times; Eldoret &nbsp;')
+        + (hasKap ? '&check; <strong>Kapsoya</strong>' : '&times; Kapsoya');
+    p.style.background = count === 3 ? '#f0fdf4' : (count >= 2 ? '#fef7e0' : '#fef2f2');
+    p.style.borderColor = count === 3 ? '#34a853' : (count >= 2 ? '#fbbc04' : '#ea4335');
+    p.style.color = count === 3 ? '#137333' : (count >= 2 ? '#78350f' : '#991b1b');
+    onEdit();
+}
+
+function calcScore() {
+    let score = 0;
+    // Primary category (10)
+    if (document.getElementById('primCat').value === 'meal') score += 10;
+    // Additional categories (10) &mdash; need 3+
+    const addN = document.querySelectorAll('#addCats .pill:not(.add)').length;
+    score += Math.min(addN, 4) * 2.5;
+    // Description present + keywords in first 250 (25)
+    const t = document.getElementById('desc').value;
+    if (t.length > 200 && t.length <= 750) score += 10;
+    const first250 = t.slice(0, 250).toLowerCase();
+    if (first250.includes('lunch delivery')) score += 5;
+    if (first250.includes('eldoret')) score += 5;
+    if (first250.includes('kapsoya')) score += 5;
+    // Attributes (15) &mdash; need 6+ on
+    const attrsOn = document.querySelectorAll('.attr.on').length;
+    score += Math.min(attrsOn, 6) * 2.5;
+    // Photos (30) &mdash; all 6 slots
+    const photosOn = document.querySelectorAll('.photo-slot.uploaded').length;
+    score += photosOn * 5;
+    return Math.min(Math.round(score), 100);
+}
+
+function onEdit() {
+    const s = calcScore();
+    document.getElementById('scoreNum').textContent = s + '%';
+    document.getElementById('scoreFill').style.width = s + '%';
+}
+
+function checkAll() {
+    const s = calcScore();
+    const v = document.getElementById('verdict');
+    v.classList.add('show');
+    if (s >= 100) {
+        v.className = 'verdict show pass';
+        v.innerHTML = '<strong>100% complete.</strong> Every field filled, all photos uploaded, all keywords in the first 250 chars, 6+ attributes on. This is the profile that ranks 1.4 positions higher on "lunch delivery Eldoret". Ready for Lesson 14.4 &mdash; reviews.';
+    } else if (s >= 80) {
+        v.className = 'verdict show pass';
+        v.innerHTML = '<strong>' + s + '% &mdash; strong, but not 100.</strong> Check the Photos tab (6 slots), attributes (6+ on), and confirm all 3 keywords appear in the first 250 chars of the description.';
+    } else {
+        v.className = 'verdict show fail';
+        v.innerHTML = '<strong>' + s + '% &mdash; too low to compete.</strong> Click the Photos tab and upload all 6 photo types. Turn on 6+ attributes. Confirm the description has "lunch delivery", "Eldoret" and "Kapsoya" in the first 250 characters.';
+    }
+}
+
+checkDesc();
+onEdit();
+</script>
+<style id="mtti-paginator-style">
+  section[data-mtti-page] { display: none !important; }
+  section[data-mtti-page].mtti-active { display: block !important; }
+  #mtti-paginator-bar {
+    position: sticky; bottom: 0; left: 0; right: 0;
+    background: #fff; border-top: 2px solid #e2e8f0;
+    padding: 12px 20px; margin-top: 20px;
+    display: flex; align-items: center; justify-content: space-between; gap: 12px;
+    font-family: 'Segoe UI', -apple-system, sans-serif;
+    box-shadow: 0 -4px 16px rgba(0,0,0,0.08);
+    z-index: 100;
+  }
+  #mtti-paginator-bar button {
+    background: #2E7D32; color: #fff; border: none; padding: 10px 18px;
+    border-radius: 8px; font-size: 13px; font-weight: 600; cursor: pointer;
+  }
+  #mtti-paginator-bar button:disabled { background: #cbd5e1; cursor: not-allowed; }
+  #mtti-paginator-bar button.mtti-prev { background: #64748b; }
+  #mtti-paginator-progress { font-size: 12px; color: #64748b; font-weight: 600; }
+</style>
+<script id="mtti-paginator-script">
+(function(){
+  function init(){
+    var sections = Array.prototype.slice.call(document.querySelectorAll('section[id]'));
+    // Only sections that are real content blocks (has an <h2>), skip stray/decorative ones.
+    sections = sections.filter(function(s){ return s.querySelector('h2'); });
+    if (sections.length < 2) return; // nothing to paginate
+
+    sections.forEach(function(s, i){ s.setAttribute('data-mtti-page', i); });
+    var current = 0;
+
+    var bar = document.createElement('div');
+    bar.id = 'mtti-paginator-bar';
+    bar.innerHTML =
+      '<button class="mtti-prev" id="mtti-pg-prev">← Previous</button>' +
+      '<span id="mtti-paginator-progress"></span>' +
+      '<button id="mtti-pg-next">Next →</button>';
+    sections[sections.length - 1].insertAdjacentElement('afterend', bar);
+
+    var prevBtn = bar.querySelector('#mtti-pg-prev');
+    var nextBtn = bar.querySelector('#mtti-pg-next');
+    var progress = bar.querySelector('#mtti-paginator-progress');
+
+    function render(){
+      sections.forEach(function(s, i){ s.classList.toggle('mtti-active', i === current); });
+      prevBtn.disabled = (current === 0);
+      nextBtn.textContent = (current === sections.length - 1) ? 'Done ✓' : 'Next →';
+      progress.textContent = 'Section ' + (current + 1) + ' of ' + sections.length;
+      window.scrollTo(0, 0);
+    }
+    prevBtn.addEventListener('click', function(){ if (current > 0) { current--; render(); } });
+    nextBtn.addEventListener('click', function(){
+      if (current < sections.length - 1) { current++; render(); }
+    });
+    render();
+  }
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', init);
+  } else {
+    init();
+  }
+})();
+</script>
+</body>
+</html>

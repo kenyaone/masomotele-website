@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Configuring the DVR/NVR and Network Settings — Lesson | MTTI CCTV Installation</title>
+<link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Fredoka:wght@500;600&display=swap" rel="stylesheet">
+<style>
+* { margin:0; padding:0; box-sizing:border-box; }
+body { font-family:'Space Mono', monospace; background:linear-gradient(135deg,#101F3C 0%,#16A34A 100%); min-height:100vh; padding:20px; color:#fff; }
+.container { max-width:820px; margin:0 auto; }
+.header { text-align:center; margin-bottom:24px; }
+.lesson-tag { display:inline-block; background:rgba(255,255,255,0.2); padding:6px 16px; border-radius:999px; font-size:0.85em; margin-bottom:12px; }
+.header h1 { font-family:'Fredoka', sans-serif; font-size:2em; margin-bottom:6px; text-shadow:3px 3px 0 rgba(0,0,0,0.2); }
+.card { background:#fff; color:#333; border-radius:22px; padding:32px; margin-bottom:20px; box-shadow:0 20px 60px rgba(0,0,0,0.3); }
+.section { margin-bottom:26px; }
+.section:last-child { margin-bottom:0; }
+.section h2 { font-family:'Fredoka', sans-serif; font-size:1.2em; margin-bottom:10px; color:#101F3C; }
+.section .body { line-height:1.65; font-size:0.98em; }
+.section .body p { margin-bottom:10px; }
+.keypoint { background:#fff8e1; border-left:4px solid #ffc107; padding:12px 16px; border-radius:8px; margin-top:12px; font-size:0.92em; }
+</style>
+</head>
+<body>
+<div class="container">
+<div class="header"><div class="lesson-tag">Unit 3 · Topic 3.3</div><h1>Configuring the DVR/NVR and Network Settings</h1></div>
+<div class="card">
+<div class="section">
+<h2>Connecting Cameras to the Recorder</h2>
+<div class="body">
+<p>The type of recorder depends on the camera type. Analog cameras connect to a DVR using coax (BNC) cable carrying the video signal, while IP cameras connect to an NVR — usually via a PoE (Power over Ethernet) switch that carries both data and power over a single network cable, cutting down on cabling and separate power supplies.</p>
+<p>Dennis always confirms which camera type he is connecting to before assuming the recorder's input type. Mixing them up, like plugging an IP camera's network cable into a DVR's BNC input, simply will not work, and it is a common early mistake.</p>
+</div>
+</div>
+<div class="section">
+<h2>Basic Network Setup</h2>
+<div class="body">
+<p>Once cameras are connected, the recorder itself needs a place on the network. Dennis usually gives the recorder a static IP address rather than leaving it on DHCP — a static address means the recorder's address never changes, so viewing software and remote access settings that point to it keep working.</p>
+<p>He connects the recorder to the client's router or switch with an ethernet cable, then accesses its settings menu, or a browser or setup app, to confirm the static IP, subnet, and gateway match the rest of the network.</p>
+</div>
+</div>
+<div class="section">
+<h2>Port Forwarding and Recording Schedules</h2>
+<div class="body">
+<p>For the client to view cameras remotely on a phone away from the site, the router needs port forwarding configured. This tells the router to send specific incoming internet traffic through to the recorder's static IP address on the local network, rather than being blocked at the door.</p>
+<p>Dennis also sets the recording schedule to match what the client actually needs — continuous recording for high-priority areas, or motion-triggered recording elsewhere to save storage space — and always changes the recorder's default admin password before switching on remote access.</p>
+<div class="keypoint"><strong>Key Point.</strong> Never enable remote access on a recorder that still has its factory-default password — this is one of the most common ways CCTV systems get broken into online, and it takes two minutes to fix.</div>
+</div>
+</div>
+</div>
+</div>
+</body>
+</html>

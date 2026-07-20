@@ -1,0 +1,346 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Why Visual Content Matters | MTTI Digital Marketing</title>
+    <link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Fredoka:wght@500;600&display=swap" rel="stylesheet">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Space Mono', monospace;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh; padding: 20px; color: #fff;
+        }
+        .container { max-width: 900px; margin: 0 auto; }
+        .header { text-align: center; margin-bottom: 30px; animation: slideDown 0.6s ease-out; }
+        .header .lesson-tag {
+            display: inline-block; background: rgba(255,255,255,0.2);
+            padding: 6px 16px; border-radius: 999px;
+            font-size: 0.85em; margin-bottom: 12px;
+        }
+        .header h1 {
+            font-family: 'Fredoka', sans-serif; font-size: 2.2em;
+            margin-bottom: 8px; text-shadow: 3px 3px 0 rgba(0,0,0,0.2);
+        }
+        .header p { opacity: 0.95; font-size: 0.95em; }
+        .score-board {
+            background: rgba(255,255,255,0.15); backdrop-filter: blur(10px);
+            border-radius: 20px; padding: 20px; margin-bottom: 20px;
+            display: flex; justify-content: space-around;
+            animation: fadeIn 0.8s ease-out 0.2s both;
+        }
+        .score-item { text-align: center; }
+        .score-item .label { font-size: 0.85em; opacity: 0.9; margin-bottom: 4px; }
+        .score-item .value {
+            font-size: 1.8em; font-weight: bold; font-family: 'Fredoka', sans-serif;
+        }
+        .progress-bar {
+            width: 100%; height: 8px; background: rgba(255,255,255,0.3);
+            border-radius: 10px; margin-bottom: 25px; overflow: hidden;
+        }
+        .progress-fill {
+            height: 100%; background: linear-gradient(90deg, #f093fb 0%, #f5576c 100%);
+            border-radius: 10px; transition: width 0.5s ease; width: 0%;
+        }
+        .exercise-card {
+            background: white; color: #333; border-radius: 25px;
+            padding: 35px; margin-bottom: 20px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            animation: fadeIn 0.6s ease-out both;
+        }
+        .scenario {
+            background: linear-gradient(135deg, #fff8e1 0%, #ffecb3 100%);
+            border-left: 5px solid #ffc107;
+            padding: 20px 24px; border-radius: 12px;
+            margin-bottom: 24px;
+            font-size: 0.98em; line-height: 1.55;
+        }
+        .scenario strong { color: #7a5a00; font-family: 'Fredoka', sans-serif; }
+        .question {
+            font-size: 1.15em; margin-bottom: 20px;
+            font-weight: 700; line-height: 1.4;
+        }
+        .options { display: flex; flex-direction: column; gap: 12px; }
+        .option {
+            background: #f5f7fb; border: 2px solid transparent;
+            padding: 16px 20px; border-radius: 12px;
+            cursor: pointer; transition: all 0.2s ease;
+            font-family: 'Space Mono', monospace; font-size: 0.98em; text-align: left;
+        }
+        .option:hover:not(.disabled) {
+            background: #eef1fb; border-color: #667eea; transform: translateX(4px);
+        }
+        .option.correct { background: #d4edda; border-color: #28a745; color: #155724; }
+        .option.wrong { background: #f8d7da; border-color: #dc3545; color: #721c24; animation: shake 0.4s; }
+        .option.disabled { cursor: not-allowed; opacity: 0.85; }
+        .feedback {
+            margin-top: 22px; padding: 18px 22px; border-radius: 12px;
+            animation: slideUp 0.4s ease-out;
+            font-size: 0.98em; line-height: 1.5;
+        }
+        .feedback.correct { background: #d4edda; color: #155724; border-left: 4px solid #28a745; }
+        .feedback.wrong { background: #f8d7da; color: #721c24; border-left: 4px solid #dc3545; }
+        .feedback strong { font-family: 'Fredoka', sans-serif; }
+        .next-btn, .restart-btn {
+            margin-top: 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white; border: none;
+            padding: 14px 32px; border-radius: 12px;
+            font-size: 1em; cursor: pointer;
+            font-family: 'Fredoka', sans-serif;
+            box-shadow: 0 6px 18px rgba(0,0,0,0.2);
+            transition: transform 0.2s ease;
+        }
+        .next-btn:hover, .restart-btn:hover { transform: scale(1.04); }
+        .results {
+            text-align: center; padding: 25px 15px;
+            animation: bounceIn 0.6s ease-out;
+        }
+        .results h2 {
+            font-family: 'Fredoka', sans-serif; font-size: 2em;
+            margin-bottom: 12px; color: #333;
+        }
+        .results .final-score {
+            font-size: 3em; font-family: 'Fredoka', sans-serif;
+            color: #667eea; margin: 20px 0;
+        }
+        .results p { color: #555; margin-bottom: 12px; }
+        .badge { display: inline-block; font-size: 3.5em; margin: 8px 0; }
+        @keyframes slideDown { from { opacity: 0; transform: translateY(-30px); } to { opacity: 1; transform: translateY(0); } }
+        @keyframes fadeIn { from { opacity: 0; transform: scale(0.96); } to { opacity: 1; transform: scale(1); } }
+        @keyframes slideUp { from { opacity: 0; transform: translateY(15px); } to { opacity: 1; transform: translateY(0); } }
+        @keyframes shake { 0%,100% { transform: translateX(0); } 25% { transform: translateX(-8px); } 75% { transform: translateX(8px); } }
+        @keyframes bounceIn { 0% { opacity: 0; transform: scale(0.4); } 60% { transform: scale(1.05); } 100% { opacity: 1; transform: scale(1); } }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <div class="lesson-tag">Module 7 · Lesson 7.1</div>
+            <h1>Why Visual Content Matters</h1>
+            <p>10 scenarios with Sarah (Karibu Kitchen) and Brian (Chapa Fitness) — the case for visual content</p>
+        </div>
+
+        <div class="score-board">
+            <div class="score-item"><div class="label">Score</div><div class="value" id="score">0</div></div>
+            <div class="score-item"><div class="label">Question</div><div class="value"><span id="current">1</span>/<span id="total">10</span></div></div>
+            <div class="score-item"><div class="label">Streak</div><div class="value" id="streak">0</div></div>
+        </div>
+
+        <div class="progress-bar"><div class="progress-fill" id="progress"></div></div>
+
+        <div class="exercise-card" id="exerciseCard"></div>
+    </div>
+
+    <script>
+        const exercises = [
+  {
+    "scenario": "Sarah is in month four. Her ads are stable but her Instagram feed shows the same food photo four times this week, each post with fewer likes than the last. Her feed uses three different fonts and six different filter styles.",
+    "question": "What is Sarah's core content problem, in the language of Lesson 7.1?",
+    "options": [
+      "She is posting too infrequently — she should post 20 times a day.",
+      "She is in a content rut — no consistent theme, no variety of visual content types, and no brand consistency across posts.",
+      "Her food is bad.",
+      "Instagram is the wrong platform for a restaurant."
+    ],
+    "correct": 1,
+    "explanation": "Section 7.1 opens with Sarah's exact content rut: repetition, inconsistent fonts and filters, and a feed that looks like it was posted by four different people. Module 7 is designed to solve precisely this problem."
+  },
+  {
+    "scenario": "Brian (Chapa Fitness, Gen-Z apparel, TikTok-first, KES 40k a month) argues to Sarah: \"Text-only posts are enough — visuals are optional.\"",
+    "question": "Which of the five research-backed numbers from Lesson 7.1 rebuts him?",
+    "options": [
+      "Posts with images get roughly 2.3x the engagement of text-only posts, and video dramatically increases conversion rate.",
+      "Text-only posts get 10x more engagement than image posts.",
+      "Visual content is illegal in Kenya.",
+      "Only stock imagery counts as visual content."
+    ],
+    "correct": 0,
+    "explanation": "Lesson 7.1 lists five numbers, starting with roughly 2.3x more engagement for image posts vs text-only, plus dramatically higher conversion for video, ~3x sharing for infographics, better recall for branded visuals, and mobile preference for scannable visuals."
+  },
+  {
+    "scenario": "Sarah says she is waiting until she can afford a KES 120,000 DSLR camera before she starts posting seriously.",
+    "question": "Which stance does Lesson 7.1 take?",
+    "options": [
+      "She is right — a KES 120,000 camera is the minimum professional standard.",
+      "Her phone is her studio. Modern Kenyan phones (Samsung, Tecno, Infinix, iPhone) shoot content that is more than good enough for social. The Kigali food business she admires was filmed on an iPhone. Start today with what you own.",
+      "She should film only on paid stock footage sites.",
+      "Never film — just post text."
+    ],
+    "correct": 1,
+    "explanation": "Section 7.1 is emphatic: your phone is your studio. Ninety per cent of top Reels are phone-shot. Better content on a phone beats no content on a camera you do not own."
+  },
+  {
+    "scenario": "Brian wants Chapa Fitness content that actually drives sales for his Gen-Z streetwear on TikTok. He asks Sarah what content TYPES the module recommends.",
+    "question": "Which four types does Lesson 7.1 list as high-converting for Kenyan businesses?",
+    "options": [
+      "Stock imagery, text-only quotes, memes lifted from Twitter, and heavy-filter photos.",
+      "Authentic photos (natural light, phone-shot), vertical short-form video (under 30 seconds), infographics, and customer-generated photos.",
+      "Only banner ads.",
+      "Only paid influencer content."
+    ],
+    "correct": 1,
+    "explanation": "Lesson 7.1 names four converting content types: authentic phone-shot photos, vertical short-form video, infographics, and customer-generated photos — each about 3x better than stock imagery or text-only posts."
+  },
+  {
+    "scenario": "Sarah's Facebook Page uses a stock photo of a smiling office worker holding a laptop.",
+    "question": "Why does Lesson 7.1 say to stop this?",
+    "options": [
+      "Stock photos are illegal in Kenya.",
+      "Kenyan customers identify a stock photo in under a second. Stock says \"we could not be bothered to take our own picture.\" It hurts trust and engagement.",
+      "Stock photos are too high-resolution for Facebook.",
+      "Stock photos always beat authentic photos."
+    ],
+    "correct": 1,
+    "explanation": "Section 7.1 flags stock imagery as one of three things to stop. Kenyan audiences recognise it instantly and read it as low-effort. Authentic phone-shot content beats stock nearly every time."
+  },
+  {
+    "scenario": "Brian applies a heavy vintage filter to every Chapa Fitness Reel because \"it looks retro-cool.\"",
+    "question": "What does Lesson 7.1 say about heavy filters?",
+    "options": [
+      "The heavier the filter, the better.",
+      "Over-filtered images look dated in 2026. Modern content is bright, sharp, and looks real. Save heavy filters for creative one-offs, not the whole feed.",
+      "Filters are required on TikTok.",
+      "Filters do not affect engagement."
+    ],
+    "correct": 1,
+    "explanation": "Section 7.1 lists heavy Instagram-style filters as one of three things to stop. Modern high-performing content is bright and sharp — an important distinction for Brian's Gen-Z TikTok audience where authenticity outperforms heavy edits."
+  },
+  {
+    "scenario": "Sarah is about to post a blurry phone photo taken at midnight under yellow kitchen light because she \"needs to post something today.\"",
+    "question": "Which question from the 90-second content check in Lesson 7.1 should stop her?",
+    "options": [
+      "\"Is it sharp?\" and \"Is it well-lit?\" — blurry photos are worse than no post, and natural light beats artificial light every time.",
+      "\"Does it use a stock photo?\" — she should add one.",
+      "\"Is it text-only?\" — she should remove the image.",
+      "None — she should post it anyway."
+    ],
+    "correct": 0,
+    "explanation": "Section 7.1's 90-second check is five questions: sharp? well-lit? real (person/place/product)? on brand? clear message in 3 seconds? A blurry photo under yellow light fails questions 1 and 2. Better to skip the day than post something that hurts the brand."
+  },
+  {
+    "scenario": "Sarah asks Brian: \"But surely a text-only post is fine sometimes — like an announcement about hours?\"",
+    "question": "How does Lesson 7.1 answer?",
+    "options": [
+      "Text-only posts are fine any time.",
+      "Every post needs an image or a video. No exceptions. If you cannot add a visual, do not post — even an announcement gets a branded card.",
+      "Text-only posts should replace images entirely.",
+      "Announcements are the only place stock photos work."
+    ],
+    "correct": 1,
+    "explanation": "Section 7.1 is explicit: no exceptions. If you do not have time to add a visual, do not post. An hours announcement can be a 30-second Canva card with brand colours — but never bare text."
+  },
+  {
+    "scenario": "Brian wants to know if visual content matters more on his TikTok-first Gen-Z audience than on Sarah's Facebook-heavy Eldoret office-worker audience.",
+    "question": "What does Lesson 7.1 imply for both?",
+    "options": [
+      "Only Brian's audience cares about visuals.",
+      "Both audiences are mobile-first and both prefer visual content that is easy to scan on a small screen. Text-only marketing in 2026 is a slow way to disappear for both businesses.",
+      "Sarah does not need visuals — office workers only read text.",
+      "Neither audience cares about visuals."
+    ],
+    "correct": 1,
+    "explanation": "Section 7.1 is written for mobile-first Kenyan audiences generally — Gen-Z TikTok users and Kapsoya office workers both scan on small screens. Visual content wins on both platforms, though the FORMAT (vertical Reel vs Facebook feed square) differs by platform."
+  },
+  {
+    "scenario": "Sarah asks: \"So what are the next seven lessons going to teach me?\"",
+    "question": "Which sequence does Lesson 7.1 preview for Module 7?",
+    "options": [
+      "SEO, PPC, email marketing, affiliate, analytics, GA4, and Google Ads.",
+      "Content tools (Canva), design principles, platform sizes, content planning, accessibility, video creation, and user-generated content.",
+      "Only Canva templates.",
+      "Only video editing."
+    ],
+    "correct": 1,
+    "explanation": "Section 7.1 previews the seven remaining lessons in Module 7: 7.2 tools (Canva), 7.3 principles, 7.4 sizes, 7.5 planning, 7.6 accessibility, 7.7 video, 7.8 UGC. By the end, Sarah will be able to film her Kigali-style Reel."
+  }
+];
+
+        let currentQuestion = 0, score = 0, streak = 0, answered = false;
+
+        function updateScoreboard() {
+            document.getElementById('score').textContent = score;
+            document.getElementById('current').textContent = Math.min(currentQuestion + 1, exercises.length);
+            document.getElementById('total').textContent = exercises.length;
+            document.getElementById('streak').textContent = streak;
+            document.getElementById('progress').style.width = ((currentQuestion) / exercises.length) * 100 + '%';
+        }
+
+        function escapeHtml(s) {
+            return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+        }
+
+        function renderQuestion() {
+            answered = false;
+            const q = exercises[currentQuestion];
+            let html = '';
+            if (q.scenario) {
+                html += `<div class="scenario"><strong>Scenario.</strong> ${escapeHtml(q.scenario)}</div>`;
+            }
+            html += `<div class="question">${escapeHtml(q.question)}</div>`;
+            html += '<div class="options">';
+            q.options.forEach((o, i) => {
+                html += `<button class="option" onclick="selectAnswer(${i})">${escapeHtml(o)}</button>`;
+            });
+            html += '</div>';
+            document.getElementById('exerciseCard').innerHTML = html;
+            updateScoreboard();
+        }
+
+        function selectAnswer(i) {
+            if (answered) return;
+            answered = true;
+            const q = exercises[currentQuestion];
+            const btns = document.querySelectorAll('.option');
+            btns.forEach(b => b.classList.add('disabled'));
+            btns[q.correct].classList.add('correct');
+            const right = i === q.correct;
+            if (!right) btns[i].classList.add('wrong');
+            if (right) { score += 10; streak += 1; } else { streak = 0; }
+            const fb = document.createElement('div');
+            fb.className = 'feedback ' + (right ? 'correct' : 'wrong');
+            fb.innerHTML = `<strong>${right ? '✅ Correct.' : '❌ Not quite.'}</strong><br>${escapeHtml(q.explanation)}`;
+            document.getElementById('exerciseCard').appendChild(fb);
+            const nb = document.createElement('button');
+            nb.className = 'next-btn';
+            nb.textContent = currentQuestion === exercises.length - 1 ? 'See results →' : 'Next scenario →';
+            nb.onclick = nextQuestion;
+            document.getElementById('exerciseCard').appendChild(nb);
+            updateScoreboard();
+        }
+
+        function nextQuestion() {
+            currentQuestion++;
+            if (currentQuestion >= exercises.length) return showResults();
+            renderQuestion();
+        }
+
+        function showResults() {
+            document.getElementById('progress').style.width = '100%';
+            const total = exercises.length * 10;
+            const pct = Math.round(score / total * 100);
+            if (window.parent) { window.parent.postMessage({type:"mtti_quiz_score", score: score, total: total, percent: pct}, "*"); }
+            let badge = '🌟', msg = 'Excellent work. You have a professional grasp of this lesson.';
+            if (pct < 50) { badge = '🌱'; msg = 'Good first attempt. Re-watch the lesson video and try again.'; }
+            else if (pct < 80) { badge = '📚'; msg = 'Solid progress. Review the scenarios you missed and retry.'; }
+            document.getElementById('exerciseCard').innerHTML = `
+                <div class="results">
+                    <span class="badge">${badge}</span>
+                    <h2>Quiz Complete</h2>
+                    <div class="final-score">${score} / ${total}</div>
+                    <p><strong>${pct}%</strong> · Longest streak: ${streak}</p>
+                    <p>${msg}</p>
+                    <button class="restart-btn" onclick="restart()">Try again 🔁</button>
+                </div>`;
+        }
+
+        function restart() {
+            currentQuestion = 0; score = 0; streak = 0;
+            renderQuestion();
+        }
+
+        renderQuestion();
+    </script>
+</body>
+</html>

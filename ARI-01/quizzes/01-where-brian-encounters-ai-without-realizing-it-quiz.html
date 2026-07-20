@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Where Brian Encounters AI Without Realizing It | MTTI Artificial Intelligence</title>
+    <link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Fredoka:wght@500;600&display=swap" rel="stylesheet">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Space Mono', monospace; background: linear-gradient(135deg, #6A1B9A 0%, #283593 100%); min-height: 100vh; padding: 20px; color: #fff; }
+        .container { max-width: 900px; margin: 0 auto; }
+        .header { text-align: center; margin-bottom: 30px; }
+        .header .lesson-tag { display: inline-block; background: rgba(255,255,255,0.2); padding: 6px 16px; border-radius: 999px; font-size: 0.85em; margin-bottom: 12px; }
+        .header h1 { font-family: 'Fredoka', sans-serif; font-size: 2.2em; margin-bottom: 8px; text-shadow: 3px 3px 0 rgba(0,0,0,0.2); }
+        .score-board { background: rgba(255,255,255,0.15); backdrop-filter: blur(10px); border-radius: 20px; padding: 20px; margin-bottom: 20px; display: flex; justify-content: space-around; }
+        .score-item { text-align: center; }
+        .score-item .label { font-size: 0.85em; opacity: 0.9; margin-bottom: 4px; }
+        .score-item .value { font-size: 1.8em; font-weight: bold; font-family: 'Fredoka', sans-serif; }
+        .progress-bar { width: 100%; height: 8px; background: rgba(255,255,255,0.3); border-radius: 10px; margin-bottom: 25px; overflow: hidden; }
+        .progress-fill { height: 100%; background: linear-gradient(90deg, #ff8a65 0%, #ff5252 100%); border-radius: 10px; transition: width 0.5s ease; width: 0%; }
+        .exercise-card { background: white; color: #333; border-radius: 25px; padding: 35px; margin-bottom: 20px; box-shadow: 0 20px 60px rgba(0,0,0,0.3); }
+        .scenario { background: linear-gradient(135deg, #fff8e1 0%, #ffecb3 100%); border-left: 5px solid #ffc107; padding: 20px 24px; border-radius: 12px; margin-bottom: 24px; font-size: 0.98em; line-height: 1.55; }
+        .scenario strong { color: #7a5a00; font-family: 'Fredoka', sans-serif; }
+        .question { font-size: 1.15em; margin-bottom: 20px; font-weight: 700; line-height: 1.4; }
+        .options { display: flex; flex-direction: column; gap: 12px; }
+        .option { background: #f5f7fb; border: 2px solid transparent; padding: 16px 20px; border-radius: 12px; cursor: pointer; transition: all 0.2s ease; font-family: 'Space Mono', monospace; font-size: 0.98em; text-align: left; }
+        .option:hover:not(.disabled) { background: #f3e5f5; border-color: #6A1B9A; transform: translateX(4px); }
+        .option.correct { background: #d4edda; border-color: #28a745; color: #155724; }
+        .option.wrong { background: #f8d7da; border-color: #dc3545; color: #721c24; }
+        .option.disabled { cursor: not-allowed; opacity: 0.85; }
+        .feedback { margin-top: 22px; padding: 18px 22px; border-radius: 12px; font-size: 0.98em; line-height: 1.5; }
+        .feedback.correct { background: #d4edda; color: #155724; border-left: 4px solid #28a745; }
+        .feedback.wrong { background: #f8d7da; color: #721c24; border-left: 4px solid #dc3545; }
+        .next-btn, .restart-btn { margin-top: 20px; background: linear-gradient(135deg, #6A1B9A 0%, #283593 100%); color: white; border: none; padding: 14px 32px; border-radius: 12px; font-size: 1em; cursor: pointer; font-family: 'Fredoka', sans-serif; box-shadow: 0 6px 18px rgba(0,0,0,0.2); }
+        .results { text-align: center; padding: 25px 15px; }
+        .results h2 { font-family: 'Fredoka', sans-serif; font-size: 2em; margin-bottom: 12px; color: #333; }
+        .results .final-score { font-size: 3em; font-family: 'Fredoka', sans-serif; color: #6A1B9A; margin: 20px 0; }
+        .results p { color: #555; margin-bottom: 12px; }
+        .badge { display: inline-block; font-size: 3.5em; margin: 8px 0; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <div class="lesson-tag">Module 1 · Lesson 1.3 · Quiz</div>
+            <h1>Where Brian Encounters AI Without Realizing It</h1>
+        </div>
+        <div class="score-board">
+            <div class="score-item"><div class="label">Score</div><div class="value" id="score">0</div></div>
+            <div class="score-item"><div class="label">Question</div><div class="value"><span id="current">1</span>/<span id="total">10</span></div></div>
+            <div class="score-item"><div class="label">Streak</div><div class="value" id="streak">0</div></div>
+        </div>
+        <div class="progress-bar"><div class="progress-fill" id="progress"></div></div>
+        <div class="exercise-card" id="exerciseCard"></div>
+    </div>
+    <script>
+        const exercises = [{"scenario":"Brian notices that several promotional emails were automatically sorted into his spam folder overnight, without him lifting a finger.","question":"What is responsible for this?","options":["A colleague manually moved the emails","A spam filter — a narrow AI tool that learned patterns from past emails to spot likely junk mail","Pure random chance","The email provider's customer service team, working overnight"],"correct":1,"explanation":"Automatic spam sorting is a working example of narrow AI recognising learned patterns in incoming email."},{"scenario":"While browsing a shopping site for a client's gift, Brian notices a 'You might also like' section tailored to what he's been viewing.","question":"What is powering this feature?","options":["A recommendation engine, which studies past browsing or purchase behaviour to predict what else someone is likely to want","A staff member selecting items by hand for every visitor","A completely random selection of products","A general AI system that understands Brian's entire life"],"correct":0,"explanation":"Recommendation engines are a common narrow-AI application, predicting likely interests from patterns in past behaviour."},{"scenario":"Brian opens a client's sales spreadsheet and uses its built-in forecast feature to project next month's revenue from the past year's figures.","question":"What is this an example of?","options":["A manual calculation with no AI involved","Narrow AI applying pattern-based prediction to the client's sales history","General AI running the client's entire business","A random guess unrelated to the data"],"correct":1,"explanation":"Spreadsheet forecasting features apply the same pattern-recognition and prediction principles that define narrow AI, using the client's own historical data."},{"scenario":"Before sending a client email, Brian asks a chat assistant to help tighten the wording of his draft.","question":"Which best describes what is happening?","options":["The chat assistant is independently deciding what the client relationship should be","A narrow AI tool is handling a language-based judgement task — drafting and refining wording — the same category of task covered earlier in this unit","This does not count as AI because it only involves text","This only counts as AI if it happens on a mobile phone"],"correct":1,"explanation":"Drafting and refining language is a judgement-style task, and a chat assistant performing it is a clear, everyday example of narrow AI."},{"scenario":"Brian tells his manager, 'Rafiki Insights hasn't adopted AI yet — we should start looking into it.'","question":"Based on this unit, is that statement accurate?","options":["Yes, completely accurate — no AI is currently in use","No — narrow AI is already at work in the spam filter, spreadsheet forecasts, and any chat assistant the team already uses","It is accurate only for the accounting department","It is impossible to know without buying new software"],"correct":1,"explanation":"Narrow AI is often already embedded in ordinary tools — spam filters, spreadsheet forecasting, recommendation features, and chat assistants — well before a business consciously 'adopts AI.'"},{"scenario":"Brian is asked to list which of his Monday-morning tasks involved AI: checking his filtered inbox, updating a client forecast chart, and asking a chat assistant to summarise a report.","question":"How many of these three tasks involved AI?","options":["None of them","All three — each is a narrow AI tool doing a specific judgement task (filtering, predicting, summarising)","Only the chat assistant task","Only the spreadsheet forecast task"],"correct":1,"explanation":"All three are everyday narrow-AI applications: pattern-based email filtering, data-based forecasting, and language-based summarising."},{"scenario":"A client says AI still feels like something only huge tech companies use, not a small Eldoret consultancy like Rafiki Insights.","question":"What would be the most accurate response, based on what this unit has covered?","options":["Agree completely — small businesses have no access to AI tools","Point out that narrow AI is already inside everyday tools like spam filters, spreadsheets, and chat assistants that any small business already uses","Say that AI is only useful for very large datasets","Say that AI requires specialised hardware no small business could afford"],"correct":1,"explanation":"Narrow AI is already embedded in widely available everyday tools, meaning small businesses like Rafiki Insights are already using it, often without a dedicated 'AI' purchase."}];
+        let currentQuestion = 0, score = 0, streak = 0, answered = false;
+        function updateScoreboard() {
+            document.getElementById('score').textContent = score;
+            document.getElementById('current').textContent = Math.min(currentQuestion + 1, exercises.length);
+            document.getElementById('total').textContent = exercises.length;
+            document.getElementById('streak').textContent = streak;
+            document.getElementById('progress').style.width = ((currentQuestion) / exercises.length) * 100 + '%';
+        }
+        function escapeHtml(s) { return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+        function renderQuestion() {
+            answered = false;
+            const q = exercises[currentQuestion];
+            let html = '';
+            if (q.scenario) html += `<div class="scenario"><strong>Scenario.</strong> ${escapeHtml(q.scenario)}</div>`;
+            html += `<div class="question">${escapeHtml(q.question)}</div>`;
+            html += '<div class="options">';
+            q.options.forEach((o, i) => { html += `<button class="option" onclick="selectAnswer(${i})">${escapeHtml(o)}</button>`; });
+            html += '</div>';
+            document.getElementById('exerciseCard').innerHTML = html;
+            updateScoreboard();
+        }
+        function selectAnswer(i) {
+            if (answered) return;
+            answered = true;
+            const q = exercises[currentQuestion];
+            const btns = document.querySelectorAll('.option');
+            btns.forEach(b => b.classList.add('disabled'));
+            btns[q.correct].classList.add('correct');
+            const right = i === q.correct;
+            if (!right) btns[i].classList.add('wrong');
+            if (right) { score += 10; streak += 1; } else { streak = 0; }
+            const fb = document.createElement('div');
+            fb.className = 'feedback ' + (right ? 'correct' : 'wrong');
+            fb.innerHTML = `<strong>${right ? '✅ Correct.' : '❌ Not quite.'}</strong><br>${escapeHtml(q.explanation)}`;
+            document.getElementById('exerciseCard').appendChild(fb);
+            const nb = document.createElement('button');
+            nb.className = 'next-btn';
+            nb.textContent = currentQuestion === exercises.length - 1 ? 'See results →' : 'Next scenario →';
+            nb.onclick = nextQuestion;
+            document.getElementById('exerciseCard').appendChild(nb);
+            updateScoreboard();
+        }
+        function nextQuestion() { currentQuestion++; if (currentQuestion >= exercises.length) return showResults(); renderQuestion(); }
+        function showResults() {
+            document.getElementById('progress').style.width = '100%';
+            const total = exercises.length * 10;
+            const pct = Math.round(score / total * 100);
+            if (window.parent) { window.parent.postMessage({type:"mtti_quiz_score", score: score, total: total, percent: pct}, "*"); }
+            let badge = '🌟', msg = 'Excellent work. You have a professional grasp of this lesson.';
+            if (pct < 50) { badge = '🌱'; msg = 'Good first attempt. Review the lesson and try again.'; }
+            else if (pct < 80) { badge = '📚'; msg = 'Solid progress. Review the scenarios you missed and retry.'; }
+            document.getElementById('exerciseCard').innerHTML = `
+                <div class="results">
+                    <span class="badge">${badge}</span>
+                    <h2>Quiz Complete</h2>
+                    <div class="final-score">${score} / ${total}</div>
+                    <p><strong>${pct}%</strong> · Longest streak: ${streak}</p>
+                    <p>${msg}</p>
+                    <button class="restart-btn" onclick="restart()">Try again 🔁</button>
+                </div>`;
+        }
+        function restart() { currentQuestion = 0; score = 0; streak = 0; renderQuestion(); }
+        renderQuestion();
+    </script>
+</body>
+</html>

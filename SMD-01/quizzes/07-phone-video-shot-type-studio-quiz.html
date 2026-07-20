@@ -1,0 +1,346 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Video Creation Basics | MTTI Digital Marketing</title>
+    <link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Fredoka:wght@500;600&display=swap" rel="stylesheet">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Space Mono', monospace;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh; padding: 20px; color: #fff;
+        }
+        .container { max-width: 900px; margin: 0 auto; }
+        .header { text-align: center; margin-bottom: 30px; animation: slideDown 0.6s ease-out; }
+        .header .lesson-tag {
+            display: inline-block; background: rgba(255,255,255,0.2);
+            padding: 6px 16px; border-radius: 999px;
+            font-size: 0.85em; margin-bottom: 12px;
+        }
+        .header h1 {
+            font-family: 'Fredoka', sans-serif; font-size: 2.2em;
+            margin-bottom: 8px; text-shadow: 3px 3px 0 rgba(0,0,0,0.2);
+        }
+        .header p { opacity: 0.95; font-size: 0.95em; }
+        .score-board {
+            background: rgba(255,255,255,0.15); backdrop-filter: blur(10px);
+            border-radius: 20px; padding: 20px; margin-bottom: 20px;
+            display: flex; justify-content: space-around;
+            animation: fadeIn 0.8s ease-out 0.2s both;
+        }
+        .score-item { text-align: center; }
+        .score-item .label { font-size: 0.85em; opacity: 0.9; margin-bottom: 4px; }
+        .score-item .value {
+            font-size: 1.8em; font-weight: bold; font-family: 'Fredoka', sans-serif;
+        }
+        .progress-bar {
+            width: 100%; height: 8px; background: rgba(255,255,255,0.3);
+            border-radius: 10px; margin-bottom: 25px; overflow: hidden;
+        }
+        .progress-fill {
+            height: 100%; background: linear-gradient(90deg, #f093fb 0%, #f5576c 100%);
+            border-radius: 10px; transition: width 0.5s ease; width: 0%;
+        }
+        .exercise-card {
+            background: white; color: #333; border-radius: 25px;
+            padding: 35px; margin-bottom: 20px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            animation: fadeIn 0.6s ease-out both;
+        }
+        .scenario {
+            background: linear-gradient(135deg, #fff8e1 0%, #ffecb3 100%);
+            border-left: 5px solid #ffc107;
+            padding: 20px 24px; border-radius: 12px;
+            margin-bottom: 24px;
+            font-size: 0.98em; line-height: 1.55;
+        }
+        .scenario strong { color: #7a5a00; font-family: 'Fredoka', sans-serif; }
+        .question {
+            font-size: 1.15em; margin-bottom: 20px;
+            font-weight: 700; line-height: 1.4;
+        }
+        .options { display: flex; flex-direction: column; gap: 12px; }
+        .option {
+            background: #f5f7fb; border: 2px solid transparent;
+            padding: 16px 20px; border-radius: 12px;
+            cursor: pointer; transition: all 0.2s ease;
+            font-family: 'Space Mono', monospace; font-size: 0.98em; text-align: left;
+        }
+        .option:hover:not(.disabled) {
+            background: #eef1fb; border-color: #667eea; transform: translateX(4px);
+        }
+        .option.correct { background: #d4edda; border-color: #28a745; color: #155724; }
+        .option.wrong { background: #f8d7da; border-color: #dc3545; color: #721c24; animation: shake 0.4s; }
+        .option.disabled { cursor: not-allowed; opacity: 0.85; }
+        .feedback {
+            margin-top: 22px; padding: 18px 22px; border-radius: 12px;
+            animation: slideUp 0.4s ease-out;
+            font-size: 0.98em; line-height: 1.5;
+        }
+        .feedback.correct { background: #d4edda; color: #155724; border-left: 4px solid #28a745; }
+        .feedback.wrong { background: #f8d7da; color: #721c24; border-left: 4px solid #dc3545; }
+        .feedback strong { font-family: 'Fredoka', sans-serif; }
+        .next-btn, .restart-btn {
+            margin-top: 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white; border: none;
+            padding: 14px 32px; border-radius: 12px;
+            font-size: 1em; cursor: pointer;
+            font-family: 'Fredoka', sans-serif;
+            box-shadow: 0 6px 18px rgba(0,0,0,0.2);
+            transition: transform 0.2s ease;
+        }
+        .next-btn:hover, .restart-btn:hover { transform: scale(1.04); }
+        .results {
+            text-align: center; padding: 25px 15px;
+            animation: bounceIn 0.6s ease-out;
+        }
+        .results h2 {
+            font-family: 'Fredoka', sans-serif; font-size: 2em;
+            margin-bottom: 12px; color: #333;
+        }
+        .results .final-score {
+            font-size: 3em; font-family: 'Fredoka', sans-serif;
+            color: #667eea; margin: 20px 0;
+        }
+        .results p { color: #555; margin-bottom: 12px; }
+        .badge { display: inline-block; font-size: 3.5em; margin: 8px 0; }
+        @keyframes slideDown { from { opacity: 0; transform: translateY(-30px); } to { opacity: 1; transform: translateY(0); } }
+        @keyframes fadeIn { from { opacity: 0; transform: scale(0.96); } to { opacity: 1; transform: scale(1); } }
+        @keyframes slideUp { from { opacity: 0; transform: translateY(15px); } to { opacity: 1; transform: translateY(0); } }
+        @keyframes shake { 0%,100% { transform: translateX(0); } 25% { transform: translateX(-8px); } 75% { transform: translateX(8px); } }
+        @keyframes bounceIn { 0% { opacity: 0; transform: scale(0.4); } 60% { transform: scale(1.05); } 100% { opacity: 1; transform: scale(1); } }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <div class="lesson-tag">Module 7 · Lesson 7.7</div>
+            <h1>Video Creation Basics</h1>
+            <p>10 Chapa Fitness scenarios — three video categories, six phone rules, three-second hook, sound and captions</p>
+        </div>
+
+        <div class="score-board">
+            <div class="score-item"><div class="label">Score</div><div class="value" id="score">0</div></div>
+            <div class="score-item"><div class="label">Question</div><div class="value"><span id="current">1</span>/<span id="total">10</span></div></div>
+            <div class="score-item"><div class="label">Streak</div><div class="value" id="streak">0</div></div>
+        </div>
+
+        <div class="progress-bar"><div class="progress-fill" id="progress"></div></div>
+
+        <div class="exercise-card" id="exerciseCard"></div>
+    </div>
+
+    <script>
+        const exercises = [
+  {
+    "scenario": "Brian (Chapa Fitness, TikTok-first Gen-Z apparel, KES 40k/month) is planning his content. He asks which video category to focus on first.",
+    "question": "Which of Lesson 7.7's three categories fits Brian's audience and budget?",
+    "options": [
+      "Long-form (2-10 minutes) — YouTube tutorials, product demos, webinars.",
+      "Short-form (15-60 seconds, vertical) — Reels, TikTok, YouTube Shorts, Facebook Stories. Fastest-growing format worldwide and the most important for a Kenyan mobile-first business.",
+      "Live only.",
+      "None — Brian should stick to text."
+    ],
+    "correct": 1,
+    "explanation": "Section 7.7's three categories are short-form, long-form, and live. For a TikTok-first Gen-Z apparel brand on KES 40k/month, short-form is the natural starting point — cheap to produce, dominant format, and native to Brian's audience."
+  },
+  {
+    "scenario": "Brian films a Chapa Fitness Reel using his phone's FRONT (selfie) camera, holding it in one hand, under his office fluorescent lights, and shoots exactly the 15 seconds he needs.",
+    "question": "Which of the six phone-video rules from Lesson 7.7 has he broken?",
+    "options": [
+      "None — this is textbook.",
+      "Rules three (use the back camera, not the front — back cameras are much higher quality), four (hold with both hands or use a small tripod — shaky video looks amateur), five (shoot in natural light near a window, never under fluorescent office lights), and six (shoot longer than you need — easier to cut than to add).",
+      "Only rule one — vertical.",
+      "Only rule two — horizontal."
+    ],
+    "correct": 1,
+    "explanation": "Section 7.7's six rules for phone video: 1 vertical for Reels/Stories/TikTok, 2 horizontal only for YouTube/hero, 3 back camera not front, 4 two hands or tripod, 5 natural light near a window not fluorescents, 6 shoot longer than you need. Brian is triggering 3, 4, 5, and 6 in one clip."
+  },
+  {
+    "scenario": "Brian's Reel opens with 5 seconds of slow static B-roll before anything happens.",
+    "question": "What does Lesson 7.7 say about the first 3 seconds?",
+    "options": [
+      "First 5-10 seconds are safe to be slow.",
+      "The first 3 seconds are the hook. If the viewer scrolls after 3 seconds, everything after that time is wasted. Brian must deliver a hook in the opening 3 seconds — a bold statement, a question, a striking visual, a countdown, a promise, or a before-and-after.",
+      "The hook is the last 3 seconds.",
+      "There is no hook — algorithms do not care about openings."
+    ],
+    "correct": 1,
+    "explanation": "Section 7.7's three-second hook is non-negotiable. Six named hook types work in Kenya: bold statement, question, striking visual, countdown, promise, before-and-after. Pick one; deliver it in three seconds; then earn the rest of the watch."
+  },
+  {
+    "scenario": "Brian argues Reels are always watched with sound off, so he should skip music entirely and burn every message into captions only.",
+    "question": "What does Lesson 7.7 actually say?",
+    "options": [
+      "Brian is right — always mute your videos.",
+      "TikTok research shows about 88% of users watch with sound ON; Instagram Reels is similar. Your video needs to work in both modes: trending audio for engagement AND burned-in captions for reach and accessibility. Both. Every video. Every time.",
+      "Never use captions.",
+      "Use captions but no audio ever."
+    ],
+    "correct": 1,
+    "explanation": "Section 7.7 addresses the tension with Lesson 7.6 directly: sound-on wins engagement, captions win reach. Both are true; both are needed. Trending audio + burned-in captions = maximum coverage."
+  },
+  {
+    "scenario": "Brian's Reel has a 15-second single-shot clip of one product with no cuts.",
+    "question": "Which editing shortcut from Lesson 7.7 should he apply?",
+    "options": [
+      "Extend the single shot to 30 seconds.",
+      "Jump cuts. Cut every clip tightly, no pauses, no \"um\". Rapid movement holds attention. Anything longer than about 4 seconds without a cut feels slow on Reels.",
+      "Slow-motion the entire clip.",
+      "Remove all edits."
+    ],
+    "correct": 1,
+    "explanation": "Section 7.7 lists three editing shortcuts: jump cuts, text overlays, and a strong ending. Brian's single-take 15-second shot needs to be broken up. Anything over ~4 seconds without a cut feels slow."
+  },
+  {
+    "scenario": "Brian's Reel ends by fading to black mid-sentence with no call to action.",
+    "question": "Which editing shortcut from Lesson 7.7 does he need to apply?",
+    "options": [
+      "No changes needed.",
+      "A strong ending. The last 2 seconds of a video are almost as important as the first 3. End on a smile, a bite, a satisfied nod, or a clear call to action. Never fade to nothing. Never end mid-sentence. A weak ending kills the share rate.",
+      "Add more fades.",
+      "Cut the ending shorter."
+    ],
+    "correct": 1,
+    "explanation": "Section 7.7's third editing shortcut: strong ending. The last 2 seconds drive share rate. Fade-to-black-mid-sentence is a share-killer. End on a defined visual or CTA."
+  },
+  {
+    "scenario": "Sarah is finally ready to film her Kigali-style Reel that she planned in Lesson 7.5.",
+    "question": "Which step-by-step from Lesson 7.7 does she follow?",
+    "options": [
+      "Phone on a small tripod, back camera, vertical, near the kitchen window in natural afternoon light. Four 3-second shots: plating; plate from above; Sarah lifting a bite; Sarah smiling with an empty fork. Then in TikTok or Instagram: import the four clips, add a trending Afrobeats snippet, burn in captions (\"Fresh Kenyan lunch. Delivered in thirty minutes.\"), add a \"WhatsApp to order\" CTA. Save. Publish.",
+      "Handheld front camera under office lights.",
+      "One 60-second static shot.",
+      "Text-only Story."
+    ],
+    "correct": 0,
+    "explanation": "Section 7.7 gives Sarah's exact filming plan: tripod, back camera, vertical, kitchen-window light; four 3-second shots; then edit in-app with trending audio, captions, and a WhatsApp CTA. Ten minutes of filming."
+  },
+  {
+    "scenario": "Brian picks a trending TikTok audio without listening to the lyrics. The lyrics turn out to contain profanity that his Chapa Fitness audience of young athletes will find off-brand.",
+    "question": "Which mistake from Lesson 7.7 has he made?",
+    "options": [
+      "Talking too much.",
+      "Using every trending audio without listening to the words. Some trending sounds are inappropriate for a brand. Listen first before adding.",
+      "Over-editing.",
+      "Filming too long."
+    ],
+    "correct": 1,
+    "explanation": "Section 7.7's four amateur mistakes: talking too much, over-editing, using trending audio without listening, and filming any one shot too long. Brian is on mistake three. Listen to every trending sound before applying it."
+  },
+  {
+    "scenario": "Brian creates a 10-second Reel with 15 jump cuts.",
+    "question": "Which mistake from Lesson 7.7 applies?",
+    "options": [
+      "Not enough cuts.",
+      "Over-editing. Fifteen jump cuts in ten seconds is confusing, not exciting. Cuts should be tight but let the eye rest for a second or two on each moment.",
+      "Talking too much.",
+      "Wrong audio."
+    ],
+    "correct": 1,
+    "explanation": "Section 7.7's mistake two: over-editing. There is a difference between tight jump cuts and chaos. Fifteen cuts in ten seconds is chaos — the viewer cannot register anything."
+  },
+  {
+    "scenario": "Brian argues \"show, don't tell\" is old advice and he should narrate everything.",
+    "question": "What does Lesson 7.7 say?",
+    "options": [
+      "Narrate everything.",
+      "Talking too much is the first named amateur mistake. Show, do not tell. A video of the product being worn/eaten/used communicates more than a monologue about it.",
+      "Never show anything.",
+      "Only talk, never show."
+    ],
+    "correct": 1,
+    "explanation": "Section 7.7's mistake one is talking too much. Video's strength is visual. A shot of a customer wearing the Chapa Fitness hoodie in Kilimani says more than 20 seconds of voiceover about the fabric."
+  }
+];
+
+        let currentQuestion = 0, score = 0, streak = 0, answered = false;
+
+        function updateScoreboard() {
+            document.getElementById('score').textContent = score;
+            document.getElementById('current').textContent = Math.min(currentQuestion + 1, exercises.length);
+            document.getElementById('total').textContent = exercises.length;
+            document.getElementById('streak').textContent = streak;
+            document.getElementById('progress').style.width = ((currentQuestion) / exercises.length) * 100 + '%';
+        }
+
+        function escapeHtml(s) {
+            return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+        }
+
+        function renderQuestion() {
+            answered = false;
+            const q = exercises[currentQuestion];
+            let html = '';
+            if (q.scenario) {
+                html += `<div class="scenario"><strong>Scenario.</strong> ${escapeHtml(q.scenario)}</div>`;
+            }
+            html += `<div class="question">${escapeHtml(q.question)}</div>`;
+            html += '<div class="options">';
+            q.options.forEach((o, i) => {
+                html += `<button class="option" onclick="selectAnswer(${i})">${escapeHtml(o)}</button>`;
+            });
+            html += '</div>';
+            document.getElementById('exerciseCard').innerHTML = html;
+            updateScoreboard();
+        }
+
+        function selectAnswer(i) {
+            if (answered) return;
+            answered = true;
+            const q = exercises[currentQuestion];
+            const btns = document.querySelectorAll('.option');
+            btns.forEach(b => b.classList.add('disabled'));
+            btns[q.correct].classList.add('correct');
+            const right = i === q.correct;
+            if (!right) btns[i].classList.add('wrong');
+            if (right) { score += 10; streak += 1; } else { streak = 0; }
+            const fb = document.createElement('div');
+            fb.className = 'feedback ' + (right ? 'correct' : 'wrong');
+            fb.innerHTML = `<strong>${right ? '✅ Correct.' : '❌ Not quite.'}</strong><br>${escapeHtml(q.explanation)}`;
+            document.getElementById('exerciseCard').appendChild(fb);
+            const nb = document.createElement('button');
+            nb.className = 'next-btn';
+            nb.textContent = currentQuestion === exercises.length - 1 ? 'See results →' : 'Next scenario →';
+            nb.onclick = nextQuestion;
+            document.getElementById('exerciseCard').appendChild(nb);
+            updateScoreboard();
+        }
+
+        function nextQuestion() {
+            currentQuestion++;
+            if (currentQuestion >= exercises.length) return showResults();
+            renderQuestion();
+        }
+
+        function showResults() {
+            document.getElementById('progress').style.width = '100%';
+            const total = exercises.length * 10;
+            const pct = Math.round(score / total * 100);
+            if (window.parent) { window.parent.postMessage({type:"mtti_quiz_score", score: score, total: total, percent: pct}, "*"); }
+            let badge = '🌟', msg = 'Excellent work. You have a professional grasp of this lesson.';
+            if (pct < 50) { badge = '🌱'; msg = 'Good first attempt. Re-watch the lesson video and try again.'; }
+            else if (pct < 80) { badge = '📚'; msg = 'Solid progress. Review the scenarios you missed and retry.'; }
+            document.getElementById('exerciseCard').innerHTML = `
+                <div class="results">
+                    <span class="badge">${badge}</span>
+                    <h2>Quiz Complete</h2>
+                    <div class="final-score">${score} / ${total}</div>
+                    <p><strong>${pct}%</strong> · Longest streak: ${streak}</p>
+                    <p>${msg}</p>
+                    <button class="restart-btn" onclick="restart()">Try again 🔁</button>
+                </div>`;
+        }
+
+        function restart() {
+            currentQuestion = 0; score = 0; streak = 0;
+            renderQuestion();
+        }
+
+        renderQuestion();
+    </script>
+</body>
+</html>

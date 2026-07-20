@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Animated Text and Sticker Overlays | MTTI Video Editing</title>
+    <link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Fredoka:wght@500;600&display=swap" rel="stylesheet">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Space Mono', monospace; background: linear-gradient(135deg, #6A11CB 0%, #2575FC 100%); min-height: 100vh; padding: 20px; color: #fff; }
+        .container { max-width: 900px; margin: 0 auto; }
+        .header { text-align: center; margin-bottom: 30px; }
+        .header .lesson-tag { display: inline-block; background: rgba(255,255,255,0.2); padding: 6px 16px; border-radius: 999px; font-size: 0.85em; margin-bottom: 12px; }
+        .header h1 { font-family: 'Fredoka', sans-serif; font-size: 2.2em; margin-bottom: 8px; text-shadow: 3px 3px 0 rgba(0,0,0,0.2); }
+        .score-board { background: rgba(255,255,255,0.15); backdrop-filter: blur(10px); border-radius: 20px; padding: 20px; margin-bottom: 20px; display: flex; justify-content: space-around; }
+        .score-item { text-align: center; }
+        .score-item .label { font-size: 0.85em; opacity: 0.9; margin-bottom: 4px; }
+        .score-item .value { font-size: 1.8em; font-weight: bold; font-family: 'Fredoka', sans-serif; }
+        .progress-bar { width: 100%; height: 8px; background: rgba(255,255,255,0.3); border-radius: 10px; margin-bottom: 25px; overflow: hidden; }
+        .progress-fill { height: 100%; background: linear-gradient(90deg, #f7971e 0%, #ffd200 100%); border-radius: 10px; transition: width 0.5s ease; width: 0%; }
+        .exercise-card { background: white; color: #333; border-radius: 25px; padding: 35px; margin-bottom: 20px; box-shadow: 0 20px 60px rgba(0,0,0,0.3); }
+        .scenario { background: linear-gradient(135deg, #fff8e1 0%, #ffecb3 100%); border-left: 5px solid #ffc107; padding: 20px 24px; border-radius: 12px; margin-bottom: 24px; font-size: 0.98em; line-height: 1.55; }
+        .scenario strong { color: #7a5a00; font-family: 'Fredoka', sans-serif; }
+        .question { font-size: 1.15em; margin-bottom: 20px; font-weight: 700; line-height: 1.4; }
+        .options { display: flex; flex-direction: column; gap: 12px; }
+        .option { background: #f5f7fb; border: 2px solid transparent; padding: 16px 20px; border-radius: 12px; cursor: pointer; transition: all 0.2s ease; font-family: 'Space Mono', monospace; font-size: 0.98em; text-align: left; }
+        .option:hover:not(.disabled) { background: #eef1fb; border-color: #2575FC; transform: translateX(4px); }
+        .option.correct { background: #d4edda; border-color: #28a745; color: #155724; }
+        .option.wrong { background: #f8d7da; border-color: #dc3545; color: #721c24; }
+        .option.disabled { cursor: not-allowed; opacity: 0.85; }
+        .feedback { margin-top: 22px; padding: 18px 22px; border-radius: 12px; font-size: 0.98em; line-height: 1.5; }
+        .feedback.correct { background: #d4edda; color: #155724; border-left: 4px solid #28a745; }
+        .feedback.wrong { background: #f8d7da; color: #721c24; border-left: 4px solid #dc3545; }
+        .next-btn, .restart-btn { margin-top: 20px; background: linear-gradient(135deg, #6A11CB 0%, #2575FC 100%); color: white; border: none; padding: 14px 32px; border-radius: 12px; font-size: 1em; cursor: pointer; font-family: 'Fredoka', sans-serif; box-shadow: 0 6px 18px rgba(0,0,0,0.2); }
+        .results { text-align: center; padding: 25px 15px; }
+        .results h2 { font-family: 'Fredoka', sans-serif; font-size: 2em; margin-bottom: 12px; color: #333; }
+        .results .final-score { font-size: 3em; font-family: 'Fredoka', sans-serif; color: #2575FC; margin: 20px 0; }
+        .results p { color: #555; margin-bottom: 12px; }
+        .badge { display: inline-block; font-size: 3.5em; margin: 8px 0; }
+
+        /* How-To intro screen — shown before question 1, not scored */
+        .howto-card { background: white; color: #333; border-radius: 25px; padding: 35px; margin-bottom: 20px; box-shadow: 0 20px 60px rgba(0,0,0,0.3); }
+        .howto-card h3 { font-family: 'Fredoka', sans-serif; font-size: 1.3em; margin-bottom: 12px; color: #2575FC; }
+        .howto-card p { line-height: 1.6; margin-bottom: 16px; color: #444; }
+        .howto-fields { display: flex; flex-direction: column; gap: 16px; background: #f5f7fb; border-radius: 12px; padding: 18px 20px; margin-bottom: 18px; }
+        .howto-field { display: flex; flex-direction: column; gap: 6px; }
+        .howto-field label { font-weight: 700; font-size: 0.92em; color: #333; }
+        .howto-field input, .howto-field select { font-family: 'Space Mono', monospace; font-size: 0.98em; padding: 10px 12px; border-radius: 8px; border: 2px solid #dfe3ee; background: #fff; color: #333; }
+        .howto-field input:focus, .howto-field select:focus { outline: none; border-color: #2575FC; }
+        .howto-results { display: none; flex-direction: column; gap: 8px; margin-bottom: 18px; }
+        .howto-results.show { display: flex; }
+        .howto-result-row { display: flex; justify-content: space-between; align-items: center; padding: 10px 14px; border-radius: 8px; font-size: 0.9em; gap: 12px; }
+        .howto-result-row.ok { background: #d4edda; color: #155724; }
+        .howto-result-row.fail { background: #f8d7da; color: #721c24; }
+        .howto-banner { margin-top: 4px; margin-bottom: 18px; padding: 12px 16px; border-radius: 10px; font-size: 0.9em; font-weight: 700; display: none; }
+        .howto-banner.show { display: block; }
+        .howto-banner.ok { background: #d4edda; color: #155724; }
+        .howto-banner.fail { background: #f8d7da; color: #721c24; }
+        .start-quiz-btn { margin-top: 4px; background: linear-gradient(135deg, #6A11CB 0%, #2575FC 100%); color: white; border: none; padding: 14px 32px; border-radius: 12px; font-size: 1em; cursor: pointer; font-family: 'Fredoka', sans-serif; box-shadow: 0 6px 18px rgba(0,0,0,0.2); }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <div class="lesson-tag">Unit 23 · Lesson 23.3 · Quiz</div>
+            <h1>Animated Text and Sticker Overlays</h1>
+        </div>
+        <div class="score-board">
+            <div class="score-item"><div class="label">Score</div><div class="value" id="score">0</div></div>
+            <div class="score-item"><div class="label">Question</div><div class="value"><span id="current">1</span>/<span id="total">10</span></div></div>
+            <div class="score-item"><div class="label">Streak</div><div class="value" id="streak">0</div></div>
+        </div>
+        <div class="progress-bar"><div class="progress-fill" id="progress"></div></div>
+        <div class="exercise-card" id="exerciseCard"></div>
+    </div>
+    <script>
+        const exercises = [{"scenario":"Otieno is adding the CTA text \"Order Now! \ud83d\udcde 0712 345 678\" to the end of a shop promo reel.","question":"Roughly how long should the text sit fully static (not still animating) on screen?","options":["Less than half a second","At least about 3 seconds","It doesn't matter as long as it appears at all","Exactly 10 seconds, always"],"correct":1,"explanation":"A CTA carrying a phone number needs enough static hang time \u2014 at least around 3 seconds \u2014 for a viewer to actually read or screenshot it."},{"scenario":"Otieno considers using a Typewriter animation, revealing the phone number one character at a time, for the \"Order Now!\" text.","question":"Why is Typewriter a risky choice here?","options":["Typewriter animations are not available in CapCut","The full number isn't visible until the animation finishes, delaying when a scrolling viewer can actually read it","Typewriter only works on video, not on text","Typewriter automatically deletes the text after one second"],"correct":1,"explanation":"Typewriter reveals text gradually, meaning a viewer scrolling quickly may move on before the complete phone number ever appears."},{"scenario":"Otieno places the CTA text right at the very bottom edge of the frame, and later notices it overlaps with the Reels caption and like\/comment icons that Instagram draws on top of the video.","question":"What should Otieno do to fix this?","options":["Nothing \u2014 overlap with platform icons doesn't matter","Move the text up slightly, into the bottom-third safe zone but clear of where the platform draws its own UI","Make the text bigger so it's readable underneath the icons","Remove the phone number entirely"],"correct":1,"explanation":"Text needs to sit in a safe zone that avoids the platform's own caption and icon overlays, not just anywhere in the bottom third."},{"scenario":"Otieno is choosing between a calm Fade In and a playful Bounce animation for two different overlays: the phone-number CTA, and a small decorative \"Follow us!\" sticker.","question":"Which animation style fits which overlay?","options":["Bounce for the CTA, Fade In for the sticker","Fade In (or Rise Up) for the CTA text, since it needs to be read calmly; Bounce is fine for the lightweight, non-informational sticker","Both should use the exact same animation, since consistency is all that matters","Neither overlay should use any animation at all"],"correct":1,"explanation":"Information the viewer must actually read (the CTA) benefits from a calmer animation, while a decorative sticker with no critical information can afford a punchier one."},{"scenario":"Otieno is deciding how long the \"Follow us!\" sticker should stay on screen compared to the phone-number CTA.","question":"Which is the better approach?","options":["Give both exactly the same on-screen duration","The sticker can be shorter-lived (around 1 second) since it's not conveying information that must be read; the CTA needs longer, static hang time","The sticker should stay on screen the longest, since it's just for fun","Duration should be random for both"],"correct":1,"explanation":"A non-informational sticker can flash by quickly for style, while a CTA carrying a phone number needs enough time to actually be read."},{"scenario":"A client complains they couldn't read the phone number in Otieno's reel because it appeared with a fast Zoom-in entrance and disappeared again after only 1 second.","question":"What should Otieno fix?","options":["Nothing needs to change; the client is mistaken","Switch to a calmer entrance (like Fade In or Rise Up) and hold the text fully static for at least 3 seconds before it exits","Make the Zoom-in even faster so it looks more dynamic","Remove the phone number and replace it with just a sticker"],"correct":1,"explanation":"The complaint points to exactly the two things that matter for a readable CTA: a calmer entrance and enough static on-screen time before it exits."}];
+        let currentQuestion = 0, score = 0, streak = 0, answered = false;
+        function updateScoreboard() {
+            document.getElementById('score').textContent = score;
+            document.getElementById('current').textContent = Math.min(currentQuestion + 1, exercises.length);
+            document.getElementById('total').textContent = exercises.length;
+            document.getElementById('streak').textContent = streak;
+            document.getElementById('progress').style.width = ((currentQuestion) / exercises.length) * 100 + '%';
+        }
+        function escapeHtml(s) { return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+        function renderQuestion() {
+            answered = false;
+            const q = exercises[currentQuestion];
+            let html = '';
+            if (q.scenario) html += `<div class="scenario"><strong>Scenario.</strong> ${escapeHtml(q.scenario)}</div>`;
+            html += `<div class="question">${escapeHtml(q.question)}</div>`;
+            html += '<div class="options">';
+            q.options.forEach((o, i) => { html += `<button class="option" onclick="selectAnswer(${i})">${escapeHtml(o)}</button>`; });
+            html += '</div>';
+            document.getElementById('exerciseCard').innerHTML = html;
+            updateScoreboard();
+        }
+        function selectAnswer(i) {
+            if (answered) return;
+            answered = true;
+            const q = exercises[currentQuestion];
+            const btns = document.querySelectorAll('.option');
+            btns.forEach(b => b.classList.add('disabled'));
+            btns[q.correct].classList.add('correct');
+            const right = i === q.correct;
+            if (!right) btns[i].classList.add('wrong');
+            if (right) { score += 10; streak += 1; } else { streak = 0; }
+            const fb = document.createElement('div');
+            fb.className = 'feedback ' + (right ? 'correct' : 'wrong');
+            fb.innerHTML = `<strong>${right ? '&#9989; Correct.' : '&#10060; Not quite.'}</strong><br>${escapeHtml(q.explanation)}`;
+            document.getElementById('exerciseCard').appendChild(fb);
+            const nb = document.createElement('button');
+            nb.className = 'next-btn';
+            nb.textContent = currentQuestion === exercises.length - 1 ? 'See results →' : 'Next scenario →';
+            nb.onclick = nextQuestion;
+            document.getElementById('exerciseCard').appendChild(nb);
+            updateScoreboard();
+        }
+        function nextQuestion() { currentQuestion++; if (currentQuestion >= exercises.length) return showResults(); renderQuestion(); }
+        function showResults() {
+            document.getElementById('progress').style.width = '100%';
+            const total = exercises.length * 10;
+            const pct = Math.round(score / total * 100);
+            if (window.parent) { window.parent.postMessage({type:"mtti_quiz_score", score: score, total: total, percent: pct}, "*"); }
+            let badge = '🌟', msg = 'Excellent work. Otieno-level editing instincts.';
+            if (pct < 50) { badge = '🌱'; msg = 'Good first attempt. Review the lesson and try again.'; }
+            else if (pct < 80) { badge = '📚'; msg = 'Solid progress. Review the scenarios you missed and retry.'; }
+            document.getElementById('exerciseCard').innerHTML = `
+                <div class="results">
+                    <span class="badge">${badge}</span>
+                    <h2>Quiz Complete</h2>
+                    <div class="final-score">${score} / ${total}</div>
+                    <p><strong>${pct}%</strong> &middot; Longest streak: ${streak}</p>
+                    <p>${msg}</p>
+                    <button class="restart-btn" onclick="restart()">Try again &#128257;</button>
+                </div>`;
+        }
+        function restart() { currentQuestion = 0; score = 0; streak = 0; renderQuestion(); }
+
+        /* How-To intro — a small, ungraded field-check demo shown before the
+           quiz starts, directly rehearsing the "pick/enter the right setting"
+           mechanic that one of the quiz scenarios asks about, so it's not
+           being asked cold. */
+        const HOWTO_FIELDS = [{id:'entrance_style', label:'Entrance animation for the CTA text', type:'select', options:['Zoom In','Bounce','Fade In']}, {id:'hold_duration', label:'Static hold time before it exits (seconds)', type:'number', placeholder:'e.g. 3'}];
+        const HOWTO_RULES = [{field:'entrance_style', operator:'eq', value:'Fade In', label:'Fade In is a calmer entrance that doesn\'t delay readability'}, {field:'hold_duration', operator:'gte', value:3, label:'At least 3 seconds static — enough time to actually read the number'}];
+
+        function escHtmlH(s) { return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+
+        function howtoFieldHtml(f) {
+            if (f.type === 'select') {
+                return `<div class="howto-field"><label for="hf_${f.id}">${escHtmlH(f.label)}</label><select id="hf_${f.id}">${(f.options||[]).map(o=>`<option value="${escHtmlH(o)}">${escHtmlH(o)}</option>`).join('')}</select></div>`;
+            }
+            return `<div class="howto-field"><label for="hf_${f.id}">${escHtmlH(f.label)}</label><input type="number" step="0.1" id="hf_${f.id}" placeholder="${escHtmlH(f.placeholder||'')}"></div>`;
+        }
+
+        function collectHowtoValues() {
+            const vals = {};
+            HOWTO_FIELDS.forEach(f => {
+                const el = document.getElementById('hf_' + f.id);
+                if (!el) return;
+                vals[f.id] = f.type === 'number' ? parseFloat(el.value) : el.value;
+            });
+            return vals;
+        }
+
+        function applyHowtoOp(val, op, target) {
+            switch (op) {
+                case 'eq': return val == target;
+                case 'gte': return !isNaN(parseFloat(val)) && parseFloat(val) >= target;
+                case 'lte': return !isNaN(parseFloat(val)) && parseFloat(val) <= target;
+                default: return false;
+            }
+        }
+
+        function checkHowto() {
+            const vals = collectHowtoValues();
+            const rows = HOWTO_RULES.map(r => {
+                const ok = applyHowtoOp(vals[r.field], r.operator, r.value);
+                return `<div class="howto-result-row ${ok?'ok':'fail'}"><span>${escHtmlH(r.label)}</span><span>${ok?'✅':'❌'}</span></div>`;
+            }).join('');
+            const allOk = HOWTO_RULES.every(r => applyHowtoOp(vals[r.field], r.operator, r.value));
+            const box = document.getElementById('howtoResults');
+            box.classList.add('show');
+            box.innerHTML = rows;
+            const banner = document.getElementById('howtoBanner');
+            banner.classList.add('show');
+            banner.className = 'howto-banner show ' + (allOk ? 'ok' : 'fail');
+            banner.textContent = allOk
+                ? '✅ That\'s the fix — a calmer entrance plus enough static hold time to actually read the number.'
+                : '❌ Not yet — use a calmer entrance (Fade In) and hold the text static for at least 3 seconds.';
+        }
+
+        function renderHowto() {
+            document.getElementById('exerciseCard').innerHTML = `
+                <div class="howto-card">
+                    <h3>🔍 Quick How-To: Making a CTA Actually Readable</h3>
+                    <p>One of the scenarios coming up asks about fixing exactly this complaint: a phone-number CTA that flashes by too fast to read. Otieno is adding a new order-number CTA and wants to avoid the same problem &mdash; pick a calmer entrance and set a static hold time below, then check your choices.</p>
+                    <div class="howto-fields" id="howtoFields"></div>
+                    <div class="howto-results" id="howtoResults"></div>
+                    <div class="howto-banner" id="howtoBanner"></div>
+                    <button class="start-quiz-btn" id="checkHowtoBtn">Check My Settings</button>
+                    <button class="start-quiz-btn" id="startQuizBtn" style="margin-left:10px;background:linear-gradient(135deg,#28a745,#1e7e34);">Start Quiz →</button>
+                </div>`;
+            document.getElementById('howtoFields').innerHTML = HOWTO_FIELDS.map(howtoFieldHtml).join('');
+            document.getElementById('checkHowtoBtn').addEventListener('click', checkHowto);
+            document.getElementById('startQuizBtn').addEventListener('click', renderQuestion);
+        }
+
+        renderHowto();
+    </script>
+</body>
+</html>

@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI-Powered Motion Detection and Smart Alerts | MTTI CCTV Installation</title>
+    <link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Fredoka:wght@500;600&display=swap" rel="stylesheet">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Space Mono', monospace; background: linear-gradient(135deg, #360033 0%, #0b8793 100%); min-height: 100vh; padding: 20px; color: #fff; }
+        .container { max-width: 900px; margin: 0 auto; }
+        .header { text-align: center; margin-bottom: 30px; }
+        .header .lesson-tag { display: inline-block; background: rgba(255,255,255,0.2); padding: 6px 16px; border-radius: 999px; font-size: 0.85em; margin-bottom: 12px; }
+        .header h1 { font-family: 'Fredoka', sans-serif; font-size: 2.2em; margin-bottom: 8px; text-shadow: 3px 3px 0 rgba(0,0,0,0.2); }
+        .score-board { background: rgba(255,255,255,0.15); backdrop-filter: blur(10px); border-radius: 20px; padding: 20px; margin-bottom: 20px; display: flex; justify-content: space-around; }
+        .score-item { text-align: center; }
+        .score-item .label { font-size: 0.85em; opacity: 0.9; margin-bottom: 4px; }
+        .score-item .value { font-size: 1.8em; font-weight: bold; font-family: 'Fredoka', sans-serif; }
+        .progress-bar { width: 100%; height: 8px; background: rgba(255,255,255,0.3); border-radius: 10px; margin-bottom: 25px; overflow: hidden; }
+        .progress-fill { height: 100%; background: linear-gradient(90deg, #f093fb 0%, #f5576c 100%); border-radius: 10px; transition: width 0.5s ease; width: 0%; }
+        .exercise-card { background: white; color: #333; border-radius: 25px; padding: 35px; margin-bottom: 20px; box-shadow: 0 20px 60px rgba(0,0,0,0.3); }
+        .scenario { background: linear-gradient(135deg, #fff8e1 0%, #ffecb3 100%); border-left: 5px solid #ffc107; padding: 20px 24px; border-radius: 12px; margin-bottom: 24px; font-size: 0.98em; line-height: 1.55; }
+        .scenario strong { color: #7a5a00; font-family: 'Fredoka', sans-serif; }
+        .question { font-size: 1.15em; margin-bottom: 20px; font-weight: 700; line-height: 1.4; }
+        .options { display: flex; flex-direction: column; gap: 12px; }
+        .option { background: #f5f7fb; border: 2px solid transparent; padding: 16px 20px; border-radius: 12px; cursor: pointer; transition: all 0.2s ease; font-family: 'Space Mono', monospace; font-size: 0.98em; text-align: left; }
+        .option:hover:not(.disabled) { background: #eef1fb; border-color: #0b8793; transform: translateX(4px); }
+        .option.correct { background: #d4edda; border-color: #28a745; color: #155724; }
+        .option.wrong { background: #f8d7da; border-color: #dc3545; color: #721c24; }
+        .option.disabled { cursor: not-allowed; opacity: 0.85; }
+        .feedback { margin-top: 22px; padding: 18px 22px; border-radius: 12px; font-size: 0.98em; line-height: 1.5; }
+        .feedback.correct { background: #d4edda; color: #155724; border-left: 4px solid #28a745; }
+        .feedback.wrong { background: #f8d7da; color: #721c24; border-left: 4px solid #dc3545; }
+        .next-btn, .restart-btn { margin-top: 20px; background: linear-gradient(135deg, #360033 0%, #0b8793 100%); color: white; border: none; padding: 14px 32px; border-radius: 12px; font-size: 1em; cursor: pointer; font-family: 'Fredoka', sans-serif; box-shadow: 0 6px 18px rgba(0,0,0,0.2); }
+        .results { text-align: center; padding: 25px 15px; }
+        .results h2 { font-family: 'Fredoka', sans-serif; font-size: 2em; margin-bottom: 12px; color: #333; }
+        .results .final-score { font-size: 3em; font-family: 'Fredoka', sans-serif; color: #0b8793; margin: 20px 0; }
+        .results p { color: #555; margin-bottom: 12px; }
+        .badge { display: inline-block; font-size: 3.5em; margin: 8px 0; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <div class="lesson-tag">Module 6 · Lesson 6.1 · Quiz</div>
+            <h1>AI-Powered Motion Detection and Smart Alerts</h1>
+        </div>
+        <div class="score-board">
+            <div class="score-item"><div class="label">Score</div><div class="value" id="score">0</div></div>
+            <div class="score-item"><div class="label">Question</div><div class="value"><span id="current">1</span>/<span id="total">10</span></div></div>
+            <div class="score-item"><div class="label">Streak</div><div class="value" id="streak">0</div></div>
+        </div>
+        <div class="progress-bar"><div class="progress-fill" id="progress"></div></div>
+        <div class="exercise-card" id="exerciseCard"></div>
+    </div>
+    <script>
+        const exercises = [{"scenario":"Dennis is comparing an old basic motion sensor system to a new AI-based smart detection system for a SafeView Security Systems client.","question":"What is the key difference between the two?","options":["There is no real difference, they work the same way","A basic sensor alerts on any movement in frame; smart detection tries to classify what actually moved (person, vehicle, animal) before alerting","Smart detection only works during the day","Basic sensors are always more accurate than AI-based ones"],"correct":1,"explanation":"Basic motion detection reacts to any change in the scene, while AI-based smart detection adds a classification step to identify the type of object before raising an alert."},{"scenario":"A client's old basic system used to alert every time a tree branch moved in the wind.","question":"Why did this happen?","options":["The camera lens was dirty","Basic motion detection has no way to tell the difference between a branch, a person, or a vehicle — any pixel change triggers it","The client's Wi-Fi was too slow","This only happens with very old cameras, never modern ones"],"correct":1,"explanation":"Basic pixel-change or PIR-based motion detection cannot classify objects, so it treats a swaying branch the same as a person walking through the frame."},{"scenario":"Dennis is setting up smart detection for a home client and wants to reduce false alerts from a cat that wanders the yard at night.","question":"What is a sensible way to handle this?","options":["Adjust the detection zone or object filter so the cat's path is excluded or animal alerts are turned off there, while person/vehicle detection stays on","Tell the client to keep the cat inside permanently","Disable the camera at night entirely","Increase motion sensitivity so it catches the cat every time"],"correct":0,"explanation":"Tuning zones and object filters lets the system ignore routine animal movement in that area without losing coverage of people or vehicles."},{"scenario":"A client wants alerts only for people approaching their front gate, not for every car driving past on the public road outside.","question":"What is the best configuration approach?","options":["One large detection zone covering the whole street with all object types enabled","A detection zone limited to the gate area, with the object filter set to person only for that zone","Alert on vehicles only, since cars matter more than people","Turn off all AI features so every movement triggers the same generic alert"],"correct":1,"explanation":"Combining a tightly scoped detection zone with the right object filter gives the client exactly the alerts they actually want."},{"scenario":"Dennis is explaining to a new colleague why some clients still get false alerts even after smart detection is switched on.","question":"What is a likely reason for this?","options":["Smart detection features work automatically at their best regardless of camera setup, so this should never happen","Detection zones, sensitivity, and camera positioning/lighting still need to be configured correctly — smart detection is not effective if these are left at poor defaults","Only cameras made by one specific brand can ever have this issue","False alerts are always caused by a faulty camera, never configuration"],"correct":1,"explanation":"AI-based detection still depends on sensible zone setup, sensitivity, and a reasonably clear view — poor configuration can undermine even good AI features."},{"scenario":"A client asks Dennis whether AI-based smart detection means the system will now be immune to any false alerts.","question":"What is the most accurate answer Dennis should give?","options":["Yes, once smart detection is on, false alerts become impossible","It significantly reduces false alerts from things like branches or small animals, but proper setup and good camera conditions are still needed for the best results","No, smart detection makes false alerts worse, not better","False alerts only happen with cheap cameras, never with AI features"],"correct":1,"explanation":"Smart detection meaningfully cuts down false alerts but is not a guarantee — sensible configuration and decent viewing conditions are still part of getting good results."},{"scenario":"Dennis is deciding what object filters to enable for a rural client who keeps free-range chickens near one of the cameras.","question":"What is a sensible approach for that specific camera?","options":["Enable person and vehicle detection, and consider disabling or limiting animal-triggered alerts for that camera's zone so the chickens don't cause constant notifications","Enable animal detection only, and disable person detection","Leave every object filter off so nothing is ever missed","Use the exact same settings as every other client regardless of their property"],"correct":0,"explanation":"Tailoring the object filters to the client's actual property — keeping person/vehicle alerts active while limiting animal-triggered noise where it's expected — gives a genuinely useful, low-noise system."}];
+        let currentQuestion = 0, score = 0, streak = 0, answered = false;
+        function updateScoreboard() {
+            document.getElementById('score').textContent = score;
+            document.getElementById('current').textContent = Math.min(currentQuestion + 1, exercises.length);
+            document.getElementById('total').textContent = exercises.length;
+            document.getElementById('streak').textContent = streak;
+            document.getElementById('progress').style.width = ((currentQuestion) / exercises.length) * 100 + '%';
+        }
+        function escapeHtml(s) { return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+        function renderQuestion() {
+            answered = false;
+            const q = exercises[currentQuestion];
+            let html = '';
+            if (q.scenario) html += `<div class="scenario"><strong>Scenario.</strong> ${escapeHtml(q.scenario)}</div>`;
+            html += `<div class="question">${escapeHtml(q.question)}</div>`;
+            html += '<div class="options">';
+            q.options.forEach((o, i) => { html += `<button class="option" onclick="selectAnswer(${i})">${escapeHtml(o)}</button>`; });
+            html += '</div>';
+            document.getElementById('exerciseCard').innerHTML = html;
+            updateScoreboard();
+        }
+        function selectAnswer(i) {
+            if (answered) return;
+            answered = true;
+            const q = exercises[currentQuestion];
+            const btns = document.querySelectorAll('.option');
+            btns.forEach(b => b.classList.add('disabled'));
+            btns[q.correct].classList.add('correct');
+            const right = i === q.correct;
+            if (!right) btns[i].classList.add('wrong');
+            if (right) { score += 10; streak += 1; } else { streak = 0; }
+            const fb = document.createElement('div');
+            fb.className = 'feedback ' + (right ? 'correct' : 'wrong');
+            fb.innerHTML = `<strong>${right ? '✅ Correct.' : '❌ Not quite.'}</strong><br>${escapeHtml(q.explanation)}`;
+            document.getElementById('exerciseCard').appendChild(fb);
+            const nb = document.createElement('button');
+            nb.className = 'next-btn';
+            nb.textContent = currentQuestion === exercises.length - 1 ? 'See results →' : 'Next scenario →';
+            nb.onclick = nextQuestion;
+            document.getElementById('exerciseCard').appendChild(nb);
+            updateScoreboard();
+        }
+        function nextQuestion() { currentQuestion++; if (currentQuestion >= exercises.length) return showResults(); renderQuestion(); }
+        function showResults() {
+            document.getElementById('progress').style.width = '100%';
+            const total = exercises.length * 10;
+            const pct = Math.round(score / total * 100);
+            if (window.parent) { window.parent.postMessage({type:"mtti_quiz_score", score: score, total: total, percent: pct}, "*"); }
+            let badge = '🌟', msg = 'Excellent work. You have a professional grasp of this lesson.';
+            if (pct < 50) { badge = '🌱'; msg = 'Good first attempt. Review the lesson and try again.'; }
+            else if (pct < 80) { badge = '📚'; msg = 'Solid progress. Review the scenarios you missed and retry.'; }
+            document.getElementById('exerciseCard').innerHTML = `
+                <div class="results">
+                    <span class="badge">${badge}</span>
+                    <h2>Quiz Complete</h2>
+                    <div class="final-score">${score} / ${total}</div>
+                    <p><strong>${pct}%</strong> · Longest streak: ${streak}</p>
+                    <p>${msg}</p>
+                    <button class="restart-btn" onclick="restart()">Try again 🔁</button>
+                </div>`;
+        }
+        function restart() { currentQuestion = 0; score = 0; streak = 0; renderQuestion(); }
+        renderQuestion();
+    </script>
+</body>
+</html>

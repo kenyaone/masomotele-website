@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Data Types | MTTI Programming Principles</title>
+<link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Fredoka:wght@500;600&display=swap" rel="stylesheet">
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body {
+    font-family: 'Space Mono', monospace;
+    background: linear-gradient(135deg, #2E7D32 0%, #1565C0 100%);
+    min-height: 100vh; padding: 20px; color: #fff;
+}
+.container { max-width: 900px; margin: 0 auto; }
+.header { text-align: center; margin-bottom: 26px; }
+.lesson-tag { display: inline-block; background: rgba(255,255,255,0.2); padding: 6px 16px; border-radius: 999px; font-size: 0.85em; margin-bottom: 12px; }
+.header h1 { font-family: 'Fredoka', sans-serif; font-size: 2.1em; margin-bottom: 8px; text-shadow: 3px 3px 0 rgba(0,0,0,0.2); }
+.task {
+    background: white; color: #333; border-radius: 22px;
+    padding: 26px; margin-bottom: 20px;
+    box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+}
+.task h2 { font-family: 'Fredoka', sans-serif; font-size: 1.3em; margin-bottom: 14px; display: flex; align-items: center; }
+.task-num {
+    display: inline-block; width: 30px; height: 30px;
+    background: linear-gradient(135deg, #2E7D32 0%, #1565C0 100%);
+    color: white; border-radius: 50%; text-align: center; line-height: 30px;
+    font-family: 'Fredoka', sans-serif; font-weight: 600; margin-right: 10px; flex-shrink: 0; font-size: 0.75em;
+}
+.section-body { color: #444; font-size: 0.98em; line-height: 1.7; }
+.section-body p { margin-bottom: 12px; }
+.section-body strong { color: #1B5E20; }
+.section-body ul, .section-body ol { margin: 10px 0 14px 22px; }
+.section-body li { margin-bottom: 6px; }
+.code-block {
+    background: #1e1e2e; color: #cdd6f4; border-radius: 10px;
+    padding: 16px 18px; margin-top: 10px; overflow-x: auto;
+    font-family: 'Courier New', monospace; font-size: 0.88em; line-height: 1.6;
+}
+</style>
+</head>
+<body>
+<div class="container">
+    <div class="header">
+        <div class="lesson-tag">Python Fundamentals · Data Types</div>
+        <h1>Data Types</h1>
+    </div>
+    <div class="task"><h2><span class="task-num">1</span>The Four Basic Data Types</h2><div class="section-body"><p>Python has several built-in data types. The four you'll use constantly are:</p><ul><li><strong>str</strong> (string) — text, always in quotes, e.g. <code>"Eldoret"</code></li><li><strong>int</strong> (integer) — a whole number, e.g. <code>25</code></li><li><strong>float</strong> — a decimal number, e.g. <code>49.99</code></li><li><strong>bool</strong> (Boolean) — either <code>True</code> or <code>False</code></li></ul><pre class="code-block"><code>name = &quot;Kipchoge&quot;   # str
+age = 25             # int
+price = 49.99         # float
+is_student = True     # bool</code></pre></div></div><div class="task"><h2><span class="task-num">2</span>Checking a Value&#039;s Type</h2><div class="section-body"><p>The built-in <code>type()</code> function tells you what type a value or variable is — useful when you're not sure, or when debugging.</p><pre class="code-block"><code>age = 25
+print(type(age))
+# Output: &lt;class &#039;int&#039;&gt;</code></pre></div></div><div class="task"><h2><span class="task-num">3</span>Why Type Matters</h2><div class="section-body"><p>Python only lets you do certain operations on certain types — you can add two numbers, but adding a number to text directly causes an error. Knowing a value's type helps you predict how your code will behave.</p></div></div>
+</div>
+</body>
+</html>

@@ -1,0 +1,346 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Install and Customise a Theme | MTTI Digital Marketing</title>
+    <link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Fredoka:wght@500;600&display=swap" rel="stylesheet">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Space Mono', monospace;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh; padding: 20px; color: #fff;
+        }
+        .container { max-width: 900px; margin: 0 auto; }
+        .header { text-align: center; margin-bottom: 30px; animation: slideDown 0.6s ease-out; }
+        .header .lesson-tag {
+            display: inline-block; background: rgba(255,255,255,0.2);
+            padding: 6px 16px; border-radius: 999px;
+            font-size: 0.85em; margin-bottom: 12px;
+        }
+        .header h1 {
+            font-family: 'Fredoka', sans-serif; font-size: 2.2em;
+            margin-bottom: 8px; text-shadow: 3px 3px 0 rgba(0,0,0,0.2);
+        }
+        .header p { opacity: 0.95; font-size: 0.95em; }
+        .score-board {
+            background: rgba(255,255,255,0.15); backdrop-filter: blur(10px);
+            border-radius: 20px; padding: 20px; margin-bottom: 20px;
+            display: flex; justify-content: space-around;
+            animation: fadeIn 0.8s ease-out 0.2s both;
+        }
+        .score-item { text-align: center; }
+        .score-item .label { font-size: 0.85em; opacity: 0.9; margin-bottom: 4px; }
+        .score-item .value {
+            font-size: 1.8em; font-weight: bold; font-family: 'Fredoka', sans-serif;
+        }
+        .progress-bar {
+            width: 100%; height: 8px; background: rgba(255,255,255,0.3);
+            border-radius: 10px; margin-bottom: 25px; overflow: hidden;
+        }
+        .progress-fill {
+            height: 100%; background: linear-gradient(90deg, #f093fb 0%, #f5576c 100%);
+            border-radius: 10px; transition: width 0.5s ease; width: 0%;
+        }
+        .exercise-card {
+            background: white; color: #333; border-radius: 25px;
+            padding: 35px; margin-bottom: 20px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            animation: fadeIn 0.6s ease-out both;
+        }
+        .scenario {
+            background: linear-gradient(135deg, #fff8e1 0%, #ffecb3 100%);
+            border-left: 5px solid #ffc107;
+            padding: 20px 24px; border-radius: 12px;
+            margin-bottom: 24px;
+            font-size: 0.98em; line-height: 1.55;
+        }
+        .scenario strong { color: #7a5a00; font-family: 'Fredoka', sans-serif; }
+        .question {
+            font-size: 1.15em; margin-bottom: 20px;
+            font-weight: 700; line-height: 1.4;
+        }
+        .options { display: flex; flex-direction: column; gap: 12px; }
+        .option {
+            background: #f5f7fb; border: 2px solid transparent;
+            padding: 16px 20px; border-radius: 12px;
+            cursor: pointer; transition: all 0.2s ease;
+            font-family: 'Space Mono', monospace; font-size: 0.98em; text-align: left;
+        }
+        .option:hover:not(.disabled) {
+            background: #eef1fb; border-color: #667eea; transform: translateX(4px);
+        }
+        .option.correct { background: #d4edda; border-color: #28a745; color: #155724; }
+        .option.wrong { background: #f8d7da; border-color: #dc3545; color: #721c24; animation: shake 0.4s; }
+        .option.disabled { cursor: not-allowed; opacity: 0.85; }
+        .feedback {
+            margin-top: 22px; padding: 18px 22px; border-radius: 12px;
+            animation: slideUp 0.4s ease-out;
+            font-size: 0.98em; line-height: 1.5;
+        }
+        .feedback.correct { background: #d4edda; color: #155724; border-left: 4px solid #28a745; }
+        .feedback.wrong { background: #f8d7da; color: #721c24; border-left: 4px solid #dc3545; }
+        .feedback strong { font-family: 'Fredoka', sans-serif; }
+        .next-btn, .restart-btn {
+            margin-top: 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white; border: none;
+            padding: 14px 32px; border-radius: 12px;
+            font-size: 1em; cursor: pointer;
+            font-family: 'Fredoka', sans-serif;
+            box-shadow: 0 6px 18px rgba(0,0,0,0.2);
+            transition: transform 0.2s ease;
+        }
+        .next-btn:hover, .restart-btn:hover { transform: scale(1.04); }
+        .results {
+            text-align: center; padding: 25px 15px;
+            animation: bounceIn 0.6s ease-out;
+        }
+        .results h2 {
+            font-family: 'Fredoka', sans-serif; font-size: 2em;
+            margin-bottom: 12px; color: #333;
+        }
+        .results .final-score {
+            font-size: 3em; font-family: 'Fredoka', sans-serif;
+            color: #667eea; margin: 20px 0;
+        }
+        .results p { color: #555; margin-bottom: 12px; }
+        .badge { display: inline-block; font-size: 3.5em; margin: 8px 0; }
+        @keyframes slideDown { from { opacity: 0; transform: translateY(-30px); } to { opacity: 1; transform: translateY(0); } }
+        @keyframes fadeIn { from { opacity: 0; transform: scale(0.96); } to { opacity: 1; transform: scale(1); } }
+        @keyframes slideUp { from { opacity: 0; transform: translateY(15px); } to { opacity: 1; transform: translateY(0); } }
+        @keyframes shake { 0%,100% { transform: translateX(0); } 25% { transform: translateX(-8px); } 75% { transform: translateX(8px); } }
+        @keyframes bounceIn { 0% { opacity: 0; transform: scale(0.4); } 60% { transform: scale(1.05); } 100% { opacity: 1; transform: scale(1); } }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <div class="lesson-tag">Module 8 · Lesson 8.6</div>
+            <h1>Install and Customise a Theme</h1>
+            <p>10 Sarah scenarios — Astra install, Customiser, brand colours, mobile check</p>
+        </div>
+
+        <div class="score-board">
+            <div class="score-item"><div class="label">Score</div><div class="value" id="score">0</div></div>
+            <div class="score-item"><div class="label">Question</div><div class="value"><span id="current">1</span>/<span id="total">10</span></div></div>
+            <div class="score-item"><div class="label">Streak</div><div class="value" id="streak">0</div></div>
+        </div>
+
+        <div class="progress-bar"><div class="progress-fill" id="progress"></div></div>
+
+        <div class="exercise-card" id="exerciseCard"></div>
+    </div>
+
+    <script>
+        const exercises = [
+  {
+    "scenario": "Sarah is worried that switching from Twenty Twenty-Six to Astra will delete her five pages of content.",
+    "question": "What is the honest answer?",
+    "options": [
+      "Yes — themes destroy page content on switch.",
+      "No — themes control layout, typography, colours, and component styles, but NOT the content. Sarah's five pages stay exactly the same. Only the wrapper changes.",
+      "Only Astra deletes content.",
+      "Only WordPress.com deletes content."
+    ],
+    "correct": 1,
+    "explanation": "Slide 2 explains what a theme controls — layout, typography, colours, component styles. Themes do NOT touch content. Sarah can install Astra, hate it, uninstall it, and nothing is lost."
+  },
+  {
+    "scenario": "Sarah asks why she should install Astra instead of just keeping Twenty Twenty-Six for Karibu Kitchen.",
+    "question": "Which set of reasons matches Lesson 8.6?",
+    "options": [
+      "Astra loads faster, has 100+ pre-built starter templates for restaurants and shops, and has a Customiser with dozens of extra controls for headers, footers, and typography.",
+      "Astra is the only theme that supports Kiswahili.",
+      "Astra is paid and therefore better.",
+      "Twenty Twenty-Six is banned by Google."
+    ],
+    "correct": 0,
+    "explanation": "Slide 3 lists Astra's three advantages — faster loading, 100+ starter templates, and Customiser controls. It is free, used by over one million sites, and the safest professional choice."
+  },
+  {
+    "scenario": "Sarah wants to install Astra. She is at Appearance in wp-admin.",
+    "question": "What is the exact click sequence?",
+    "options": [
+      "Appearance > Themes > Add New Theme > search Astra > Install > Activate.",
+      "Appearance > Widgets > Astra.",
+      "Plugins > Add New > Astra.",
+      "Settings > General > Astra."
+    ],
+    "correct": 0,
+    "explanation": "Slide 4 describes the install path — Appearance > Themes > Add New Theme, search Astra, click Install, wait 15 seconds, click Activate. Refresh the homepage in another tab to see the change."
+  },
+  {
+    "scenario": "Sarah opens Appearance > Customise and sees a live preview on the right and a sidebar with nine sections on the left.",
+    "question": "Which two sections does Lesson 8.6 say Sarah will actually use for Karibu Kitchen?",
+    "options": [
+      "Site Identity and Colours.",
+      "Additional CSS and Widgets.",
+      "Menus and Header Builder.",
+      "Footer Builder and Typography."
+    ],
+    "correct": 0,
+    "explanation": "Slide 5 lists the nine Customiser sections but tells Sarah to focus on Site Identity (logo and tagline) and Colours (the palette). Those two are enough for Karibu Kitchen."
+  },
+  {
+    "scenario": "Sarah opens Colours in the Customiser and sees five colour pickers — Primary, Secondary, Text, Link, Background.",
+    "question": "Which pair matches Karibu Kitchen's brand?",
+    "options": [
+      "Primary maroon #801E28 and Secondary gold #C69458.",
+      "Primary black and Secondary black.",
+      "Primary pink and Secondary purple.",
+      "Primary blue and Secondary green."
+    ],
+    "correct": 0,
+    "explanation": "Slide 6 sets Primary to hash 801E28 (maroon) and Secondary to hash C69458 (gold). Text stays near-black, Link matches maroon, Background stays white."
+  },
+  {
+    "scenario": "Sarah changes the Primary colour and expects to wait for a preview refresh. Instead the preview updates instantly.",
+    "question": "What is this feature called and why does it matter?",
+    "options": [
+      "It is a bug.",
+      "It is called live preview — one of the reasons WordPress is easier than every alternative. You see design changes immediately without saving.",
+      "It is called dark mode.",
+      "It is called offline mode."
+    ],
+    "correct": 1,
+    "explanation": "Slide 6 names this live preview. It updates in real time as Sarah changes each colour. This is why WordPress customisation is faster than hand-editing CSS."
+  },
+  {
+    "scenario": "Sarah's design looks perfect on her desktop. She is about to publish. Her trainer asks: have you checked mobile?",
+    "question": "Why does Lesson 8.6 insist on the mobile check?",
+    "options": [
+      "Because Kenyan customers see the mobile view 87 per cent of the time. Fixing mobile is not optional.",
+      "Because desktop no longer exists in Kenya.",
+      "Because Google refuses to rank desktop sites.",
+      "Because Astra only works on mobile."
+    ],
+    "correct": 0,
+    "explanation": "Slide 7 says Kenyan customers see the mobile view 87 per cent of the time. Fixing mobile is not optional. The Customiser has a mobile phone icon in the top bar to switch preview modes."
+  },
+  {
+    "scenario": "Sarah switches the Customiser preview to mobile and notices her three feature tiles are still shown side by side, making each unreadable on a small screen.",
+    "question": "What is the correct fix?",
+    "options": [
+      "Publish anyway — customers can pinch to zoom.",
+      "Configure the tiles to stack vertically on mobile so each tile is readable, then re-check the mobile preview.",
+      "Delete the tiles and use only text.",
+      "Remove Astra and go back to Twenty Twenty-Six."
+    ],
+    "correct": 1,
+    "explanation": "Slide 7 asks — do the three feature tiles stack vertically on mobile instead of side by side? If not, fix it before publishing. Mobile readability is critical."
+  },
+  {
+    "scenario": "Sarah clicks Publish in the Customiser. She then panics — does Publish here mean the site goes live on the public internet immediately?",
+    "question": "What is actually happening?",
+    "options": [
+      "Yes — the site is live to the world instantly.",
+      "No — Sarah is still on her local Studio installation. Publish only saves the Customiser changes to the local site. To share the design she uses Studio's Share Demo Site to get a public URL.",
+      "The site self-destructs.",
+      "The site is published to Facebook."
+    ],
+    "correct": 1,
+    "explanation": "Slide 8 clarifies — Publish inside wp-admin saves changes to the LOCAL Studio installation. Nothing is on the public internet yet. Sharing requires Studio's Share Demo Site."
+  },
+  {
+    "scenario": "Sarah's classmate says: 'You do not need themes. Just write CSS by hand for every element.'",
+    "question": "What is the professional response drawn from Lesson 8.6?",
+    "options": [
+      "The classmate is right — always hand-write CSS.",
+      "Themes save time by managing layout, typography, colours, and component styles from one place. Astra is free, used by over one million sites, and lets Sarah apply Karibu Kitchen's maroon and gold in minutes.",
+      "Themes are illegal.",
+      "Themes only work for blogs."
+    ],
+    "correct": 1,
+    "explanation": "Slide 3 explains why themes exist — they package layout, typography, colours, and component styles. Astra is free, used by 1M+ sites, and the safest professional choice for a Kenyan agency workflow."
+  }
+];
+
+        let currentQuestion = 0, score = 0, streak = 0, answered = false;
+
+        function updateScoreboard() {
+            document.getElementById('score').textContent = score;
+            document.getElementById('current').textContent = Math.min(currentQuestion + 1, exercises.length);
+            document.getElementById('total').textContent = exercises.length;
+            document.getElementById('streak').textContent = streak;
+            document.getElementById('progress').style.width = ((currentQuestion) / exercises.length) * 100 + '%';
+        }
+
+        function escapeHtml(s) {
+            return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+        }
+
+        function renderQuestion() {
+            answered = false;
+            const q = exercises[currentQuestion];
+            let html = '';
+            if (q.scenario) {
+                html += `<div class="scenario"><strong>Scenario.</strong> ${escapeHtml(q.scenario)}</div>`;
+            }
+            html += `<div class="question">${escapeHtml(q.question)}</div>`;
+            html += '<div class="options">';
+            q.options.forEach((o, i) => {
+                html += `<button class="option" onclick="selectAnswer(${i})">${escapeHtml(o)}</button>`;
+            });
+            html += '</div>';
+            document.getElementById('exerciseCard').innerHTML = html;
+            updateScoreboard();
+        }
+
+        function selectAnswer(i) {
+            if (answered) return;
+            answered = true;
+            const q = exercises[currentQuestion];
+            const btns = document.querySelectorAll('.option');
+            btns.forEach(b => b.classList.add('disabled'));
+            btns[q.correct].classList.add('correct');
+            const right = i === q.correct;
+            if (!right) btns[i].classList.add('wrong');
+            if (right) { score += 10; streak += 1; } else { streak = 0; }
+            const fb = document.createElement('div');
+            fb.className = 'feedback ' + (right ? 'correct' : 'wrong');
+            fb.innerHTML = `<strong>${right ? '✅ Correct.' : '❌ Not quite.'}</strong><br>${escapeHtml(q.explanation)}`;
+            document.getElementById('exerciseCard').appendChild(fb);
+            const nb = document.createElement('button');
+            nb.className = 'next-btn';
+            nb.textContent = currentQuestion === exercises.length - 1 ? 'See results →' : 'Next scenario →';
+            nb.onclick = nextQuestion;
+            document.getElementById('exerciseCard').appendChild(nb);
+            updateScoreboard();
+        }
+
+        function nextQuestion() {
+            currentQuestion++;
+            if (currentQuestion >= exercises.length) return showResults();
+            renderQuestion();
+        }
+
+        function showResults() {
+            document.getElementById('progress').style.width = '100%';
+            const total = exercises.length * 10;
+            const pct = Math.round(score / total * 100);
+            if (window.parent) { window.parent.postMessage({type:"mtti_quiz_score", score: score, total: total, percent: pct}, "*"); }
+            let badge = '🌟', msg = 'Excellent work. You have a professional grasp of this lesson.';
+            if (pct < 50) { badge = '🌱'; msg = 'Good first attempt. Re-watch the lesson video and try again.'; }
+            else if (pct < 80) { badge = '📚'; msg = 'Solid progress. Review the scenarios you missed and retry.'; }
+            document.getElementById('exerciseCard').innerHTML = `
+                <div class="results">
+                    <span class="badge">${badge}</span>
+                    <h2>Quiz Complete</h2>
+                    <div class="final-score">${score} / ${total}</div>
+                    <p><strong>${pct}%</strong> · Longest streak: ${streak}</p>
+                    <p>${msg}</p>
+                    <button class="restart-btn" onclick="restart()">Try again 🔁</button>
+                </div>`;
+        }
+
+        function restart() {
+            currentQuestion = 0; score = 0; streak = 0;
+            renderQuestion();
+        }
+
+        renderQuestion();
+    </script>
+</body>
+</html>

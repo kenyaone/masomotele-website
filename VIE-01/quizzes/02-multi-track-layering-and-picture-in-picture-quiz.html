@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Multi-Track Layering and Picture-in-Picture | MTTI Video Editing</title>
+    <link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Fredoka:wght@500;600&display=swap" rel="stylesheet">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Space Mono', monospace; background: linear-gradient(135deg, #6A11CB 0%, #2575FC 100%); min-height: 100vh; padding: 20px; color: #fff; }
+        .container { max-width: 900px; margin: 0 auto; }
+        .header { text-align: center; margin-bottom: 30px; }
+        .header .lesson-tag { display: inline-block; background: rgba(255,255,255,0.2); padding: 6px 16px; border-radius: 999px; font-size: 0.85em; margin-bottom: 12px; }
+        .header h1 { font-family: 'Fredoka', sans-serif; font-size: 2.2em; margin-bottom: 8px; text-shadow: 3px 3px 0 rgba(0,0,0,0.2); }
+        .score-board { background: rgba(255,255,255,0.15); backdrop-filter: blur(10px); border-radius: 20px; padding: 20px; margin-bottom: 20px; display: flex; justify-content: space-around; }
+        .score-item { text-align: center; }
+        .score-item .label { font-size: 0.85em; opacity: 0.9; margin-bottom: 4px; }
+        .score-item .value { font-size: 1.8em; font-weight: bold; font-family: 'Fredoka', sans-serif; }
+        .progress-bar { width: 100%; height: 8px; background: rgba(255,255,255,0.3); border-radius: 10px; margin-bottom: 25px; overflow: hidden; }
+        .progress-fill { height: 100%; background: linear-gradient(90deg, #f7971e 0%, #ffd200 100%); border-radius: 10px; transition: width 0.5s ease; width: 0%; }
+        .exercise-card { background: white; color: #333; border-radius: 25px; padding: 35px; margin-bottom: 20px; box-shadow: 0 20px 60px rgba(0,0,0,0.3); }
+        .scenario { background: linear-gradient(135deg, #fff8e1 0%, #ffecb3 100%); border-left: 5px solid #ffc107; padding: 20px 24px; border-radius: 12px; margin-bottom: 24px; font-size: 0.98em; line-height: 1.55; }
+        .scenario strong { color: #7a5a00; font-family: 'Fredoka', sans-serif; }
+        .question { font-size: 1.15em; margin-bottom: 20px; font-weight: 700; line-height: 1.4; }
+        .options { display: flex; flex-direction: column; gap: 12px; }
+        .option { background: #f5f7fb; border: 2px solid transparent; padding: 16px 20px; border-radius: 12px; cursor: pointer; transition: all 0.2s ease; font-family: 'Space Mono', monospace; font-size: 0.98em; text-align: left; }
+        .option:hover:not(.disabled) { background: #eef1fb; border-color: #6A11CB; transform: translateX(4px); }
+        .option.correct { background: #d4edda; border-color: #28a745; color: #155724; }
+        .option.wrong { background: #f8d7da; border-color: #dc3545; color: #721c24; }
+        .option.disabled { cursor: not-allowed; opacity: 0.85; }
+        .feedback { margin-top: 22px; padding: 18px 22px; border-radius: 12px; font-size: 0.98em; line-height: 1.5; }
+        .feedback.correct { background: #d4edda; color: #155724; border-left: 4px solid #28a745; }
+        .feedback.wrong { background: #f8d7da; color: #721c24; border-left: 4px solid #dc3545; }
+        .next-btn, .restart-btn { margin-top: 20px; background: linear-gradient(135deg, #6A11CB 0%, #2575FC 100%); color: white; border: none; padding: 14px 32px; border-radius: 12px; font-size: 1em; cursor: pointer; font-family: 'Fredoka', sans-serif; box-shadow: 0 6px 18px rgba(0,0,0,0.2); }
+        .results { text-align: center; padding: 25px 15px; }
+        .results h2 { font-family: 'Fredoka', sans-serif; font-size: 2em; margin-bottom: 12px; color: #333; }
+        .results .final-score { font-size: 3em; font-family: 'Fredoka', sans-serif; color: #6A11CB; margin: 20px 0; }
+        .results p { color: #555; margin-bottom: 12px; }
+
+        /* How-To intro screen — shown before question 1, not scored */
+        .howto-card { background: white; color: #333; border-radius: 25px; padding: 35px; margin-bottom: 20px; box-shadow: 0 20px 60px rgba(0,0,0,0.3); }
+        .howto-card h3 { font-family: 'Fredoka', sans-serif; font-size: 1.3em; margin-bottom: 12px; color: #6A11CB; }
+        .howto-card p { line-height: 1.6; margin-bottom: 16px; color: #444; }
+        .howto-timeline { display: flex; gap: 6px; background: #0f0f18; border-radius: 12px; padding: 12px; margin-bottom: 18px; overflow-x: auto; }
+        .howto-clip { flex-shrink: 0; min-width: 100px; border-radius: 8px; padding: 10px 10px 8px; display: flex; flex-direction: column; justify-content: space-between; font-size: 0.78em; color: #fff; }
+        .howto-clip .hc-label { font-weight: 700; }
+        .howto-clip .hc-move { display: flex; gap: 4px; margin-top: 6px; }
+        .howto-clip .hc-move button { flex: 1; background: rgba(0,0,0,0.25); border: none; color: #fff; border-radius: 5px; padding: 3px 0; cursor: pointer; font-size: 0.95em; }
+        .howto-clip .hc-move button:disabled { opacity: 0.3; cursor: not-allowed; }
+        .howto-clip.hc-correct { outline: 3px solid #28a745; }
+        .howto-clip.hc-wrong { outline: 3px solid #dc3545; }
+        .howto-banner { margin-top: 4px; margin-bottom: 18px; padding: 12px 16px; border-radius: 10px; font-size: 0.9em; font-weight: 700; display: none; }
+        .howto-banner.show { display: block; }
+        .howto-banner.ok { background: #d4edda; color: #155724; }
+        .howto-banner.fail { background: #f8d7da; color: #721c24; }
+        .start-quiz-btn { margin-top: 4px; background: linear-gradient(135deg, #6A11CB 0%, #2575FC 100%); color: white; border: none; padding: 14px 32px; border-radius: 12px; font-size: 1em; cursor: pointer; font-family: 'Fredoka', sans-serif; box-shadow: 0 6px 18px rgba(0,0,0,0.2); }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <div class="lesson-tag">Unit 22 · Lesson 22.3 · Quiz</div>
+            <h1>Multi-Track Layering and Picture-in-Picture</h1>
+        </div>
+        <div class="score-board">
+            <div class="score-item"><div class="label">Score</div><div class="value" id="score">0</div></div>
+            <div class="score-item"><div class="label">Question</div><div class="value"><span id="current">1</span>/<span id="total">10</span></div></div>
+            <div class="score-item"><div class="label">Streak</div><div class="value" id="streak">0</div></div>
+        </div>
+        <div class="progress-bar"><div class="progress-fill" id="progress"></div></div>
+        <div class="exercise-card" id="exerciseCard"></div>
+    </div>
+    <script>
+        const exercises = [{"scenario":"Otieno adds a PIP reaction clip on Track 2, above his main footage on Track 1, and a logo watermark on Track 3, above both.","question":"During playback, what renders on top?","options":["The main footage on Track 1, since it was added first","The logo on Track 3, since the highest track in the stack renders on top of everything beneath it","Whichever clip is longest in duration","All three tracks render at equal visibility with no layering"],"correct":1,"explanation":"Track order determines stacking order during playback \u2014 the topmost track (Track 3, the logo) renders above everything on the tracks beneath it."},{"scenario":"Otieno sets his logo watermark's opacity to 100%.","question":"What is the likely visual problem with this setting?","options":["There is no problem; opacity never affects how a logo looks","At full 100% opacity the logo becomes fully solid, which can look harsh and distracting rather than a subtle watermark","100% opacity makes the logo invisible","100% opacity automatically resizes the logo to fill the screen"],"correct":1,"explanation":"A fully solid (100% opacity) logo tends to look heavy-handed and distracting rather than a subtle brand mark \u2014 a moderate, partial opacity usually reads better as a watermark."},{"scenario":"Otieno positions his PIP reaction clip as 'Full screen (covers everything)' instead of a corner position.","question":"What problem does this create for the church-event highlight video?","options":["No problem; PIP clips are always meant to fill the whole screen","The full-screen PIP clip completely covers the main ceremony footage, defeating the purpose of a picture-in-picture overlay","Full screen size automatically makes the PIP transparent","Full screen positioning removes the need for a logo watermark"],"correct":1,"explanation":"A PIP overlay is meant to sit alongside the main footage, not replace it visually \u2014 sizing and positioning it to cover the whole frame defeats the purpose and hides the ceremony footage entirely."},{"scenario":"A client asks Otieno why he placed the guest reaction clip on Track 2 rather than Track 1 (the same track as the main ceremony footage).","question":"What's the best explanation?","options":["Track number has no effect on layering; any track works the same way","Clips on the same track can't overlap and stack \u2014 placing the reaction clip on a separate, higher track lets it appear as an overlay above the main footage instead of replacing it","Track 1 is reserved only for audio, never video","Placing it on Track 2 makes the reaction clip play before the ceremony footage instead of during it"],"correct":1,"explanation":"Same-track clips occupy the same slot in time and simply play in sequence rather than layering \u2014 a separate, higher track is required for the reaction clip to appear as an overlay on top of the main footage."},{"scenario":"Otieno sizes his PIP reaction clip at just 8% of the frame in the bottom-right corner.","question":"What is the likely issue with this size choice?","options":["There is no issue; smaller is always better for a PIP clip","At only 8% of the frame, the reaction clip may be too small for viewers to clearly make out the guest's reaction","8% size automatically moves the PIP clip to the centre of the frame","PIP clips below 10% size are not supported at all"],"correct":1,"explanation":"If the PIP clip is sized too small, viewers may not be able to clearly see the reaction it's meant to show \u2014 it needs to be large enough to read clearly while still leaving the main footage visible."},{"scenario":"Otieno wants viewers to always be able to identify Eldoret Reels Studio from the logo, even during scenes that also have the PIP reaction clip on screen.","question":"Where must the logo track sit relative to the PIP track for this to work?","options":["The logo can go on any track; visibility during playback is unaffected by track position","The logo must sit on a track above the PIP clip's track, so it renders on top even when both overlays are visible at once","The logo must sit below the main footage track","The logo and PIP clip must always share the same single track"],"correct":1,"explanation":"Since track order controls what's on top, the logo needs to sit on a higher track than the PIP clip so it stays visible above both the ceremony footage and the reaction overlay at the same time."},{"scenario":"A new apprentice at Eldoret Reels Studio asks Otieno for a simple rule for choosing overlay opacity and PIP size.","question":"Which guideline best matches what Otieno teaches?","options":["Always use 100% opacity and full-screen size for maximum visibility","Keep a logo's opacity moderate so it's visible but not distracting, and size\/position a PIP clip in a corner, big enough to see clearly but small enough to leave the main footage visible","Opacity and size settings don't matter as long as the clip is on the topmost track","Overlay opacity should always be set to 0% so it never distracts from the main footage"],"correct":1,"explanation":"The core rule balances visibility against distraction: moderate opacity for a logo, and a corner-positioned, moderately sized PIP clip that's clear without hiding the main action."}];
+        let currentQuestion = 0, score = 0, streak = 0, answered = false;
+        function updateScoreboard() {
+            document.getElementById('score').textContent = score;
+            document.getElementById('current').textContent = Math.min(currentQuestion + 1, exercises.length);
+            document.getElementById('total').textContent = exercises.length;
+            document.getElementById('streak').textContent = streak;
+            document.getElementById('progress').style.width = ((currentQuestion) / exercises.length) * 100 + '%';
+        }
+        function escapeHtml(s) { return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+        function renderQuestion() {
+            answered = false;
+            const q = exercises[currentQuestion];
+            let html = '';
+            if (q.scenario) html += `<div class="scenario"><strong>Scenario.</strong> ${escapeHtml(q.scenario)}</div>`;
+            html += `<div class="question">${escapeHtml(q.question)}</div>`;
+            html += '<div class="options">';
+            q.options.forEach((o, i) => { html += `<button class="option" onclick="selectAnswer(${i})">${escapeHtml(o)}</button>`; });
+            html += '</div>';
+            document.getElementById('exerciseCard').innerHTML = html;
+            updateScoreboard();
+        }
+        function selectAnswer(i) {
+            if (answered) return;
+            answered = true;
+            const q = exercises[currentQuestion];
+            const btns = document.querySelectorAll('.option');
+            btns.forEach(b => b.classList.add('disabled'));
+            btns[q.correct].classList.add('correct');
+            const right = i === q.correct;
+            if (!right) btns[i].classList.add('wrong');
+            if (right) { score += 10; streak += 1; } else { streak = 0; }
+            const fb = document.createElement('div');
+            fb.className = 'feedback ' + (right ? 'correct' : 'wrong');
+            fb.innerHTML = `<strong>${right ? '&#9989; Correct.' : '&#10060; Not quite.'}</strong><br>${escapeHtml(q.explanation)}`;
+            document.getElementById('exerciseCard').appendChild(fb);
+            const nb = document.createElement('button');
+            nb.className = 'next-btn';
+            nb.textContent = currentQuestion === exercises.length - 1 ? 'See results →' : 'Next scenario →';
+            nb.onclick = nextQuestion;
+            document.getElementById('exerciseCard').appendChild(nb);
+            updateScoreboard();
+        }
+        function nextQuestion() { currentQuestion++; if (currentQuestion >= exercises.length) return showResults(); renderQuestion(); }
+        function showResults() {
+            document.getElementById('progress').style.width = '100%';
+            const total = exercises.length * 10;
+            const pct = Math.round(score / total * 100);
+            if (window.parent) { window.parent.postMessage({type:"mtti_quiz_score", score: score, total: total, percent: pct}, "*"); }
+            let badge = '🌟', msg = 'Excellent work. Otieno-level editing instincts.';
+            if (pct < 50) { badge = '🌱'; msg = 'Good first attempt. Review the lesson and try again.'; }
+            else if (pct < 80) { badge = '📚'; msg = 'Solid progress. Review the scenarios you missed and retry.'; }
+            document.getElementById('exerciseCard').innerHTML = `
+                <div class="results">
+                    <span class="badge">${badge}</span>
+                    <h2>Quiz Complete</h2>
+                    <div class="final-score">${score} / ${total}</div>
+                    <p><strong>${pct}%</strong> &middot; Longest streak: ${streak}</p>
+                    <p>${msg}</p>
+                    <button class="restart-btn" onclick="restart()">Try again &#128257;</button>
+                </div>`;
+        }
+        function restart() { currentQuestion = 0; score = 0; streak = 0; renderQuestion(); }
+        /* How-To intro — a small, ungraded reorder demo shown before the
+           quiz starts, directly rehearsing the "arrange overlay tracks so
+           everything stays visible in the right stacking order" mechanic
+           one of the quiz scenarios asks about, so it's not being asked
+           cold. Left-to-right below = bottom track to top track — whichever
+           block sits furthest right renders on top of everything to its
+           left. */
+        const HOWTO_CLIPS = [
+            { id: 'h1', label: 'Main Footage (Track 1)', color: '#2575FC' },
+            { id: 'h2', label: 'PIP Reaction (Track 2)', color: '#E65100' },
+            { id: 'h3', label: 'Logo Watermark (Track 3)', color: '#6A11CB' },
+        ];
+        const HOWTO_CORRECT = ['h1', 'h2', 'h3'];
+        let howtoOrder = ['h1', 'h3', 'h2']; // logo and PIP start swapped, hiding the logo behind the reaction clip
+
+        function escHtmlH(s) { return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+        function howtoClipById(id) { return HOWTO_CLIPS.find(c => c.id === id); }
+
+        function renderHowtoTimeline(marks) {
+            document.getElementById('howtoTimeline').innerHTML = howtoOrder.map((id, i) => {
+                const c = howtoClipById(id);
+                const cls = marks ? (marks[i] ? 'hc-correct' : 'hc-wrong') : '';
+                return `<div class="howto-clip ${cls}" style="background:${c.color};">
+                    <div class="hc-label">${escHtmlH(c.label)}</div>
+                    <div class="hc-move">
+                        <button data-dir="left" data-id="${id}" ${i===0?'disabled':''}>◀</button>
+                        <button data-dir="right" data-id="${id}" ${i===howtoOrder.length-1?'disabled':''}>▶</button>
+                    </div>
+                </div>`;
+            }).join('');
+            document.querySelectorAll('.hc-move button').forEach(btn => {
+                btn.addEventListener('click', () => moveHowtoClip(btn.dataset.id, btn.dataset.dir));
+            });
+        }
+
+        function moveHowtoClip(id, dir) {
+            const i = howtoOrder.indexOf(id);
+            const j = dir === 'left' ? i - 1 : i + 1;
+            if (j < 0 || j >= howtoOrder.length) return;
+            [howtoOrder[i], howtoOrder[j]] = [howtoOrder[j], howtoOrder[i]];
+            renderHowtoTimeline();
+            document.getElementById('howtoBanner').classList.remove('show');
+        }
+
+        function checkHowto() {
+            const marks = howtoOrder.map((id, i) => id === HOWTO_CORRECT[i]);
+            renderHowtoTimeline(marks);
+            const allOk = marks.every(m => m);
+            const banner = document.getElementById('howtoBanner');
+            banner.classList.add('show');
+            banner.className = 'howto-banner show ' + (allOk ? 'ok' : 'fail');
+            banner.textContent = allOk
+                ? '✅ Stacked correctly — the logo stays visible on top of both the reaction clip and the main footage.'
+                : '❌ Not quite yet — keep using ◀▶ so the order reads Main Footage, then PIP Reaction, then Logo Watermark, left to right.';
+        }
+
+        function renderHowto() {
+            document.getElementById('exerciseCard').innerHTML = `
+                <div class="howto-card">
+                    <h3>🔍 Quick How-To: Stacking Tracks Correctly</h3>
+                    <p>One of the scenarios coming up asks about exactly this: Otieno has three elements to layer for a birthday-shoot highlight reel — the main footage, a guest reaction PIP clip, and the studio's logo watermark — and needs the logo to stay visible above everything else. Below, left-to-right represents bottom-track to top-track: whichever block is furthest right renders on top. Arrange these three tracks so the reaction clip sits above the main footage, and the logo stays on top of both, then check your work.</p>
+                    <div class="howto-timeline" id="howtoTimeline"></div>
+                    <div class="howto-banner" id="howtoBanner"></div>
+                    <button class="start-quiz-btn" id="checkHowtoBtn">Check My Order</button>
+                    <button class="start-quiz-btn" id="startQuizBtn" style="margin-left:10px;background:linear-gradient(135deg,#28a745,#1e7e34);">Start Quiz →</button>
+                </div>`;
+            renderHowtoTimeline();
+            document.getElementById('checkHowtoBtn').addEventListener('click', checkHowto);
+            document.getElementById('startQuizBtn').addEventListener('click', renderQuestion);
+        }
+
+        renderHowto();
+    </script>
+</body>
+</html>

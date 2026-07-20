@@ -1,0 +1,346 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>What Google Business Profile Is + Why It Wins Local Search | MTTI Digital Marketing</title>
+    <link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Fredoka:wght@500;600&display=swap" rel="stylesheet">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Space Mono', monospace;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh; padding: 20px; color: #fff;
+        }
+        .container { max-width: 900px; margin: 0 auto; }
+        .header { text-align: center; margin-bottom: 30px; animation: slideDown 0.6s ease-out; }
+        .header .lesson-tag {
+            display: inline-block; background: rgba(255,255,255,0.2);
+            padding: 6px 16px; border-radius: 999px;
+            font-size: 0.85em; margin-bottom: 12px;
+        }
+        .header h1 {
+            font-family: 'Fredoka', sans-serif; font-size: 2.2em;
+            margin-bottom: 8px; text-shadow: 3px 3px 0 rgba(0,0,0,0.2);
+        }
+        .header p { opacity: 0.95; font-size: 0.95em; }
+        .score-board {
+            background: rgba(255,255,255,0.15); backdrop-filter: blur(10px);
+            border-radius: 20px; padding: 20px; margin-bottom: 20px;
+            display: flex; justify-content: space-around;
+            animation: fadeIn 0.8s ease-out 0.2s both;
+        }
+        .score-item { text-align: center; }
+        .score-item .label { font-size: 0.85em; opacity: 0.9; margin-bottom: 4px; }
+        .score-item .value {
+            font-size: 1.8em; font-weight: bold; font-family: 'Fredoka', sans-serif;
+        }
+        .progress-bar {
+            width: 100%; height: 8px; background: rgba(255,255,255,0.3);
+            border-radius: 10px; margin-bottom: 25px; overflow: hidden;
+        }
+        .progress-fill {
+            height: 100%; background: linear-gradient(90deg, #f093fb 0%, #f5576c 100%);
+            border-radius: 10px; transition: width 0.5s ease; width: 0%;
+        }
+        .exercise-card {
+            background: white; color: #333; border-radius: 25px;
+            padding: 35px; margin-bottom: 20px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            animation: fadeIn 0.6s ease-out both;
+        }
+        .scenario {
+            background: linear-gradient(135deg, #fff8e1 0%, #ffecb3 100%);
+            border-left: 5px solid #ffc107;
+            padding: 20px 24px; border-radius: 12px;
+            margin-bottom: 24px;
+            font-size: 0.98em; line-height: 1.55;
+        }
+        .scenario strong { color: #7a5a00; font-family: 'Fredoka', sans-serif; }
+        .question {
+            font-size: 1.15em; margin-bottom: 20px;
+            font-weight: 700; line-height: 1.4;
+        }
+        .options { display: flex; flex-direction: column; gap: 12px; }
+        .option {
+            background: #f5f7fb; border: 2px solid transparent;
+            padding: 16px 20px; border-radius: 12px;
+            cursor: pointer; transition: all 0.2s ease;
+            font-family: 'Space Mono', monospace; font-size: 0.98em; text-align: left;
+        }
+        .option:hover:not(.disabled) {
+            background: #eef1fb; border-color: #667eea; transform: translateX(4px);
+        }
+        .option.correct { background: #d4edda; border-color: #28a745; color: #155724; }
+        .option.wrong { background: #f8d7da; border-color: #dc3545; color: #721c24; animation: shake 0.4s; }
+        .option.disabled { cursor: not-allowed; opacity: 0.85; }
+        .feedback {
+            margin-top: 22px; padding: 18px 22px; border-radius: 12px;
+            animation: slideUp 0.4s ease-out;
+            font-size: 0.98em; line-height: 1.5;
+        }
+        .feedback.correct { background: #d4edda; color: #155724; border-left: 4px solid #28a745; }
+        .feedback.wrong { background: #f8d7da; color: #721c24; border-left: 4px solid #dc3545; }
+        .feedback strong { font-family: 'Fredoka', sans-serif; }
+        .next-btn, .restart-btn {
+            margin-top: 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white; border: none;
+            padding: 14px 32px; border-radius: 12px;
+            font-size: 1em; cursor: pointer;
+            font-family: 'Fredoka', sans-serif;
+            box-shadow: 0 6px 18px rgba(0,0,0,0.2);
+            transition: transform 0.2s ease;
+        }
+        .next-btn:hover, .restart-btn:hover { transform: scale(1.04); }
+        .results {
+            text-align: center; padding: 25px 15px;
+            animation: bounceIn 0.6s ease-out;
+        }
+        .results h2 {
+            font-family: 'Fredoka', sans-serif; font-size: 2em;
+            margin-bottom: 12px; color: #333;
+        }
+        .results .final-score {
+            font-size: 3em; font-family: 'Fredoka', sans-serif;
+            color: #667eea; margin: 20px 0;
+        }
+        .results p { color: #555; margin-bottom: 12px; }
+        .badge { display: inline-block; font-size: 3.5em; margin: 8px 0; }
+        @keyframes slideDown { from { opacity: 0; transform: translateY(-30px); } to { opacity: 1; transform: translateY(0); } }
+        @keyframes fadeIn { from { opacity: 0; transform: scale(0.96); } to { opacity: 1; transform: scale(1); } }
+        @keyframes slideUp { from { opacity: 0; transform: translateY(15px); } to { opacity: 1; transform: translateY(0); } }
+        @keyframes shake { 0%,100% { transform: translateX(0); } 25% { transform: translateX(-8px); } 75% { transform: translateX(8px); } }
+        @keyframes bounceIn { 0% { opacity: 0; transform: scale(0.4); } 60% { transform: scale(1.05); } 100% { opacity: 1; transform: scale(1); } }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <div class="lesson-tag">Module 14 · Lesson 14.1</div>
+            <h1>What Google Business Profile Is + Why It Wins Local Search</h1>
+            <p>10 Sarah Chebet scenarios — surfaces, ranking factors, and why GBP beats organic #1</p>
+        </div>
+
+        <div class="score-board">
+            <div class="score-item"><div class="label">Score</div><div class="value" id="score">0</div></div>
+            <div class="score-item"><div class="label">Question</div><div class="value"><span id="current">1</span>/<span id="total">10</span></div></div>
+            <div class="score-item"><div class="label">Streak</div><div class="value" id="streak">0</div></div>
+        </div>
+
+        <div class="progress-bar"><div class="progress-fill" id="progress"></div></div>
+
+        <div class="exercise-card" id="exerciseCard"></div>
+    </div>
+
+    <script>
+        const exercises = [
+  {
+    "scenario": "Sarah has heard people talk about \"Google My Business\" and also about \"Google Business Profile\". She asks whether they are two different products.",
+    "question": "Which is correct?",
+    "options": [
+      "They are separate products with different logins.",
+      "Same product. Google renamed Google My Business to Google Business Profile in 2021 and moved management into the Business Profile Manager. Same free listing, same features, new name.",
+      "Google My Business was replaced by Google Ads.",
+      "Google Business Profile is a paid tier of Google My Business."
+    ],
+    "correct": 1,
+    "explanation": "Slide 2 of §14.1: GBP was called Google My Business until 2021. Same free product, renamed. No paid tier — GBP is completely free."
+  },
+  {
+    "scenario": "Sarah asks where exactly a verified Karibu Kitchen listing will appear once she completes GBP.",
+    "question": "Which trio matches Lesson 14.1?",
+    "options": [
+      "Facebook Marketplace, Instagram Shop, TikTok Shop.",
+      "Google Search local pack (top 3 with map), Google Maps (mobile + desktop), and the knowledge panel side card when someone Googles the brand name.",
+      "Only inside the Google Maps app on Android.",
+      "Only on the karibukitchen.co.ke homepage."
+    ],
+    "correct": 1,
+    "explanation": "Slide 3 lists the three surfaces: local pack, Google Maps, and the knowledge panel. One profile, three surfaces, zero shillings."
+  },
+  {
+    "scenario": "A trainee asks: \"Is being in the local pack really more valuable than being organic result number one on the same page?\"",
+    "question": "What is the correct answer for a query like \"lunch delivery Eldoret\"?",
+    "options": [
+      "No — organic #1 always wins.",
+      "Yes. The local pack sits ABOVE organic #1, shows photos, star ratings and Call/Directions buttons, and captures roughly 40% of all clicks on restaurant queries. For local intent, the local pack beats organic #1.",
+      "It depends on the day of the week.",
+      "Neither matters — social media wins."
+    ],
+    "correct": 1,
+    "explanation": "Slide 4 explains why the local pack beats organic #1 for local queries: it sits above, offers immediate-action buttons, and captures around 40% of restaurant-query clicks."
+  },
+  {
+    "scenario": "Sarah is picking her primary GBP category. She is torn between \"Restaurant\" and \"Meal delivery service\". Her business is 90% delivery, 10% collection from the Kapsoya kitchen.",
+    "question": "What is the correct primary category, and why does it matter?",
+    "options": [
+      "Restaurant — it is a more familiar word.",
+      "\"Meal delivery service\" as primary. Primary category is the single strongest Relevance signal — it must match the query intent (\"lunch delivery Eldoret\"). She can add \"Restaurant\", \"Caterer\" and \"African restaurant\" as additional categories (up to 9 more).",
+      "It does not matter — Google picks for you.",
+      "\"Meal delivery service\" as an additional category only, with something else primary."
+    ],
+    "correct": 1,
+    "explanation": "Slide 5: primary category is the strongest Relevance signal. It must match the searcher's intent. Since Karibu Kitchen is a delivery-first business, Meal delivery service goes primary; other categories are added as secondary."
+  },
+  {
+    "scenario": "Sarah is in Kapsoya. A student in Elgon View Googles \"lunch delivery Eldoret\" from a phone.",
+    "question": "Which factor does Sarah have the LEAST direct control over in this exact search, and what is her mitigation?",
+    "options": [
+      "Relevance — she cannot influence her categories.",
+      "Distance — physical distance between the searcher and her Kapsoya address is fixed. Mitigation: set a Service Area listing Eldoret CBD, Kapsoya, Elgon View, Racecourse and Pioneer, and grow Relevance + Prominence hard enough that Google shows her over a wider radius.",
+      "Prominence — she cannot get reviews.",
+      "None — she controls everything."
+    ],
+    "correct": 1,
+    "explanation": "Slide 6: Distance is the one factor Sarah cannot fully control. Mitigations are a Service Area covering every delivery estate, and building Relevance + Prominence so Google widens her display radius."
+  },
+  {
+    "scenario": "Sarah asks how she can outrank a well-established competitor whose kitchen is closer to Eldoret CBD than her Kapsoya location.",
+    "question": "Which strategy maps to the Prominence ranking factor?",
+    "options": [
+      "Move her kitchen physically to Eldoret CBD.",
+      "Grow prominence — collect fresh reviews continuously (recency matters, not just quantity), earn mentions from Eldoret blogs and Yellowpages Kenya citations, and keep her name, address and phone number identical across every website. Prominence is what makes a well-known business appear further out than an unknown one.",
+      "Delete the competitor's profile.",
+      "Buy Google Ads — that is the only way."
+    ],
+    "correct": 1,
+    "explanation": "Slide 7: Prominence is built from review quantity + quality + recency, links and web mentions, and Google's own confidence signals (including NAP consistency). It is the factor that lets a well-known business outrank a physically closer one."
+  },
+  {
+    "scenario": "Sarah's cousin thinks she should get all thirty-five loyal customers to leave one 5-star review this weekend, then stop asking for reviews.",
+    "question": "What is wrong with this plan, based on Slide 7?",
+    "options": [
+      "Nothing — that is the correct approach.",
+      "Two problems. First, review VELOCITY matters — thirty-five reviews in one weekend looks like fake activity to Google and risks removal. Second, review RECENCY matters — a fresh review last week beats twenty from years ago, so ongoing weekly velocity is what compounds prominence.",
+      "The reviews should all be 3-star to look natural.",
+      "Reviews do not affect ranking at all."
+    ],
+    "correct": 1,
+    "explanation": "Slide 7 lists review quantity, quality, AND recency as prominence signals. A spike of 35 reviews in one weekend is a velocity red flag; sustained weekly reviews are what actually build ranking. Recency is explicitly called out."
+  },
+  {
+    "scenario": "A trainee says Google Business Profile is going to replace Sarah's karibukitchen.co.ke website — \"the profile has everything a website has\".",
+    "question": "What is wrong with this claim?",
+    "options": [
+      "Nothing — GBP is a full website replacement.",
+      "GBP is a LISTING, not a website. It shows menu items, prices, photos, hours, buttons and reviews — but there is no cart, no checkout, no payment processing, no blog, no custom pages. GBP is the discovery layer that drives traffic TO karibukitchen.co.ke and to WhatsApp Business. The website still does the selling.",
+      "GBP is only for restaurants.",
+      "Websites are illegal in Kenya without a business licence."
+    ],
+    "correct": 1,
+    "explanation": "Slide 8 makes this exact point. GBP is a listing that drives discovery. It is not a website replacement and it is not an ecommerce store. Karibu Kitchen still needs its site — GBP feeds traffic into it."
+  },
+  {
+    "scenario": "Sarah asks how much a well-optimised GBP listing will cost her per month.",
+    "question": "Which is the correct answer?",
+    "options": [
+      "KES 2,500/month for the basic tier.",
+      "KES 0. Google Business Profile is completely free. No ads, no monthly fee, no per-lead charges. Sarah pays with time and effort — categories, description, photos, reviews, posts — never money.",
+      "USD 99/month once verified.",
+      "KES 500 setup + KES 1,000/month."
+    ],
+    "correct": 1,
+    "explanation": "Slide 2 is explicit: GBP is completely free. No ads, no monthly fee. That is why it is the single highest-return free action for a local business."
+  },
+  {
+    "scenario": "A trainee summarises Lesson 14.1 as: \"GBP is a paid listing, ranked by one factor (distance), that appears only inside Google Maps and works as an ecommerce store.\"",
+    "question": "How many of the four claims are correct?",
+    "options": [
+      "All four.",
+      "Three.",
+      "Zero — every claim is wrong.",
+      "One — only the surfaces claim."
+    ],
+    "correct": 2,
+    "explanation": "Every claim is wrong. GBP is FREE, not paid (Slide 2). It is ranked by THREE factors — Relevance, Distance, Prominence (Slides 5-7). It appears on THREE surfaces — local pack, Maps AND knowledge panel (Slide 3). And it is NOT an ecommerce store (Slide 8)."
+  }
+];
+
+        let currentQuestion = 0, score = 0, streak = 0, answered = false;
+
+        function updateScoreboard() {
+            document.getElementById('score').textContent = score;
+            document.getElementById('current').textContent = Math.min(currentQuestion + 1, exercises.length);
+            document.getElementById('total').textContent = exercises.length;
+            document.getElementById('streak').textContent = streak;
+            document.getElementById('progress').style.width = ((currentQuestion) / exercises.length) * 100 + '%';
+        }
+
+        function escapeHtml(s) {
+            return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+        }
+
+        function renderQuestion() {
+            answered = false;
+            const q = exercises[currentQuestion];
+            let html = '';
+            if (q.scenario) {
+                html += `<div class="scenario"><strong>Scenario.</strong> ${escapeHtml(q.scenario)}</div>`;
+            }
+            html += `<div class="question">${escapeHtml(q.question)}</div>`;
+            html += '<div class="options">';
+            q.options.forEach((o, i) => {
+                html += `<button class="option" onclick="selectAnswer(${i})">${escapeHtml(o)}</button>`;
+            });
+            html += '</div>';
+            document.getElementById('exerciseCard').innerHTML = html;
+            updateScoreboard();
+        }
+
+        function selectAnswer(i) {
+            if (answered) return;
+            answered = true;
+            const q = exercises[currentQuestion];
+            const btns = document.querySelectorAll('.option');
+            btns.forEach(b => b.classList.add('disabled'));
+            btns[q.correct].classList.add('correct');
+            const right = i === q.correct;
+            if (!right) btns[i].classList.add('wrong');
+            if (right) { score += 10; streak += 1; } else { streak = 0; }
+            const fb = document.createElement('div');
+            fb.className = 'feedback ' + (right ? 'correct' : 'wrong');
+            fb.innerHTML = `<strong>${right ? '✅ Correct.' : '❌ Not quite.'}</strong><br>${escapeHtml(q.explanation)}`;
+            document.getElementById('exerciseCard').appendChild(fb);
+            const nb = document.createElement('button');
+            nb.className = 'next-btn';
+            nb.textContent = currentQuestion === exercises.length - 1 ? 'See results →' : 'Next scenario →';
+            nb.onclick = nextQuestion;
+            document.getElementById('exerciseCard').appendChild(nb);
+            updateScoreboard();
+        }
+
+        function nextQuestion() {
+            currentQuestion++;
+            if (currentQuestion >= exercises.length) return showResults();
+            renderQuestion();
+        }
+
+        function showResults() {
+            document.getElementById('progress').style.width = '100%';
+            const total = exercises.length * 10;
+            const pct = Math.round(score / total * 100);
+            if (window.parent) { window.parent.postMessage({type:"mtti_quiz_score", score: score, total: total, percent: pct}, "*"); }
+            let badge = '🌟', msg = 'Excellent work. You have a professional grasp of this lesson.';
+            if (pct < 50) { badge = '🌱'; msg = 'Good first attempt. Re-watch the lesson video and try again.'; }
+            else if (pct < 80) { badge = '📚'; msg = 'Solid progress. Review the scenarios you missed and retry.'; }
+            document.getElementById('exerciseCard').innerHTML = `
+                <div class="results">
+                    <span class="badge">${badge}</span>
+                    <h2>Quiz Complete</h2>
+                    <div class="final-score">${score} / ${total}</div>
+                    <p><strong>${pct}%</strong> · Longest streak: ${streak}</p>
+                    <p>${msg}</p>
+                    <button class="restart-btn" onclick="restart()">Try again 🔁</button>
+                </div>`;
+        }
+
+        function restart() {
+            currentQuestion = 0; score = 0; streak = 0;
+            renderQuestion();
+        }
+
+        renderQuestion();
+    </script>
+</body>
+</html>

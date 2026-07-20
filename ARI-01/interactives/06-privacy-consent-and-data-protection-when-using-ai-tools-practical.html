@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Privacy, Consent and Data Protection When Using AI Tools | MTTI Artificial Intelligence</title>
+<link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Fredoka:wght@500;600&display=swap" rel="stylesheet">
+<style>
+* { margin:0; padding:0; box-sizing:border-box; }
+body { font-family:'Space Mono', monospace; background:linear-gradient(135deg,#1B2A4A 0%,#2E86AB 100%); min-height:100vh; padding:20px; color:#fff; }
+.container { max-width:900px; margin:0 auto; }
+.header { text-align:center; margin-bottom:24px; }
+.lesson-tag { display:inline-block; background:rgba(255,255,255,0.2); padding:6px 16px; border-radius:999px; font-size:0.85em; margin-bottom:12px; }
+.header h1 { font-family:'Fredoka', sans-serif; font-size:2em; margin-bottom:6px; text-shadow:3px 3px 0 rgba(0,0,0,0.2); }
+.scenario { background:rgba(255,255,255,0.14); backdrop-filter:blur(10px); border-radius:16px; padding:16px 22px; margin-bottom:20px; border-left:5px solid #ffd54f; font-size:0.95em; line-height:1.55; }
+.task { background:#fff; color:#333; border-radius:20px; padding:24px; margin-bottom:16px; box-shadow:0 14px 40px rgba(0,0,0,0.25); }
+.task-num { display:inline-block; width:28px; height:28px; background:linear-gradient(135deg,#1B2A4A 0%,#2E86AB 100%); color:#fff; border-radius:50%; text-align:center; line-height:28px; font-family:'Fredoka', sans-serif; font-weight:600; margin-right:8px; }
+.task h3 { font-family:'Fredoka', sans-serif; font-size:1.05em; display:inline; }
+.options { margin-top:14px; display:flex; flex-direction:column; gap:10px; }
+.option { background:#f5f7fb; border:2px solid transparent; padding:12px 16px; border-radius:10px; cursor:pointer; transition:all 0.2s; font-family:'Space Mono', monospace; font-size:0.92em; text-align:left; }
+.option:hover:not(.disabled) { background:#e8f0fe; border-color:#2E86AB; }
+.option.correct { background:#d4edda; border-color:#28a745; color:#155724; }
+.option.wrong { background:#f8d7da; border-color:#dc3545; color:#721c24; }
+.option.disabled { cursor:not-allowed; }
+.feedback { margin-top:14px; padding:12px 16px; border-radius:10px; font-size:0.9em; line-height:1.5; }
+.feedback.correct { background:#d4edda; color:#155724; border-left:4px solid #28a745; }
+.feedback.wrong { background:#f8d7da; color:#721c24; border-left:4px solid #dc3545; }
+.done-banner { text-align:center; padding:20px; color:#fff; font-family:'Fredoka', sans-serif; font-size:1.1em; }
+</style>
+</head>
+<body>
+<div class="container">
+<div class="header"><div class="lesson-tag">Module 6 · Lesson 6.2 · Practical</div><h1>Privacy, Consent and Data Protection When Using AI Tools</h1></div>
+<div class="scenario">A client, a small agrovet supply shop, has sent Rafiki Insights a spreadsheet of 800 customer records — names, phone numbers, and purchase history — asking Brian to help spot buying trends. Brian is considering using a free public AI chatbot to speed up the analysis.</div>
+<div id="tasks"></div>
+<div class="done-banner" id="doneBanner" style="display:none;">✅ Practical complete — you can move to the quiz.</div>
+</div>
+<script>
+const tasks = [{"prompt":"Brian is about to paste the full customer spreadsheet, names and phone numbers included, into a free public AI chatbot to ask it to summarise buying trends. What is the problem with this?","options":["There is no problem, it will save time","It shares real customers' identifying details with a third-party tool the client never agreed to, which is a confidentiality risk regardless of good intentions","The chatbot will refuse to answer","It will make the analysis less accurate"],"correct":1,"explanation":"Pasting identifying customer data into a public AI tool hands it to a third party the client did not agree to, creating a confidentiality and data-protection problem \\u2014 even if Brian meant no harm."},{"prompt":"What is the better first step before Brian uses any AI tool to help analyse this customer data?","options":["Remove or replace names and phone numbers with anonymous labels before pasting anything in, or confirm with the client that this specific use is allowed","Just proceed, since it is only being used internally","Rename the spreadsheet file","Print the spreadsheet instead of using a computer"],"correct":0,"explanation":"Anonymizing identifying details first, or getting explicit client consent for the specific tool and purpose, are the two safe paths before any client data goes into an AI tool."},{"prompt":"The client never mentioned AI tools at all when they shared the spreadsheet. What should Brian assume about permission to use a public AI tool on this data?","options":["That permission is automatically implied since they hired Rafiki Insights for analysis","That nothing was agreed, so Brian should not assume it is fine to paste identifying data into an external AI tool without asking first","That it is fine as long as the analysis is accurate","That permission only matters for very large companies"],"correct":1,"explanation":"Consent has to be reasonably clear and specific \\u2014 being hired for analysis does not automatically mean permission to send identifying data to an external AI tool. When unsure, Brian should ask."}];
+function escapeHtml(s){return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
+function render(){
+  const c = document.getElementById('tasks');
+  c.innerHTML = tasks.map((t,i)=>`
+    <div class="task" id="task-${i}">
+      <div><span class="task-num">${i+1}</span><h3>${escapeHtml(t.prompt)}</h3></div>
+      <div class="options">
+        ${t.options.map((o,j)=>`<button class="option" onclick="answer(${i},${j})">${escapeHtml(o)}</button>`).join('')}
+      </div>
+    </div>`).join('');
+}
+function answer(i,j){
+  const task = tasks[i];
+  const el = document.getElementById('task-'+i);
+  const btns = el.querySelectorAll('.option');
+  if (btns[0].classList.contains('disabled')) return;
+  btns.forEach(b=>b.classList.add('disabled'));
+  btns[task.correct].classList.add('correct');
+  const right = j === task.correct;
+  if (!right) btns[j].classList.add('wrong');
+  const fb = document.createElement('div');
+  fb.className = 'feedback ' + (right?'correct':'wrong');
+  fb.innerHTML = '<strong>' + (right?'✅ Correct.':'❌ Not quite.') + '</strong><br>' + escapeHtml(task.explanation);
+  el.appendChild(fb);
+  if (i === tasks.length-1) document.getElementById('doneBanner').style.display='block';
+}
+render();
+</script>
+</body>
+</html>

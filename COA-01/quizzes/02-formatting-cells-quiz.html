@@ -37,6 +37,26 @@
         .results .final-score { font-size: 3em; font-family: 'Fredoka', sans-serif; color: #667eea; margin: 20px 0; }
         .results p { color: #555; margin-bottom: 12px; }
         .badge { display: inline-block; font-size: 3.5em; margin: 8px 0; }
+
+        /* How-To intro screen — shown before question 1, not scored */
+        .howto-card { background: white; color: #333; border-radius: 25px; padding: 35px; margin-bottom: 20px; box-shadow: 0 20px 60px rgba(0,0,0,0.3); }
+        .howto-card h3 { font-family: 'Fredoka', sans-serif; font-size: 1.3em; margin-bottom: 12px; color: #667eea; }
+        .howto-card p { line-height: 1.6; margin-bottom: 16px; color: #444; }
+        .howto-grid { display: flex; gap: 14px; margin-bottom: 18px; flex-wrap: wrap; }
+        .howto-cell { flex: 1 1 120px; background: #f5f7fb; border: 2px solid #ddd; border-radius: 10px; overflow: hidden; }
+        .howto-cell .hc-ref { background: #667eea; color: #fff; font-family: 'Fredoka', sans-serif; font-weight: 700; font-size: 0.8em; padding: 6px 10px; }
+        .howto-cell.locked .hc-ref { background: #555; }
+        .howto-cell .hc-value { padding: 12px 10px; font-family: 'Space Mono', monospace; font-size: 0.95em; color: #333; }
+        .howto-cell input, .howto-cell select { width: 100%; border: none; padding: 12px 10px; font-family: 'Space Mono', monospace; font-size: 0.95em; background: #fff; }
+        .howto-cell input:focus, .howto-cell select:focus { outline: 2px solid #667eea; }
+        .howto-cell input:disabled, .howto-cell select:disabled { color: #333; opacity: 1; -webkit-text-fill-color: #333; background: #fff; }
+        .howto-cell.hc-correct { border-color: #28a745; }
+        .howto-cell.hc-wrong { border-color: #dc3545; }
+        .howto-banner { margin-top: 4px; margin-bottom: 18px; padding: 12px 16px; border-radius: 10px; font-size: 0.9em; font-weight: 700; display: none; }
+        .howto-banner.show { display: block; }
+        .howto-banner.ok { background: #d4edda; color: #155724; }
+        .howto-banner.fail { background: #f8d7da; color: #721c24; }
+        .start-quiz-btn { margin-top: 4px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; border: none; padding: 14px 32px; border-radius: 12px; font-size: 1em; cursor: pointer; font-family: 'Fredoka', sans-serif; box-shadow: 0 6px 18px rgba(0,0,0,0.2); }
     </style>
 </head>
 <body>
@@ -117,7 +137,66 @@
                 </div>`;
         }
         function restart() { currentQuestion = 0; score = 0; streak = 0; renderQuestion(); }
-        renderQuestion();
+        /* How-To intro — a small, ungraded field-check demo shown before the
+           quiz starts, directly rehearsing the "set up a Conditional
+           Formatting rule" mechanic that one of the quiz scenarios asks
+           about, so it's not being asked cold. */
+        const HOWTO_RULE_683 = { opTarget: 'less than', valueTarget: 5 };
+
+        function renderHowtoGrid() {
+            const html = `
+                <div class="howto-cell" id="cell-hf1">
+                    <div class="hc-ref">Format Quantity cells that are...</div>
+                    <select id="hf1">
+                        <option value="">Choose a comparison</option>
+                        <option value="less than">less than</option>
+                        <option value="greater than">greater than</option>
+                        <option value="equal to">equal to</option>
+                    </select>
+                </div>
+                <div class="howto-cell" id="cell-hf2">
+                    <div class="hc-ref">...this many units</div>
+                    <input type="number" id="hf2" placeholder="enter a number" autocomplete="off">
+                </div>`;
+            document.getElementById('howtoGrid').innerHTML = html;
+        }
+
+        function checkHowto() {
+            const opInput = document.getElementById('hf1');
+            const valInput = document.getElementById('hf2');
+            const opOk = opInput.value.trim().toLowerCase() === HOWTO_RULE_683.opTarget;
+            const valOk = parseFloat(valInput.value) === HOWTO_RULE_683.valueTarget;
+            document.getElementById('cell-hf1').classList.remove('hc-correct', 'hc-wrong');
+            document.getElementById('cell-hf1').classList.add(opOk ? 'hc-correct' : 'hc-wrong');
+            document.getElementById('cell-hf2').classList.remove('hc-correct', 'hc-wrong');
+            document.getElementById('cell-hf2').classList.add(valOk ? 'hc-correct' : 'hc-wrong');
+            opInput.disabled = true;
+            valInput.disabled = true;
+            const allOk = opOk && valOk;
+            const banner = document.getElementById('howtoBanner');
+            banner.classList.add('show');
+            banner.className = 'howto-banner show ' + (allOk ? 'ok' : 'fail');
+            banner.textContent = allOk
+                ? `Correct — that's the exact rule: Quantity less than 5 triggers the highlight, and it stays live as stock levels change.`
+                : `Not yet — Brenda's rule flags stock under 5 units. Check both the comparison and the number.`;
+        }
+
+        function renderHowto() {
+            document.getElementById('exerciseCard').innerHTML = `
+                <div class="howto-card">
+                    <h3>🔍 Quick How-To: Setting Up a Conditional Formatting Rule</h3>
+                    <p>One of the scenarios coming up is about Brenda flagging low-stock products automatically. The habit: select the Quantity column, open Conditional Formatting → Highlight Cells Rules, then choose a comparison and a value — Excel keeps the highlight live as numbers change. Brenda wants any product with less than 5 units in stock flagged red. Set up the same rule below, then check your work.</p>
+                    <div class="howto-grid" id="howtoGrid"></div>
+                    <div class="howto-banner" id="howtoBanner"></div>
+                    <button class="start-quiz-btn" id="checkHowtoBtn">Check My Rule</button>
+                    <button class="start-quiz-btn" id="startQuizBtn" style="margin-left:10px;background:linear-gradient(135deg,#28a745,#1e7e34);">Start Quiz →</button>
+                </div>`;
+            renderHowtoGrid();
+            document.getElementById('checkHowtoBtn').addEventListener('click', checkHowto);
+            document.getElementById('startQuizBtn').addEventListener('click', renderQuestion);
+        }
+
+        renderHowto();
     </script>
 </body>
 </html>

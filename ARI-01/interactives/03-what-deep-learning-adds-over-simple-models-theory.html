@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>What Deep Learning Adds Over Simple Models (Lesson) | MTTI Artificial Intelligence</title>
+<link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Fredoka:wght@500;600&display=swap" rel="stylesheet">
+<style>
+* { margin:0; padding:0; box-sizing:border-box; }
+body { font-family:'Space Mono', monospace; background:linear-gradient(135deg,#4A00E0 0%,#8E2DE2 100%); min-height:100vh; padding:20px; color:#fff; }
+.container { max-width:820px; margin:0 auto; }
+.header { text-align:center; margin-bottom:24px; }
+.lesson-tag { display:inline-block; background:rgba(255,255,255,0.2); padding:6px 16px; border-radius:999px; font-size:0.85em; margin-bottom:12px; }
+.header h1 { font-family:'Fredoka', sans-serif; font-size:2em; margin-bottom:6px; text-shadow:3px 3px 0 rgba(0,0,0,0.2); }
+.card { background:#fff; color:#333; border-radius:22px; padding:32px; margin-bottom:20px; box-shadow:0 20px 60px rgba(0,0,0,0.3); }
+.section { margin-bottom:26px; }
+.section:last-child { margin-bottom:0; }
+.section h2 { font-family:'Fredoka', sans-serif; font-size:1.2em; margin-bottom:10px; color:#4A00E0; }
+.section .body { line-height:1.65; font-size:0.98em; }
+.section .body p { margin-bottom:10px; }
+.section .body code { background:#f5f7fb; padding:2px 6px; border-radius:4px; font-size:0.92em; }
+.compare { display:flex; gap:12px; margin:12px 0; flex-wrap:wrap; }
+.compare .col { flex:1; min-width:200px; background:#f5f7fb; border-radius:12px; padding:14px 16px; font-size:0.9em; line-height:1.6; }
+.compare .col strong { display:block; margin-bottom:6px; color:#4A00E0; font-family:'Fredoka', sans-serif; }
+.keypoint { background:#fff8e1; border-left:4px solid #ffc107; padding:12px 16px; border-radius:8px; margin-top:12px; font-size:0.92em; }
+</style>
+</head>
+<body>
+<div class="container">
+<div class="header"><div class="lesson-tag">Neural Networks &amp; Deep Learning · Topic 3 of 3</div><h1>What Deep Learning Adds Over Simple Models</h1></div>
+<div class="card">
+<div class="section">
+<h2>1. What "Deep" Actually Means</h2>
+<div class="body">
+<p>Back in Topic 1, a network was described as an input layer, one or more hidden layers, and an output layer. A "deep" network is simply one with <strong>many</strong> hidden layers stacked on top of each other — sometimes dozens or more — rather than just one or two.</p>
+<p>That's the entire meaning of the word "deep" here. It is not a claim about the network being smarter in some mysterious sense, or thinking deeply about anything — it is purely a description of how many layers are stacked between the input and the output.</p>
+</div>
+</div>
+<div class="section">
+<h2>2. Hand-Crafted Features vs Features the Network Discovers Itself</h2>
+<div class="body">
+<p>Older, simpler machine-learning models usually need a person to first decide which "features" — specific signals — are worth feeding in. For a simple loan-risk model, a Rafiki Insights analyst might hand-pick features like "average monthly deposit" or "number of missed repayments" before the model ever sees the data.</p>
+<div class="compare">
+<div class="col"><strong>Simple model</strong>An analyst hand-picks the useful signals in advance; the model only ever sees those chosen features.</div>
+<div class="col"><strong>Deep network</strong>Early layers pick up simple raw patterns; later layers combine those into increasingly abstract, useful signals — largely on their own, with far less need for a person to hand-pick features first.</div>
+</div>
+<p>This is one of the biggest practical differences: a deep network can often work from rawer data and build its own useful internal features layer by layer, rather than depending entirely on a person's judgment about what matters.</p>
+</div>
+</div>
+<div class="section">
+<h2>3. The Trade-Off: Data and Computing Power</h2>
+<div class="body">
+<p>This benefit comes at a cost. Learning good features from scratch, layer by layer, generally requires far more example data and far more computing power than a simpler model that only has to learn a much smaller, hand-picked set of features.</p>
+<p>If a Rafiki Insights client only has a few hundred sales records, a deep network may not have nearly enough examples to learn reliable features on its own — a simpler model, using a handful of sensible hand-picked signals, can often perform just as well, train much faster, and cost far less to run.</p>
+</div>
+<div class="keypoint"><strong>Key Point.</strong> "Deep" just means many stacked layers. That depth lets a network learn increasingly abstract features on its own instead of relying on hand-crafted ones — but it typically demands much more data and computing power to pay off.</div>
+</div>
+</div>
+</div>
+</body>
+</html>

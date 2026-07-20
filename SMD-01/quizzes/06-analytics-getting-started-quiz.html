@@ -1,0 +1,346 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Analytics: Getting Started | MTTI Digital Marketing</title>
+    <link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Fredoka:wght@500;600&display=swap" rel="stylesheet">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Space Mono', monospace;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh; padding: 20px; color: #fff;
+        }
+        .container { max-width: 900px; margin: 0 auto; }
+        .header { text-align: center; margin-bottom: 30px; animation: slideDown 0.6s ease-out; }
+        .header .lesson-tag {
+            display: inline-block; background: rgba(255,255,255,0.2);
+            padding: 6px 16px; border-radius: 999px;
+            font-size: 0.85em; margin-bottom: 12px;
+        }
+        .header h1 {
+            font-family: 'Fredoka', sans-serif; font-size: 2.2em;
+            margin-bottom: 8px; text-shadow: 3px 3px 0 rgba(0,0,0,0.2);
+        }
+        .header p { opacity: 0.95; font-size: 0.95em; }
+        .score-board {
+            background: rgba(255,255,255,0.15); backdrop-filter: blur(10px);
+            border-radius: 20px; padding: 20px; margin-bottom: 20px;
+            display: flex; justify-content: space-around;
+            animation: fadeIn 0.8s ease-out 0.2s both;
+        }
+        .score-item { text-align: center; }
+        .score-item .label { font-size: 0.85em; opacity: 0.9; margin-bottom: 4px; }
+        .score-item .value {
+            font-size: 1.8em; font-weight: bold; font-family: 'Fredoka', sans-serif;
+        }
+        .progress-bar {
+            width: 100%; height: 8px; background: rgba(255,255,255,0.3);
+            border-radius: 10px; margin-bottom: 25px; overflow: hidden;
+        }
+        .progress-fill {
+            height: 100%; background: linear-gradient(90deg, #f093fb 0%, #f5576c 100%);
+            border-radius: 10px; transition: width 0.5s ease; width: 0%;
+        }
+        .exercise-card {
+            background: white; color: #333; border-radius: 25px;
+            padding: 35px; margin-bottom: 20px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            animation: fadeIn 0.6s ease-out both;
+        }
+        .scenario {
+            background: linear-gradient(135deg, #fff8e1 0%, #ffecb3 100%);
+            border-left: 5px solid #ffc107;
+            padding: 20px 24px; border-radius: 12px;
+            margin-bottom: 24px;
+            font-size: 0.98em; line-height: 1.55;
+        }
+        .scenario strong { color: #7a5a00; font-family: 'Fredoka', sans-serif; }
+        .question {
+            font-size: 1.15em; margin-bottom: 20px;
+            font-weight: 700; line-height: 1.4;
+        }
+        .options { display: flex; flex-direction: column; gap: 12px; }
+        .option {
+            background: #f5f7fb; border: 2px solid transparent;
+            padding: 16px 20px; border-radius: 12px;
+            cursor: pointer; transition: all 0.2s ease;
+            font-family: 'Space Mono', monospace; font-size: 0.98em; text-align: left;
+        }
+        .option:hover:not(.disabled) {
+            background: #eef1fb; border-color: #667eea; transform: translateX(4px);
+        }
+        .option.correct { background: #d4edda; border-color: #28a745; color: #155724; }
+        .option.wrong { background: #f8d7da; border-color: #dc3545; color: #721c24; animation: shake 0.4s; }
+        .option.disabled { cursor: not-allowed; opacity: 0.85; }
+        .feedback {
+            margin-top: 22px; padding: 18px 22px; border-radius: 12px;
+            animation: slideUp 0.4s ease-out;
+            font-size: 0.98em; line-height: 1.5;
+        }
+        .feedback.correct { background: #d4edda; color: #155724; border-left: 4px solid #28a745; }
+        .feedback.wrong { background: #f8d7da; color: #721c24; border-left: 4px solid #dc3545; }
+        .feedback strong { font-family: 'Fredoka', sans-serif; }
+        .next-btn, .restart-btn {
+            margin-top: 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white; border: none;
+            padding: 14px 32px; border-radius: 12px;
+            font-size: 1em; cursor: pointer;
+            font-family: 'Fredoka', sans-serif;
+            box-shadow: 0 6px 18px rgba(0,0,0,0.2);
+            transition: transform 0.2s ease;
+        }
+        .next-btn:hover, .restart-btn:hover { transform: scale(1.04); }
+        .results {
+            text-align: center; padding: 25px 15px;
+            animation: bounceIn 0.6s ease-out;
+        }
+        .results h2 {
+            font-family: 'Fredoka', sans-serif; font-size: 2em;
+            margin-bottom: 12px; color: #333;
+        }
+        .results .final-score {
+            font-size: 3em; font-family: 'Fredoka', sans-serif;
+            color: #667eea; margin: 20px 0;
+        }
+        .results p { color: #555; margin-bottom: 12px; }
+        .badge { display: inline-block; font-size: 3.5em; margin: 8px 0; }
+        @keyframes slideDown { from { opacity: 0; transform: translateY(-30px); } to { opacity: 1; transform: translateY(0); } }
+        @keyframes fadeIn { from { opacity: 0; transform: scale(0.96); } to { opacity: 1; transform: scale(1); } }
+        @keyframes slideUp { from { opacity: 0; transform: translateY(15px); } to { opacity: 1; transform: translateY(0); } }
+        @keyframes shake { 0%,100% { transform: translateX(0); } 25% { transform: translateX(-8px); } 75% { transform: translateX(8px); } }
+        @keyframes bounceIn { 0% { opacity: 0; transform: scale(0.4); } 60% { transform: scale(1.05); } 100% { opacity: 1; transform: scale(1); } }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <div class="lesson-tag">Module 6 · Lesson 6.1</div>
+            <h1>Analytics: Getting Started</h1>
+            <p>10 Karibu Kitchen scenarios — vanity vs business metrics, A/B testing, and reporting cadence</p>
+        </div>
+
+        <div class="score-board">
+            <div class="score-item"><div class="label">Score</div><div class="value" id="score">0</div></div>
+            <div class="score-item"><div class="label">Question</div><div class="value"><span id="current">1</span>/<span id="total">10</span></div></div>
+            <div class="score-item"><div class="label">Streak</div><div class="value" id="streak">0</div></div>
+        </div>
+
+        <div class="progress-bar"><div class="progress-fill" id="progress"></div></div>
+
+        <div class="exercise-card" id="exerciseCard"></div>
+    </div>
+
+    <script>
+        const exercises = [
+  {
+    "scenario": "Sarah has spent KES 45,000 on Meta ads over three months. Her cousin, again, tells her to switch them all off because \"they feel like they are losing money\". Sarah is about to make a KES 45,000-a-quarter decision based on a feeling.",
+    "question": "Which statement from Lesson 6.1 should you put to Sarah first?",
+    "options": [
+      "\"Feelings are a valid input — if the ads feel wrong, switch them off.\"",
+      "\"The one rule of digital marketing is that you cannot improve what you do not measure. Before you switch anything off, we look at the numbers.\"",
+      "\"Trust your cousin — he has seen more Facebook adverts than you have.\"",
+      "\"Ignore the numbers and post more often — volume beats analysis.\""
+    ],
+    "correct": 1,
+    "explanation": "Section 6.1 opens with the one rule of all digital marketing: you cannot improve what you do not measure. Analytics exists precisely to replace feelings like Sarah's (and her cousin's) with numbers. Every other option promotes guessing over measurement."
+  },
+  {
+    "scenario": "Sarah opens her Meta Business Suite and proudly reports to you: \"I got 138,000 impressions and 42,000 people in reach this month, and my follower count is up 120.\" She has not mentioned orders or revenue.",
+    "question": "How should you classify the numbers Sarah is celebrating?",
+    "options": [
+      "Business metrics — impressions and reach directly measure sales.",
+      "Vanity metrics — they look impressive but do not by themselves prove business outcomes.",
+      "Conversion metrics — they represent completed customer actions.",
+      "Return-on-ad-spend metrics — they show profitability."
+    ],
+    "correct": 1,
+    "explanation": "Section 6.1 draws the line between vanity metrics (followers, likes, impressions, reach) and business metrics (sales generated, leads captured, conversion rate, ROAS). Sarah is tracking vanity numbers and ignoring business numbers — the exact mistake the lesson names."
+  },
+  {
+    "scenario": "You are quizzing Sarah on definitions. She confuses several terms because they all sound similar.",
+    "question": "Which pairing correctly matches the metric to its definition?",
+    "options": [
+      "Impressions = unique people who saw a post at least once.",
+      "Reach = total times a post was displayed, including repeats.",
+      "Engagement rate = the sum of likes, comments and shares divided by reach or followers, expressed as a percentage.",
+      "CTR = revenue divided by ad spend."
+    ],
+    "correct": 2,
+    "explanation": "Engagement rate is engagements divided by an audience denominator (reach or followers). Impressions count total displays including repeats; reach counts unique people; ROAS is revenue divided by ad spend; CTR is clicks divided by impressions. Options 1, 2 and 4 all swap definitions."
+  },
+  {
+    "scenario": "Sarah wants to run her first proper A/B test. She has two lunch photos performing similarly on Meta. She proposes: test Photo A with headline \"Fresh lunch, delivered\" against Photo B with headline \"Order in 30 minutes\", change the audience for B too, and run it for three days.",
+    "question": "Which of the three A/B testing rules from Lesson 6.1 is Sarah breaking?",
+    "options": [
+      "None — her plan is textbook.",
+      "Rule one — she is changing more than one thing at a time (photo AND headline AND audience).",
+      "Rule two — she is running it too long.",
+      "Rule three — she has not picked a colour scheme."
+    ],
+    "correct": 1,
+    "explanation": "Rule one of A/B testing (§6.1) is to change only ONE thing at a time. Sarah is varying photo, headline, AND audience, so she cannot know which change drove any difference. Three days is also probably too short (rule two — at least 100 conversions per variant), but the primary violation named in the options is rule one."
+  },
+  {
+    "scenario": "Sarah's proper A/B test on plating — Version A (original sun-lit photo) vs Version B (white-plate re-shot) — has run for two weeks. Winning metric was defined in advance as orders placed within 24 hours of exposure, and she hit her 200-conversion minimum per variant. Version B produced 67% more orders.",
+    "question": "What should Sarah do next?",
+    "options": [
+      "Ignore the result and go back to Version A because she likes it more.",
+      "Retire Version A and make Version B the default, then design the next A/B test.",
+      "Run Version A again for another two weeks to be sure.",
+      "Increase her ad budget by KES 40,000 immediately."
+    ],
+    "correct": 1,
+    "explanation": "Section 6.1 states clearly: the winner becomes your default, the loser is retired. Sarah met the three rules (one variable, statistical significance via 200 conversions, and a pre-declared winning metric), so the test result is valid. This is how ROAS improves without adding a shilling to the budget."
+  },
+  {
+    "scenario": "Sarah decides after seeing the A/B test results that she is going to \"call it a win on engagement instead of orders\" because Version A got more likes even though Version B got more orders.",
+    "question": "What professional mistake is Sarah making?",
+    "options": [
+      "None — you can change your winning metric at the end of a test.",
+      "She is cherry-picking — deciding on the winning metric after seeing the results, which Lesson 6.1 calls dishonest.",
+      "She is being too strict with her data.",
+      "She is over-relying on statistical significance."
+    ],
+    "correct": 1,
+    "explanation": "Rule three of A/B testing (§6.1) is to define your winning metric BEFORE the test starts. Sarah pre-declared \"orders within 24 hours\" as the winning metric. Switching to likes after the fact is cherry-picking — the lesson names it dishonest."
+  },
+  {
+    "scenario": "Sarah asks: \"When exactly am I supposed to look at my numbers? I do not want analytics to eat every day.\"",
+    "question": "Which reporting cadence does Lesson 6.1 recommend for a Kenyan small business like Karibu Kitchen?",
+    "options": [
+      "Check every metric every hour, seven days a week.",
+      "Never — just check when a client asks.",
+      "Weekly 30-minute review every Friday, monthly 90-minute review on the last Friday, and a quarterly review every 90 days.",
+      "Once a year, at tax time."
+    ],
+    "correct": 2,
+    "explanation": "Section 6.1 sets the professional cadence: weekly Friday 30-minute review across active campaigns, monthly 90-minute review on the last Friday of the month against goals, and a quarterly review every 90 days. Constant checking is drowning, no checking is guessing."
+  },
+  {
+    "scenario": "During Sarah's first Friday 30-minute review, she notices one Reel from Tuesday drove 8 orders while three static image posts drove one order between them. She has a limited budget for boosted posts next week.",
+    "question": "What is the correct analytics-driven action?",
+    "options": [
+      "Boost all four posts equally so nobody feels left out.",
+      "Boost the static image posts because they need help.",
+      "Replace the static posts, and put next week's boost budget behind more Reels in the style of the winner.",
+      "Delete all posts and start over."
+    ],
+    "correct": 2,
+    "explanation": "The Friday cadence exists so Sarah can answer \"what needs replacing next week?\" (§6.1). The measurable winner earns more of her scarce KES 15,000 budget; the losers are retired. Spreading budget equally ignores the data. "
+  },
+  {
+    "scenario": "Sarah's cousin insists on a KES 5,000 boost, saying \"I just KNOW people love Fridays for lunch orders — do it my way.\" Sarah has no data on Friday performance because she has never boosted on a Friday.",
+    "question": "How does Lesson 6.1 tell Sarah to respond?",
+    "options": [
+      "Do exactly what the cousin says — his gut is data.",
+      "Turn his opinion into an A/B test — boost equally on a Friday and on a matched non-Friday, define the winning metric (orders) in advance, and let the numbers decide.",
+      "Refuse to boost at all until she has three years of data.",
+      "Ignore the idea completely because it did not come from Meta Ads Manager."
+    ],
+    "correct": 1,
+    "explanation": "Section 6.1 frames A/B testing as the tool that converts opinions into evidence. Sarah's cousin has a hypothesis; the professional response is to test it under the three rules and let the data settle the argument, not to trust or dismiss the opinion outright."
+  },
+  {
+    "scenario": "Sarah tells you: \"Analytics is just something I will send my cousin as a report if he asks.\"",
+    "question": "Which framing from Lesson 6.1 corrects her?",
+    "options": [
+      "\"Correct — analytics is a report you generate on demand.\"",
+      "\"Analytics is not a report you send to a client. It is a habit you build. Amateurs post and hope; professionals post and measure.\"",
+      "\"Analytics is only for large businesses like Safaricom.\"",
+      "\"Analytics is optional if you have good instincts.\""
+    ],
+    "correct": 1,
+    "explanation": "Section 6.1 defines analytics as systematic collection AND analysis, done every week for every campaign — a habit, not a document. The \"amateurs post and hope, professionals post and measure\" line captures the whole discipline."
+  }
+];
+
+        let currentQuestion = 0, score = 0, streak = 0, answered = false;
+
+        function updateScoreboard() {
+            document.getElementById('score').textContent = score;
+            document.getElementById('current').textContent = Math.min(currentQuestion + 1, exercises.length);
+            document.getElementById('total').textContent = exercises.length;
+            document.getElementById('streak').textContent = streak;
+            document.getElementById('progress').style.width = ((currentQuestion) / exercises.length) * 100 + '%';
+        }
+
+        function escapeHtml(s) {
+            return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+        }
+
+        function renderQuestion() {
+            answered = false;
+            const q = exercises[currentQuestion];
+            let html = '';
+            if (q.scenario) {
+                html += `<div class="scenario"><strong>Scenario.</strong> ${escapeHtml(q.scenario)}</div>`;
+            }
+            html += `<div class="question">${escapeHtml(q.question)}</div>`;
+            html += '<div class="options">';
+            q.options.forEach((o, i) => {
+                html += `<button class="option" onclick="selectAnswer(${i})">${escapeHtml(o)}</button>`;
+            });
+            html += '</div>';
+            document.getElementById('exerciseCard').innerHTML = html;
+            updateScoreboard();
+        }
+
+        function selectAnswer(i) {
+            if (answered) return;
+            answered = true;
+            const q = exercises[currentQuestion];
+            const btns = document.querySelectorAll('.option');
+            btns.forEach(b => b.classList.add('disabled'));
+            btns[q.correct].classList.add('correct');
+            const right = i === q.correct;
+            if (!right) btns[i].classList.add('wrong');
+            if (right) { score += 10; streak += 1; } else { streak = 0; }
+            const fb = document.createElement('div');
+            fb.className = 'feedback ' + (right ? 'correct' : 'wrong');
+            fb.innerHTML = `<strong>${right ? '✅ Correct.' : '❌ Not quite.'}</strong><br>${escapeHtml(q.explanation)}`;
+            document.getElementById('exerciseCard').appendChild(fb);
+            const nb = document.createElement('button');
+            nb.className = 'next-btn';
+            nb.textContent = currentQuestion === exercises.length - 1 ? 'See results →' : 'Next scenario →';
+            nb.onclick = nextQuestion;
+            document.getElementById('exerciseCard').appendChild(nb);
+            updateScoreboard();
+        }
+
+        function nextQuestion() {
+            currentQuestion++;
+            if (currentQuestion >= exercises.length) return showResults();
+            renderQuestion();
+        }
+
+        function showResults() {
+            document.getElementById('progress').style.width = '100%';
+            const total = exercises.length * 10;
+            const pct = Math.round(score / total * 100);
+            if (window.parent) { window.parent.postMessage({type:"mtti_quiz_score", score: score, total: total, percent: pct}, "*"); }
+            let badge = '🌟', msg = 'Excellent work. You have a professional grasp of this lesson.';
+            if (pct < 50) { badge = '🌱'; msg = 'Good first attempt. Re-watch the lesson video and try again.'; }
+            else if (pct < 80) { badge = '📚'; msg = 'Solid progress. Review the scenarios you missed and retry.'; }
+            document.getElementById('exerciseCard').innerHTML = `
+                <div class="results">
+                    <span class="badge">${badge}</span>
+                    <h2>Quiz Complete</h2>
+                    <div class="final-score">${score} / ${total}</div>
+                    <p><strong>${pct}%</strong> · Longest streak: ${streak}</p>
+                    <p>${msg}</p>
+                    <button class="restart-btn" onclick="restart()">Try again 🔁</button>
+                </div>`;
+        }
+
+        function restart() {
+            currentQuestion = 0; score = 0; streak = 0;
+            renderQuestion();
+        }
+
+        renderQuestion();
+    </script>
+</body>
+</html>

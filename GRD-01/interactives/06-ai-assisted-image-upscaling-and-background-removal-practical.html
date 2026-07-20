@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AI-Assisted Image Upscaling and Background Removal | MTTI Graphic Design</title>
+<link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Fredoka:wght@500;600&display=swap" rel="stylesheet">
+<style>
+* { margin:0; padding:0; box-sizing:border-box; }
+body { font-family:'Space Mono', monospace; background:linear-gradient(135deg,#16A085 0%,#2980B9 100%); min-height:100vh; padding:20px; color:#fff; }
+.container { max-width:900px; margin:0 auto; }
+.header { text-align:center; margin-bottom:24px; }
+.lesson-tag { display:inline-block; background:rgba(255,255,255,0.2); padding:6px 16px; border-radius:999px; font-size:0.85em; margin-bottom:12px; }
+.header h1 { font-family:'Fredoka', sans-serif; font-size:2em; margin-bottom:6px; text-shadow:3px 3px 0 rgba(0,0,0,0.2); }
+.scenario { background:rgba(255,255,255,0.14); backdrop-filter:blur(10px); border-radius:16px; padding:16px 22px; margin-bottom:20px; border-left:5px solid #ffd54f; font-size:0.95em; line-height:1.55; }
+.task { background:#fff; color:#333; border-radius:20px; padding:24px; margin-bottom:16px; box-shadow:0 14px 40px rgba(0,0,0,0.25); }
+.task-num { display:inline-block; width:28px; height:28px; background:linear-gradient(135deg,#16A085 0%,#2980B9 100%); color:#fff; border-radius:50%; text-align:center; line-height:28px; font-family:'Fredoka', sans-serif; font-weight:600; margin-right:8px; }
+.task h3 { font-family:'Fredoka', sans-serif; font-size:1.05em; display:inline; }
+.options { margin-top:14px; display:flex; flex-direction:column; gap:10px; }
+.option { background:#f5f7fb; border:2px solid transparent; padding:12px 16px; border-radius:10px; cursor:pointer; transition:all 0.2s; font-family:'Space Mono', monospace; font-size:0.92em; text-align:left; }
+.option:hover:not(.disabled) { background:#e8f5e9; border-color:#16A085; }
+.option.correct { background:#d4edda; border-color:#28a745; color:#155724; }
+.option.wrong { background:#f8d7da; border-color:#dc3545; color:#721c24; }
+.option.disabled { cursor:not-allowed; }
+.feedback { margin-top:14px; padding:12px 16px; border-radius:10px; font-size:0.9em; line-height:1.5; }
+.feedback.correct { background:#d4edda; color:#155724; border-left:4px solid #28a745; }
+.feedback.wrong { background:#f8d7da; color:#721c24; border-left:4px solid #dc3545; }
+.done-banner { text-align:center; padding:20px; color:#fff; font-family:'Fredoka', sans-serif; font-size:1.1em; }
+</style>
+</head>
+<body>
+<div class="container">
+<div class="header"><div class="lesson-tag">AI Tools for Graphic Designers · Topic 2 · Practical</div><h1>AI-Assisted Image Upscaling and Background Removal</h1></div>
+<div class="scenario">A returning client emails Chapa Design Studio a tiny, blurry JPEG of their old logo (saved years ago from Facebook) for a new shop sign, plus a product photo with a cluttered background for this month's flyer.</div>
+<div id="tasks"></div>
+<div class="done-banner" id="doneBanner" style="display:none;">&#9989; Practical complete — you can move to the quiz.</div>
+</div>
+<script>
+const tasks = [{"prompt":"What is the safest way for Ivy to handle the blurry old logo for a large, crisp shop sign?","options":["Print the tiny blurry JPEG directly, enlarged","Run it through an AI upscaler, then still trace/rebuild it as a clean vector logo in CorelDraw before use on signage","Ask the client to accept a blurry sign","Reduce the sign size to match the blurry image quality"],"correct":1,"explanation":"AI upscaling helps as a cleanup step, but a scalable, crisp final logo for signage still needs to be traced or rebuilt as vector artwork in CorelDraw."},{"prompt":"Which task is AI background removal well suited for here?","options":["Quickly isolating the product from its cluttered background for the flyer, ready for layout in CorelDraw","Replacing the need for a camera entirely","Rewriting the flyer's marketing text","Designing the shop's entire signage from scratch"],"correct":0,"explanation":"AI background removal is well suited to quickly isolating a photo subject so it can be dropped into a layout, saving manual selection time."},{"prompt":"After running the background removal, Ivy notices ragged, uneven edges around the product's fine details. What should she do?","options":["Ignore it, no one will zoom in","Use it exactly as-is to save time","Zoom in, review the edges closely, and touch up or re-mask the rough areas before placing it in the flyer","Discard AI background removal as a method entirely"],"correct":2,"explanation":"Fine edges are a common weak point for AI background removal — reviewing closely and touching up rough spots keeps the final print looking professional."}];
+function escapeHtml(s){return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
+function render(){
+  const c = document.getElementById('tasks');
+  c.innerHTML = tasks.map((t,i)=>`
+    <div class="task" id="task-${i}">
+      <div><span class="task-num">${i+1}</span><h3>${escapeHtml(t.prompt)}</h3></div>
+      <div class="options">
+        ${t.options.map((o,j)=>`<button class="option" onclick="answer(${i},${j})">${escapeHtml(o)}</button>`).join('')}
+      </div>
+    </div>`).join('');
+}
+function answer(i,j){
+  const task = tasks[i];
+  const el = document.getElementById('task-'+i);
+  const btns = el.querySelectorAll('.option');
+  if (btns[0].classList.contains('disabled')) return;
+  btns.forEach(b=>b.classList.add('disabled'));
+  btns[task.correct].classList.add('correct');
+  const right = j === task.correct;
+  if (!right) btns[j].classList.add('wrong');
+  const fb = document.createElement('div');
+  fb.className = 'feedback ' + (right?'correct':'wrong');
+  fb.innerHTML = '<strong>' + (right?'&#9989; Correct.':'&#10060; Not quite.') + '</strong><br>' + escapeHtml(task.explanation);
+  el.appendChild(fb);
+  if (i === tasks.length-1) document.getElementById('doneBanner').style.display='block';
+}
+render();
+</script>
+</body>
+</html>

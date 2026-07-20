@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Color Theory Basics: Hue, Saturation, and Contrast | MTTI Graphic Design</title>
+    <link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Fredoka:wght@500;600&display=swap" rel="stylesheet">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Space Mono', monospace; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); min-height: 100vh; padding: 20px; color: #fff; }
+        .container { max-width: 900px; margin: 0 auto; }
+        .header { text-align: center; margin-bottom: 30px; }
+        .header .lesson-tag { display: inline-block; background: rgba(255,255,255,0.2); padding: 6px 16px; border-radius: 999px; font-size: 0.85em; margin-bottom: 12px; }
+        .header h1 { font-family: 'Fredoka', sans-serif; font-size: 2.2em; margin-bottom: 8px; text-shadow: 3px 3px 0 rgba(0,0,0,0.2); }
+        .score-board { background: rgba(255,255,255,0.15); backdrop-filter: blur(10px); border-radius: 20px; padding: 20px; margin-bottom: 20px; display: flex; justify-content: space-around; }
+        .score-item { text-align: center; }
+        .score-item .label { font-size: 0.85em; opacity: 0.9; margin-bottom: 4px; }
+        .score-item .value { font-size: 1.8em; font-weight: bold; font-family: 'Fredoka', sans-serif; }
+        .progress-bar { width: 100%; height: 8px; background: rgba(255,255,255,0.3); border-radius: 10px; margin-bottom: 25px; overflow: hidden; }
+        .progress-fill { height: 100%; background: linear-gradient(90deg, #f093fb 0%, #f5576c 100%); border-radius: 10px; transition: width 0.5s ease; width: 0%; }
+        .exercise-card { background: white; color: #333; border-radius: 25px; padding: 35px; margin-bottom: 20px; box-shadow: 0 20px 60px rgba(0,0,0,0.3); }
+        .scenario { background: linear-gradient(135deg, #fff8e1 0%, #ffecb3 100%); border-left: 5px solid #ffc107; padding: 20px 24px; border-radius: 12px; margin-bottom: 24px; font-size: 0.98em; line-height: 1.55; }
+        .scenario strong { color: #7a5a00; font-family: 'Fredoka', sans-serif; }
+        .question { font-size: 1.15em; margin-bottom: 20px; font-weight: 700; line-height: 1.4; }
+        .options { display: flex; flex-direction: column; gap: 12px; }
+        .option { background: #f5f7fb; border: 2px solid transparent; padding: 16px 20px; border-radius: 12px; cursor: pointer; transition: all 0.2s ease; font-family: 'Space Mono', monospace; font-size: 0.98em; text-align: left; }
+        .option:hover:not(.disabled) { background: #eef1fb; border-color: #667eea; transform: translateX(4px); }
+        .option.correct { background: #d4edda; border-color: #28a745; color: #155724; }
+        .option.wrong { background: #f8d7da; border-color: #dc3545; color: #721c24; }
+        .option.disabled { cursor: not-allowed; opacity: 0.85; }
+        .feedback { margin-top: 22px; padding: 18px 22px; border-radius: 12px; font-size: 0.98em; line-height: 1.5; }
+        .feedback.correct { background: #d4edda; color: #155724; border-left: 4px solid #28a745; }
+        .feedback.wrong { background: #f8d7da; color: #721c24; border-left: 4px solid #dc3545; }
+        .next-btn, .restart-btn { margin-top: 20px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; border: none; padding: 14px 32px; border-radius: 12px; font-size: 1em; cursor: pointer; font-family: 'Fredoka', sans-serif; box-shadow: 0 6px 18px rgba(0,0,0,0.2); }
+        .results { text-align: center; padding: 25px 15px; }
+        .results h2 { font-family: 'Fredoka', sans-serif; font-size: 2em; margin-bottom: 12px; color: #333; }
+        .results .final-score { font-size: 3em; font-family: 'Fredoka', sans-serif; color: #667eea; margin: 20px 0; }
+        .results p { color: #555; margin-bottom: 12px; }
+        .badge { display: inline-block; font-size: 3.5em; margin: 8px 0; }
+
+        /* How-To intro screen — shown before question 1, not scored */
+        .howto-card { background: white; color: #333; border-radius: 25px; padding: 35px; margin-bottom: 20px; box-shadow: 0 20px 60px rgba(0,0,0,0.3); }
+        .howto-card h3 { font-family: 'Fredoka', sans-serif; font-size: 1.3em; margin-bottom: 12px; color: #667eea; }
+        .howto-card p { line-height: 1.6; margin-bottom: 16px; color: #444; }
+        .howto-field-row { display: flex; align-items: center; gap: 18px; background: #f5f7fb; border-radius: 12px; padding: 16px 20px; margin-bottom: 18px; }
+        .howto-swatch { width: 70px; height: 70px; border-radius: 10px; flex-shrink: 0; box-shadow: 0 2px 8px rgba(0,0,0,0.2); }
+        .howto-field-body { flex: 1; }
+        .howto-field-body label { display: block; font-weight: 700; margin-bottom: 8px; font-size: 0.95em; }
+        .howto-field-body input[type="range"] { width: 100%; }
+        .howto-field-meta { display: flex; justify-content: space-between; font-size: 0.8em; color: #666; margin-top: 4px; }
+        .howto-banner { margin-top: 4px; margin-bottom: 18px; padding: 12px 16px; border-radius: 10px; font-size: 0.9em; font-weight: 700; display: none; }
+        .howto-banner.show { display: block; }
+        .howto-banner.ok { background: #d4edda; color: #155724; }
+        .howto-banner.fail { background: #f8d7da; color: #721c24; }
+        .start-quiz-btn { margin-top: 4px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; border: none; padding: 14px 32px; border-radius: 12px; font-size: 1em; cursor: pointer; font-family: 'Fredoka', sans-serif; box-shadow: 0 6px 18px rgba(0,0,0,0.2); }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <div class="lesson-tag">Unit 2 · Topic 1 · Quiz</div>
+            <h1>Color Theory Basics: Hue, Saturation, and Contrast</h1>
+        </div>
+        <div class="score-board">
+            <div class="score-item"><div class="label">Score</div><div class="value" id="score">0</div></div>
+            <div class="score-item"><div class="label">Question</div><div class="value"><span id="current">1</span>/<span id="total">10</span></div></div>
+            <div class="score-item"><div class="label">Streak</div><div class="value" id="streak">0</div></div>
+        </div>
+        <div class="progress-bar"><div class="progress-fill" id="progress"></div></div>
+        <div class="exercise-card" id="exerciseCard"></div>
+    </div>
+    <script>
+        const exercises = [{"scenario":"Ivy is explaining to a new intern at Chapa Design Studio what makes up a single color in CorelDraw's color picker.","question":"Which three properties combine to define a color?","options":["Hue, saturation, and brightness","Width, height, and depth","Font, size, and weight","CMYK, RGB, and Pantone only"],"correct":0,"explanation":"Hue, saturation, and brightness together define exactly what a color looks like."},{"scenario":"A client wants their fitness brand to feel energetic and bold.","question":"Which color family is the stronger starting point?","options":["Cool blues and purples","Warm reds and oranges","Pure greyscale","Muted pastels only"],"correct":1,"explanation":"Warm colors tend to feel energetic and bold, fitting an energetic fitness brand."},{"scenario":"A client wants their financial consulting brand to feel calm and trustworthy.","question":"Which color family fits best?","options":["Warm reds and oranges","Cool blues and greens","Bright neon yellow","Random rainbow mix"],"correct":1,"explanation":"Cool colors like blues and greens tend to read as calm and trustworthy, which suits a financial brand."},{"scenario":"Ivy lowers the saturation of a bright red swatch without changing its hue or brightness.","question":"What will the color look like afterward?","options":["Still a bold, vivid red","A more muted, dusty version of the same red","A completely different hue, like blue","Pure white"],"correct":1,"explanation":"Lowering saturation while keeping hue and brightness the same makes a color look more muted and dusty, not a different hue."},{"scenario":"A draft poster has pale yellow text sitting on a white background.","question":"What is the biggest problem with this choice?","options":["The text is too large","There isn't enough contrast, so the text will be hard to read","Yellow is not allowed in branding","The font is too bold"],"correct":1,"explanation":"Pale yellow on white has very low contrast, making the text difficult to read."},{"scenario":"Ivy needs to place white headline text over a photo background.","question":"What should she check before finalizing it?","options":["That the photo area behind the text is dark enough for the white text to stand out","That the photo is the right file size","That the text uses italics","That the photo was taken recently"],"correct":0,"explanation":"White text needs a sufficiently dark area behind it to remain readable."},{"scenario":"Ivy is deciding between two near-identical mid-tone colors for a headline and its background.","question":"What should concern her most?","options":["Whether the two colors are trendy this year","Whether the two colors are similar in brightness, which would create poor contrast","Whether the colors have long names","Whether the colors are both cool colors"],"correct":1,"explanation":"Two mid-tone colors of similar brightness create poor contrast, regardless of their hue."},{"scenario":"A teammate says warm and cool colors are 'just a matter of taste' with no real design impact.","question":"How should Ivy respond?","options":["Agree completely, hue never affects mood","Explain that warm and cool colors reliably shift the mood and feel of a design, which is why the choice matters","Say only cool colors should ever be used","Say color theory only applies to logos"],"correct":1,"explanation":"Warm and cool colors reliably influence the mood of a design, which is exactly why the choice matters for a brand."}];
+        let currentQuestion = 0, score = 0, streak = 0, answered = false;
+        function updateScoreboard() {
+            document.getElementById('score').textContent = score;
+            document.getElementById('current').textContent = Math.min(currentQuestion + 1, exercises.length);
+            document.getElementById('total').textContent = exercises.length;
+            document.getElementById('streak').textContent = streak;
+            document.getElementById('progress').style.width = ((currentQuestion) / exercises.length) * 100 + '%';
+        }
+        function escapeHtml(s) { return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+        function renderQuestion() {
+            answered = false;
+            const q = exercises[currentQuestion];
+            let html = '';
+            if (q.scenario) html += `<div class="scenario"><strong>Scenario.</strong> ${escapeHtml(q.scenario)}</div>`;
+            html += `<div class="question">${escapeHtml(q.question)}</div>`;
+            html += '<div class="options">';
+            q.options.forEach((o, i) => { html += `<button class="option" onclick="selectAnswer(${i})">${escapeHtml(o)}</button>`; });
+            html += '</div>';
+            document.getElementById('exerciseCard').innerHTML = html;
+            updateScoreboard();
+        }
+        function selectAnswer(i) {
+            if (answered) return;
+            answered = true;
+            const q = exercises[currentQuestion];
+            const btns = document.querySelectorAll('.option');
+            btns.forEach(b => b.classList.add('disabled'));
+            btns[q.correct].classList.add('correct');
+            const right = i === q.correct;
+            if (!right) btns[i].classList.add('wrong');
+            if (right) { score += 10; streak += 1; } else { streak = 0; }
+            const fb = document.createElement('div');
+            fb.className = 'feedback ' + (right ? 'correct' : 'wrong');
+            fb.innerHTML = `<strong>${right ? 'Correct.' : 'Not quite.'}</strong><br>${escapeHtml(q.explanation)}`;
+            document.getElementById('exerciseCard').appendChild(fb);
+            const nb = document.createElement('button');
+            nb.className = 'next-btn';
+            nb.textContent = currentQuestion === exercises.length - 1 ? 'See results →' : 'Next scenario →';
+            nb.onclick = nextQuestion;
+            document.getElementById('exerciseCard').appendChild(nb);
+            updateScoreboard();
+        }
+        function nextQuestion() { currentQuestion++; if (currentQuestion >= exercises.length) return showResults(); renderQuestion(); }
+        function showResults() {
+            document.getElementById('progress').style.width = '100%';
+            const total = exercises.length * 10;
+            const pct = Math.round(score / total * 100);
+            if (window.parent) { window.parent.postMessage({type:"mtti_quiz_score", score: score, total: total, percent: pct}, "*"); }
+            let badge = '⭐', msg = 'Excellent work. You have a professional grasp of this lesson.';
+            if (pct < 50) { badge = '🌱'; msg = 'Good first attempt. Review the lesson and try again.'; }
+            else if (pct < 80) { badge = '📘'; msg = 'Solid progress. Review the scenarios you missed and retry.'; }
+            document.getElementById('exerciseCard').innerHTML = `
+                <div class="results">
+                    <span class="badge">${badge}</span>
+                    <h2>Quiz Complete</h2>
+                    <div class="final-score">${score} / ${total}</div>
+                    <p><strong>${pct}%</strong> · Longest streak: ${streak}</p>
+                    <p>${msg}</p>
+                    <button class="restart-btn" onclick="restart()">Try again</button>
+                </div>`;
+        }
+        function restart() { currentQuestion = 0; score = 0; streak = 0; renderQuestion(); }
+
+        /* How-To intro — an ungraded field-check demo rehearsing the
+           "lower saturation without changing hue or brightness" mechanic
+           one of the quiz scenarios asks about, so it is not asked cold. */
+        const HOWTO_HUE = 355;        // locked — a bold red hue, unchanged throughout
+        const HOWTO_BRIGHTNESS = 55;  // locked — unchanged throughout
+        let howtoSaturation = 92;     // starts vivid, student drags it down
+
+        function howtoSwatchColor() {
+            return `hsl(${HOWTO_HUE}, ${howtoSaturation}%, ${HOWTO_BRIGHTNESS}%)`;
+        }
+
+        function renderHowtoField() {
+            document.getElementById('howtoSwatch').style.background = howtoSwatchColor();
+            document.getElementById('howtoSatValue').textContent = howtoSaturation + '%';
+        }
+
+        function onHowtoSaturationInput(e) {
+            howtoSaturation = Number(e.target.value);
+            renderHowtoField();
+            document.getElementById('howtoBanner').classList.remove('show');
+        }
+
+        function checkHowto() {
+            const banner = document.getElementById('howtoBanner');
+            const muted = howtoSaturation <= 40 && howtoSaturation >= 10;
+            banner.classList.add('show');
+            banner.className = 'howto-banner show ' + (muted ? 'ok' : 'fail');
+            banner.textContent = muted
+                ? 'Correct - same hue, same brightness, just a more muted, dusty version of the red. That is exactly what lowering saturation alone does.'
+                : 'Not yet - drag the Saturation slider down until the swatch looks like a muted, dusty red, not a vivid one.';
+        }
+
+        function renderHowto() {
+            document.getElementById('exerciseCard').innerHTML = `
+                <div class="howto-card">
+                    <h3>Quick How-To: Adjusting Saturation</h3>
+                    <p>Ivy is showing an intern at Chapa Design Studio what happens when you lower saturation without touching hue or brightness. Hue and Brightness are locked below — <strong>drag the Saturation slider down</strong> until the swatch turns into a muted, dusty red, then check your work.</p>
+                    <div class="howto-field-row">
+                        <div class="howto-swatch" id="howtoSwatch"></div>
+                        <div class="howto-field-body">
+                            <label for="howtoSatSlider">Saturation: <span id="howtoSatValue">92%</span></label>
+                            <input type="range" id="howtoSatSlider" min="0" max="100" value="92">
+                            <div class="howto-field-meta"><span>Hue: ${HOWTO_HUE}° (locked)</span><span>Brightness: ${HOWTO_BRIGHTNESS}% (locked)</span></div>
+                        </div>
+                    </div>
+                    <div class="howto-banner" id="howtoBanner"></div>
+                    <button class="start-quiz-btn" id="checkHowtoBtn">Check My Adjustment</button>
+                    <button class="start-quiz-btn" id="startQuizBtn" style="margin-left:10px;background:linear-gradient(135deg,#28a745,#1e7e34);">Start Quiz →</button>
+                </div>`;
+            renderHowtoField();
+            document.getElementById('howtoSatSlider').addEventListener('input', onHowtoSaturationInput);
+            document.getElementById('checkHowtoBtn').addEventListener('click', checkHowto);
+            document.getElementById('startQuizBtn').addEventListener('click', renderQuestion);
+        }
+
+        renderHowto();
+    </script>
+</body>
+</html>

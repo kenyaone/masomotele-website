@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Building a Simple Brand Identity Kit | MTTI Graphic Design</title>
+    <link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Fredoka:wght@500;600&display=swap" rel="stylesheet">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Space Mono', monospace; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); min-height: 100vh; padding: 20px; color: #fff; }
+        .container { max-width: 900px; margin: 0 auto; }
+        .header { text-align: center; margin-bottom: 30px; }
+        .header .lesson-tag { display: inline-block; background: rgba(255,255,255,0.2); padding: 6px 16px; border-radius: 999px; font-size: 0.85em; margin-bottom: 12px; }
+        .header h1 { font-family: 'Fredoka', sans-serif; font-size: 2.2em; margin-bottom: 8px; text-shadow: 3px 3px 0 rgba(0,0,0,0.2); }
+        .score-board { background: rgba(255,255,255,0.15); backdrop-filter: blur(10px); border-radius: 20px; padding: 20px; margin-bottom: 20px; display: flex; justify-content: space-around; }
+        .score-item { text-align: center; }
+        .score-item .label { font-size: 0.85em; opacity: 0.9; margin-bottom: 4px; }
+        .score-item .value { font-size: 1.8em; font-weight: bold; font-family: 'Fredoka', sans-serif; }
+        .progress-bar { width: 100%; height: 8px; background: rgba(255,255,255,0.3); border-radius: 10px; margin-bottom: 25px; overflow: hidden; }
+        .progress-fill { height: 100%; background: linear-gradient(90deg, #f093fb 0%, #f5576c 100%); border-radius: 10px; transition: width 0.5s ease; width: 0%; }
+        .exercise-card { background: white; color: #333; border-radius: 25px; padding: 35px; margin-bottom: 20px; box-shadow: 0 20px 60px rgba(0,0,0,0.3); }
+        .scenario { background: linear-gradient(135deg, #fff8e1 0%, #ffecb3 100%); border-left: 5px solid #ffc107; padding: 20px 24px; border-radius: 12px; margin-bottom: 24px; font-size: 0.98em; line-height: 1.55; }
+        .scenario strong { color: #7a5a00; font-family: 'Fredoka', sans-serif; }
+        .question { font-size: 1.15em; margin-bottom: 20px; font-weight: 700; line-height: 1.4; }
+        .options { display: flex; flex-direction: column; gap: 12px; }
+        .option { background: #f5f7fb; border: 2px solid transparent; padding: 16px 20px; border-radius: 12px; cursor: pointer; transition: all 0.2s ease; font-family: 'Space Mono', monospace; font-size: 0.98em; text-align: left; }
+        .option:hover:not(.disabled) { background: #eef1fb; border-color: #667eea; transform: translateX(4px); }
+        .option.correct { background: #d4edda; border-color: #28a745; color: #155724; }
+        .option.wrong { background: #f8d7da; border-color: #dc3545; color: #721c24; }
+        .option.disabled { cursor: not-allowed; opacity: 0.85; }
+        .feedback { margin-top: 22px; padding: 18px 22px; border-radius: 12px; font-size: 0.98em; line-height: 1.5; }
+        .feedback.correct { background: #d4edda; color: #155724; border-left: 4px solid #28a745; }
+        .feedback.wrong { background: #f8d7da; color: #721c24; border-left: 4px solid #dc3545; }
+        .next-btn, .restart-btn { margin-top: 20px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; border: none; padding: 14px 32px; border-radius: 12px; font-size: 1em; cursor: pointer; font-family: 'Fredoka', sans-serif; box-shadow: 0 6px 18px rgba(0,0,0,0.2); }
+        .results { text-align: center; padding: 25px 15px; }
+        .results h2 { font-family: 'Fredoka', sans-serif; font-size: 2em; margin-bottom: 12px; color: #333; }
+        .results .final-score { font-size: 3em; font-family: 'Fredoka', sans-serif; color: #667eea; margin: 20px 0; }
+        .results p { color: #555; margin-bottom: 12px; }
+        .badge { display: inline-block; font-size: 3.5em; margin: 8px 0; }
+
+        /* How-To intro screen — shown before question 1, not scored */
+        .howto-card { background: white; color: #333; border-radius: 25px; padding: 35px; margin-bottom: 20px; box-shadow: 0 20px 60px rgba(0,0,0,0.3); }
+        .howto-card h3 { font-family: 'Fredoka', sans-serif; font-size: 1.3em; margin-bottom: 12px; color: #667eea; }
+        .howto-card p { line-height: 1.6; margin-bottom: 16px; color: #444; }
+        .howto-field-group { margin-bottom: 18px; }
+        .howto-field { margin-bottom: 16px; }
+        .howto-field label { display: block; font-weight: 700; margin-bottom: 6px; color: #333; font-size: 0.92em; }
+        .howto-field select, .howto-field input[type="text"] { width: 100%; padding: 10px 12px; border-radius: 8px; border: 2px solid #ddd; font-family: 'Space Mono', monospace; font-size: 0.95em; background: #f5f7fb; }
+        .howto-field.hf-correct select, .howto-field.hf-correct input[type="text"] { border-color: #28a745; background: #f0fff4; }
+        .howto-field.hf-wrong select, .howto-field.hf-wrong input[type="text"] { border-color: #dc3545; background: #fff5f5; }
+        .howto-checkbox-row { display: flex; align-items: flex-start; gap: 10px; }
+        .howto-checkbox-row input[type="checkbox"] { margin-top: 3px; width: 18px; height: 18px; flex-shrink: 0; }
+        .howto-checkbox-row label { font-weight: 700; color: #333; font-size: 0.92em; line-height: 1.4; }
+        .howto-field.hf-correct .howto-checkbox-row label { color: #155724; }
+        .howto-field.hf-wrong .howto-checkbox-row label { color: #721c24; }
+        .howto-banner { margin-top: 4px; margin-bottom: 18px; padding: 12px 16px; border-radius: 10px; font-size: 0.9em; font-weight: 700; display: none; }
+        .howto-banner.show { display: block; }
+        .howto-banner.ok { background: #d4edda; color: #155724; }
+        .howto-banner.fail { background: #f8d7da; color: #721c24; }
+        .start-quiz-btn { margin-top: 4px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; border: none; padding: 14px 32px; border-radius: 12px; font-size: 1em; cursor: pointer; font-family: 'Fredoka', sans-serif; box-shadow: 0 6px 18px rgba(0,0,0,0.2); }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <div class="lesson-tag">Branding & Illustration · Brand Identity · Quiz</div>
+            <h1>Building a Simple Brand Identity Kit</h1>
+        </div>
+        <div class="score-board">
+            <div class="score-item"><div class="label">Score</div><div class="value" id="score">0</div></div>
+            <div class="score-item"><div class="label">Question</div><div class="value"><span id="current">1</span>/<span id="total">10</span></div></div>
+            <div class="score-item"><div class="label">Streak</div><div class="value" id="streak">0</div></div>
+        </div>
+        <div class="progress-bar"><div class="progress-fill" id="progress"></div></div>
+        <div class="exercise-card" id="exerciseCard"></div>
+    </div>
+    <script>
+        const exercises = [{"scenario":"Ivy finishes a strong logo for a new bakery client, but notices their flyers already use five different colours and three different fonts.","question":"What is the main problem here?","options":["There is no problem, more variety looks lively","The materials look inconsistent, which weakens brand recognition even though the logo itself is fine","The logo is the only thing that matters","Five colours is always the ideal number for a brand"],"correct":1,"explanation":"Inconsistent colours and fonts across materials undermine brand recognition, regardless of how strong the logo itself is."},{"scenario":"A client's brand colours are a specific teal and mustard yellow taken directly from their logo.","question":"Why should Ivy record the exact colour codes rather than just describing them as \"teal\" and \"yellow\"?","options":["Descriptions like \"teal\" are precise enough for any printer","Exact colour codes ensure every future printer, sign-writer, or designer reproduces the identical shade, not just something close","It doesn't matter, colours print the same everywhere","Only screen colours need codes, print never does"],"correct":1,"explanation":"Colour names are vague and interpreted differently by different people; exact colour codes guarantee the same shade is reproduced every time."},{"scenario":"Ivy is choosing brand fonts for a client and is tempted to use a different decorative font on every poster to \"keep things interesting.\"","question":"Why would this be poor practice for a brand kit?","options":["It would make the brand instantly more recognisable","Constantly changing fonts undermines consistency, which is what makes materials instantly recognisable as the same brand","Clients always prefer maximum variety in fonts","Fonts have no effect on brand recognition"],"correct":1,"explanation":"Recognisable branding depends on consistent, repeated visual choices; swapping fonts constantly works against that consistency."},{"scenario":"A simple brand kit typically includes one heading font and one body font rather than just one font for everything.","question":"Why two fonts rather than just one?","options":["One bold or distinctive font suits headings and one clean, readable font suits body text, together covering both roles without adding more inconsistency","Two fonts are required by law for every business","It's purely arbitrary and has no real reasoning behind it","More fonts should always be added over time"],"correct":0,"explanation":"Pairing a distinctive heading font with a readable body font covers both practical roles while still keeping the kit simple and consistent."},{"scenario":"Ivy hands a new client's finished brand kit to an outside printer who has never worked with Chapa Design Studio before.","question":"What should this simple kit reference sheet include so the printer gets it right the first time?","options":["Only Ivy's phone number","The logo, the exact brand colour codes, and the chosen fonts, all in one place","A blank page for the printer to decide everything","Just the logo with no other guidance"],"correct":1,"explanation":"A useful reference sheet gives an outside printer everything needed to reproduce the brand accurately without needing to guess or ask."},{"scenario":"A client's supporting colour palette includes a light grey used for backgrounds, alongside their one or two primary brand colours.","question":"What is the purpose of a supporting colour like this?","options":["It replaces the need for a logo entirely","It provides a neutral background or accent option that works alongside the primary brand colours without clashing","It should be used as the main logo colour instead","Supporting colours are never needed in a brand kit"],"correct":1,"explanation":"Supporting colours give designers a neutral option for backgrounds and accents that complements, rather than competes with, the primary brand colours."},{"scenario":"Months after delivering a brand kit, Ivy notices the client's new signboard uses a slightly different shade of green than the original logo.","question":"What likely went wrong?","options":["Nothing, slight shade differences don't matter","The exact colour code from the brand kit likely wasn't followed, so the shade drifted from the original brand colour","Signboards can never match logo colours","Green always looks the same regardless of shade"],"correct":1,"explanation":"Colour drift like this is the classic symptom of a brand kit's exact colour codes not being followed by whoever produced the new material."}];
+        let currentQuestion = 0, score = 0, streak = 0, answered = false;
+        function updateScoreboard() {
+            document.getElementById('score').textContent = score;
+            document.getElementById('current').textContent = Math.min(currentQuestion + 1, exercises.length);
+            document.getElementById('total').textContent = exercises.length;
+            document.getElementById('streak').textContent = streak;
+            document.getElementById('progress').style.width = ((currentQuestion) / exercises.length) * 100 + '%';
+        }
+        function escapeHtml(s) { return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+        function renderQuestion() {
+            answered = false;
+            const q = exercises[currentQuestion];
+            let html = '';
+            if (q.scenario) html += `<div class="scenario"><strong>Scenario.</strong> ${escapeHtml(q.scenario)}</div>`;
+            html += `<div class="question">${escapeHtml(q.question)}</div>`;
+            html += '<div class="options">';
+            q.options.forEach((o, i) => { html += `<button class="option" onclick="selectAnswer(${i})">${escapeHtml(o)}</button>`; });
+            html += '</div>';
+            document.getElementById('exerciseCard').innerHTML = html;
+            updateScoreboard();
+        }
+        function selectAnswer(i) {
+            if (answered) return;
+            answered = true;
+            const q = exercises[currentQuestion];
+            const btns = document.querySelectorAll('.option');
+            btns.forEach(b => b.classList.add('disabled'));
+            btns[q.correct].classList.add('correct');
+            const right = i === q.correct;
+            if (!right) btns[i].classList.add('wrong');
+            if (right) { score += 10; streak += 1; } else { streak = 0; }
+            const fb = document.createElement('div');
+            fb.className = 'feedback ' + (right ? 'correct' : 'wrong');
+            fb.innerHTML = `<strong>${right ? '✅ Correct.' : '❌ Not quite.'}</strong><br>${escapeHtml(q.explanation)}`;
+            document.getElementById('exerciseCard').appendChild(fb);
+            const nb = document.createElement('button');
+            nb.className = 'next-btn';
+            nb.textContent = currentQuestion === exercises.length - 1 ? 'See results →' : 'Next scenario →';
+            nb.onclick = nextQuestion;
+            document.getElementById('exerciseCard').appendChild(nb);
+            updateScoreboard();
+        }
+        function nextQuestion() { currentQuestion++; if (currentQuestion >= exercises.length) return showResults(); renderQuestion(); }
+        function showResults() {
+            document.getElementById('progress').style.width = '100%';
+            const total = exercises.length * 10;
+            const pct = Math.round(score / total * 100);
+            if (window.parent) { window.parent.postMessage({type:"mtti_quiz_score", score: score, total: total, percent: pct}, "*"); }
+            let badge = '🌟', msg = 'Excellent work. You have a professional grasp of this lesson.';
+            if (pct < 50) { badge = '🌱'; msg = 'Good first attempt. Review the lesson and try again.'; }
+            else if (pct < 80) { badge = '📚'; msg = 'Solid progress. Review the scenarios you missed and retry.'; }
+            document.getElementById('exerciseCard').innerHTML = `
+                <div class="results">
+                    <span class="badge">${badge}</span>
+                    <h2>Quiz Complete</h2>
+                    <div class="final-score">${score} / ${total}</div>
+                    <p><strong>${pct}%</strong> · Longest streak: ${streak}</p>
+                    <p>${msg}</p>
+                    <button class="restart-btn" onclick="restart()">Try again 🔁</button>
+                </div>`;
+        }
+        function restart() { currentQuestion = 0; score = 0; streak = 0; renderQuestion(); }
+
+        /* How-To intro — a small, ungraded field-check demo shown before the
+           quiz starts, directly rehearsing the "record exact colour codes instead of vague names like teal or mustard yellow" habit
+           that one of the quiz scenarios asks about, so it is not being asked cold. */
+        const HOWTO_TITLE = "🔍 Quick How-To: Recording Exact Brand Colours";
+        const HOWTO_INTRO = "Ivy has just picked colours for a new client brand kit at Chapa Design Studio: a teal and a mustard yellow. She needs to hand the printer something precise, not a vague description. One of the scenarios coming up asks exactly why this matters. Replace the colour names below with real colour codes, then check your work.";
+        const HOWTO_CHECK_LABEL = "Check My Colour Codes";
+        const HOWTO_OK_MSG = "✅ Recorded precisely - codes like these let a printer, sign-writer, or another designer reproduce the exact same shade every time.";
+        const HOWTO_FAIL_MSG = "❌ Not yet - teal and mustard yellow are only descriptions. Replace them with exact colour codes, for example #2E8B78.";
+        const HOWTO_FIELDS = [
+            { id: 'primaryColor', type: 'text', label: 'Primary brand colour - record as an exact code (e.g. #2E8B78):', defaultValue: 'teal', rule: { op: 'regex', value: /^#[0-9A-Fa-f]{6}$/ } },
+            { id: 'accentColor', type: 'text', label: 'Accent colour - record as an exact code:', defaultValue: 'mustard yellow', rule: { op: 'regex', value: /^#[0-9A-Fa-f]{6}$/ } }
+        ];
+        function escHtmlH(s) { return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+
+        function howtoFieldHtml(f) {
+            if (f.type === 'checkbox') {
+                return `<div class="howto-field" id="howtoField-${f.id}">
+                    <div class="howto-checkbox-row">
+                        <input type="checkbox" id="hf-${f.id}">
+                        <label for="hf-${f.id}">${escHtmlH(f.label)}</label>
+                    </div>
+                </div>`;
+            }
+            if (f.type === 'select') {
+                const opts = f.options.map(o => `<option value="${escHtmlH(o.value)}"${o.value === f.defaultValue ? ' selected' : ''}>${escHtmlH(o.label)}</option>`).join('');
+                return `<div class="howto-field" id="howtoField-${f.id}">
+                    <label for="hf-${f.id}">${escHtmlH(f.label)}</label>
+                    <select id="hf-${f.id}">${opts}</select>
+                </div>`;
+            }
+            return `<div class="howto-field" id="howtoField-${f.id}">
+                <label for="hf-${f.id}">${escHtmlH(f.label)}</label>
+                <input type="text" id="hf-${f.id}" value="${escHtmlH(f.defaultValue || '')}">
+            </div>`;
+        }
+
+        function renderHowtoFields() {
+            document.getElementById('howtoFields').innerHTML = HOWTO_FIELDS.map(howtoFieldHtml).join('');
+        }
+
+        function howtoFieldValue(f) {
+            const el = document.getElementById('hf-' + f.id);
+            if (f.type === 'checkbox') return el.checked;
+            return el.value;
+        }
+
+        function howtoFieldPasses(f) {
+            const v = howtoFieldValue(f);
+            if (f.rule.op === 'checked') return v === true;
+            if (f.rule.op === 'eq') return v === f.rule.value;
+            if (f.rule.op === 'regex') return f.rule.value.test(v);
+            return false;
+        }
+
+        function checkHowtoFields() {
+            let allOk = true;
+            HOWTO_FIELDS.forEach(f => {
+                const ok = howtoFieldPasses(f);
+                if (!ok) allOk = false;
+                const wrap = document.getElementById('howtoField-' + f.id);
+                wrap.classList.remove('hf-correct', 'hf-wrong');
+                wrap.classList.add(ok ? 'hf-correct' : 'hf-wrong');
+            });
+            const banner = document.getElementById('howtoBanner');
+            banner.classList.add('show');
+            banner.className = 'howto-banner show ' + (allOk ? 'ok' : 'fail');
+            banner.textContent = allOk ? HOWTO_OK_MSG : HOWTO_FAIL_MSG;
+        }
+
+        function renderHowto() {
+            document.getElementById('exerciseCard').innerHTML = `
+                <div class="howto-card">
+                    <h3>${HOWTO_TITLE}</h3>
+                    <p>${HOWTO_INTRO}</p>
+                    <div class="howto-field-group" id="howtoFields"></div>
+                    <div class="howto-banner" id="howtoBanner"></div>
+                    <button class="start-quiz-btn" id="checkHowtoBtn">${HOWTO_CHECK_LABEL}</button>
+                    <button class="start-quiz-btn" id="startQuizBtn" style="margin-left:10px;background:linear-gradient(135deg,#28a745,#1e7e34);">Start Quiz →</button>
+                </div>`;
+            renderHowtoFields();
+            document.getElementById('checkHowtoBtn').addEventListener('click', checkHowtoFields);
+            document.getElementById('startQuizBtn').addEventListener('click', renderQuestion);
+        }
+
+        renderHowto();
+    </script>
+</body>
+</html>

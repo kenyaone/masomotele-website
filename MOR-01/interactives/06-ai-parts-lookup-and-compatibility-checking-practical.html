@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AI Parts-Lookup and Compatibility Checking | MTTI Mobile Repair</title>
+<link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Fredoka:wght@500;600&display=swap" rel="stylesheet">
+<style>
+* { margin:0; padding:0; box-sizing:border-box; }
+body { font-family:'Space Mono', monospace; background:linear-gradient(135deg,#134E5E 0%,#71B280 100%); min-height:100vh; padding:20px; color:#fff; }
+.container { max-width:900px; margin:0 auto; }
+.header { text-align:center; margin-bottom:24px; }
+.lesson-tag { display:inline-block; background:rgba(255,255,255,0.2); padding:6px 16px; border-radius:999px; font-size:0.85em; margin-bottom:12px; }
+.header h1 { font-family:'Fredoka', sans-serif; font-size:2em; margin-bottom:6px; text-shadow:3px 3px 0 rgba(0,0,0,0.2); }
+.scenario { background:rgba(255,255,255,0.14); backdrop-filter:blur(10px); border-radius:16px; padding:16px 22px; margin-bottom:20px; border-left:5px solid #ffd54f; font-size:0.95em; line-height:1.55; }
+.task { background:#fff; color:#333; border-radius:20px; padding:24px; margin-bottom:16px; box-shadow:0 14px 40px rgba(0,0,0,0.25); }
+.task-num { display:inline-block; width:28px; height:28px; background:linear-gradient(135deg,#134E5E 0%,#71B280 100%); color:#fff; border-radius:50%; text-align:center; line-height:28px; font-family:'Fredoka', sans-serif; font-weight:600; margin-right:8px; }
+.task h3 { font-family:'Fredoka', sans-serif; font-size:1.05em; display:inline; }
+.options { margin-top:14px; display:flex; flex-direction:column; gap:10px; }
+.option { background:#f5f7fb; border:2px solid transparent; padding:12px 16px; border-radius:10px; cursor:pointer; transition:all 0.2s; font-family:'Space Mono', monospace; font-size:0.92em; text-align:left; }
+.option:hover:not(.disabled) { background:#e8f5e9; border-color:#134E5E; }
+.option.correct { background:#d4edda; border-color:#28a745; color:#155724; }
+.option.wrong { background:#f8d7da; border-color:#dc3545; color:#721c24; }
+.option.disabled { cursor:not-allowed; }
+.feedback { margin-top:14px; padding:12px 16px; border-radius:10px; font-size:0.9em; line-height:1.5; }
+.feedback.correct { background:#d4edda; color:#155724; border-left:4px solid #28a745; }
+.feedback.wrong { background:#f8d7da; color:#721c24; border-left:4px solid #dc3545; }
+.done-banner { text-align:center; padding:20px; color:#fff; font-family:'Fredoka', sans-serif; font-size:1.1em; }
+</style>
+</head>
+<body>
+<div class="container">
+<div class="header"><div class="lesson-tag">AI Tools for Mobile Repair Technicians · Topic 2 of 3 · Practical</div><h1>AI Parts-Lookup and Compatibility Checking</h1></div>
+<div class="scenario">A customer at QuickFix Phone Repairs needs a replacement screen for their Samsung Galaxy A12. Purity wants to check compatibility with an AI tool before ordering the part.</div>
+<div id="tasks"></div>
+<div class="done-banner" id="doneBanner" style="display:none;">Practical complete — you can move to the quiz.</div>
+</div>
+<script>
+const tasks = [{"prompt":"What should Purity give the AI assistant to get an accurate compatibility check for the screen?","options":["Just \\"a Samsung phone\\"","The exact phone model number (e.g. SM-A125F) plus the exact replacement part number she is considering","The color of the customer's phone case","Nothing — she should just order and see if it fits"],"correct":1,"explanation":"Precise model and part numbers give the AI something concrete to reason about, producing a far more accurate compatibility answer than a vague description."},{"prompt":"The AI says the screen \\"should be compatible\\" but sounds unsure about a specific regional variant. What should Purity do?","options":["Order it anyway without checking anything further","Cross-check the AI's answer against the supplier's spec sheet, or compare the connector before ordering","Tell the customer it is guaranteed to fit","Never use AI for parts lookup again"],"correct":1,"explanation":"When the AI hedges on a detail, a quick cross-check against a supplier spec sheet or the physical connector catches mistakes before money is spent."},{"prompt":"Purity once ordered a part based only on the AI's answer, skipped the supplier spec check, and the part turned out incompatible. What is the right lesson here?","options":["AI compatibility checks are useless and should never be used","Use AI as a fast first-pass check, but always verify against a trusted source before committing money","Always order two of every part just in case","It was the customer's fault for having an unusual phone"],"correct":1,"explanation":"AI is a fast, useful first-pass check — but a trusted source (spec sheet, supplier listing, or physical comparison) should always confirm it before an order is placed."}];
+function escapeHtml(s){return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
+function render(){
+  const c = document.getElementById('tasks');
+  c.innerHTML = tasks.map((t,i)=>`
+    <div class="task" id="task-${i}">
+      <div><span class="task-num">${i+1}</span><h3>${escapeHtml(t.prompt)}</h3></div>
+      <div class="options">
+        ${t.options.map((o,j)=>`<button class="option" onclick="answer(${i},${j})">${escapeHtml(o)}</button>`).join('')}
+      </div>
+    </div>`).join('');
+}
+function answer(i,j){
+  const task = tasks[i];
+  const el = document.getElementById('task-'+i);
+  const btns = el.querySelectorAll('.option');
+  if (btns[0].classList.contains('disabled')) return;
+  btns.forEach(b=>b.classList.add('disabled'));
+  btns[task.correct].classList.add('correct');
+  const right = j === task.correct;
+  if (!right) btns[j].classList.add('wrong');
+  const fb = document.createElement('div');
+  fb.className = 'feedback ' + (right?'correct':'wrong');
+  fb.innerHTML = '<strong>' + (right?'Correct.':'Not quite.') + '</strong><br>' + escapeHtml(task.explanation);
+  el.appendChild(fb);
+  if (i === tasks.length-1) document.getElementById('doneBanner').style.display='block';
+}
+render();
+</script>
+</body>
+</html>

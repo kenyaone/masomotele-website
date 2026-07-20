@@ -1,0 +1,346 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Reviews + Q&A + Google Posts | MTTI Digital Marketing</title>
+    <link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Fredoka:wght@500;600&display=swap" rel="stylesheet">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Space Mono', monospace;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh; padding: 20px; color: #fff;
+        }
+        .container { max-width: 900px; margin: 0 auto; }
+        .header { text-align: center; margin-bottom: 30px; animation: slideDown 0.6s ease-out; }
+        .header .lesson-tag {
+            display: inline-block; background: rgba(255,255,255,0.2);
+            padding: 6px 16px; border-radius: 999px;
+            font-size: 0.85em; margin-bottom: 12px;
+        }
+        .header h1 {
+            font-family: 'Fredoka', sans-serif; font-size: 2.2em;
+            margin-bottom: 8px; text-shadow: 3px 3px 0 rgba(0,0,0,0.2);
+        }
+        .header p { opacity: 0.95; font-size: 0.95em; }
+        .score-board {
+            background: rgba(255,255,255,0.15); backdrop-filter: blur(10px);
+            border-radius: 20px; padding: 20px; margin-bottom: 20px;
+            display: flex; justify-content: space-around;
+            animation: fadeIn 0.8s ease-out 0.2s both;
+        }
+        .score-item { text-align: center; }
+        .score-item .label { font-size: 0.85em; opacity: 0.9; margin-bottom: 4px; }
+        .score-item .value {
+            font-size: 1.8em; font-weight: bold; font-family: 'Fredoka', sans-serif;
+        }
+        .progress-bar {
+            width: 100%; height: 8px; background: rgba(255,255,255,0.3);
+            border-radius: 10px; margin-bottom: 25px; overflow: hidden;
+        }
+        .progress-fill {
+            height: 100%; background: linear-gradient(90deg, #f093fb 0%, #f5576c 100%);
+            border-radius: 10px; transition: width 0.5s ease; width: 0%;
+        }
+        .exercise-card {
+            background: white; color: #333; border-radius: 25px;
+            padding: 35px; margin-bottom: 20px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            animation: fadeIn 0.6s ease-out both;
+        }
+        .scenario {
+            background: linear-gradient(135deg, #fff8e1 0%, #ffecb3 100%);
+            border-left: 5px solid #ffc107;
+            padding: 20px 24px; border-radius: 12px;
+            margin-bottom: 24px;
+            font-size: 0.98em; line-height: 1.55;
+        }
+        .scenario strong { color: #7a5a00; font-family: 'Fredoka', sans-serif; }
+        .question {
+            font-size: 1.15em; margin-bottom: 20px;
+            font-weight: 700; line-height: 1.4;
+        }
+        .options { display: flex; flex-direction: column; gap: 12px; }
+        .option {
+            background: #f5f7fb; border: 2px solid transparent;
+            padding: 16px 20px; border-radius: 12px;
+            cursor: pointer; transition: all 0.2s ease;
+            font-family: 'Space Mono', monospace; font-size: 0.98em; text-align: left;
+        }
+        .option:hover:not(.disabled) {
+            background: #eef1fb; border-color: #667eea; transform: translateX(4px);
+        }
+        .option.correct { background: #d4edda; border-color: #28a745; color: #155724; }
+        .option.wrong { background: #f8d7da; border-color: #dc3545; color: #721c24; animation: shake 0.4s; }
+        .option.disabled { cursor: not-allowed; opacity: 0.85; }
+        .feedback {
+            margin-top: 22px; padding: 18px 22px; border-radius: 12px;
+            animation: slideUp 0.4s ease-out;
+            font-size: 0.98em; line-height: 1.5;
+        }
+        .feedback.correct { background: #d4edda; color: #155724; border-left: 4px solid #28a745; }
+        .feedback.wrong { background: #f8d7da; color: #721c24; border-left: 4px solid #dc3545; }
+        .feedback strong { font-family: 'Fredoka', sans-serif; }
+        .next-btn, .restart-btn {
+            margin-top: 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white; border: none;
+            padding: 14px 32px; border-radius: 12px;
+            font-size: 1em; cursor: pointer;
+            font-family: 'Fredoka', sans-serif;
+            box-shadow: 0 6px 18px rgba(0,0,0,0.2);
+            transition: transform 0.2s ease;
+        }
+        .next-btn:hover, .restart-btn:hover { transform: scale(1.04); }
+        .results {
+            text-align: center; padding: 25px 15px;
+            animation: bounceIn 0.6s ease-out;
+        }
+        .results h2 {
+            font-family: 'Fredoka', sans-serif; font-size: 2em;
+            margin-bottom: 12px; color: #333;
+        }
+        .results .final-score {
+            font-size: 3em; font-family: 'Fredoka', sans-serif;
+            color: #667eea; margin: 20px 0;
+        }
+        .results p { color: #555; margin-bottom: 12px; }
+        .badge { display: inline-block; font-size: 3.5em; margin: 8px 0; }
+        @keyframes slideDown { from { opacity: 0; transform: translateY(-30px); } to { opacity: 1; transform: translateY(0); } }
+        @keyframes fadeIn { from { opacity: 0; transform: scale(0.96); } to { opacity: 1; transform: scale(1); } }
+        @keyframes slideUp { from { opacity: 0; transform: translateY(15px); } to { opacity: 1; transform: translateY(0); } }
+        @keyframes shake { 0%,100% { transform: translateX(0); } 25% { transform: translateX(-8px); } 75% { transform: translateX(8px); } }
+        @keyframes bounceIn { 0% { opacity: 0; transform: scale(0.4); } 60% { transform: scale(1.05); } 100% { opacity: 1; transform: scale(1); } }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <div class="lesson-tag">Module 14 · Lesson 14.4</div>
+            <h1>Reviews + Q&A + Google Posts</h1>
+            <p>10 Sarah + Mwema scenarios — reviews, Kenya DPA 2019, Q&A seeding, Posts</p>
+        </div>
+
+        <div class="score-board">
+            <div class="score-item"><div class="label">Score</div><div class="value" id="score">0</div></div>
+            <div class="score-item"><div class="label">Question</div><div class="value"><span id="current">1</span>/<span id="total">10</span></div></div>
+            <div class="score-item"><div class="label">Streak</div><div class="value" id="streak">0</div></div>
+        </div>
+
+        <div class="progress-bar"><div class="progress-fill" id="progress"></div></div>
+
+        <div class="exercise-card" id="exerciseCard"></div>
+    </div>
+
+    <script>
+        const exercises = [
+  {
+    "scenario": "Sarah asks how she should collect reviews for Karibu Kitchen — she has heard of businesses that got hundreds of reviews overnight.",
+    "question": "What is Sarah's correct review-collection strategy?",
+    "options": [
+      "Mass-blast every phone number she has on WhatsApp with the review link.",
+      "Ask every satisfied customer individually via WhatsApp, after each delivery, with the g.page/r/<string> direct link. Target 1-2 fresh reviews per week, forever. ~1 in 5 satisfied customers responds — 100 individual asks per month becomes ~20 real reviews per month. Sustained velocity, not spikes.",
+      "Buy 100 reviews from a Facebook group at KES 50 each.",
+      "Reviews do not matter for restaurants."
+    ],
+    "correct": 1,
+    "explanation": "Slides 2-3: individual asks via WhatsApp with the direct g.page/r/ link. Sustained velocity, ~1 in 5 conversion. Sarah's target: 1-2/week forever. Google rewards steady velocity, not spikes."
+  },
+  {
+    "scenario": "A customer signed her 5-star review as \"Faith\". Sarah is drafting the public response.",
+    "question": "Which response is Kenya DPA 2019 compliant?",
+    "options": [
+      "\"Asante Faith Wanjiru of Elgon View, so glad the chapati beans landed well!\"",
+      "\"Asante Faith! So glad the chapati beans landed well. Karibu tena — Sarah.\"",
+      "\"Faith Wanjiru — call me on 0722-xxx-xxx to discuss.\"",
+      "\"Thanks Faith Wanjiru of Elgon View phone 0722xxxxxx — free chapati next time!\""
+    ],
+    "correct": 1,
+    "explanation": "Slide 5: Kenya DPA 2019 makes it unlawful to publish personal data (surname, phone, estate) without consent. Faith signed with her first name — that is public consent. Adding surname, phone or estate = personal data disclosure. Fine up to KES 5 million per breach."
+  },
+  {
+    "scenario": "A customer left a 1-star review saying the food arrived cold and 40 minutes late during a rainy day.",
+    "question": "Which is the correct public response?",
+    "options": [
+      "\"Actually you gave us the wrong address — this is your fault.\"",
+      "Ignore it. Bad reviews should never be answered.",
+      "\"Sarah here — I am so sorry the food arrived cold today. That is absolutely not our standard, especially in the rain. Please WhatsApp me on the number on our profile so I can make this right personally. Karibu tena — Sarah.\"",
+      "\"Delete this review or we sue you.\""
+    ],
+    "correct": 2,
+    "explanation": "Slide 4: apologise, offer a specific fix, move resolution to a private channel (WhatsApp). Never argue in public, never blame the customer, never publish a surname. Every future customer scrolling past reads the response."
+  },
+  {
+    "scenario": "Karibu Kitchen is at 47 reviews and Sarah's cousin suggests they pay KES 50 per fake review to a Facebook contact to reach 100 reviews faster.",
+    "question": "What is wrong with this?",
+    "options": [
+      "Nothing — everyone does it.",
+      "Buying reviews is Google's #1 shortcut mistake. Google detects fake reviews at scale, removes them, flags the profile, and in severe cases suspends the entire listing. Competitors also report each other. Real customer + real transaction is the ONLY sustainable review source.",
+      "It is a great idea — Google encourages it.",
+      "It only counts as fraud if she pays more than KES 200 per review."
+    ],
+    "correct": 1,
+    "explanation": "Slide 6: never buy reviews. Detection is easy, removal is automatic, suspension is possible. Real customer + real transaction only. No shortcuts."
+  },
+  {
+    "scenario": "A prospective customer opens the Q&A tab and sees a random Google local guide has posted the wrong answer: \"They don't deliver on Sundays\" (Karibu Kitchen delivers Sun 12:00-20:00).",
+    "question": "What should Sarah do?",
+    "options": [
+      "Nothing — only Karibu Kitchen staff should reply to Q&A.",
+      "Post the correct answer (\"Yes, we deliver Sun 12:00-20:00 across Eldoret CBD, Kapsoya, Elgon View, Racecourse and Pioneer\") and ask the community to mark the correct answer as helpful. Also monitor Q&A weekly to catch these early. Wrong Q&As kill orders.",
+      "Report the local guide to the police.",
+      "Delete the whole Q&A section — it is not useful."
+    ],
+    "correct": 1,
+    "explanation": "Slide 7: anyone can answer Q&A, including community members who may be wrong. Sarah's job = post the correct answer and get it marked helpful. Monitor weekly. Wrong Q&A = lost orders."
+  },
+  {
+    "scenario": "Sarah asks what Google Posts are and how often she should post.",
+    "question": "Which description matches Lesson 14.4?",
+    "options": [
+      "Google Posts are essays that go on the karibukitchen.co.ke blog.",
+      "Google Posts are short posts that appear on the GBP listing itself. Four types: What's New, Offer, Event, Product. Post 1-2 per week — the cadence gives Google a freshness signal that helps ranking. Posts typically expire after 7 days unless dated (offers, events).",
+      "One post per year is enough.",
+      "Posts only appear on Instagram."
+    ],
+    "correct": 1,
+    "explanation": "Slide 8: four Post types, 1-2 per week, appear on the GBP listing itself, freshness signal. Not a blog, not Instagram."
+  },
+  {
+    "scenario": "Mwema Coffee House in Nairobi got three brutal reviews during a staff shortage — cold coffee, slow service, wrong orders. Their local-pack rank collapsed from position 2 to position 7 in three weeks.",
+    "question": "What is the recovery strategy Sarah taught Mwema?",
+    "options": [
+      "Nothing recovers a rank drop — start over with a new profile.",
+      "Delete all three reviews.",
+      "Respond publicly to each review within 48 hours (apologise, offer a private fix, no arguing), move resolution to DM/WhatsApp, post twice a week for two months to send freshness signals, and steadily ask happy customers for fresh reviews. Response strategy IS the recovery strategy — Mwema was back at position 2 within 8 weeks.",
+      "Buy fake reviews to bury the bad ones."
+    ],
+    "correct": 2,
+    "explanation": "Slide 8: Mwema's cameo. Response + private resolution + posting cadence + fresh review requests. No deletion, no fake reviews. Back to position 2 in 8 weeks."
+  },
+  {
+    "scenario": "Sarah is deciding response times for reviews.",
+    "question": "Which cadence matches Lesson 14.4?",
+    "options": [
+      "Respond only when the reviewer is famous.",
+      "Every review — positive AND negative — gets a response within 48 hours. Every response is read by every future customer scrolling past the listing.",
+      "Only respond to 5-star reviews.",
+      "Only respond after 3 months so it looks less desperate."
+    ],
+    "correct": 1,
+    "explanation": "Slide 4: every review, positive or negative, within 48 hours. Public responses double as marketing to every prospect who scrolls past."
+  },
+  {
+    "scenario": "Karibu Kitchen delivered ~100 orders last month. Sarah wants to know how many reviews she should realistically expect if she asks every satisfied customer with the g.page/r/ link.",
+    "question": "What is the realistic conversion?",
+    "options": [
+      "0% — nobody leaves reviews.",
+      "About 1 in 5 satisfied customers who receive a warm, direct request will leave a review. 100 messages → ~20 new reviews per month. That is real, sustained velocity — exactly what Google rewards.",
+      "100% — every customer always reviews.",
+      "10 reviews per delivery."
+    ],
+    "correct": 1,
+    "explanation": "Slide 3: ~1 in 5 satisfied customers responds to a warm, direct WhatsApp ask. 100 messages → ~20 reviews per month = sustainable velocity."
+  },
+  {
+    "scenario": "A trainee summarises §14.4 as: \"Only respond to 5-star reviews, always publish the customer's full name, and buying reviews is fine if you spend under KES 5,000.\"",
+    "question": "How many of the three claims are correct?",
+    "options": [
+      "All three.",
+      "Two.",
+      "Zero — every claim is wrong.",
+      "One — only the publishing-full-name claim."
+    ],
+    "correct": 2,
+    "explanation": "Every claim is wrong. EVERY review gets a response within 48 hours (Slide 4). Publishing a customer's surname without consent is unlawful under Kenya DPA 2019 — fine up to KES 5 million per breach (Slide 5). Buying reviews at ANY spend level is a policy violation with detection + suspension risk (Slide 6)."
+  }
+];
+
+        let currentQuestion = 0, score = 0, streak = 0, answered = false;
+
+        function updateScoreboard() {
+            document.getElementById('score').textContent = score;
+            document.getElementById('current').textContent = Math.min(currentQuestion + 1, exercises.length);
+            document.getElementById('total').textContent = exercises.length;
+            document.getElementById('streak').textContent = streak;
+            document.getElementById('progress').style.width = ((currentQuestion) / exercises.length) * 100 + '%';
+        }
+
+        function escapeHtml(s) {
+            return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+        }
+
+        function renderQuestion() {
+            answered = false;
+            const q = exercises[currentQuestion];
+            let html = '';
+            if (q.scenario) {
+                html += `<div class="scenario"><strong>Scenario.</strong> ${escapeHtml(q.scenario)}</div>`;
+            }
+            html += `<div class="question">${escapeHtml(q.question)}</div>`;
+            html += '<div class="options">';
+            q.options.forEach((o, i) => {
+                html += `<button class="option" onclick="selectAnswer(${i})">${escapeHtml(o)}</button>`;
+            });
+            html += '</div>';
+            document.getElementById('exerciseCard').innerHTML = html;
+            updateScoreboard();
+        }
+
+        function selectAnswer(i) {
+            if (answered) return;
+            answered = true;
+            const q = exercises[currentQuestion];
+            const btns = document.querySelectorAll('.option');
+            btns.forEach(b => b.classList.add('disabled'));
+            btns[q.correct].classList.add('correct');
+            const right = i === q.correct;
+            if (!right) btns[i].classList.add('wrong');
+            if (right) { score += 10; streak += 1; } else { streak = 0; }
+            const fb = document.createElement('div');
+            fb.className = 'feedback ' + (right ? 'correct' : 'wrong');
+            fb.innerHTML = `<strong>${right ? '✅ Correct.' : '❌ Not quite.'}</strong><br>${escapeHtml(q.explanation)}`;
+            document.getElementById('exerciseCard').appendChild(fb);
+            const nb = document.createElement('button');
+            nb.className = 'next-btn';
+            nb.textContent = currentQuestion === exercises.length - 1 ? 'See results →' : 'Next scenario →';
+            nb.onclick = nextQuestion;
+            document.getElementById('exerciseCard').appendChild(nb);
+            updateScoreboard();
+        }
+
+        function nextQuestion() {
+            currentQuestion++;
+            if (currentQuestion >= exercises.length) return showResults();
+            renderQuestion();
+        }
+
+        function showResults() {
+            document.getElementById('progress').style.width = '100%';
+            const total = exercises.length * 10;
+            const pct = Math.round(score / total * 100);
+            if (window.parent) { window.parent.postMessage({type:"mtti_quiz_score", score: score, total: total, percent: pct}, "*"); }
+            let badge = '🌟', msg = 'Excellent work. You have a professional grasp of this lesson.';
+            if (pct < 50) { badge = '🌱'; msg = 'Good first attempt. Re-watch the lesson video and try again.'; }
+            else if (pct < 80) { badge = '📚'; msg = 'Solid progress. Review the scenarios you missed and retry.'; }
+            document.getElementById('exerciseCard').innerHTML = `
+                <div class="results">
+                    <span class="badge">${badge}</span>
+                    <h2>Quiz Complete</h2>
+                    <div class="final-score">${score} / ${total}</div>
+                    <p><strong>${pct}%</strong> · Longest streak: ${streak}</p>
+                    <p>${msg}</p>
+                    <button class="restart-btn" onclick="restart()">Try again 🔁</button>
+                </div>`;
+        }
+
+        function restart() {
+            currentQuestion = 0; score = 0; streak = 0;
+            renderQuestion();
+        }
+
+        renderQuestion();
+    </script>
+</body>
+</html>

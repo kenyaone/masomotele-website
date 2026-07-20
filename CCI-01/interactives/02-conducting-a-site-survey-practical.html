@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Conducting a Site Survey — Practical | MTTI CCTV Installation</title>
+<link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Fredoka:wght@500;600&display=swap" rel="stylesheet">
+<style>
+* { margin:0; padding:0; box-sizing:border-box; }
+body { font-family:'Space Mono', monospace; background:linear-gradient(135deg,#0369a1 0%,#0c4a6e 100%); min-height:100vh; padding:20px; color:#fff; }
+.container { max-width:800px; margin:0 auto; }
+.header { text-align:center; margin-bottom:18px; }
+.header .tag { display:inline-block; background:rgba(255,255,255,0.2); padding:6px 16px; border-radius:999px; font-size:0.85em; margin-bottom:10px; }
+.header h1 { font-family:'Fredoka', sans-serif; font-size:1.8em; text-shadow:2px 2px 0 rgba(0,0,0,0.2); }
+.brief { background:rgba(255,255,255,0.12); backdrop-filter:blur(10px); border-radius:14px; padding:14px 20px; margin-bottom:16px; border-left:5px solid #ffd54f; font-size:0.92em; line-height:1.5; }
+.studio { background:#fff; color:#333; border-radius:18px; padding:18px; box-shadow:0 20px 60px rgba(0,0,0,0.3); }
+.hint { font-size:0.82em; color:#777; margin-bottom:12px; }
+.step-list { list-style:none; }
+.step-item { display:flex; align-items:center; gap:10px; background:#f5f7fb; border:2px solid #e0e0e0; border-radius:10px; padding:12px 14px; margin-bottom:8px; font-size:0.92em; }
+.step-item .step-num { flex:0 0 auto; width:26px; height:26px; border-radius:50%; background:#455a64; color:#fff; display:flex; align-items:center; justify-content:center; font-weight:700; font-size:0.85em; }
+.step-item .step-text { flex:1; }
+.step-item .move-btns { display:flex; flex-direction:column; gap:2px; }
+.step-item .move-btns button { background:#eceff1; border:none; border-radius:5px; padding:3px 8px; cursor:pointer; font-size:0.85em; }
+.step-item .move-btns button:hover { background:#cfd8dc; }
+.step-item .move-btns button:disabled { opacity:0.35; cursor:not-allowed; }
+.step-item.correct-pos { border-color:#28a745; background:#eafaf0; }
+.step-item.wrong-pos { border-color:#dc3545; background:#fdecea; }
+.check-btn { margin-top:14px; width:100%; background:linear-gradient(135deg,#0369a1 0%,#0c4a6e 100%); color:#fff; border:none; padding:12px; border-radius:10px; font-weight:700; font-size:0.95em; cursor:pointer; font-family:'Fredoka', sans-serif; }
+.result-banner { margin-top:14px; padding:12px 16px; border-radius:10px; font-size:0.9em; font-weight:700; display:none; }
+.result-banner.show { display:block; }
+.result-banner.ok { background:#d4edda; color:#155724; }
+.result-banner.fail { background:#f8d7da; color:#721c24; }
+</style>
+</head>
+<body>
+<div class="container">
+<div class="header"><div class="tag">Module 2 · Lesson 2.1 · Practical</div><h1>Conducting a Site Survey — Practical</h1></div>
+<div class="brief">Dennis from SafeView Security Systems is carrying out a site survey at Highland Fresh Grocers, a busy grocery shop in Eldoret town centre, ahead of quoting a CCTV installation. Arrange the steps of a proper site survey in the correct order.</div>
+<div class="studio">
+<div class="hint">Use the ▲▼ buttons to arrange the steps in the correct order, then check your work.</div>
+<ul class="step-list" id="stepList"></ul>
+<button class="check-btn" id="checkBtn">Check My Order ✓</button>
+<div class="result-banner" id="resultBanner"></div>
+</div>
+</div>
+<script>
+/* MTTI_StepSim v1 — lightweight step-ordering practice widget for hands-on
+   procedures (mounting, cable termination, replacement procedures, safety
+   sequences). Steps start shuffled; the student reorders them with ▲▼ and
+   checks the result. No native dialogs — the iframe sandbox blocks
+   prompt/alert/confirm, so there's no drag-and-drop reliance either,
+   keeping this robust on touch devices. */
+class MTTI_StepSim {
+    constructor(cfg) {
+        this.cfg = cfg;
+        this.order = cfg.steps.map(s => s.id); // current (shuffled) order
+    }
+    render() {
+        this.listEl = document.getElementById('stepList');
+        this.bannerEl = document.getElementById('resultBanner');
+        this.renderList();
+        document.getElementById('checkBtn').addEventListener('click', () => this.check());
+    }
+    stepText(id) { return this.cfg.steps.find(s => s.id === id).text; }
+    escHtml(s) { return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+    renderList(marks) {
+        this.listEl.innerHTML = this.order.map((id, i) => {
+            const cls = marks ? (marks[i] ? 'correct-pos' : 'wrong-pos') : '';
+            return `<li class="step-item ${cls}" data-id="${id}">
+                <span class="step-num">${i+1}</span>
+                <span class="step-text">${this.escHtml(this.stepText(id))}</span>
+                <span class="move-btns">
+                    <button data-dir="up" data-id="${id}" ${i===0?'disabled':''}>▲</button>
+                    <button data-dir="down" data-id="${id}" ${i===this.order.length-1?'disabled':''}>▼</button>
+                </span>
+            </li>`;
+        }).join('');
+        this.listEl.querySelectorAll('button[data-dir]').forEach(btn => {
+            btn.addEventListener('click', () => this.move(btn.dataset.id, btn.dataset.dir));
+        });
+    }
+    move(id, dir) {
+        const i = this.order.indexOf(id);
+        const j = dir === 'up' ? i - 1 : i + 1;
+        if (j < 0 || j >= this.order.length) return;
+        [this.order[i], this.order[j]] = [this.order[j], this.order[i]];
+        this.renderList();
+        this.bannerEl.classList.remove('show');
+    }
+    check() {
+        const correct = this.cfg.correctOrder;
+        const marks = this.order.map((id, i) => id === correct[i]);
+        this.renderList(marks);
+        const allOk = marks.every(m => m);
+        this.bannerEl.classList.add('show');
+        this.bannerEl.className = 'result-banner show ' + (allOk ? 'ok' : 'fail');
+        this.bannerEl.textContent = allOk
+            ? '✅ Correct order! That\'s exactly the right sequence.'
+            : '❌ Not quite the right order yet — green steps are in the right place, red ones need to move.';
+    }
+}
+const CONFIG = {"steps":[{"id":"s4","text":"Check existing wiring and infrastructure (power outlets, trunking, existing cabling)"},{"id":"s1","text":"Walk the perimeter of the property to understand the layout and boundaries"},{"id":"s6","text":"Discuss findings and coverage priorities with the client"},{"id":"s2","text":"Identify all entry and exit points \u2014 doors, gates, and windows"},{"id":"s5","text":"Document blind spots and areas that will need special coverage"},{"id":"s3","text":"Note lighting conditions at different times of day"}],"correctOrder":["s1","s2","s3","s4","s5","s6"]};
+new MTTI_StepSim(CONFIG).render();
+</script>
+</body>
+</html>

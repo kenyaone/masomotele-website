@@ -1,0 +1,346 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Marketing and Promotion Activities | MTTI Digital Marketing</title>
+    <link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Fredoka:wght@500;600&display=swap" rel="stylesheet">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Space Mono', monospace;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh; padding: 20px; color: #fff;
+        }
+        .container { max-width: 900px; margin: 0 auto; }
+        .header { text-align: center; margin-bottom: 30px; animation: slideDown 0.6s ease-out; }
+        .header .lesson-tag {
+            display: inline-block; background: rgba(255,255,255,0.2);
+            padding: 6px 16px; border-radius: 999px;
+            font-size: 0.85em; margin-bottom: 12px;
+        }
+        .header h1 {
+            font-family: 'Fredoka', sans-serif; font-size: 2.2em;
+            margin-bottom: 8px; text-shadow: 3px 3px 0 rgba(0,0,0,0.2);
+        }
+        .header p { opacity: 0.95; font-size: 0.95em; }
+        .score-board {
+            background: rgba(255,255,255,0.15); backdrop-filter: blur(10px);
+            border-radius: 20px; padding: 20px; margin-bottom: 20px;
+            display: flex; justify-content: space-around;
+            animation: fadeIn 0.8s ease-out 0.2s both;
+        }
+        .score-item { text-align: center; }
+        .score-item .label { font-size: 0.85em; opacity: 0.9; margin-bottom: 4px; }
+        .score-item .value {
+            font-size: 1.8em; font-weight: bold; font-family: 'Fredoka', sans-serif;
+        }
+        .progress-bar {
+            width: 100%; height: 8px; background: rgba(255,255,255,0.3);
+            border-radius: 10px; margin-bottom: 25px; overflow: hidden;
+        }
+        .progress-fill {
+            height: 100%; background: linear-gradient(90deg, #f093fb 0%, #f5576c 100%);
+            border-radius: 10px; transition: width 0.5s ease; width: 0%;
+        }
+        .exercise-card {
+            background: white; color: #333; border-radius: 25px;
+            padding: 35px; margin-bottom: 20px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            animation: fadeIn 0.6s ease-out both;
+        }
+        .scenario {
+            background: linear-gradient(135deg, #fff8e1 0%, #ffecb3 100%);
+            border-left: 5px solid #ffc107;
+            padding: 20px 24px; border-radius: 12px;
+            margin-bottom: 24px;
+            font-size: 0.98em; line-height: 1.55;
+        }
+        .scenario strong { color: #7a5a00; font-family: 'Fredoka', sans-serif; }
+        .question {
+            font-size: 1.15em; margin-bottom: 20px;
+            font-weight: 700; line-height: 1.4;
+        }
+        .options { display: flex; flex-direction: column; gap: 12px; }
+        .option {
+            background: #f5f7fb; border: 2px solid transparent;
+            padding: 16px 20px; border-radius: 12px;
+            cursor: pointer; transition: all 0.2s ease;
+            font-family: 'Space Mono', monospace; font-size: 0.98em; text-align: left;
+        }
+        .option:hover:not(.disabled) {
+            background: #eef1fb; border-color: #667eea; transform: translateX(4px);
+        }
+        .option.correct { background: #d4edda; border-color: #28a745; color: #155724; }
+        .option.wrong { background: #f8d7da; border-color: #dc3545; color: #721c24; animation: shake 0.4s; }
+        .option.disabled { cursor: not-allowed; opacity: 0.85; }
+        .feedback {
+            margin-top: 22px; padding: 18px 22px; border-radius: 12px;
+            animation: slideUp 0.4s ease-out;
+            font-size: 0.98em; line-height: 1.5;
+        }
+        .feedback.correct { background: #d4edda; color: #155724; border-left: 4px solid #28a745; }
+        .feedback.wrong { background: #f8d7da; color: #721c24; border-left: 4px solid #dc3545; }
+        .feedback strong { font-family: 'Fredoka', sans-serif; }
+        .next-btn, .restart-btn {
+            margin-top: 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white; border: none;
+            padding: 14px 32px; border-radius: 12px;
+            font-size: 1em; cursor: pointer;
+            font-family: 'Fredoka', sans-serif;
+            box-shadow: 0 6px 18px rgba(0,0,0,0.2);
+            transition: transform 0.2s ease;
+        }
+        .next-btn:hover, .restart-btn:hover { transform: scale(1.04); }
+        .results {
+            text-align: center; padding: 25px 15px;
+            animation: bounceIn 0.6s ease-out;
+        }
+        .results h2 {
+            font-family: 'Fredoka', sans-serif; font-size: 2em;
+            margin-bottom: 12px; color: #333;
+        }
+        .results .final-score {
+            font-size: 3em; font-family: 'Fredoka', sans-serif;
+            color: #667eea; margin: 20px 0;
+        }
+        .results p { color: #555; margin-bottom: 12px; }
+        .badge { display: inline-block; font-size: 3.5em; margin: 8px 0; }
+        @keyframes slideDown { from { opacity: 0; transform: translateY(-30px); } to { opacity: 1; transform: translateY(0); } }
+        @keyframes fadeIn { from { opacity: 0; transform: scale(0.96); } to { opacity: 1; transform: scale(1); } }
+        @keyframes slideUp { from { opacity: 0; transform: translateY(15px); } to { opacity: 1; transform: translateY(0); } }
+        @keyframes shake { 0%,100% { transform: translateX(0); } 25% { transform: translateX(-8px); } 75% { transform: translateX(8px); } }
+        @keyframes bounceIn { 0% { opacity: 0; transform: scale(0.4); } 60% { transform: scale(1.05); } 100% { opacity: 1; transform: scale(1); } }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <div class="lesson-tag">Module 4 · Lesson 4.2</div>
+            <h1>Marketing and Promotion Activities</h1>
+            <p>10 Karibu Kitchen scenarios — apply the vocabulary, viral ingredients, and five content practices</p>
+        </div>
+
+        <div class="score-board">
+            <div class="score-item"><div class="label">Score</div><div class="value" id="score">0</div></div>
+            <div class="score-item"><div class="label">Question</div><div class="value"><span id="current">1</span>/<span id="total">10</span></div></div>
+            <div class="score-item"><div class="label">Streak</div><div class="value" id="streak">0</div></div>
+        </div>
+
+        <div class="progress-bar"><div class="progress-fill" id="progress"></div></div>
+
+        <div class="exercise-card" id="exerciseCard"></div>
+    </div>
+
+    <script>
+        const exercises = [
+  {
+    "scenario": "Sarah's cousin is back: \"Post one TikTok. Go viral. Twenty million views. Orders pour in. Done.\"",
+    "question": "How does Lesson 4.2 frame the \"go viral\" strategy?",
+    "options": [
+      "Viral is the only strategy that works — always chase it.",
+      "Going viral is not a strategy — it is the lottery. Real professionals build slow, steady, growing audiences. Viral videos are lightning strikes; steady audiences are the sunrise you can plan around.",
+      "Sarah must go viral every week or the business fails.",
+      "Only videos over one hour go viral."
+    ],
+    "correct": 1,
+    "explanation": "Section 4.2 uses the exact lottery/lightning/sunrise metaphor. Chasing viral fantasies wastes time; building a reliable audience is what pays the bills. When content DOES go viral it is a bonus, not the plan."
+  },
+  {
+    "scenario": "You are teaching Sarah the seven vocabulary words from Lesson 4.2 that come up in every marketing interview.",
+    "question": "Which list matches?",
+    "options": [
+      "Influencer, targeted audience, video marketing, review, referral, URL shortener, viral.",
+      "SEO, SEM, SMM, CRM, CMS, KPI, ROI.",
+      "Post, comment, share, like, tag, hashtag, mention.",
+      "PPC, CPC, CPM, CTR, CPA, CPL, CPI."
+    ],
+    "correct": 0,
+    "explanation": "Section 4.2 names these seven words exactly: influencer, targeted audience, video marketing, review, referral, URL shortener, viral. Option 3 is Lesson 3.2 vocabulary. Options 2 and 4 belong to other modules."
+  },
+  {
+    "scenario": "Sarah is watching Nyakinyua Kitchen post the same tired trend for the fifth time in a row. It is not funny, it is not surprising, it does not connect with any real feeling, and nobody is talking about it.",
+    "question": "Which four viral ingredients from Lesson 4.2 is Nyakinyua's content missing?",
+    "options": [
+      "Humour, originality, resonance, provokes discussion.",
+      "SEO, SEM, CRM, CMS.",
+      "Bio, profile picture, cover photo, URL.",
+      "Facebook, Instagram, TikTok, YouTube."
+    ],
+    "correct": 0,
+    "explanation": "Section 4.2's four viral ingredients are humour (funny gets shared), originality (nobody shares the fifth version of a trend), resonance (connects to a real feeling), and provokes discussion (people reply, argue, add their take). Nyakinyua's content scores low on all four."
+  },
+  {
+    "scenario": "You are helping Sarah pick her weekly content practices.",
+    "question": "Which set matches the five content practices from Lesson 4.2?",
+    "options": [
+      "Post regularly, post relevant content, research competitors/customers/industry leaders, run competitions, use visuals (every post needs an image or video).",
+      "Delete negative comments, ignore DMs, post once a month, use text only, buy followers.",
+      "Only post influencer collaborations.",
+      "Post only during eclipses."
+    ],
+    "correct": 0,
+    "explanation": "Section 4.2 lists these five practices exactly: post regularly (consistency over brilliance), post relevant content (what your audience cares about, not what you find interesting), research, run competitions (a small giveaway drives real signups), use visuals. Text-only posts get half the engagement."
+  },
+  {
+    "scenario": "A Nairobi beauty influencer with 180,000 followers offers Sarah a Karibu Kitchen shoutout for KES 25,000. Sarah is excited.",
+    "question": "Which three checks from Lesson 4.2 should she run BEFORE paying?",
+    "options": [
+      "Just pay and hope — trust the follower count.",
+      "Is the influencer's audience YOUR audience (a beauty influencer's followers will not buy lunch delivery in Eldoret)? Is engagement REAL (below 1 per cent engagement suggests bought followers)? Can you TRACK the result (unique discount code or trackable URL)? Without all three, walk away.",
+      "Only check the follower count.",
+      "Only check the price."
+    ],
+    "correct": 1,
+    "explanation": "Section 4.2 names these three checks explicitly. Audience fit (Nairobi beauty is not Eldoret lunch); engagement authenticity (below 1 per cent = red flag); trackability (no code or trackable URL = guessing). Influencer marketing without all three is a waste."
+  },
+  {
+    "scenario": "Sarah pastes a raw link into every Facebook post: \"karibukitchen.co.ke/menu?utm_source=facebook&campaign=lunch-oct-2026&promo=mid-week-special-eldoret\". She has no idea how many people click.",
+    "question": "Which Lesson 4.2 tool solves both problems?",
+    "options": [
+      "URL shortener — creates shorter, cleaner links AND tracks every click. Bit.ly is the classic free service.",
+      "A longer URL will work better.",
+      "Google Analytics only — no URL tool needed.",
+      "SEO."
+    ],
+    "correct": 0,
+    "explanation": "Section 4.2 names the URL shortener as the key tool for exactly this: shorter links look cleaner, AND every click is tracked. Bit.ly is called out as the classic free service. Sarah now knows which content drives clicks and which does not."
+  },
+  {
+    "scenario": "Sarah's weekly post mix looks like this: two food photos, one behind-the-scenes video of her cooking, one customer testimonial, one delivery-driver story, and one direct promotion with a shortened URL and a call to action.",
+    "question": "Does this match the Lesson 4.2 recommendation, and why?",
+    "options": [
+      "No — she needs 30 posts a week.",
+      "Yes — six posts, five content types, every one with an image or video, every one relevant, every one scheduled, no desperation to go viral. A slow, steady, growing audience.",
+      "No — every post must be a testimonial.",
+      "No — she should only post promotions."
+    ],
+    "correct": 1,
+    "explanation": "Section 4.2 lays out this exact weekly mix as \"Sarah's Monday planning session, applied\". Six posts, five content types, visuals on every one, tracked promotion. This is the practical alternative to viral chasing."
+  },
+  {
+    "scenario": "Sarah wants to run a small Facebook giveaway to grow her Karibu Kitchen followers. KES 500 free lunch for one winner drawn from anyone who follows the page and tags a friend.",
+    "question": "Which content practice from Lesson 4.2 does this activate?",
+    "options": [
+      "Post relevant content only.",
+      "Run competitions — a KES 500 giveaway on Facebook can bring 20+ new followers in an hour when the mechanic is simple and shareable.",
+      "Use visuals only.",
+      "Post regularly only."
+    ],
+    "correct": 1,
+    "explanation": "Section 4.2 names running competitions as one of the five daily practices and uses the KES 500 giveaway as its illustration. Simple mechanic, low cost, real follower growth. The other practices still matter but do not describe this specific activity."
+  },
+  {
+    "scenario": "Sarah wants to know what \"targeted audience\" — one of the seven vocabulary words — means in practice.",
+    "question": "Which definition matches Lesson 4.2?",
+    "options": [
+      "Every human being with an internet connection.",
+      "The specific group most likely to buy from you — for example, Eldoret office workers aged 25–50 living in Kapsoya who order lunch because they are too busy to cook.",
+      "People who share Sarah's political views.",
+      "Random anonymous accounts."
+    ],
+    "correct": 1,
+    "explanation": "Section 4.2 defines targeted audience as the specific group most likely to buy. This matches the buyer persona work from Lesson 1.2. Option 1 is the \"selling to everyone means selling to no one\" mistake."
+  },
+  {
+    "scenario": "Sarah writes a beautiful text-only post about her chapati recipe and gets 4 likes. She writes the same content with a good photo of the chapati and gets 34 likes and 6 comments.",
+    "question": "Which content practice from Lesson 4.2 explains the gap?",
+    "options": [
+      "Post regularly.",
+      "Use visuals — every single post needs an image or a video. Text-only posts get half the engagement of visual posts.",
+      "Research.",
+      "Run competitions."
+    ],
+    "correct": 1,
+    "explanation": "Section 4.2's fifth practice is use visuals, and it is explicit about text-only posts getting half the engagement. The gap between 4 likes and 34 likes is exactly the pattern the lesson predicts. The other practices matter too but do not describe this specific finding."
+  }
+];
+
+        let currentQuestion = 0, score = 0, streak = 0, answered = false;
+
+        function updateScoreboard() {
+            document.getElementById('score').textContent = score;
+            document.getElementById('current').textContent = Math.min(currentQuestion + 1, exercises.length);
+            document.getElementById('total').textContent = exercises.length;
+            document.getElementById('streak').textContent = streak;
+            document.getElementById('progress').style.width = ((currentQuestion) / exercises.length) * 100 + '%';
+        }
+
+        function escapeHtml(s) {
+            return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+        }
+
+        function renderQuestion() {
+            answered = false;
+            const q = exercises[currentQuestion];
+            let html = '';
+            if (q.scenario) {
+                html += `<div class="scenario"><strong>Scenario.</strong> ${escapeHtml(q.scenario)}</div>`;
+            }
+            html += `<div class="question">${escapeHtml(q.question)}</div>`;
+            html += '<div class="options">';
+            q.options.forEach((o, i) => {
+                html += `<button class="option" onclick="selectAnswer(${i})">${escapeHtml(o)}</button>`;
+            });
+            html += '</div>';
+            document.getElementById('exerciseCard').innerHTML = html;
+            updateScoreboard();
+        }
+
+        function selectAnswer(i) {
+            if (answered) return;
+            answered = true;
+            const q = exercises[currentQuestion];
+            const btns = document.querySelectorAll('.option');
+            btns.forEach(b => b.classList.add('disabled'));
+            btns[q.correct].classList.add('correct');
+            const right = i === q.correct;
+            if (!right) btns[i].classList.add('wrong');
+            if (right) { score += 10; streak += 1; } else { streak = 0; }
+            const fb = document.createElement('div');
+            fb.className = 'feedback ' + (right ? 'correct' : 'wrong');
+            fb.innerHTML = `<strong>${right ? '✅ Correct.' : '❌ Not quite.'}</strong><br>${escapeHtml(q.explanation)}`;
+            document.getElementById('exerciseCard').appendChild(fb);
+            const nb = document.createElement('button');
+            nb.className = 'next-btn';
+            nb.textContent = currentQuestion === exercises.length - 1 ? 'See results →' : 'Next scenario →';
+            nb.onclick = nextQuestion;
+            document.getElementById('exerciseCard').appendChild(nb);
+            updateScoreboard();
+        }
+
+        function nextQuestion() {
+            currentQuestion++;
+            if (currentQuestion >= exercises.length) return showResults();
+            renderQuestion();
+        }
+
+        function showResults() {
+            document.getElementById('progress').style.width = '100%';
+            const total = exercises.length * 10;
+            const pct = Math.round(score / total * 100);
+            if (window.parent) { window.parent.postMessage({type:"mtti_quiz_score", score: score, total: total, percent: pct}, "*"); }
+            let badge = '🌟', msg = 'Excellent work. You have a professional grasp of this lesson.';
+            if (pct < 50) { badge = '🌱'; msg = 'Good first attempt. Re-watch the lesson video and try again.'; }
+            else if (pct < 80) { badge = '📚'; msg = 'Solid progress. Review the scenarios you missed and retry.'; }
+            document.getElementById('exerciseCard').innerHTML = `
+                <div class="results">
+                    <span class="badge">${badge}</span>
+                    <h2>Quiz Complete</h2>
+                    <div class="final-score">${score} / ${total}</div>
+                    <p><strong>${pct}%</strong> · Longest streak: ${streak}</p>
+                    <p>${msg}</p>
+                    <button class="restart-btn" onclick="restart()">Try again 🔁</button>
+                </div>`;
+        }
+
+        function restart() {
+            currentQuestion = 0; score = 0; streak = 0;
+            renderQuestion();
+        }
+
+        renderQuestion();
+    </script>
+</body>
+</html>

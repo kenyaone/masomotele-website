@@ -1,0 +1,243 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Building Layouts in CorelDraw — Practical | MTTI Graphic Design</title>
+<link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Fredoka:wght@500;600&display=swap" rel="stylesheet">
+<style>
+* { margin:0; padding:0; box-sizing:border-box; }
+body { font-family:'Space Mono', monospace; background:linear-gradient(135deg,#6A1B9A 0%,#1565C0 100%); min-height:100vh; padding:20px; color:#fff; }
+.container { max-width:1000px; margin:0 auto; }
+.header { text-align:center; margin-bottom:18px; }
+.lesson-tag { display:inline-block; background:rgba(255,255,255,0.2); padding:6px 16px; border-radius:999px; font-size:0.85em; margin-bottom:10px; }
+.header h1 { font-family:'Fredoka', sans-serif; font-size:1.8em; margin-bottom:4px; text-shadow:2px 2px 0 rgba(0,0,0,0.2); }
+.brief { background:rgba(255,255,255,0.12); backdrop-filter:blur(10px); border-radius:14px; padding:14px 20px; margin-bottom:16px; border-left:5px solid #ffd54f; font-size:0.92em; line-height:1.5; }
+.studio { background:#fff; color:#333; border-radius:18px; padding:16px; box-shadow:0 20px 60px rgba(0,0,0,0.3); }
+.toolbar { display:flex; gap:6px; flex-wrap:wrap; margin-bottom:10px; padding-bottom:10px; border-bottom:2px solid #f0f0f0; }
+.tool-btn { background:#f5f7fb; border:2px solid transparent; padding:8px 14px; border-radius:8px; cursor:pointer; font-family:'Space Mono', monospace; font-size:0.85em; font-weight:700; color:#444; }
+.tool-btn:hover { background:#eef1fb; }
+.tool-btn.active { background:#6A1B9A; color:#fff; border-color:#4A148C; }
+.studio-body { display:flex; gap:14px; flex-wrap:wrap; }
+.canvas-wrap { flex:1; min-width:280px; }
+.mtti-canvas-svg { width:100%; height:360px; background:#fafafa; border:2px dashed #ccc; border-radius:10px; cursor:crosshair; touch-action:none; }
+.props-panel { width:200px; background:#f9f7fc; border-radius:10px; padding:12px; font-size:0.82em; }
+.props-panel h4 { font-family:'Fredoka', sans-serif; font-size:1em; margin-bottom:8px; color:#4A148C; }
+.props-row { margin-bottom:10px; }
+.props-row label { display:block; font-weight:700; margin-bottom:3px; color:#555; }
+.props-row input[type=color] { width:100%; height:28px; border:1px solid #ccc; border-radius:6px; cursor:pointer; }
+.props-row input[type=range] { width:100%; }
+.props-row input[type=text] { width:100%; padding:6px; border:1px solid #ccc; border-radius:6px; font-family:inherit; font-size:0.95em; }
+.layers-list { list-style:none; margin-top:6px; max-height:120px; overflow-y:auto; }
+.layers-list li { padding:5px 8px; border-radius:6px; cursor:pointer; font-size:0.85em; margin-bottom:3px; background:#fff; border:1px solid #eee; }
+.layers-list li.selected { background:#ede7f6; border-color:#6A1B9A; }
+.layers-list li .del-btn { float:right; color:#c62828; font-weight:700; }
+.check-btn { margin-top:14px; width:100%; background:linear-gradient(135deg,#6A1B9A 0%,#4A148C 100%); color:#fff; border:none; padding:12px; border-radius:10px; font-weight:700; font-size:0.95em; cursor:pointer; font-family:'Fredoka', sans-serif; }
+.check-list { list-style:none; margin-top:14px; display:flex; flex-direction:column; gap:6px; }
+.check-item { display:flex; align-items:center; gap:8px; padding:8px 12px; border-radius:8px; font-size:0.85em; background:#f5f7fb; border:1.5px solid #e0e0e0; }
+.check-item.ok { background:#d4edda; border-color:#28a745; color:#155724; }
+.check-item.fail { background:#f8d7da; border-color:#dc3545; color:#721c24; }
+.check-icon { font-weight:800; }
+.empty-hint { color:#999; text-align:center; padding:20px; font-size:0.85em; }
+@media screen and (max-width:520px) {
+  .studio-body { flex-direction:column; }
+  .canvas-wrap { min-width:0; width:100%; }
+  .mtti-canvas-svg { height:280px; }
+  .props-panel { width:100%; }
+}
+</style>
+</head>
+<body>
+<div class="container">
+<div class="header">
+<div class="lesson-tag">Module 3 · Lesson 3.3 · Practical</div>
+<h1>Building Layouts in CorelDraw — Practical</h1>
+</div>
+<div class="brief">Ivy at Chapa Design Studio is finishing a simple flyer for the studio&#039;s Open Day. Draw a rectangle to act as a colored panel, then add a text element reading &quot;Chapa Design Studio Open Day&quot; and drag it so it sits neatly aligned along the top or side edge of the panel — the same instinct real CorelDraw guides and alignment tools train, even though this simplified canvas has no snap-to-guide lines.</div>
+<div class="studio">
+<div class="toolbar" id="toolbar"></div>
+<div class="studio-body">
+<div class="canvas-wrap">
+<svg class="mtti-canvas-svg" id="canvas"></svg>
+</div>
+<div class="props-panel">
+<h4>Properties</h4>
+<div id="propsBody"><div class="empty-hint">Select or draw a shape</div></div>
+<h4 style="margin-top:14px;">Layers</h4>
+<ul class="layers-list" id="layersList"></ul>
+</div>
+</div>
+<button class="check-btn" id="checkBtn">Check My Work ✓</button>
+<ul class="check-list" id="checkList"></ul>
+</div>
+</div>
+<script>
+/* MTTI_CorelSim v1 — lightweight in-browser vector-design practice widget.
+   Not real CorelDraw: a simplified SVG canvas teaching the same core moves
+   (draw shapes, add text, set fill/stroke, check your work against a task
+   spec) without needing real software or cloud infrastructure. */
+class MTTI_CorelSim {
+    constructor(cfg) {
+        this.cfg = cfg;
+        this.shapes = [];
+        this.tool = cfg.tools[0].id;
+        this.selectedId = null;
+        this.drawing = null;
+        this.idSeq = 1;
+    }
+    render(rootId) {
+        this.root = document.getElementById(rootId);
+        this.toolbar = document.getElementById('toolbar');
+        this.svg = document.getElementById('canvas');
+        this.propsBody = document.getElementById('propsBody');
+        this.layersList = document.getElementById('layersList');
+        this.checkList = document.getElementById('checkList');
+        this.renderToolbar();
+        this.svg.addEventListener('mousedown', e => this.onDown(e));
+        this.svg.addEventListener('mousemove', e => this.onMove(e));
+        window.addEventListener('mouseup', () => this.onUp());
+        this.svg.addEventListener('touchstart', e => this.onDown(e.touches[0], true), {passive:true});
+        this.svg.addEventListener('touchmove', e => this.onMove(e.touches[0], true), {passive:true});
+        window.addEventListener('touchend', () => this.onUp());
+        document.getElementById('checkBtn').addEventListener('click', () => this.evaluateChecks());
+        this.renderLayers();
+    }
+    renderToolbar() {
+        this.toolbar.innerHTML = this.cfg.tools.map(t =>
+            `<button class="tool-btn${t.id===this.tool?' active':''}" data-tool="${t.id}">${t.icon} ${t.label}</button>`
+        ).join('');
+        this.toolbar.querySelectorAll('.tool-btn').forEach(b => {
+            b.addEventListener('click', () => { this.tool = b.dataset.tool; this.renderToolbar(); });
+        });
+    }
+    svgPoint(e) {
+        const r = this.svg.getBoundingClientRect();
+        return { x: e.clientX - r.left, y: e.clientY - r.top };
+    }
+    onDown(e, touch) {
+        if (!e || (touch && !e.clientX)) return;
+        const p = this.svgPoint(e);
+        if (this.tool === 'select') {
+            const hit = this.hitTest(p);
+            this.selectedId = hit ? hit.id : null;
+            this.renderShapes(); this.renderProps(); this.renderLayers();
+            return;
+        }
+        if (this.tool === 'text') {
+            // No native prompt() here — the iframe sandbox (allow-scripts
+            // allow-forms allow-popups, no allow-modals) silently blocks
+            // window.prompt/alert/confirm, so it would never show anything.
+            // Place a default text element instead and auto-select it — the
+            // properties panel's text input (already wired via renderProps)
+            // is where the student actually edits the wording.
+            this.shapes.push({ id: this.idSeq++, type:'text', x:p.x, y:p.y, text:'New Text', fontSize:18, fill:'#222222' });
+            this.selectedId = this.shapes[this.shapes.length-1].id;
+            this.renderShapes(); this.renderProps(); this.renderLayers();
+            return;
+        }
+        this.drawing = { type:this.tool, x:p.x, y:p.y, w:0, h:0, fill:'#8e24aa', stroke:'#4A148C', strokeWidth:2 };
+    }
+    onMove(e, touch) {
+        if (!this.drawing || !e) return;
+        const p = this.svgPoint(e);
+        this.drawing.w = p.x - this.drawing.x;
+        this.drawing.h = p.y - this.drawing.y;
+        this.renderShapes(true);
+    }
+    onUp() {
+        if (!this.drawing) return;
+        if (Math.abs(this.drawing.w) > 4 && Math.abs(this.drawing.h) > 4) {
+            const s = this.drawing;
+            if (s.w < 0) { s.x += s.w; s.w = -s.w; }
+            if (s.h < 0) { s.y += s.h; s.h = -s.h; }
+            s.id = this.idSeq++;
+            this.shapes.push(s);
+            this.selectedId = s.id;
+        }
+        this.drawing = null;
+        this.renderShapes(); this.renderProps(); this.renderLayers();
+    }
+    hitTest(p) {
+        for (let i = this.shapes.length - 1; i >= 0; i--) {
+            const s = this.shapes[i];
+            if (s.type === 'text') {
+                if (p.x >= s.x - 4 && p.x <= s.x + (s.text.length * s.fontSize * 0.6) && p.y >= s.y - s.fontSize && p.y <= s.y + 6) return s;
+            } else if (p.x >= s.x && p.x <= s.x + s.w && p.y >= s.y && p.y <= s.y + s.h) return s;
+        }
+        return null;
+    }
+    escXml(s) { return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+    renderShapes(previewOnly) {
+        const all = previewOnly && this.drawing ? [...this.shapes, this.drawing] : this.shapes;
+        this.svg.innerHTML = all.map(s => {
+            const sel = s.id === this.selectedId ? ' stroke-dasharray="4,3"' : '';
+            if (s.type === 'rect') return `<rect x="${s.x}" y="${s.y}" width="${s.w}" height="${s.h}" fill="${s.fill}" stroke="${s.stroke}" stroke-width="${s.strokeWidth}"${sel}></rect>`;
+            if (s.type === 'ellipse') return `<ellipse cx="${s.x+s.w/2}" cy="${s.y+s.h/2}" rx="${Math.abs(s.w/2)}" ry="${Math.abs(s.h/2)}" fill="${s.fill}" stroke="${s.stroke}" stroke-width="${s.strokeWidth}"${sel}></ellipse>`;
+            if (s.type === 'line') return `<line x1="${s.x}" y1="${s.y}" x2="${s.x+s.w}" y2="${s.y+s.h}" stroke="${s.stroke}" stroke-width="${s.strokeWidth||3}"${sel}></line>`;
+            if (s.type === 'text') return `<text x="${s.x}" y="${s.y}" font-size="${s.fontSize}" font-family="Fredoka, sans-serif" fill="${s.fill}"${sel}>${this.escXml(s.text)}</text>`;
+            return '';
+        }).join('');
+    }
+    renderProps() {
+        const s = this.shapes.find(x => x.id === this.selectedId);
+        if (!s) { this.propsBody.innerHTML = '<div class="empty-hint">Select or draw a shape</div>'; return; }
+        let html = '';
+        if (s.type === 'text') {
+            html += `<div class="props-row"><label>Text</label><input type="text" id="p_text" value="${this.escXml(s.text)}"></div>`;
+            html += `<div class="props-row"><label>Font size</label><input type="range" id="p_fs" min="10" max="48" value="${s.fontSize}"></div>`;
+            html += `<div class="props-row"><label>Color</label><input type="color" id="p_fill" value="${s.fill}"></div>`;
+        } else {
+            html += `<div class="props-row"><label>Fill</label><input type="color" id="p_fill" value="${s.fill}"></div>`;
+            html += `<div class="props-row"><label>Stroke</label><input type="color" id="p_stroke" value="${s.stroke}"></div>`;
+        }
+        this.propsBody.innerHTML = html;
+        const fill = document.getElementById('p_fill'); if (fill) fill.oninput = e => { s.fill = e.target.value; this.renderShapes(); };
+        const stroke = document.getElementById('p_stroke'); if (stroke) stroke.oninput = e => { s.stroke = e.target.value; this.renderShapes(); };
+        const text = document.getElementById('p_text'); if (text) text.oninput = e => { s.text = e.target.value; this.renderShapes(); this.renderLayers(); };
+        const fs = document.getElementById('p_fs'); if (fs) fs.oninput = e => { s.fontSize = parseInt(e.target.value); this.renderShapes(); };
+    }
+    renderLayers() {
+        if (!this.shapes.length) { this.layersList.innerHTML = '<div class="empty-hint">Nothing drawn yet</div>'; return; }
+        this.layersList.innerHTML = this.shapes.map(s => {
+            const label = s.type === 'text' ? `"${this.escXml(s.text).slice(0,16)}"` : s.type;
+            return `<li class="${s.id===this.selectedId?'selected':''}" data-id="${s.id}">${label}<span class="del-btn" data-del="${s.id}">✕</span></li>`;
+        }).join('');
+        this.layersList.querySelectorAll('li').forEach(li => {
+            li.addEventListener('click', e => {
+                if (e.target.dataset.del) {
+                    this.shapes = this.shapes.filter(s => s.id != e.target.dataset.del);
+                    if (this.selectedId == e.target.dataset.del) this.selectedId = null;
+                } else {
+                    this.selectedId = parseInt(li.dataset.id);
+                }
+                this.renderShapes(); this.renderProps(); this.renderLayers();
+            });
+        });
+    }
+    evaluateChecks() {
+        const results = this.cfg.checks.map(c => {
+            let pass = false;
+            if (c.type === 'shape_count') {
+                const n = this.shapes.filter(s => !c.shape || s.type === c.shape).length;
+                pass = c.min ? n >= c.min : n === c.exact;
+            } else if (c.type === 'has_text_containing') {
+                pass = this.shapes.some(s => s.type === 'text' && s.text.toLowerCase().includes(c.value.toLowerCase()));
+            } else if (c.type === 'fill_color_used') {
+                pass = this.shapes.some(s => s.fill && s.fill.toLowerCase() === c.value.toLowerCase());
+            } else if (c.type === 'any_shape_has_fill_not_default') {
+                pass = this.shapes.some(s => s.fill && s.fill.toLowerCase() !== '#8e24aa');
+            } else if (c.type === 'min_total_shapes') {
+                pass = this.shapes.length >= c.min;
+            }
+            return { label: c.label, pass };
+        });
+        this.checkList.innerHTML = results.map(r =>
+            `<li class="check-item ${r.pass?'ok':'fail'}"><span class="check-icon">${r.pass?'✓':'✗'}</span> ${r.label}</li>`
+        ).join('');
+    }
+}
+const CONFIG = {"tools":[{"id":"select","icon":"\u2196","label":"Select"},{"id":"rect","icon":"\u25ad","label":"Rectangle"},{"id":"ellipse","icon":"\u25ef","label":"Ellipse"},{"id":"line","icon":"\u2571","label":"Line"},{"id":"text","icon":"T","label":"Text"}],"checks":[{"type":"min_total_shapes","min":3,"label":"Combined at least 3 elements into a flyer layout"},{"type":"shape_count","shape":"rect","min":1,"label":"Added at least one rectangle as a background/panel block"},{"type":"has_text_containing","value":"Chapa","label":"Added text mentioning Chapa Design Studio, positioned to align with the panel"},{"type":"any_shape_has_fill_not_default","label":"Applied a fill color to the panel to match the flyer's branding"}]};
+new MTTI_CorelSim(CONFIG).render('root');
+</script>
+</body>
+</html>

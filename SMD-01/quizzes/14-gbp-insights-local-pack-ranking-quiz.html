@@ -1,0 +1,346 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GBP Insights + Local-Pack Ranking | MTTI Digital Marketing</title>
+    <link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Fredoka:wght@500;600&display=swap" rel="stylesheet">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Space Mono', monospace;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh; padding: 20px; color: #fff;
+        }
+        .container { max-width: 900px; margin: 0 auto; }
+        .header { text-align: center; margin-bottom: 30px; animation: slideDown 0.6s ease-out; }
+        .header .lesson-tag {
+            display: inline-block; background: rgba(255,255,255,0.2);
+            padding: 6px 16px; border-radius: 999px;
+            font-size: 0.85em; margin-bottom: 12px;
+        }
+        .header h1 {
+            font-family: 'Fredoka', sans-serif; font-size: 2.2em;
+            margin-bottom: 8px; text-shadow: 3px 3px 0 rgba(0,0,0,0.2);
+        }
+        .header p { opacity: 0.95; font-size: 0.95em; }
+        .score-board {
+            background: rgba(255,255,255,0.15); backdrop-filter: blur(10px);
+            border-radius: 20px; padding: 20px; margin-bottom: 20px;
+            display: flex; justify-content: space-around;
+            animation: fadeIn 0.8s ease-out 0.2s both;
+        }
+        .score-item { text-align: center; }
+        .score-item .label { font-size: 0.85em; opacity: 0.9; margin-bottom: 4px; }
+        .score-item .value {
+            font-size: 1.8em; font-weight: bold; font-family: 'Fredoka', sans-serif;
+        }
+        .progress-bar {
+            width: 100%; height: 8px; background: rgba(255,255,255,0.3);
+            border-radius: 10px; margin-bottom: 25px; overflow: hidden;
+        }
+        .progress-fill {
+            height: 100%; background: linear-gradient(90deg, #f093fb 0%, #f5576c 100%);
+            border-radius: 10px; transition: width 0.5s ease; width: 0%;
+        }
+        .exercise-card {
+            background: white; color: #333; border-radius: 25px;
+            padding: 35px; margin-bottom: 20px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            animation: fadeIn 0.6s ease-out both;
+        }
+        .scenario {
+            background: linear-gradient(135deg, #fff8e1 0%, #ffecb3 100%);
+            border-left: 5px solid #ffc107;
+            padding: 20px 24px; border-radius: 12px;
+            margin-bottom: 24px;
+            font-size: 0.98em; line-height: 1.55;
+        }
+        .scenario strong { color: #7a5a00; font-family: 'Fredoka', sans-serif; }
+        .question {
+            font-size: 1.15em; margin-bottom: 20px;
+            font-weight: 700; line-height: 1.4;
+        }
+        .options { display: flex; flex-direction: column; gap: 12px; }
+        .option {
+            background: #f5f7fb; border: 2px solid transparent;
+            padding: 16px 20px; border-radius: 12px;
+            cursor: pointer; transition: all 0.2s ease;
+            font-family: 'Space Mono', monospace; font-size: 0.98em; text-align: left;
+        }
+        .option:hover:not(.disabled) {
+            background: #eef1fb; border-color: #667eea; transform: translateX(4px);
+        }
+        .option.correct { background: #d4edda; border-color: #28a745; color: #155724; }
+        .option.wrong { background: #f8d7da; border-color: #dc3545; color: #721c24; animation: shake 0.4s; }
+        .option.disabled { cursor: not-allowed; opacity: 0.85; }
+        .feedback {
+            margin-top: 22px; padding: 18px 22px; border-radius: 12px;
+            animation: slideUp 0.4s ease-out;
+            font-size: 0.98em; line-height: 1.5;
+        }
+        .feedback.correct { background: #d4edda; color: #155724; border-left: 4px solid #28a745; }
+        .feedback.wrong { background: #f8d7da; color: #721c24; border-left: 4px solid #dc3545; }
+        .feedback strong { font-family: 'Fredoka', sans-serif; }
+        .next-btn, .restart-btn {
+            margin-top: 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white; border: none;
+            padding: 14px 32px; border-radius: 12px;
+            font-size: 1em; cursor: pointer;
+            font-family: 'Fredoka', sans-serif;
+            box-shadow: 0 6px 18px rgba(0,0,0,0.2);
+            transition: transform 0.2s ease;
+        }
+        .next-btn:hover, .restart-btn:hover { transform: scale(1.04); }
+        .results {
+            text-align: center; padding: 25px 15px;
+            animation: bounceIn 0.6s ease-out;
+        }
+        .results h2 {
+            font-family: 'Fredoka', sans-serif; font-size: 2em;
+            margin-bottom: 12px; color: #333;
+        }
+        .results .final-score {
+            font-size: 3em; font-family: 'Fredoka', sans-serif;
+            color: #667eea; margin: 20px 0;
+        }
+        .results p { color: #555; margin-bottom: 12px; }
+        .badge { display: inline-block; font-size: 3.5em; margin: 8px 0; }
+        @keyframes slideDown { from { opacity: 0; transform: translateY(-30px); } to { opacity: 1; transform: translateY(0); } }
+        @keyframes fadeIn { from { opacity: 0; transform: scale(0.96); } to { opacity: 1; transform: scale(1); } }
+        @keyframes slideUp { from { opacity: 0; transform: translateY(15px); } to { opacity: 1; transform: translateY(0); } }
+        @keyframes shake { 0%,100% { transform: translateX(0); } 25% { transform: translateX(-8px); } 75% { transform: translateX(8px); } }
+        @keyframes bounceIn { 0% { opacity: 0; transform: scale(0.4); } 60% { transform: scale(1.05); } 100% { opacity: 1; transform: scale(1); } }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <div class="lesson-tag">Module 14 · Lesson 14.5</div>
+            <h1>GBP Insights + Local-Pack Ranking</h1>
+            <p>10 Sarah scenarios — Performance report, Monday routine, ranking checklist, 90-day KPI</p>
+        </div>
+
+        <div class="score-board">
+            <div class="score-item"><div class="label">Score</div><div class="value" id="score">0</div></div>
+            <div class="score-item"><div class="label">Question</div><div class="value"><span id="current">1</span>/<span id="total">10</span></div></div>
+            <div class="score-item"><div class="label">Streak</div><div class="value" id="streak">0</div></div>
+        </div>
+
+        <div class="progress-bar"><div class="progress-fill" id="progress"></div></div>
+
+        <div class="exercise-card" id="exerciseCard"></div>
+    </div>
+
+    <script>
+        const exercises = [
+  {
+    "scenario": "Sarah wants to open the Insights dashboard for Karibu Kitchen.",
+    "question": "Where does she click, and what is it called today?",
+    "options": [
+      "google.com/analytics — click Reports.",
+      "business.google.com → Karibu Kitchen listing → Performance. Formerly called Insights inside Google My Business, Google renamed it Performance in 2022 (everyone still says Insights). Two tabs: Searches, Interactions. Default view = last 28 days, adjustable up to 6 months.",
+      "search.google.com/search-console → Coverage.",
+      "The dashboard was removed in 2020."
+    ],
+    "correct": 1,
+    "explanation": "Slide 2: Performance report inside business.google.com — the modern name for the former Insights dashboard. Searches + Interactions tabs. 28-day default."
+  },
+  {
+    "scenario": "Sarah looks at her month-three searches: 120 Direct, 340 Discovery, 80 Branded.",
+    "question": "What does this split tell her?",
+    "options": [
+      "Nothing meaningful.",
+      "Discovery is winning — that means Google is introducing NEW customers who searched \"lunch delivery Eldoret\" or similar to Karibu Kitchen. That is exactly the outcome a growing local business wants. Direct = existing awareness. Branded = interested prospects researching. Discovery = the new-customer engine.",
+      "The profile should be deleted — too many Discovery searches is bad.",
+      "Sarah should stop optimising."
+    ],
+    "correct": 1,
+    "explanation": "Slide 3: Discovery = new customers Google introduced. 340/540 = strong new-customer engine. Direct + Branded = existing awareness. Discovery growing is the goal."
+  },
+  {
+    "scenario": "Sarah's interactions in month three: 72 calls, 94 directions, 51 website clicks, 22 messages — 239 interactions from 540 impressions.",
+    "question": "What does the ~44% action rate mean?",
+    "options": [
+      "Nothing — Google made those numbers up.",
+      "About 44% of people who saw Karibu Kitchen's listing took a warm-lead action (called, tapped directions, clicked to the website, or opened chat). Every interaction is a warm lead. A rising action rate week-over-week means the listing is convincing more people to act.",
+      "Sarah is only getting 44% of the payments.",
+      "The action rate must always be 100%."
+    ],
+    "correct": 1,
+    "explanation": "Slide 4: interactions ÷ impressions = action rate. 239/540 = ~44%. Every interaction is a warm lead — a rising rate = better-converting listing."
+  },
+  {
+    "scenario": "Sarah asks how much time she should spend in the Performance report every week.",
+    "question": "Which cadence matches Lesson 14.5?",
+    "options": [
+      "Never open it — GBP runs itself.",
+      "Every Monday for 15 minutes. Four checks: total searches growing week-over-week, Discovery percentage growing, interactions vs impressions rising, and any new reviews to respond to within 48 hours. Same discipline as the Search Console routine from Lesson 9.6.",
+      "3 hours every day.",
+      "Only after Google emails her."
+    ],
+    "correct": 1,
+    "explanation": "Slide 5: 15 minutes every Monday, four specific checks. Same rhythm as the GSC Monday routine (Lesson 9.6). Consistency > intensity."
+  },
+  {
+    "scenario": "Sarah lists Karibu Kitchen's phone as 0722-000-111 on GBP, 0722 000 111 on Facebook, +254722000111 on the website, and \"call the kitchen\" (no digits) on WhatsApp Business.",
+    "question": "What is the problem, and why does it matter?",
+    "options": [
+      "No problem — Google understands variations.",
+      "NAP mismatch — the format differences and missing digits on WhatsApp break the identical-string match Google uses as a trust signal. Sarah needs a single canonical format (+254 722 000 111) applied to every property. One missing space or dash can break the match.",
+      "The phone number needs to be a landline.",
+      "Sarah should delete the phone number entirely."
+    ],
+    "correct": 1,
+    "explanation": "Slide 6: NAP = Name, Address, Phone — identical everywhere. Format differences break the match. One canonical format across every property."
+  },
+  {
+    "scenario": "Sarah asks which Kenya business directories she should get Karibu Kitchen listed on for citation prominence.",
+    "question": "Which set matches Lesson 14.5?",
+    "options": [
+      "Only Google Maps — no other directory matters.",
+      "Yellowpages Kenya, Business List Africa, Kenya Business Directory, TripAdvisor and Zomato Kenya. Each citation is a Prominence signal. Target 10 quality Kenya citations by month 6.",
+      "Only social media — LinkedIn and Twitter.",
+      "Random spammy directories — quantity is all that matters."
+    ],
+    "correct": 1,
+    "explanation": "Slide 6: real Kenya business directories = real Prominence signals. Target 10 by month 6. Quality > quantity, and NAP must match on each one."
+  },
+  {
+    "scenario": "Sarah's cousin says: \"Ask 20 customers in one day for reviews — you will hit 30 total reviews this week and Google will notice.\"",
+    "question": "What is wrong with this plan?",
+    "options": [
+      "Nothing — spikes are fine.",
+      "Google reads review velocity as an authenticity signal. 1-2 fresh reviews per week beats 20 in one day. A sudden 20-in-a-day spike looks inauthentic and can be flagged. Sustained weekly velocity is what compounds prominence.",
+      "Sarah should ask 50 in one day.",
+      "Reviews should only come in on weekends."
+    ],
+    "correct": 1,
+    "explanation": "Slide 7: review velocity matters. Sustained 1-2/week > 20-in-one-day. Google reads velocity as an authenticity signal."
+  },
+  {
+    "scenario": "Sarah has genuinely started offering bulk office catering (10+ meals delivered as a single order to Eldoret offices) and event bookings.",
+    "question": "How should this affect her category setup?",
+    "options": [
+      "Do nothing — categories only get chosen at signup.",
+      "Expand secondary categories to include \"Corporate caterer\" and \"Event caterer\" — real services she now truly offers. Each new legitimate category opens a new discovery keyword. But she must never add categories for services she does not truly provide.",
+      "Replace \"Meal delivery service\" with \"Corporate caterer\" as primary.",
+      "Add every category Google offers, whether she serves it or not."
+    ],
+    "correct": 1,
+    "explanation": "Slide 7: category expansion as services grow. Add only categories the business truly serves. Each new legit category opens a new discovery keyword. Primary stays \"Meal delivery service\"."
+  },
+  {
+    "scenario": "Sarah's 90-day KPI is to move from position 4 to position 1 on the local pack for \"lunch delivery Eldoret\".",
+    "question": "Which combined 90-day plan matches Lesson 14.5?",
+    "options": [
+      "Do nothing — position 1 will come automatically.",
+      "Profile at 100% completeness, 10+ photos across 6 types, 12 fresh reviews (3/week), 16 Google Posts (2/week), 5 Q&As seeded and monitored, 10 Kenya citations earned, monthly NAP audit across every property, category expansion as new services come online. If the checklist runs, ranking moves.",
+      "Buy 200 reviews.",
+      "Delete the profile and start over."
+    ],
+    "correct": 1,
+    "explanation": "Slide 8: Sarah's specific 90-day plan. Every item on the ranking checklist executed for 90 days. If the checklist runs, ranking moves — that is the whole game."
+  },
+  {
+    "scenario": "A trainee summarises Module 14 in one line: \"GBP is a paid product, works only on Mondays, and ranking depends entirely on distance.\"",
+    "question": "How many of the three claims are correct?",
+    "options": [
+      "All three.",
+      "Two.",
+      "Zero — every claim is wrong.",
+      "One — only the Mondays claim."
+    ],
+    "correct": 2,
+    "explanation": "Every claim is wrong. GBP is FREE (Lesson 14.1, Slide 2). It runs 24/7 — the Monday routine is just when SARAH checks it (Slide 5). Ranking depends on THREE factors — Relevance, Distance, Prominence (Lesson 14.1, Slides 5-7), and Prominence is the one Sarah can most influence."
+  }
+];
+
+        let currentQuestion = 0, score = 0, streak = 0, answered = false;
+
+        function updateScoreboard() {
+            document.getElementById('score').textContent = score;
+            document.getElementById('current').textContent = Math.min(currentQuestion + 1, exercises.length);
+            document.getElementById('total').textContent = exercises.length;
+            document.getElementById('streak').textContent = streak;
+            document.getElementById('progress').style.width = ((currentQuestion) / exercises.length) * 100 + '%';
+        }
+
+        function escapeHtml(s) {
+            return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+        }
+
+        function renderQuestion() {
+            answered = false;
+            const q = exercises[currentQuestion];
+            let html = '';
+            if (q.scenario) {
+                html += `<div class="scenario"><strong>Scenario.</strong> ${escapeHtml(q.scenario)}</div>`;
+            }
+            html += `<div class="question">${escapeHtml(q.question)}</div>`;
+            html += '<div class="options">';
+            q.options.forEach((o, i) => {
+                html += `<button class="option" onclick="selectAnswer(${i})">${escapeHtml(o)}</button>`;
+            });
+            html += '</div>';
+            document.getElementById('exerciseCard').innerHTML = html;
+            updateScoreboard();
+        }
+
+        function selectAnswer(i) {
+            if (answered) return;
+            answered = true;
+            const q = exercises[currentQuestion];
+            const btns = document.querySelectorAll('.option');
+            btns.forEach(b => b.classList.add('disabled'));
+            btns[q.correct].classList.add('correct');
+            const right = i === q.correct;
+            if (!right) btns[i].classList.add('wrong');
+            if (right) { score += 10; streak += 1; } else { streak = 0; }
+            const fb = document.createElement('div');
+            fb.className = 'feedback ' + (right ? 'correct' : 'wrong');
+            fb.innerHTML = `<strong>${right ? '✅ Correct.' : '❌ Not quite.'}</strong><br>${escapeHtml(q.explanation)}`;
+            document.getElementById('exerciseCard').appendChild(fb);
+            const nb = document.createElement('button');
+            nb.className = 'next-btn';
+            nb.textContent = currentQuestion === exercises.length - 1 ? 'See results →' : 'Next scenario →';
+            nb.onclick = nextQuestion;
+            document.getElementById('exerciseCard').appendChild(nb);
+            updateScoreboard();
+        }
+
+        function nextQuestion() {
+            currentQuestion++;
+            if (currentQuestion >= exercises.length) return showResults();
+            renderQuestion();
+        }
+
+        function showResults() {
+            document.getElementById('progress').style.width = '100%';
+            const total = exercises.length * 10;
+            const pct = Math.round(score / total * 100);
+            if (window.parent) { window.parent.postMessage({type:"mtti_quiz_score", score: score, total: total, percent: pct}, "*"); }
+            let badge = '🌟', msg = 'Excellent work. You have a professional grasp of this lesson.';
+            if (pct < 50) { badge = '🌱'; msg = 'Good first attempt. Re-watch the lesson video and try again.'; }
+            else if (pct < 80) { badge = '📚'; msg = 'Solid progress. Review the scenarios you missed and retry.'; }
+            document.getElementById('exerciseCard').innerHTML = `
+                <div class="results">
+                    <span class="badge">${badge}</span>
+                    <h2>Quiz Complete</h2>
+                    <div class="final-score">${score} / ${total}</div>
+                    <p><strong>${pct}%</strong> · Longest streak: ${streak}</p>
+                    <p>${msg}</p>
+                    <button class="restart-btn" onclick="restart()">Try again 🔁</button>
+                </div>`;
+        }
+
+        function restart() {
+            currentQuestion = 0; score = 0; streak = 0;
+            renderQuestion();
+        }
+
+        renderQuestion();
+    </script>
+</body>
+</html>

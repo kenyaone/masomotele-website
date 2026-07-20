@@ -1,0 +1,346 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LinkedIn Campaign Manager | MTTI Digital Marketing</title>
+    <link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Fredoka:wght@500;600&display=swap" rel="stylesheet">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Space Mono', monospace;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh; padding: 20px; color: #fff;
+        }
+        .container { max-width: 900px; margin: 0 auto; }
+        .header { text-align: center; margin-bottom: 30px; animation: slideDown 0.6s ease-out; }
+        .header .lesson-tag {
+            display: inline-block; background: rgba(255,255,255,0.2);
+            padding: 6px 16px; border-radius: 999px;
+            font-size: 0.85em; margin-bottom: 12px;
+        }
+        .header h1 {
+            font-family: 'Fredoka', sans-serif; font-size: 2.2em;
+            margin-bottom: 8px; text-shadow: 3px 3px 0 rgba(0,0,0,0.2);
+        }
+        .header p { opacity: 0.95; font-size: 0.95em; }
+        .score-board {
+            background: rgba(255,255,255,0.15); backdrop-filter: blur(10px);
+            border-radius: 20px; padding: 20px; margin-bottom: 20px;
+            display: flex; justify-content: space-around;
+            animation: fadeIn 0.8s ease-out 0.2s both;
+        }
+        .score-item { text-align: center; }
+        .score-item .label { font-size: 0.85em; opacity: 0.9; margin-bottom: 4px; }
+        .score-item .value {
+            font-size: 1.8em; font-weight: bold; font-family: 'Fredoka', sans-serif;
+        }
+        .progress-bar {
+            width: 100%; height: 8px; background: rgba(255,255,255,0.3);
+            border-radius: 10px; margin-bottom: 25px; overflow: hidden;
+        }
+        .progress-fill {
+            height: 100%; background: linear-gradient(90deg, #f093fb 0%, #f5576c 100%);
+            border-radius: 10px; transition: width 0.5s ease; width: 0%;
+        }
+        .exercise-card {
+            background: white; color: #333; border-radius: 25px;
+            padding: 35px; margin-bottom: 20px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            animation: fadeIn 0.6s ease-out both;
+        }
+        .scenario {
+            background: linear-gradient(135deg, #fff8e1 0%, #ffecb3 100%);
+            border-left: 5px solid #ffc107;
+            padding: 20px 24px; border-radius: 12px;
+            margin-bottom: 24px;
+            font-size: 0.98em; line-height: 1.55;
+        }
+        .scenario strong { color: #7a5a00; font-family: 'Fredoka', sans-serif; }
+        .question {
+            font-size: 1.15em; margin-bottom: 20px;
+            font-weight: 700; line-height: 1.4;
+        }
+        .options { display: flex; flex-direction: column; gap: 12px; }
+        .option {
+            background: #f5f7fb; border: 2px solid transparent;
+            padding: 16px 20px; border-radius: 12px;
+            cursor: pointer; transition: all 0.2s ease;
+            font-family: 'Space Mono', monospace; font-size: 0.98em; text-align: left;
+        }
+        .option:hover:not(.disabled) {
+            background: #eef1fb; border-color: #667eea; transform: translateX(4px);
+        }
+        .option.correct { background: #d4edda; border-color: #28a745; color: #155724; }
+        .option.wrong { background: #f8d7da; border-color: #dc3545; color: #721c24; animation: shake 0.4s; }
+        .option.disabled { cursor: not-allowed; opacity: 0.85; }
+        .feedback {
+            margin-top: 22px; padding: 18px 22px; border-radius: 12px;
+            animation: slideUp 0.4s ease-out;
+            font-size: 0.98em; line-height: 1.5;
+        }
+        .feedback.correct { background: #d4edda; color: #155724; border-left: 4px solid #28a745; }
+        .feedback.wrong { background: #f8d7da; color: #721c24; border-left: 4px solid #dc3545; }
+        .feedback strong { font-family: 'Fredoka', sans-serif; }
+        .next-btn, .restart-btn {
+            margin-top: 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white; border: none;
+            padding: 14px 32px; border-radius: 12px;
+            font-size: 1em; cursor: pointer;
+            font-family: 'Fredoka', sans-serif;
+            box-shadow: 0 6px 18px rgba(0,0,0,0.2);
+            transition: transform 0.2s ease;
+        }
+        .next-btn:hover, .restart-btn:hover { transform: scale(1.04); }
+        .results {
+            text-align: center; padding: 25px 15px;
+            animation: bounceIn 0.6s ease-out;
+        }
+        .results h2 {
+            font-family: 'Fredoka', sans-serif; font-size: 2em;
+            margin-bottom: 12px; color: #333;
+        }
+        .results .final-score {
+            font-size: 3em; font-family: 'Fredoka', sans-serif;
+            color: #667eea; margin: 20px 0;
+        }
+        .results p { color: #555; margin-bottom: 12px; }
+        .badge { display: inline-block; font-size: 3.5em; margin: 8px 0; }
+        @keyframes slideDown { from { opacity: 0; transform: translateY(-30px); } to { opacity: 1; transform: translateY(0); } }
+        @keyframes fadeIn { from { opacity: 0; transform: scale(0.96); } to { opacity: 1; transform: scale(1); } }
+        @keyframes slideUp { from { opacity: 0; transform: translateY(15px); } to { opacity: 1; transform: translateY(0); } }
+        @keyframes shake { 0%,100% { transform: translateX(0); } 25% { transform: translateX(-8px); } 75% { transform: translateX(8px); } }
+        @keyframes bounceIn { 0% { opacity: 0; transform: scale(0.4); } 60% { transform: scale(1.05); } 100% { opacity: 1; transform: scale(1); } }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <div class="lesson-tag">Module 5 · Lesson 5.5</div>
+            <h1>LinkedIn Campaign Manager</h1>
+            <p>10 Wangari Wellness scenarios — B2B targeting, four levels, and the cost reality</p>
+        </div>
+
+        <div class="score-board">
+            <div class="score-item"><div class="label">Score</div><div class="value" id="score">0</div></div>
+            <div class="score-item"><div class="label">Question</div><div class="value"><span id="current">1</span>/<span id="total">10</span></div></div>
+            <div class="score-item"><div class="label">Streak</div><div class="value" id="streak">0</div></div>
+        </div>
+
+        <div class="progress-bar"><div class="progress-fill" id="progress"></div></div>
+
+        <div class="exercise-card" id="exerciseCard"></div>
+    </div>
+
+    <script>
+        const exercises = [
+  {
+    "scenario": "Wangari runs a Nairobi-based corporate wellness consultancy. She sells mental-health workshops to insurance and banking firms with 200-plus staff. Her target buyer is the HR Director or Head of People. Deal size: KES 350,000 per workshop. She has USD 800 (roughly KES 100,000) for her first LinkedIn campaign.",
+    "question": "Why is LinkedIn — not Meta — the right platform for Wangari, even though clicks are much more expensive?",
+    "options": [
+      "Because Meta does not exist in Kenya.",
+      "Because LinkedIn's professional targeting (job title, company size, industry, seniority) is unmatched by any other platform, and Wangari can spend USD 5-15 per click and still profit when a single closed deal is worth KES 350,000. Meta cannot reach an HR Director specifically at a 200-plus insurance firm with the same precision.",
+      "Because LinkedIn is cheaper per click than Meta.",
+      "Because LinkedIn is the only platform that runs in Nairobi."
+    ],
+    "correct": 1,
+    "explanation": "Slide 8 of §5.5: LinkedIn CPCs are USD 5-15 (20-30 in finance/legal), 50-100x higher than Meta. That maths only works when deal size is high enough — Wangari's KES 350,000 per workshop qualifies. Slide 5 explains why: unmatched professional targeting from verified profiles."
+  },
+  {
+    "scenario": "Wangari is used to Meta's three-level hierarchy (Campaign, Ad Set, Ad). She opens LinkedIn Campaign Manager and finds four levels.",
+    "question": "What are LinkedIn's four levels, and what is the purpose of the extra one?",
+    "options": [
+      "Account · Campaign Group · Campaign · Ad. The extra Campaign Group level lets Wangari group related campaigns for cleaner reporting — for example, \"Q1 HR Directors\" and \"Q2 Compliance Officers\" as two groups inside her Account.",
+      "Campaign · Ad Set · Ad · Creative — identical to Meta plus one.",
+      "Account · Ad · Ad · Ad — LinkedIn nests four ad levels.",
+      "Company · Person · Post · Comment — LinkedIn is different."
+    ],
+    "correct": 0,
+    "explanation": "Slide 3 of §5.5: LinkedIn's four levels are Account (billing, users, Insight Tag), Campaign Group (portfolio grouping for reporting), Campaign (objective, audience, budget, schedule, bidding), and Ad (creative). The Campaign Group is optional but useful for the reporting rollup — Wangari's Q1 vs Q2 example is exactly the intended use case."
+  },
+  {
+    "scenario": "Wangari wants to book discovery calls with HR Directors — a lead-generation goal. LinkedIn shows her eight objectives.",
+    "question": "Which objective should she pick?",
+    "options": [
+      "Brand Awareness — because HR Directors need to see her name.",
+      "Video Views — because she has a corporate testimonial video.",
+      "Lead Generation — LinkedIn's speciality, using in-platform Lead Gen Forms that pre-fill from the member's profile.",
+      "Job Applicants — because HR Directors work in HR."
+    ],
+    "correct": 2,
+    "explanation": "Slide 4 of §5.5 lists LinkedIn's eight objectives (Brand Awareness, Website Visits, Engagement, Video Views, Lead Generation, Website Conversions, Job Applicants, Talent Leads). For Wangari's workshop-booking goal the answer is Lead Generation — LinkedIn's Lead Gen Forms are the platform's speciality and pre-fill from the member's verified profile, driving high conversion rates."
+  },
+  {
+    "scenario": "Wangari layers her LinkedIn targeting like this: current job title \"HR Director\" OR \"Head of People\", at companies with 200-plus employees, in the Financial Services industry, based in Kenya.",
+    "question": "Which set of targeting attributes is Wangari using, and why can Meta not replicate this precision?",
+    "options": [
+      "Only demographics (age, gender) — Meta has this too.",
+      "Company (size, industry) plus Job Experience (title) plus Location — layered with AND/OR/NOT logic. Meta cannot match this because Meta's audience data is derived from behaviour and self-declared interests, not from verified professional profiles.",
+      "Interests only — she is interested in HR.",
+      "Random — LinkedIn does not allow layered targeting."
+    ],
+    "correct": 1,
+    "explanation": "Slide 5 of §5.5 lists LinkedIn's targeting families: Company (name, size, industry, growth), Demographics (age, gender), Education (school, degree, field), Job Experience (title, seniority, function, years), Interests and Traits (Groups, skills, interests). LinkedIn's precision comes from every user filling in a verified professional profile — a data source Meta simply does not have."
+  },
+  {
+    "scenario": "Wangari has a spreadsheet of 200 target Kenyan insurance and banking firms she wants to reach — an account-based marketing play. She wants to upload it into LinkedIn.",
+    "question": "Which of LinkedIn's six Matched Audience types does she use, and how does it differ from Meta Custom Audiences?",
+    "options": [
+      "Contact List — but only if she has 300 emails minimum.",
+      "Company List — upload target company NAMES for account-based marketing. Meta does not offer an equivalent because Meta targets people, not companies. Also possible: Contact List (business emails, minimum 300 to activate), Website Retargeting, Video Retargeting, Lead Gen Form Retargeting, Lookalike Audiences.",
+      "Lookalike only — companies are not supported.",
+      "None — LinkedIn does not have Matched Audiences."
+    ],
+    "correct": 1,
+    "explanation": "Slide 6 of §5.5 lists LinkedIn's six Matched Audience types: Contact List (min 300 business emails), Company List (for ABM), Website Retargeting (Insight Tag), Video Retargeting (25/50/75/100% watch), Lead Gen Form Retargeting, Lookalike Audiences. The Company List is the ABM entry point and has no direct Meta equivalent."
+  },
+  {
+    "scenario": "Wangari wants to distribute her case study — a 6-page PDF showing outcomes from three prior workshops — as a lead magnet inside the LinkedIn feed.",
+    "question": "Which ad format from Lesson 5.5 is designed for this exact use case?",
+    "options": [
+      "Text Ads — a text-plus-small-image in the right sidebar.",
+      "Message Ads — a direct inbox message.",
+      "Document Ads — a downloadable PDF that opens inline in the LinkedIn feed, ideal for case studies, whitepapers, and reports.",
+      "Dynamic Ads — personalised with the member's own profile picture."
+    ],
+    "correct": 2,
+    "explanation": "Slide 7 of §5.5 lists LinkedIn's seven ad formats (Sponsored Content, Message Ads, Conversation Ads, Text Ads, Dynamic Ads, Event Ads, Document Ads). The Document Ad opens inline in the feed and is designed for lead-generation PDFs — case studies, whitepapers, playbooks. Wangari's setup pairs it with a Lead Gen Form for booking calls."
+  },
+  {
+    "scenario": "Wangari's boss asks: \"If LinkedIn CPCs are USD 5-15 and Meta CPCs are USD 0.50-2, is LinkedIn really 5-30x more expensive per click? Is it worth it?\"",
+    "question": "What is the honest professional answer, using §5.5's benchmarks?",
+    "options": [
+      "LinkedIn is only 2x more expensive — the numbers are exaggerated.",
+      "Yes, LinkedIn is 50-100x more expensive per interaction than Meta on a like-for-like basis (CPCs USD 5-15 vs Meta cents to a dollar; cost per lead USD 25-75 vs USD 0.20-1 on Meta). It IS justified when one closed deal is worth KES 350,000, like Wangari's workshops. It is NOT justified for a KES 400 lunch order.",
+      "LinkedIn is cheaper than Meta once you factor in lead quality.",
+      "There is no cost difference between LinkedIn and Meta."
+    ],
+    "correct": 1,
+    "explanation": "Slide 8 of §5.5 gives exact benchmarks: CPC USD 5-15 (20-30 in finance/legal), CPM USD 30-100, cost per lead USD 25-75, versus Meta at USD 0.20-1 per lead — meaning LinkedIn is 50-100x more expensive per interaction. It is only rational when the closed deal is high-value, like Wangari's B2B workshops. Never for Sarah's lunch delivery."
+  },
+  {
+    "scenario": "Wangari's finance team runs the maths on the USD 800 budget: at LinkedIn benchmark of roughly KES 1,000 per click, that budget delivers around 100 clicks. If 10% become qualified leads, that is 10 leads. If just one closes, at KES 350,000 per workshop, her return is 3.5x ad spend.",
+    "question": "What professional lesson does this worked example teach?",
+    "options": [
+      "LinkedIn is unprofitable at any scale.",
+      "LinkedIn only works for businesses whose average deal size can absorb the cost per lead. Wangari's KES 350,000 workshop absorbs a USD 25-75 cost per lead easily; Sarah's KES 400 lunch cannot. Match platform economics to deal size — that is the whole B2B versus B2C decision.",
+      "Wangari should quit and open a restaurant instead.",
+      "The maths only works with a USD 10,000 budget."
+    ],
+    "correct": 1,
+    "explanation": "This exact worked example appears in §5.7 Slide 5 (Wangari's case) and is derived from §5.5 Slide 8. The lesson is deal-size economics: LinkedIn's cost per lead only pays back when a single closed deal is large. That is why Module 5 uses three different characters — the platform choice follows the economics, not the platform's popularity."
+  },
+  {
+    "scenario": "Wangari's junior marketer suggests they also \"try TikTok\" and \"boost some Facebook lifestyle content\" alongside LinkedIn, because \"HR Directors are humans too\".",
+    "question": "Using the four choice questions from §5.1 applied to Wangari's business, what is the right response?",
+    "options": [
+      "Yes — spread the USD 800 across LinkedIn, TikTok, and Meta equally.",
+      "The four questions point to LinkedIn only. HR Directors do professional research on LinkedIn (WHERE), the sale is high-value B2B (WHAT), the decision cycle is slow (URGENCY). Splitting the small USD 800 budget across three platforms fragments it below any platform's Learning Phase and delivers nothing. Focus wins.",
+      "Move the whole budget to TikTok — it is trending.",
+      "Cancel the campaign and buy billboards instead."
+    ],
+    "correct": 1,
+    "explanation": "The four questions from §5.1 (customer, where, what, urgency) applied to Wangari all point to LinkedIn as the single answer. §5.7 Slide 8 (\"common mistakes\") explicitly warns against fragmenting a small budget across too many platforms — you starve every campaign of the data it needs. For a USD 800 B2B budget, LinkedIn only."
+  },
+  {
+    "scenario": "A trainee summarises Lesson 5.5 in one line: \"LinkedIn has three levels, six objectives, no Matched Audiences, and is cheap per click.\"",
+    "question": "How many of those four claims are correct?",
+    "options": [
+      "All four.",
+      "Two — the levels and objectives parts.",
+      "Zero — every claim is wrong.",
+      "One — only the Matched Audiences part."
+    ],
+    "correct": 2,
+    "explanation": "Every claim is wrong. LinkedIn has FOUR levels — Account, Campaign Group, Campaign, Ad (Slide 3). It has EIGHT objectives (Slide 4). It DOES have Matched Audiences — six types (Slide 6). And clicks are EXPENSIVE — USD 5-15, 50-100x Meta (Slide 8). This question tests every headline fact of §5.5."
+  }
+];
+
+        let currentQuestion = 0, score = 0, streak = 0, answered = false;
+
+        function updateScoreboard() {
+            document.getElementById('score').textContent = score;
+            document.getElementById('current').textContent = Math.min(currentQuestion + 1, exercises.length);
+            document.getElementById('total').textContent = exercises.length;
+            document.getElementById('streak').textContent = streak;
+            document.getElementById('progress').style.width = ((currentQuestion) / exercises.length) * 100 + '%';
+        }
+
+        function escapeHtml(s) {
+            return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+        }
+
+        function renderQuestion() {
+            answered = false;
+            const q = exercises[currentQuestion];
+            let html = '';
+            if (q.scenario) {
+                html += `<div class="scenario"><strong>Scenario.</strong> ${escapeHtml(q.scenario)}</div>`;
+            }
+            html += `<div class="question">${escapeHtml(q.question)}</div>`;
+            html += '<div class="options">';
+            q.options.forEach((o, i) => {
+                html += `<button class="option" onclick="selectAnswer(${i})">${escapeHtml(o)}</button>`;
+            });
+            html += '</div>';
+            document.getElementById('exerciseCard').innerHTML = html;
+            updateScoreboard();
+        }
+
+        function selectAnswer(i) {
+            if (answered) return;
+            answered = true;
+            const q = exercises[currentQuestion];
+            const btns = document.querySelectorAll('.option');
+            btns.forEach(b => b.classList.add('disabled'));
+            btns[q.correct].classList.add('correct');
+            const right = i === q.correct;
+            if (!right) btns[i].classList.add('wrong');
+            if (right) { score += 10; streak += 1; } else { streak = 0; }
+            const fb = document.createElement('div');
+            fb.className = 'feedback ' + (right ? 'correct' : 'wrong');
+            fb.innerHTML = `<strong>${right ? '✅ Correct.' : '❌ Not quite.'}</strong><br>${escapeHtml(q.explanation)}`;
+            document.getElementById('exerciseCard').appendChild(fb);
+            const nb = document.createElement('button');
+            nb.className = 'next-btn';
+            nb.textContent = currentQuestion === exercises.length - 1 ? 'See results →' : 'Next scenario →';
+            nb.onclick = nextQuestion;
+            document.getElementById('exerciseCard').appendChild(nb);
+            updateScoreboard();
+        }
+
+        function nextQuestion() {
+            currentQuestion++;
+            if (currentQuestion >= exercises.length) return showResults();
+            renderQuestion();
+        }
+
+        function showResults() {
+            document.getElementById('progress').style.width = '100%';
+            const total = exercises.length * 10;
+            const pct = Math.round(score / total * 100);
+            if (window.parent) { window.parent.postMessage({type:"mtti_quiz_score", score: score, total: total, percent: pct}, "*"); }
+            let badge = '🌟', msg = 'Excellent work. You have a professional grasp of this lesson.';
+            if (pct < 50) { badge = '🌱'; msg = 'Good first attempt. Re-watch the lesson video and try again.'; }
+            else if (pct < 80) { badge = '📚'; msg = 'Solid progress. Review the scenarios you missed and retry.'; }
+            document.getElementById('exerciseCard').innerHTML = `
+                <div class="results">
+                    <span class="badge">${badge}</span>
+                    <h2>Quiz Complete</h2>
+                    <div class="final-score">${score} / ${total}</div>
+                    <p><strong>${pct}%</strong> · Longest streak: ${streak}</p>
+                    <p>${msg}</p>
+                    <button class="restart-btn" onclick="restart()">Try again 🔁</button>
+                </div>`;
+        }
+
+        function restart() {
+            currentQuestion = 0; score = 0; streak = 0;
+            renderQuestion();
+        }
+
+        renderQuestion();
+    </script>
+</body>
+</html>

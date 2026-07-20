@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Audio Levels, Fades, and Noise Reduction | MTTI Video Editing</title>
+    <link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Fredoka:wght@500;600&display=swap" rel="stylesheet">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Space Mono', monospace; background: linear-gradient(135deg, #2b0b5e 0%, #1a1a4b 100%); min-height: 100vh; padding: 20px; color: #fff; }
+        .container { max-width: 900px; margin: 0 auto; }
+        .header { text-align: center; margin-bottom: 30px; }
+        .header .lesson-tag { display: inline-block; background: rgba(255,255,255,0.2); padding: 6px 16px; border-radius: 999px; font-size: 0.85em; margin-bottom: 12px; }
+        .header h1 { font-family: 'Fredoka', sans-serif; font-size: 2.2em; margin-bottom: 8px; text-shadow: 3px 3px 0 rgba(0,0,0,0.2); }
+        .score-board { background: rgba(255,255,255,0.15); backdrop-filter: blur(10px); border-radius: 20px; padding: 20px; margin-bottom: 20px; display: flex; justify-content: space-around; }
+        .score-item { text-align: center; }
+        .score-item .label { font-size: 0.85em; opacity: 0.9; margin-bottom: 4px; }
+        .score-item .value { font-size: 1.8em; font-weight: bold; font-family: 'Fredoka', sans-serif; }
+        .progress-bar { width: 100%; height: 8px; background: rgba(255,255,255,0.3); border-radius: 10px; margin-bottom: 25px; overflow: hidden; }
+        .progress-fill { height: 100%; background: linear-gradient(90deg, #f7971e 0%, #ffd200 100%); border-radius: 10px; transition: width 0.5s ease; width: 0%; }
+        .exercise-card { background: white; color: #333; border-radius: 25px; padding: 35px; margin-bottom: 20px; box-shadow: 0 20px 60px rgba(0,0,0,0.3); }
+        .scenario { background: linear-gradient(135deg, #fff8e1 0%, #ffecb3 100%); border-left: 5px solid #ffc107; padding: 20px 24px; border-radius: 12px; margin-bottom: 24px; font-size: 0.98em; line-height: 1.55; }
+        .scenario strong { color: #7a5a00; font-family: 'Fredoka', sans-serif; }
+        .question { font-size: 1.15em; margin-bottom: 20px; font-weight: 700; line-height: 1.4; }
+        .options { display: flex; flex-direction: column; gap: 12px; }
+        .option { background: #f5f7fb; border: 2px solid transparent; padding: 16px 20px; border-radius: 12px; cursor: pointer; transition: all 0.2s ease; font-family: 'Space Mono', monospace; font-size: 0.98em; text-align: left; }
+        .option:hover:not(.disabled) { background: #eef1fb; border-color: #2b0b5e; transform: translateX(4px); }
+        .option.correct { background: #d4edda; border-color: #28a745; color: #155724; }
+        .option.wrong { background: #f8d7da; border-color: #dc3545; color: #721c24; }
+        .option.disabled { cursor: not-allowed; opacity: 0.85; }
+        .feedback { margin-top: 22px; padding: 18px 22px; border-radius: 12px; font-size: 0.98em; line-height: 1.5; }
+        .feedback.correct { background: #d4edda; color: #155724; border-left: 4px solid #28a745; }
+        .feedback.wrong { background: #f8d7da; color: #721c24; border-left: 4px solid #dc3545; }
+        .next-btn, .restart-btn { margin-top: 20px; background: linear-gradient(135deg, #2b0b5e 0%, #1a1a4b 100%); color: white; border: none; padding: 14px 32px; border-radius: 12px; font-size: 1em; cursor: pointer; font-family: 'Fredoka', sans-serif; box-shadow: 0 6px 18px rgba(0,0,0,0.2); }
+        .results { text-align: center; padding: 25px 15px; }
+        .results h2 { font-family: 'Fredoka', sans-serif; font-size: 2em; margin-bottom: 12px; color: #333; }
+        .results .final-score { font-size: 3em; font-family: 'Fredoka', sans-serif; color: #2b0b5e; margin: 20px 0; }
+        .results p { color: #555; margin-bottom: 12px; }
+        .badge { display: inline-block; font-size: 3.5em; margin: 8px 0; }
+    
+        /* How-To intro screen — shown before question 1, not scored */
+        .howto-card { background: white; color: #333; border-radius: 25px; padding: 35px; margin-bottom: 20px; box-shadow: 0 20px 60px rgba(0,0,0,0.3); }
+        .howto-card h3 { font-family: 'Fredoka', sans-serif; font-size: 1.3em; margin-bottom: 12px; color: #2b0b5e; }
+        .howto-card p { line-height: 1.6; margin-bottom: 16px; color: #444; }
+        .howto-fields { display: flex; flex-direction: column; gap: 16px; margin-bottom: 18px; }
+        .howto-field { background: #f5f7fb; border-radius: 12px; padding: 16px 18px; }
+        .howto-field label { display: block; font-weight: 700; margin-bottom: 8px; color: #333; font-family: 'Fredoka', sans-serif; }
+        .howto-field .hf-hint { font-size: 0.82em; color: #777; margin-bottom: 8px; }
+        .howto-field input { width: 100%; max-width: 220px; padding: 10px 14px; border-radius: 8px; border: 2px solid #ccc; font-family: 'Space Mono', monospace; font-size: 1em; }
+        .howto-field input.hf-correct { border-color: #28a745; background: #d4edda; }
+        .howto-field input.hf-wrong { border-color: #dc3545; background: #f8d7da; }
+        .howto-field .hf-result { margin-top: 8px; font-size: 0.85em; font-weight: 700; min-height: 1.1em; }
+        .howto-field .hf-result.ok { color: #155724; }
+        .howto-field .hf-result.fail { color: #721c24; }
+        .howto-banner { margin-top: 4px; margin-bottom: 18px; padding: 12px 16px; border-radius: 10px; font-size: 0.9em; font-weight: 700; display: none; }
+        .howto-banner.show { display: block; }
+        .howto-banner.ok { background: #d4edda; color: #155724; }
+        .howto-banner.fail { background: #f8d7da; color: #721c24; }
+        .start-quiz-btn { margin-top: 4px; background: linear-gradient(135deg, #2b0b5e 0%, #1a1a4b 100%); color: white; border: none; padding: 14px 32px; border-radius: 12px; font-size: 1em; cursor: pointer; font-family: 'Fredoka', sans-serif; box-shadow: 0 6px 18px rgba(0,0,0,0.2); }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <div class="lesson-tag">Audio Editing · Topic 3 · Quiz</div>
+            <h1>Audio Levels, Fades, and Noise Reduction</h1>
+        </div>
+        <div class="score-board">
+            <div class="score-item"><div class="label">Score</div><div class="value" id="score">0</div></div>
+            <div class="score-item"><div class="label">Question</div><div class="value"><span id="current">1</span>/<span id="total">10</span></div></div>
+            <div class="score-item"><div class="label">Streak</div><div class="value" id="streak">0</div></div>
+        </div>
+        <div class="progress-bar"><div class="progress-fill" id="progress"></div></div>
+        <div class="exercise-card" id="exerciseCard"></div>
+    </div>
+    <script>
+        const exercises = [{"scenario":"Otieno's narration and background hymn track are both sitting at 100% volume, and the words are hard to follow under the music.","question":"What is the most direct fix?","options":["Raise the music volume even higher so it masks the narration issue","Duck the music volume down (roughly 20-35%) while keeping the narration near its recorded level, so the voice stays clearly on top","Delete the music track entirely \u2014 background music should never be used with narration","Mute the narration and let the music carry the video"],"correct":1,"explanation":"Bringing the music volume down while leaving the narration at a normal level is the standard fix for a voice getting buried under equally-loud music."},{"scenario":"A phone-recorded narration clip has a faint hiss picked up from a venue's sound system, while a separate music track layered underneath is clean.","question":"Which clip should Otieno apply noise reduction to?","options":["The narration clip, since that's where the hiss actually is","The music track, since noise reduction always goes on background audio","Both clips equally, regardless of which one has noise","Neither \u2014 noise reduction can't target one specific track"],"correct":0,"explanation":"Noise reduction should be applied to whichever clip actually contains the unwanted noise \u2014 here, that's the narration, not the clean music track."},{"scenario":"Otieno sets noise reduction to its maximum strength (100) on his narration, hoping to fully erase a faint hiss.","question":"What is the likely downside of this choice?","options":["There is no downside \u2014 maximum noise reduction is always safe","The voice may start sounding metallic, muffled, or \"underwater\" from over-aggressive processing","Maximum noise reduction will make the narration louder","Noise reduction settings only affect video, not audio quality"],"correct":1,"explanation":"Pushing noise reduction to its maximum strips too much from the voice itself, producing the metallic\/underwater artifact rather than a clean result."},{"scenario":"Otieno is about to start mixing a new clip and wants to work in the most effective order.","question":"Which order of operations makes the most sense?","options":["Add fades first, then balance levels, then clean up noise last","Clean up noise reduction first, then balance narration vs music volume, then add fades","Balance volume levels first, then decide whether any audio exists at all","Order doesn't matter, since all three steps are independent of each other"],"correct":1,"explanation":"Cleaning the audio first makes it easier to judge appropriate volume levels afterward, and fades are best added once the underlying mix is already balanced."},{"scenario":"A client complains that a delivered video's narration sounds \"robotic\" and slightly hollow, even though the background hiss is completely gone.","question":"What is the most likely cause?","options":["The music track was too quiet","Noise reduction was set too aggressively on the narration, over-processing the voice while removing the hiss","The video's export resolution was too low","The narration volume was set to exactly 100%"],"correct":1,"explanation":"A robotic, hollow-sounding voice after noise cleanup is the classic symptom of over-aggressive noise reduction, not a volume or export setting."},{"scenario":"Otieno boosts his narration clip's volume to 300% to make sure it's loud enough over the music, instead of ducking the music down.","question":"What is the likely risk with this approach?","options":["No risk \u2014 higher percentage always means a cleaner sound","Pushing the volume that high risks distorted, clipped audio, whereas ducking the music down would have solved the balance problem without that risk","300% volume automatically triggers noise reduction","This will make the music track quieter automatically"],"correct":1,"explanation":"Cranking a clip's volume far above its recorded level risks harsh digital clipping; the safer fix for a voice-vs-music balance problem is ducking the competing track down, not over-boosting the narration."}];
+        let currentQuestion = 0, score = 0, streak = 0, answered = false;
+        function updateScoreboard() {
+            document.getElementById('score').textContent = score;
+            document.getElementById('current').textContent = Math.min(currentQuestion + 1, exercises.length);
+            document.getElementById('total').textContent = exercises.length;
+            document.getElementById('streak').textContent = streak;
+            document.getElementById('progress').style.width = ((currentQuestion) / exercises.length) * 100 + '%';
+        }
+        function escapeHtml(s) { return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+        function renderQuestion() {
+            answered = false;
+            const q = exercises[currentQuestion];
+            let html = '';
+            if (q.scenario) html += `<div class="scenario"><strong>Scenario.</strong> ${escapeHtml(q.scenario)}</div>`;
+            html += `<div class="question">${escapeHtml(q.question)}</div>`;
+            html += '<div class="options">';
+            q.options.forEach((o, i) => { html += `<button class="option" onclick="selectAnswer(${i})">${escapeHtml(o)}</button>`; });
+            html += '</div>';
+            document.getElementById('exerciseCard').innerHTML = html;
+            updateScoreboard();
+        }
+        function selectAnswer(i) {
+            if (answered) return;
+            answered = true;
+            const q = exercises[currentQuestion];
+            const btns = document.querySelectorAll('.option');
+            btns.forEach(b => b.classList.add('disabled'));
+            btns[q.correct].classList.add('correct');
+            const right = i === q.correct;
+            if (!right) btns[i].classList.add('wrong');
+            if (right) { score += 10; streak += 1; } else { streak = 0; }
+            const fb = document.createElement('div');
+            fb.className = 'feedback ' + (right ? 'correct' : 'wrong');
+            fb.innerHTML = `<strong>${right ? '&#9989; Correct.' : '&#10060; Not quite.'}</strong><br>${escapeHtml(q.explanation)}`;
+            document.getElementById('exerciseCard').appendChild(fb);
+            const nb = document.createElement('button');
+            nb.className = 'next-btn';
+            nb.textContent = currentQuestion === exercises.length - 1 ? 'See results →' : 'Next scenario →';
+            nb.onclick = nextQuestion;
+            document.getElementById('exerciseCard').appendChild(nb);
+            updateScoreboard();
+        }
+        function nextQuestion() { currentQuestion++; if (currentQuestion >= exercises.length) return showResults(); renderQuestion(); }
+        function showResults() {
+            document.getElementById('progress').style.width = '100%';
+            const total = exercises.length * 10;
+            const pct = Math.round(score / total * 100);
+            if (window.parent) { window.parent.postMessage({type:"mtti_quiz_score", score: score, total: total, percent: pct}, "*"); }
+            let badge = '🌟', msg = 'Excellent work. Otieno-level audio-editing know-how.';
+            if (pct < 50) { badge = '🌱'; msg = 'Good first attempt. Review the lesson and try again.'; }
+            else if (pct < 80) { badge = '📚'; msg = 'Solid progress. Review the scenarios you missed and retry.'; }
+            document.getElementById('exerciseCard').innerHTML = `
+                <div class="results">
+                    <span class="badge">${badge}</span>
+                    <h2>Quiz Complete</h2>
+                    <div class="final-score">${score} / ${total}</div>
+                    <p><strong>${pct}%</strong> &middot; Longest streak: ${streak}</p>
+                    <p>${msg}</p>
+                    <button class="restart-btn" onclick="restart()">Try again &#128257;</button>
+                </div>`;
+        }
+        function restart() { currentQuestion = 0; score = 0; streak = 0; renderQuestion(); }
+        
+        /* How-To intro — a small, ungraded field-check demo shown before the
+           quiz starts, directly rehearsing the mechanic one of the quiz
+           scenarios asks about, so it's not being asked cold. */
+        const HOWTO_FIELDS = [
+            { id: 'music', label: 'Background music volume (%)', hint: 'Duck it down so the narration stays clearly on top.', placeholder: 'e.g. 25', okText: 'Music ducked into the right range — the voice sits clearly on top now.', failText: 'Not quite — duck the music down to roughly 20-35%.' },
+            { id: 'narration', label: 'Narration volume (%)', hint: 'Keep it near its recorded level — don\'t touch it.', placeholder: 'e.g. 100', okText: 'Narration left near its recorded level — no need to touch it.', failText: 'Careful — don\'t cut the narration down along with the music.' },
+        ];
+        const HOWTO_RULES = {
+            music: {op:'range',min:20,max:35},
+            narration: {op:'gte',value:90},
+        };
+
+        function howtoApplyOp(op, actual, rule) {
+            if (op === 'eq') return Math.abs(actual - rule.value) < 0.001;
+            if (op === 'gte') return actual >= rule.value;
+            if (op === 'lte') return actual <= rule.value;
+            if (op === 'range') return actual >= rule.min && actual <= rule.max;
+            return false;
+        }
+
+        function checkHowto() {
+            let allOk = true;
+            HOWTO_FIELDS.forEach(f => {
+                const input = document.getElementById('howto_' + f.id);
+                const raw = input.value.trim();
+                const val = parseFloat(raw);
+                const rule = HOWTO_RULES[f.id];
+                const ok = raw !== '' && !isNaN(val) && howtoApplyOp(rule.op, val, rule);
+                input.classList.remove('hf-correct', 'hf-wrong');
+                input.classList.add(ok ? 'hf-correct' : 'hf-wrong');
+                const resultEl = document.getElementById('howto_result_' + f.id);
+                resultEl.className = 'hf-result ' + (ok ? 'ok' : 'fail');
+                resultEl.textContent = (ok ? '✅ ' : '❌ ') + (ok ? f.okText : f.failText);
+                if (!ok) allOk = false;
+            });
+            const banner = document.getElementById('howtoBanner');
+            banner.classList.add('show');
+            banner.className = 'howto-banner show ' + (allOk ? 'ok' : 'fail');
+            banner.textContent = allOk ? '✅ Balanced — narration on top, music ducked underneath. That\'s the standard fix; no need to touch noise reduction or fades for this.' : '❌ Not balanced yet — duck the music into the 20-35% range and keep narration near 100%.';
+        }
+
+        function renderHowto() {
+            const fieldsHtml = HOWTO_FIELDS.map(f => `
+                <div class="howto-field">
+                    <label for="howto_${f.id}">${f.label}</label>
+                    <div class="hf-hint">${f.hint}</div>
+                    <input type="number" step="any" id="howto_${f.id}" placeholder="${f.placeholder}">
+                    <div class="hf-result" id="howto_result_${f.id}"></div>
+                </div>`).join('');
+            document.getElementById('exerciseCard').innerHTML = `
+                <div class="howto-card">
+                    <h3>🔍 Quick How-To: Ducking Music Under Narration</h3>
+                    <p>One of the scenarios coming up asks for the standard fix when narration gets buried under music. Here's the mechanic: open each clip's volume control and drag the music down while leaving the narration where it was recorded (below, just type the percentages instead of dragging). Otieno is mixing a customer testimonial — the narration and a soft instrumental track are both sitting at 100% volume, and the words are getting lost under the music. Duck the music into the standard range, leave the narration near its recorded level, then check your mix.</p>
+                    <div class="howto-fields">${fieldsHtml}</div>
+                    <div class="howto-banner" id="howtoBanner"></div>
+                    <button class="start-quiz-btn" id="checkHowtoBtn">Check My Settings</button>
+                    <button class="start-quiz-btn" id="startQuizBtn" style="margin-left:10px;background:linear-gradient(135deg,#28a745,#1e7e34);">Start Quiz →</button>
+                </div>`;
+            document.getElementById('checkHowtoBtn').addEventListener('click', checkHowto);
+            document.getElementById('startQuizBtn').addEventListener('click', renderQuestion);
+        }
+
+        renderHowto();
+    </script>
+</body>
+</html>

@@ -7,63 +7,236 @@
 <link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Fredoka:wght@500;600&display=swap" rel="stylesheet">
 <style>
 * { margin:0; padding:0; box-sizing:border-box; }
-body { font-family:'Space Mono', monospace; background:linear-gradient(135deg,#387633 0%,#259BD7 100%); min-height:100vh; padding:20px; color:#fff; }
-.container { max-width:900px; margin:0 auto; }
-.header { text-align:center; margin-bottom:24px; }
-.lesson-tag { display:inline-block; background:rgba(255,255,255,0.2); padding:6px 16px; border-radius:999px; font-size:0.85em; margin-bottom:12px; }
-.header h1 { font-family:'Fredoka', sans-serif; font-size:2em; margin-bottom:6px; text-shadow:3px 3px 0 rgba(0,0,0,0.2); }
-.scenario { background:rgba(255,255,255,0.14); backdrop-filter:blur(10px); border-radius:16px; padding:16px 22px; margin-bottom:20px; border-left:5px solid #ffd54f; font-size:0.95em; line-height:1.55; }
-.task { background:#fff; color:#333; border-radius:20px; padding:24px; margin-bottom:16px; box-shadow:0 14px 40px rgba(0,0,0,0.25); }
-.task-num { display:inline-block; width:28px; height:28px; background:linear-gradient(135deg,#387633 0%,#259BD7 100%); color:#fff; border-radius:50%; text-align:center; line-height:28px; font-family:'Fredoka', sans-serif; font-weight:600; margin-right:8px; }
-.task h3 { font-family:'Fredoka', sans-serif; font-size:1.05em; display:inline; }
-.options { margin-top:14px; display:flex; flex-direction:column; gap:10px; }
-.option { background:#f5f7fb; border:2px solid transparent; padding:12px 16px; border-radius:10px; cursor:pointer; transition:all 0.2s; font-family:'Space Mono', monospace; font-size:0.92em; text-align:left; }
-.option:hover:not(.disabled) { background:#e8f5e9; border-color:#387633; }
-.option.correct { background:#d4edda; border-color:#28a745; color:#155724; }
-.option.wrong { background:#f8d7da; border-color:#dc3545; color:#721c24; }
-.option.disabled { cursor:not-allowed; }
-.feedback { margin-top:14px; padding:12px 16px; border-radius:10px; font-size:0.9em; line-height:1.5; }
-.feedback.correct { background:#d4edda; color:#155724; border-left:4px solid #28a745; }
-.feedback.wrong { background:#f8d7da; color:#721c24; border-left:4px solid #dc3545; }
-.done-banner { text-align:center; padding:20px; color:#fff; font-family:'Fredoka', sans-serif; font-size:1.1em; }
+body { font-family:'Space Mono', monospace; background:linear-gradient(135deg,#1B5E20 0%,#2E7D32 100%); min-height:100vh; padding:20px; color:#fff; }
+.container { max-width:1000px; margin:0 auto; }
+.header { text-align:center; margin-bottom:18px; }
+.lesson-tag { display:inline-block; background:rgba(255,255,255,0.2); padding:6px 16px; border-radius:999px; font-size:0.85em; margin-bottom:10px; }
+.header h1 { font-family:'Fredoka', sans-serif; font-size:1.8em; margin-bottom:4px; text-shadow:2px 2px 0 rgba(0,0,0,0.2); }
+.brief { background:rgba(255,255,255,0.12); backdrop-filter:blur(10px); border-radius:14px; padding:14px 20px; margin-bottom:16px; border-left:5px solid #ffd54f; font-size:0.92em; line-height:1.5; }
+.studio { background:#fff; color:#333; border-radius:18px; padding:16px; box-shadow:0 20px 60px rgba(0,0,0,0.3); }
+.toolbar { display:flex; gap:8px; flex-wrap:wrap; margin-bottom:10px; padding-bottom:10px; border-bottom:2px solid #f0f0f0; align-items:center; }
+.tool-btn { background:#f5f7fb; border:2px solid transparent; padding:7px 12px; border-radius:8px; cursor:pointer; font-family:'Space Mono', monospace; font-size:0.85em; font-weight:700; color:#444; }
+.tool-btn:hover { background:#eef1fb; }
+.formula-bar { display:flex; align-items:center; gap:8px; margin-bottom:10px; }
+.formula-bar .cell-ref { background:#e8f5e9; padding:7px 12px; border-radius:6px; font-weight:700; color:#1B5E20; min-width:44px; text-align:center; }
+.formula-bar input { flex:1; padding:8px 10px; border:1.5px solid #ccc; border-radius:6px; font-family:'Space Mono', monospace; font-size:0.9em; }
+.grid-wrap { overflow-x:auto; border:1px solid #ddd; border-radius:8px; }
+table.grid { border-collapse:collapse; width:100%; font-size:0.85em; }
+table.grid th { background:#e8f5e9; color:#1B5E20; padding:6px; border:1px solid #ccc; font-weight:700; position:sticky; top:0; }
+table.grid td { border:1px solid #e0e0e0; padding:0; min-width:70px; height:28px; }
+table.grid td.rowhead { background:#e8f5e9; text-align:center; font-weight:700; color:#1B5E20; }
+table.grid td .cellbox { width:100%; height:100%; padding:5px 7px; outline:none; cursor:cell; white-space:nowrap; overflow:hidden; }
+table.grid td .cellbox.selected { background:#e3f2fd; box-shadow:inset 0 0 0 2px #1565C0; }
+table.grid td .cellbox.bold { font-weight:700; }
+.check-btn { margin-top:14px; width:100%; background:linear-gradient(135deg,#2E7D32 0%,#1B5E20 100%); color:#fff; border:none; padding:12px; border-radius:10px; font-weight:700; font-size:0.95em; cursor:pointer; font-family:'Fredoka', sans-serif; }
+.check-list { list-style:none; margin-top:14px; display:flex; flex-direction:column; gap:6px; }
+.check-item { display:flex; align-items:center; gap:8px; padding:8px 12px; border-radius:8px; font-size:0.85em; background:#f5f7fb; border:1.5px solid #e0e0e0; }
+.check-item.ok { background:#d4edda; border-color:#28a745; color:#155724; }
+.check-item.fail { background:#f8d7da; border-color:#dc3545; color:#721c24; }
+.check-icon { font-weight:800; }
+#chartArea { margin-top:10px; }
 </style>
 </head>
 <body>
 <div class="container">
-<div class="header"><div class="lesson-tag">Module 2 · Lesson 2.3 · Practical</div><h1>Formatting Cells</h1></div>
-<div class="scenario">Brenda wants her stock sheet to automatically flag any item with quantity below 5 in red, and show all prices as Kenyan Shillings.</div>
-<div id="tasks"></div>
-<div class="done-banner" id="doneBanner" style="display:none;">✅ Practical complete — you can move to the quiz.</div>
+<div class="header">
+<div class="lesson-tag">Module 2 · Lesson 2.3 · Practical</div>
+<h1>Formatting Cells</h1>
+</div>
+<div class="brief">Brenda&rsquo;s price list for Amani Stationers has headers &ldquo;Item&rdquo; and &ldquo;Price&rdquo; in row 1, with three stock items below. Select the header cells in <strong>row 1</strong> and click <strong>Bold</strong> so the headings stand out before she prints the list for customers.</div>
+<div class="studio">
+<div class="toolbar" id="toolbar"></div>
+<div class="formula-bar">
+    <div class="cell-ref" id="cellRef">A1</div>
+    <input type="text" id="formulaInput" placeholder="Enter a value or a formula like =SUM(A1:A3)">
+</div>
+<div class="grid-wrap"><table class="grid" id="grid"></table></div>
+<div id="chartArea"></div>
+<button class="check-btn" id="checkBtn">Check My Work ✓</button>
+<ul class="check-list" id="checkList"></ul>
+</div>
 </div>
 <script>
-const tasks = [{"prompt":"Brenda wants \"500\" to display as \"KES 500.00\" without changing the actual stored value. What should she use?","options":["Retype every cell as text","Currency number format","Conditional Formatting","A border"],"correct":1,"explanation":"Currency format changes only the display, keeping 500 as the real underlying number formulas will use."},{"prompt":"She wants any Quantity cell below 5 to turn red automatically, and stay updated as stock changes. What is the right tool?","options":["Manually colour each low cell by hand once","Conditional Formatting with a \"less than 5\" rule","Currency format","Freeze Panes"],"correct":1,"explanation":"Conditional Formatting applies and re-applies automatically whenever the data changes \u2014 manual colouring would need constant rechecking."},{"prompt":"A column is too narrow and shows ### instead of the number. What is the fastest fix?","options":["Delete the column","Double-click the column border to AutoFit its width","Change the font colour","Add a border"],"correct":1,"explanation":"AutoFit (double-clicking the column's right border) resizes it to fit its widest content, resolving the ### display issue caused by a too-narrow column."}];
-function escapeHtml(s){return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
-function render(){
-  const c = document.getElementById('tasks');
-  c.innerHTML = tasks.map((t,i)=>`
-    <div class="task" id="task-${i}">
-      <div><span class="task-num">${i+1}</span><h3>${escapeHtml(t.prompt)}</h3></div>
-      <div class="options">
-        ${t.options.map((o,j)=>`<button class="option" onclick="answer(${i},${j})">${escapeHtml(o)}</button>`).join('')}
-      </div>
-    </div>`).join('');
+/* MTTI_GridSim v1 — lightweight in-browser spreadsheet practice widget.
+   Not real Excel: a simplified grid supporting SUM/AVERAGE/basic arithmetic
+   formulas with cell references (relative A1 and absolute $A$1 syntax),
+   sorting, a bold toggle, and a simple bar-chart preview — enough to
+   practise the actual moves, not just answer questions about them. No
+   native dialogs — the iframe sandbox blocks prompt/alert/confirm. */
+class MTTI_GridSim {
+    constructor(cfg) {
+        this.cfg = cfg;
+        this.cols = cfg.cols || 6;
+        this.rows = cfg.rows || 10;
+        this.raw = {};   // "A1" -> raw string the student typed
+        this.bold = {};  // "A1" -> true
+        this.selected = 'A1';
+        (cfg.seed || []).forEach(s => { this.raw[s.cell] = s.value; });
+    }
+    colLetter(i) { return String.fromCharCode(65 + i); }
+    render(rootId) {
+        this.grid = document.getElementById('grid');
+        this.toolbar = document.getElementById('toolbar');
+        this.cellRefEl = document.getElementById('cellRef');
+        this.formulaInput = document.getElementById('formulaInput');
+        this.checkList = document.getElementById('checkList');
+        this.renderToolbar();
+        this.renderGrid();
+        this.formulaInput.addEventListener('input', () => {
+            this.raw[this.selected] = this.formulaInput.value;
+            this.renderGrid();
+        });
+        document.getElementById('checkBtn').addEventListener('click', () => this.evaluateChecks());
+    }
+    renderToolbar() {
+        this.toolbar.innerHTML = `
+            <button class="tool-btn" id="boldBtn">𝐁 Bold</button>
+            <button class="tool-btn" id="sortBtn">⇅ Sort by selected column (A→Z)</button>
+            <button class="tool-btn" id="chartBtn">📊 Insert Chart from selected column</button>`;
+        document.getElementById('boldBtn').addEventListener('click', () => {
+            this.bold[this.selected] = !this.bold[this.selected];
+            this.renderGrid();
+        });
+        document.getElementById('sortBtn').addEventListener('click', () => this.sortByColumn(this.selected.replace(/[0-9]/g,'')));
+        document.getElementById('chartBtn').addEventListener('click', () => this.insertChart(this.selected.replace(/[0-9]/g,'')));
+    }
+    parseRef(ref) {
+        const m = ref.replace(/\$/g,'').match(/^([A-Za-z]+)(\d+)$/);
+        if (!m) return null;
+        return { col: m[1].toUpperCase(), row: parseInt(m[2]) };
+    }
+    cellValue(cell, seen) {
+        seen = seen || {};
+        if (seen[cell]) return 0; // circular guard
+        seen[cell] = true;
+        const raw = this.raw[cell];
+        if (raw === undefined || raw === '') return '';
+        if (typeof raw === 'string' && raw.trim().startsWith('=')) {
+            return this.evalFormula(raw.trim().slice(1), seen);
+        }
+        const n = parseFloat(raw);
+        return isNaN(n) ? raw : n;
+    }
+    expandRange(a, b) {
+        const ra = this.parseRef(a), rb = this.parseRef(b);
+        if (!ra || !rb) return [];
+        const cells = [];
+        const c1 = ra.col.charCodeAt(0), c2 = rb.col.charCodeAt(0);
+        for (let c = Math.min(c1,c2); c <= Math.max(c1,c2); c++) {
+            for (let r = Math.min(ra.row,rb.row); r <= Math.max(ra.row,rb.row); r++) {
+                cells.push(String.fromCharCode(c) + r);
+            }
+        }
+        return cells;
+    }
+    evalFormula(expr, seen) {
+        expr = expr.trim();
+        let m;
+        if ((m = expr.match(/^SUM\(([A-Za-z$]+\d+):([A-Za-z$]+\d+)\)$/i))) {
+            return this.expandRange(m[1], m[2]).reduce((s,c) => s + (parseFloat(this.cellValue(c, seen)) || 0), 0);
+        }
+        if ((m = expr.match(/^AVERAGE\(([A-Za-z$]+\d+):([A-Za-z$]+\d+)\)$/i))) {
+            const cells = this.expandRange(m[1], m[2]);
+            const total = cells.reduce((s,c) => s + (parseFloat(this.cellValue(c, seen)) || 0), 0);
+            return cells.length ? total / cells.length : 0;
+        }
+        // Basic arithmetic with cell refs, e.g. A1+B1, A1*2, $A$1-B2
+        const substituted = expr.replace(/\$?[A-Za-z]+\$?\d+/g, ref => {
+            const v = this.cellValue(ref.replace(/\$/g,''), seen);
+            return (typeof v === 'number') ? v : 0;
+        });
+        if (/^[0-9+\-*/.() ]+$/.test(substituted)) {
+            try { return Function('"use strict";return (' + substituted + ')')(); } catch(e) { return '#ERROR'; }
+        }
+        return '#ERROR';
+    }
+    renderGrid() {
+        let html = '<tr><th></th>';
+        for (let c = 0; c < this.cols; c++) html += `<th>${this.colLetter(c)}</th>`;
+        html += '</tr>';
+        for (let r = 1; r <= this.rows; r++) {
+            html += `<tr><td class="rowhead">${r}</td>`;
+            for (let c = 0; c < this.cols; c++) {
+                const cell = this.colLetter(c) + r;
+                const val = this.cellValue(cell);
+                const cls = (cell===this.selected?'selected ':'') + (this.bold[cell]?'bold':'');
+                html += `<td><div class="cellbox ${cls}" data-cell="${cell}" tabindex="0">${val === '' ? '' : val}</div></td>`;
+            }
+            html += '</tr>';
+        }
+        this.grid.innerHTML = html;
+        this.grid.querySelectorAll('.cellbox').forEach(el => {
+            el.addEventListener('click', () => this.selectCell(el.dataset.cell));
+            el.addEventListener('focus', () => this.selectCell(el.dataset.cell));
+        });
+    }
+    selectCell(cell) {
+        this.selected = cell;
+        this.cellRefEl.textContent = cell;
+        this.formulaInput.value = this.raw[cell] || '';
+        this.renderGrid();
+        this.formulaInput.focus();
+    }
+    sortByColumn(col) {
+        const rows = [];
+        for (let r = 1; r <= this.rows; r++) rows.push(r);
+        rows.sort((a,b) => {
+            const va = this.cellValue(col+a), vb = this.cellValue(col+b);
+            if (va === '' ) return 1; if (vb === '') return -1;
+            return (typeof va==='number'&&typeof vb==='number') ? va-vb : String(va).localeCompare(String(vb));
+        });
+        const newRaw = {};
+        for (let c = 0; c < this.cols; c++) {
+            const colLetter = this.colLetter(c);
+            rows.forEach((origRow, i) => {
+                const oldCell = colLetter + origRow;
+                const newCell = colLetter + (i + 1);
+                if (this.raw[oldCell] !== undefined) newRaw[newCell] = this.raw[oldCell];
+            });
+        }
+        this.raw = newRaw;
+        this._lastSortedCol = col;
+        this.renderGrid();
+    }
+    insertChart(col) {
+        const bars = [];
+        for (let r = 1; r <= this.rows; r++) {
+            const v = this.cellValue(col + r);
+            if (typeof v === 'number') bars.push(v);
+        }
+        const max = Math.max(1, ...bars);
+        const svg = `<svg width="100%" height="120" viewBox="0 0 ${bars.length*40} 120">` +
+            bars.map((v,i) => `<rect x="${i*40+5}" y="${120-(v/max*100)}" width="26" height="${(v/max*100)}" fill="#2E7D32"></rect>`).join('') +
+            '</svg>';
+        document.getElementById('chartArea').innerHTML = '<div style="background:#f5f7fb;border-radius:8px;padding:10px;">' + svg + '</div>';
+        this._chartInserted = true;
+    }
+    evaluateChecks() {
+        const results = this.cfg.checks.map(c => {
+            let pass = false;
+            if (c.type === 'cell_value') {
+                const v = this.cellValue(c.cell);
+                pass = (typeof c.value === 'number') ? Math.abs(parseFloat(v) - c.value) < 0.01 : String(v) === String(c.value);
+            } else if (c.type === 'cell_formula_contains') {
+                pass = (this.raw[c.cell] || '').toUpperCase().includes(c.value.toUpperCase());
+            } else if (c.type === 'used_absolute_reference') {
+                pass = Object.values(this.raw).some(v => typeof v === 'string' && v.includes('$'));
+            } else if (c.type === 'bold_applied') {
+                pass = Object.values(this.bold).some(b => b);
+            } else if (c.type === 'sorted_column') {
+                pass = this._lastSortedCol === c.value;
+            } else if (c.type === 'chart_inserted') {
+                pass = !!this._chartInserted;
+            }
+            return { label: c.label, pass };
+        });
+        this.checkList.innerHTML = results.map(r =>
+            `<li class="check-item ${r.pass?'ok':'fail'}"><span class="check-icon">${r.pass?'✓':'✗'}</span> ${r.label}</li>`
+        ).join('');
+    }
 }
-function answer(i,j){
-  const task = tasks[i];
-  const el = document.getElementById('task-'+i);
-  const btns = el.querySelectorAll('.option');
-  if (btns[0].classList.contains('disabled')) return;
-  btns.forEach(b=>b.classList.add('disabled'));
-  btns[task.correct].classList.add('correct');
-  const right = j === task.correct;
-  if (!right) btns[j].classList.add('wrong');
-  const fb = document.createElement('div');
-  fb.className = 'feedback ' + (right?'correct':'wrong');
-  fb.innerHTML = '<strong>' + (right?'✅ Correct.':'❌ Not quite.') + '</strong><br>' + escapeHtml(task.explanation);
-  el.appendChild(fb);
-  if (i === tasks.length-1) document.getElementById('doneBanner').style.display='block';
-}
-render();
+const CONFIG = {"cols":2,"rows":5,"seed":[{"cell":"A1","value":"Item"},{"cell":"B1","value":"Price"},{"cell":"A2","value":"Exercise Book"},{"cell":"B2","value":50},{"cell":"A3","value":"Biro Pen"},{"cell":"B3","value":20},{"cell":"A4","value":"Ruler"},{"cell":"B4","value":15}],"checks":[{"type":"bold_applied","label":"Bold formatting was applied to at least one cell"}]};
+new MTTI_GridSim(CONFIG).render('root');
 </script>
 </body>
 </html>

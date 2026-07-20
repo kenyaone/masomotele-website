@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Detection vs Classification (Lesson) | MTTI Artificial Intelligence</title>
+<link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Fredoka:wght@500;600&display=swap" rel="stylesheet">
+<style>
+* { margin:0; padding:0; box-sizing:border-box; }
+body { font-family:'Space Mono', monospace; background:linear-gradient(135deg,#1565C0 0%,#0D47A1 100%); min-height:100vh; padding:20px; color:#fff; }
+.container { max-width:820px; margin:0 auto; }
+.header { text-align:center; margin-bottom:24px; }
+.lesson-tag { display:inline-block; background:rgba(255,255,255,0.2); padding:6px 16px; border-radius:999px; font-size:0.85em; margin-bottom:12px; }
+.header h1 { font-family:'Fredoka', sans-serif; font-size:2em; margin-bottom:6px; text-shadow:3px 3px 0 rgba(0,0,0,0.2); }
+.card { background:#fff; color:#333; border-radius:22px; padding:32px; margin-bottom:20px; box-shadow:0 20px 60px rgba(0,0,0,0.3); }
+.section { margin-bottom:26px; }
+.section:last-child { margin-bottom:0; }
+.section h2 { font-family:'Fredoka', sans-serif; font-size:1.2em; margin-bottom:10px; color:#0D47A1; }
+.section .body { line-height:1.65; font-size:0.98em; }
+.section .body p { margin-bottom:10px; }
+.section .body code { background:#f5f7fb; padding:2px 6px; border-radius:4px; font-size:0.92em; }
+.keypoint { background:#fff8e1; border-left:4px solid #ffc107; padding:12px 16px; border-radius:8px; margin-top:12px; font-size:0.92em; }
+</style>
+</head>
+<body>
+<div class="container">
+<div class="header"><div class="lesson-tag">Module 5 · Lesson 5.2</div><h1>Common Computer Vision Tasks — Detection vs Classification</h1></div>
+<div class="card">
+<div class="section"><h2>Classification: What Is This Image, Overall?</h2><div class="body"><p>Image classification looks at a whole photo and gives it a single overall label. Rafiki Insights might build a classifier that sorts incoming photos as "receipt" or "invoice," or that labels a shelf photo as "fully stocked" or "needs restocking." Whatever is in the picture, classification answers just one question at a time, with one answer, for the whole image — it does not say where anything is, or how many of something there are.</p></div></div>
+<div class="section"><h2>Object Detection: What's In It, and Where?</h2><div class="body"><p>Object detection goes further: it finds one or more objects within a single image and reports both what they are and roughly where they are, usually marked with a box drawn around each one. A delivery-yard photo might be run through a detector that finds every crate in the frame, counts them, and marks each one's position — something a single overall label could never do.</p></div>
+<div class="keypoint"><strong>Key Point.</strong> Classification gives one label for the whole picture ("what is this, overall"). Object detection finds, counts and locates individual objects inside the picture ("what's here, and where"). Both start from the same pixel-pattern idea from the previous lesson — they just answer different questions.</div></div>
+<div class="section"><h2>Choosing the Right Task for the Business Question</h2><div class="body"><p>When a client describes what they want from a photo-based tool, the first thing Brian needs to work out is which question they are actually asking. If the answer they need is a single overall label — "is this a receipt or an invoice," "is this shelf okay or not" — that's classification. If the answer they need involves finding, counting, or locating several things within one photo — "how many sacks are stacked here, and roughly where" — that's object detection. Getting this right at the scoping stage saves Rafiki Insights from building the wrong tool and having to redo the work later.</p></div></div>
+</div>
+</div>
+</body>
+</html>

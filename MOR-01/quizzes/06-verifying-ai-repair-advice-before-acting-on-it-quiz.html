@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Verifying AI Repair Advice Before Acting On It | MTTI Mobile Repair</title>
+    <link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Fredoka:wght@500;600&display=swap" rel="stylesheet">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Space Mono', monospace; background: linear-gradient(135deg, #CB2D3E 0%, #EF473A 100%); min-height: 100vh; padding: 20px; color: #fff; }
+        .container { max-width: 900px; margin: 0 auto; }
+        .header { text-align: center; margin-bottom: 30px; }
+        .header .lesson-tag { display: inline-block; background: rgba(255,255,255,0.2); padding: 6px 16px; border-radius: 999px; font-size: 0.85em; margin-bottom: 12px; }
+        .header h1 { font-family: 'Fredoka', sans-serif; font-size: 2.2em; margin-bottom: 8px; text-shadow: 3px 3px 0 rgba(0,0,0,0.2); }
+        .score-board { background: rgba(255,255,255,0.15); backdrop-filter: blur(10px); border-radius: 20px; padding: 20px; margin-bottom: 20px; display: flex; justify-content: space-around; }
+        .score-item { text-align: center; }
+        .score-item .label { font-size: 0.85em; opacity: 0.9; margin-bottom: 4px; }
+        .score-item .value { font-size: 1.8em; font-weight: bold; font-family: 'Fredoka', sans-serif; }
+        .progress-bar { width: 100%; height: 8px; background: rgba(255,255,255,0.3); border-radius: 10px; margin-bottom: 25px; overflow: hidden; }
+        .progress-fill { height: 100%; background: linear-gradient(90deg, #EF473A 0%, #CB2D3E 100%); border-radius: 10px; transition: width 0.5s ease; width: 0%; }
+        .exercise-card { background: white; color: #333; border-radius: 25px; padding: 35px; margin-bottom: 20px; box-shadow: 0 20px 60px rgba(0,0,0,0.3); }
+        .scenario { background: linear-gradient(135deg, #fff8e1 0%, #ffecb3 100%); border-left: 5px solid #ffc107; padding: 20px 24px; border-radius: 12px; margin-bottom: 24px; font-size: 0.98em; line-height: 1.55; }
+        .scenario strong { color: #7a5a00; font-family: 'Fredoka', sans-serif; }
+        .question { font-size: 1.15em; margin-bottom: 20px; font-weight: 700; line-height: 1.4; }
+        .options { display: flex; flex-direction: column; gap: 12px; }
+        .option { background: #f5f7fb; border: 2px solid transparent; padding: 16px 20px; border-radius: 12px; cursor: pointer; transition: all 0.2s ease; font-family: 'Space Mono', monospace; font-size: 0.98em; text-align: left; }
+        .option:hover:not(.disabled) { background: #eef1fb; border-color: #CB2D3E; transform: translateX(4px); }
+        .option.correct { background: #d4edda; border-color: #28a745; color: #155724; }
+        .option.wrong { background: #f8d7da; border-color: #dc3545; color: #721c24; }
+        .option.disabled { cursor: not-allowed; opacity: 0.85; }
+        .feedback { margin-top: 22px; padding: 18px 22px; border-radius: 12px; font-size: 0.98em; line-height: 1.5; }
+        .feedback.correct { background: #d4edda; color: #155724; border-left: 4px solid #28a745; }
+        .feedback.wrong { background: #f8d7da; color: #721c24; border-left: 4px solid #dc3545; }
+        .next-btn, .restart-btn { margin-top: 20px; background: linear-gradient(135deg, #CB2D3E 0%, #EF473A 100%); color: white; border: none; padding: 14px 32px; border-radius: 12px; font-size: 1em; cursor: pointer; font-family: 'Fredoka', sans-serif; box-shadow: 0 6px 18px rgba(0,0,0,0.2); }
+        .results { text-align: center; padding: 25px 15px; }
+        .results h2 { font-family: 'Fredoka', sans-serif; font-size: 2em; margin-bottom: 12px; color: #333; }
+        .results .final-score { font-size: 3em; font-family: 'Fredoka', sans-serif; color: #CB2D3E; margin: 20px 0; }
+        .results p { color: #555; margin-bottom: 12px; }
+        .badge { display: inline-block; font-size: 3.5em; margin: 8px 0; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <div class="lesson-tag">AI Tools for Mobile Repair Technicians · Topic 3 of 3 · Quiz</div>
+            <h1>Verifying AI Repair Advice Before Acting On It</h1>
+        </div>
+        <div class="score-board">
+            <div class="score-item"><div class="label">Score</div><div class="value" id="score">0</div></div>
+            <div class="score-item"><div class="label">Question</div><div class="value"><span id="current">1</span>/<span id="total">8</span></div></div>
+            <div class="score-item"><div class="label">Streak</div><div class="value" id="streak">0</div></div>
+        </div>
+        <div class="progress-bar"><div class="progress-fill" id="progress"></div></div>
+        <div class="exercise-card" id="exerciseCard"></div>
+    </div>
+    <script>
+        const exercises = [{"scenario":"An AI assistant suggests Purity re-solder a specific pin on a charging IC to fix a phone that won't charge.","question":"What should Purity do before touching the board?","options":["Solder immediately, since the AI sounded confident","Cross-check the suggestion against the phone's service manual, schematic, or a senior technician first","Ignore the fault entirely","Tell the customer the phone cannot be fixed without trying anything"],"correct":1,"explanation":"Soldering is irreversible — it must be verified against a trusted, device-specific source before Purity acts on it."},{"scenario":"Purity notices the AI's confident tone when suggesting the repair step.","question":"What does a confident-sounding AI answer actually guarantee?","options":["That the answer is definitely correct","Nothing on its own — confidence in tone does not guarantee accuracy","That a senior technician has reviewed it","That it matches the official service manual"],"correct":1,"explanation":"AI assistants can sound confident while still being wrong, especially about very specific hardware details — tone is not proof of accuracy."},{"scenario":"The service manual for the exact device disagrees with the AI's suggested pin.","question":"Which source should Purity follow?","options":["The AI, because it was consulted first","The service manual, since it is verified and specific to that exact device","Whichever seems easier to perform","Neither, she should invent her own approach"],"correct":1,"explanation":"A verified, device-specific service manual outranks an unverified AI suggestion when the two conflict."},{"scenario":"Purity cannot find any official manual matching the AI's suggested repair step, and is not fully confident in it.","question":"What is the safest next step?","options":["Proceed anyway since time is limited","Ask a senior technician at QuickFix Phone Repairs before performing the irreversible step","Perform the step on a less important customer's phone first to test it","Tell the customer to accept whatever happens"],"correct":1,"explanation":"When verification isn't possible, escalating to a senior technician is the professional, safe choice before an irreversible action."},{"scenario":"A junior technician at another shop skipped verification and soldered a pin exactly as an AI suggested, permanently damaging a customer's board.","question":"What does this scenario illustrate?","options":["AI advice should always be followed exactly as given","Acting on unverified AI advice for an irreversible step can permanently destroy a device","The technician should have used a different AI tool instead","This kind of mistake can never actually happen"],"correct":1,"explanation":"This is exactly the risk of skipping verification on irreversible repair steps — real, permanent damage can result."},{"scenario":"Purity is deciding which repair steps most need a second source before acting.","question":"Which type of step needs the most caution?","options":["Wiping dust off the outer casing","An irreversible step such as soldering a specific pin or applying voltage to a test point","Charging the phone to check the battery percentage","Taking a photo of the phone before starting"],"correct":1,"explanation":"Irreversible, high-stakes steps like soldering or applying voltage carry the greatest risk if the AI's suggestion turns out to be wrong."},{"scenario":"Purity wants to build a reliable verify-before-acting habit at QuickFix Phone Repairs.","question":"What should that habit include?","options":["Note the AI's suggestion, check it against an official manual or trusted source, and ask a senior technician if still unsure","Act on every AI suggestion immediately to save time","Only verify steps that seem obviously risky","Skip verification once she has some experience"],"correct":0,"explanation":"A consistent habit of noting, verifying, and escalating when unsure protects both the customer's device and Purity's growing reputation as a technician."},{"scenario":"A customer asks Purity why she didn't just follow the AI's first suggestion directly.","question":"What is the best explanation Purity can give?","options":["Because AI is never useful for repairs","Because acting on unverified AI advice for an irreversible step risks permanently damaging their device, so she confirms it first","Because she doesn't trust any technology at all","Because it takes longer to follow the AI's advice"],"correct":1,"explanation":"The core reason for verification is protecting the customer's device from irreversible damage caused by an unverified, possibly wrong suggestion."}];
+        let currentQuestion = 0, score = 0, streak = 0, answered = false;
+        function updateScoreboard() {
+            document.getElementById('score').textContent = score;
+            document.getElementById('current').textContent = Math.min(currentQuestion + 1, exercises.length);
+            document.getElementById('total').textContent = exercises.length;
+            document.getElementById('streak').textContent = streak;
+            document.getElementById('progress').style.width = ((currentQuestion) / exercises.length) * 100 + '%';
+        }
+        function escapeHtml(s) { return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+        function renderQuestion() {
+            answered = false;
+            const q = exercises[currentQuestion];
+            let html = '';
+            if (q.scenario) html += `<div class="scenario"><strong>Scenario.</strong> ${escapeHtml(q.scenario)}</div>`;
+            html += `<div class="question">${escapeHtml(q.question)}</div>`;
+            html += '<div class="options">';
+            q.options.forEach((o, i) => { html += `<button class="option" onclick="selectAnswer(${i})">${escapeHtml(o)}</button>`; });
+            html += '</div>';
+            document.getElementById('exerciseCard').innerHTML = html;
+            updateScoreboard();
+        }
+        function selectAnswer(i) {
+            if (answered) return;
+            answered = true;
+            const q = exercises[currentQuestion];
+            const btns = document.querySelectorAll('.option');
+            btns.forEach(b => b.classList.add('disabled'));
+            btns[q.correct].classList.add('correct');
+            const right = i === q.correct;
+            if (!right) btns[i].classList.add('wrong');
+            if (right) { score += 10; streak += 1; } else { streak = 0; }
+            const fb = document.createElement('div');
+            fb.className = 'feedback ' + (right ? 'correct' : 'wrong');
+            fb.innerHTML = `<strong>${right ? 'Correct.' : 'Not quite.'}</strong><br>${escapeHtml(q.explanation)}`;
+            document.getElementById('exerciseCard').appendChild(fb);
+            const nb = document.createElement('button');
+            nb.className = 'next-btn';
+            nb.textContent = currentQuestion === exercises.length - 1 ? 'See results →' : 'Next scenario →';
+            nb.onclick = nextQuestion;
+            document.getElementById('exerciseCard').appendChild(nb);
+            updateScoreboard();
+        }
+        function nextQuestion() { currentQuestion++; if (currentQuestion >= exercises.length) return showResults(); renderQuestion(); }
+        function showResults() {
+            document.getElementById('progress').style.width = '100%';
+            const total = exercises.length * 10;
+            const pct = Math.round(score / total * 100);
+            if (window.parent) { window.parent.postMessage({type:"mtti_quiz_score", score: score, total: total, percent: pct}, "*"); }
+            let badge = '🌟', msg = 'Excellent work. You have a professional grasp of this lesson.';
+            if (pct < 50) { badge = '🌱'; msg = 'Good first attempt. Review the lesson and try again.'; }
+            else if (pct < 80) { badge = '📚'; msg = 'Solid progress. Review the scenarios you missed and retry.'; }
+            document.getElementById('exerciseCard').innerHTML = `
+                <div class="results">
+                    <span class="badge">${badge}</span>
+                    <h2>Quiz Complete</h2>
+                    <div class="final-score">${score} / ${total}</div>
+                    <p><strong>${pct}%</strong> · Longest streak: ${streak}</p>
+                    <p>${msg}</p>
+                    <button class="restart-btn" onclick="restart()">Try again 🔁</button>
+                </div>`;
+        }
+        function restart() { currentQuestion = 0; score = 0; streak = 0; renderQuestion(); }
+        renderQuestion();
+    </script>
+</body>
+</html>

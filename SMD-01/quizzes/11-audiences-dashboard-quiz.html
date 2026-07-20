@@ -1,0 +1,346 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Audiences: Core, Custom, and Lookalike | MTTI Digital Marketing</title>
+    <link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Fredoka:wght@500;600&display=swap" rel="stylesheet">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Space Mono', monospace;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh; padding: 20px; color: #fff;
+        }
+        .container { max-width: 900px; margin: 0 auto; }
+        .header { text-align: center; margin-bottom: 30px; animation: slideDown 0.6s ease-out; }
+        .header .lesson-tag {
+            display: inline-block; background: rgba(255,255,255,0.2);
+            padding: 6px 16px; border-radius: 999px;
+            font-size: 0.85em; margin-bottom: 12px;
+        }
+        .header h1 {
+            font-family: 'Fredoka', sans-serif; font-size: 2.2em;
+            margin-bottom: 8px; text-shadow: 3px 3px 0 rgba(0,0,0,0.2);
+        }
+        .header p { opacity: 0.95; font-size: 0.95em; }
+        .score-board {
+            background: rgba(255,255,255,0.15); backdrop-filter: blur(10px);
+            border-radius: 20px; padding: 20px; margin-bottom: 20px;
+            display: flex; justify-content: space-around;
+            animation: fadeIn 0.8s ease-out 0.2s both;
+        }
+        .score-item { text-align: center; }
+        .score-item .label { font-size: 0.85em; opacity: 0.9; margin-bottom: 4px; }
+        .score-item .value {
+            font-size: 1.8em; font-weight: bold; font-family: 'Fredoka', sans-serif;
+        }
+        .progress-bar {
+            width: 100%; height: 8px; background: rgba(255,255,255,0.3);
+            border-radius: 10px; margin-bottom: 25px; overflow: hidden;
+        }
+        .progress-fill {
+            height: 100%; background: linear-gradient(90deg, #f093fb 0%, #f5576c 100%);
+            border-radius: 10px; transition: width 0.5s ease; width: 0%;
+        }
+        .exercise-card {
+            background: white; color: #333; border-radius: 25px;
+            padding: 35px; margin-bottom: 20px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            animation: fadeIn 0.6s ease-out both;
+        }
+        .scenario {
+            background: linear-gradient(135deg, #fff8e1 0%, #ffecb3 100%);
+            border-left: 5px solid #ffc107;
+            padding: 20px 24px; border-radius: 12px;
+            margin-bottom: 24px;
+            font-size: 0.98em; line-height: 1.55;
+        }
+        .scenario strong { color: #7a5a00; font-family: 'Fredoka', sans-serif; }
+        .question {
+            font-size: 1.15em; margin-bottom: 20px;
+            font-weight: 700; line-height: 1.4;
+        }
+        .options { display: flex; flex-direction: column; gap: 12px; }
+        .option {
+            background: #f5f7fb; border: 2px solid transparent;
+            padding: 16px 20px; border-radius: 12px;
+            cursor: pointer; transition: all 0.2s ease;
+            font-family: 'Space Mono', monospace; font-size: 0.98em; text-align: left;
+        }
+        .option:hover:not(.disabled) {
+            background: #eef1fb; border-color: #667eea; transform: translateX(4px);
+        }
+        .option.correct { background: #d4edda; border-color: #28a745; color: #155724; }
+        .option.wrong { background: #f8d7da; border-color: #dc3545; color: #721c24; animation: shake 0.4s; }
+        .option.disabled { cursor: not-allowed; opacity: 0.85; }
+        .feedback {
+            margin-top: 22px; padding: 18px 22px; border-radius: 12px;
+            animation: slideUp 0.4s ease-out;
+            font-size: 0.98em; line-height: 1.5;
+        }
+        .feedback.correct { background: #d4edda; color: #155724; border-left: 4px solid #28a745; }
+        .feedback.wrong { background: #f8d7da; color: #721c24; border-left: 4px solid #dc3545; }
+        .feedback strong { font-family: 'Fredoka', sans-serif; }
+        .next-btn, .restart-btn {
+            margin-top: 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white; border: none;
+            padding: 14px 32px; border-radius: 12px;
+            font-size: 1em; cursor: pointer;
+            font-family: 'Fredoka', sans-serif;
+            box-shadow: 0 6px 18px rgba(0,0,0,0.2);
+            transition: transform 0.2s ease;
+        }
+        .next-btn:hover, .restart-btn:hover { transform: scale(1.04); }
+        .results {
+            text-align: center; padding: 25px 15px;
+            animation: bounceIn 0.6s ease-out;
+        }
+        .results h2 {
+            font-family: 'Fredoka', sans-serif; font-size: 2em;
+            margin-bottom: 12px; color: #333;
+        }
+        .results .final-score {
+            font-size: 3em; font-family: 'Fredoka', sans-serif;
+            color: #667eea; margin: 20px 0;
+        }
+        .results p { color: #555; margin-bottom: 12px; }
+        .badge { display: inline-block; font-size: 3.5em; margin: 8px 0; }
+        @keyframes slideDown { from { opacity: 0; transform: translateY(-30px); } to { opacity: 1; transform: translateY(0); } }
+        @keyframes fadeIn { from { opacity: 0; transform: scale(0.96); } to { opacity: 1; transform: scale(1); } }
+        @keyframes slideUp { from { opacity: 0; transform: translateY(15px); } to { opacity: 1; transform: translateY(0); } }
+        @keyframes shake { 0%,100% { transform: translateX(0); } 25% { transform: translateX(-8px); } 75% { transform: translateX(8px); } }
+        @keyframes bounceIn { 0% { opacity: 0; transform: scale(0.4); } 60% { transform: scale(1.05); } 100% { opacity: 1; transform: scale(1); } }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <div class="lesson-tag">Module 11 · Lesson 11.3</div>
+            <h1>Audiences: Core, Custom, and Lookalike</h1>
+            <p>10 scenarios — Sarah Chebet's retargeting stack and Wangari Kamau's B2B upload</p>
+        </div>
+
+        <div class="score-board">
+            <div class="score-item"><div class="label">Score</div><div class="value" id="score">0</div></div>
+            <div class="score-item"><div class="label">Question</div><div class="value"><span id="current">1</span>/<span id="total">10</span></div></div>
+            <div class="score-item"><div class="label">Streak</div><div class="value" id="streak">0</div></div>
+        </div>
+
+        <div class="progress-bar"><div class="progress-fill" id="progress"></div></div>
+
+        <div class="exercise-card" id="exerciseCard"></div>
+    </div>
+
+    <script>
+        const exercises = [
+  {
+    "scenario": "Sarah wants to build three audiences: (a) women 25-50 in Eldoret interested in food, (b) everyone who added a menu item to cart in the last 14 days without purchasing, and (c) tens of thousands of new Kenyan Meta users who resemble her 120 past purchasers.",
+    "question": "What are these three audience types called?",
+    "options": [
+      "(a) Custom · (b) Lookalike · (c) Core.",
+      "(a) Core · (b) Custom · (c) Lookalike.",
+      "(a) Lookalike · (b) Core · (c) Custom.",
+      "All three are called \"Advantage+ Audiences\"."
+    ],
+    "correct": 1,
+    "explanation": "Slide 2, 4, and 6 of §11.3: Core is Meta's data (location + demographics + interests), Custom is YOUR data (Pixel visitors, cart abandoners, uploaded lists), Lookalike is Meta finding new people who resemble a source Custom audience."
+  },
+  {
+    "scenario": "Sarah wants to target \"Kenyans with diabetes who need low-carb lunches\" as a Core audience interest — she saw this was possible three years ago.",
+    "question": "What is happening, and what should she do instead?",
+    "options": [
+      "Meta will let her — Kenyan users are exempt.",
+      "Meta has been removing sensitive detailed-targeting options (health, politics, religion, sexual orientation) since 2022 — that interest is gone and is not coming back. Sarah should build on broader Core signals (age + city + broad food interest) and let the Pixel + Learning Phase find the right sub-slice.",
+      "She should search harder — the interest is hidden.",
+      "She should target the entire population of Kenya."
+    ],
+    "correct": 1,
+    "explanation": "Slide 3 of §11.3 covers detailed-targeting shrinkage. Meta removed sensitive interests as a privacy response and it is not reversing. The professional move is broader Core targeting plus a strong Pixel — the algorithm finds the sub-slice better than a clever narrow interest ever could."
+  },
+  {
+    "scenario": "Sarah's Custom audience library has four pools: all website visitors (30 days), cart abandoners (14 days), purchasers (180 days), and video viewers who watched ≥75% of her lunch Reel.",
+    "question": "Which of these is the highest-ROI retargeting audience for a \"complete your order\" ad?",
+    "options": [
+      "All website visitors — biggest audience wins.",
+      "Cart abandoners in the last 14 days — they proved intent by choosing an item but did not complete, so a nudge ad has the strongest close rate.",
+      "Past purchasers — they already bought once, retarget them again with the same product.",
+      "Video viewers — video watching means they must be about to buy."
+    ],
+    "correct": 1,
+    "explanation": "Slide 5 of §11.3 gives cart abandoners as the highest-ROI retargeting audience. Demonstrated intent + no purchase = warmest possible nudge target. Retargeting purchasers is loyalty/upsell work, not maximum-ROI retargeting."
+  },
+  {
+    "scenario": "Sarah is running a cold prospecting campaign to acquire NEW customers. Her current setup targets \"All website visitors, last 30 days\" as the campaign audience.",
+    "question": "What is wrong, and what should she change?",
+    "options": [
+      "Nothing — website visitors are perfect for cold prospecting.",
+      "Website visitors are a retargeting audience, not a cold-prospecting audience. Cold prospecting needs Core (Meta's data) or Lookalike (new people who resemble her purchasers). She should also EXCLUDE all purchasers from the cold campaign so budget never re-sells to loyal customers.",
+      "She should widen the audience to \"all of Kenya\" and pay for reach.",
+      "She should use App Promotion instead."
+    ],
+    "correct": 1,
+    "explanation": "Slide 5 of §11.3: cold prospecting = Core or Lookalike. Retargeting = Custom (visitors, cart abandoners). Always EXCLUDE purchasers from the cold campaign so budget is not wasted re-selling to people who already bought. Two separate campaign structures."
+  },
+  {
+    "scenario": "Sarah wants to build a Lookalike audience of her 120 past purchasers, targeting Kenya at 1-3% similarity.",
+    "question": "Which of Meta's Lookalike rules is she breaking, if any?",
+    "options": [
+      "None — 120 people, one country, 1-3% similarity, purchaser-based source all follow the four Lookalike rules.",
+      "She needs at least 1,000 people in the source.",
+      "Lookalikes cannot be built in Kenya.",
+      "She must use 10% similarity."
+    ],
+    "correct": 0,
+    "explanation": "Slide 6 of §11.3 lists the four rules: source ≥ 100 people (she has 120 ✓), one country per Lookalike (Kenya ✓), similarity 1-10% (1-3% ✓), purchasers beat visitors as source (purchasers ✓). All four rules satisfied. This is a textbook Lookalike setup."
+  },
+  {
+    "scenario": "Wangari of Wangari Wellness has a spreadsheet of 250 HR Directors she has met at Nairobi conferences. Contract sizes are KES 200,000-500,000 each. She wants to run brand-awareness ads to exactly these 250 people on Meta.",
+    "question": "What is the right audience type, and what does she do?",
+    "options": [
+      "Core audience — she picks \"HR Director\" as a job title.",
+      "Custom audience from a customer list. She uploads the spreadsheet (email + phone + first name) via Business Manager's customer-list flow — Meta hashes the values with SHA-256 on her machine before upload — and matches ~60-70% of the list. She then runs ads to the ~170 matched HR Directors.",
+      "Lookalike audience of the 250 people.",
+      "There is no way to do this on Meta."
+    ],
+    "correct": 1,
+    "explanation": "Slide 7 of §11.3 walks through Wangari's B2B workflow. Uploaded customer lists are Custom audiences. Business Manager hashes with SHA-256 automatically, matches ~60-70% typically, and the resulting audience is used exactly like any other Custom audience. Runs alongside her LinkedIn campaigns from §5.5."
+  },
+  {
+    "scenario": "Wangari uploads her spreadsheet with a column of raw (unhashed) email addresses. Business Manager warns her.",
+    "question": "What does the Kenya Data Protection Act 2019 require here?",
+    "options": [
+      "Raw email is fine as long as she trusts Meta.",
+      "Three obligations: (1) documented lawful basis — usually consent from every person on the list; (2) all PII must be hashed with SHA-256 before upload (Business Manager does this by default); (3) she must honour deletion requests within 30 days. Breach fines reach KES 5,000,000 per breach.",
+      "The DPA only applies to Meta, not to Wangari.",
+      "She should upload raw phone numbers instead."
+    ],
+    "correct": 1,
+    "explanation": "Slide 8 of §11.3 covers the three DPA 2019 rules on uploaded PII: lawful basis (consent), SHA-256 hashing, and 30-day deletion right. The Office of the Data Protection Commissioner enforces with fines up to KES 5,000,000. Business Manager's customer-list tool hashes automatically — but any manual pipeline that skips hashing violates the DPA."
+  },
+  {
+    "scenario": "Sarah is looking at her four Custom audiences: website visitors 30 days (~800), cart abandoners 14 days (~40), purchasers 180 days (~120), video viewers ≥75% (~200).",
+    "question": "Which of the four is BELOW the minimum size required to build a Lookalike from it?",
+    "options": [
+      "Cart abandoners — 40 people is below the ≥100 minimum for Lookalike source.",
+      "All four are large enough.",
+      "Purchasers — 120 is too few.",
+      "Video viewers — 200 is too few."
+    ],
+    "correct": 0,
+    "explanation": "Slide 6 of §11.3: Lookalike source must be at least 100 people. Cart abandoners at 40 is below the threshold. Website visitors (800), purchasers (120), and video viewers (200) all qualify. Sarah's best Lookalike source is her purchasers — Meta learns from higher-value signal."
+  },
+  {
+    "scenario": "A trainee argues that Wangari's LinkedIn B2B campaigns (from §5.5) make the Meta B2B upload pointless — \"HR Directors are on LinkedIn, not Facebook\".",
+    "question": "What is the professional read?",
+    "options": [
+      "The trainee is right — skip Meta for B2B.",
+      "The trainee is wrong. HR Directors are humans — most also have Facebook and Instagram accounts. Wangari's ~170 matched Meta users see brand-awareness Meta ads while her LinkedIn Lead Gen Forms do the direct-response work. Two channels, complementary roles.",
+      "The trainee is right — but only in Nairobi.",
+      "The trainee is right — Meta blocks B2B ads."
+    ],
+    "correct": 1,
+    "explanation": "Slide 7 of §11.3: Wangari's Meta uploaded-list audience runs warmth-building ads to the same decision-makers she pitches on LinkedIn. Multi-channel presence increases brand recall and lifts LinkedIn response rates. Meta and LinkedIn are complementary for B2B, not substitutes."
+  },
+  {
+    "scenario": "A trainee summarises Lesson 11.3 in one line: \"Meta has two audience types, Lookalike must have at least 10 people in the source, and uploaded emails should be sent raw for best matching.\"",
+    "question": "How many of those three claims are correct?",
+    "options": [
+      "All three.",
+      "Two — the audience types and Lookalike parts.",
+      "Zero — every claim is wrong.",
+      "One — only the raw email part."
+    ],
+    "correct": 2,
+    "explanation": "Every claim is wrong. Meta has THREE audience types — Core, Custom, Lookalike (Slide 2/4/6). Lookalike source must be at least 100 people, not 10 (Slide 6). Uploaded emails MUST be hashed with SHA-256 before upload — never raw — both under Meta's terms and Kenya DPA 2019 (Slide 8)."
+  }
+];
+
+        let currentQuestion = 0, score = 0, streak = 0, answered = false;
+
+        function updateScoreboard() {
+            document.getElementById('score').textContent = score;
+            document.getElementById('current').textContent = Math.min(currentQuestion + 1, exercises.length);
+            document.getElementById('total').textContent = exercises.length;
+            document.getElementById('streak').textContent = streak;
+            document.getElementById('progress').style.width = ((currentQuestion) / exercises.length) * 100 + '%';
+        }
+
+        function escapeHtml(s) {
+            return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+        }
+
+        function renderQuestion() {
+            answered = false;
+            const q = exercises[currentQuestion];
+            let html = '';
+            if (q.scenario) {
+                html += `<div class="scenario"><strong>Scenario.</strong> ${escapeHtml(q.scenario)}</div>`;
+            }
+            html += `<div class="question">${escapeHtml(q.question)}</div>`;
+            html += '<div class="options">';
+            q.options.forEach((o, i) => {
+                html += `<button class="option" onclick="selectAnswer(${i})">${escapeHtml(o)}</button>`;
+            });
+            html += '</div>';
+            document.getElementById('exerciseCard').innerHTML = html;
+            updateScoreboard();
+        }
+
+        function selectAnswer(i) {
+            if (answered) return;
+            answered = true;
+            const q = exercises[currentQuestion];
+            const btns = document.querySelectorAll('.option');
+            btns.forEach(b => b.classList.add('disabled'));
+            btns[q.correct].classList.add('correct');
+            const right = i === q.correct;
+            if (!right) btns[i].classList.add('wrong');
+            if (right) { score += 10; streak += 1; } else { streak = 0; }
+            const fb = document.createElement('div');
+            fb.className = 'feedback ' + (right ? 'correct' : 'wrong');
+            fb.innerHTML = `<strong>${right ? '✅ Correct.' : '❌ Not quite.'}</strong><br>${escapeHtml(q.explanation)}`;
+            document.getElementById('exerciseCard').appendChild(fb);
+            const nb = document.createElement('button');
+            nb.className = 'next-btn';
+            nb.textContent = currentQuestion === exercises.length - 1 ? 'See results →' : 'Next scenario →';
+            nb.onclick = nextQuestion;
+            document.getElementById('exerciseCard').appendChild(nb);
+            updateScoreboard();
+        }
+
+        function nextQuestion() {
+            currentQuestion++;
+            if (currentQuestion >= exercises.length) return showResults();
+            renderQuestion();
+        }
+
+        function showResults() {
+            document.getElementById('progress').style.width = '100%';
+            const total = exercises.length * 10;
+            const pct = Math.round(score / total * 100);
+            if (window.parent) { window.parent.postMessage({type:"mtti_quiz_score", score: score, total: total, percent: pct}, "*"); }
+            let badge = '🌟', msg = 'Excellent work. You have a professional grasp of this lesson.';
+            if (pct < 50) { badge = '🌱'; msg = 'Good first attempt. Re-watch the lesson video and try again.'; }
+            else if (pct < 80) { badge = '📚'; msg = 'Solid progress. Review the scenarios you missed and retry.'; }
+            document.getElementById('exerciseCard').innerHTML = `
+                <div class="results">
+                    <span class="badge">${badge}</span>
+                    <h2>Quiz Complete</h2>
+                    <div class="final-score">${score} / ${total}</div>
+                    <p><strong>${pct}%</strong> · Longest streak: ${streak}</p>
+                    <p>${msg}</p>
+                    <button class="restart-btn" onclick="restart()">Try again 🔁</button>
+                </div>`;
+        }
+
+        function restart() {
+            currentQuestion = 0; score = 0; streak = 0;
+            renderQuestion();
+        }
+
+        renderQuestion();
+    </script>
+</body>
+</html>

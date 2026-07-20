@@ -1,0 +1,346 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Engagement, Lead Generation & Sales | MTTI Digital Marketing</title>
+    <link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Fredoka:wght@500;600&display=swap" rel="stylesheet">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Space Mono', monospace;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh; padding: 20px; color: #fff;
+        }
+        .container { max-width: 900px; margin: 0 auto; }
+        .header { text-align: center; margin-bottom: 30px; animation: slideDown 0.6s ease-out; }
+        .header .lesson-tag {
+            display: inline-block; background: rgba(255,255,255,0.2);
+            padding: 6px 16px; border-radius: 999px;
+            font-size: 0.85em; margin-bottom: 12px;
+        }
+        .header h1 {
+            font-family: 'Fredoka', sans-serif; font-size: 2.2em;
+            margin-bottom: 8px; text-shadow: 3px 3px 0 rgba(0,0,0,0.2);
+        }
+        .header p { opacity: 0.95; font-size: 0.95em; }
+        .score-board {
+            background: rgba(255,255,255,0.15); backdrop-filter: blur(10px);
+            border-radius: 20px; padding: 20px; margin-bottom: 20px;
+            display: flex; justify-content: space-around;
+            animation: fadeIn 0.8s ease-out 0.2s both;
+        }
+        .score-item { text-align: center; }
+        .score-item .label { font-size: 0.85em; opacity: 0.9; margin-bottom: 4px; }
+        .score-item .value {
+            font-size: 1.8em; font-weight: bold; font-family: 'Fredoka', sans-serif;
+        }
+        .progress-bar {
+            width: 100%; height: 8px; background: rgba(255,255,255,0.3);
+            border-radius: 10px; margin-bottom: 25px; overflow: hidden;
+        }
+        .progress-fill {
+            height: 100%; background: linear-gradient(90deg, #f093fb 0%, #f5576c 100%);
+            border-radius: 10px; transition: width 0.5s ease; width: 0%;
+        }
+        .exercise-card {
+            background: white; color: #333; border-radius: 25px;
+            padding: 35px; margin-bottom: 20px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            animation: fadeIn 0.6s ease-out both;
+        }
+        .scenario {
+            background: linear-gradient(135deg, #fff8e1 0%, #ffecb3 100%);
+            border-left: 5px solid #ffc107;
+            padding: 20px 24px; border-radius: 12px;
+            margin-bottom: 24px;
+            font-size: 0.98em; line-height: 1.55;
+        }
+        .scenario strong { color: #7a5a00; font-family: 'Fredoka', sans-serif; }
+        .question {
+            font-size: 1.15em; margin-bottom: 20px;
+            font-weight: 700; line-height: 1.4;
+        }
+        .options { display: flex; flex-direction: column; gap: 12px; }
+        .option {
+            background: #f5f7fb; border: 2px solid transparent;
+            padding: 16px 20px; border-radius: 12px;
+            cursor: pointer; transition: all 0.2s ease;
+            font-family: 'Space Mono', monospace; font-size: 0.98em; text-align: left;
+        }
+        .option:hover:not(.disabled) {
+            background: #eef1fb; border-color: #667eea; transform: translateX(4px);
+        }
+        .option.correct { background: #d4edda; border-color: #28a745; color: #155724; }
+        .option.wrong { background: #f8d7da; border-color: #dc3545; color: #721c24; animation: shake 0.4s; }
+        .option.disabled { cursor: not-allowed; opacity: 0.85; }
+        .feedback {
+            margin-top: 22px; padding: 18px 22px; border-radius: 12px;
+            animation: slideUp 0.4s ease-out;
+            font-size: 0.98em; line-height: 1.5;
+        }
+        .feedback.correct { background: #d4edda; color: #155724; border-left: 4px solid #28a745; }
+        .feedback.wrong { background: #f8d7da; color: #721c24; border-left: 4px solid #dc3545; }
+        .feedback strong { font-family: 'Fredoka', sans-serif; }
+        .next-btn, .restart-btn {
+            margin-top: 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white; border: none;
+            padding: 14px 32px; border-radius: 12px;
+            font-size: 1em; cursor: pointer;
+            font-family: 'Fredoka', sans-serif;
+            box-shadow: 0 6px 18px rgba(0,0,0,0.2);
+            transition: transform 0.2s ease;
+        }
+        .next-btn:hover, .restart-btn:hover { transform: scale(1.04); }
+        .results {
+            text-align: center; padding: 25px 15px;
+            animation: bounceIn 0.6s ease-out;
+        }
+        .results h2 {
+            font-family: 'Fredoka', sans-serif; font-size: 2em;
+            margin-bottom: 12px; color: #333;
+        }
+        .results .final-score {
+            font-size: 3em; font-family: 'Fredoka', sans-serif;
+            color: #667eea; margin: 20px 0;
+        }
+        .results p { color: #555; margin-bottom: 12px; }
+        .badge { display: inline-block; font-size: 3.5em; margin: 8px 0; }
+        @keyframes slideDown { from { opacity: 0; transform: translateY(-30px); } to { opacity: 1; transform: translateY(0); } }
+        @keyframes fadeIn { from { opacity: 0; transform: scale(0.96); } to { opacity: 1; transform: scale(1); } }
+        @keyframes slideUp { from { opacity: 0; transform: translateY(15px); } to { opacity: 1; transform: translateY(0); } }
+        @keyframes shake { 0%,100% { transform: translateX(0); } 25% { transform: translateX(-8px); } 75% { transform: translateX(8px); } }
+        @keyframes bounceIn { 0% { opacity: 0; transform: scale(0.4); } 60% { transform: scale(1.05); } 100% { opacity: 1; transform: scale(1); } }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <div class="lesson-tag">Module 4 · Lesson 4.3</div>
+            <h1>Engagement, Lead Generation & Sales</h1>
+            <p>10 Karibu Kitchen scenarios — handle complaints, run CTAs, and convert followers to orders</p>
+        </div>
+
+        <div class="score-board">
+            <div class="score-item"><div class="label">Score</div><div class="value" id="score">0</div></div>
+            <div class="score-item"><div class="label">Question</div><div class="value"><span id="current">1</span>/<span id="total">10</span></div></div>
+            <div class="score-item"><div class="label">Streak</div><div class="value" id="streak">0</div></div>
+        </div>
+
+        <div class="progress-bar"><div class="progress-fill" id="progress"></div></div>
+
+        <div class="exercise-card" id="exerciseCard"></div>
+    </div>
+
+    <script>
+        const exercises = [
+  {
+    "scenario": "Yesterday afternoon a customer wrote on Karibu Kitchen's Facebook Page: \"This food is disgusting. Do not order here.\" It has been up 12 hours. 34 people have seen it. 1 person liked it. Sarah's first instinct is to delete it, her second is to reply angrily.",
+    "question": "Which professional response does Lesson 4.3 teach?",
+    "options": [
+      "Delete the comment immediately.",
+      "Reply angrily in public — customers respect a firm defence.",
+      "Do neither. Reply within two hours with three sentences: (1) acknowledge with empathy — \"I am so sorry your meal was not up to our standards\"; (2) offer to make it right — \"This is not the experience we want any customer to have\"; (3) take it offline — \"Please DM me the details of your order — I would like to make it right personally. Sarah.\"",
+      "Ignore it — it will disappear."
+    ],
+    "correct": 2,
+    "explanation": "Section 4.3 walks through this exact three-sentence formula: acknowledge, offer, take offline. Delete is worse than the comment. Angry replies live forever in screenshots. Silence lets 34 watchers assume it is true. The professional reply turns the angry comment into a public testimonial."
+  },
+  {
+    "scenario": "You are teaching Sarah the four engagement principles that govern every reply — positive or negative — on Karibu Kitchen's accounts.",
+    "question": "Which set matches Lesson 4.3?",
+    "options": [
+      "Reply within 24 hours (faster if possible), use an appropriate tone (professional but personable — sound like yourself on your best day), NEVER delete a negative comment unless it contains abuse/threats/spam, take sensitive issues offline (publicly acknowledge, privately resolve).",
+      "Delete first, ask questions later.",
+      "Reply once a week, in legalistic tone, delete all criticism, argue publicly.",
+      "Never reply — let followers argue among themselves."
+    ],
+    "correct": 0,
+    "explanation": "Section 4.3 names these four principles exactly: 24-hour reply window, appropriate tone, never delete legitimate negative comments (deletion is a red flag every customer notices), take sensitive issues offline. Silence is worse than any reply."
+  },
+  {
+    "scenario": "Sarah's phone is silent all day. She has notifications turned off completely on Facebook, Instagram, and Google Business Profile because \"they were annoying\". Two complaints, one DM enquiry about a corporate lunch order worth KES 12,000, and a five-star review have gone unnoticed for three days.",
+    "question": "Which three notifications does Lesson 4.3 say must stay ON?",
+    "options": [
+      "None — silence is professional.",
+      "Alerts when the Business Page is mentioned by another user, alerts on every new comment on any post, alerts on every direct message. If quiet, keep sound on; if busy, mute sound but keep the badge — never turn them all off.",
+      "Only alerts on likes.",
+      "Only alerts on new followers."
+    ],
+    "correct": 1,
+    "explanation": "Section 4.3 names these three notifications. A single missed complaint can become tomorrow's viral scandal; a single missed DM can be a KES 12,000 order lost. Mute the sound if you must, but keep the badge visible."
+  },
+  {
+    "scenario": "Sarah posted a stunning photo of ugali and beef stew, and got 89 likes. Not one person messaged her to order. Her caption ended with: \"Yummy.\"",
+    "question": "What is Lesson 4.3's diagnosis?",
+    "options": [
+      "The photo was not good enough.",
+      "There was no call to action (CTA). Every business post needs a specific instruction to the reader — \"Get a quote\", \"Sign up now\", \"Order now\", \"Send us a DM\", \"Tag a friend who needs this\", \"Comment YES if you agree\". Beautiful photos without CTAs produce likes, not orders.",
+      "She posted at the wrong time.",
+      "She should not have used a photo."
+    ],
+    "correct": 1,
+    "explanation": "Section 4.3 is explicit: every business post — every single one — needs a CTA. Six formulas are listed. Without one, the reader admires the photo and scrolls on. The post did its job on step one (awareness) but did not activate step three (conversion)."
+  },
+  {
+    "scenario": "Sarah is picking a CTA for a Karibu Kitchen delivery post about the Kapsoya route.",
+    "question": "Which set from Lesson 4.3's six CTA formulas fits a direct food-order post best?",
+    "options": [
+      "\"Order now\", \"Send us a DM\", \"Comment YES if you want tomorrow's menu\".",
+      "\"Please read my whitepaper on chapati economics\".",
+      "\"Buy stock in our restaurant\".",
+      "Do not use any CTA — customers know what to do."
+    ],
+    "correct": 0,
+    "explanation": "Section 4.3 lists six CTAs: \"Get a quote\", \"Sign up now\", \"Order now\", \"Send us a DM\", \"Tag a friend who needs this\", \"Comment YES if you agree\". Options 2 and 3 are off-strategy; option 4 is the mistake being corrected."
+  },
+  {
+    "scenario": "Sarah has 3,400 Facebook followers. Only 8 orders came from Facebook last month. Her cousin blames the algorithm.",
+    "question": "Which step in Lesson 4.3's three-step path from follower to customer is likely broken?",
+    "options": [
+      "Step 1 — awareness. She needs another 30,000 followers.",
+      "Step 3 — conversion. Most businesses focus only on awareness and wonder why followers do not become customers. The real work is in step three: every DM is an opportunity — reply within 30 minutes, send the menu, quote the delivery fee, confirm the order, take the payment.",
+      "Step 2 — engagement.",
+      "None — 8 orders is enough."
+    ],
+    "correct": 1,
+    "explanation": "Section 4.3's three-step path is awareness → engagement → conversion. Most businesses over-invest in step one. Sarah has awareness (3,400 followers) but is losing at conversion. The lesson prescribes a 30-minute DM reply, menu, delivery fee, confirmation, payment. That is how a follower becomes a KES 500 receipt."
+  },
+  {
+    "scenario": "Every Monday Sarah's competitor Nyakinyua Kitchen leaves comments under her posts saying \"Better food at Nyakinyua.\" She wants to delete every comment on sight.",
+    "question": "What does Lesson 4.3 prescribe as the professional escalation?",
+    "options": [
+      "Delete immediately — always.",
+      "Reply with insults.",
+      "Report the comments as spam through Facebook's official reporting tool with screenshot evidence. Do this for two weeks. If Facebook does not act, then — and only then — mute or restrict Nyakinyua's account so future comments do not appear on her Page. Deletion is reserved for genuine abuse.",
+      "Post fake reviews of Nyakinyua Kitchen in retaliation."
+    ],
+    "correct": 2,
+    "explanation": "Section 4.3's competitor-spam ladder: report first (with evidence), mute/restrict second, delete only for genuine abuse. Deletion looks defensive; retaliation is unprofessional and traceable; reporting is the platform's designed remedy."
+  },
+  {
+    "scenario": "Sarah does receive a DM about a corporate lunch order — 40 boxes, KES 400 each — but she is busy with the kitchen and does not reply until Wednesday. By then the enquirer has ordered elsewhere.",
+    "question": "Which Lesson 4.3 principle failed?",
+    "options": [
+      "Reply timing — every DM is an opportunity, and the target reply window for orders is 30 minutes. The 24-hour engagement principle is the outer bound for public comments; DMs about active orders should be handled faster.",
+      "The offering was wrong.",
+      "The DM was fake.",
+      "Corporate customers do not use DMs."
+    ],
+    "correct": 0,
+    "explanation": "Section 4.3 sets the 30-minute reply target for DMs in the conversion step — \"every DM Sarah receives is an opportunity\". The 24-hour rule is for public comments as the OUTER limit; DMs about live orders are the priority above all. A KES 16,000 order lost to slow reply is a preventable loss."
+  },
+  {
+    "scenario": "A customer posts a comment on Karibu Kitchen containing personal contact details, a complaint about a specific order, and an accusation about food safety.",
+    "question": "According to Lesson 4.3, what is the professional path?",
+    "options": [
+      "Reply in public with every private detail.",
+      "Publicly acknowledge briefly (empathy + ownership) and take the sensitive issue offline into DM or email to resolve. Publicly acknowledge, privately resolve.",
+      "Delete the comment because it mentions food safety.",
+      "Ignore it — food safety complaints resolve themselves."
+    ],
+    "correct": 1,
+    "explanation": "Section 4.3's fourth engagement principle: publicly acknowledge, privately resolve. The public reply shows every watcher that Sarah takes the issue seriously; the private DM handles the confidential details and specifics. Deletion looks like a cover-up; broadcasting private details violates the customer's privacy under the DPA 2019."
+  },
+  {
+    "scenario": "Sarah says: \"Fine, I will reply. But when? I am cooking from 6am to 8pm.\"",
+    "question": "What reply-time standard does Lesson 4.3 set, and how should she operationalise it?",
+    "options": [
+      "Reply once a month.",
+      "Reply within 24 hours (faster if possible) to every comment, positive or negative. Combined with notifications turned on for mentions/comments/DMs, Sarah can batch her replies during two short windows a day — one before lunch service and one after dinner service.",
+      "Only reply on Sundays.",
+      "Never reply — let followers argue among themselves."
+    ],
+    "correct": 1,
+    "explanation": "Section 4.3 sets 24 hours as the maximum reply window, faster if possible. Combined with the notifications section, this makes reply management sustainable for a working owner — two windows a day is enough to hit the 24-hour target without pulling her out of the kitchen constantly."
+  }
+];
+
+        let currentQuestion = 0, score = 0, streak = 0, answered = false;
+
+        function updateScoreboard() {
+            document.getElementById('score').textContent = score;
+            document.getElementById('current').textContent = Math.min(currentQuestion + 1, exercises.length);
+            document.getElementById('total').textContent = exercises.length;
+            document.getElementById('streak').textContent = streak;
+            document.getElementById('progress').style.width = ((currentQuestion) / exercises.length) * 100 + '%';
+        }
+
+        function escapeHtml(s) {
+            return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+        }
+
+        function renderQuestion() {
+            answered = false;
+            const q = exercises[currentQuestion];
+            let html = '';
+            if (q.scenario) {
+                html += `<div class="scenario"><strong>Scenario.</strong> ${escapeHtml(q.scenario)}</div>`;
+            }
+            html += `<div class="question">${escapeHtml(q.question)}</div>`;
+            html += '<div class="options">';
+            q.options.forEach((o, i) => {
+                html += `<button class="option" onclick="selectAnswer(${i})">${escapeHtml(o)}</button>`;
+            });
+            html += '</div>';
+            document.getElementById('exerciseCard').innerHTML = html;
+            updateScoreboard();
+        }
+
+        function selectAnswer(i) {
+            if (answered) return;
+            answered = true;
+            const q = exercises[currentQuestion];
+            const btns = document.querySelectorAll('.option');
+            btns.forEach(b => b.classList.add('disabled'));
+            btns[q.correct].classList.add('correct');
+            const right = i === q.correct;
+            if (!right) btns[i].classList.add('wrong');
+            if (right) { score += 10; streak += 1; } else { streak = 0; }
+            const fb = document.createElement('div');
+            fb.className = 'feedback ' + (right ? 'correct' : 'wrong');
+            fb.innerHTML = `<strong>${right ? '✅ Correct.' : '❌ Not quite.'}</strong><br>${escapeHtml(q.explanation)}`;
+            document.getElementById('exerciseCard').appendChild(fb);
+            const nb = document.createElement('button');
+            nb.className = 'next-btn';
+            nb.textContent = currentQuestion === exercises.length - 1 ? 'See results →' : 'Next scenario →';
+            nb.onclick = nextQuestion;
+            document.getElementById('exerciseCard').appendChild(nb);
+            updateScoreboard();
+        }
+
+        function nextQuestion() {
+            currentQuestion++;
+            if (currentQuestion >= exercises.length) return showResults();
+            renderQuestion();
+        }
+
+        function showResults() {
+            document.getElementById('progress').style.width = '100%';
+            const total = exercises.length * 10;
+            const pct = Math.round(score / total * 100);
+            if (window.parent) { window.parent.postMessage({type:"mtti_quiz_score", score: score, total: total, percent: pct}, "*"); }
+            let badge = '🌟', msg = 'Excellent work. You have a professional grasp of this lesson.';
+            if (pct < 50) { badge = '🌱'; msg = 'Good first attempt. Re-watch the lesson video and try again.'; }
+            else if (pct < 80) { badge = '📚'; msg = 'Solid progress. Review the scenarios you missed and retry.'; }
+            document.getElementById('exerciseCard').innerHTML = `
+                <div class="results">
+                    <span class="badge">${badge}</span>
+                    <h2>Quiz Complete</h2>
+                    <div class="final-score">${score} / ${total}</div>
+                    <p><strong>${pct}%</strong> · Longest streak: ${streak}</p>
+                    <p>${msg}</p>
+                    <button class="restart-btn" onclick="restart()">Try again 🔁</button>
+                </div>`;
+        }
+
+        function restart() {
+            currentQuestion = 0; score = 0; streak = 0;
+            renderQuestion();
+        }
+
+        renderQuestion();
+    </script>
+</body>
+</html>

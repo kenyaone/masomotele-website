@@ -1,0 +1,346 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Business Manager and Account Structure | MTTI Digital Marketing</title>
+    <link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Fredoka:wght@500;600&display=swap" rel="stylesheet">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Space Mono', monospace;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh; padding: 20px; color: #fff;
+        }
+        .container { max-width: 900px; margin: 0 auto; }
+        .header { text-align: center; margin-bottom: 30px; animation: slideDown 0.6s ease-out; }
+        .header .lesson-tag {
+            display: inline-block; background: rgba(255,255,255,0.2);
+            padding: 6px 16px; border-radius: 999px;
+            font-size: 0.85em; margin-bottom: 12px;
+        }
+        .header h1 {
+            font-family: 'Fredoka', sans-serif; font-size: 2.2em;
+            margin-bottom: 8px; text-shadow: 3px 3px 0 rgba(0,0,0,0.2);
+        }
+        .header p { opacity: 0.95; font-size: 0.95em; }
+        .score-board {
+            background: rgba(255,255,255,0.15); backdrop-filter: blur(10px);
+            border-radius: 20px; padding: 20px; margin-bottom: 20px;
+            display: flex; justify-content: space-around;
+            animation: fadeIn 0.8s ease-out 0.2s both;
+        }
+        .score-item { text-align: center; }
+        .score-item .label { font-size: 0.85em; opacity: 0.9; margin-bottom: 4px; }
+        .score-item .value {
+            font-size: 1.8em; font-weight: bold; font-family: 'Fredoka', sans-serif;
+        }
+        .progress-bar {
+            width: 100%; height: 8px; background: rgba(255,255,255,0.3);
+            border-radius: 10px; margin-bottom: 25px; overflow: hidden;
+        }
+        .progress-fill {
+            height: 100%; background: linear-gradient(90deg, #f093fb 0%, #f5576c 100%);
+            border-radius: 10px; transition: width 0.5s ease; width: 0%;
+        }
+        .exercise-card {
+            background: white; color: #333; border-radius: 25px;
+            padding: 35px; margin-bottom: 20px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            animation: fadeIn 0.6s ease-out both;
+        }
+        .scenario {
+            background: linear-gradient(135deg, #fff8e1 0%, #ffecb3 100%);
+            border-left: 5px solid #ffc107;
+            padding: 20px 24px; border-radius: 12px;
+            margin-bottom: 24px;
+            font-size: 0.98em; line-height: 1.55;
+        }
+        .scenario strong { color: #7a5a00; font-family: 'Fredoka', sans-serif; }
+        .question {
+            font-size: 1.15em; margin-bottom: 20px;
+            font-weight: 700; line-height: 1.4;
+        }
+        .options { display: flex; flex-direction: column; gap: 12px; }
+        .option {
+            background: #f5f7fb; border: 2px solid transparent;
+            padding: 16px 20px; border-radius: 12px;
+            cursor: pointer; transition: all 0.2s ease;
+            font-family: 'Space Mono', monospace; font-size: 0.98em; text-align: left;
+        }
+        .option:hover:not(.disabled) {
+            background: #eef1fb; border-color: #667eea; transform: translateX(4px);
+        }
+        .option.correct { background: #d4edda; border-color: #28a745; color: #155724; }
+        .option.wrong { background: #f8d7da; border-color: #dc3545; color: #721c24; animation: shake 0.4s; }
+        .option.disabled { cursor: not-allowed; opacity: 0.85; }
+        .feedback {
+            margin-top: 22px; padding: 18px 22px; border-radius: 12px;
+            animation: slideUp 0.4s ease-out;
+            font-size: 0.98em; line-height: 1.5;
+        }
+        .feedback.correct { background: #d4edda; color: #155724; border-left: 4px solid #28a745; }
+        .feedback.wrong { background: #f8d7da; color: #721c24; border-left: 4px solid #dc3545; }
+        .feedback strong { font-family: 'Fredoka', sans-serif; }
+        .next-btn, .restart-btn {
+            margin-top: 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white; border: none;
+            padding: 14px 32px; border-radius: 12px;
+            font-size: 1em; cursor: pointer;
+            font-family: 'Fredoka', sans-serif;
+            box-shadow: 0 6px 18px rgba(0,0,0,0.2);
+            transition: transform 0.2s ease;
+        }
+        .next-btn:hover, .restart-btn:hover { transform: scale(1.04); }
+        .results {
+            text-align: center; padding: 25px 15px;
+            animation: bounceIn 0.6s ease-out;
+        }
+        .results h2 {
+            font-family: 'Fredoka', sans-serif; font-size: 2em;
+            margin-bottom: 12px; color: #333;
+        }
+        .results .final-score {
+            font-size: 3em; font-family: 'Fredoka', sans-serif;
+            color: #667eea; margin: 20px 0;
+        }
+        .results p { color: #555; margin-bottom: 12px; }
+        .badge { display: inline-block; font-size: 3.5em; margin: 8px 0; }
+        @keyframes slideDown { from { opacity: 0; transform: translateY(-30px); } to { opacity: 1; transform: translateY(0); } }
+        @keyframes fadeIn { from { opacity: 0; transform: scale(0.96); } to { opacity: 1; transform: scale(1); } }
+        @keyframes slideUp { from { opacity: 0; transform: translateY(15px); } to { opacity: 1; transform: translateY(0); } }
+        @keyframes shake { 0%,100% { transform: translateX(0); } 25% { transform: translateX(-8px); } 75% { transform: translateX(8px); } }
+        @keyframes bounceIn { 0% { opacity: 0; transform: scale(0.4); } 60% { transform: scale(1.05); } 100% { opacity: 1; transform: scale(1); } }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <div class="lesson-tag">Module 11 · Lesson 11.1</div>
+            <h1>Business Manager and Account Structure</h1>
+            <p>10 Sarah Chebet scenarios — assets, roles, task-based permissions, verification</p>
+        </div>
+
+        <div class="score-board">
+            <div class="score-item"><div class="label">Score</div><div class="value" id="score">0</div></div>
+            <div class="score-item"><div class="label">Question</div><div class="value"><span id="current">1</span>/<span id="total">10</span></div></div>
+            <div class="score-item"><div class="label">Streak</div><div class="value" id="streak">0</div></div>
+        </div>
+
+        <div class="progress-bar"><div class="progress-fill" id="progress"></div></div>
+
+        <div class="exercise-card" id="exerciseCard"></div>
+    </div>
+
+    <script>
+        const exercises = [
+  {
+    "scenario": "Sarah has been running Karibu Kitchen's Meta ads for three months from the personal ad account Meta auto-created when she first clicked Boost Post. Her cousin asks if he can help manage the ads. Sarah is nervous about sharing her personal Facebook password.",
+    "question": "What should Sarah do?",
+    "options": [
+      "Keep going with the personal ad account and share her Facebook password with her cousin — it is faster.",
+      "Set up a Business Manager at business.facebook.com. The BM owns the Page, the ad account, the Pixel, and the Instagram — Sarah remains Admin, her cousin becomes Employee with task-based permissions, and no passwords are shared.",
+      "Delete the ad account and start over on Instagram only.",
+      "Give her cousin her Meta email and reset the password every week."
+    ],
+    "correct": 1,
+    "explanation": "Slide 2 of §11.1 is explicit: personal ad accounts are fragile — they die with the personal Facebook and cannot delegate cleanly. Business Manager is a separate container owned by the business, with named users, task-based permissions, and full audit logging. Never share personal credentials."
+  },
+  {
+    "scenario": "Sarah's Business Manager for Karibu Kitchen now holds one Facebook Page, one ad account, one Pixel, one linked Instagram, and one small catalogue of ten menu items.",
+    "question": "Which of the five asset families is NOT represented in Sarah's Business Manager?",
+    "options": [
+      "Pages",
+      "Ad accounts",
+      "Instagram accounts",
+      "None — all five families (Pages, ad accounts, Pixel/CAPI dataset, Instagram accounts, catalogues) are represented."
+    ],
+    "correct": 3,
+    "explanation": "Slide 3 of §11.1 lists the five asset families every Business Manager can hold: Pages, ad accounts, Pixel/CAPI datasets, Instagram accounts, and catalogues. Sarah's setup — 1 Page, 1 ad account, 1 Pixel, 1 IG, 1 catalogue of 10 items — covers all five."
+  },
+  {
+    "scenario": "Sarah wants to bring in her cousin (who posts photos and answers WhatsApp messages), her accountant (who pays Meta invoices), and her freelance web developer (who is about to install the Pixel).",
+    "question": "What roles should she assign, applying the least-privilege principle?",
+    "options": [
+      "Everyone Admin — simpler.",
+      "Cousin = Employee (Content + Messages on Page). Accountant = Finance Editor. Developer = Developer.",
+      "Everyone Employee — even the accountant.",
+      "Cousin = Admin. Accountant = Advertiser. Developer = Finance Analyst."
+    ],
+    "correct": 1,
+    "explanation": "Slide 4 of §11.1 gives the six standard roles: Admin, Employee, Finance Editor, Finance Analyst, Developer, Advertiser. Least privilege applies: Employee for day-to-day content work, Finance Editor for someone who edits billing, Developer for someone who installs the Pixel. Admin is reserved for the owner and true business partners."
+  },
+  {
+    "scenario": "Sarah is adding her freelance graphic designer to the Karibu Kitchen ad account so she can upload new creative but not touch anything else.",
+    "question": "What is the correct approach at the ad-account level?",
+    "options": [
+      "Make her Admin of the whole Business Manager.",
+      "On the ad account, grant her the \"Manage creative hub\" task only. She can create and edit ads but cannot change the account itself, add people, or access billing.",
+      "Give her the Sarah's Facebook password.",
+      "Add her as Finance Editor."
+    ],
+    "correct": 1,
+    "explanation": "Slide 5 of §11.1 explains that on top of the six standard roles, every asset has task-based sliders. On the ad account: Manage campaigns, Manage creative hub, View performance. Grant only what the person needs. When the freelancer leaves, one switch removes access."
+  },
+  {
+    "scenario": "Sarah is setting up the ad account inside her Business Manager. She sees fields for currency and time zone.",
+    "question": "What should she pick, and why does it matter now rather than later?",
+    "options": [
+      "USD and America/New_York — Meta reports look better in dollars.",
+      "KES and Africa/Nairobi. Reporting and billing must be in local currency and timezone. These cannot be changed later without creating a fresh ad account and losing history.",
+      "It does not matter — Meta converts everything automatically.",
+      "GBP and Europe/London."
+    ],
+    "correct": 1,
+    "explanation": "Slide 6 of §11.1 walks through the seven-step setup — step five is create the ad account with currency KES, timezone Africa/Nairobi. Changing these later requires creating a new ad account from scratch, which destroys reporting continuity. Get it right on day one."
+  },
+  {
+    "scenario": "Sarah's newly created Business Manager keeps hitting an invisible spending cap around USD 500 per day (roughly KES 65,000), even though her ad account payment method is valid.",
+    "question": "What is the most likely cause, and how does she fix it?",
+    "options": [
+      "The cap is permanent — she must open a second Business Manager to work around it.",
+      "Her Business Manager is not yet business-verified. She uploads her Kenyan business registration certificate and a utility bill in the business name. Verified BMs unlock higher spending limits, domain verification, and the Conversions API.",
+      "Meta only allows KES 65,000/day for Kenyan businesses.",
+      "She needs to switch off 2FA."
+    ],
+    "correct": 1,
+    "explanation": "Slide 7 of §11.1 covers business verification. Unverified BMs hit invisible ~USD 500/day caps. Verification requires uploading a business registration document and a matching utility bill. Once verified, higher spending limits, domain verification, and CAPI unlock — none of which are optional for a professional operation."
+  },
+  {
+    "scenario": "Sarah's accountant is on Business Manager as Admin (\"so he can see everything\"). This week he accidentally disabled the running Meta Pixel while exploring settings.",
+    "question": "What was the mistake, and what is the fix?",
+    "options": [
+      "There is no mistake — accountants need Admin.",
+      "Wrong role. An accountant should be Finance Editor (sees and edits billing) or Finance Analyst (view-only). Admin lets him spend money and change every setting — including breaking the Pixel. Downgrade him to Finance Editor immediately.",
+      "The mistake is having a Pixel at all — remove it.",
+      "Make Sarah's cousin Admin too, for redundancy."
+    ],
+    "correct": 1,
+    "explanation": "Slide 4 of §11.1 lists Finance Editor and Finance Analyst as the finance-scoped roles. Admin is for the owner and business partners. Least privilege prevents exactly this class of accident. Downgrade to Finance Editor (or Analyst if he does not need to change billing)."
+  },
+  {
+    "scenario": "Karibu Kitchen is growing. Sarah wants Business Manager to survive if her personal Facebook is disabled tomorrow.",
+    "question": "What is the most important step to guarantee this?",
+    "options": [
+      "Nothing — Business Manager cannot survive without her personal Facebook.",
+      "Add at least one other trusted person as Admin, ensure both admins have 2FA on, and complete business verification. The BM is owned by the business — as long as at least one admin can sign in, the ad account, Page, Pixel, and Instagram continue running.",
+      "Print out the Facebook password and mail it to herself.",
+      "Delete her personal Facebook to prove it does not matter."
+    ],
+    "correct": 1,
+    "explanation": "Slide 8 of §11.1 gives \"ownership\" as reason #1 for Business Manager: it survives any single personal Facebook being disabled. The safeguard is at least one other Admin — plus 2FA on every Admin, plus business verification — so the business is never one incident away from disappearing."
+  },
+  {
+    "scenario": "A trainee argues: \"Business Manager, two-factor authentication, and business verification are only worth setting up once Sarah is spending KES 100,000 a month.\"",
+    "question": "How should you respond?",
+    "options": [
+      "Correct — small budgets do not need BM.",
+      "Wrong. BM should be set up on day one — before the ad account gets flagged, before a second staff member is added, and before the Pixel is installed. Fixing any of these AFTER an account is disabled is difficult; setting them up first is fifteen minutes of work.",
+      "It depends on the day of the week.",
+      "Correct — Meta blocks BM for spends under KES 100,000/month."
+    ],
+    "correct": 1,
+    "explanation": "Slide 8 of §11.1 is explicit: \"Set it up on day one — not the day the ad account gets flagged.\" Meta account recovery after a disable is slow and often unsuccessful. Business Manager, 2FA, and verification are the guardrails that prevent ever needing recovery in the first place."
+  },
+  {
+    "scenario": "A trainee summarises Lesson 11.1 in one line: \"Business Manager has three asset families and two permission roles, and 2FA is optional.\"",
+    "question": "How many of those three claims are correct?",
+    "options": [
+      "All three.",
+      "Two — the asset families and the 2FA parts.",
+      "Zero — every claim is wrong.",
+      "One — only the roles part."
+    ],
+    "correct": 2,
+    "explanation": "Every claim is wrong. Business Manager holds FIVE asset families — Pages, ad accounts, Pixel/CAPI datasets, Instagram accounts, catalogues (Slide 3). There are SIX standard permission roles — Admin, Employee, Finance Editor, Finance Analyst, Developer, Advertiser (Slide 4). And 2FA is NOT optional for admins — it is the single biggest defence against the #1 cause of ad-account disables (Slide 7)."
+  }
+];
+
+        let currentQuestion = 0, score = 0, streak = 0, answered = false;
+
+        function updateScoreboard() {
+            document.getElementById('score').textContent = score;
+            document.getElementById('current').textContent = Math.min(currentQuestion + 1, exercises.length);
+            document.getElementById('total').textContent = exercises.length;
+            document.getElementById('streak').textContent = streak;
+            document.getElementById('progress').style.width = ((currentQuestion) / exercises.length) * 100 + '%';
+        }
+
+        function escapeHtml(s) {
+            return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+        }
+
+        function renderQuestion() {
+            answered = false;
+            const q = exercises[currentQuestion];
+            let html = '';
+            if (q.scenario) {
+                html += `<div class="scenario"><strong>Scenario.</strong> ${escapeHtml(q.scenario)}</div>`;
+            }
+            html += `<div class="question">${escapeHtml(q.question)}</div>`;
+            html += '<div class="options">';
+            q.options.forEach((o, i) => {
+                html += `<button class="option" onclick="selectAnswer(${i})">${escapeHtml(o)}</button>`;
+            });
+            html += '</div>';
+            document.getElementById('exerciseCard').innerHTML = html;
+            updateScoreboard();
+        }
+
+        function selectAnswer(i) {
+            if (answered) return;
+            answered = true;
+            const q = exercises[currentQuestion];
+            const btns = document.querySelectorAll('.option');
+            btns.forEach(b => b.classList.add('disabled'));
+            btns[q.correct].classList.add('correct');
+            const right = i === q.correct;
+            if (!right) btns[i].classList.add('wrong');
+            if (right) { score += 10; streak += 1; } else { streak = 0; }
+            const fb = document.createElement('div');
+            fb.className = 'feedback ' + (right ? 'correct' : 'wrong');
+            fb.innerHTML = `<strong>${right ? '✅ Correct.' : '❌ Not quite.'}</strong><br>${escapeHtml(q.explanation)}`;
+            document.getElementById('exerciseCard').appendChild(fb);
+            const nb = document.createElement('button');
+            nb.className = 'next-btn';
+            nb.textContent = currentQuestion === exercises.length - 1 ? 'See results →' : 'Next scenario →';
+            nb.onclick = nextQuestion;
+            document.getElementById('exerciseCard').appendChild(nb);
+            updateScoreboard();
+        }
+
+        function nextQuestion() {
+            currentQuestion++;
+            if (currentQuestion >= exercises.length) return showResults();
+            renderQuestion();
+        }
+
+        function showResults() {
+            document.getElementById('progress').style.width = '100%';
+            const total = exercises.length * 10;
+            const pct = Math.round(score / total * 100);
+            if (window.parent) { window.parent.postMessage({type:"mtti_quiz_score", score: score, total: total, percent: pct}, "*"); }
+            let badge = '🌟', msg = 'Excellent work. You have a professional grasp of this lesson.';
+            if (pct < 50) { badge = '🌱'; msg = 'Good first attempt. Re-watch the lesson video and try again.'; }
+            else if (pct < 80) { badge = '📚'; msg = 'Solid progress. Review the scenarios you missed and retry.'; }
+            document.getElementById('exerciseCard').innerHTML = `
+                <div class="results">
+                    <span class="badge">${badge}</span>
+                    <h2>Quiz Complete</h2>
+                    <div class="final-score">${score} / ${total}</div>
+                    <p><strong>${pct}%</strong> · Longest streak: ${streak}</p>
+                    <p>${msg}</p>
+                    <button class="restart-btn" onclick="restart()">Try again 🔁</button>
+                </div>`;
+        }
+
+        function restart() {
+            currentQuestion = 0; score = 0; streak = 0;
+            renderQuestion();
+        }
+
+        renderQuestion();
+    </script>
+</body>
+</html>

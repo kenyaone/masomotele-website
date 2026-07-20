@@ -1,0 +1,507 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lesson 9.6 — Setting Up Google Search Console (Interactive)</title>
+<style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: 'Segoe UI', -apple-system, sans-serif; line-height: 1.55; color: #1e293b; background: #f8fafc; min-height: 100vh; }
+    .container { max-width: 1200px; margin: 0 auto; padding: 20px; }
+    header {
+        background: linear-gradient(135deg, #2E7D32, #1B5E20);
+        color: #fff; padding: 40px 30px; border-radius: 12px; margin-bottom: 24px;
+        box-shadow: 0 10px 30px rgba(234,67,53,0.25);
+    }
+    header .badge { display: inline-block; background: rgba(255,255,255,0.2); padding: 4px 14px; border-radius: 16px; font-size: 12px; font-weight: bold; letter-spacing: 1px; margin-bottom: 14px; }
+    header h1 { font-size: 34px; margin-bottom: 8px; }
+    header .subtitle { font-size: 17px; opacity: 0.95; margin-bottom: 20px; }
+    .meta-strip { display: flex; flex-wrap: wrap; gap: 12px; }
+    .meta-strip span { background: rgba(255,255,255,0.18); padding: 6px 14px; border-radius: 20px; font-size: 13px; }
+    .toc { background: #fff; border: 1px solid #e2e8f0; border-radius: 10px; padding: 22px 26px; margin-bottom: 22px; }
+    .toc h3 { color: #ea4335; margin-bottom: 10px; }
+    .toc ol { padding-left: 20px; }
+    .toc a { color: #ea4335; text-decoration: none; font-weight: 600; }
+    section { background: #fff; border: 1px solid #e2e8f0; border-radius: 10px; padding: 26px 30px; margin-bottom: 22px; }
+    section h2 { color: #ea4335; font-size: 22px; margin-bottom: 12px; padding-bottom: 8px; border-bottom: 3px solid #ea4335; }
+    section h3 { color: #0f172a; font-size: 17px; margin: 18px 0 8px; }
+    section p { margin-bottom: 12px; }
+    section ul, section ol { padding-left: 22px; margin-bottom: 12px; }
+    section li { margin-bottom: 4px; }
+    .callout { border-left: 5px solid #ea4335; background: #fef2f2; padding: 14px 18px; margin: 14px 0; border-radius: 4px; }
+    .callout.warn { border-left-color: #d97706; background: #fef3c7; }
+    .callout.tip { border-left-color: #059669; background: #ecfdf5; }
+    .callout strong { color: #ea4335; }
+
+    /* Verification method picker */
+    .verify-tabs { display: flex; gap: 6px; flex-wrap: wrap; border-bottom: 2px solid #e2e8f0; margin: 18px 0 0; }
+    .verify-tabs button { background: none; border: none; padding: 10px 16px; cursor: pointer; font-size: 14px; font-weight: 600; color: #64748b; border-bottom: 3px solid transparent; margin-bottom: -2px; }
+    .verify-tabs button.active { color: #ea4335; border-bottom-color: #ea4335; }
+    .verify-panel { display: none; padding: 18px 0; }
+    .verify-panel.active { display: block; }
+    .difficulty { display: inline-block; padding: 3px 10px; border-radius: 12px; font-size: 12px; font-weight: bold; margin-left: 8px; }
+    .difficulty.easy { background: #d1fae5; color: #065f46; }
+    .difficulty.med { background: #fef3c7; color: #78350f; }
+    .difficulty.hard { background: #fee2e2; color: #991b1b; }
+
+    /* Mock GSC dashboard */
+    .gsc {
+        background: #fff; border: 1px solid #dadce0; border-radius: 8px;
+        overflow: hidden; margin: 14px 0;
+    }
+    .gsc-top { background: #fff; padding: 10px 16px; display: flex; align-items: center; gap: 12px; border-bottom: 1px solid #e5e7eb; font-size: 13px; }
+    .gsc-top .g { display: inline-flex; align-items: center; font-weight: 500; color: #202124; font-size: 15px; }
+    .gsc-top .g::before { content: 'G'; background: linear-gradient(45deg, #4285f4, #ea4335, #fbbc04, #34a853); background-clip: text; -webkit-background-clip: text; color: #ea4335; width: 22px; height: 22px; border-radius: 50%; display: inline-flex; align-items: center; justify-content: center; font-size: 14px; font-weight: bold; margin-right: 10px; border: 1px solid #dadce0; }
+    .gsc-top .prop { padding: 4px 12px; background: #f1f3f4; border-radius: 4px; font-size: 12px; color: #5f6368; }
+    .gsc-body { display: grid; grid-template-columns: 200px 1fr; min-height: 400px; }
+    @media (max-width: 800px) { .gsc-body { grid-template-columns: 1fr; } .gsc-sidebar { display: none; } }
+    .gsc-sidebar { background: #fff; border-right: 1px solid #e5e7eb; padding: 10px 0; font-size: 13px; }
+    .gsc-menu { padding: 8px 20px; color: #202124; cursor: pointer; border-left: 3px solid transparent; }
+    .gsc-menu:hover { background: #f1f3f4; }
+    .gsc-menu.active { border-left-color: #1a73e8; color: #1a73e8; background: #e8f0fe; }
+    .gsc-menu .icon { display: inline-block; width: 20px; margin-right: 8px; }
+    .gsc-content { padding: 20px; background: #fafafa; }
+
+    .gsc-title { font-size: 18px; color: #202124; margin-bottom: 4px; }
+    .gsc-date { font-size: 12px; color: #5f6368; margin-bottom: 16px; }
+    .kpi-cards { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; margin-bottom: 16px; }
+    @media (max-width: 700px) { .kpi-cards { grid-template-columns: 1fr 1fr; } }
+    .kpi-card { background: #fff; border: 1px solid #dadce0; border-radius: 8px; padding: 14px; cursor: pointer; transition: all 0.2s; }
+    .kpi-card:hover { border-color: #1a73e8; box-shadow: 0 2px 8px rgba(26,115,232,0.1); }
+    .kpi-card.active { border-color: #1a73e8; border-width: 2px; background: #e8f0fe; }
+    .kpi-card .label { font-size: 12px; color: #5f6368; }
+    .kpi-card .value { font-size: 24px; color: #202124; font-weight: 500; margin-top: 4px; }
+    .kpi-card .change { font-size: 11px; margin-top: 2px; }
+    .kpi-card .change.up { color: #188038; }
+    .kpi-card .change.down { color: #ea4335; }
+
+    .kpi-explain {
+        margin-top: 12px; padding: 14px;
+        background: #e8f0fe; border-left: 4px solid #1a73e8;
+        border-radius: 4px; font-size: 14px; color: #1a1a1a;
+        display: none;
+    }
+    .kpi-explain.show { display: block; }
+    .kpi-explain h5 { color: #1967d2; margin-bottom: 6px; }
+
+    /* Chart placeholder */
+    .chart-mock { height: 140px; background: linear-gradient(to top, #e8f0fe 0%, #fff 100%); border: 1px solid #dadce0; border-radius: 8px; padding: 12px; position: relative; margin-top: 12px; }
+    .chart-mock svg { width: 100%; height: 100%; }
+
+    /* Queries table */
+    .queries { background: #fff; border: 1px solid #dadce0; border-radius: 8px; margin-top: 14px; overflow-x: auto; }
+    .queries table { width: 100%; border-collapse: collapse; font-size: 13px; }
+    .queries th { background: #f8f9fa; color: #202124; padding: 10px 12px; text-align: left; border-bottom: 1px solid #dadce0; font-weight: 500; font-size: 12px; }
+    .queries td { padding: 10px 12px; border-bottom: 1px solid #f1f3f4; }
+    .queries tr:hover { background: #fafafa; }
+    .queries .kw { color: #1a73e8; }
+
+    /* Verify simulator flow */
+    .verify-sim { background: #f1f5f9; border: 1.5px solid #cbd5e1; border-radius: 10px; padding: 16px; margin: 14px 0; }
+    .verify-step { display: flex; align-items: center; gap: 12px; padding: 10px 12px; border-radius: 6px; margin-bottom: 6px; background: #fff; border: 1px solid #e2e8f0; }
+    .verify-step.done { background: #ecfdf5; border-color: #16a34a; }
+    .verify-step .num { width: 26px; height: 26px; border-radius: 50%; background: #cbd5e1; color: #fff; display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: bold; flex-shrink: 0; }
+    .verify-step.done .num { background: #16a34a; }
+    .verify-step .txt { flex: 1; font-size: 14px; }
+    .verify-step button { background: #ea4335; color: #fff; border: 0; padding: 6px 14px; border-radius: 6px; cursor: pointer; font-size: 12px; }
+    .verify-step button:disabled { background: #cbd5e1; cursor: not-allowed; }
+
+    /* Monday routine */
+    .routine { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 12px; margin: 14px 0; }
+    .r-card { background: #fef3c7; border-left: 4px solid #f59e0b; border-radius: 6px; padding: 14px; }
+    .r-card h5 { color: #78350f; font-size: 14px; margin-bottom: 6px; }
+    .r-card p { color: #92400e; font-size: 13px; margin: 0; }
+
+    .quiz-question { background: #fff; border: 2px solid #cbd5e1; border-radius: 10px; padding: 18px; margin: 14px 0; }
+    .quiz-question.correct { border-color: #059669; background: #ecfdf5; }
+    .quiz-question.wrong { border-color: #dc2626; background: #fef2f2; }
+    .quiz-question h4 { margin-bottom: 12px; font-size: 15px; color: #1e293b; }
+    .quiz-question .options label { display: block; padding: 10px 14px; margin-bottom: 6px; background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 6px; cursor: pointer; font-size: 14px; }
+    .quiz-question .options label:hover { background: #fef2f2; }
+    .quiz-question .options input[type="radio"] { margin-right: 10px; }
+    .quiz-question .explanation { display: none; margin-top: 12px; padding: 10px 14px; border-radius: 6px; font-size: 14px; }
+    .quiz-question.correct .explanation { display: block; background: #d1fae5; color: #065f46; border-left: 4px solid #059669; }
+    .quiz-question.wrong .explanation { display: block; background: #fee2e2; color: #991b1b; border-left: 4px solid #dc2626; }
+    .quiz-summary { text-align: center; padding: 30px; background: linear-gradient(135deg, #fef2f2 0%, #fee2e2 100%); border-radius: 10px; margin: 20px 0; display: none; }
+    .quiz-summary.show { display: block; }
+    .quiz-summary .score { font-size: 48px; font-weight: bold; color: #ea4335; margin-bottom: 8px; }
+    button.btn { background: #ea4335; color: #fff; border: none; padding: 10px 20px; border-radius: 6px; font-size: 15px; font-weight: 600; cursor: pointer; }
+    button.btn:hover { background: #c5221f; }
+    button.btn.reset { background: #64748b; margin-left: 8px; }
+    footer { text-align: center; color: #64748b; padding: 24px; font-size: 13px; }
+
+    /* MTTI logo stamp */
+    .mtti-logo-stamp {
+        position: fixed; top: 14px; right: 18px; z-index: 999;
+        opacity: 0.88; transition: opacity 0.2s;
+    }
+    .mtti-logo-stamp:hover { opacity: 1; }
+    .mtti-logo-stamp img { width: 56px; height: 56px; border-radius: 50%; box-shadow: 0 2px 8px rgba(0,0,0,0.18); }
+</style>
+</head>
+<body>
+<div class="mtti-logo-stamp">
+    <img src="../../Resources/Logo.jpeg" alt="MTTI" title="Masomotele Technical Training Institute — Start learning, Start earning">
+</div>
+
+<div class="container">
+
+<header>
+    <div class="badge">LESSON 9.6  ·  SEO IMPLEMENTATION LAB  ·  INTERACTIVE</div>
+    <h1>Setting Up Google Search Console</h1>
+    <div class="subtitle">The only free tool showing how Google sees your site. Add property, verify, submit sitemap, tour the Performance report.</div>
+    <div class="meta-strip">
+        <span><strong>Duration:</strong> ~35 min interactive</span>
+        <span><strong>Level:</strong> Intermediate</span>
+        <span><strong>Tool:</strong> search.google.com/search-console</span>
+        <span><strong>Handbook:</strong> Part 9, §9.6</span>
+    </div>
+</header>
+
+<div class="toc">
+    <h3>What you'll do in this lesson</h3>
+    <ol>
+        <li><a href="#s1">What Search Console measures</a></li>
+        <li><a href="#s2">Add a property (Domain vs URL-prefix)</a></li>
+        <li><a href="#s3">Verify ownership — 3 methods</a></li>
+        <li><a href="#s4"><strong>Simulated verification flow</strong></a></li>
+        <li><a href="#s5">Submit your sitemap</a></li>
+        <li><a href="#s6"><strong>Mock GSC dashboard — click each KPI</strong></a></li>
+        <li><a href="#s7">Monday morning routine</a></li>
+        <li><a href="#s8">Self-check quiz (10 questions)</a></li>
+    </ol>
+</div>
+
+<section id="s1">
+    <h2>1. What Search Console measures</h2>
+    <p>GSC tells you five things no other tool tells you:</p>
+    <ol>
+        <li>How many people <strong>saw</strong> your site in Google results (impressions)</li>
+        <li>How many <strong>clicked</strong> (clicks)</li>
+        <li>Which <strong>keywords</strong> brought them (queries)</li>
+        <li>Which pages are <strong>indexed</strong> (and which aren't)</li>
+        <li>Technical <strong>problems</strong> Google found while crawling</li>
+    </ol>
+    <div class="callout tip">
+        <strong>GSC vs GA:</strong> Search Console shows how GOOGLE sees your site. Google Analytics shows how VISITORS behave. Both matter. Both are free. Every Kenyan marketer runs both.
+    </div>
+</section>
+
+<section id="s2">
+    <h2>2. Add a property (Domain vs URL-prefix)</h2>
+    <p>Open <strong>search.google.com/search-console</strong> and click <em>Add Property</em>. Google offers two types:</p>
+    <table style="width:100%; border-collapse:collapse; font-size:14px;">
+        <tr><th style="background:#ea4335;color:#fff;padding:10px;text-align:left;">Domain property</th><th style="background:#ea4335;color:#fff;padding:10px;text-align:left;">URL-prefix property</th></tr>
+        <tr><td style="padding:10px;border:1px solid #e2e8f0;vertical-align:top;">Covers <strong>all</strong> variations of the domain (http, https, www, non-www, all subdomains). <br><br>Verification: DNS TXT record only. <strong>Harder</strong> for beginners.</td><td style="padding:10px;border:1px solid #e2e8f0;vertical-align:top;">Covers <strong>exact</strong> URL prefix (e.g. https://karibukitchen.co.ke). <br><br>Verification: HTML file, meta tag, or GA/GTM. <strong>Easier</strong> for beginners. ★</td></tr>
+    </table>
+    <div class="callout">
+        <strong>Beginner choice:</strong> URL-prefix. Type <code>https://karibukitchen.co.ke</code> and click Continue.
+    </div>
+</section>
+
+<section id="s3">
+    <h2>3. Verify ownership — 3 methods</h2>
+    <div class="verify-tabs">
+        <button class="active" onclick="showVerify('html', this)">HTML file</button>
+        <button onclick="showVerify('tag', this)">HTML tag</button>
+        <button onclick="showVerify('ga', this)">Google Analytics</button>
+    </div>
+    <div class="verify-panel active" id="v-html">
+        <h3>Method 1: HTML file upload <span class="difficulty med">Medium</span></h3>
+        <ol>
+            <li>Download the special HTML file Google gives you (e.g. <code>google1234.html</code>)</li>
+            <li>Upload it to your site's root folder via FTP or hosting file manager</li>
+            <li>Confirm it's live at <code>karibukitchen.co.ke/google1234.html</code></li>
+            <li>Click Verify in Search Console</li>
+        </ol>
+    </div>
+    <div class="verify-panel" id="v-tag">
+        <h3>Method 2: HTML tag <span class="difficulty med">Medium</span></h3>
+        <ol>
+            <li>Copy the meta tag Google gives you</li>
+            <li>In WordPress: Yoast SEO → General → Webmaster Tools → paste into Google verification code</li>
+            <li>Click Save</li>
+            <li>Click Verify in Search Console</li>
+        </ol>
+        <div class="callout tip"><strong>Yoast has a dedicated field</strong> — no theme editing required.</div>
+    </div>
+    <div class="verify-panel" id="v-ga">
+        <h3>Method 3: Google Analytics / GTM <span class="difficulty easy">Easiest ★</span></h3>
+        <ol>
+            <li>Ensure GA4 or Google Tag Manager is already installed on the site (Lesson 9.7 / 8.7)</li>
+            <li>Sign into GSC with the SAME Google account that owns GA</li>
+            <li>Google verifies automatically — no code, no upload</li>
+        </ol>
+        <div class="callout tip"><strong>Use this whenever you can.</strong> Fastest, zero technical steps.</div>
+    </div>
+</section>
+
+<section id="s4">
+    <h2>4. Simulated verification flow</h2>
+    <p>Walk through Sarah's verification. Click Go on each step.</p>
+    <div class="verify-sim">
+        <div class="verify-step" id="vs1"><div class="num">1</div><div class="txt">Sign in to search.google.com/search-console</div><button onclick="doVerify(1)" id="vb1">Sign in</button></div>
+        <div class="verify-step" id="vs2"><div class="num">2</div><div class="txt">Click Add Property → URL-prefix → type <code>https://karibukitchen.co.ke</code></div><button onclick="doVerify(2)" id="vb2" disabled>Add</button></div>
+        <div class="verify-step" id="vs3"><div class="num">3</div><div class="txt">Choose verification method: Google Analytics (already installed)</div><button onclick="doVerify(3)" id="vb3" disabled>Choose</button></div>
+        <div class="verify-step" id="vs4"><div class="num">4</div><div class="txt">Google verifies automatically ✨</div><button onclick="doVerify(4)" id="vb4" disabled>Verify</button></div>
+        <div id="verifyDone" style="display:none; margin-top:14px; padding:14px; background:#d1fae5; color:#065f46; border-radius:8px; font-weight:600;">✓ Ownership verified. Dashboard ready.</div>
+    </div>
+</section>
+
+<section id="s5">
+    <h2>5. Submit your sitemap</h2>
+    <p>After verification, the FIRST thing you do — submit the sitemap. Without it, Google might miss half your pages.</p>
+    <ol>
+        <li>Sidebar → <strong>Sitemaps</strong></li>
+        <li>Under "Add a new sitemap", type <code>sitemap_index.xml</code></li>
+        <li>Click <strong>Submit</strong></li>
+        <li>Wait ~24 hours. All pages appear in Google's index.</li>
+    </ol>
+    <div class="callout warn">
+        <strong>Day 1 non-negotiable:</strong> submit the sitemap. This one action can double the pages Google indexes.
+    </div>
+</section>
+
+<section id="s6">
+    <h2>6. Mock GSC dashboard — click each KPI</h2>
+    <p>The Performance report is the most-used screen in GSC. Click each KPI card below to reveal what the number actually means.</p>
+
+    <div class="gsc">
+        <div class="gsc-top">
+            <span class="g">Search Console</span>
+            <span class="prop">https://karibukitchen.co.ke/</span>
+        </div>
+        <div class="gsc-body">
+            <div class="gsc-sidebar">
+                <div class="gsc-menu active"><span class="icon">📊</span>Performance</div>
+                <div class="gsc-menu"><span class="icon">🔍</span>URL Inspection</div>
+                <div class="gsc-menu"><span class="icon">📄</span>Coverage</div>
+                <div class="gsc-menu"><span class="icon">🗺️</span>Sitemaps</div>
+                <div class="gsc-menu"><span class="icon">📱</span>Mobile Usability</div>
+                <div class="gsc-menu"><span class="icon">⚡</span>Core Web Vitals</div>
+                <div class="gsc-menu"><span class="icon">🔗</span>Links</div>
+                <div class="gsc-menu"><span class="icon">🛠️</span>Settings</div>
+            </div>
+            <div class="gsc-content">
+                <div class="gsc-title">Performance</div>
+                <div class="gsc-date">Last 3 months · Web results</div>
+
+                <div class="kpi-cards">
+                    <div class="kpi-card" onclick="showKPI('clicks', this)">
+                        <div class="label">Total clicks</div>
+                        <div class="value">128</div>
+                        <div class="change up">↑ 42% vs previous 3 months</div>
+                    </div>
+                    <div class="kpi-card" onclick="showKPI('imp', this)">
+                        <div class="label">Total impressions</div>
+                        <div class="value">2,417</div>
+                        <div class="change up">↑ 63%</div>
+                    </div>
+                    <div class="kpi-card" onclick="showKPI('ctr', this)">
+                        <div class="label">Average CTR</div>
+                        <div class="value">5.3%</div>
+                        <div class="change down">↓ 0.4pp</div>
+                    </div>
+                    <div class="kpi-card" onclick="showKPI('pos', this)">
+                        <div class="label">Average position</div>
+                        <div class="value">18.4</div>
+                        <div class="change up">↑ 4.1 (better)</div>
+                    </div>
+                </div>
+
+                <div class="kpi-explain" id="expBox">
+                    <h5>Click a KPI card above</h5>
+                    <p>Each number tells you something specific about Sarah's search performance.</p>
+                </div>
+
+                <div class="chart-mock">
+                    <svg viewBox="0 0 400 120" preserveAspectRatio="none">
+                        <polyline fill="rgba(26,115,232,0.15)" stroke="#1a73e8" stroke-width="2" points="0,90 40,80 80,85 120,70 160,72 200,60 240,55 280,45 320,40 360,30 400,25 400,120 0,120"/>
+                        <polyline fill="none" stroke="#ea4335" stroke-width="2" points="0,105 40,100 80,95 120,90 160,85 200,80 240,72 280,65 320,55 360,50 400,42"/>
+                    </svg>
+                    <div style="position:absolute;top:8px;right:12px;font-size:11px;color:#5f6368;">Blue = impressions · Red = clicks</div>
+                </div>
+
+                <div class="queries">
+                    <table>
+                        <tr><th>Top queries</th><th style="text-align:right;">Clicks</th><th style="text-align:right;">Impressions</th><th style="text-align:right;">CTR</th><th style="text-align:right;">Position</th></tr>
+                        <tr><td class="kw">lunch delivery Eldoret</td><td style="text-align:right;">34</td><td style="text-align:right;">210</td><td style="text-align:right;">16.2%</td><td style="text-align:right;">8.2</td></tr>
+                        <tr><td class="kw">Karibu Kitchen menu</td><td style="text-align:right;">22</td><td style="text-align:right;">48</td><td style="text-align:right;">45.8%</td><td style="text-align:right;">2.1</td></tr>
+                        <tr><td class="kw">cheap lunch delivery Kapsoya</td><td style="text-align:right;">18</td><td style="text-align:right;">88</td><td style="text-align:right;">20.4%</td><td style="text-align:right;">6.4</td></tr>
+                        <tr><td class="kw">office lunch delivery Eldoret</td><td style="text-align:right;">14</td><td style="text-align:right;">102</td><td style="text-align:right;">13.7%</td><td style="text-align:right;">9.8</td></tr>
+                        <tr><td class="kw">vegetarian lunch Elgon View</td><td style="text-align:right;">9</td><td style="text-align:right;">54</td><td style="text-align:right;">16.7%</td><td style="text-align:right;">7.2</td></tr>
+                        <tr><td class="kw">chapati delivery Racecourse</td><td style="text-align:right;">6</td><td style="text-align:right;">31</td><td style="text-align:right;">19.4%</td><td style="text-align:right;">5.9</td></tr>
+                        <tr><td class="kw">food delivery Eldoret</td><td style="text-align:right;">4</td><td style="text-align:right;">208</td><td style="text-align:right;">1.9%</td><td style="text-align:right;">32.4</td></tr>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<section id="s7">
+    <h2>7. Monday morning routine</h2>
+    <p>Every Monday, 30 minutes in GSC. Four questions. Forever.</p>
+    <div class="routine">
+        <div class="r-card"><h5>Q1. Are clicks growing?</h5><p>Week-over-week clicks trending up = good. Down = action needed.</p></div>
+        <div class="r-card"><h5>Q2. Improving in average position?</h5><p>Rankings climbing means the on-page + backlink work is paying off.</p></div>
+        <div class="r-card"><h5>Q3. Impressions but no clicks?</h5><p>These queries need better titles and meta descriptions (Lesson 9.3).</p></div>
+        <div class="r-card"><h5>Q4. Coverage or indexing errors?</h5><p>Fix immediately. Every unindexed page is invisible to Google.</p></div>
+    </div>
+</section>
+
+<section id="s8">
+    <h2>8. Self-check quiz</h2>
+
+    <div class="quiz-question" data-correct="B"><h4>1. What does Search Console show that Google Analytics does not?</h4><div class="options"><label><input type="radio" name="q1" value="A"> A) How much a page cost.</label><label><input type="radio" name="q1" value="B"> B) How Google sees your site — impressions, queries, coverage.</label><label><input type="radio" name="q1" value="C"> C) The site's colour palette.</label><label><input type="radio" name="q1" value="D"> D) Your revenue.</label></div><div class="explanation">Correct — GSC is Google's view of your site; GA is the visitor's view.</div></div>
+
+    <div class="quiz-question" data-correct="C"><h4>2. Easiest verification method for a WordPress beginner?</h4><div class="options"><label><input type="radio" name="q2" value="A"> A) DNS TXT</label><label><input type="radio" name="q2" value="B"> B) HTML file upload</label><label><input type="radio" name="q2" value="C"> C) Google Analytics / GTM (already installed)</label><label><input type="radio" name="q2" value="D"> D) SFTP</label></div><div class="explanation">Correct — no code, no file upload. GA account must be signed in with the same Google user.</div></div>
+
+    <div class="quiz-question" data-correct="A"><h4>3. What do you submit on day one?</h4><div class="options"><label><input type="radio" name="q3" value="A"> A) The sitemap</label><label><input type="radio" name="q3" value="B"> B) Your CV</label><label><input type="radio" name="q3" value="C"> C) An ad campaign</label><label><input type="radio" name="q3" value="D"> D) A backup</label></div><div class="explanation">Correct — sitemap first. Google needs a map to crawl every page.</div></div>
+
+    <div class="quiz-question" data-correct="D"><h4>4. Impressions =</h4><div class="options"><label><input type="radio" name="q4" value="A"> A) Clicks</label><label><input type="radio" name="q4" value="B"> B) Sales</label><label><input type="radio" name="q4" value="C"> C) Visitors</label><label><input type="radio" name="q4" value="D"> D) Times your site appeared in Google search results</label></div><div class="explanation">Correct — appearances, not visits.</div></div>
+
+    <div class="quiz-question" data-correct="B"><h4>5. CTR =</h4><div class="options"><label><input type="radio" name="q5" value="A"> A) Cost To Rank</label><label><input type="radio" name="q5" value="B"> B) Clicks ÷ Impressions × 100</label><label><input type="radio" name="q5" value="C"> C) Country's Total Rank</label><label><input type="radio" name="q5" value="D"> D) Content Traffic Rate</label></div><div class="explanation">Correct — the click-through rate of impressions that became clicks.</div></div>
+
+    <div class="quiz-question" data-correct="C"><h4>6. Sarah has 208 impressions for "food delivery Eldoret" but only 4 clicks. What does that mean?</h4><div class="options"><label><input type="radio" name="q6" value="A"> A) Great CTR.</label><label><input type="radio" name="q6" value="B"> B) Nothing to do.</label><label><input type="radio" name="q6" value="C"> C) She ranks poorly (position 32) — few clicks because she's on page 3+.</label><label><input type="radio" name="q6" value="D"> D) She's #1.</label></div><div class="explanation">Correct — high impressions + low CTR + high position = ranking too low to earn clicks. Improve on-page SEO.</div></div>
+
+    <div class="quiz-question" data-correct="A"><h4>7. If avg position is 8, where does the site rank on average?</h4><div class="options"><label><input type="radio" name="q7" value="A"> A) Bottom of page 1</label><label><input type="radio" name="q7" value="B"> B) Page 8</label><label><input type="radio" name="q7" value="C"> C) Position 8 of Google Ads</label><label><input type="radio" name="q7" value="D"> D) Rank number 88</label></div><div class="explanation">Correct — organic results 1–10 = page 1. Position 8 is bottom of page 1.</div></div>
+
+    <div class="quiz-question" data-correct="B"><h4>8. Sarah's branded query "Karibu Kitchen menu" has 45.8% CTR. Why?</h4><div class="options"><label><input type="radio" name="q8" value="A"> A) Because Google likes her.</label><label><input type="radio" name="q8" value="B"> B) Branded searches nearly always click through — the searcher was looking for her specifically.</label><label><input type="radio" name="q8" value="C"> C) Random.</label><label><input type="radio" name="q8" value="D"> D) Because she paid for ads.</label></div><div class="explanation">Correct — searchers typing "Karibu Kitchen" already want her. High CTR is expected.</div></div>
+
+    <div class="quiz-question" data-correct="D"><h4>9. Q3 of the Monday routine asks…</h4><div class="options"><label><input type="radio" name="q9" value="A"> A) How much did we spend?</label><label><input type="radio" name="q9" value="B"> B) Did we post to Instagram?</label><label><input type="radio" name="q9" value="C"> C) Which colour is our brand?</label><label><input type="radio" name="q9" value="D"> D) Any queries with impressions but no clicks (need better title/meta)?</label></div><div class="explanation">Correct — those queries are low-hanging fruit for on-page rewrites.</div></div>
+
+    <div class="quiz-question" data-correct="A"><h4>10. Which is a Coverage error?</h4><div class="options"><label><input type="radio" name="q10" value="A"> A) A page returned 404 or is blocked by robots.txt</label><label><input type="radio" name="q10" value="B"> B) A high bounce rate</label><label><input type="radio" name="q10" value="C"> C) A low ROAS</label><label><input type="radio" name="q10" value="D"> D) A missing logo</label></div><div class="explanation">Correct — Coverage tracks whether Google can access and index each URL.</div></div>
+
+    <div style="margin-top: 20px;">
+        <button class="btn" onclick="markQuiz()">Mark my quiz</button>
+        <button class="btn reset" onclick="resetQuiz()">Reset</button>
+    </div>
+    <div class="quiz-summary" id="quizSummary"><div class="score" id="scoreDisplay">0 / 10</div><p id="scoreMessage"></p></div>
+</section>
+
+<footer>
+    <p>Lesson 9.6 — Setting Up Google Search Console · Masomotele Technical Training Institute · Handbook Part 9, §9.6</p>
+    <p>Next: <strong>Lesson 9.7 — Setting Up Google Analytics 4</strong></p>
+</footer>
+</div>
+
+<script>
+function showVerify(name, btn) {
+    document.querySelectorAll('.verify-panel').forEach(p => p.classList.remove('active'));
+    document.querySelectorAll('.verify-tabs button').forEach(b => b.classList.remove('active'));
+    document.getElementById('v-' + name).classList.add('active');
+    btn.classList.add('active');
+}
+
+function doVerify(n) {
+    document.getElementById('vs' + n).classList.add('done');
+    document.getElementById('vb' + n).disabled = true;
+    document.getElementById('vb' + n).textContent = '✓';
+    if (n < 4) document.getElementById('vb' + (n+1)).disabled = false;
+    else document.getElementById('verifyDone').style.display = 'block';
+}
+
+const kpiExplanations = {
+    clicks: { title: 'Total clicks', body: 'How many people clicked from Google search to Sarah\'s site. This is the outcome number — every click is a real person on her site. Sarah\'s 128 is up 42% vs last quarter — the on-page work is compounding.' },
+    imp: { title: 'Total impressions', body: 'How many times Sarah\'s pages APPEARED in Google results, whether clicked or not. High impressions + low clicks = ranking too low OR titles/metas need work.' },
+    ctr: { title: 'Average CTR (click-through rate)', body: 'Clicks ÷ Impressions. Kenya-typical benchmark: 3–6% for position 8–10. Sarah\'s 5.3% is healthy. To raise it: better titles, better meta descriptions, better rich snippets.' },
+    pos: { title: 'Average position', body: 'Where Sarah\'s pages rank on average across all queries. Lower number = better. Sarah dropped from 22.5 to 18.4 — she\'s pushing into page 2 and some queries onto page 1.' }
+};
+function showKPI(k, card) {
+    document.querySelectorAll('.kpi-card').forEach(c => c.classList.remove('active'));
+    card.classList.add('active');
+    const box = document.getElementById('expBox');
+    box.classList.add('show');
+    box.innerHTML = '<h5>' + kpiExplanations[k].title + '</h5><p>' + kpiExplanations[k].body + '</p>';
+}
+
+function markQuiz() {
+    const questions = document.querySelectorAll('.quiz-question');
+    let score = 0;
+    questions.forEach((q, i) => {
+        const correct = q.dataset.correct;
+        const picked = q.querySelector(`input[name="q${i+1}"]:checked`);
+        q.classList.remove('correct', 'wrong');
+        if (picked && picked.value === correct) { q.classList.add('correct'); score++; }
+        else if (picked) q.classList.add('wrong');
+    });
+    const summary = document.getElementById('quizSummary');
+    summary.classList.add('show');
+    document.getElementById('scoreDisplay').textContent = `${score} / 10`;
+    const msg = document.getElementById('scoreMessage');
+    if (score === 10) msg.textContent = 'Perfect. Move to 9.7 — GA4 setup.';
+    else if (score >= 7) msg.textContent = 'Strong.';
+    else msg.textContent = 'Return to the mock dashboard and click each KPI before retaking.';
+    summary.scrollIntoView({ behavior: 'smooth', block: 'center' });
+}
+function resetQuiz() {
+    document.querySelectorAll('.quiz-question').forEach(q => { q.classList.remove('correct', 'wrong'); q.querySelectorAll('input[type=radio]').forEach(r => r.checked = false); });
+    document.getElementById('quizSummary').classList.remove('show');
+}
+</script>
+<style id="mtti-paginator-style">
+  section[data-mtti-page] { display: none !important; }
+  section[data-mtti-page].mtti-active { display: block !important; }
+  #mtti-paginator-bar {
+    position: sticky; bottom: 0; left: 0; right: 0;
+    background: #fff; border-top: 2px solid #e2e8f0;
+    padding: 12px 20px; margin-top: 20px;
+    display: flex; align-items: center; justify-content: space-between; gap: 12px;
+    font-family: 'Segoe UI', -apple-system, sans-serif;
+    box-shadow: 0 -4px 16px rgba(0,0,0,0.08);
+    z-index: 100;
+  }
+  #mtti-paginator-bar button {
+    background: #2E7D32; color: #fff; border: none; padding: 10px 18px;
+    border-radius: 8px; font-size: 13px; font-weight: 600; cursor: pointer;
+  }
+  #mtti-paginator-bar button:disabled { background: #cbd5e1; cursor: not-allowed; }
+  #mtti-paginator-bar button.mtti-prev { background: #64748b; }
+  #mtti-paginator-progress { font-size: 12px; color: #64748b; font-weight: 600; }
+</style>
+<script id="mtti-paginator-script">
+(function(){
+  function init(){
+    var sections = Array.prototype.slice.call(document.querySelectorAll('section[id]'));
+    // Only sections that are real content blocks (has an <h2>), skip stray/decorative ones.
+    sections = sections.filter(function(s){ return s.querySelector('h2'); });
+    if (sections.length < 2) return; // nothing to paginate
+
+    sections.forEach(function(s, i){ s.setAttribute('data-mtti-page', i); });
+    var current = 0;
+
+    var bar = document.createElement('div');
+    bar.id = 'mtti-paginator-bar';
+    bar.innerHTML =
+      '<button class="mtti-prev" id="mtti-pg-prev">← Previous</button>' +
+      '<span id="mtti-paginator-progress"></span>' +
+      '<button id="mtti-pg-next">Next →</button>';
+    sections[sections.length - 1].insertAdjacentElement('afterend', bar);
+
+    var prevBtn = bar.querySelector('#mtti-pg-prev');
+    var nextBtn = bar.querySelector('#mtti-pg-next');
+    var progress = bar.querySelector('#mtti-paginator-progress');
+
+    function render(){
+      sections.forEach(function(s, i){ s.classList.toggle('mtti-active', i === current); });
+      prevBtn.disabled = (current === 0);
+      nextBtn.textContent = (current === sections.length - 1) ? 'Done ✓' : 'Next →';
+      progress.textContent = 'Section ' + (current + 1) + ' of ' + sections.length;
+      window.scrollTo(0, 0);
+    }
+    prevBtn.addEventListener('click', function(){ if (current > 0) { current--; render(); } });
+    nextBtn.addEventListener('click', function(){
+      if (current < sections.length - 1) { current++; render(); }
+    });
+    render();
+  }
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', init);
+  } else {
+    init();
+  }
+})();
+</script>
+</body>
+</html>

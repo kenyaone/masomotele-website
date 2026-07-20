@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ARI-01 Final Assessment | MTTI Artificial Intelligence</title>
+<link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Fredoka:wght@500;600&display=swap" rel="stylesheet">
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body { font-family: 'Space Mono', monospace; background: linear-gradient(135deg, #37474F 0%, #263238 100%); min-height: 100vh; padding: 20px; color: #fff; }
+.container { max-width: 900px; margin: 0 auto; }
+.header { text-align: center; margin-bottom: 30px; }
+.header .lesson-tag { display: inline-block; background: rgba(255,255,255,0.2); padding: 6px 16px; border-radius: 999px; font-size: 0.85em; margin-bottom: 12px; }
+.header h1 { font-family: 'Fredoka', sans-serif; font-size: 2.2em; margin-bottom: 8px; text-shadow: 3px 3px 0 rgba(0,0,0,0.2); }
+.score-board { background: rgba(255,255,255,0.15); backdrop-filter: blur(10px); border-radius: 20px; padding: 20px; margin-bottom: 20px; display: flex; justify-content: space-around; }
+.score-item { text-align: center; }
+.score-item .label { font-size: 0.85em; opacity: 0.9; margin-bottom: 4px; }
+.score-item .value { font-size: 1.8em; font-weight: bold; font-family: 'Fredoka', sans-serif; }
+.progress-bar { width: 100%; height: 8px; background: rgba(255,255,255,0.3); border-radius: 10px; margin-bottom: 25px; overflow: hidden; }
+.progress-fill { height: 100%; background: linear-gradient(90deg, #4FC3F7 0%, #29B6F6 100%); border-radius: 10px; transition: width 0.5s ease; width: 0%; }
+.exercise-card { background: white; color: #333; border-radius: 25px; padding: 35px; margin-bottom: 20px; box-shadow: 0 20px 60px rgba(0,0,0,0.3); }
+.scenario { background: linear-gradient(135deg, #eceff1 0%, #cfd8dc 100%); border-left: 5px solid #607d8b; padding: 20px 24px; border-radius: 12px; margin-bottom: 24px; font-size: 0.98em; line-height: 1.55; }
+.scenario strong { color: #263238; font-family: 'Fredoka', sans-serif; }
+.question { font-size: 1.15em; margin-bottom: 20px; font-weight: 700; line-height: 1.4; }
+.options { display: flex; flex-direction: column; gap: 12px; }
+.option { background: #f5f7fb; border: 2px solid transparent; padding: 16px 20px; border-radius: 12px; cursor: pointer; transition: all 0.2s ease; font-family: 'Space Mono', monospace; font-size: 0.98em; text-align: left; }
+.option:hover:not(.disabled) { background: #eef1fb; border-color: #607d8b; transform: translateX(4px); }
+.option.correct { background: #d4edda; border-color: #28a745; color: #155724; }
+.option.wrong { background: #f8d7da; border-color: #dc3545; color: #721c24; }
+.option.disabled { cursor: not-allowed; opacity: 0.85; }
+.feedback { margin-top: 22px; padding: 18px 22px; border-radius: 12px; font-size: 0.98em; line-height: 1.5; }
+.feedback.correct { background: #d4edda; color: #155724; border-left: 4px solid #28a745; }
+.feedback.wrong { background: #f8d7da; color: #721c24; border-left: 4px solid #dc3545; }
+.next-btn, .restart-btn { margin-top: 20px; background: linear-gradient(135deg, #607d8b 0%, #37474F 100%); color: white; border: none; padding: 14px 32px; border-radius: 12px; font-size: 1em; cursor: pointer; font-family: 'Fredoka', sans-serif; box-shadow: 0 6px 18px rgba(0,0,0,0.2); }
+.results { text-align: center; padding: 25px 15px; }
+.results h2 { font-family: 'Fredoka', sans-serif; font-size: 2em; margin-bottom: 12px; color: #333; }
+.results .final-score { font-size: 3em; font-family: 'Fredoka', sans-serif; color: #37474F; margin: 20px 0; }
+.results p { color: #555; margin-bottom: 12px; }
+.badge { display: inline-block; font-size: 3.5em; margin: 8px 0; }
+</style>
+</head>
+<body>
+<div class="container">
+<div class="header">
+<div class="lesson-tag">ARI-01 &middot; Final Assessment</div>
+<h1>Artificial Intelligence &mdash; Final Assessment</h1>
+</div>
+<div class="score-board">
+<div class="score-item"><div class="label">Score</div><div class="value" id="score">0</div></div>
+<div class="score-item"><div class="label">Question</div><div class="value"><span id="current">1</span>/<span id="total">16</span></div></div>
+<div class="score-item"><div class="label">Streak</div><div class="value" id="streak">0</div></div>
+</div>
+<div class="progress-bar"><div class="progress-fill" id="progress"></div></div>
+<div class="exercise-card" id="exerciseCard"></div>
+</div>
+<script>
+const exercises = [{"scenario":"A client asks Brian whether the 'AI' in a new tool means it can think for itself like a person.","question":"What's the accurate answer?","options":["Yes, it thinks exactly like a human","No \u2014 it's software performing specific tasks (like pattern recognition or prediction) that would otherwise need human judgement, not general human-like thinking","AI can only ever do simple arithmetic","AI is just a marketing term with no real technology behind it"],"correct":1,"explanation":"Today's AI systems are narrow \u2014 very capable at specific tasks, not generally intelligent like a person."},{"scenario":"Brian is asked why AI research went through 'AI winters' in past decades before the recent boom.","question":"What best explains this history?","options":["Computers used to be too cold to run software","Early rule-based/symbolic AI hit limits, funding and interest dropped, then statistical machine learning and later deep learning revived progress","AI has always advanced at a perfectly steady pace with no setbacks","AI was invented only in the last two years"],"correct":1,"explanation":"AI's history includes real setbacks (the 'AI winters') between the symbolic-AI era and the modern machine-learning/deep-learning resurgence."},{"scenario":"Rafiki Insights has a spreadsheet of past client outcomes labeled 'renewed' or 'churned', and wants a model to predict future churn.","question":"What type of machine learning does this call for?","options":["Unsupervised learning, since there's no data at all","Supervised learning, since there are labeled examples (renewed/churned) to learn from","This isn't a machine learning problem at all","Computer vision, since it involves a spreadsheet"],"correct":1,"explanation":"Labeled historical outcomes are exactly what supervised learning trains on."},{"scenario":"A model performs perfectly on the training data Brian gave it, but performs poorly on brand-new client data.","question":"What has most likely happened?","options":["The model is perfect and the new data is wrong","Overfitting \u2014 the model memorized the training data's quirks instead of learning patterns that generalize","This always means more computing power is needed","The model needs to be renamed"],"correct":1,"explanation":"Overfitting is exactly this pattern: great on training data, weak on new data, because it memorized rather than generalized."},{"scenario":"Brian is explaining, in plain terms, how a neural network is loosely inspired by the brain.","question":"Which description is accurate?","options":["Layers of simple units combine weighted inputs and pass on outputs, loosely inspired by neurons, not literal brain tissue","It's an actual biological brain grown in a lab","It only works if it has exactly one layer","It is unrelated to how neurons work in any way, even loosely"],"correct":0,"explanation":"Neural networks are a loose, simplified computational analogy to neurons \u2014 layers of simple units passing signals forward."},{"scenario":"Brian wants to explain to a colleague, without any math, how a neural network 'learns'.","question":"Which explanation fits?","options":["It learns by being restarted every day","It repeatedly compares its guess to the correct answer and adjusts its internal weights to be less wrong next time","It learns instantly with a single example","It doesn't actually learn, it's pre-programmed with fixed rules"],"correct":1,"explanation":"Training is this repeated compare-and-adjust feedback loop across many examples."},{"scenario":"Brian asks an AI chat assistant a factual question and it states something confidently that turns out to be false.","question":"What is this phenomenon called, and what should Brian do?","options":["This is called 'hallucination' \u2014 Brian should verify facts against a real source before using them","This never happens with AI chat tools","This means the internet is broken","This means Brian typed the question wrong"],"correct":0,"explanation":"Hallucination \u2014 confidently stated but false output \u2014 is a known limitation, which is why verification is essential."},{"scenario":"Brian is deciding between an image-classification tool and an object-detection tool for a task.","question":"He needs to know not just what's in a photo, but exactly where each item is located within it. Which fits?","options":["Classification, since it only labels the whole image","Object detection, since it locates individual objects within the image","Neither tool can help with this at all","A spreadsheet formula is the only option"],"correct":1,"explanation":"Object detection identifies and locates individual items within an image, unlike classification which labels the image as a whole."},{"scenario":"A client wants to check that all photos of ID documents were correctly captured during onboarding.","question":"What computer vision concept underlies a computer being able to process these images at all?","options":["The computer reads the images the same way a person does, visually","An image is represented as a grid of numeric pixel values that the system analyzes for patterns","Computers cannot process images, only text","Only professional photographers' cameras can be analyzed by computers"],"correct":1,"explanation":"Computer vision systems work on numeric pixel data, looking for patterns, not 'seeing' the way a human eye does."},{"scenario":"Rafiki Insights is asked to build a hiring-screening tool trained mostly on one narrow group of past successful applicants.","question":"What ethical risk does this raise?","options":["None, since more data always fixes bias automatically","The tool may reproduce or amplify the biases present in that narrow training data, disadvantaging other qualified applicants","This only matters for computer vision projects","This is purely a legal issue with no technical cause"],"correct":1,"explanation":"Bias usually comes from unrepresentative training data \u2014 a tool trained on a narrow slice of past outcomes tends to reproduce that narrowness."},{"scenario":"Brian is about to paste a client's raw financial dataset into a public AI chat tool to get a quick summary.","question":"What should Brian consider first?","options":["Nothing, public AI tools are always safe for any data","Whether the data is confidential and needs anonymizing or client consent before being shared with an external tool","Whether the tool has a colorful logo","Whether it's a weekday"],"correct":1,"explanation":"Client data privacy and consent matter before pasting anything sensitive into a third-party AI tool."},{"scenario":"Brian used an AI assistant to help draft part of a client report.","question":"What's the professionally responsible approach?","options":["Say nothing and hope no one notices","Be transparent that AI assistance was used, and verify the content is accurate before sending it","Refuse to ever mention AI was involved under any circumstance","Send it without reading it since AI is always correct"],"correct":1,"explanation":"Transparency about AI assistance, combined with verification, is the professionally responsible standard."},{"scenario":"Rafiki Insights wants to free up time spent on repetitive data-cleaning grunt work.","question":"What's a sound way to use AI/automation here?","options":["Automate the repetitive categorizing/cleaning tasks so Brian can focus on higher-judgement analysis","Automate every single decision including which clients to take on","Avoid any automation since it's inherently untrustworthy","Only automate tasks nobody understands"],"correct":0,"explanation":"Automating repetitive, low-judgement tasks is exactly where AI/automation adds the most value, freeing time for higher-value analysis."},{"scenario":"An AI tool recommends a lending decision for a client's SME.","question":"What's the appropriate way to treat this recommendation?","options":["Treat it as the final decision with no human review","Treat it as one input to inform a human decision, especially since it's a consequential outcome for a real business","Ignore it completely regardless of its content","Only follow it if it's the analyst's first week on the job"],"correct":1,"explanation":"AI should support, not replace, human judgement on consequential decisions \u2014 it's decision support, not a decision-maker."},{"scenario":"A business question at Rafiki Insights could be answered with a simple spreadsheet formula, but a colleague suggests building a machine learning model instead.","question":"What's the sound approach?","options":["Always use the most complex AI tool available regardless of the problem","Match the tool to the actual problem \u2014 a simple formula may be entirely sufficient, without needing ML","Never use spreadsheets for any business question","Machine learning is required for every business question"],"correct":1,"explanation":"Choosing the right tool for the actual problem \u2014 sometimes a simple formula, sometimes ML \u2014 is better than defaulting to the most complex option."},{"scenario":"Before sending an AI-assisted report to a client, Brian runs through a quick check.","question":"Which of these should be on that checklist?","options":["Confirm the figures against the original source data, and check nothing confidential was pasted into a public tool","Only check that the document's font looks professional","Skip checking since AI-assisted content never needs review","Only check spelling, nothing else matters"],"correct":0,"explanation":"Verifying figures against source data and confirming no confidential data was exposed are core parts of responsibly using AI-assisted output."}];
+let currentQuestion = 0, score = 0, streak = 0, answered = false;
+function updateScoreboard() {
+    document.getElementById('score').textContent = score;
+    document.getElementById('current').textContent = Math.min(currentQuestion + 1, exercises.length);
+    document.getElementById('total').textContent = exercises.length;
+    document.getElementById('streak').textContent = streak;
+    document.getElementById('progress').style.width = ((currentQuestion) / exercises.length) * 100 + '%';
+}
+function escapeHtml(s) { return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+function renderQuestion() {
+    answered = false;
+    const q = exercises[currentQuestion];
+    let html = '';
+    if (q.scenario) html += `<div class="scenario"><strong>Scenario.</strong> ${escapeHtml(q.scenario)}</div>`;
+    html += `<div class="question">${escapeHtml(q.question)}</div>`;
+    html += '<div class="options">';
+    q.options.forEach((o, i) => { html += `<button class="option" onclick="selectAnswer(${i})">${escapeHtml(o)}</button>`; });
+    html += '</div>';
+    document.getElementById('exerciseCard').innerHTML = html;
+    updateScoreboard();
+}
+function selectAnswer(i) {
+    if (answered) return;
+    answered = true;
+    const q = exercises[currentQuestion];
+    const btns = document.querySelectorAll('.option');
+    btns.forEach(b => b.classList.add('disabled'));
+    btns[q.correct].classList.add('correct');
+    const right = i === q.correct;
+    if (!right) btns[i].classList.add('wrong');
+    if (right) { score += 10; streak += 1; } else { streak = 0; }
+    const fb = document.createElement('div');
+    fb.className = 'feedback ' + (right ? 'correct' : 'wrong');
+    fb.innerHTML = `<strong>${right ? '✅ Correct.' : '❌ Not quite.'}</strong><br>${escapeHtml(q.explanation)}`;
+    document.getElementById('exerciseCard').appendChild(fb);
+    const nb = document.createElement('button');
+    nb.className = 'next-btn';
+    nb.textContent = currentQuestion === exercises.length - 1 ? 'See results →' : 'Next question →';
+    nb.onclick = nextQuestion;
+    document.getElementById('exerciseCard').appendChild(nb);
+    updateScoreboard();
+}
+function nextQuestion() { currentQuestion++; if (currentQuestion >= exercises.length) return showResults(); renderQuestion(); }
+function showResults() {
+    document.getElementById('progress').style.width = '100%';
+    const total = exercises.length * 10;
+    const pct = Math.round(score / total * 100);
+    if (window.parent) { window.parent.postMessage({type:"mtti_quiz_score", score: score, total: total, percent: pct}, "*"); }
+    let badge = '🌟', msg = 'Excellent work. You have a solid grasp of AI fundamentals and how to apply them responsibly.';
+    if (pct < 50) { badge = '🌱'; msg = 'Good first attempt. Review the units and try again.'; }
+    else if (pct < 80) { badge = '📚'; msg = 'Solid progress. Review the questions you missed and retry.'; }
+    document.getElementById('exerciseCard').innerHTML = `
+        <div class="results">
+            <span class="badge">${badge}</span>
+            <h2>Final Assessment Complete</h2>
+            <div class="final-score">${score} / ${total}</div>
+            <p><strong>${pct}%</strong> · Longest streak: ${streak}</p>
+            <p>${msg}</p>
+            <button class="restart-btn" onclick="restart()">Try again 🔁</button>
+        </div>`;
+}
+function restart() { currentQuestion = 0; score = 0; streak = 0; renderQuestion(); }
+renderQuestion();
+</script>
+</body>
+</html>

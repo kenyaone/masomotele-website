@@ -37,6 +37,27 @@
         .results .final-score { font-size: 3em; font-family: 'Fredoka', sans-serif; color: #667eea; margin: 20px 0; }
         .results p { color: #555; margin-bottom: 12px; }
         .badge { display: inline-block; font-size: 3.5em; margin: 8px 0; }
+
+    /* How-To intro screen — shown before question 1, not scored */
+    .howto-card { background: white; color: #333; border-radius: 25px; padding: 35px; margin-bottom: 20px; box-shadow: 0 20px 60px rgba(0,0,0,0.3); }
+    .howto-card h3 { font-family: 'Fredoka', sans-serif; font-size: 1.3em; margin-bottom: 12px; color: #667eea; }
+    .howto-card p { line-height: 1.6; margin-bottom: 16px; color: #444; }
+    .howto-fields { background: #f5f7fb; border-radius: 12px; padding: 20px; margin-bottom: 18px; }
+    .howto-field { margin-bottom: 16px; }
+    .howto-field:last-child { margin-bottom: 0; }
+    .howto-field label { display: block; font-weight: 700; margin-bottom: 6px; font-size: 0.92em; color: #333; }
+    .howto-field select { width: 100%; padding: 10px 12px; border-radius: 8px; border: 2px solid #ddd; font-family: 'Space Mono', monospace; font-size: 0.95em; background: #fff; }
+    .howto-field .howto-checkbox-row { display: flex; align-items: center; gap: 10px; }
+    .howto-field .howto-checkbox-row input[type="checkbox"] { width: 20px; height: 20px; }
+    .howto-field .howto-result { margin-top: 8px; font-size: 0.88em; font-weight: 700; display: none; }
+    .howto-field .howto-result.show { display: block; }
+    .howto-field .howto-result.ok { color: #155724; }
+    .howto-field .howto-result.fail { color: #721c24; }
+    .howto-banner { margin-top: 4px; margin-bottom: 18px; padding: 12px 16px; border-radius: 10px; font-size: 0.9em; font-weight: 700; display: none; }
+    .howto-banner.show { display: block; }
+    .howto-banner.ok { background: #d4edda; color: #155724; }
+    .howto-banner.fail { background: #f8d7da; color: #721c24; }
+    .start-quiz-btn { margin-top: 4px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; border: none; padding: 14px 32px; border-radius: 12px; font-size: 1em; cursor: pointer; font-family: 'Fredoka', sans-serif; box-shadow: 0 6px 18px rgba(0,0,0,0.2); }
     </style>
 </head>
 <body>
@@ -117,7 +138,75 @@
                 </div>`;
         }
         function restart() { currentQuestion = 0; score = 0; streak = 0; renderQuestion(); }
-        renderQuestion();
+
+        /* How-To intro — a small, ungraded field-check demo shown before the
+           quiz starts, directly rehearsing the "save a reusable invoice layout as a Word Template (.dotx)" mechanic that one
+           of the quiz scenarios asks about, so it's not being asked cold. */
+        const HOWTO_RULES = [
+            { id: 'saveFormat', type: 'eq', target: 'dotx', label: 'Save as type — should be Word Template (*.dotx)' },
+            { id: 'createFromTemplate', type: 'checked', target: true, label: 'Confirm new invoices are created FROM this file' }
+        ];
+
+        function howtoFieldValue(id) {
+            const el = document.getElementById(id);
+            if (!el) return null;
+            if (el.type === 'checkbox') return el.checked;
+            return el.value;
+        }
+
+        function checkHowto() {
+            let allOk = true;
+            HOWTO_RULES.forEach(rule => {
+                const val = howtoFieldValue(rule.id);
+                const ok = (val === rule.target);
+                if (!ok) allOk = false;
+                const resEl = document.getElementById(rule.id + 'Result');
+                if (resEl) {
+                    resEl.classList.add('show');
+                    resEl.className = 'howto-result show ' + (ok ? 'ok' : 'fail');
+                    resEl.textContent = (ok ? '\u2705 ' : '\u274C ') + rule.label;
+                }
+            });
+            const banner = document.getElementById('howtoBanner');
+            banner.classList.add('show');
+            banner.className = 'howto-banner show ' + (allOk ? 'ok' : 'fail');
+            banner.textContent = allOk ? 'Correct \u2014 saving this as a Word Template (*.dotx) means every new invoice starts fresh from Brenda\u2019s layout, and Kevin will never risk editing the master file by accident.' : 'Not yet \u2014 pick Word Template (*.dotx) as the save format, and confirm new invoices will be created from it rather than by editing it directly.';
+        }
+
+        function renderHowto() {
+            document.getElementById('exerciseCard').innerHTML = `
+                <div class="howto-card">
+                    <h3>&#128269; Quick How-To: Saving the Right File Type</h3>
+                    <p>One of the scenarios coming up is about saving a reusable starting point for Brenda\u2019s invoices, with the logo and table already placed. Set up the Save As options below the way Kevin should, then check your work.</p>
+                    <div class="howto-fields">
+                        <div class="howto-field">
+                            <label for="saveFormat">Save As &mdash; file type</label>
+                            <select id="saveFormat">
+                                <option value="docx">Word Document (*.docx)</option>
+                                <option value="dotx">Word Template (*.dotx)</option>
+                                <option value="pdf">PDF (*.pdf)</option>
+                                <option value="txt">Plain Text (*.txt)</option>
+                            </select>
+                            <div class="howto-result" id="saveFormatResult"></div>
+                        </div>
+                        <div class="howto-field">
+                            <label for="createFromTemplate">Going forward</label>
+                            <div class="howto-checkbox-row">
+                                <input type="checkbox" id="createFromTemplate">
+                                <span>New invoices will be created FROM this file, not by editing it directly</span>
+                            </div>
+                            <div class="howto-result" id="createFromTemplateResult"></div>
+                        </div>
+                    </div>
+                    <div class="howto-banner" id="howtoBanner"></div>
+                    <button class="start-quiz-btn" id="checkHowtoBtn">Check My Setup</button>
+                    <button class="start-quiz-btn" id="startQuizBtn" style="margin-left:10px;background:linear-gradient(135deg,#28a745,#1e7e34);">Start Quiz &#8594;</button>
+                </div>`;
+            document.getElementById('checkHowtoBtn').addEventListener('click', checkHowto);
+            document.getElementById('startQuizBtn').addEventListener('click', renderQuestion);
+        }
+
+        renderHowto();
     </script>
 </body>
 </html>

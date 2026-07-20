@@ -1,0 +1,346 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>What is Digital Marketing? | MTTI Digital Marketing</title>
+    <link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Fredoka:wght@500;600&display=swap" rel="stylesheet">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Space Mono', monospace;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh; padding: 20px; color: #fff;
+        }
+        .container { max-width: 900px; margin: 0 auto; }
+        .header { text-align: center; margin-bottom: 30px; animation: slideDown 0.6s ease-out; }
+        .header .lesson-tag {
+            display: inline-block; background: rgba(255,255,255,0.2);
+            padding: 6px 16px; border-radius: 999px;
+            font-size: 0.85em; margin-bottom: 12px;
+        }
+        .header h1 {
+            font-family: 'Fredoka', sans-serif; font-size: 2.2em;
+            margin-bottom: 8px; text-shadow: 3px 3px 0 rgba(0,0,0,0.2);
+        }
+        .header p { opacity: 0.95; font-size: 0.95em; }
+        .score-board {
+            background: rgba(255,255,255,0.15); backdrop-filter: blur(10px);
+            border-radius: 20px; padding: 20px; margin-bottom: 20px;
+            display: flex; justify-content: space-around;
+            animation: fadeIn 0.8s ease-out 0.2s both;
+        }
+        .score-item { text-align: center; }
+        .score-item .label { font-size: 0.85em; opacity: 0.9; margin-bottom: 4px; }
+        .score-item .value {
+            font-size: 1.8em; font-weight: bold; font-family: 'Fredoka', sans-serif;
+        }
+        .progress-bar {
+            width: 100%; height: 8px; background: rgba(255,255,255,0.3);
+            border-radius: 10px; margin-bottom: 25px; overflow: hidden;
+        }
+        .progress-fill {
+            height: 100%; background: linear-gradient(90deg, #f093fb 0%, #f5576c 100%);
+            border-radius: 10px; transition: width 0.5s ease; width: 0%;
+        }
+        .exercise-card {
+            background: white; color: #333; border-radius: 25px;
+            padding: 35px; margin-bottom: 20px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            animation: fadeIn 0.6s ease-out both;
+        }
+        .scenario {
+            background: linear-gradient(135deg, #fff8e1 0%, #ffecb3 100%);
+            border-left: 5px solid #ffc107;
+            padding: 20px 24px; border-radius: 12px;
+            margin-bottom: 24px;
+            font-size: 0.98em; line-height: 1.55;
+        }
+        .scenario strong { color: #7a5a00; font-family: 'Fredoka', sans-serif; }
+        .question {
+            font-size: 1.15em; margin-bottom: 20px;
+            font-weight: 700; line-height: 1.4;
+        }
+        .options { display: flex; flex-direction: column; gap: 12px; }
+        .option {
+            background: #f5f7fb; border: 2px solid transparent;
+            padding: 16px 20px; border-radius: 12px;
+            cursor: pointer; transition: all 0.2s ease;
+            font-family: 'Space Mono', monospace; font-size: 0.98em; text-align: left;
+        }
+        .option:hover:not(.disabled) {
+            background: #eef1fb; border-color: #667eea; transform: translateX(4px);
+        }
+        .option.correct { background: #d4edda; border-color: #28a745; color: #155724; }
+        .option.wrong { background: #f8d7da; border-color: #dc3545; color: #721c24; animation: shake 0.4s; }
+        .option.disabled { cursor: not-allowed; opacity: 0.85; }
+        .feedback {
+            margin-top: 22px; padding: 18px 22px; border-radius: 12px;
+            animation: slideUp 0.4s ease-out;
+            font-size: 0.98em; line-height: 1.5;
+        }
+        .feedback.correct { background: #d4edda; color: #155724; border-left: 4px solid #28a745; }
+        .feedback.wrong { background: #f8d7da; color: #721c24; border-left: 4px solid #dc3545; }
+        .feedback strong { font-family: 'Fredoka', sans-serif; }
+        .next-btn, .restart-btn {
+            margin-top: 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white; border: none;
+            padding: 14px 32px; border-radius: 12px;
+            font-size: 1em; cursor: pointer;
+            font-family: 'Fredoka', sans-serif;
+            box-shadow: 0 6px 18px rgba(0,0,0,0.2);
+            transition: transform 0.2s ease;
+        }
+        .next-btn:hover, .restart-btn:hover { transform: scale(1.04); }
+        .results {
+            text-align: center; padding: 25px 15px;
+            animation: bounceIn 0.6s ease-out;
+        }
+        .results h2 {
+            font-family: 'Fredoka', sans-serif; font-size: 2em;
+            margin-bottom: 12px; color: #333;
+        }
+        .results .final-score {
+            font-size: 3em; font-family: 'Fredoka', sans-serif;
+            color: #667eea; margin: 20px 0;
+        }
+        .results p { color: #555; margin-bottom: 12px; }
+        .badge { display: inline-block; font-size: 3.5em; margin: 8px 0; }
+        @keyframes slideDown { from { opacity: 0; transform: translateY(-30px); } to { opacity: 1; transform: translateY(0); } }
+        @keyframes fadeIn { from { opacity: 0; transform: scale(0.96); } to { opacity: 1; transform: scale(1); } }
+        @keyframes slideUp { from { opacity: 0; transform: translateY(15px); } to { opacity: 1; transform: translateY(0); } }
+        @keyframes shake { 0%,100% { transform: translateX(0); } 25% { transform: translateX(-8px); } 75% { transform: translateX(8px); } }
+        @keyframes bounceIn { 0% { opacity: 0; transform: scale(0.4); } 60% { transform: scale(1.05); } 100% { opacity: 1; transform: scale(1); } }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <div class="lesson-tag">Module 1 · Lesson 1.1</div>
+            <h1>What is Digital Marketing?</h1>
+            <p>10 Karibu Kitchen scenarios — apply the nine elements, goals, and legal rules</p>
+        </div>
+
+        <div class="score-board">
+            <div class="score-item"><div class="label">Score</div><div class="value" id="score">0</div></div>
+            <div class="score-item"><div class="label">Question</div><div class="value"><span id="current">1</span>/<span id="total">10</span></div></div>
+            <div class="score-item"><div class="label">Streak</div><div class="value" id="streak">0</div></div>
+        </div>
+
+        <div class="progress-bar"><div class="progress-fill" id="progress"></div></div>
+
+        <div class="exercise-card" id="exerciseCard"></div>
+    </div>
+
+    <script>
+        const exercises = [
+  {
+    "scenario": "Sarah's sister-in-law tells her Karibu Kitchen \"needs digital marketing\", and Sarah assumes that means paying for Facebook adverts. Her cousin quotes KES 40,000 a month for a \"complete package\". Sarah has KES 15,000 a month and wants 200 new lunch orders in month one.",
+    "question": "Which statement should you make to Sarah first?",
+    "options": [
+      "\"Take the KES 40,000 package — you cannot do this yourself.\"",
+      "\"Digital marketing is one thing — Facebook adverts. Stick with that.\"",
+      "\"Digital marketing is nine connected activities. You can start with three of them yourself on your KES 15,000 budget.\"",
+      "\"Stop marketing until the business earns more.\""
+    ],
+    "correct": 2,
+    "explanation": "Digital marketing is not one activity — it's the nine elements from §1.1 (content, social, email, mobile, affiliate, SEM, SEO, display, analytics). Sarah does not need to buy a KES 40,000 package to run three of them well herself. The \"one thing = Facebook ads\" myth is exactly what this lesson exists to correct."
+  },
+  {
+    "scenario": "Sarah asks which THREE of the nine elements she should prioritise in the first three months for Karibu Kitchen — a small lunch-delivery restaurant serving Eldoret office workers and families.",
+    "question": "Which three should you recommend?",
+    "options": [
+      "Affiliate Marketing · Display Advertising · Whitepapers",
+      "Social Media Marketing · Mobile Marketing · Analytics",
+      "Search Engine Marketing (paid ads) · Affiliate Marketing · Display Advertising",
+      "Content Marketing only — nothing else matters for a small business"
+    ],
+    "correct": 1,
+    "explanation": "Sarah's customers are mobile-first Kenyans on Facebook and Instagram, ordering via WhatsApp. Social Media Marketing reaches them, Mobile Marketing meets them on the device they actually use, and Analytics tells her which content actually drove orders. Affiliate/Display/Whitepapers require budgets and audiences she does not yet have. Content Marketing alone with no measurement is guessing."
+  },
+  {
+    "scenario": "Sarah's stated goal is \"200 new lunch orders in month one\" from her KES 15,000 marketing budget. Karibu Kitchen currently averages 340 Facebook friends and about 40 lunch orders a week from word of mouth.",
+    "question": "How should you rewrite Sarah's goal so it becomes a SMART marketing objective?",
+    "options": [
+      "\"Get more customers — as many as possible — from Facebook.\"",
+      "\"Get 200 orders — this is realistic because the KES 15,000 budget will guarantee it.\"",
+      "\"Grow weekly lunch delivery orders in Kapsoya from 40 to 55 within 90 days by boosting three Facebook posts per week within the KES 15,000 monthly budget.\"",
+      "\"Beat Nyakinyua Kitchen at everything within 30 days.\""
+    ],
+    "correct": 2,
+    "explanation": "SMART = Specific (Kapsoya, lunch delivery), Measurable (40 → 55), Achievable (grounded in her current baseline and budget), Relevant (aligns to her business), Time-bound (90 days). Options 1, 2, and 4 fail at least one SMART criterion — either vague, unrealistic, or unmeasurable."
+  },
+  {
+    "scenario": "Sarah's WhatsApp Business collects customer names, phone numbers, and delivery addresses. She saves them in a shared Google Sheet that all four of her staff can view.",
+    "question": "Which action is required under Kenya's Data Protection Act 2019?",
+    "options": [
+      "Nothing — Kenya's law does not apply to WhatsApp businesses.",
+      "Restrict access to the sheet on a need-to-know basis, obtain customer consent for storing data, and log how the data is used.",
+      "Delete all customer data immediately — she is not allowed to store it at all.",
+      "Sell the data to a partner to help fund the business — this is legal in Kenya."
+    ],
+    "correct": 1,
+    "explanation": "Under Kenya's DPA 2019, Sarah is a data controller. Her obligations include limiting access, obtaining explicit consent, and being able to demonstrate how data is stored and used. Options 1 and 4 are wrong on the law. Option 3 overreads — she may store data with consent, she just cannot leak it or share it commercially without further consent."
+  },
+  {
+    "scenario": "A friend gives Sarah two cost estimates: (a) print 500 flyers at KES 8 each and hand them to office reception desks, or (b) boost a single Facebook post for KES 5,000 targeting Eldoret CBD.",
+    "question": "How would you compare the cost per order they are likely to produce?",
+    "options": [
+      "Flyers are always cheaper because there is no ad platform taking a cut.",
+      "Facebook boost is always cheaper because it uses AI.",
+      "It depends on measurable results. Flyers cost KES 4,000 and are hard to track. The Facebook boost costs KES 5,000 but Meta will report exact impressions, clicks, and (with a Pixel) purchases — so Sarah can calculate real cost per order for the ad, but only guess for the flyers.",
+      "Neither works — Sarah should hire a KES 40,000-a-month agency."
+    ],
+    "correct": 2,
+    "explanation": "The right answer is not \"which one is cheaper\", it is \"which one is measurable\". This lesson introduces analytics as one of the nine elements (§1.1) — the boost is trackable, the flyers are not. That measurability itself has value for a small business learning what works."
+  },
+  {
+    "scenario": "Sarah is considering whether digital marketing has any DISADVANTAGES she should worry about for Karibu Kitchen.",
+    "question": "Which of these is a genuine limitation of digital marketing for her business?",
+    "options": [
+      "Digital marketing is more expensive than traditional advertising in every case.",
+      "It cannot reach mobile users.",
+      "It removes the face-to-face connection with some customers — for example, an elderly Kapsoya resident with a Nokia feature phone.",
+      "It is illegal to run in Kenya."
+    ],
+    "correct": 2,
+    "explanation": "From §1.1: digital marketing's real limitations are reduced face-to-face contact, possible obtrusiveness, need for constant management, and unsuitability for some customer segments. Options 1, 2, and 4 are factually wrong."
+  },
+  {
+    "scenario": "Sarah's cousin argues: \"Just start posting on Facebook. Do not waste time planning a strategy.\"",
+    "question": "Why is this advice wrong?",
+    "options": [
+      "It is not wrong — planning is optional for small businesses.",
+      "It is wrong because without alignment to business goals, defined objectives, target audience, and a way to measure results, Sarah will spend her KES 15,000 with nothing to show for it.",
+      "It is wrong because Facebook is a bad platform for restaurants.",
+      "It is wrong only for large businesses — Sarah is small enough to skip planning."
+    ],
+    "correct": 1,
+    "explanation": "Section 1.2 defines a digital marketing strategy through eight elements — alignment to goals, objectives, target audience, competitor analysis, platform selection, content planning, budget allocation, reporting. Skipping any of these is what turns marketing budgets into wasted money. Small businesses need this MORE than large ones because their budgets are more precious."
+  },
+  {
+    "scenario": "Sarah's Karibu Kitchen graphics — her Facebook cover, her Instagram posts, and her printed flyers — all use different logos, different fonts, and different colours. She is not aware this is a problem.",
+    "question": "What should you tell her?",
+    "options": [
+      "\"It doesn't matter — customers just want good food.\"",
+      "\"Consistent brand elements — logo, colours, fonts, tone of voice — across every channel help customers recognise your business. This is a KEY POINT from Lesson 1.2.\"",
+      "\"Change your brand every month to stay fresh.\"",
+      "\"Just copy Nyakinyua Kitchen's design.\""
+    ],
+    "correct": 1,
+    "explanation": "Section 1.2 flags brand consistency as a KEY POINT: same logo, same voice, same colours across website, social, and email. Otherwise customers will not recognise you. Option 3 destroys recognition; option 4 destroys differentiation."
+  },
+  {
+    "scenario": "You are Sarah's trainer. She asks: \"If I do all this digital marketing well, what specific business results should I aim for?\"",
+    "question": "Which of these is NOT one of the seven goals listed in Lesson 1.1?",
+    "options": [
+      "Increased brand awareness",
+      "Lead generation",
+      "Sales generation",
+      "Winning an industry award for the best-designed website"
+    ],
+    "correct": 3,
+    "explanation": "Section 1.1's seven digital-marketing goals are: brand awareness, lead generation, sales generation, customer information (education), improved customer service, direct engagement, traffic generation. Awards are not on that list."
+  },
+  {
+    "scenario": "Sarah tells you: \"My cousin says I should run one Facebook campaign for one week, and if it does not deliver 200 orders I should give up on digital marketing entirely.\"",
+    "question": "What is the strongest reason this plan is flawed?",
+    "options": [
+      "One week is enough time to know — she is right to give up if it fails.",
+      "Digital marketing is a set of nine connected activities that require consistent effort over months, not a one-week experiment on one channel. Analytics needs weeks of data to reveal what works.",
+      "Facebook is the wrong platform.",
+      "Two hundred orders is possible in a week."
+    ],
+    "correct": 1,
+    "explanation": "This is the core lesson of Module 1 — digital marketing is a discipline, not a single one-week bet. One channel + one week + no analytics is a lottery ticket. The nine elements (§1.1) plus the eight strategy elements (§1.2) are designed to be run consistently, measured, and adjusted."
+  }
+];
+
+        let currentQuestion = 0, score = 0, streak = 0, answered = false;
+
+        function updateScoreboard() {
+            document.getElementById('score').textContent = score;
+            document.getElementById('current').textContent = Math.min(currentQuestion + 1, exercises.length);
+            document.getElementById('total').textContent = exercises.length;
+            document.getElementById('streak').textContent = streak;
+            document.getElementById('progress').style.width = ((currentQuestion) / exercises.length) * 100 + '%';
+        }
+
+        function escapeHtml(s) {
+            return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+        }
+
+        function renderQuestion() {
+            answered = false;
+            const q = exercises[currentQuestion];
+            let html = '';
+            if (q.scenario) {
+                html += `<div class="scenario"><strong>Scenario.</strong> ${escapeHtml(q.scenario)}</div>`;
+            }
+            html += `<div class="question">${escapeHtml(q.question)}</div>`;
+            html += '<div class="options">';
+            q.options.forEach((o, i) => {
+                html += `<button class="option" onclick="selectAnswer(${i})">${escapeHtml(o)}</button>`;
+            });
+            html += '</div>';
+            document.getElementById('exerciseCard').innerHTML = html;
+            updateScoreboard();
+        }
+
+        function selectAnswer(i) {
+            if (answered) return;
+            answered = true;
+            const q = exercises[currentQuestion];
+            const btns = document.querySelectorAll('.option');
+            btns.forEach(b => b.classList.add('disabled'));
+            btns[q.correct].classList.add('correct');
+            const right = i === q.correct;
+            if (!right) btns[i].classList.add('wrong');
+            if (right) { score += 10; streak += 1; } else { streak = 0; }
+            const fb = document.createElement('div');
+            fb.className = 'feedback ' + (right ? 'correct' : 'wrong');
+            fb.innerHTML = `<strong>${right ? '✅ Correct.' : '❌ Not quite.'}</strong><br>${escapeHtml(q.explanation)}`;
+            document.getElementById('exerciseCard').appendChild(fb);
+            const nb = document.createElement('button');
+            nb.className = 'next-btn';
+            nb.textContent = currentQuestion === exercises.length - 1 ? 'See results →' : 'Next scenario →';
+            nb.onclick = nextQuestion;
+            document.getElementById('exerciseCard').appendChild(nb);
+            updateScoreboard();
+        }
+
+        function nextQuestion() {
+            currentQuestion++;
+            if (currentQuestion >= exercises.length) return showResults();
+            renderQuestion();
+        }
+
+        function showResults() {
+            document.getElementById('progress').style.width = '100%';
+            const total = exercises.length * 10;
+            const pct = Math.round(score / total * 100);
+            if (window.parent) { window.parent.postMessage({type:"mtti_quiz_score", score: score, total: total, percent: pct}, "*"); }
+            let badge = '🌟', msg = 'Excellent work. You have a professional grasp of this lesson.';
+            if (pct < 50) { badge = '🌱'; msg = 'Good first attempt. Re-watch the lesson video and try again.'; }
+            else if (pct < 80) { badge = '📚'; msg = 'Solid progress. Review the scenarios you missed and retry.'; }
+            document.getElementById('exerciseCard').innerHTML = `
+                <div class="results">
+                    <span class="badge">${badge}</span>
+                    <h2>Quiz Complete</h2>
+                    <div class="final-score">${score} / ${total}</div>
+                    <p><strong>${pct}%</strong> · Longest streak: ${streak}</p>
+                    <p>${msg}</p>
+                    <button class="restart-btn" onclick="restart()">Try again 🔁</button>
+                </div>`;
+        }
+
+        function restart() {
+            currentQuestion = 0; score = 0; streak = 0;
+            renderQuestion();
+        }
+
+        renderQuestion();
+    </script>
+</body>
+</html>

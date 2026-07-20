@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Importing Media into CapCut and Canva Video (Lesson) | MTTI Video Editing</title>
+<link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Fredoka:wght@500;600&display=swap" rel="stylesheet">
+<style>
+* { margin:0; padding:0; box-sizing:border-box; }
+body { font-family:'Space Mono', monospace; background:linear-gradient(135deg,#6A11CB 0%,#2575FC 100%); min-height:100vh; padding:20px; color:#fff; }
+.container { max-width:820px; margin:0 auto; }
+.header { text-align:center; margin-bottom:24px; }
+.lesson-tag { display:inline-block; background:rgba(255,255,255,0.2); padding:6px 16px; border-radius:999px; font-size:0.85em; margin-bottom:12px; }
+.header h1 { font-family:'Fredoka', sans-serif; font-size:2em; margin-bottom:6px; text-shadow:3px 3px 0 rgba(0,0,0,0.2); }
+.card { background:#fff; color:#333; border-radius:22px; padding:32px; margin-bottom:20px; box-shadow:0 20px 60px rgba(0,0,0,0.3); }
+.section { margin-bottom:26px; }
+.section:last-child { margin-bottom:0; }
+.section h2 { font-family:'Fredoka', sans-serif; font-size:1.2em; margin-bottom:10px; color:#2575FC; }
+.section .body { line-height:1.65; font-size:0.98em; }
+.section .body p { margin-bottom:10px; }
+.section .body code { background:#f5f7fb; padding:2px 6px; border-radius:4px; font-size:0.92em; }
+.keypoint { background:#fff8e1; border-left:4px solid #ffc107; padding:12px 16px; border-radius:8px; margin-top:12px; font-size:0.92em; }
+
+/* ---------- Phone-mockup mini interface — a real screen-by-screen walk
+   through Home -> Gallery -> Timeline, not just a generic tap grid ---- */
+.demo-wrap { display:flex; justify-content:center; margin:18px 0 6px; }
+.demo-label { text-align:center; font-size:0.72em; color:#8a5cc9; text-transform:uppercase; letter-spacing:.06em; margin-bottom:10px; font-weight:700; }
+.demo-hint { text-align:center; font-size:0.85em; color:#666; max-width:420px; margin:0 auto 14px; line-height:1.5; }
+
+.phone-frame { width:260px; background:#0b0b12; border-radius:34px; padding:10px; box-shadow:0 24px 60px rgba(0,0,0,0.45); border:2px solid #2a2a3d; }
+.phone-notch { width:70px; height:16px; background:#0b0b12; border-radius:0 0 12px 12px; margin:0 auto 4px; position:relative; z-index:2; }
+.phone-screen-wrap { background:#15151f; border-radius:24px; overflow:hidden; height:420px; position:relative; }
+.phone-screen { position:absolute; inset:0; display:none; flex-direction:column; padding:16px 14px; color:#fff; }
+.phone-screen.active { display:flex; }
+.phone-home-indicator { width:100px; height:4px; background:#3a3a52; border-radius:3px; margin:6px auto 0; }
+
+/* Home screen */
+.pc-appname { text-align:center; font-family:'Fredoka', sans-serif; font-weight:700; font-size:1.05em; margin:6px 0 30px; color:#fff; }
+.pc-appname .dot { display:inline-block; width:7px; height:7px; border-radius:50%; background:#FE2C55; margin-right:6px; }
+.pc-new-project-btn { background:linear-gradient(135deg,#6A11CB,#2575FC); color:#fff; border:none; padding:16px; border-radius:14px; font-size:0.95em; font-weight:700; font-family:'Fredoka', sans-serif; cursor:pointer; margin:0 auto; width:90%; }
+.pc-home-sub { text-align:center; font-size:0.7em; color:#7a7a95; margin-top:12px; }
+
+/* Gallery screen */
+.pc-topbar { display:flex; align-items:center; justify-content:space-between; margin-bottom:14px; }
+.pc-back { color:#c7c7dd; font-size:1.1em; cursor:pointer; background:none; border:none; font-family:inherit; }
+.pc-title { font-family:'Fredoka', sans-serif; font-size:0.95em; font-weight:600; }
+.pc-add-btn { background:#6A11CB; color:#fff; border:none; padding:6px 12px; border-radius:8px; font-size:0.72em; font-weight:700; cursor:pointer; font-family:inherit; opacity:0.4; }
+.pc-add-btn.enabled { opacity:1; }
+.pc-gallery-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:6px; overflow-y:auto; flex:1; }
+.pc-gallery-item { position:relative; aspect-ratio:1; background:#26263c; border-radius:8px; display:flex; align-items:center; justify-content:center; font-size:1.4em; cursor:pointer; border:2px solid transparent; }
+.pc-gallery-item.selected { border-color:#22c55e; }
+.pc-gallery-item .sel-badge { position:absolute; top:3px; right:3px; width:18px; height:18px; background:#22c55e; color:#fff; border-radius:50%; font-size:0.62em; display:none; align-items:center; justify-content:center; font-weight:700; }
+.pc-gallery-item.selected .sel-badge { display:flex; }
+.pc-gallery-caption { position:absolute; bottom:2px; left:0; right:0; text-align:center; font-size:0.5em; color:#c7c7dd; }
+
+/* Timeline/editor screen */
+.pc-preview { background:linear-gradient(160deg,#2a2a45,#1a1a2e); border-radius:10px; height:150px; display:flex; align-items:center; justify-content:center; font-size:2em; margin-bottom:12px; flex-shrink:0; }
+.pc-editor-toolbar { display:flex; gap:6px; margin-bottom:10px; overflow-x:auto; }
+.pc-tool-pill { flex-shrink:0; background:#1f1f30; border:1px solid #33334d; color:#c7c7dd; padding:5px 10px; border-radius:8px; font-size:0.65em; white-space:nowrap; }
+.pc-timeline-label { font-size:0.65em; color:#8a8aa3; text-transform:uppercase; margin-bottom:6px; }
+.pc-timeline { display:flex; gap:4px; background:#0b0b12; border-radius:8px; padding:6px; overflow-x:auto; flex:1; align-items:flex-start; }
+.pc-timeline-clip { flex-shrink:0; background:#2575FC; border-radius:6px; padding:8px 10px; font-size:0.68em; font-weight:700; white-space:nowrap; }
+.pc-start-over { margin-top:10px; background:rgba(255,255,255,0.12); border:1px solid rgba(255,255,255,0.25); color:#fff; padding:8px; border-radius:8px; font-size:0.72em; cursor:pointer; font-family:'Space Mono', monospace; }
+</style>
+</head>
+<body>
+<div class="container">
+<div class="header"><div class="lesson-tag">Unit 21 · Topic 1</div><h1>Importing Media into CapCut and Canva Video</h1></div>
+<div class="card">
+<div class="section"><h2>Starting a New Project and Reaching the Gallery</h2><div class="body"><p>In CapCut, everything begins with tapping <strong>New Project</strong> on the home screen. CapCut immediately opens the phone's <strong>Gallery/Albums</strong> tab so Otieno can select the footage he wants to bring in &mdash; there is no separate "import" step before this; selecting clips here <em>is</em> the import.</p><p>The first time CapCut needs this, the phone asks for permission to access photos and videos. If Otieno denies this, the Gallery tab stays empty, which is a common reason a new phone or client-borrowed device seems to have "no footage" available.</p></div></div>
+
+<div class="section"><h2>Selecting and Adding Clips in CapCut</h2><div class="body"><p>Clips can be tapped one at a time or multi-selected in the Gallery grid, and CapCut numbers each clip in the order it was tapped. Tapping <strong>Add</strong> brings every selected clip onto the timeline in that same selection order &mdash; so for a shop promo made of five phone clips, Otieno should tap them in the order he wants them to play, not just in the order they happen to sit in the gallery.</p><p>If the order comes out wrong, nothing needs re-importing: clips can simply be dragged left or right along the timeline afterward to fix the sequence.</p></div>
+
+<div class="demo-label">Try It — Actual CapCut Screens</div>
+<div class="demo-hint">This is a real walkthrough of the three CapCut screens Otieno actually sees: tap <strong>New Project</strong>, select his shop-promo clips in the Gallery in whatever order you like, then tap <strong>Add</strong> to watch them land on the Timeline in that exact order — just like the text above describes. Nothing here is graded.</div>
+<div class="demo-wrap">
+<div class="phone-frame">
+  <div class="phone-notch"></div>
+  <div class="phone-screen-wrap">
+
+    <div class="phone-screen active" id="screenHome">
+      <div class="pc-appname"><span class="dot"></span>CapCut</div>
+      <button class="pc-new-project-btn" id="newProjectBtn">+ New Project</button>
+      <div class="pc-home-sub">Tap to start a project from your Gallery</div>
+    </div>
+
+    <div class="phone-screen" id="screenGallery">
+      <div class="pc-topbar">
+        <button class="pc-back" id="galleryBackBtn">←</button>
+        <span class="pc-title">Gallery</span>
+        <button class="pc-add-btn" id="galleryAddBtn">Add (<span id="selCount">0</span>)</button>
+      </div>
+      <div class="pc-gallery-grid" id="galleryGrid"></div>
+    </div>
+
+    <div class="phone-screen" id="screenEditor">
+      <div class="pc-preview">▶</div>
+      <div class="pc-editor-toolbar">
+        <div class="pc-tool-pill">✂️ Split</div>
+        <div class="pc-tool-pill">🔀 Transitions</div>
+        <div class="pc-tool-pill">🔊 Audio</div>
+        <div class="pc-tool-pill">📤 Export</div>
+      </div>
+      <div class="pc-timeline-label">Timeline</div>
+      <div class="pc-timeline" id="editorTimeline"></div>
+      <button class="pc-start-over" id="startOverBtn">↺ Start Over</button>
+    </div>
+
+  </div>
+  <div class="phone-home-indicator"></div>
+</div>
+</div>
+
+</div>
+
+<div class="section"><h2>Importing into Canva Video</h2><div class="body"><p>When Otieno edits a bigger job on his laptop in Canva Video, footage comes in through the <strong>Uploads</strong> tab on the left-hand panel instead of a phone Gallery. He can drag video files in directly from a folder on the laptop, or upload straight from a connected Google Drive if that's where the client's files were shared. Once uploaded, clips are dragged from the Uploads panel onto the timeline, the same way CapCut clips are dragged into place.</p></div></div>
+
+<div class="section"><h2>Common Import Pitfalls</h2><div class="body"><p>Clients often forward footage over WhatsApp because it's easy, but WhatsApp automatically compresses video, throwing away detail and sharpness before Otieno ever sees the file. Where possible, he asks for the original file by cable transfer, Google Drive link, or direct phone-to-phone copy instead of a WhatsApp-forwarded copy, especially for paid promo work that clients expect to look sharp.</p><p>Right after import, it is worth a quick scroll through the timeline to confirm every clip landed in the right order and that nothing was accidentally imported twice.</p></div><div class="keypoint"><strong>Key Point.</strong> Import from the best-quality source available (original file, not a WhatsApp-compressed forward), select clips in the order they should play, and always double-check the timeline order right after import rather than discovering a mix-up halfway through editing.</div></div>
+</div>
+</div>
+<script>
+/* Real screen-by-screen CapCut walkthrough: Home -> Gallery -> Editor,
+   mirroring the actual app flow rather than an abstract tap-grid. Ungraded,
+   no right/wrong — pure "see how the real app behaves" reinforcement,
+   separate from the scored Practical later in this topic. */
+const GALLERY_CLIPS = [
+    { id: 'g1', label: 'Shop Front', icon: '🏪' },
+    { id: 'g2', label: 'Product Rack 1', icon: '🛍️' },
+    { id: 'g3', label: 'Owner Talking', icon: '🗣️' },
+    { id: 'g4', label: 'Product Rack 2', icon: '🛒' },
+    { id: 'g5', label: 'Shop Exterior', icon: '🏬' },
+    { id: 'g6', label: 'Till Point', icon: '💳' },
+];
+let selected = [];
+
+function escHtml(s) { return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+
+function showScreen(id) {
+    document.querySelectorAll('.phone-screen').forEach(s => s.classList.remove('active'));
+    document.getElementById(id).classList.add('active');
+}
+
+function renderGallery() {
+    document.getElementById('galleryGrid').innerHTML = GALLERY_CLIPS.map(c => {
+        const isSel = selected.includes(c.id);
+        const num = isSel ? selected.indexOf(c.id) + 1 : '';
+        return `<div class="pc-gallery-item ${isSel ? 'selected' : ''}" data-id="${c.id}">
+            <span class="sel-badge">${num}</span>
+            <span>${c.icon}</span>
+            <span class="pc-gallery-caption">${escHtml(c.label)}</span>
+        </div>`;
+    }).join('');
+    document.querySelectorAll('.pc-gallery-item').forEach(el => {
+        el.addEventListener('click', () => toggleSelect(el.dataset.id));
+    });
+    document.getElementById('selCount').textContent = selected.length;
+    document.getElementById('galleryAddBtn').classList.toggle('enabled', selected.length > 0);
+}
+
+function toggleSelect(id) {
+    const i = selected.indexOf(id);
+    if (i === -1) selected.push(id); else selected.splice(i, 1);
+    renderGallery();
+}
+
+function renderEditorTimeline() {
+    document.getElementById('editorTimeline').innerHTML = selected.map(id => {
+        const c = GALLERY_CLIPS.find(g => g.id === id);
+        return `<div class="pc-timeline-clip">${escHtml(c.label)}</div>`;
+    }).join('');
+}
+
+document.getElementById('newProjectBtn').addEventListener('click', () => {
+    showScreen('screenGallery');
+    renderGallery();
+});
+document.getElementById('galleryBackBtn').addEventListener('click', () => showScreen('screenHome'));
+document.getElementById('galleryAddBtn').addEventListener('click', () => {
+    if (selected.length === 0) return;
+    renderEditorTimeline();
+    showScreen('screenEditor');
+});
+document.getElementById('startOverBtn').addEventListener('click', () => {
+    selected = [];
+    showScreen('screenHome');
+});
+</script>
+</body>
+</html>

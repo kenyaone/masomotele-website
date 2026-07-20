@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Syncing Voice-Over and Video (Lesson) | MTTI Video Editing</title>
+<link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Fredoka:wght@500;600&display=swap" rel="stylesheet">
+<style>
+* { margin:0; padding:0; box-sizing:border-box; }
+body { font-family:'Space Mono', monospace; background:linear-gradient(135deg,#6A11CB 0%,#2575FC 100%); min-height:100vh; padding:20px; color:#fff; }
+.container { max-width:820px; margin:0 auto; }
+.header { text-align:center; margin-bottom:24px; }
+.lesson-tag { display:inline-block; background:rgba(255,255,255,0.2); padding:6px 16px; border-radius:999px; font-size:0.85em; margin-bottom:12px; }
+.header h1 { font-family:'Fredoka', sans-serif; font-size:2em; margin-bottom:6px; text-shadow:3px 3px 0 rgba(0,0,0,0.2); }
+.card { background:#fff; color:#333; border-radius:22px; padding:32px; margin-bottom:20px; box-shadow:0 20px 60px rgba(0,0,0,0.3); }
+.section { margin-bottom:26px; }
+.section:last-child { margin-bottom:0; }
+.section h2 { font-family:'Fredoka', sans-serif; font-size:1.2em; margin-bottom:10px; color:#6A11CB; }
+.section .body { line-height:1.65; font-size:0.98em; }
+.section .body p { margin-bottom:10px; }
+.section .body code { background:#f5f7fb; padding:2px 6px; border-radius:4px; font-size:0.92em; }
+.keypoint { background:#fff8e1; border-left:4px solid #ffc107; padding:12px 16px; border-radius:8px; margin-top:12px; font-size:0.92em; }
+</style>
+</head>
+<body>
+<div class="container">
+<div class="header"><div class="lesson-tag">Audio Editing · Topic 2</div><h1>Syncing Voice-Over and Video</h1></div>
+<div class="card"><div class="section"><h2>Why Voice-Overs Get Re-Recorded</h2><div class="body"><p>Otieno often films a client speaking on location &mdash; a shop owner giving a testimonial, a pastor greeting a congregation &mdash; only to find the on-camera audio is full of traffic noise or wind. Rather than trying to rescue the original take, he re-records the same lines in a quiet room and drops that clean voice-over onto its own audio track under the original video, muting or deleting the noisy on-camera audio.</p><p>Because the new recording was never performed in perfect lockstep with the camera, it almost never lines up with the client's lips the moment it is dropped onto the timeline &mdash; it needs to be nudged into place.</p></div></div><div class="section"><h2>Spotting a Sync Mismatch</h2><div class="body"><p>Otieno zooms in on the timeline and scrubs slowly across a moment where the client's mouth clearly opens or closes. If the sound arrives <strong>before</strong> the lips move, the audio is said to <strong>lead</strong> the video; if it arrives <strong>after</strong>, the audio <strong>lags</strong> behind. Either direction looks and sounds wrong to a viewer, even by a fraction of a second.</p><p>The waveform view helps here: a sharp spike in the waveform should land under the exact frame where the mouth closes or opens, not several frames before or after it.</p></div></div><div class="section"><h2>Nudging the Audio Track</h2><div class="body"><p>To fix a mismatch, Otieno drags the audio clip along its own track: moving it <strong>left</strong> makes it play <strong>earlier</strong>, and moving it <strong>right</strong> makes it play <strong>later</strong>. If the audio was leading (arriving too early), it needs to move right/later so it catches up with the lips; if it was lagging, it needs to move left/earlier. He zooms the timeline in tightly and nudges in small steps, checking the offset in milliseconds or frames rather than eyeballing a rough drag.</p><p>A reliable way to check the fix is to find a <strong>plosive</strong> consonant in the line &mdash; a hard "p" or "b" sound &mdash; since the lips visibly snap shut right at that instant, giving a precise visual marker to line up against the matching spike in the waveform.</p></div><div class="keypoint"><strong>Key Point.</strong> Once a rough offset is corrected, Otieno re-checks sync at more than one point across the clip &mdash; the start, the middle, and near the end &mdash; since two recordings made at slightly different times can drift apart over a long clip even after the opening lines match perfectly.</div></div></div>
+</div>
+</body>
+</html>

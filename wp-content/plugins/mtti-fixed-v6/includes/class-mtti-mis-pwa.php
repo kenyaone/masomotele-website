@@ -309,14 +309,13 @@ class MTTI_MIS_PWA {
  * Provides offline caching and fast loading
  */
 
-const CACHE_NAME = 'mtti-portal-v1';
+const CACHE_NAME = 'mtti-portal-v2';
 const OFFLINE_URL = '{$offline_url}';
 
-// Files to cache immediately on install
+// Only genuinely static, non-personalized assets get precached and served
+// cache-first. The portal shell itself (and '/wp-login.php') were removed
+// from here in v2 — see the fetch handler below for why.
 const PRECACHE_URLS = [
-    '/',
-    '{$portal_url}',
-    '/wp-login.php',
     '{$offline_url}',
     '{$css_url}',
     '{$js_url}',
@@ -335,7 +334,11 @@ self.addEventListener('install', event => {
     );
 });
 
-// Activate event - clean up old caches
+// Activate event - clean up old caches. Bumping CACHE_NAME here (v1 -> v2)
+// is what actually purges every stale HTML page any visitor's browser
+// wrongly cached under the old strategy below — without the name change,
+// old cached entries would just sit there forever since nothing else ever
+// deletes a cache by itself.
 self.addEventListener('activate', event => {
     event.waitUntil(
         caches.keys().then(cacheNames => {
@@ -348,19 +351,54 @@ self.addEventListener('activate', event => {
     );
 });
 
-// Fetch event - serve from cache, fall back to network
+// Fetch event.
+// v1 served EVERY GET request cache-first, including full-page navigations
+// to the student portal — /student-portal/ was in PRECACHE_URLS, and any
+// other URL (any ?portal_tab=...&filter_course=... variant) got cached on
+// first visit and then served stale forever after, refreshing only in the
+// background one visit too late. That silently fought the server's own
+// nocache_headers()/DONOTCACHEPAGE on a page that is explicitly
+// personalized per student (payment balance, unlocked lessons, progress) —
+// a paid-down balance or a newly unlocked lesson could appear to "not take
+// effect" indefinitely because the browser kept re-serving whatever HTML
+// it first saw for that exact URL.
+//
+// Fix: navigation requests (actual page loads, i.e. the portal itself and
+// any other page) are now network-first — always try the network for the
+// current, real data, and only fall back to a cached/offline copy if the
+// network genuinely fails (offline). Cache-first-with-background-refresh
+// is kept, but only for real static sub-resources (CSS/JS/images), where
+// serving a slightly-stale asset for one extra request is harmless and the
+// speed benefit is the whole point.
 self.addEventListener('fetch', event => {
     // Skip non-GET requests
     if (event.request.method !== 'GET') return;
-    
+
     // Skip admin and API requests
     const url = new URL(event.request.url);
-    if (url.pathname.startsWith('/wp-admin') || 
+    if (url.pathname.startsWith('/wp-admin') ||
         url.pathname.startsWith('/wp-json') ||
         url.pathname.includes('admin-ajax.php')) {
         return;
     }
 
+    // Navigation requests (page loads) — network-first, never stale.
+    if (event.request.mode === 'navigate') {
+        event.respondWith(
+            fetch(event.request)
+                .then(response => {
+                    if (response.status === 200) {
+                        const responseClone = response.clone();
+                        caches.open(CACHE_NAME).then(cache => cache.put(event.request, responseClone));
+                    }
+                    return response;
+                })
+                .catch(() => caches.match(event.request).then(cached => cached || caches.match(OFFLINE_URL)))
+        );
+        return;
+    }
+
+    // Static sub-resources — cache-first, refresh in background.
     event.respondWith(
         caches.match(event.request)
             .then(cachedResponse => {
@@ -369,7 +407,7 @@ self.addEventListener('fetch', event => {
                     event.waitUntil(updateCache(event.request));
                     return cachedResponse;
                 }
-                
+
                 // Not in cache - fetch from network
                 return fetch(event.request)
                     .then(response => {
@@ -381,12 +419,7 @@ self.addEventListener('fetch', event => {
                         }
                         return response;
                     })
-                    .catch(() => {
-                        // Network failed - show offline page for navigation requests
-                        if (event.request.mode === 'navigate') {
-                            return caches.match(OFFLINE_URL);
-                        }
-                    });
+                    .catch(() => {});
             })
     );
 });

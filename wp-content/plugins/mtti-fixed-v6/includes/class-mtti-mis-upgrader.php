@@ -69,8 +69,22 @@ class MTTI_MIS_Upgrader {
             self::upgrade_to_7_8_0();
         }
 
+        // Deposit/installment enrollment: per-course minimum deposit, and
+        // distinguishing new-enrollment purchases from balance top-ups
+        if (version_compare($current_version, '7.9.0', '<')) {
+            self::upgrade_to_7_9_0();
+        }
+
+        // Fix mtti_certificates.status — every certificate-creation call
+        // site writes 'Valid', but the enum never included it, so MySQL
+        // silently stored an empty string and every student-facing
+        // certificate download has always failed its 'Valid' check
+        if (version_compare($current_version, '7.9.1', '<')) {
+            self::upgrade_to_7_9_1();
+        }
+
         // Update database version
-        update_option('mtti_mis_db_version', '7.8.0');
+        update_option('mtti_mis_db_version', '7.9.1');
     }
     
     /**
@@ -500,5 +514,48 @@ class MTTI_MIS_Upgrader {
         }
 
         error_log('MTTI MIS: Database upgraded to version 7.8.0 - Added mtti_course_purchases.pesapal_tracking_id');
+    }
+
+    private static function upgrade_to_7_9_0() {
+        global $wpdb;
+
+        $courses_table = $wpdb->prefix . 'mtti_courses';
+        $columns = $wpdb->get_results("SHOW COLUMNS FROM {$courses_table}");
+        $column_names = array();
+        foreach ($columns as $column) {
+            $column_names[] = $column->Field;
+        }
+        if (!in_array('min_deposit_percent', $column_names)) {
+            $wpdb->query("ALTER TABLE {$courses_table} ADD COLUMN min_deposit_percent DECIMAL(5,2) NULL DEFAULT NULL AFTER online_fee");
+        }
+
+        $purchases_table = $wpdb->prefix . 'mtti_course_purchases';
+        $columns = $wpdb->get_results("SHOW COLUMNS FROM {$purchases_table}");
+        $column_names = array();
+        foreach ($columns as $column) {
+            $column_names[] = $column->Field;
+        }
+        if (!in_array('enrollment_id', $column_names)) {
+            $wpdb->query("ALTER TABLE {$purchases_table} ADD COLUMN enrollment_id BIGINT NULL DEFAULT NULL AFTER student_id, ADD KEY enrollment_id (enrollment_id)");
+        }
+        if (!in_array('purchase_type', $column_names)) {
+            $wpdb->query("ALTER TABLE {$purchases_table} ADD COLUMN purchase_type VARCHAR(20) NOT NULL DEFAULT 'enrollment' AFTER status");
+        }
+
+        error_log('MTTI MIS: Database upgraded to version 7.9.0 - Added mtti_courses.min_deposit_percent, mtti_course_purchases.enrollment_id/purchase_type');
+    }
+
+    private static function upgrade_to_7_9_1() {
+        global $wpdb;
+        $certs_table = $wpdb->prefix . 'mtti_certificates';
+
+        $wpdb->query("ALTER TABLE {$certs_table} MODIFY COLUMN status ENUM('Issued','Pending','Revoked','Valid') DEFAULT 'Pending'");
+
+        // Backfill certificates that were silently corrupted to '' by the
+        // enum mismatch (every one of them was written with the intent of
+        // 'Valid' at creation time) — skip soft-deleted rows.
+        $wpdb->query("UPDATE {$certs_table} SET status = 'Valid' WHERE status = '' AND deleted_at IS NULL");
+
+        error_log('MTTI MIS: Database upgraded to version 7.9.1 - Fixed mtti_certificates.status enum, backfilled corrupted rows to Valid');
     }
 }

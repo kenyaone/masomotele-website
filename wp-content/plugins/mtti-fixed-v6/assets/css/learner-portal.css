@@ -129,12 +129,14 @@ body.mtti-portal-active .ast-container{max-width:100%!important;padding-left:0!i
 .mtti-ring-info{flex:1!important;min-width:180px!important;}
 .mtti-ring-info h3{margin:0 0 4px!important;font-size:14px!important;color:var(--text-1)!important;}
 .mtti-ring-info p{margin:0!important;font-size:12px!important;color:var(--text-3)!important;}
-.mtti-progress-bar{height:6px!important;background:var(--border)!important;border-radius:4px!important;overflow:hidden!important;margin:7px 0!important;}
-.mtti-progress-fill{height:100%!important;background:linear-gradient(90deg,var(--mtti-primary),var(--mtti-primary-light))!important;border-radius:4px!important;transition:width 1s ease!important;}
+.mtti-progress-bar{height:14px!important;background:var(--border)!important;border-radius:999px!important;overflow:hidden!important;margin:9px 0!important;box-shadow:inset 0 1px 3px rgba(0,0,0,.12)!important;position:relative!important;}
+.mtti-progress-fill{height:100%!important;background:linear-gradient(90deg,#FF8F00,#FFC107 55%,#FFD54F)!important;border-radius:999px!important;transition:width 1s ease!important;box-shadow:0 0 10px rgba(255,143,0,.55),0 1px 2px rgba(0,0,0,.15)!important;position:relative!important;overflow:hidden!important;}
+.mtti-progress-fill::after{content:''!important;position:absolute!important;inset:0!important;background:linear-gradient(120deg,transparent 0%,rgba(255,255,255,.45) 45%,transparent 65%)!important;background-size:220% 100%!important;animation:mtti-progress-shine 2.6s ease-in-out infinite!important;}
+@keyframes mtti-progress-shine{0%{background-position:130% 0;}100%{background-position:-30% 0;}}
 .mtti-other-courses-progress{background:var(--bg-card)!important;border:1px solid var(--border)!important;border-radius:var(--r-md)!important;padding:14px 18px!important;margin-bottom:18px!important;box-shadow:var(--shadow-sm)!important;}
 .mtti-other-course-row{display:flex!important;align-items:center!important;gap:12px!important;padding:6px 0!important;}
 .mtti-other-course-name{font-size:12px!important;font-weight:700!important;color:var(--text-2)!important;width:70px!important;flex-shrink:0!important;}
-.mtti-other-course-row .mtti-progress-bar{margin:0!important;}
+.mtti-other-course-row .mtti-progress-bar{height:9px!important;margin:0!important;}
 .mtti-other-course-pct{font-size:11px!important;color:var(--text-3)!important;flex-shrink:0!important;white-space:nowrap!important;}
 
 /* Goal + Payment */
@@ -322,7 +324,7 @@ body.mtti-portal-active .ast-container{max-width:100%!important;padding-left:0!i
 .mtti-ai-send:disabled{opacity:.5!important;cursor:not-allowed!important;}
 
 /* Modal */
-.mtti-modal{position:fixed!important;inset:0!important;background:rgba(0,0,0,.5)!important;display:flex!important;justify-content:center!important;align-items:center!important;z-index:9999!important;}
+.mtti-modal{position:fixed!important;inset:0!important;background:rgba(0,0,0,.5)!important;display:flex!important;justify-content:center!important;align-items:center!important;z-index:10000!important;}
 .mtti-modal-content{background:var(--bg-card)!important;border-radius:var(--r-md)!important;padding:26px!important;width:90%!important;max-width:500px!important;max-height:90vh!important;overflow-y:auto!important;color:var(--text-1)!important;}
 .mtti-modal-content h3{margin:0 0 18px!important;color:var(--text-1)!important;}
 .mtti-form-group{margin-bottom:16px!important;}
@@ -461,3 +463,15 @@ a.mtti-player-lesson-row:hover{background:var(--bg-subtle)!important;color:var(-
     #mtti-portal .mtti-portal-menu li.active a{border-left-color:white!important;border-bottom:none!important;}
     #mtti-portal .mtti-portal-main{flex:1!important;min-width:0!important;}
 }
+
+/* Floating WhatsApp help button — persistent across every portal tab */
+.mtti-wa-float{position:fixed!important;bottom:22px!important;right:22px!important;z-index:9999!important;display:flex!important;align-items:center!important;gap:9px!important;background:#25D366!important;color:#fff!important;text-decoration:none!important;padding:13px 20px 13px 16px!important;border-radius:999px!important;box-shadow:0 6px 20px rgba(37,211,102,.45),0 2px 8px rgba(0,0,0,.15)!important;font-family:'Plus Jakarta Sans',sans-serif!important;font-size:14px!important;font-weight:700!important;transition:transform .2s ease,box-shadow .2s ease!important;animation:mtti-wa-pulse 2.4s ease-in-out infinite!important;}
+.mtti-wa-float:hover{transform:translateY(-3px) scale(1.04)!important;box-shadow:0 10px 26px rgba(37,211,102,.55),0 3px 10px rgba(0,0,0,.18)!important;color:#fff!important;}
+.mtti-wa-float svg{width:24px!important;height:24px!important;flex-shrink:0!important;}
+.mtti-wa-float-label{white-space:nowrap!important;}
+@keyframes mtti-wa-pulse{0%,100%{box-shadow:0 6px 20px rgba(37,211,102,.45),0 2px 8px rgba(0,0,0,.15);}50%{box-shadow:0 6px 20px rgba(37,211,102,.75),0 2px 8px rgba(0,0,0,.15),0 0 0 8px rgba(37,211,102,.15);}}
+@media screen and (max-width:480px){.mtti-wa-float{bottom:16px!important;right:16px!important;padding:13px!important;}.mtti-wa-float-label{display:none!important;}}
+
+/* Progress-bar encouragement copy — dashboard widget & lesson-player sidebar */
+.mtti-dash-progress-encourage{margin:6px 0 0!important;font-size:13px!important;font-weight:700!important;color:#E65100!important;}
+.mtti-player-progress-encourage{display:block!important;margin-top:4px!important;font-size:11px!important;font-weight:700!important;color:#FFD54F!important;}

@@ -173,6 +173,16 @@ class MTTI_MIS_Admin_Courses {
                         <td><input type="number" name="fee" required class="regular-text" step="0.01"></td>
                     </tr>
                     <tr>
+                        <th><label>Online Fee (KES)</label></th>
+                        <td><input type="number" name="online_fee" class="regular-text" step="0.01">
+                            <p class="description">Charged instead of the standard fee for online self-checkout. Leave blank to use the standard fee.</p></td>
+                    </tr>
+                    <tr>
+                        <th><label>Minimum Deposit (%)</label></th>
+                        <td><input type="number" name="min_deposit_percent" class="regular-text" step="1" min="1" max="100">
+                            <p class="description">Minimum % of the online fee required to enroll online (installment payments). Leave blank to use the site-wide default (currently <?php echo esc_html(get_option('mtti_mis_default_deposit_percent', 50)); ?>%).</p></td>
+                    </tr>
+                    <tr>
                         <th><label>Description</label></th>
                         <td><textarea name="description" rows="4" class="large-text"></textarea></td>
                     </tr>
@@ -304,6 +314,22 @@ class MTTI_MIS_Admin_Courses {
                         </td>
                     </tr>
                     <tr>
+                        <th><label>Online Fee (KES)</label></th>
+                        <td>
+                            <input type="number" name="online_fee" class="regular-text" step="0.01"
+                                   value="<?php echo esc_attr($course->online_fee ?? ''); ?>">
+                            <p class="description">Charged instead of the standard fee for online self-checkout. Leave blank to use the standard fee.</p>
+                        </td>
+                    </tr>
+                    <tr>
+                        <th><label>Minimum Deposit (%)</label></th>
+                        <td>
+                            <input type="number" name="min_deposit_percent" class="regular-text" step="1" min="1" max="100"
+                                   value="<?php echo esc_attr($course->min_deposit_percent ?? ''); ?>">
+                            <p class="description">Minimum % of the online fee required to enroll online (installment payments). Leave blank to use the site-wide default (currently <?php echo esc_html(get_option('mtti_mis_default_deposit_percent', 50)); ?>%).</p>
+                        </td>
+                    </tr>
+                    <tr>
                         <th><label>Description</label></th>
                         <td>
                             <textarea name="description" rows="4" class="large-text"><?php echo esc_textarea($course->description); ?></textarea>
@@ -337,6 +363,8 @@ class MTTI_MIS_Admin_Courses {
             'category' => sanitize_text_field($_POST['category']),
             'duration_weeks' => intval($_POST['duration_weeks']),
             'fee' => floatval($_POST['fee']),
+            'online_fee' => (($_POST['online_fee'] ?? '') !== '') ? floatval($_POST['online_fee']) : null,
+            'min_deposit_percent' => (($_POST['min_deposit_percent'] ?? '') !== '') ? floatval($_POST['min_deposit_percent']) : null,
             'description' => sanitize_textarea_field($_POST['description'])
         );
         

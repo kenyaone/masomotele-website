@@ -1,12 +1,21 @@
 <?php
 /**
- * M-Pesa STK Push Handler for MTTI
- * Endpoint: /mtti-stk-push.php
- * Called via AJAX from student portal and admin panel
+ * M-Pesa STK Push Handler for MTTI — DISABLED 2026-07-19.
+ * This was a direct Safaricom Daraja integration still wired to SANDBOX
+ * credentials (see MPESA_ENV below), so it was showing students a false
+ * "STK Push sent!" success message without processing any real payment.
+ * PesaPal is the one real, configured online payment gateway now — the UI
+ * box that called this endpoint (learner portal payments tab) has been
+ * removed. Left in place (not deleted) with the request short-circuited
+ * below, in case a real production Daraja integration is wired up later.
  */
 
-require_once __DIR__ . '/wp-load.php';
 header('Content-Type: application/json');
+http_response_code(410);
+echo json_encode(['success' => false, 'message' => 'This payment method has been retired. Please use PesaPal.']);
+exit;
+
+require_once __DIR__ . '/wp-load.php';
 
 // ── CONFIG ────────────────────────────────────────────────────────────────────
 // SANDBOX credentials — replace with Production values when go-live

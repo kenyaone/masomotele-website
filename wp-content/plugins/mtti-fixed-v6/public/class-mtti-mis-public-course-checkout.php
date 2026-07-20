@@ -3,14 +3,13 @@
  * Online self-checkout – shortcode [mtti_course_checkout]
  *
  * For purely-online learners: pick a course, see its fee, leave contact
- * details, and land in an "awaiting payment" state. No student/enrollment
- * record is created yet at this point — a mtti_course_purchases row is,
- * with a shareable reference code. Enrollment is created automatically
- * (mtti_mis_complete_course_purchase() in mtti-mis.php) only once that
- * purchase is marked paid, currently done from the admin "Course
- * Purchases" screen and intended to be triggered by a real M-Pesa webhook
- * once those credentials are wired in — the enrollment logic itself
- * doesn't change either way.
+ * details, and get handed off to PesaPal for real payment. No student/
+ * enrollment record is created yet at this point — a mtti_course_purchases
+ * row is, with a shareable reference code. Enrollment is created
+ * automatically (mtti_mis_complete_course_purchase() in mtti-mis.php) once
+ * that purchase is marked paid — normally via PesaPal's own confirmation,
+ * with the admin "Course Purchases" screen as a manual fallback if PesaPal's
+ * API is ever unreachable at submission time.
  */
 
 if (!defined('ABSPATH')) exit;
@@ -21,7 +20,7 @@ class MTTI_MIS_Public_Course_Checkout {
         global $wpdb;
 
         $courses = $wpdb->get_results(
-            "SELECT course_id, course_code, course_name, fee, online_fee, duration_weeks
+            "SELECT course_id, course_code, course_name, fee, online_fee, min_deposit_percent, duration_weeks
              FROM {$wpdb->prefix}mtti_courses
              WHERE status = 'Active' AND is_active = 1 AND deleted_at IS NULL
                AND course_name IS NOT NULL
@@ -30,8 +29,12 @@ class MTTI_MIS_Public_Course_Checkout {
         // Purely-online checkout charges the online fee when one is set,
         // falling back to the standard (campus) fee for courses that don't
         // have a separate online price yet.
+        $default_deposit_pct = floatval(get_option('mtti_mis_default_deposit_percent', 50));
         foreach ($courses as $c) {
             $c->effective_fee = (!is_null($c->online_fee) && $c->online_fee > 0) ? $c->online_fee : $c->fee;
+            $c->deposit_pct = (!is_null($c->min_deposit_percent) && $c->min_deposit_percent > 0)
+                ? floatval($c->min_deposit_percent) : $default_deposit_pct;
+            $c->min_deposit = round($c->effective_fee * $c->deposit_pct / 100, 2);
         }
 
         ob_start();
@@ -71,6 +74,22 @@ class MTTI_MIS_Public_Course_Checkout {
         }
         if (!$course) $errors[] = 'Please choose a course.';
 
+        // Deposit amount — server is the source of truth, never trust the
+        // client-computed minimum. Defaults to the full fee (unchanged
+        // behavior for anyone who doesn't touch the deposit option).
+        $submitted_amount = $course ? $course->effective_fee : 0;
+        if ($course) {
+            $pay_full = ($_POST['payment_choice'] ?? 'full') === 'full';
+            $submitted_amount = $pay_full ? $course->effective_fee : floatval($_POST['amount'] ?? 0);
+
+            if (!$pay_full && $submitted_amount < $course->min_deposit) {
+                $errors[] = 'Minimum deposit for this course is KES ' . number_format($course->min_deposit, 2) . '.';
+            }
+            if ($submitted_amount > $course->effective_fee) {
+                $submitted_amount = $course->effective_fee; // never accept more than the fee at signup
+            }
+        }
+
         if (!empty($errors)) {
             $this->last_errors = $errors;
             return null;
@@ -87,18 +106,20 @@ class MTTI_MIS_Public_Course_Checkout {
             'last_name'      => $last_name,
             'email'          => $email,
             'phone'          => $phone,
-            'amount'         => $course->effective_fee,
+            'amount'         => $submitted_amount,
             'status'         => 'awaiting_payment',
+            'purchase_type'  => 'enrollment',
         ));
         $purchase_id = (int) $wpdb->insert_id;
 
         // Try to hand off to PesaPal for real online payment. If it fails
         // for any reason (API down, bad credentials, etc.) we fall back to
-        // the old "we'll confirm your M-Pesa payment manually" flow rather
-        // than blocking the whole enrollment.
+        // a manual-follow-up flow rather than blocking the whole enrollment
+        // — staff complete it via PesaPal once it's reachable again, not
+        // via a separate M-Pesa process.
         $order = MTTI_MIS_Pesapal::submit_order(array(
             'merchant_reference' => $reference_code,
-            'amount'             => $course->effective_fee,
+            'amount'             => $submitted_amount,
             'description'        => $course->course_name . ' (' . $course->course_code . ')',
             'email'              => $email,
             'phone'              => $phone,
@@ -122,7 +143,7 @@ class MTTI_MIS_Public_Course_Checkout {
             'reference_code' => $reference_code,
             'course_name'    => $course->course_name,
             'course_code'    => $course->course_code,
-            'amount'         => $course->effective_fee,
+            'amount'         => $submitted_amount,
             'first_name'     => $first_name,
         );
     }
@@ -150,6 +171,9 @@ class MTTI_MIS_Public_Course_Checkout {
                 }
                 .mtti-checkout-btn:hover { background: #1B5E20; }
                 .mtti-checkout-errors { background: #fdecea; border-left: 4px solid #c62828; padding: 10px 14px; border-radius: 6px; margin-bottom: 16px; font-size: 13px; color: #c62828; }
+                .mtti-co-deposit-choice { display: flex; gap: 16px; margin-bottom: 10px; }
+                .mtti-co-deposit-choice label { display: flex; align-items: center; gap: 6px; font-weight: 500; font-size: 13.5px; color: #334; cursor: pointer; }
+                .mtti-co-deposit-hint { font-size: 12px; color: #789; margin: -4px 0 12px; }
             </style>
             <div class="mtti-checkout-card">
                 <h2>🎓 Enroll Online</h2>
@@ -168,13 +192,22 @@ class MTTI_MIS_Public_Course_Checkout {
                         <select name="course_id" id="mtti_co_course" required onchange="mttiCoShowFee(this)">
                             <option value="">-- Select a course --</option>
                             <?php foreach ($courses as $c) : ?>
-                            <option value="<?php echo esc_attr($c->course_id); ?>" data-fee="<?php echo esc_attr($c->effective_fee); ?>"
+                            <option value="<?php echo esc_attr($c->course_id); ?>" data-fee="<?php echo esc_attr($c->effective_fee); ?>" data-min-deposit="<?php echo esc_attr($c->min_deposit); ?>"
                                 <?php selected($old['course_id'] ?? '', $c->course_id); ?>>
                                 <?php echo esc_html($c->course_name . ' (' . $c->course_code . ')'); ?>
                             </option>
                             <?php endforeach; ?>
                         </select>
                         <div class="mtti-checkout-fee" id="mtti_co_fee"></div>
+                    </div>
+                    <div class="mtti-co-field" id="mtti_co_deposit_wrap" style="display:none;">
+                        <label>Payment</label>
+                        <div class="mtti-co-deposit-choice">
+                            <label><input type="radio" name="payment_choice" value="full" checked onchange="mttiCoToggleDeposit()"> Pay in full</label>
+                            <label><input type="radio" name="payment_choice" value="deposit" onchange="mttiCoToggleDeposit()"> Pay a deposit now</label>
+                        </div>
+                        <input type="number" name="amount" id="mtti_co_amount" step="0.01" disabled>
+                        <div class="mtti-co-deposit-hint" id="mtti_co_deposit_hint"></div>
                     </div>
                     <div class="mtti-co-row">
                         <div class="mtti-co-field">
@@ -203,14 +236,31 @@ class MTTI_MIS_Public_Course_Checkout {
         <script>
         function mttiCoShowFee(sel) {
             var box = document.getElementById('mtti_co_fee');
+            var wrap = document.getElementById('mtti_co_deposit_wrap');
             var opt = sel.options[sel.selectedIndex];
             var fee = opt ? opt.getAttribute('data-fee') : null;
+            var minDeposit = opt ? opt.getAttribute('data-min-deposit') : null;
             if (fee) {
                 box.style.display = 'block';
                 box.innerHTML = '<strong>Online fee:</strong> KES ' + Number(fee).toLocaleString();
+                wrap.style.display = 'block';
+                var amountInput = document.getElementById('mtti_co_amount');
+                amountInput.min = minDeposit;
+                amountInput.max = fee;
+                amountInput.value = fee;
+                document.getElementById('mtti_co_deposit_hint').textContent = 'Minimum deposit: KES ' + Number(minDeposit).toLocaleString();
             } else {
                 box.style.display = 'none';
+                wrap.style.display = 'none';
             }
+        }
+        function mttiCoToggleDeposit() {
+            var payFull = document.querySelector('input[name="payment_choice"]:checked').value === 'full';
+            var sel = document.getElementById('mtti_co_course');
+            var opt = sel.options[sel.selectedIndex];
+            var amountInput = document.getElementById('mtti_co_amount');
+            amountInput.disabled = payFull;
+            if (payFull && opt) amountInput.value = opt.getAttribute('data-fee');
         }
         document.addEventListener('DOMContentLoaded', function () {
             var sel = document.getElementById('mtti_co_course');
@@ -228,8 +278,9 @@ class MTTI_MIS_Public_Course_Checkout {
                 <h2 style="margin:0 0 8px;color:#1B5E20;">Almost there, <?php echo esc_html($purchase['first_name']); ?>!</h2>
                 <p style="color:#556;margin:0 0 20px;">
                     Your spot in <strong><?php echo esc_html($purchase['course_name']); ?></strong>
-                    (<?php echo esc_html($purchase['course_code']); ?>) is reserved. Online payment isn't switched on
-                    just yet — our team will reach out shortly to confirm your M-Pesa payment and activate your account.
+                    (<?php echo esc_html($purchase['course_code']); ?>) is reserved. We couldn't reach the online
+                    payment gateway just now — our team will reach out shortly to help you complete payment via
+                    PesaPal and activate your account.
                 </p>
                 <div style="background:#eaf3ea;border-radius:8px;padding:16px;margin-bottom:20px;">
                     <div style="font-size:12px;color:#667;text-transform:uppercase;letter-spacing:.05em;margin-bottom:4px;">Amount due</div>

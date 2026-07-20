@@ -915,9 +915,10 @@ class MTTI_MIS_Admin_Certificates {
                 <img src="<?php echo esc_url($logo_url); ?>" alt="MTTI Logo" class="logo">
                 <div class="header-text">
                     <h1>Masomotele Technical Training Institute</h1>
-                    <p>TVETA Accredited | Sagaas Center, Fourth Floor, Eldoret, Kenya</p>
+                    <p>Sagaas Center, Fourth Floor, Eldoret, Kenya</p>
                 </div>
             </div>
+            <div style="display:flex;justify-content:center;gap:8px;flex-wrap:wrap;margin:6px 0;"><span style="background:#2E7D32;color:#fff;font-weight:bold;font-size:10px;letter-spacing:.3px;padding:4px 10px;border-radius:12px;white-space:nowrap;">TVETA Reg. No: TVETA/PRIVATE/TVC/0023/2026</span><span style="background:#1976D2;color:#fff;font-weight:bold;font-size:10px;letter-spacing:.3px;padding:4px 10px;border-radius:12px;white-space:nowrap;">NITA Reg. No: NITA/LEVY/GPEA/25749</span></div>
             <h2>Official Academic Transcript</h2>
         </div>
         
@@ -1792,7 +1793,8 @@ class MTTI_MIS_Admin_Certificates {
                 
                 <h1>Masomotele Technical Training Institute</h1>
                 <h2>Sagaas Center, Eldoret, Kenya</h2>
-                
+                <div style="display:flex;justify-content:center;gap:8px;flex-wrap:wrap;margin:6px 0;"><span style="background:#2E7D32;color:#fff;font-weight:bold;font-size:10px;letter-spacing:.3px;padding:4px 10px;border-radius:12px;white-space:nowrap;">TVETA Reg. No: TVETA/PRIVATE/TVC/0023/2026</span><span style="background:#1976D2;color:#fff;font-weight:bold;font-size:10px;letter-spacing:.3px;padding:4px 10px;border-radius:12px;white-space:nowrap;">NITA Reg. No: NITA/LEVY/GPEA/25749</span></div>
+
                 <p class="cert-title">CERTIFICATE OF COMPLETION</p>
                 
                 <p class="certify-text">This is to certify that</p>

@@ -18,7 +18,7 @@ if (!defined('WPINC')) {
 }
 
 // Plugin version
-define('MTTI_MIS_VERSION', '7.5.10');
+define('MTTI_MIS_VERSION', '7.5.12');
 define('MTTI_MIS_PLUGIN_DIR', plugin_dir_path(__FILE__));
 define('MTTI_MIS_PLUGIN_URL', plugin_dir_url(__FILE__));
 define('MTTI_MIS_PLUGIN_BASENAME', plugin_basename(__FILE__));
@@ -494,7 +494,7 @@ function mtti_mis_output_unit_transcript($unit_id, $student_id, $back_url = null
     <button class="print-btn no-print" onclick="window.print()">🖨️ Print</button>
     <div class="transcript-container"><div class="watermark">MTTI</div>
     <div class="content">
-        <div class="header"><img src="<?php echo esc_url($logo_url); ?>" alt="MTTI Logo" class="logo"><h1>MASOMOTELE TECHNICAL TRAINING INSTITUTE</h1><p>Sagaas Center, Fourth Floor, Eldoret, Kenya · TVETA Accredited</p><h2>Official Unit Transcript</h2></div>
+        <div class="header"><img src="<?php echo esc_url($logo_url); ?>" alt="MTTI Logo" class="logo"><h1>MASOMOTELE TECHNICAL TRAINING INSTITUTE</h1><p>Sagaas Center, Fourth Floor, Eldoret, Kenya</p><div style="display:flex;justify-content:center;gap:8px;flex-wrap:wrap;margin:6px 0;"><span style="background:#2E7D32;color:#fff;font-weight:bold;font-size:10px;letter-spacing:.3px;padding:4px 10px;border-radius:12px;white-space:nowrap;">TVETA Reg. No: TVETA/PRIVATE/TVC/0023/2026</span><span style="background:#1976D2;color:#fff;font-weight:bold;font-size:10px;letter-spacing:.3px;padding:4px 10px;border-radius:12px;white-space:nowrap;">NITA Reg. No: NITA/LEVY/GPEA/25749</span></div><h2>Official Unit Transcript</h2></div>
         <div class="section"><div class="section-title">Student Information</div>
             <div class="info-row"><span class="info-label">Student Name:</span><span><strong><?php echo esc_html($student->display_name); ?></strong></span></div>
             <div class="info-row"><span class="info-label">Admission Number:</span><span><?php echo esc_html($student->admission_number); ?></span></div>
@@ -556,8 +556,68 @@ function mtti_mis_output_student_unit_transcript() {
     $unit_id = intval($_GET['unit_id'] ?? 0);
     if (!$unit_id) { wp_die('Missing unit.'); }
 
+    // Balance gate: transcript stays locked until the course balance is
+    // fully cleared (no partial access, unlike lessons), regardless of
+    // delivery mode — physical/campus students owe the same fee discipline
+    // as online ones, and self-service download shouldn't outrun what the
+    // admin issuance flow already requires of everyone. Only checked here
+    // — never in mtti_mis_output_unit_transcript() itself, which the admin
+    // back-office view also calls and must stay unaffected.
+    $gate = $wpdb->get_row($wpdb->prepare(
+        "SELECT e.delivery_mode, sb.balance
+         FROM {$wpdb->prefix}mtti_course_units cu
+         JOIN {$wpdb->prefix}mtti_enrollments e ON e.course_id = cu.course_id AND e.student_id = %d
+         LEFT JOIN {$wpdb->prefix}mtti_student_balances sb ON sb.enrollment_id = e.enrollment_id
+         WHERE cu.unit_id = %d LIMIT 1",
+        $student_id, $unit_id
+    ));
+    if ($gate && floatval($gate->balance) > 0) {
+        wp_die('Your transcript will be available once your course balance is fully paid. Outstanding balance: KES '
+            . number_format(floatval($gate->balance), 2) . '. Visit the Payments tab in your portal to clear it.');
+    }
+
     $referer = wp_get_referer();
     mtti_mis_output_unit_transcript($unit_id, $student_id, $referer ?: home_url());
+}
+
+/**
+ * Recomputes a student_balances row from source of truth (the payments
+ * table) rather than incrementing a stored value — avoids drift if a
+ * payment is ever edited/refunded. Mirrors
+ * class-mtti-mis-admin-payments.php's update_student_balance(), but
+ * resolves the "actual fee" the same online-aware way checkout does
+ * (online_fee when set, else the standard fee) so it works for both
+ * delivery modes.
+ */
+function mtti_mis_recompute_balance($enrollment_id) {
+    global $wpdb;
+    $enrollment = $wpdb->get_row($wpdb->prepare(
+        "SELECT e.delivery_mode, e.course_id, sb.balance_id, sb.discount_amount, c.fee, c.online_fee
+         FROM {$wpdb->prefix}mtti_enrollments e
+         JOIN {$wpdb->prefix}mtti_courses c ON c.course_id = e.course_id
+         LEFT JOIN {$wpdb->prefix}mtti_student_balances sb ON sb.enrollment_id = e.enrollment_id
+         WHERE e.enrollment_id = %d",
+        $enrollment_id
+    ));
+    if (!$enrollment) return false;
+
+    $actual_fee = ($enrollment->delivery_mode === 'online' && $enrollment->online_fee > 0)
+        ? floatval($enrollment->online_fee)
+        : floatval($enrollment->fee);
+    $real_total_paid = (float) $wpdb->get_var($wpdb->prepare(
+        "SELECT COALESCE(SUM(amount),0) FROM {$wpdb->prefix}mtti_payments WHERE enrollment_id = %d AND status = 'Completed'",
+        $enrollment_id
+    ));
+    $new_balance = max(0, $actual_fee - floatval($enrollment->discount_amount) - $real_total_paid);
+
+    $wpdb->update($wpdb->prefix . 'mtti_student_balances', array(
+        'total_fee'         => $actual_fee,
+        'total_paid'        => $real_total_paid,
+        'balance'           => $new_balance,
+        'last_payment_date' => current_time('mysql'),
+    ), array('enrollment_id' => $enrollment_id));
+
+    return $new_balance;
 }
 
 /**
@@ -566,13 +626,13 @@ function mtti_mis_output_student_unit_transcript() {
  * flow. Mirrors class-mtti-mis-public-admission-form.php's enroll_student()
  * (same WP user + student + enrollment + balance + unit-enrollment
  * sequence) but sources its data from the purchase record instead of
- * $_POST, and always enrolls as delivery_mode='online' with the balance
- * already cleared, since this only ever runs after payment is confirmed.
+ * $_POST, and always enrolls as delivery_mode='online'. The balance is set
+ * from the course's real fee against whatever was actually paid — not
+ * assumed to be fully cleared, since checkout allows paying a deposit.
  *
- * Not yet wired to a live payment gateway — call this directly (e.g. from
- * the admin "Course Purchases" screen) until the M-Pesa credentials are in
- * place, at which point the payment webhook should call this in place of
- * the manual admin action.
+ * Called by mtti_mis_pesapal_confirm_and_complete() once PesaPal confirms
+ * payment (via IPN or the browser return), and can also be triggered
+ * manually from the admin "Course Purchases" screen as a fallback.
  *
  * Idempotent: calling it again on an already-enrolled purchase just
  * returns the existing student_id rather than creating a duplicate.
@@ -666,7 +726,7 @@ function mtti_mis_complete_course_purchase($purchase_id) {
         return new WP_Error('student_failed', 'Could not create the student record.');
     }
 
-    // --- Enrollment, already-cleared balance, unit enrollments -----------
+    // --- Enrollment, balance (may be a deposit, not full payment), unit enrollments -----------
     $wpdb->insert($wpdb->prefix . 'mtti_enrollments', array(
         'student_id'      => $student_id,
         'course_id'       => $purchase->course_id,
@@ -678,13 +738,19 @@ function mtti_mis_complete_course_purchase($purchase_id) {
     $enrollment_id = (int) $wpdb->insert_id;
 
     if ($enrollment_id) {
+        // total_fee is the course's real fee, not the amount actually paid —
+        // checkout allows paying a deposit, so total_paid may be less.
+        $actual_fee = ($course->online_fee && $course->online_fee > 0) ? floatval($course->online_fee) : floatval($course->fee);
+        $total_paid = floatval($purchase->amount);
+        $new_balance = max(0, $actual_fee - $total_paid);
+
         $wpdb->insert($wpdb->prefix . 'mtti_student_balances', array(
             'student_id'      => $student_id,
             'enrollment_id'   => $enrollment_id,
-            'total_fee'       => $purchase->amount,
+            'total_fee'       => $actual_fee,
             'discount_amount' => 0,
-            'total_paid'      => $purchase->amount,
-            'balance'         => 0,
+            'total_paid'      => $total_paid,
+            'balance'         => $new_balance,
             'updated_at'      => current_time('mysql'),
         ), array('%d', '%d', '%f', '%f', '%f', '%f', '%s'));
 
@@ -736,6 +802,64 @@ function mtti_mis_complete_course_purchase($purchase_id) {
     ), 30 * MINUTE_IN_SECONDS);
 
     return $student_id;
+}
+
+/**
+ * Records a PesaPal payment made against an EXISTING online enrollment's
+ * balance (the "pay more later" installment path) — as opposed to
+ * mtti_mis_complete_course_purchase(), which creates a brand-new student.
+ * Idempotent via the purchase row's own 'paid_recorded' status.
+ */
+function mtti_mis_complete_topup_purchase($purchase_id) {
+    global $wpdb;
+    $purchases_table = $wpdb->prefix . 'mtti_course_purchases';
+
+    $purchase = $wpdb->get_row($wpdb->prepare(
+        "SELECT * FROM {$purchases_table} WHERE purchase_id = %d", $purchase_id
+    ));
+    if (!$purchase || $purchase->purchase_type !== 'topup' || !$purchase->enrollment_id) {
+        return new WP_Error('bad_purchase', 'Not a valid top-up purchase.');
+    }
+    if ($purchase->status === 'paid_recorded') {
+        return (float) $wpdb->get_var($wpdb->prepare(
+            "SELECT balance FROM {$wpdb->prefix}mtti_student_balances WHERE enrollment_id = %d", $purchase->enrollment_id
+        )); // already recorded — idempotent
+    }
+
+    $enrollment = $wpdb->get_row($wpdb->prepare(
+        "SELECT * FROM {$wpdb->prefix}mtti_enrollments WHERE enrollment_id = %d", $purchase->enrollment_id
+    ));
+    if (!$enrollment) {
+        return new WP_Error('bad_enrollment', 'The enrollment on this purchase no longer exists.');
+    }
+    $course = $wpdb->get_row($wpdb->prepare(
+        "SELECT course_name FROM {$wpdb->prefix}mtti_courses WHERE course_id = %d", $purchase->course_id
+    ));
+
+    $wpdb->insert($wpdb->prefix . 'mtti_payments', array(
+        'student_id'            => $enrollment->student_id,
+        'enrollment_id'         => $purchase->enrollment_id,
+        'gross_amount'          => $purchase->amount,
+        'amount'                => $purchase->amount,
+        'payment_method'        => 'PESAPAL',
+        'transaction_reference' => $purchase->mpesa_receipt ?: $purchase->reference_code,
+        'payment_date'          => current_time('mysql'),
+        'payment_for'           => $course->course_name . ' — balance top-up',
+        'receipt_number'        => 'PCH-' . $purchase->purchase_id . '-' . strtoupper(substr(md5($purchase->reference_code), 0, 6)),
+        'status'                => 'Completed',
+        'notes'                 => 'PesaPal balance top-up, ref ' . $purchase->reference_code,
+    ));
+
+    $new_balance = mtti_mis_recompute_balance($purchase->enrollment_id);
+
+    $wpdb->update($purchases_table, array('status' => 'paid_recorded'), array('purchase_id' => $purchase_id));
+
+    set_transient('mtti_pesapal_topup_' . $purchase_id, array(
+        'new_balance' => $new_balance,
+        'course_name' => $course->course_name,
+    ), 30 * MINUTE_IN_SECONDS);
+
+    return $new_balance;
 }
 
 /**
@@ -805,6 +929,9 @@ function mtti_mis_pesapal_confirm_and_complete($order_tracking_id) {
     if ($purchase->status === 'enrolled' && $purchase->student_id) {
         return (int) $purchase->student_id; // already done — idempotent
     }
+    if ($purchase->status === 'paid_recorded') {
+        return mtti_mis_complete_topup_purchase($purchase->purchase_id); // already recorded — idempotent
+    }
 
     $status = MTTI_MIS_Pesapal::get_transaction_status($order_tracking_id);
     if (is_wp_error($status)) {
@@ -825,6 +952,9 @@ function mtti_mis_pesapal_confirm_and_complete($order_tracking_id) {
         'mpesa_receipt' => $status['confirmation_code'] ?? $purchase->mpesa_receipt,
     ), array('purchase_id' => $purchase->purchase_id));
 
+    if ($purchase->purchase_type === 'topup' && $purchase->enrollment_id) {
+        return mtti_mis_complete_topup_purchase($purchase->purchase_id);
+    }
     return mtti_mis_complete_course_purchase($purchase->purchase_id);
 }
 
@@ -870,9 +1000,34 @@ function mtti_mis_pesapal_return_handler() {
     header('Content-Type: text/html; charset=UTF-8');
     if (!is_wp_error($result)) {
         global $wpdb;
-        $purchase_id = (int) $wpdb->get_var($wpdb->prepare(
-            "SELECT purchase_id FROM {$wpdb->prefix}mtti_course_purchases WHERE pesapal_tracking_id = %s", $tracking_id
+        $purchase = $wpdb->get_row($wpdb->prepare(
+            "SELECT purchase_id, purchase_type FROM {$wpdb->prefix}mtti_course_purchases WHERE pesapal_tracking_id = %s", $tracking_id
         ));
+        $purchase_id = $purchase ? (int) $purchase->purchase_id : 0;
+
+        if ($purchase && $purchase->purchase_type === 'topup') {
+            $topup = $purchase_id ? get_transient('mtti_pesapal_topup_' . $purchase_id) : false;
+            if ($purchase_id) delete_transient('mtti_pesapal_topup_' . $purchase_id); // shown once
+
+            $balance_html = $topup
+                ? '<div style="background:#eaf3ea;border-radius:8px;padding:16px;margin:20px 0;text-align:left;font-size:14px;">'
+                    . '<div style="margin:4px 0;"><strong>Course:</strong> ' . esc_html($topup['course_name']) . '</div>'
+                    . '<div style="margin:4px 0;"><strong>New Balance:</strong> KES ' . number_format(floatval($topup['new_balance']), 2) . '</div>'
+                    . '</div>'
+                : '';
+
+            echo '<!DOCTYPE html><html><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Payment Successful</title>'
+                . '<style>body{font-family:-apple-system,"Segoe UI",Roboto,sans-serif;background:#f5f7fb;display:flex;align-items:center;justify-content:center;min-height:100vh;margin:0;padding:20px;}'
+                . '.card{background:#fff;border-radius:12px;padding:40px 32px;max-width:420px;text-align:center;box-shadow:0 4px 20px rgba(0,0,0,.08);}'
+                . '.card h1{color:#1B5E20;font-size:22px;margin:16px 0 8px;}.card p{color:#556;font-size:14px;line-height:1.6;}'
+                . '.btn{display:inline-block;margin-top:20px;background:#2E7D32;color:#fff;text-decoration:none;padding:12px 28px;border-radius:8px;font-weight:600;}</style></head>'
+                . '<body><div class="card"><div style="font-size:48px;">&#9989;</div><h1>Payment received!</h1>'
+                . '<p>Your balance has been updated.</p>'
+                . $balance_html
+                . '<a class="btn" href="' . esc_url(add_query_arg('portal_tab', 'payments', home_url('/student-portal/'))) . '">Back to Portal</a></div></body></html>';
+            exit;
+        }
+
         $creds = $purchase_id ? get_transient('mtti_pesapal_creds_' . $purchase_id) : false;
         if ($purchase_id) {
             delete_transient('mtti_pesapal_creds_' . $purchase_id); // shown once
@@ -945,6 +1100,7 @@ function mtti_mis_output_certificate() {
     <div class="certificate-wrapper"><div class="certificate"><div class="inner-border">
         <img src="<?php echo esc_url($logo_url); ?>" alt="MTTI Logo" class="logo">
         <h1>Masomotele Technical Training Institute</h1><p style="color:#666;font-size:14px;">Sagaas Center, Eldoret, Kenya</p>
+        <div style="display:flex;justify-content:center;gap:8px;flex-wrap:wrap;margin:6px 0;"><span style="background:#2E7D32;color:#fff;font-weight:bold;font-size:10px;letter-spacing:.3px;padding:4px 10px;border-radius:12px;white-space:nowrap;">TVETA Reg. No: TVETA/PRIVATE/TVC/0023/2026</span><span style="background:#1976D2;color:#fff;font-weight:bold;font-size:10px;letter-spacing:.3px;padding:4px 10px;border-radius:12px;white-space:nowrap;">NITA Reg. No: NITA/LEVY/GPEA/25749</span></div>
         <div class="cert-title">Certificate of Completion</div>
         <p style="font-size:14px;margin:12px 0 8px 0;">This is to certify that</p>
         <div class="student-name"><?php echo esc_html($student->display_name); ?></div>
@@ -1032,7 +1188,7 @@ function mtti_mis_output_bulk_transcripts($items_string) {
         $transcript_number = 'MTTI/TR/' . date('Y') . '/' . str_pad($unit_id, 4, '0', STR_PAD_LEFT) . '/' . str_pad($student_id, 4, '0', STR_PAD_LEFT);
         ?>
         <div class="transcript"><div class="watermark">MTTI</div><div class="content">
-            <div class="header"><img src="<?php echo esc_url($logo_url); ?>" alt="MTTI" class="logo"><h1>MASOMOTELE TECHNICAL TRAINING INSTITUTE</h1><p style="color:#666;font-size:9px;">Sagaas Center, Eldoret · TVETA Accredited</p><h2>Official Unit Transcript</h2></div>
+            <div class="header"><img src="<?php echo esc_url($logo_url); ?>" alt="MTTI" class="logo"><h1>MASOMOTELE TECHNICAL TRAINING INSTITUTE</h1><p style="color:#666;font-size:9px;">Sagaas Center, Eldoret</p><div style="display:flex;justify-content:center;gap:5px;flex-wrap:wrap;margin:3px 0;"><span style="background:#2E7D32;color:#fff;font-weight:bold;font-size:8px;padding:2px 7px;border-radius:9px;white-space:nowrap;">TVETA: TVETA/PRIVATE/TVC/0023/2026</span><span style="background:#1976D2;color:#fff;font-weight:bold;font-size:8px;padding:2px 7px;border-radius:9px;white-space:nowrap;">NITA: NITA/LEVY/GPEA/25749</span></div><h2>Official Unit Transcript</h2></div>
             <div class="section"><div class="section-title">Student</div><div class="info-row"><span class="info-label">Name:</span><span><?php echo esc_html($student->display_name); ?></span></div><div class="info-row"><span class="info-label">Adm No:</span><span><?php echo esc_html($student->admission_number); ?></span></div></div>
             <div class="section"><div class="section-title">Course</div><div class="info-row"><span class="info-label">Course:</span><span><?php echo esc_html($result->course_name . ' (' . $result->course_code . ')'); ?></span></div></div>
             <div class="unit-box"><div style="font-size:10px;color:#666;"><?php echo esc_html($result->unit_code); ?></div><div class="unit-name"><?php echo esc_html($result->unit_name); ?></div><?php if ($result->duration_hours) : ?><div style="color:#666;font-size:10px;">Duration: <?php echo intval($result->duration_hours); ?> Hours</div><?php endif; ?></div>
@@ -1078,6 +1234,7 @@ function mtti_mis_output_bulk_certificates($items_string, $completion_date) {
         <div class="certificate-page"><div class="certificate"><div class="inner-border">
             <img src="<?php echo esc_url($logo_url); ?>" alt="MTTI Logo" class="logo">
             <h1>Certificate of Completion</h1><h2>Masomotele Technical Training Institute</h2>
+            <div style="display:flex;justify-content:center;gap:8px;flex-wrap:wrap;margin:6px 0;"><span style="background:#2E7D32;color:#fff;font-weight:bold;font-size:10px;letter-spacing:.3px;padding:4px 10px;border-radius:12px;white-space:nowrap;">TVETA Reg. No: TVETA/PRIVATE/TVC/0023/2026</span><span style="background:#1976D2;color:#fff;font-weight:bold;font-size:10px;letter-spacing:.3px;padding:4px 10px;border-radius:12px;white-space:nowrap;">NITA Reg. No: NITA/LEVY/GPEA/25749</span></div>
             <p style="font-size:14px;color:#666;margin:15px 0 5px 0;">This is to certify that</p>
             <div class="student-name"><?php echo esc_html($student->display_name); ?></div>
             <p style="font-size:14px;color:#666;margin:10px 0;">has successfully completed the course</p>
@@ -1694,7 +1851,10 @@ function mtti_mis_serve_interactive() {
     nocache_headers();
     header('Content-Type: text/html; charset=UTF-8');
     header('X-Frame-Options: SAMEORIGIN');
-    header('Content-Security-Policy: default-src \'self\' \'unsafe-inline\' \'unsafe-eval\' https://fonts.googleapis.com https://fonts.gstatic.com data: blob:;');
+    // 'wasm-unsafe-eval' is required separately from 'unsafe-eval' for
+    // WebAssembly compilation in current Chrome/Firefox (CSP3) — without
+    // it, Pyodide's core WASM binary silently fails to instantiate.
+    header('Content-Security-Policy: default-src \'self\' \'unsafe-inline\' \'unsafe-eval\' \'wasm-unsafe-eval\' https://fonts.googleapis.com https://fonts.gstatic.com https://cdn.jsdelivr.net data: blob:;');
 
     // Fix relative paths before serving
     $content = mtti_mis_fix_interactive_paths($lesson->content);
@@ -1736,21 +1896,15 @@ function mtti_mis_maybe_complete_unit($unit_id, $student_id) {
     ));
     if (empty($lessons)) return;
 
-    // Physical-class learners are graded exclusively through the manual
-    // marks form (admin/class-mtti-mis-admin-units.php) — a teacher-entered
-    // physical exam result must never be silently overwritten by this
-    // auto-completion path just because the student also opened an online
-    // quiz. Skip entirely for any student whose enrollment in this unit's
-    // course is flagged 'physical'.
-    $course_id_for_gate = $lessons[0]->course_id;
-    $delivery_mode = $wpdb->get_var($wpdb->prepare(
-        "SELECT delivery_mode FROM {$wpdb->prefix}mtti_enrollments
-         WHERE student_id = %d AND course_id = %d AND status IN ('Active','Enrolled','In Progress')
-         ORDER BY enrollment_date DESC LIMIT 1",
-        $student_id, $course_id_for_gate
-    ));
-    if ($delivery_mode === 'physical') return;
-
+    // Policy as of 2026-07-19: physical/campus learners must also pass the
+    // online quizzes to qualify for a transcript/certificate, same as
+    // online learners — this auto-completion path now applies regardless
+    // of delivery mode. Teachers can still manually enter marks for any
+    // course/unit via admin/class-mtti-mis-admin-units.php; the guard below
+    // (score IS NOT NULL and remarks isn't ours) already keeps that
+    // independent of this quiz-based path — a manual mark is never
+    // silently overwritten just because the student also passed an online
+    // quiz.
     $quiz_lessons = array_values(array_filter($lessons, function ($l) { return $l->interactive_role === 'quiz'; }));
 
     // The "no quiz content -> completes on view" branch below must only
@@ -1892,18 +2046,31 @@ function mtti_mis_save_quiz_score() {
 // ============================================================
 
 function mtti_mis_download_certificate() {
-    $student_id = intval($_GET['student_id'] ?? 0);
-    $cert_no    = sanitize_text_field($_GET['cert_no'] ?? '');
-    $nonce      = $_GET['nonce'] ?? '';
+    $cert_no = sanitize_text_field($_GET['cert_no'] ?? '');
+    $nonce   = $_GET['nonce'] ?? '';
 
-    if (!$student_id || !$cert_no || !wp_verify_nonce($nonce, 'mtti_cert_' . $student_id)) {
-        wp_die('Access denied.', 403);
-    }
     if (!is_user_logged_in()) {
         wp_die('Please log in to download your certificate.', 401);
     }
 
     global $wpdb;
+
+    // student_id is resolved server-side from the logged-in session — never
+    // trusted from the query string — matching the transcript endpoint's
+    // pattern. Every legitimate link the portal generates already computes
+    // its nonce off the real student's id, so this only closes a forgery
+    // path (a URL crafted with someone else's student_id) without changing
+    // anything for honest callers.
+    $student_id = (int) $wpdb->get_var($wpdb->prepare(
+        "SELECT student_id FROM {$wpdb->prefix}mtti_students WHERE user_id = %d LIMIT 1",
+        get_current_user_id()
+    ));
+    if (!$student_id) {
+        wp_die('No student record found for your account.', 403);
+    }
+    if (!$cert_no || !wp_verify_nonce($nonce, 'mtti_cert_' . $student_id)) {
+        wp_die('Access denied.', 403);
+    }
 
     // Verify the certificate belongs to this student
     $cert = $wpdb->get_row($wpdb->prepare(
@@ -1917,6 +2084,25 @@ function mtti_mis_download_certificate() {
 
     if (!$cert) {
         wp_die('Certificate not found or invalid.', 404);
+    }
+
+    // Certificate stays locked until the course balance is fully cleared
+    // (same policy as the transcript gate), regardless of delivery mode —
+    // this closes a gap where physical/campus students weren't balance-
+    // checked at all on self-service download. Admin-issued certificates
+    // (mtti_mis_output_certificate()) are unaffected — staff keep discretion
+    // to issue manually as an exception; this only governs re-downloading
+    // an already-issued one.
+    $gate = $wpdb->get_row($wpdb->prepare(
+        "SELECT e.delivery_mode, sb.balance
+         FROM {$wpdb->prefix}mtti_enrollments e
+         LEFT JOIN {$wpdb->prefix}mtti_student_balances sb ON sb.enrollment_id = e.enrollment_id
+         WHERE e.student_id = %d AND e.course_id = %d LIMIT 1",
+        $cert->student_id, $cert->course_id
+    ));
+    if ($gate && floatval($gate->balance) > 0) {
+        wp_die('Your certificate will be available once your course balance is fully paid. Outstanding balance: KES '
+            . number_format(floatval($gate->balance), 2) . '.', 402);
     }
 
     $verify_url = home_url('/verify-certificate/?code=' . urlencode($cert->verification_code));
@@ -1967,7 +2153,8 @@ function mtti_mis_download_certificate() {
   <div class="cert-border-inner"></div>
   <img src="<?php echo esc_url($logo_url); ?>" class="cert-logo" alt="MTTI Logo">
   <div class="cert-institute">Masomotele Technical Training Institute</div>
-  <div class="cert-institute" style="font-size:11px;">TVETA Accredited · Sagaas Centre, 4th Floor, Eldoret, Kenya</div>
+  <div class="cert-institute" style="font-size:11px;">Sagaas Centre, 4th Floor, Eldoret, Kenya</div>
+  <div style="display:flex;justify-content:center;gap:8px;flex-wrap:wrap;margin:6px 0;"><span style="background:#2E7D32;color:#fff;font-weight:bold;font-size:10px;letter-spacing:.3px;padding:4px 10px;border-radius:12px;white-space:nowrap;">TVETA Reg. No: TVETA/PRIVATE/TVC/0023/2026</span><span style="background:#1976D2;color:#fff;font-weight:bold;font-size:10px;letter-spacing:.3px;padding:4px 10px;border-radius:12px;white-space:nowrap;">NITA Reg. No: NITA/LEVY/GPEA/25749</span></div>
   <div class="cert-title">Certificate of Completion</div>
   <div class="cert-presented">This is to certify that</div>
   <div class="cert-name"><?php echo esc_html($cert->display_name ?: $cert->student_name); ?></div>

@@ -45,6 +45,9 @@ class MTTI_MIS_Learner_Portal {
         // Quiz AJAX handlers (requires authentication, NOT nopriv)
         add_action('wp_ajax_mtti_start_quiz_attempt', array($this, 'ajax_start_quiz_attempt'));
         add_action('wp_ajax_mtti_submit_quiz_attempt', array($this, 'ajax_submit_quiz_attempt'));
+
+        // PesaPal balance top-up (installment payments) — logged-in students only
+        add_action('wp_ajax_mtti_pesapal_topup', array($this, 'ajax_pesapal_topup'));
     }
     
     /**
@@ -252,6 +255,12 @@ class MTTI_MIS_Learner_Portal {
 <body class="mtti-portal-fullpage">
 <?php wp_body_open(); ?>
 <?php echo $portal_html; ?>
+<?php if (is_user_logged_in()) : ?>
+<a href="https://wa.me/254712464936?text=<?php echo rawurlencode('Hello MTTI, I need help with my student portal.'); ?>" target="_blank" rel="noopener noreferrer" class="mtti-wa-float" title="Chat with us on WhatsApp">
+    <svg viewBox="0 0 24 24" fill="#fff" xmlns="http://www.w3.org/2000/svg"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
+    <span class="mtti-wa-float-label">Need Help?</span>
+</a>
+<?php endif; ?>
 <?php wp_footer(); ?>
 </body>
 </html>
@@ -381,7 +390,7 @@ function mttiToggleFullscreen(btn){
         $courses_table = $wpdb->prefix . 'mtti_courses';
         return $wpdb->get_row($wpdb->prepare(
             "SELECT s.student_id, s.user_id, s.admission_number, s.course_id, s.id_number,
-                    s.date_of_birth, s.gender, s.address, s.county,
+                    s.date_of_birth, s.gender, s.address, s.county, s.phone,
                     s.emergency_contact, s.emergency_phone, s.enrollment_date,
                     s.status, s.photo_url, s.created_at, s.updated_at,
                     u.display_name, u.user_email,
@@ -474,10 +483,12 @@ function mttiToggleFullscreen(btn){
      */
     private function get_enrolled_course_ids($student) {
         global $wpdb;
-        // Admin preview identity (see build_admin_preview_student): treat as
-        // "enrolled" in every active course rather than querying real
-        // enrollments, so admins can browse the whole catalog's lessons.
-        if ((int) $student->student_id === 0 && $this->is_admin_preview()) {
+        // Admin/staff always browse the whole catalog, regardless of
+        // student_id — keying this on student_id === 0 alone meant an
+        // admin who *also* happens to have a real (even incidental, e.g.
+        // leftover test) student record would stop getting this bypass
+        // and instead get scoped to only their real enrollments.
+        if ($this->is_admin_preview()) {
             return array_map('intval', $wpdb->get_col(
                 "SELECT course_id FROM {$wpdb->prefix}mtti_courses WHERE status = 'Active' AND is_active = 1 AND deleted_at IS NULL"
             ));
@@ -511,7 +522,7 @@ function mttiToggleFullscreen(btn){
         // the URL further up the call chain (render_course_filter(),
         // render_lessons()) since "0 or 1 enrolled courses" short-circuits
         // to the student's primary course_id instead of the request.
-        if ((int) $student->student_id === 0 && $this->is_admin_preview()) {
+        if ($this->is_admin_preview()) {
             return $wpdb->get_results(
                 "SELECT course_id, course_name, course_code FROM {$wpdb->prefix}mtti_courses
                  WHERE status = 'Active' AND is_active = 1 AND deleted_at IS NULL
@@ -1202,6 +1213,7 @@ function mttiToggleFullscreen(btn){
             if ($primary_progress['total_topics'] > 0) {
                 echo '<p>🎯 ' . $primary_progress['completed_topics'] . ' of ' . $primary_progress['total_topics'] . ' topics complete</p>';
                 echo '<p style="color:var(--text-3);font-size:12px;">' . $primary_progress['completed_steps'] . ' of ' . $primary_progress['total_steps'] . ' steps done (lessons, videos, practicals & quizzes)</p>';
+                echo '<p class="mtti-dash-progress-encourage">' . esc_html($this->progress_encouragement_message($progress_pct)) . '</p>';
             } else {
                 echo '<p style="color:var(--text-3);font-size:13px;">No content published yet</p>';
             }
@@ -1940,21 +1952,70 @@ function mttiToggleFullscreen(btn){
             echo '</div>';
         }
         
-        // ── STK PUSH: Pay Now button ─────────────────────────────────────────
-        if ($balance > 0) {
-            $student_phone = esc_attr($student->phone_number ?? $student->phone ?? '');
-            echo '<div class="mtti-stk-box" style="background:#e8f5e9;border:1px solid #a5d6a7;border-radius:10px;padding:22px;margin:24px 0;">';
-            echo '<h3 style="margin:0 0 6px;color:#2E7D32;">📲 Pay via M-Pesa STK Push</h3>';
-            echo '<p style="margin:0 0 16px;color:#555;font-size:13px;">Enter amount and phone — we will send an M-Pesa prompt directly to your phone.</p>';
+        // ── STK PUSH box removed 2026-07-19: this was a separate, direct
+        // Safaricom Daraja integration (mtti-stk-push.php) still pointed at
+        // SANDBOX credentials — it showed students a false "STK Push sent!"
+        // success message without actually processing real payment. PesaPal
+        // (below) is the one real, configured online payment path; this
+        // duplicate/broken one is intentionally disabled, not deleted, in
+        // case a real production Daraja integration is wired up later.
+
+        // ── PesaPal: Pay via PesaPal (installments — top up an online enrollment's balance) ──
+        global $wpdb;
+        // Available to any enrollment with a balance, regardless of delivery
+        // mode — PesaPal is the one real, configured payment gateway now
+        // (was previously online-only, leaving physical-mode students with
+        // no self-service option but manual Paybill/bank instructions).
+        $online_balances = $wpdb->get_results($wpdb->prepare(
+            "SELECT e.enrollment_id, c.course_name, sb.balance
+             FROM {$wpdb->prefix}mtti_enrollments e
+             JOIN {$wpdb->prefix}mtti_student_balances sb ON sb.enrollment_id = e.enrollment_id
+             JOIN {$wpdb->prefix}mtti_courses c ON e.course_id = c.course_id
+             WHERE e.student_id = %d AND sb.balance > 0",
+            $student->student_id
+        ));
+        if (!empty($online_balances)) {
+            $nonce = wp_create_nonce('mtti_portal_nonce');
+            echo '<div class="mtti-pesapal-topup-box" style="background:#e3f2fd;border:1px solid #90caf9;border-radius:10px;padding:22px;margin:24px 0;">';
+            echo '<h3 style="margin:0 0 6px;color:#1565C0;">💳 Pay via PesaPal (Card / M-Pesa)</h3>';
+            echo '<p style="margin:0 0 16px;color:#555;font-size:13px;">Pay any amount toward your remaining balance — installments are fine, you don\'t need to pay it all at once.</p>';
             echo '<div style="display:flex;gap:12px;flex-wrap:wrap;align-items:flex-end;">';
-            echo '<div><label style="font-size:12px;font-weight:600;display:block;margin-bottom:4px;">Amount (KES)</label><input type="number" id="mtti-stk-amount" min="1" placeholder="e.g. 5000" style="padding:10px;border:1px solid #ccc;border-radius:6px;font-size:15px;width:160px;"></div>';
-            echo '<div><label style="font-size:12px;font-weight:600;display:block;margin-bottom:4px;">Phone Number</label><input type="tel" id="mtti-stk-phone" value="' . $student_phone . '" placeholder="07XXXXXXXX" style="padding:10px;border:1px solid #ccc;border-radius:6px;font-size:15px;width:180px;"></div>';
-            echo '<button id="mtti-stk-btn" onclick="mtti_stk_push()" style="padding:10px 24px;background:#2E7D32;color:#fff;border:none;border-radius:6px;font-size:15px;font-weight:600;cursor:pointer;">Pay Now via M-Pesa</button>';
+            echo '<div><label style="font-size:12px;font-weight:600;display:block;margin-bottom:4px;">Course</label><select id="mtti-pesapal-enrollment" style="padding:10px;border:1px solid #ccc;border-radius:6px;font-size:15px;min-width:220px;" onchange="mttiPesapalUpdateAmount()">';
+            foreach ($online_balances as $ob) {
+                echo '<option value="' . intval($ob->enrollment_id) . '" data-balance="' . esc_attr($ob->balance) . '">' . esc_html($ob->course_name) . ' — KES ' . number_format($ob->balance, 2) . ' due</option>';
+            }
+            echo '</select></div>';
+            echo '<div><label style="font-size:12px;font-weight:600;display:block;margin-bottom:4px;">Amount (KES)</label><input type="number" id="mtti-pesapal-amount" min="1" step="0.01" style="padding:10px;border:1px solid #ccc;border-radius:6px;font-size:15px;width:160px;"></div>';
+            echo '<button id="mtti-pesapal-btn" onclick="mttiPesapalTopup()" style="padding:10px 24px;background:#1565C0;color:#fff;border:none;border-radius:6px;font-size:15px;font-weight:600;cursor:pointer;">Pay Now via PesaPal</button>';
             echo '</div>';
-            echo '<div id="mtti-stk-msg" style="margin-top:14px;display:none;padding:12px;border-radius:6px;font-size:13px;"></div>';
+            echo '<div id="mtti-pesapal-msg" style="margin-top:14px;display:none;padding:12px;border-radius:6px;font-size:13px;"></div>';
             echo '</div>';
-            $stk_url = esc_url(home_url('/mtti-stk-push.php'));
-            echo "<script>function mtti_stk_push(){var a=document.getElementById('mtti-stk-amount').value;var p=document.getElementById('mtti-stk-phone').value;var m=document.getElementById('mtti-stk-msg');var b=document.getElementById('mtti-stk-btn');if(!a||a<1){alert('Enter a valid amount');return;}if(!p){alert('Enter phone number');return;}b.disabled=true;b.textContent='Sending...';m.style.display='none';fetch('$stk_url',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({amount:parseInt(a),phone:p,source:'portal'})}).then(function(r){return r.json();}).then(function(d){m.style.display='block';if(d.success){m.style.background='#e8f5e9';m.style.color='#2E7D32';m.innerHTML='✅ '+d.message;b.textContent='✅ Sent';}else{m.style.background='#ffebee';m.style.color='#c62828';m.innerHTML='❌ '+d.message;b.disabled=false;b.textContent='Pay Now via M-Pesa';}}).catch(function(){m.style.display='block';m.style.background='#ffebee';m.style.color='#c62828';m.innerHTML='❌ Network error. Try again.';b.disabled=false;b.textContent='Pay Now via M-Pesa';});}</script>";
+            $ajax_url = esc_url(admin_url('admin-ajax.php'));
+            echo "<script>
+            function mttiPesapalUpdateAmount(){var sel=document.getElementById('mtti-pesapal-enrollment');var opt=sel.options[sel.selectedIndex];document.getElementById('mtti-pesapal-amount').value=opt.getAttribute('data-balance');}
+            document.addEventListener('DOMContentLoaded', mttiPesapalUpdateAmount);
+            function mttiPesapalTopup(){
+                var sel=document.getElementById('mtti-pesapal-enrollment');
+                var enrollmentId=sel.value;
+                var amount=document.getElementById('mtti-pesapal-amount').value;
+                var m=document.getElementById('mtti-pesapal-msg');
+                var b=document.getElementById('mtti-pesapal-btn');
+                if(!amount||amount<=0){alert('Enter a valid amount');return;}
+                b.disabled=true;b.textContent='Redirecting...';m.style.display='none';
+                var body=new URLSearchParams();
+                body.set('action','mtti_pesapal_topup');
+                body.set('nonce','$nonce');
+                body.set('enrollment_id',enrollmentId);
+                body.set('amount',amount);
+                fetch('$ajax_url',{method:'POST',headers:{'Content-Type':'application/x-www-form-urlencoded'},body:body.toString()})
+                    .then(function(r){return r.json();})
+                    .then(function(d){
+                        if(d.success){window.location=d.data.redirect_url;}
+                        else{m.style.display='block';m.style.background='#ffebee';m.style.color='#c62828';m.innerHTML='❌ '+d.data.message;b.disabled=false;b.textContent='Pay Now via PesaPal';}
+                    })
+                    .catch(function(){m.style.display='block';m.style.background='#ffebee';m.style.color='#c62828';m.innerHTML='❌ Network error. Try again.';b.disabled=false;b.textContent='Pay Now via PesaPal';});
+            }
+            </script>";
         }
 
         echo '<div class="mtti-payment-instructions"><h3>💡 How to Pay — Lipa na M-PESA</h3>';
@@ -2262,6 +2323,83 @@ function mttiToggleFullscreen(btn){
         echo '</div></div></div>';
     }
     
+    /**
+     * Starts a PesaPal top-up payment against the current student's OWN
+     * online enrollment balance — the installment "pay more later" path,
+     * separate from the M-Pesa STK-push box above. Never trusts
+     * enrollment_id blindly: ownership + delivery_mode + balance are all
+     * re-checked server-side before any order is submitted.
+     */
+    public function ajax_pesapal_topup() {
+        check_ajax_referer('mtti_portal_nonce', 'nonce');
+
+        if (!is_user_logged_in()) {
+            wp_send_json_error(array('message' => 'Please log in.'));
+        }
+        $student = $this->get_current_student();
+        if (!$student) {
+            wp_send_json_error(array('message' => 'Student not found.'));
+        }
+
+        global $wpdb;
+        $enrollment_id = intval($_POST['enrollment_id'] ?? 0);
+        $amount = floatval($_POST['amount'] ?? 0);
+
+        $enrollment = $wpdb->get_row($wpdb->prepare(
+            "SELECT e.*, c.course_name, sb.balance
+             FROM {$wpdb->prefix}mtti_enrollments e
+             JOIN {$wpdb->prefix}mtti_courses c ON e.course_id = c.course_id
+             JOIN {$wpdb->prefix}mtti_student_balances sb ON sb.enrollment_id = e.enrollment_id
+             WHERE e.enrollment_id = %d AND e.student_id = %d",
+            $enrollment_id, $student->student_id
+        ));
+        if (!$enrollment) {
+            wp_send_json_error(array('message' => 'Enrollment not found.'));
+        }
+        if ($amount <= 0 || $amount > floatval($enrollment->balance) + 0.01) {
+            wp_send_json_error(array('message' => 'Enter a valid amount up to your remaining balance.'));
+        }
+
+        $wp_user = wp_get_current_user();
+        $reference_code = 'MTTI-TOP-' . strtoupper(substr(str_replace('-', '', wp_generate_uuid4()), 0, 8));
+        $wpdb->insert($wpdb->prefix . 'mtti_course_purchases', array(
+            'reference_code' => $reference_code,
+            'course_id'      => $enrollment->course_id,
+            'first_name'     => $wp_user->first_name ?: $student->display_name,
+            'last_name'      => $wp_user->last_name,
+            'email'          => $student->user_email,
+            'phone'          => $student->phone ?? '',
+            'amount'         => $amount,
+            'status'         => 'awaiting_payment',
+            'purchase_type'  => 'topup',
+            'enrollment_id'  => $enrollment_id,
+            'student_id'     => $student->student_id,
+        ));
+        $purchase_id = (int) $wpdb->insert_id;
+
+        $order = MTTI_MIS_Pesapal::submit_order(array(
+            'merchant_reference' => $reference_code,
+            'amount'             => $amount,
+            'description'        => $enrollment->course_name . ' — Balance Top-up',
+            'email'              => $student->user_email,
+            'phone'              => $student->phone ?? '',
+            'first_name'         => $wp_user->first_name,
+            'last_name'          => $wp_user->last_name,
+        ));
+
+        if (is_wp_error($order)) {
+            wp_send_json_error(array('message' => 'Could not start payment: ' . $order->get_error_message()));
+        }
+
+        $wpdb->update(
+            $wpdb->prefix . 'mtti_course_purchases',
+            array('pesapal_tracking_id' => $order['order_tracking_id']),
+            array('purchase_id' => $purchase_id)
+        );
+
+        wp_send_json_success(array('redirect_url' => $order['redirect_url']));
+    }
+
     public function ajax_submit_assignment() {
         check_ajax_referer('mtti_portal_nonce', 'nonce');
         
@@ -2431,7 +2569,7 @@ function mttiToggleFullscreen(btn){
                        (l.release_week IS NULL AND l.release_date IS NULL)
                      ))
                    )
-                 ORDER BY c.course_name, l.unit_id, l.order_number ASC",
+                 ORDER BY c.course_name, l.order_number ASC",
                 $student->student_id,
                 ...$query_ids
             ));
@@ -2726,7 +2864,7 @@ function mttiToggleFullscreen(btn){
              WHERE l.course_id = %d AND l.status = 'Published'
                AND l.title NOT LIKE '🤖 Quiz:%'
                AND l.deleted_at IS NULL
-             ORDER BY l.unit_id, l.order_number ASC",
+             ORDER BY l.order_number ASC",
             $student->student_id, $course_id
         ));
         if (empty($lessons)) return 0;
@@ -2769,6 +2907,67 @@ function mttiToggleFullscreen(btn){
             $course_id
         ));
         return $cache[$course_id] = $exists;
+    }
+
+    /**
+     * Short, punchy encouragement line tied to a completion percentage —
+     * turns a progress bar from a flat status indicator into something that
+     * actually talks back to the learner, to nudge returning/continuing.
+     */
+    private function progress_encouragement_message($pct) {
+        $pct = (int) $pct;
+        if ($pct >= 100) return "Course complete — amazing work! 🎉";
+        if ($pct >= 75)  return "So close! Finish strong 🏁";
+        if ($pct >= 50)  return "Halfway there — don't stop now! ⭐";
+        if ($pct >= 25)  return "You're building real momentum 🔥";
+        if ($pct > 0)    return "Great start — keep it going! 💪";
+        return "Let's get started! 🚀";
+    }
+
+    /**
+     * Installment-payment lesson gate — ONLINE enrollments only (physical
+     * students are unaffected: a no-op there). A lesson at position k of N
+     * (by the same course-wide order_number sequence prerequisite_satisfied()
+     * uses) unlocks once the percent of the course fee paid so far reaches
+     * k/N — e.g. 50% paid unlocks roughly the first half of the lessons.
+     * Fails open (unlocked) on missing enrollment/balance data or a course
+     * with no published lessons, mirroring prerequisite_satisfied()'s stance.
+     */
+    private function lesson_unlocked_by_payment($course_id, $order_number, $student_id) {
+        static $cache = array();
+        $course_id = (int) $course_id;
+        $student_id = (int) $student_id;
+        $key = $course_id . ':' . $student_id;
+        if (!isset($cache[$key])) {
+            global $wpdb;
+            $enrollment = $wpdb->get_row($wpdb->prepare(
+                "SELECT e.delivery_mode, sb.total_fee, sb.balance
+                 FROM {$wpdb->prefix}mtti_enrollments e
+                 LEFT JOIN {$wpdb->prefix}mtti_student_balances sb ON sb.enrollment_id = e.enrollment_id
+                 WHERE e.course_id = %d AND e.student_id = %d
+                 ORDER BY e.enrollment_id DESC LIMIT 1",
+                $course_id, $student_id
+            ));
+            if (!$enrollment || $enrollment->delivery_mode !== 'online' || !$enrollment->total_fee) {
+                $cache[$key] = array('applies' => false); // physical students / no balance row: no-op
+            } else {
+                $percent_paid = max(0, min(100, (($enrollment->total_fee - $enrollment->balance) / $enrollment->total_fee) * 100));
+                $total_lessons = (int) $wpdb->get_var($wpdb->prepare(
+                    "SELECT COUNT(*) FROM {$wpdb->prefix}mtti_lessons WHERE course_id = %d AND status = 'Published' AND deleted_at IS NULL",
+                    $course_id
+                ));
+                $cache[$key] = array('applies' => true, 'percent_paid' => $percent_paid, 'total_lessons' => $total_lessons);
+            }
+        }
+        $c = $cache[$key];
+        if (!$c['applies'] || $c['total_lessons'] <= 0) return true;
+
+        global $wpdb;
+        $lessons_before_or_at = (int) $wpdb->get_var($wpdb->prepare(
+            "SELECT COUNT(*) FROM {$wpdb->prefix}mtti_lessons WHERE course_id = %d AND status = 'Published' AND deleted_at IS NULL AND order_number <= %d",
+            $course_id, $order_number
+        ));
+        return (($lessons_before_or_at / $c['total_lessons']) * 100) <= $c['percent_paid'];
     }
 
     /**
@@ -2911,7 +3110,7 @@ function mttiToggleFullscreen(btn){
              WHERE l.course_id = %d AND l.status = 'Published'
                AND l.title NOT LIKE '🤖 Quiz:%'
                AND l.deleted_at IS NULL
-             ORDER BY l.unit_id, l.order_number ASC",
+             ORDER BY l.order_number ASC",
             $student->student_id, $course_id
         ));
 
@@ -2970,6 +3169,9 @@ function mttiToggleFullscreen(btn){
         echo '<h3>' . esc_html($course->course_name ?? '') . '</h3>';
         echo '<div class="mtti-progress-bar"><div class="mtti-progress-fill" style="width:' . intval($pct) . '%;"></div></div>';
         echo '<span class="mtti-player-progress-label">' . intval($viewed) . ' of ' . intval($total) . ' lessons complete (' . intval($pct) . '%)</span>';
+        if ($total > 0) {
+            echo '<span class="mtti-player-progress-encourage">' . esc_html($this->progress_encouragement_message($pct)) . '</span>';
+        }
         echo '</div>';
 
         foreach ($by_unit as $unit) {
@@ -3080,6 +3282,19 @@ function mttiToggleFullscreen(btn){
                 $is_released = false;
                 $locked_message = "Complete the previous step in this course first to unlock this one.";
             }
+        }
+
+        // Third, independent gate: for online (installment-eligible)
+        // enrollments only, lesson content unlocks progressively as more of
+        // the course fee gets paid off — a no-op for physical students.
+        if ($is_released && !$this->lesson_unlocked_by_payment($lesson->course_id, $lesson->order_number, $student->student_id)) {
+            echo '<div class="mtti-empty-state">';
+            echo '<h3>🔒 Payment Required</h3>';
+            echo '<p style="color:var(--text-3);font-size:15px;">This lesson unlocks as you pay down your course balance. Make a payment to continue.</p>';
+            $payments_url = add_query_arg(array('portal_tab' => 'payments'), get_permalink());
+            echo '<a href="' . esc_url($payments_url) . '" class="mtti-btn mtti-btn-primary" style="text-decoration:none;display:inline-block;margin-top:16px;">💳 Go to Payments</a>';
+            echo '</div>';
+            return;
         }
 
         if (!$is_released) {
@@ -3203,14 +3418,26 @@ function mttiToggleFullscreen(btn){
             echo '<button type="button" onclick="mttiToggleFullscreen(this)" class="mtti-player-fullscreen-link">⛶ Full screen</button>';
             echo $this->embed_video_player($lesson->content_url);
             echo '</div>';
+        } elseif ($lesson->content_type == 'video' && !$lesson->content_url && $lesson->content === 'NO_VIDEO_NEEDED') {
+            // Topics where the interactive Practical below (a real hands-on
+            // tool simulator, not a click-a-quiz-answer page) already IS the
+            // teaching method — a passive video would add less than the
+            // student actually doing it themselves, so this is a deliberate
+            // choice, not a content gap. Framed as such to avoid reading as
+            // an unfinished course.
+            echo '<div class="mtti-video-coming-soon mtti-video-learn-by-doing">';
+            echo '<span class="mtti-video-coming-soon-icon">⚡</span>';
+            echo '<h3>Learn by Doing</h3>';
+            echo '<p>This topic is best learned hands-on rather than by watching. Head straight to the <strong>Practical</strong> below, where you\'ll actually use the tool yourself — that\'s the real lesson here.</p>';
+            echo '</div>';
         } elseif ($lesson->content_type == 'video' && !$lesson->content_url) {
             // Reserved video slot with nothing uploaded yet — visible so the
             // sequence structure is clear, but opening it still records a
             // view (below) so it never blocks the next step.
             echo '<div class="mtti-video-coming-soon">';
             echo '<span class="mtti-video-coming-soon-icon">🎬</span>';
-            echo '<h3>Video Coming Soon</h3>';
-            echo '<p>This lesson\'s video is being produced — check back soon. You can continue to the next step below in the meantime.</p>';
+            echo '<h3>Video Walkthrough Coming Soon</h3>';
+            echo '<p>We\'re producing a video demonstration for this topic. In the meantime, the <strong>Lesson</strong> and <strong>Practical</strong> below already cover everything you need to complete this topic and pass the quiz — you\'re not missing anything by continuing now.</p>';
             echo '</div>';
         }
 

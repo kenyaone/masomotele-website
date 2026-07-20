@@ -9,6 +9,8 @@ if (!defined('ABSPATH')) {
     exit;
 }
 
+require_once plugin_dir_path(__FILE__) . '../includes/class-mtti-mis-quiz-grader.php';
+
 if (!class_exists('MTTI_MIS_Learner_Portal')) {
 
 class MTTI_MIS_Learner_Portal {
@@ -2781,7 +2783,7 @@ function mttiToggleFullscreen(btn){
         global $wpdb;
         if ($interactive_role === 'quiz') {
             return (bool) $wpdb->get_var($wpdb->prepare(
-                "SELECT 1 FROM {$wpdb->prefix}mtti_quiz_attempts WHERE lesson_id = %d AND student_id = %d LIMIT 1",
+                "SELECT 1 FROM {$wpdb->prefix}mtti_quiz_attempts WHERE lesson_id = %d AND student_id = %d AND passed = 1 LIMIT 1",
                 $lesson_id, $student_id
             ));
         }
@@ -4854,6 +4856,14 @@ function mttiSubmitAttCode(nonce) {
             wp_send_json_error('Quiz not found');
         }
 
+        // Server-side max_attempts enforcement — the UI already hides "Start
+        // Quiz" once max_attempts is reached, but that's client-side only;
+        // without this check a student can still POST directly to this
+        // action and start another attempt past the limit.
+        if (!MTTI_MIS_Quiz_Grader::can_retake($quiz_id, get_current_user_id())) {
+            wp_send_json_error('Maximum attempts reached for this quiz');
+        }
+
         // Get questions without answer keys
         $questions = $wpdb->get_results($wpdb->prepare("
             SELECT question_id, quiz_id, question_text, question_type, options, points, order_number, explanation
@@ -4980,39 +4990,36 @@ function mttiSubmitAttCode(nonce) {
 
         // If passed and is_final, auto-complete unit
         if ($passed && $quiz->is_final && $quiz->unit_id) {
-            $wpdb->insert(
-                $wpdb->prefix . 'mtti_unit_results',
-                array(
-                    'unit_id'    => $quiz->unit_id,
-                    'student_id' => $student->ID,
-                    'score'      => $earned_points,
-                    'percentage' => $percentage,
-                    'grade'      => ($percentage >= 80) ? 'A' : (($percentage >= 70) ? 'B' : (($percentage >= 60) ? 'C' : 'D')),
-                    'passed'     => 1,
-                    'remarks'    => 'Auto-graded from quiz: ' . $quiz->title,
-                ),
-                array('%d', '%d', '%f', '%f', '%s', '%d', '%s'),
-                array(
-                    'unit_id, student_id' => array('values' => array($quiz->unit_id, $student->ID), 'compare' => '=', 'type' => 'AND'),
-                ),
-                false
-            );
-
-            // Use proper UPSERT for unit_results
-            $wpdb->query($wpdb->prepare("
-                INSERT INTO {$wpdb->prefix}mtti_unit_results (unit_id, student_id, score, percentage, grade, passed, remarks)
-                VALUES (%d, %d, %f, %f, %s, %d, %s)
-                ON DUPLICATE KEY UPDATE
-                score = VALUES(score),
-                percentage = VALUES(percentage),
-                grade = VALUES(grade),
-                passed = VALUES(passed),
-                remarks = VALUES(remarks)
-            ", $quiz->unit_id, $student->ID, $earned_points, $percentage,
-                ($percentage >= 80) ? 'A' : (($percentage >= 70) ? 'B' : (($percentage >= 60) ? 'C' : 'D')),
-                1,
-                'Auto-graded from quiz: ' . $quiz->title
+            // Never silently overwrite a teacher-entered mark, same guard as
+            // mtti_mis_maybe_complete_unit() in mtti-mis.php: only auto-write
+            // when there's no existing score, or the existing score was
+            // itself written by an auto path (this one, or the online-quiz
+            // one) — a manual mark stays authoritative regardless of what
+            // this student does in a structured quiz afterward.
+            $existing = $wpdb->get_row($wpdb->prepare(
+                "SELECT score, remarks FROM {$wpdb->prefix}mtti_unit_results WHERE unit_id = %d AND student_id = %d",
+                $quiz->unit_id, $student->ID
             ));
+            $is_manual_mark = ($existing !== null && $existing->score !== null
+                && $existing->remarks !== 'Auto-completed from online course activity'
+                && strpos((string) $existing->remarks, 'Auto-graded from quiz:') !== 0);
+
+            if (!$is_manual_mark) {
+                $wpdb->query($wpdb->prepare("
+                    INSERT INTO {$wpdb->prefix}mtti_unit_results (unit_id, student_id, score, percentage, grade, passed, remarks)
+                    VALUES (%d, %d, %f, %f, %s, %d, %s)
+                    ON DUPLICATE KEY UPDATE
+                    score = VALUES(score),
+                    percentage = VALUES(percentage),
+                    grade = VALUES(grade),
+                    passed = VALUES(passed),
+                    remarks = VALUES(remarks)
+                ", $quiz->unit_id, $student->ID, $earned_points, $percentage,
+                    ($percentage >= 80) ? 'A' : (($percentage >= 70) ? 'B' : (($percentage >= 60) ? 'C' : 'D')),
+                    1,
+                    'Auto-graded from quiz: ' . $quiz->title
+                ));
+            }
         }
 
         // Clean up attempt token

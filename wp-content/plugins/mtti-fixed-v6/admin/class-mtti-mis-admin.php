@@ -15,6 +15,8 @@ class MTTI_MIS_Admin {
         
         // Register AJAX handlers early (before page loads)
         add_action('wp_ajax_get_student_fee_info', array($this, 'ajax_get_student_fee_info'));
+        add_action('wp_ajax_mtti_online_student_activity', array($this, 'ajax_online_student_activity'));
+        add_action('wp_ajax_mtti_portal_access_activity', array($this, 'ajax_portal_access_activity'));
 
         // Self-heal caps on every admin page load — survives reactivation and role permission saves
         add_action('admin_init', array($this, 'ensure_required_caps'));
@@ -407,6 +409,28 @@ class MTTI_MIS_Admin {
             array($this, 'display_students')
         );
 
+        // Online Students submenu — read-only oversight view (payment status,
+        // lesson progress, last activity) for delivery_mode='online' enrollments
+        add_submenu_page(
+            'mtti-mis',
+            'Online Students',
+            '💻 Online Students',
+            'manage_students',
+            'mtti-mis-online-students',
+            array($this, 'display_online_students')
+        );
+
+        // Portal Access submenu — every student's portal login activity,
+        // all delivery modes (see class-mtti-mis-admin-portal-access.php)
+        add_submenu_page(
+            'mtti-mis',
+            'Portal Access',
+            '🔑 Portal Access',
+            'manage_students',
+            'mtti-mis-portal-access',
+            array($this, 'display_portal_access')
+        );
+
         // Staff / Teachers submenu
         add_submenu_page(
             'mtti-mis',
@@ -662,6 +686,39 @@ class MTTI_MIS_Admin {
         require_once MTTI_MIS_PLUGIN_DIR . 'admin/class-mtti-mis-admin-course-income-report.php';
         $report = new MTTI_MIS_Admin_Course_Income_Report($this->plugin_name, $this->version);
         $report->display();
+    }
+
+    public function display_online_students() {
+        require_once MTTI_MIS_PLUGIN_DIR . 'admin/class-mtti-mis-admin-online-students.php';
+        $online_students = new MTTI_MIS_Admin_Online_Students($this->plugin_name, $this->version);
+        $online_students->display();
+    }
+
+    /**
+     * AJAX passthrough — the "Details" drill-down on the Online Students
+     * page needs this hooked up before that page's class is ever loaded
+     * (this constructor runs on every admin request, including admin-ajax.php).
+     */
+    public function ajax_online_student_activity() {
+        require_once MTTI_MIS_PLUGIN_DIR . 'admin/class-mtti-mis-admin-online-students.php';
+        $online_students = new MTTI_MIS_Admin_Online_Students($this->plugin_name, $this->version);
+        $online_students->ajax_get_activity();
+    }
+
+    /**
+     * AJAX passthrough for the Portal Access "Details" drill-down — same
+     * reasoning as ajax_online_student_activity() above.
+     */
+    public function ajax_portal_access_activity() {
+        require_once MTTI_MIS_PLUGIN_DIR . 'admin/class-mtti-mis-admin-portal-access.php';
+        $portal_access = new MTTI_MIS_Admin_Portal_Access($this->plugin_name, $this->version);
+        $portal_access->ajax_get_activity();
+    }
+
+    public function display_portal_access() {
+        require_once MTTI_MIS_PLUGIN_DIR . 'admin/class-mtti-mis-admin-portal-access.php';
+        $portal_access = new MTTI_MIS_Admin_Portal_Access($this->plugin_name, $this->version);
+        $portal_access->display();
     }
 
     public function display_assets() {
@@ -2136,6 +2193,50 @@ class MTTI_MIS_Admin {
      * Auto-crop whitespace/transparent borders from an uploaded image using GD.
      * Returns raw PNG bytes of the cropped result (falls back to original on failure).
      */
+    /**
+     * Makes the background transparent in place, per-pixel — a stamp or
+     * signature upload here is typically a phone photo of ink on paper,
+     * which has uneven lighting (vignette/shadow) rather than one flat
+     * background color, so a single sampled reference color doesn't hold
+     * across the whole image. Instead this classifies each pixel by how
+     * colorful it is (chroma) and how bright it is: paper stays low-chroma
+     * (grayish, whatever the local exposure) and reasonably bright, while
+     * ink is either saturated (colored stamps/signatures) or, if achromatic
+     * black ink, still dark — so "low chroma AND bright" is safe to key out
+     * without touching dark ink. A soft band between the two avoids a hard
+     * cutout edge around each stroke.
+     */
+    private function remove_flat_background($img, $w, $h) {
+        imagealphablending($img, false);
+        for ($y = 0; $y < $h; $y++) {
+            for ($x = 0; $x < $w; $x++) {
+                $rgba = imagecolorat($img, $x, $y);
+                $a = ($rgba >> 24) & 0x7F;
+                if ($a >= 100) continue; // already mostly transparent
+
+                $r = ($rgba >> 16) & 0xFF;
+                $g = ($rgba >> 8) & 0xFF;
+                $b = $rgba & 0xFF;
+                $chroma     = max($r, $g, $b) - min($r, $g, $b);
+                $brightness = ( $r + $g + $b ) / 3;
+
+                if ($chroma <= 20 && $brightness >= 90) {
+                    $new_alpha = 127;
+                } elseif ($chroma <= 45 && $brightness >= 55) {
+                    $t_chroma     = max( 0, min( 1, ( $chroma - 20 ) / 25 ) );
+                    $t_brightness = max( 0, min( 1, ( 90 - $brightness ) / 35 ) );
+                    $t = max( $t_chroma, $t_brightness );
+                    $new_alpha = (int) round( 127 * ( 1 - $t ) );
+                } else {
+                    continue;
+                }
+
+                imagesetpixel( $img, $x, $y, imagecolorallocatealpha( $img, $r, $g, $b, $new_alpha ) );
+            }
+        }
+        imagealphablending($img, true);
+    }
+
     private function trim_image_whitespace($raw_data) {
         if (!function_exists('imagecreatefromstring') || !function_exists('imagepng')) {
             return $raw_data;
@@ -2157,47 +2258,42 @@ class MTTI_MIS_Admin {
         imagecopy($img, $src, 0, 0, 0, 0, $w, $h);
         imagedestroy($src);
 
-        // Use imagecropauto if available (PHP 5.5+)
-        if (function_exists('imagecropauto')) {
-            $cropped = @imagecropauto($img, IMG_CROP_DEFAULT, 0.05);
-            if ($cropped !== false && imagesx($cropped) > 5 && imagesy($cropped) > 5) {
-                imagedestroy($img);
-                $img = $cropped;
-            }
-        } else {
-            // Manual bounding-box crop: find first/last non-white non-transparent row/column
-            $w2 = imagesx($img);
-            $h2 = imagesy($img);
-            $top = $h2; $bottom = 0; $left = $w2; $right = 0;
-            for ($y = 0; $y < $h2; $y++) {
-                for ($x = 0; $x < $w2; $x++) {
-                    $rgba = imagecolorat($img, $x, $y);
-                    $a = ($rgba >> 24) & 0x7F;
-                    $r = ($rgba >> 16) & 0xFF;
-                    $g = ($rgba >>  8) & 0xFF;
-                    $b = $rgba & 0xFF;
-                    if ($a < 100 && !($r > 245 && $g > 245 && $b > 245)) {
-                        if ($y < $top)    $top    = $y;
-                        if ($y > $bottom) $bottom = $y;
-                        if ($x < $left)   $left   = $x;
-                        if ($x > $right)  $right  = $x;
-                    }
+        // Chroma-key the background to transparent before cropping, so a
+        // scanned/photographed stamp or signature (typically on plain
+        // white or off-white paper) prints cleanly over the document
+        // instead of sitting in a white box.
+        $this->remove_flat_background($img, $w, $h);
+
+        // Bounding-box crop to the non-transparent content. Deliberately
+        // not using imagecropauto() here — on this GD build it silently
+        // discards the chroma-keyed alpha channel and hands back a
+        // byte-for-byte copy of the pre-edit image instead of cropping it.
+        $top = $h; $bottom = 0; $left = $w; $right = 0;
+        for ($y = 0; $y < $h; $y++) {
+            for ($x = 0; $x < $w; $x++) {
+                $rgba = imagecolorat($img, $x, $y);
+                $a = ($rgba >> 24) & 0x7F;
+                if ($a < 100) {
+                    if ($y < $top)    $top    = $y;
+                    if ($y > $bottom) $bottom = $y;
+                    if ($x < $left)   $left   = $x;
+                    if ($x > $right)  $right  = $x;
                 }
             }
-            if ($bottom > $top && $right > $left) {
-                $pad    = 4;
-                $cx     = max(0, $left - $pad);
-                $cy     = max(0, $top  - $pad);
-                $cw     = min($w2, $right  + $pad + 1) - $cx;
-                $ch     = min($h2, $bottom + $pad + 1) - $cy;
-                $canvas = imagecreatetruecolor($cw, $ch);
-                imagealphablending($canvas, false);
-                imagesavealpha($canvas, true);
-                imagefilledrectangle($canvas, 0, 0, $cw, $ch, imagecolorallocatealpha($canvas, 255, 255, 255, 127));
-                imagecopy($canvas, $img, 0, 0, $cx, $cy, $cw, $ch);
-                imagedestroy($img);
-                $img = $canvas;
-            }
+        }
+        if ($bottom > $top && $right > $left) {
+            $pad    = 4;
+            $cx     = max(0, $left - $pad);
+            $cy     = max(0, $top  - $pad);
+            $cw     = min($w, $right  + $pad + 1) - $cx;
+            $ch     = min($h, $bottom + $pad + 1) - $cy;
+            $canvas = imagecreatetruecolor($cw, $ch);
+            imagealphablending($canvas, false);
+            imagesavealpha($canvas, true);
+            imagefilledrectangle($canvas, 0, 0, $cw, $ch, imagecolorallocatealpha($canvas, 255, 255, 255, 127));
+            imagecopy($canvas, $img, 0, 0, $cx, $cy, $cw, $ch);
+            imagedestroy($img);
+            $img = $canvas;
         }
 
         ob_start();

@@ -456,6 +456,47 @@ function mtti_mis_output_transcript($student_id) {
     </div></body></html><?php exit;
 }
 
+/**
+ * Renders the "Principal/Director" signature slot on transcripts and
+ * certificates — the real uploaded signature image (background already
+ * made transparent at upload time, see MTTI_MIS_Admin::remove_flat_background())
+ * if one exists, otherwise the same blank signature-line every other
+ * signatory on the document falls back to.
+ */
+function mtti_mis_signature_html($label) {
+    $sig_b64 = get_option('mtti_admission_signature_b64', '');
+    ob_start(); ?>
+    <div class="signature">
+        <?php if ($sig_b64): ?>
+        <img src="<?php echo esc_attr($sig_b64); ?>" style="display:block;max-width:120px;max-height:45px;width:auto;height:auto;margin:0 auto 4px;" alt="Signature">
+        <?php else: ?>
+        <div class="signature-line"></div>
+        <?php endif; ?>
+        <p class="signature-title"><?php echo esc_html($label); ?></p>
+    </div>
+    <?php return ob_get_clean();
+}
+
+/**
+ * Renders the official stamp slot with today's date automatically
+ * overlaid — like a real ink date-stamp, it always shows the date the
+ * document was generated/printed, not a date baked into the uploaded
+ * image. Returns '' (renders nothing) if no stamp has been uploaded.
+ */
+function mtti_mis_stamp_html() {
+    $stamp_b64 = get_option('mtti_admission_stamp_b64', '');
+    if (!$stamp_b64) return '';
+    ob_start(); ?>
+    <div class="signature">
+        <div style="position:relative;display:inline-block;">
+            <img src="<?php echo esc_attr($stamp_b64); ?>" style="display:block;max-width:70px;max-height:70px;width:auto;height:auto;margin:0 auto 4px;" alt="Official Stamp">
+            <span style="position:absolute;left:50%;top:56%;transform:translate(-50%,-50%) rotate(-10deg);font-size:7px;font-weight:bold;color:#8a1f1f;letter-spacing:.3px;white-space:nowrap;text-shadow:0 0 2px #fff,0 0 2px #fff,0 0 2px #fff;"><?php echo esc_html(date('d/m/Y')); ?></span>
+        </div>
+        <p class="signature-title">Official Stamp</p>
+    </div>
+    <?php return ob_get_clean();
+}
+
 function mtti_mis_output_unit_transcript($unit_id, $student_id, $back_url = null) {
     global $wpdb;
     $students_table = $wpdb->prefix . 'mtti_students';
@@ -476,11 +517,6 @@ function mtti_mis_output_unit_transcript($unit_id, $student_id, $back_url = null
     ));
     if (!$result) { wp_die('Unit result not found'); }
     $logo_url = MTTI_MIS_PLUGIN_URL . 'assets/images/logo.jpeg';
-    // Same real signature/stamp already used on the admission-letter PDF
-    // (uploaded once via admin settings, stored as base64 in these two
-    // options) — not a generic placeholder image.
-    $sig_b64   = get_option('mtti_admission_signature_b64', '');
-    $stamp_b64 = get_option('mtti_admission_stamp_b64', '');
     $transcript_number = 'MTTI/TR/' . date('Y') . '/' . str_pad($unit_id, 4, '0', STR_PAD_LEFT) . '/' . str_pad($student_id, 4, '0', STR_PAD_LEFT);
     $pct = isset($result->percentage) ? floatval($result->percentage) : 0;
     $grade_category = 'REFER'; $category_color = '#D32F2F';
@@ -510,21 +546,9 @@ function mtti_mis_output_unit_transcript($unit_id, $student_id, $back_url = null
         </div>
         <div class="spacer"></div>
         <div class="signatures">
-            <div class="signature">
-                <?php if ($sig_b64): ?>
-                <img src="<?php echo esc_attr($sig_b64); ?>" style="display:block;max-width:120px;max-height:45px;width:auto;height:auto;margin:0 auto 4px;" alt="Signature">
-                <?php else: ?>
-                <div class="signature-line"></div>
-                <?php endif; ?>
-                <p class="signature-title">Principal/Director</p>
-            </div>
+            <?php echo mtti_mis_signature_html('Principal/Director'); ?>
             <div class="signature"><div class="signature-line"></div><p class="signature-title">Registrar</p></div>
-            <div class="signature">
-                <?php if ($stamp_b64): ?>
-                <img src="<?php echo esc_attr($stamp_b64); ?>" style="display:block;max-width:70px;max-height:70px;width:auto;height:auto;margin:0 auto 4px;" alt="Official Stamp">
-                <p class="signature-title">Official Stamp</p>
-                <?php endif; ?>
-            </div>
+            <?php echo mtti_mis_stamp_html(); ?>
         </div>
         <p class="motto">"Start Learning, Start Earning"</p>
         <div class="footer"><p>Ref: <?php echo esc_html($transcript_number); ?> | Generated: <?php echo date('F j, Y'); ?></p></div>
@@ -1093,7 +1117,7 @@ function mtti_mis_output_certificate() {
     $wpdb->insert($cert_table, array('certificate_number' => $cert_number, 'verification_code' => $verification_code, 'student_id' => $student->student_id, 'student_name' => $student->display_name, 'admission_number' => $student->admission_number, 'course_id' => $course->course_id, 'course_name' => $course->course_name, 'course_code' => $course->course_code, 'grade' => $grade, 'completion_date' => $completion_date, 'issue_date' => current_time('mysql'), 'status' => 'Valid', 'created_at' => current_time('mysql')));
     $logo_url = MTTI_MIS_PLUGIN_URL . 'assets/images/logo.jpeg';
     ?><!DOCTYPE html><html lang="en"><head><meta charset="UTF-8"><title>Certificate - <?php echo esc_html($student->display_name); ?></title>
-    <style>* { margin:0;padding:0;box-sizing:border-box; } @page{size:A4 landscape;margin:0;} @media print{html,body{margin:0;padding:0;width:297mm;height:210mm;}.no-print{display:none!important;}.certificate-wrapper{padding:5mm;width:297mm;height:210mm;}.certificate{height:calc(210mm - 10mm);}} body{font-family:Georgia,serif;background:#f0f0f0;padding:15px;-webkit-print-color-adjust:exact;print-color-adjust:exact;} .certificate-wrapper{width:297mm;height:210mm;max-width:100%;margin:0 auto;background:white;padding:5mm;} .certificate{background:white;border:12px solid #2E7D32;padding:10px;text-align:center;height:100%;display:flex;flex-direction:column;} .inner-border{border:2px solid #FF9800;padding:20px 40px;flex:1;display:flex;flex-direction:column;justify-content:center;align-items:center;} .logo{width:70px;margin-bottom:10px;} h1{color:#2E7D32;font-size:28px;margin:8px 0;} .cert-title{font-size:22px;color:#2E7D32;margin:15px 0;text-transform:uppercase;letter-spacing:3px;font-weight:bold;} .student-name{font-size:36px;color:#1976D2;margin:10px 0;font-weight:bold;border-bottom:2px solid #FF9800;display:inline-block;padding-bottom:5px;} .course-name{font-size:24px;color:#2E7D32;margin:8px 0;font-weight:bold;} .details{font-size:14px;color:#333;margin:15px 0;line-height:1.6;} .details strong{color:#FF9800;} .signatures{display:flex;justify-content:center;gap:120px;margin:20px 0;} .signature{text-align:center;} .signature-line{border-top:1px solid #333;width:150px;margin:0 auto 5px auto;} .signature-title{font-size:12px;color:#666;} .motto{color:#FF9800;font-style:italic;font-size:14px;margin:15px 0;font-weight:bold;} .cert-footer{display:flex;justify-content:space-between;align-items:center;font-size:10px;color:#666;padding-top:10px;border-top:1px solid #ddd;margin-top:10px;width:100%;} .print-btn{position:fixed;top:10px;right:10px;padding:10px 20px;background:#2E7D32;color:white;border:none;border-radius:4px;cursor:pointer;font-size:14px;} .print-instructions{background:#fff3cd;border:1px solid #ffc107;border-radius:8px;padding:12px 20px;margin:0 auto 15px auto;max-width:297mm;text-align:center;font-family:Arial,sans-serif;font-size:14px;}</style>
+    <style>* { margin:0;padding:0;box-sizing:border-box; } @page{size:A4 landscape;margin:0;} @media print{html,body{margin:0;padding:0;width:297mm;height:210mm;}.no-print{display:none!important;}.certificate-wrapper{padding:5mm;width:297mm;height:210mm;}.certificate{height:calc(210mm - 10mm);}} body{font-family:Georgia,serif;background:#f0f0f0;padding:15px;-webkit-print-color-adjust:exact;print-color-adjust:exact;} .certificate-wrapper{width:297mm;height:210mm;max-width:100%;margin:0 auto;background:white;padding:5mm;overflow:hidden;} .certificate{background:white;border:12px solid #2E7D32;padding:10px;text-align:center;height:100%;display:flex;flex-direction:column;} .inner-border{border:2px solid #FF9800;padding:10px 40px;flex:1;display:flex;flex-direction:column;justify-content:center;align-items:center;} .logo{width:70px;margin-bottom:8px;} h1{color:#2E7D32;font-size:28px;margin:4px 0;} .cert-title{font-size:22px;color:#2E7D32;margin:8px 0;text-transform:uppercase;letter-spacing:3px;font-weight:bold;} .student-name{font-size:36px;color:#1976D2;margin:8px 0;font-weight:bold;border-bottom:2px solid #FF9800;display:inline-block;padding-bottom:5px;} .course-name{font-size:24px;color:#2E7D32;margin:6px 0;font-weight:bold;} .details{font-size:14px;color:#333;margin:10px 0;line-height:1.4;} .details strong{color:#FF9800;} .signatures{display:flex;justify-content:center;align-items:flex-end;gap:120px;margin:10px 0;} .signature{text-align:center;} .signature-line{border-top:1px solid #333;width:150px;margin:0 auto 5px auto;} .signature-title{font-size:12px;color:#666;} .motto{color:#FF9800;font-style:italic;font-size:14px;margin:8px 0;font-weight:bold;} .cert-footer{display:flex;justify-content:space-between;align-items:center;font-size:10px;color:#666;padding-top:8px;border-top:1px solid #ddd;margin-top:6px;width:100%;} .print-btn{position:fixed;top:10px;right:10px;padding:10px 20px;background:#2E7D32;color:white;border:none;border-radius:4px;cursor:pointer;font-size:14px;} .print-instructions{background:#fff3cd;border:1px solid #ffc107;border-radius:8px;padding:12px 20px;margin:0 auto 15px auto;max-width:297mm;text-align:center;font-family:Arial,sans-serif;font-size:14px;}</style>
     </head><body>
     <button class="print-btn no-print" onclick="window.print()">🖨️ Print</button>
     <div class="print-instructions no-print"><strong>⚠️ IMPORTANT:</strong> When printing, select <strong>LANDSCAPE</strong> orientation and margins <strong>None</strong>.</div>
@@ -1109,7 +1133,7 @@ function mtti_mis_output_certificate() {
         <div class="course-name"><?php echo esc_html($course->course_name); ?></div>
         <p style="font-size:14px;color:#666;margin:5px 0 12px 0;">(<?php echo esc_html($course->course_code); ?>)</p>
         <div class="details">Grade Achieved: <strong><?php echo esc_html($grade); ?></strong> &nbsp;|&nbsp; Date of Completion: <strong><?php echo date('F j, Y', strtotime($completion_date)); ?></strong></div>
-        <div class="signatures"><div class="signature"><div class="signature-line"></div><p class="signature-title">Director</p></div><div class="signature"><div class="signature-line"></div><p class="signature-title">Registrar</p></div></div>
+        <div class="signatures"><?php echo mtti_mis_signature_html('Director'); ?><div class="signature"><div class="signature-line"></div><p class="signature-title">Registrar</p></div><?php echo mtti_mis_stamp_html(); ?></div>
         <p class="motto">"Start Learning, Start Earning"</p>
         <div class="cert-footer"><div><strong>Certificate No:</strong> <?php echo esc_html($cert_number); ?></div><div><strong>Verification Code:</strong> <?php echo esc_html($verification_code); ?></div><div><strong>Date Issued:</strong> <?php echo date('F j, Y'); ?></div></div>
     </div></div></div></body></html><?php exit;
@@ -1195,7 +1219,7 @@ function mtti_mis_output_bulk_transcripts($items_string) {
             <div class="grade-box" style="border-color:<?php echo $grade_color; ?>;"><div style="font-size:9px;color:#666;text-transform:uppercase;letter-spacing:1px;">Final Grade</div><div class="grade-value" style="color:<?php echo $grade_color; ?>;"><?php echo esc_html($result->grade); ?></div><div class="status-badge <?php echo $result->passed ? 'status-passed' : 'status-failed'; ?>"><?php echo $result->passed ? '✓ PASSED' : '✗ NOT PASSED'; ?></div></div>
             <div class="section"><div class="info-row"><span class="info-label">Assessment Date:</span><span><?php echo date('F j, Y', strtotime($result->result_date)); ?></span></div></div>
             <div class="spacer"></div>
-            <div class="signatures"><div class="signature"><div class="signature-line"></div><p class="signature-title">Principal</p></div><div class="signature"><div class="signature-line"></div><p class="signature-title">Registrar</p></div></div>
+            <div class="signatures"><?php echo mtti_mis_signature_html('Principal'); ?><div class="signature"><div class="signature-line"></div><p class="signature-title">Registrar</p></div><?php echo mtti_mis_stamp_html(); ?></div>
             <p class="motto">"Start Learning, Start Earning"</p>
             <div class="footer">Ref: <?php echo esc_html($transcript_number); ?> | Generated: <?php echo date('F j, Y'); ?></div>
         </div></div>
@@ -1240,7 +1264,7 @@ function mtti_mis_output_bulk_certificates($items_string, $completion_date) {
             <p style="font-size:14px;color:#666;margin:10px 0;">has successfully completed the course</p>
             <div class="course-name"><?php echo esc_html($course->course_name); ?></div>
             <div class="details"><p><strong>Adm No:</strong> <?php echo esc_html($student->admission_number); ?> | <strong>Code:</strong> <?php echo esc_html($course->course_code); ?></p><p><strong>Grade:</strong> <span class="grade-highlight"><?php echo esc_html($grade); ?></span> | <strong>Completion:</strong> <?php echo date('F j, Y', strtotime($completion_date)); ?></p></div>
-            <div class="signatures"><div class="signature"><div class="signature-line"></div><p class="signature-title">Principal/Director</p></div><div class="signature"><div class="signature-line"></div><p class="signature-title">Head of Department</p></div></div>
+            <div class="signatures"><?php echo mtti_mis_signature_html('Principal/Director'); ?><div class="signature"><div class="signature-line"></div><p class="signature-title">Head of Department</p></div><?php echo mtti_mis_stamp_html(); ?></div>
             <p class="motto">"Start Learning, Start Earning"</p>
             <div class="cert-footer"><span>Cert No: <?php echo esc_html($cert_number); ?></span><span style="text-align:center;"><img src="<?php echo esc_url($qr_url); ?>" alt="QR" style="width:60px;height:60px;margin-bottom:3px;"><br><span style="font-size:8px;">Scan to Verify</span></span><span>Issued: <?php echo date('F j, Y'); ?></span></div>
         </div></div></div>

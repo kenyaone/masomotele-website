@@ -163,6 +163,34 @@ class MTTI_MIS_Shortcodes {
         return array_map('intval', $ids);
     }
 
+    /**
+     * course_code => slug for the dedicated, SEO-written landing page that
+     * exists for some courses (WordPress pages, not this catalog's own
+     * ?course_id= detail view). Cards for these courses link straight to
+     * the landing page instead of the generic detail view, so the page
+     * actually gets an internal link pointing at it — previously these
+     * pages had good on-page SEO copy but zero crawlable links anywhere on
+     * the site, including from this catalog that's supposed to be their
+     * natural entry point.
+     */
+    private static $landing_pages = array(
+        'HCS-01' => 'certified-nursing-assistant-course-eldoret',
+        'GEA-01' => 'german-language-course-eldoret',
+        'ARI-01' => 'artificial-intelligence-course-eldoret',
+        'CON-01' => 'computer-networking-course-eldoret',
+        'CCI-01' => 'cctv-installation-course-eldoret',
+        'VIE-01' => 'video-editing-course-eldoret',
+        'CYS-01' => 'cybersecurity-course-eldoret',
+        'SMD-01' => 'digital-marketing-course-eldoret',
+        'GRD-01' => 'graphic-design-course-eldoret',
+        'COA-01' => 'computer-applications-course-eldoret',
+        'COE-01' => 'computer-essentials-course-eldoret',
+        'PRP-01' => 'coding-programming-course-eldoret',
+        'WDD-01' => 'web-design-course-eldoret',
+        'MOR-01' => 'mobile-phone-repair-course-eldoret',
+        'CMP-01' => 'computer-repair-course-eldoret',
+    );
+
     private function render_catalog_grid() {
         global $wpdb;
         $courses_table = $wpdb->prefix . 'mtti_courses';
@@ -195,7 +223,9 @@ class MTTI_MIS_Shortcodes {
             <?php else: ?>
             <div class="mtti-course-grid" id="mttiCourseGrid">
                 <?php foreach ($courses as $course):
-                    $detail_url = add_query_arg('course_id', $course->course_id, $current_url);
+                    $detail_url = isset(self::$landing_pages[$course->course_code])
+                        ? home_url('/' . self::$landing_pages[$course->course_code] . '/')
+                        : add_query_arg('course_id', $course->course_id, $current_url);
                     $search_key = strtolower($course->course_name . ' ' . $course->category);
                 ?>
                 <?php list($accent_a, $accent_b) = $this->course_accent($course); ?>

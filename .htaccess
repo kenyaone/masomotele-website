@@ -64,12 +64,16 @@ FileETag None
 </IfModule>
 </FilesMatch>
 # END LBCWpFastestCache
-# DirectoryIndex must be index.php only — Apache picks the index file by path
-# alone, ignoring query strings, so "index.html index.php" here served the
-# static homepage for EVERY request to "/" including "?page_id=X&preview=true",
-# bypassing WordPress entirely. index.php already replicates the fast static
-# homepage serve (readfile of index.html) for the true bare "/" case.
-DirectoryIndex index.php
+# index.php must come FIRST — Apache tries each listed index file in order
+# and uses the first one that exists, so with index.php first it always
+# wins at the root (avoiding the original bug: "index.html index.php" — the
+# static file listed first — served the static homepage for EVERY request
+# to "/" including "?page_id=X&preview=true", bypassing WordPress entirely).
+# index.html is kept as a fallback for directories with no index.php of
+# their own — e.g. /blog/, a static legacy landing page with no index.php,
+# which 403'd once index.php became the *only* candidate (Options -Indexes
+# blocks the directory-listing fallback Apache would otherwise show).
+DirectoryIndex index.php index.html
 
 # Enable mod_rewrite
 <IfModule mod_rewrite.c>

@@ -42,6 +42,7 @@ class MTTI_MIS {
         require_once MTTI_MIS_PLUGIN_DIR . 'public/class-mtti-mis-public-course-checkout.php';
         require_once MTTI_MIS_PLUGIN_DIR . 'public/class-mtti-mis-public-popup.php';
         require_once MTTI_MIS_PLUGIN_DIR . 'public/class-mtti-mis-shortcodes.php';
+        require_once MTTI_MIS_PLUGIN_DIR . 'public/class-mtti-mis-demo-lessons.php';
         if (!class_exists('MTTI_MIS_Learner_Portal')) {
             require_once MTTI_MIS_PLUGIN_DIR . 'public/class-mtti-mis-learner-portal.php';
         }
@@ -70,6 +71,9 @@ class MTTI_MIS {
         // Register shortcodes
         $shortcodes = new MTTI_MIS_Shortcodes();
         $this->loader->add_action('init', $shortcodes, 'register_shortcodes');
+
+        // Public demo-lesson pages (SEO/marketing)
+        new MTTI_MIS_Demo_Lessons();
     }
 
     public function run() {

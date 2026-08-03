@@ -18,7 +18,12 @@ if (!is_array($payload)) fail('bad payload');
 $deviceId = trim((string)($payload['deviceId'] ?? ''));
 if ($deviceId === '') fail('missing device_id');
 
-$m = new mysqli('localhost','uvyzhdzt_mtti','mtti_sync_2026!','uvyzhdzt_mtti');
+// DB credentials live outside public_html so they're never committed.
+// See /home/uvyzhdzt/mtti_db_config.php on the server.
+$cfgPath = '/home/uvyzhdzt/mtti_db_config.php';
+if (!is_file($cfgPath)) fail('db config missing', 500);
+$cfg = require $cfgPath;
+$m = new mysqli($cfg['host'], $cfg['user'], $cfg['pass'], $cfg['db']);
 if ($m->connect_errno) fail('db: '.$m->connect_error, 500);
 $m->set_charset('utf8mb4');
 

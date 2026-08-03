@@ -26,9 +26,15 @@ function county_coords(string $c): ?array {
     return null;
 }
 
-$m=@new mysqli('localhost','uvyzhdzt_mtti','mtti_sync_2026!','uvyzhdzt_mtti');
-$dbError=$m->connect_errno?$m->connect_error:null;
-if(!$dbError)$m->set_charset('utf8mb4');
+// DB credentials in a file outside public_html, never committed.
+$cfgPath='/home/uvyzhdzt/mtti_db_config.php';
+if(!is_file($cfgPath)){$dbError='db config missing';$m=null;}
+else{
+    $cfg=require $cfgPath;
+    $m=@new mysqli($cfg['host'],$cfg['user'],$cfg['pass'],$cfg['db']);
+    $dbError=$m->connect_errno?$m->connect_error:null;
+    if(!$dbError)$m->set_charset('utf8mb4');
+}
 
 function h($s){return htmlspecialchars((string)$s,ENT_QUOTES,'UTF-8');}
 function num($n,$dp=0){return $n===null?'—':number_format((float)$n,$dp);}

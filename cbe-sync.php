@@ -4,7 +4,14 @@
 // Companion map: cbe-locations.php.
 
 declare(strict_types=1);
+
+// CORS — the courier PWA runs on the school box's origin (e.g. http://192.168.0.100)
+// then POSTs here from a phone once it has internet.
+header('Access-Control-Allow-Origin: *');
+header('Access-Control-Allow-Methods: POST, OPTIONS');
+header('Access-Control-Allow-Headers: Content-Type');
 header('Content-Type: application/json');
+if (($_SERVER['REQUEST_METHOD'] ?? '') === 'OPTIONS') { http_response_code(204); exit; }
 
 const CBE_SYNC_SECRET = 'cbe_sync_k3nya_2026';
 

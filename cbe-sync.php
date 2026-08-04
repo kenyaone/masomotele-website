@@ -13,6 +13,10 @@ header('Access-Control-Allow-Headers: Content-Type');
 header('Content-Type: application/json');
 if (($_SERVER['REQUEST_METHOD'] ?? '') === 'OPTIONS') { http_response_code(204); exit; }
 
+// PHP 8.1+ mysqli throws by default; keep return-false semantics so we can
+// surface a proper JSON error instead of an uncaught fatal / empty 500.
+mysqli_report(MYSQLI_REPORT_OFF);
+
 const CBE_SYNC_SECRET = 'cbe_sync_k3nya_2026';
 
 function fail(string $msg, int $code = 400): void {
@@ -40,7 +44,7 @@ if ($m->connect_errno) fail('db: '.$m->connect_error, 500);
 $m->set_charset('utf8mb4');
 
 // One-time bootstrap; noop on subsequent calls.
-$m->query("CREATE TABLE IF NOT EXISTS cbe_devices (
+if (!$m->query("CREATE TABLE IF NOT EXISTS cbe_devices (
     device_id               VARCHAR(64)  NOT NULL PRIMARY KEY,
     school_name             VARCHAR(191) DEFAULT '',
     county                  VARCHAR(64)  DEFAULT '',
@@ -60,7 +64,9 @@ $m->query("CREATE TABLE IF NOT EXISTS cbe_devices (
     last_sync_at            DATETIME     NULL,
     INDEX idx_county (county),
     INDEX idx_last_sync (last_sync_at)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4");
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4")) {
+    fail('table create failed: '.$m->error, 500);
+}
 
 $m->begin_transaction();
 try {
@@ -112,7 +118,8 @@ try {
             last_sync_at            = NOW()
             /* school_name, county, region locked on first sync */'
     );
-    $stmt->bind_param('ssssddiiididisii',
+    // 15 params: 4×s + 2×d + 3×i + 1×d + 2×i + 1×s + 2×i
+    $stmt->bind_param('ssssddiiidiisii',
         $deviceId, $name, $county, $region, $lat, $lng,
         $learners, $lessons, $quizzes, $avgScore,
         $certs, $active30, $appVersion,
